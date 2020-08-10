@@ -59,7 +59,7 @@ case $file in
 
 *.yaml | *.yml)
   output=$(mktemp)
-  yq --yaml-roundtrip . <"$file" >"$output"
+  yq read --prettyPrint "$file" >"$output"
   mv "$output" "$file"
   ;;
 

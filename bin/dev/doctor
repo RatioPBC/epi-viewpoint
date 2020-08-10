@@ -91,6 +91,10 @@ check "npm: packages installed" \
   "npm list --prefix assets --dev" \
   "npm install --prefix assets"
 
+check "yq: correct version is installed" \
+  "yq --version 2>&1 | grep -q 'yq version 3'" \
+  "brew upgrade yq # you may need to uninstall python-yq"
+
 if darwin; then
   check "chromedriver: not quarantined by Mac OS" \
     "test $(xattr "$(command -v chromedriver)" | grep -s -c 'com.apple.quarantine') -eq 0" \
