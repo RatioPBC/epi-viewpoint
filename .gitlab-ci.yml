@@ -6,7 +6,7 @@ variables:
   POSTGRES_DB: epicenter_test
   POSTGRES_HOST: postgres
   POSTGRES_HOST_AUTH_METHOD: trust
-  POSTGRES_PASSWORD: ""
+  POSTGRES_PASSWORD: postgres
   POSTGRES_USER: postgres
 cache:
   key:
