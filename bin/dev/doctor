@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+source "bin/_support/cecho.sh"
+source "bin/_support/check.sh"
+source "bin/_support/step.sh"
+source "bin/_support/os.sh"
+
+testcomm() {
+  result=$(comm -13 /tmp/.envrc-keys /tmp/.envrc-keys.sample)
+  echo "$result"
+
+  test -z "$result"
+}
+
+# run doctor in home directory if present
+if [[ -f "${HOME}/bin/dev/doctor" ]]; then
+  step "Running system doctor" "pushd ${HOME} > /dev/null && ./bin/dev/doctor && popd > /dev/null"
+
+  step_header "Running project doctor steps"
+fi
+
+check "git-duet: installed" \
+  "command -v git-duet" \
+  "open https://github.com/git-duet/git-duet#installation"
+
+check "direnv: installed" \
+  "command -v direnv" \
+  "brew install direnv && echo 'eval \"$(direnv hook bash)\"' >> ~/.bash_profile"
+
+check "direnv: .envrc file exists" \
+  "head .envrc" \
+  "cp .envrc.sample .envrc"
+
+check "direnv: .envrc file has all keys" \
+  "sed -E 's/=.+//' .envrc.sample >/tmp/.envrc-keys.sample && sed -E 's/=.+//' .envrc >/tmp/.envrc-keys && testcomm" \
+  "# copy required keys from .envrc.sample to .envrc and don't forget to run 'direnv allow'"
+
+check "direnv: loaded RC path" \
+  "direnv status | grep -s 'Loaded RC path $(pwd)/.envrc'" \
+  "open https://direnv.net/docs/hook.html"
+
+check "asdf: installed" \
+  "command -v asdf" \
+  "git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8 && echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bash_profile && echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> ~/.bash_profile && asdf update"
+
+check "repo: euclid is installed locally" \
+  "ls ../euclid" \
+  "git clone git@gitlab.com:geometerio/resolve/euclid ../euclid"
+
+check "repo: nys-etl-dashboard is installed locally" \
+  "ls ../nys-etl-dashboard" \
+  "git clone git@gitlab.com:geometerio/resolve/nys-etl-dashboard ../nys-etl-dashboard"
+
+check "asdf: erlang plugin installed" \
+  "asdf plugin-list | grep erlang" \
+  "asdf plugin-add erlang"
+
+check "asdf: elixir plugin installed" \
+  "asdf plugin-list | grep elixir" \
+  "asdf plugin-add elixir"
+
+check "asdf: nodejs plugin exists?" \
+  "asdf plugin-list | grep nodejs" \
+  "asdf plugin-add nodejs && bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring"
+
+check "asdf: tools are installed" \
+  "asdf which erl > /dev/null && asdf which elixir > /dev/null && asdf which node > /dev/null" \
+  "asdf install"
+
+check "elixir: hex installed" \
+  "mix local.hex --if-missing --force" \
+  "mix local.hex --force"
+
+check "elixir: rebar3 installed" \
+  "mix local.rebar --if-missing --force" \
+  "mix local.rebar --force"
+
+check "elixir: authenticated with Hex.pm" \
+  "mix hex.organization list | grep geometer" \
+  "mix hex.organization auth geometer --key \$HEX_GEOMETER_READ_ONLY_KEY"
+
+check "elixir: authenticated with Hex.pm for oban ui" \
+  "mix hex.organization list | grep oban" \
+  "mix hex.organization auth oban --key \$HEX_OBAN_UI_KEY # Grab key from 1Password"
+
+check "elixir: deps installed" \
+  "test $(mix deps | grep -c 'the dependency is not available') -eq 0" \
+  "mix deps.get"
+
+check "npm: packages installed" \
+  "npm list --prefix assets --dev" \
+  "npm install --prefix assets"
+
+if darwin; then
+  check "chromedriver: not quarantined by Mac OS" \
+    "test $(xattr "$(command -v chromedriver)" | grep -s -c 'com.apple.quarantine') -eq 0" \
+    "xattr -d com.apple.quarantine $(command -v chromedriver)"
+else
+  cecho --yellow "[checking] chromedriver: Skipping MacOS-specific check."
+fi
+
+if darwin; then
+  chromedriver_rec="brew cask upgrade chromedriver"
+else
+  chromedriver_rec="Google Chrome and Chromedriver versions must match"
+fi
+
+check "chromedriver: version matches Chrome version" \
+  "bin/_support/doctor/compare-chromedriver-and-chrome-versions.sh" \
+  "$chromedriver_rec"
+
+check "postgres: running" \
+  "psql -l" \
+  "bin/dev/postgres-start"
+
+check "postgres: role exists" \
+  "psql -A -c '\du' postgres | grep 'postgres|'" \
+  "createuser -s postgres -U \$USER"
+
+check "postgres: dev database exists" \
+  "psql -c '\l' epicenter_dev" \
+  "mix ecto.setup"

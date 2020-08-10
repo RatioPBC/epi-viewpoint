@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -e
+
+eval "$(ps -o command | grep '[/]bin/postgres -D' | sed 's/bin\/postgres/bin\/pg_ctl/') stop"

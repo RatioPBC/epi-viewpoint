@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+source "bin/_support/step.sh"
+
+step "Pulling" "git pull --rebase"
+step "Authing for geometer deps" "MIX_QUIET=true mix hex.organization auth geometer --key ${HEX_GEOMETER_READ_ONLY_KEY}"
+step "Authing for oban deps" "MIX_QUIET=true mix hex.organization auth oban --key ${HEX_OBAN_UI_KEY}"
+step "Updating deps" "MIX_QUIET=true mix deps.get"
+step "Running migrations" "MIX_QUIET=true mix ecto.migrate"
+step "Running doctor" "bin/dev/doctor"
+step "Running migrations" "mix ecto.migrate"

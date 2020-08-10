@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+start() {
+  iex -S mix phx.server
+}
+
+case $1 in
+fast | no-doctor)
+  start
+  ;;
+*)
+  source ./bin/dev/doctor
+  start
+  ;;
+esac

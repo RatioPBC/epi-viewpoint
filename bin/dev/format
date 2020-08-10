@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+set -e
+
+file=$1
+
+get_abs_filename() {
+  # $1 : relative filename
+  if [ -d "$(dirname "$1")" ]; then
+    echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+  fi
+}
+
+if [[ -z "$file" ]]; then
+  echo "Usage: $0 <file>"
+  exit 1
+fi
+
+case $file in
+*/project.clj | */seeds.sql | */en.yml | */*.rb | */*.min.js | */rails/app/assets/javascripts/dfp.js)
+  echo "not formatting ${file}"
+  ;;
+
+*.clj | *.cljs | *.cljc | *.edn)
+  output=$(mktemp)
+  zprintm "$zprintm_config" <"$file" >"$output"
+  mv "$output" "$file"
+  ;;
+
+*.sql)
+  if [[ $(get_abs_filename "$file") == *"/migrations/"* ]]; then
+    echo "Not formatting migration file: ${file}"
+  elif command -v pg_format >/dev/null; then
+    # placeholder allows forms like :v*:items and :parameters-containing-dashes (used only in HugSQL)
+    output=$(mktemp)
+    pg_format \
+      --keyword-case 2 \
+      --function-case 2 \
+      --placeholder ":\w+\*?:[\w-]+|:(?:\w*-\w*)+" \
+      "$file" >"$output"
+    mv "$output" "$file"
+  else
+    echo "install pg_format by running 'brew install pgformatter'"
+    exit 1
+  fi
+  ;;
+
+*.js | *.json)
+  if command -v prettier >/dev/null; then
+    output=$(mktemp)
+    assets/node_modules/.bin/prettier --config assets/.prettierrc "$file" >"$output"
+    mv "$output" "$file"
+  else
+    echo "install prettier by running 'npm install --global prettier'"
+    echo "(and maybe run 'asdf reshim' afterwards)"
+    exit 1
+  fi
+  ;;
+
+*.yaml | *.yml)
+  output=$(mktemp)
+  yq --yaml-roundtrip . <"$file" >"$output"
+  mv "$output" "$file"
+  ;;
+
+*.ex | *.exs)
+  mix format "$file"
+  ;;
+
+*.sh | */bin/*)
+  shfmt -i 2 -w "$file"
+  ;;
+esac

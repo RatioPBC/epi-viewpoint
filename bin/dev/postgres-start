@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+mkdir -p ./tmp
+touch ./tmp/postgres-logfile
+
+"$(asdf where postgres)/bin/pg_ctl" -D "$(asdf where postgres)/data" -l tmp/postgres-logfile start
