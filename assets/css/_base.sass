@@ -1,0 +1,36 @@
+@import "variables"
+@import "mixins"
+
+html
+  position: relative
+  background-color: white
+  font-size: $em-base
+  -webkit-font-smoothing: antialiased
+  min-height: 100%
+
+body
+  font-size: $medium-font-size
+  font-family: $system-font
+  line-height: $medium-line-height
+
+main
+  background-color: white
+
+section
+  @include slab
+
+a
+  text-decoration: none
+  color: $link-color
+
+h1, h2, h3, h4, h5, h6
+  margin: 0
+
+h1
+  font-weight: 800
+  font-size: $very-large-font-size
+  line-height: $very-large-line-height
+
+ul
+  list-style-type: none
+

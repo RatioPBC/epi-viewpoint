@@ -1,0 +1,6 @@
+# add sass
+(cd assets && npm install sass-loader@7.3.1 --save-dev)
+
+# test asset building
+(cd assets  && node node_modules/webpack/bin/webpack.js --mode development)
+
