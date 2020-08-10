@@ -33,20 +33,21 @@ defmodule Epicenter.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.4"},
-      {:phoenix_ecto, "~> 4.1"},
+      local_or_remote(:remote, :euclid, version: "~> 1.0", organization: "geometer", path: "../euclid"),
       {:ecto_sql, "~> 3.4"},
-      {:postgrex, ">= 0.0.0"},
-      {:phoenix_live_view, "~> 0.13.0"},
       {:floki, ">= 0.0.0", only: :test},
-      {:phoenix_html, "~> 2.11"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_dashboard, "~> 0.2"},
-      {:telemetry_metrics, "~> 0.4"},
-      {:telemetry_poller, "~> 0.4"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"}
+      {:phoenix, "~> 1.5.4"},
+      {:phoenix_ecto, "~> 4.1"},
+      {:phoenix_html, "~> 2.11"},
+      {:phoenix_live_dashboard, "~> 0.2"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_view, "~> 0.13.0"},
+      {:plug_cowboy, "~> 2.0"},
+      {:postgrex, ">= 0.0.0"},
+      {:telemetry_metrics, "~> 0.4"},
+      {:telemetry_poller, "~> 0.4"}
     ]
   end
 
@@ -63,5 +64,13 @@ defmodule Epicenter.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
+  end
+
+  defp local_or_remote(:local, package, options) do
+    {package, options |> Keyword.delete(:organization) |> Keyword.delete(:version)}
+  end
+
+  defp local_or_remote(:remote, package, options) do
+    {package, options |> Keyword.get(:version), options |> Keyword.delete(:path) |> Keyword.delete(:version)}
   end
 end
