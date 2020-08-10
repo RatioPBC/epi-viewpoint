@@ -1,20 +1,23 @@
 # Epicenter
 
-To start your Phoenix server:
+## Resources
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Install Node.js dependencies with `npm install` inside the `assets` directory
-  * Start Phoenix endpoint with `mix phx.server`
+* Repo: https://gitlab.com/geometerio/resolve/epicenter
+* CI: https://gitlab.com/geometerio/resolve/epicenter/-/pipelines
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Development
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+### Getting started
 
-## Learn more
+1. Clone the repo
+2. Run `bin/dev/doctor` and for each problem, either use the suggested remedies or fix it some other way
+3. Run `bin/dev/test` and then `bin/dev/start` to make sure everything is working
+  
+### Day-to-day
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+* Get latest code: `bin/dev/update`
+* Run tests: `bin/dev/test`
+* Start server: 
+  * `bin/dev/start` 
+  * (to skip running doctor when starting, use `bin/dev/start fast`)
+* Run tests and push: `bin/dev/shipit`
