@@ -18,17 +18,12 @@ cache:
     - deps
     - assets/node_modules
 before_script:
-  - sudo apt install ssh-askpass
-  - mkdir -p ~/.ssh && chmod 0700 ~/.ssh
-  - ssh-keyscan -t rsa gitlab.com > ~/.ssh/known_hosts
-  - which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )
-  - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
   - npm install --prefix assets
   - mix local.rebar --force
   - mix local.hex --force
   - mix hex.organization auth geometer --key "$HEX_GEOMETER_READ_ONLY_KEY"
-  - mix deps.get --only test
+  - mix deps.get
+  - mix deps.audit
 test:
   script:
     - bin/dev/test
