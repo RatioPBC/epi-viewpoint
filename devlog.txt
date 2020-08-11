@@ -4,3 +4,6 @@
 # test asset building
 (cd assets  && node node_modules/webpack/bin/webpack.js --mode development)
 
+# install prettier (for bin/dev/format)
+npm install prettier --save-dev --prefix assets
+

@@ -4,7 +4,28 @@
   margin: 2rem auto
   max-width: $hero-width
 
-@mixin slab($centered: false)
-  display: block
+@mixin level-left
+  align-items: center
+  justify-items: left
+  display: flex
+
+  * + *
+    margin-right: 1rem
+
+@mixin level-right
+  align-items: center
+  justify-items: right
+  display: flex
+
+  * + *
+    margin-left: 1rem
+
+// https://1linelayouts.glitch.me
+@mixin pancake-stack
+  display: grid
+  grid-template-rows: auto 1fr auto
+
+@mixin slab($centered: false, $display: block)
+  display: $display
   margin: 1rem
   padding: 1rem

@@ -1,0 +1,13 @@
+@import "mixins"
+@import "variables"
+
+#nav
+  justify-content: space-between
+  @include slab($display: flex)
+
+  #nav-left
+    font-weight: bold
+    @include level-left
+
+  #nav-right
+    @include level-right
