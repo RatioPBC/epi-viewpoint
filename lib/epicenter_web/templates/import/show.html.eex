@@ -1,0 +1,7 @@
+<section id="import-page">
+  <h2>Upload a CSV File</h2>
+
+  <p><%= @last_import_length %> items were successfully imported.<p>
+
+  <%= link "Continue", to: "/", id: "continue-button" %>
+</section>

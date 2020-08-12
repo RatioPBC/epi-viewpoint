@@ -3,14 +3,14 @@ defmodule Epicenter.CsvTest do
 
   alias Epicenter.Csv
 
-  describe "import" do
+  describe "read" do
     test "reads a csv file" do
       """
       first_name , last_name , dob        , thing, sample_date , result_date , result   , glorp
       Alice      , Ant       , 01/02/1970 , graz , 06/01/2020  , 06/03/2020  , positive , 393
       Billy      , Bat       , 03/04/1990 , fnord, 06/06/2020  , 06/07/2020  , negative , sn3
       """
-      |> Csv.import()
+      |> Csv.read()
       |> assert_eq([
         %{
           "first_name" => "Alice",

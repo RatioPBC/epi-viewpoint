@@ -3,8 +3,14 @@ defmodule Epicenter.Csv do
 
   @header_keys ~w{first_name last_name dob sample_date result_date result}
 
-  def import(string) do
-    [headers | rows] = string |> NimbleCsv.parse_string(skip_headers: false)
+  def read(string) when is_binary(string),
+    do: read(string, &NimbleCsv.parse_string/2)
+
+  def read(stream),
+    do: read(stream, &NimbleCsv.parse_stream/2)
+
+  def read(input, parser) do
+    [headers | rows] = parser.(input, skip_headers: false)
     headers = headers |> Enum.map(&String.trim/1)
 
     header_indices =
