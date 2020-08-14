@@ -37,6 +37,7 @@ defmodule Epicenter.MixProject do
       {:ecto_sql, "~> 3.4"},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.11"},
+      {:inflex, "~> 2.1"},
       {:jason, "~> 1.0"},
       {:mix_audit, "~> 0.1", only: [:dev, :test], runtime: false},
       {:nimble_csv, "~> 0.7"},
@@ -48,6 +49,7 @@ defmodule Epicenter.MixProject do
       {:phoenix_live_view, "~> 0.13.0"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
+      {:table_rex, "~> 3.0"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"}
     ]

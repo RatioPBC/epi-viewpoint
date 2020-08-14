@@ -24,6 +24,7 @@ defmodule Epicenter.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Epicenter.DataCase
+      import Epicenter.Test.SchemaAssertions
     end
   end
 
