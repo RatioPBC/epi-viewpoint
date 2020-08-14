@@ -1,0 +1,55 @@
+#!/bin/bash
+
+source "bin/_support/cecho.sh"
+
+set -e
+
+filename=$1
+modulename=$2
+
+if [[ -z ${filename} || -z ${modulename} ]]; then
+  echo ""
+  cecho --bright-bold-red "Usage: ${0} filename modulename"
+  echo ""
+  cecho --white "Example:"
+  cecho --bright-bold-yellow "  ${0} cases/import Cases.Import"
+  cecho --white "generates:"
+  cecho --yellow "  lib/cases/import.ex" --white "with module" --yellow "Epicenter.Cases.Import"
+  cecho --yellow "  test/cases/import_test.exs" --white "with module" --yellow "Epicenter.Cases.ImportTest"
+  echo ""
+
+  exit 1
+fi
+
+new_filename="lib/epicenter/${filename}.ex"
+new_modulename="Epicenter.${modulename}"
+
+new_test_filename="test/epicenter/${filename}_test.exs"
+new_test_modulename="Epicenter.${modulename}Test"
+
+cat >$new_filename <<EOF
+defmodule $new_modulename do
+
+end
+EOF
+
+cat >$new_test_filename <<EOF
+defmodule $new_test_modulename do
+  use Epicenter.SimpleCase, async: true
+
+  alias $new_modulename
+
+  describe "function" do
+    test "case" do
+
+    end
+  end
+end
+EOF
+
+echo ""
+cecho --white "Created module" --bright-bold-yellow "${new_modulename}" --white "in" --bright-bold-yellow "${new_filename}"
+cecho --white "Created test" --bright-bold-yellow "${new_test_modulename}" --white "in" --bright-bold-yellow "${new_test_filename}"
+echo ""
+cecho --bright-bold-green "OK"
+echo ""
