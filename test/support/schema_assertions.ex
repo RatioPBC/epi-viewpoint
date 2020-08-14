@@ -104,8 +104,8 @@ defmodule Epicenter.Test.SchemaAssertions do
       2. To add to or remove from the database:
 
          a. Create a migration with one of:
-            *  mix ecto.gen.migration add_columns_to_#{table_name}
-            *  mix ecto.gen.migration remove_columns_from_#{table_name}
+            *  mix ecto.gen.migration add_column1_column2_to_#{table_name}
+            *  mix ecto.gen.migration remove_column1_column_2_from_#{table_name}
 
          b. In the newly-generated migration, modify the change function:
 
