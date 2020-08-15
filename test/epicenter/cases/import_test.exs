@@ -17,6 +17,10 @@ defmodule Epicenter.Cases.ImportTest do
       [lab_result_1, lab_result_2] = Cases.list_lab_results()
       assert lab_result_1.result == "positive"
       assert lab_result_2.result == "negative"
+
+      [alice, billy] = Cases.list_people()
+      assert alice.first_name == "Alice"
+      assert billy.first_name == "Billy"
     end
   end
 end
