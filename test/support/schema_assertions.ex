@@ -31,6 +31,11 @@ defmodule Epicenter.Test.SchemaAssertions do
   def assert_table_exists(schema_module, field_tuples) do
     table_name = Schema.table_name(schema_module)
 
+    fields_for_migration =
+      field_tuples
+      |> Enum.reject(fn tuple -> elem(tuple, 0) in [:id, :inserted_at, :updated_at] end)
+      |> Enum.map(&"add #{inspect_contents(&1)}")
+
     if not Schema.table_exists?(schema_module) do
       """
       Expected database table “#{table_name}” to exist, but it doesn’t.
@@ -43,7 +48,7 @@ defmodule Epicenter.Test.SchemaAssertions do
 
          def change() do
            create table(:#{table_name}) do
-      #{field_tuples |> Enum.map(&"add #{inspect_contents(&1)}") |> indented_list(7)}
+      #{fields_for_migration |> indented_list(7)}
 
              timestamps()
            end
