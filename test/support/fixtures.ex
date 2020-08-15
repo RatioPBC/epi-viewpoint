@@ -10,6 +10,20 @@ defmodule Epicenter.Test.Fixtures do
       sample_date: sample_date |> DateParser.parse_mm_dd_yyyy!(),
       tid: tid
     }
-    |> Map.merge(Enum.into(attrs, %{}))
+    |> merge_attrs(attrs)
+  end
+
+  def person_attrs(tid, dob, attrs \\ %{}) do
+    %{
+      dob: dob |> DateParser.parse_mm_dd_yyyy!(),
+      first_name: String.capitalize(tid),
+      last_name: String.capitalize(tid <> "blat"),
+      tid: tid
+    }
+    |> merge_attrs(attrs)
+  end
+
+  defp merge_attrs(defaults, attrs) do
+    Map.merge(defaults, Enum.into(attrs, %{}))
   end
 end

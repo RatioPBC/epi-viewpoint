@@ -29,7 +29,7 @@ defmodule Epicenter.Cases.LabResult do
     import Ecto.Query
 
     def all() do
-      from lab_result in LabResult, order_by: [asc: lab_result.sample_date]
+      from lab_result in LabResult, order_by: [asc: lab_result.sample_date, asc: lab_result.id]
     end
   end
 end
