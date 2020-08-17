@@ -4,6 +4,7 @@ defmodule Epicenter.Cases.LabResult do
   import Ecto.Changeset
 
   alias Epicenter.Cases.LabResult
+  alias Epicenter.Cases.Person
 
   schema "lab_results" do
     field :request_accession_number, :string
@@ -14,9 +15,11 @@ defmodule Epicenter.Cases.LabResult do
     field :tid, :string
 
     timestamps()
+
+    belongs_to :person, Person
   end
 
-  @required_attrs ~w{result sample_date}a
+  @required_attrs ~w{person_id result sample_date}a
   @optional_attrs ~w{request_accession_number request_facility_code request_facility_name tid}a
 
   def changeset(lab_result, attrs) do

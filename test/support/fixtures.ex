@@ -1,8 +1,10 @@
 defmodule Epicenter.Test.Fixtures do
+  alias Epicenter.Cases.Person
   alias Epicenter.DateParser
 
-  def lab_result_attrs(tid, sample_date, attrs \\ %{}) do
+  def lab_result_attrs(%Person{id: person_id}, tid, sample_date, attrs \\ %{}) do
     %{
+      person_id: person_id,
       request_accession_number: "accession-" <> tid,
       request_facility_code: "facility-" <> tid,
       request_facility_name: tid <> " Lab, Inc.",

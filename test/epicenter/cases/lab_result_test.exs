@@ -12,6 +12,7 @@ defmodule Epicenter.Cases.LabResultTest do
         [
           {:id, :id},
           {:inserted_at, :naive_datetime},
+          {:person_id, :id},
           {:request_accession_number, :string},
           {:request_facility_code, :string},
           {:request_facility_name, :string},
@@ -26,11 +27,13 @@ defmodule Epicenter.Cases.LabResultTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      default_attrs = Test.Fixtures.lab_result_attrs("result1", "06-01-2020")
+      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      default_attrs = Test.Fixtures.lab_result_attrs(person, "result1", "06-01-2020")
       Cases.change_lab_result(%LabResult{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
+    test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
     test "result is required", do: assert_invalid(new_changeset(result: nil))
     test "sample date is required", do: assert_invalid(new_changeset(sample_date: nil))
   end

@@ -3,6 +3,7 @@ defmodule Epicenter.Cases.Person do
 
   import Ecto.Changeset
 
+  alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
 
   schema "people" do
@@ -12,6 +13,8 @@ defmodule Epicenter.Cases.Person do
     field :tid, :string
 
     timestamps()
+
+    has_many :lab_results, LabResult
   end
 
   @required_attrs ~w{dob first_name last_name}a
