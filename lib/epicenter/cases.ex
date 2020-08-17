@@ -5,15 +5,11 @@ defmodule Epicenter.Cases do
   alias Epicenter.Repo
 
   #
-  # import/export
-  #
-  def import(csv_string), do: Import.from_csv(csv_string)
-
-  #
   # lab results
   #
   def change_lab_result(%LabResult{} = lab_result, attrs), do: LabResult.changeset(lab_result, attrs)
   def create_lab_result!(attrs), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!()
+  def import_lab_results(lab_result_csv_string), do: Import.from_csv(lab_result_csv_string)
   def list_lab_results(), do: LabResult.Query.all() |> Repo.all()
 
   #
