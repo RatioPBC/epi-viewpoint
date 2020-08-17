@@ -1,7 +1,13 @@
 defmodule Epicenter.Cases do
+  alias Epicenter.Cases.Import
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Repo
+
+  #
+  # import/export
+  #
+  def import(csv_string), do: Import.from_csv(csv_string)
 
   #
   # lab results

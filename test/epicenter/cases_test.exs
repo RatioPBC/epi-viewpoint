@@ -6,6 +6,21 @@ defmodule Epicenter.CasesTest do
   alias Epicenter.Cases
   alias Epicenter.Test
 
+  describe "importing" do
+    test "import imports lab results and people" do
+      """
+      first_name , last_name , dob        , sample_date , result_date , result
+      Alice      , Ant       , 01/02/1970 , 06/01/2020  , 06/03/2020  , positive
+      Billy      , Bat       , 03/04/1990 , 06/06/2020  , 06/07/2020  , negative
+      """
+      |> Cases.import()
+      |> assert_eq({:ok, %{people: 2, lab_results: 2}})
+
+      Cases.list_people() |> Enum.map(& &1.first_name) |> assert_eq(["Alice", "Billy"], ignore_order: true)
+      Cases.list_lab_results() |> Enum.map(& &1.result) |> assert_eq(["positive", "negative"], ignore_order: true)
+    end
+  end
+
   describe "lab results" do
     test "create_lab_result! creates a lab result" do
       lab_result = Test.Fixtures.lab_result_attrs("result1", "06-01-2020") |> Cases.create_lab_result!()
