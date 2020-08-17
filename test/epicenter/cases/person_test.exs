@@ -50,4 +50,21 @@ defmodule Epicenter.Cases.PersonTest do
     test "first name is required", do: assert_invalid(new_changeset(first_name: nil))
     test "last name is required", do: assert_invalid(new_changeset(last_name: nil))
   end
+
+  describe "latest_lab_result" do
+    test "returns nil if no lab results" do
+      Test.Fixtures.person_attrs("alice", "01-01-2000")
+      |> Cases.create_person!()
+      |> Person.latest_lab_result()
+      |> assert_eq(nil)
+    end
+
+    test "returns the lab result with the most recent sample date" do
+      alice = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, "newer", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, "older", "06-01-2020") |> Cases.create_lab_result!()
+
+      assert Person.latest_lab_result(alice).tid == "newer"
+    end
+  end
 end

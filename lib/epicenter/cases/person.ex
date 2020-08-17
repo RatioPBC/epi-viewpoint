@@ -3,6 +3,7 @@ defmodule Epicenter.Cases.Person do
 
   import Ecto.Changeset
 
+  alias Epicenter.Cases
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
 
@@ -24,6 +25,14 @@ defmodule Epicenter.Cases.Person do
     person
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+  end
+
+  def latest_lab_result(person) do
+    case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do
+      nil -> nil
+      [] -> nil
+      lab_results -> lab_results |> Enum.max_by(& &1.sample_date, Date)
+    end
   end
 
   defmodule Query do
