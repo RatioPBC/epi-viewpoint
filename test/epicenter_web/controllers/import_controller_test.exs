@@ -19,7 +19,7 @@ defmodule EpicenterWeb.ImportControllerTest do
       conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path}})
 
       assert conn |> redirected_to() == "/import/complete"
-      assert conn |> Session.last_csv_import_length() == 2
+      assert conn |> Session.last_csv_import_results() == %{people: 2, lab_results: 2}
     end
   end
 
@@ -28,10 +28,10 @@ defmodule EpicenterWeb.ImportControllerTest do
       conn =
         conn
         |> Plug.Test.init_test_session([])
-        |> Session.put_last_csv_import_length(5)
+        |> Session.put_last_csv_import_results(%{people: 2, lab_results: 3})
         |> get(Routes.import_path(conn, :show))
 
-      assert conn |> html_response(200) =~ "5 items were successfully imported"
+      assert conn |> html_response(200) =~ "Successfully imported 2 people and 3 lab results"
     end
   end
 end

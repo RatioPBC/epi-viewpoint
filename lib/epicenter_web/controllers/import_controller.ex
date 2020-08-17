@@ -6,18 +6,18 @@ defmodule EpicenterWeb.ImportController do
 
   use EpicenterWeb, :controller
 
-  alias Epicenter.Csv
+  alias Epicenter.Cases
   alias EpicenterWeb.Session
 
   def create(conn, %{"file" => %Plug.Upload{path: path}}) do
-    length = path |> File.read!() |> Csv.read() |> length()
+    {:ok, results} = path |> File.read!() |> Cases.import()
 
     conn
-    |> Session.put_last_csv_import_length(length)
+    |> Session.put_last_csv_import_results(results)
     |> redirect(to: Routes.import_path(conn, :show))
   end
 
   def show(conn, _params) do
-    conn |> render(last_import_length: Session.last_csv_import_length(conn))
+    conn |> render(last_csv_import_results: Session.last_csv_import_results(conn))
   end
 end
