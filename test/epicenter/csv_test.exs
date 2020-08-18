@@ -10,7 +10,7 @@ defmodule Epicenter.CsvTest do
       Alice      , Ant       , 01/02/1970 , graz , 06/01/2020  , 06/03/2020  , positive , 393
       Billy      , Bat       , 03/04/1990 , fnord, 06/06/2020  , 06/07/2020  , negative , sn3
       """
-      |> Csv.read()
+      |> Csv.read(required: ~w{first_name last_name dob sample_date result_date result}, optional: ~w{})
       |> assert_eq([
         %{
           "first_name" => "Alice",
