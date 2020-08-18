@@ -7,15 +7,21 @@ defmodule Epicenter.Csv do
   def read(stream, headers),
     do: read(stream, headers, &NimbleCsv.parse_stream/2)
 
-  def read(input, [required: required_headers, optional: _optional_headers], parser) do
-    [headers | rows] = parser.(input, skip_headers: false)
-    headers = headers |> Enum.map(&String.trim/1)
+  def read(input, [required: required_headers, optional: optional_headers], parser) do
+    [provided_headers | rows] = parser.(input, skip_headers: false)
+    provided_headers = provided_headers |> Enum.map(&String.trim/1)
 
-    case required_headers -- headers do
+    case required_headers -- provided_headers do
       [] ->
+        headers =
+          MapSet.intersection(
+            MapSet.new(provided_headers),
+            MapSet.union(MapSet.new(required_headers), MapSet.new(optional_headers))
+          )
+
         header_indices =
-          for header_key <- required_headers, into: %{} do
-            {header_key, Enum.find_index(headers, &(&1 == header_key))}
+          for header_key <- headers, into: %{} do
+            {header_key, Enum.find_index(provided_headers, &(&1 == header_key))}
           end
 
         data =

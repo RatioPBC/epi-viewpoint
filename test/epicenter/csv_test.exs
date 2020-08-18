@@ -42,5 +42,14 @@ defmodule Epicenter.CsvTest do
       |> Csv.read(required: ~w{column_a column_b column_c column_d}, optional: ~w{})
       |> assert_eq({:error, "Missing required columns: column_c, column_d"})
     end
+
+    test "allows optional headers" do
+      """
+      column_a , column_b , optional_c
+      value_a  , value_b  , value_c
+      """
+      |> Csv.read(required: ~w{column_a column_b}, optional: ~w{optional_c optional_d})
+      |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b", "optional_c" => "value_c"}]})
+    end
   end
 end
