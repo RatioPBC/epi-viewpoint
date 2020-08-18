@@ -34,6 +34,15 @@ defmodule Epicenter.CsvTest do
       )
     end
 
+    test "ingores unspecified headers" do
+      """
+      column_a , column_b , column_c
+      value_a  , value_b  , value_c
+      """
+      |> Csv.read(required: ~w{column_a}, optional: ~w{column_b})
+      |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b"}]})
+    end
+
     test "fails if required header is missing" do
       """
       column_a , column_b
