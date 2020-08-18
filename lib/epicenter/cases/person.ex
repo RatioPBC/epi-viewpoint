@@ -54,5 +54,9 @@ defmodule Epicenter.Cases.Person do
     def all() do
       from person in Person, order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.id]
     end
+
+    def opts_for_upsert() do
+      [returning: true, on_conflict: {:replace_all_except, ~w{id dob fingerprint first_name last_name}a}, conflict_target: :fingerprint]
+    end
   end
 end

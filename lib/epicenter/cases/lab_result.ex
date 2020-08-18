@@ -26,6 +26,7 @@ defmodule Epicenter.Cases.LabResult do
     lab_result
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+    |> foreign_key_constraint(:person_id, name: :lab_results_person_id_fkey)
   end
 
   defmodule Query do

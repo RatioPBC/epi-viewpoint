@@ -62,5 +62,26 @@ defmodule Epicenter.CasesTest do
 
       Cases.list_people() |> tids() |> assert_eq(~w{first middle last})
     end
+
+    test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
+      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.upsert_person!()
+
+      assert person.dob == ~D[2000-01-01]
+      assert person.first_name == "Alice"
+      assert person.last_name == "Aliceblat"
+      assert person.tid == "alice"
+    end
+
+    test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
+      Test.Fixtures.person_attrs("alice", "01-01-2000", tid: "first-insert") |> Cases.upsert_person!()
+      Test.Fixtures.person_attrs("alice", "01-01-2000", tid: "second-insert") |> Cases.upsert_person!()
+
+      assert [person] = Cases.list_people()
+
+      assert person.dob == ~D[2000-01-01]
+      assert person.first_name == "Alice"
+      assert person.last_name == "Aliceblat"
+      assert person.tid == "second-insert"
+    end
   end
 end

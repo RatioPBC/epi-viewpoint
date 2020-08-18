@@ -5,7 +5,7 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Cases.Import
 
   describe "from_csv" do
-    test "creates LabResults from csv data" do
+    test "creates LabResult records and Person records from csv data" do
       """
       first_name , last_name , dob        , thing, sample_date , result_date , result   , glorp
       Alice      , Ant       , 01/02/1970 , graz , 06/01/2020  , 06/03/2020  , positive , 393
@@ -21,6 +21,24 @@ defmodule Epicenter.Cases.ImportTest do
       [alice, billy] = Cases.list_people()
       assert alice.first_name == "Alice"
       assert billy.first_name == "Billy"
+    end
+
+    test "if two lab results have the same first_name, last_name, and dob, they are considered the same person" do
+      """
+      first_name , last_name , dob        , sample_date , result_date , result
+      Alice      , Ant       , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive
+      Billy      , Bat       , 01/01/1990 , 07/01/2020  , 07/02/2020  , negative
+      Billy      , Bat       , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive
+      Billy      , Bat       , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive
+      """
+      |> Import.from_csv()
+      |> assert_eq({:ok, %{people: 3, lab_results: 4}})
+
+      [alice, billy_2, billy_1] = Cases.list_people() |> Enum.map(&Cases.preload_lab_results/1)
+      assert alice.dob == ~D[1970-01-01]
+      assert alice.lab_results |> Enum.map(& &1.sample_date) == [~D[2020-06-01]]
+      assert billy_1.lab_results |> Enum.map(& &1.sample_date) == [~D[2020-07-01], ~D[2020-08-01]]
+      assert billy_2.lab_results |> Enum.map(& &1.sample_date) == [~D[2020-09-01]]
     end
   end
 end
