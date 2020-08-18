@@ -11,15 +11,24 @@ defmodule Epicenter.Csv do
     [headers | rows] = parser.(input, skip_headers: false)
     headers = headers |> Enum.map(&String.trim/1)
 
-    header_indices =
-      for header_key <- required_headers, into: %{} do
-        {header_key, Enum.find_index(headers, &(&1 == header_key))}
-      end
+    case required_headers -- headers do
+      [] ->
+        header_indices =
+          for header_key <- required_headers, into: %{} do
+            {header_key, Enum.find_index(headers, &(&1 == header_key))}
+          end
 
-    for row <- rows, into: [] do
-      for {header_key, header_index} <- header_indices, into: %{} do
-        {header_key, Enum.at(row, header_index) |> String.trim()}
-      end
+        data =
+          for row <- rows, into: [] do
+            for {header_key, header_index} <- header_indices, into: %{} do
+              {header_key, Enum.at(row, header_index) |> String.trim()}
+            end
+          end
+
+        {:ok, data}
+
+      missing_headers ->
+        {:error, "Missing required columns: #{missing_headers |> Enum.sort() |> Enum.join(", ")}"}
     end
   end
 end

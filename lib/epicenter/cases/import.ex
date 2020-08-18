@@ -9,8 +9,10 @@ defmodule Epicenter.Cases.Import do
   @fields [required: @lab_result_fields ++ @person_fields, optional: ~w{}]
 
   def from_csv(csv_string) do
+    {:ok, rows} = Csv.read(csv_string, @fields)
+
     result =
-      for row <- Csv.read(csv_string, @fields), reduce: %{people: [], lab_results: []} do
+      for row <- rows, reduce: %{people: [], lab_results: []} do
         %{people: people, lab_results: lab_results} ->
           person =
             row
