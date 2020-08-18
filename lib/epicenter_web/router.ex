@@ -18,6 +18,7 @@ defmodule EpicenterWeb.Router do
     pipe_through :browser
 
     live "/", PageLive, :index
+    live "/admin", AdminLive
     live "/import", ImportLive
     post "/import/upload", ImportController, :create
     get "/import/complete", ImportController, :show
