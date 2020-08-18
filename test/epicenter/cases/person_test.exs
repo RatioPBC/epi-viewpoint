@@ -12,11 +12,12 @@ defmodule Epicenter.Cases.PersonTest do
       assert_schema(
         Person,
         [
+          {:dob, :date},
+          {:fingerprint, :string},
+          {:first_name, :string},
           {:id, :id},
           {:inserted_at, :naive_datetime},
-          {:first_name, :string},
           {:last_name, :string},
-          {:dob, :date},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]
@@ -35,7 +36,11 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.lab_result_attrs(alice, "result1", "06-01-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, "result2", "06-02-2020") |> Cases.create_lab_result!()
 
-      alice |> Cases.preload_lab_results() |> Map.get(:lab_results) |> tids() |> assert_eq(~w{result1 result2}, ignore_order: true)
+      alice
+      |> Cases.preload_lab_results()
+      |> Map.get(:lab_results)
+      |> tids()
+      |> assert_eq(~w{result1 result2}, ignore_order: true)
     end
   end
 
@@ -46,9 +51,42 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
-    test "dib is required", do: assert_invalid(new_changeset(dob: nil))
+    test "dob is required", do: assert_invalid(new_changeset(dob: nil))
     test "first name is required", do: assert_invalid(new_changeset(first_name: nil))
     test "last name is required", do: assert_invalid(new_changeset(last_name: nil))
+
+    test "creates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice aliceblat")
+  end
+
+  describe "constraints" do
+    defp fingerprint_contstraint_error?(attrs) do
+      case Cases.create_person(attrs) do
+        {:ok, %Person{}} ->
+          false
+
+        {:error, changeset} ->
+          if errors_on(changeset).fingerprint == ["has already been taken"],
+            do: true,
+            else: raise("Unexpected changeset errors: #{changeset |> errors_on() |> inspect()}")
+      end
+    end
+
+    test "case-insensitive unique constraint on first_name + last_name + dob" do
+      alice_attrs = Test.Fixtures.person_attrs("alice", "01-01-2000")
+      assert {:ok, %Person{} = _} = alice_attrs |> Cases.create_person()
+
+      assert fingerprint_contstraint_error?(alice_attrs)
+
+      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "ALICE"))
+      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "aLiCe"))
+      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "Alice2"))
+
+      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:last_name, "ALICEBLAT"))
+      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:last_name, "AlIcEbLaT"))
+      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:last_name, "Aliceblat2"))
+
+      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:dob, ~D[1999-09-09]))
+    end
   end
 
   describe "latest_lab_result" do

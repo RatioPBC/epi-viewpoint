@@ -9,6 +9,7 @@ defmodule Epicenter.Cases.Person do
 
   schema "people" do
     field :dob, :date
+    field :fingerprint, :string
     field :first_name, :string
     field :last_name, :string
     field :tid, :string
@@ -25,7 +26,19 @@ defmodule Epicenter.Cases.Person do
     person
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+    |> change_fingerprint()
+    |> unique_constraint(:fingerprint)
   end
+
+  defp change_fingerprint(%Ecto.Changeset{valid?: true} = changeset) do
+    dob = changeset |> get_field(:dob) |> Date.to_iso8601()
+    first_name = changeset |> get_field(:first_name) |> String.downcase()
+    last_name = changeset |> get_field(:last_name) |> String.downcase()
+
+    changeset |> change(fingerprint: "#{dob} #{first_name} #{last_name}")
+  end
+
+  defp change_fingerprint(changeset), do: changeset
 
   def latest_lab_result(person) do
     case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do

@@ -22,6 +22,7 @@ defmodule Epicenter.Cases do
   # people
   #
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
+  def create_person(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert()
   def create_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert!()
   def list_people(), do: Person.Query.all() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:lab_results])
