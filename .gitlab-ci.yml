@@ -35,4 +35,5 @@ deploy_staging:
     - master
   stage: deploy
   script:
-    - dpl --provider=heroku --app=$HEROKU_APP_STAGING --api-key=$HEROKU_API_KEY
+    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_STAGING.git || true
+    - git push -f heroku HEAD:master
