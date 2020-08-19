@@ -23,6 +23,10 @@ check "git-duet: installed" \
   "command -v git-duet" \
   "open https://github.com/git-duet/git-duet#installation"
 
+check "homebrew: up to date" \
+  "brew bundle check" \
+  "brew bundle"
+
 check "direnv: installed" \
   "command -v direnv" \
   "brew install direnv && echo 'eval \"$(direnv hook bash)\"' >> ~/.bash_profile"
@@ -46,10 +50,6 @@ check "asdf: installed" \
 check "repo: euclid is installed locally" \
   "ls ../euclid" \
   "git clone git@gitlab.com:geometerio/resolve/euclid ../euclid"
-
-check "repo: nys-etl-dashboard is installed locally" \
-  "ls ../nys-etl-dashboard" \
-  "git clone git@gitlab.com:geometerio/resolve/nys-etl-dashboard ../nys-etl-dashboard"
 
 check "asdf: erlang plugin installed" \
   "asdf plugin-list | grep erlang" \
@@ -78,10 +78,6 @@ check "elixir: rebar3 installed" \
 check "elixir: authenticated with Hex.pm" \
   "mix hex.organization list | grep geometer" \
   "mix hex.organization auth geometer --key \$HEX_GEOMETER_READ_ONLY_KEY"
-
-check "elixir: authenticated with Hex.pm for oban ui" \
-  "mix hex.organization list | grep oban" \
-  "mix hex.organization auth oban --key \$HEX_OBAN_UI_KEY # Grab key from 1Password"
 
 check "elixir: deps installed" \
   "test $(mix deps | grep -c 'the dependency is not available') -eq 0" \
