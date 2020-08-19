@@ -5,6 +5,11 @@
 * Repo: https://gitlab.com/geometerio/resolve/epicenter
 * CI: https://gitlab.com/geometerio/resolve/epicenter/-/pipelines
 
+## Terminology (work-in-progress)
+* case - a person with confirmed or suspected covid
+* lab result - the information that comes from a laboratory, excluding person's name, phone, address, etc. 
+* result - "positive" or "negative" lab result
+
 ## Development
 
 ### Getting started

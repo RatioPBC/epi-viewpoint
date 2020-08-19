@@ -14,7 +14,15 @@ defmodule Epicenter.Cases.ImportTest do
       Billy      , Bat       , 03/04/1990 , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1
       """
       |> Import.from_csv()
-      |> assert_eq({:ok, %{people: 2, lab_results: 2}})
+      |> assert_eq(
+        {:ok,
+         %Epicenter.Cases.Import.ImportInfo{
+           imported_lab_result_count: 2,
+           imported_person_count: 2,
+           total_lab_result_count: 2,
+           total_person_count: 2
+         }}
+      )
 
       [lab_result_1, lab_result_2] = Cases.list_lab_results()
       assert lab_result_1.tid == "alice-result-1"
@@ -39,7 +47,15 @@ defmodule Epicenter.Cases.ImportTest do
       Billy      , Bat       , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
       """
       |> Import.from_csv()
-      |> assert_eq({:ok, %{people: 3, lab_results: 4}})
+      |> assert_eq(
+        {:ok,
+         %Epicenter.Cases.Import.ImportInfo{
+           imported_lab_result_count: 4,
+           imported_person_count: 3,
+           total_lab_result_count: 4,
+           total_person_count: 3
+         }}
+      )
 
       [alice, billy_2, billy_1] = Cases.list_people() |> Enum.map(&Cases.preload_lab_results/1)
       assert alice.tid == "alice"

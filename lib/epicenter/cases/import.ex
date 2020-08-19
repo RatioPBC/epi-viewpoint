@@ -13,6 +13,10 @@ defmodule Epicenter.Cases.Import do
     optional: @optional_lab_result_fields ++ @optional_person_fields
   ]
 
+  defmodule ImportInfo do
+    defstruct ~w{imported_person_count imported_lab_result_count total_person_count total_lab_result_count}a
+  end
+
   def from_csv(csv_string) do
     {:ok, rows} = Csv.read(csv_string, @fields)
 
@@ -37,6 +41,15 @@ defmodule Epicenter.Cases.Import do
           %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}
       end
 
-    {:ok, %{people: result.people |> Enum.uniq() |> length(), lab_results: result.lab_results |> Enum.uniq() |> length()}}
+    import_info = %ImportInfo{
+      imported_person_count: result.people |> Enum.uniq() |> length(),
+      imported_lab_result_count: result.lab_results |> Enum.uniq() |> length(),
+      total_person_count: Cases.count_people(),
+      total_lab_result_count: Cases.count_lab_results()
+    }
+
+    Phoenix.PubSub.broadcast(Epicenter.PubSub, "cases", {:import, import_info})
+
+    {:ok, import_info}
   end
 end

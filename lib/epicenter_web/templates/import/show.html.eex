@@ -2,7 +2,7 @@
   <h2>Upload a CSV File</h2>
 
   <p>
-    Successfully imported <%= @last_csv_import_results.people %> people and <%= @last_csv_import_results.lab_results %> lab results.
+    Successfully imported <%= @last_csv_import_info.imported_person_count %> people and <%= @last_csv_import_info.imported_lab_result_count %> lab results.
   <p>
 
   <%= link "Continue", to: "/", id: "continue-button" %>

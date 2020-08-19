@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.ImportControllerTest do
   use EpicenterWeb.ConnCase, async: true
 
+  alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Tempfile
   alias EpicenterWeb.Session
 
@@ -19,7 +20,13 @@ defmodule EpicenterWeb.ImportControllerTest do
       conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path}})
 
       assert conn |> redirected_to() == "/import/complete"
-      assert conn |> Session.last_csv_import_results() == %{people: 2, lab_results: 2}
+
+      assert conn |> Session.last_csv_import_info() == %Epicenter.Cases.Import.ImportInfo{
+               imported_lab_result_count: 2,
+               imported_person_count: 2,
+               total_lab_result_count: 2,
+               total_person_count: 2
+             }
     end
   end
 
@@ -28,7 +35,12 @@ defmodule EpicenterWeb.ImportControllerTest do
       conn =
         conn
         |> Plug.Test.init_test_session([])
-        |> Session.put_last_csv_import_results(%{people: 2, lab_results: 3})
+        |> Session.put_last_csv_import_info(%ImportInfo{
+          imported_person_count: 2,
+          imported_lab_result_count: 3,
+          total_person_count: 50,
+          total_lab_result_count: 100
+        })
         |> get(Routes.import_path(conn, :show))
 
       assert conn |> html_response(200) =~ "Successfully imported 2 people and 3 lab results"

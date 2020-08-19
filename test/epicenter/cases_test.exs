@@ -4,6 +4,7 @@ defmodule Epicenter.CasesTest do
   import Euclid.Extra.Enum, only: [tids: 1]
 
   alias Epicenter.Cases
+  alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Test
 
   describe "importing" do
@@ -14,7 +15,15 @@ defmodule Epicenter.CasesTest do
       Billy      , Bat       , 03/04/1990 , 06/06/2020  , 06/07/2020  , negative
       """
       |> Cases.import_lab_results()
-      |> assert_eq({:ok, %{people: 2, lab_results: 2}})
+      |> assert_eq(
+        {:ok,
+         %ImportInfo{
+           imported_lab_result_count: 2,
+           imported_person_count: 2,
+           total_lab_result_count: 2,
+           total_person_count: 2
+         }}
+      )
 
       Cases.list_people() |> Enum.map(& &1.first_name) |> assert_eq(["Alice", "Billy"], ignore_order: true)
       Cases.list_lab_results() |> Enum.map(& &1.result) |> assert_eq(["positive", "negative"], ignore_order: true)
