@@ -7,6 +7,9 @@ variables:
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
   POSTGRES_USER: postgres
+stages:
+  - test
+  - deploy
 cache:
   key:
     files:
@@ -24,5 +27,12 @@ before_script:
   - mix deps.get
   - mix deps.audit
 test:
+  stage: test
   script:
     - bin/dev/test
+deploy_staging:
+  only:
+    - master
+  stage: deploy
+  script:
+    - dpl --provider=heroku --app=$HEROKU_APP_STAGING --api-key=$HEROKU_API_KEY
