@@ -23,6 +23,7 @@ defmodule EpicenterWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import EpicenterWeb.ConnCase
+      import EpicenterWeb.Test.LiveViewAssertions
 
       alias EpicenterWeb.Router.Helpers, as: Routes
 

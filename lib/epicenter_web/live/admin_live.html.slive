@@ -3,7 +3,7 @@ section#admin-page
   table
     tr
       th People
-      td= @person_count
+      td data-role="person-count" = @person_count
     tr
       th Lab results
-      td= @lab_result_count
+      td data-role="lab-result-count"= @lab_result_count
