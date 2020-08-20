@@ -1,0 +1,8 @@
+section#import-page
+  h2 Upload a CSV File
+
+  p Choose a file, click “Upload”, and then wait for the file to upload.
+
+  = form_tag("/import/upload", multipart: true, method: :post)
+    input type="file" name="file"
+    input#upload-button type="submit" value="Upload"

@@ -1,0 +1,22 @@
+doctype html
+html lang="en"
+  head
+    meta charset="utf-8"
+    meta http-equiv="X-UA-Compatible" content="IE=edge"
+    meta name="viewport" content="width=device-width, initial-scale=1.0"
+    = csrf_meta_tag()
+    = live_title_tag assigns[:page_title] || "", suffix: " · Epicenter"
+    link phx-track-static=true rel="stylesheet" href="#{ Routes.static_path(@conn, "/css/app.css") }"
+    script defer=true phx-track-static=true type="text/javascript" src="#{ Routes.static_path(@conn, "/js/app.js") }"
+  body
+    header#nav
+      #nav-left
+        = link "Epicenter", to: "/"
+      #nav-right
+        = live_redirect "Import", to: "/import"
+        = live_redirect "Admin", to: "/admin"
+    main
+      = @inner_content
+    footer
+      section
+        | &copy; 2020 Epicenter

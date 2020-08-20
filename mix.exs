@@ -47,6 +47,8 @@ defmodule Epicenter.MixProject do
       {:phoenix_live_dashboard, "~> 0.2"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.13.0"},
+      {:phoenix_slime, "~> 0.13.1"},
+      {:phoenix_slime_live_view_collocated_template, "~> 0.1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
       {:table_rex, "~> 3.0"},

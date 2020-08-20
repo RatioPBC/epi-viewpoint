@@ -61,7 +61,7 @@ config :epicenter, EpicenterWeb.Endpoint,
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/epicenter_web/(live|views)/.*(ex)$",
-      ~r"lib/epicenter_web/templates/.*(eex)$"
+      ~r"lib/epicenter_web/templates/.*(eex|slim|slimleex)$"
     ]
   ]
 

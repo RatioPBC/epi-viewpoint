@@ -1,0 +1,23 @@
+section#cases-page
+  h2 Cases
+  table
+    thead
+      tr
+        th Last name
+        th First name
+        th DOB
+        th Latest lab status
+        th Latest lab date
+      tr#subheader
+        th colspan="2" = "#{@case_count} cases"
+        th colspan="3"
+          = if @reload_message do
+            = link @reload_message, to: "#", phx_click: "refresh-cases"
+    tbody
+      = for case <- @cases do
+        tr
+          td= case.last_name
+          td= case.first_name
+          td= case.dob
+          td= case.latest_result
+          td= case.latest_sample_date
