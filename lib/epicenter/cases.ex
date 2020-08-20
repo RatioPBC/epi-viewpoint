@@ -29,4 +29,10 @@ defmodule Epicenter.Cases do
   def list_people(), do: Person.Query.all() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:lab_results])
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert!(Person.Query.opts_for_upsert())
+
+  #
+  # pubsub
+  #
+  def broadcast(message), do: Phoenix.PubSub.broadcast(Epicenter.PubSub, "cases", message)
+  def subscribe(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "cases")
 end

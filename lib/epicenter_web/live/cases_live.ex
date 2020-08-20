@@ -6,7 +6,7 @@ defmodule EpicenterWeb.CasesLive do
 
   def mount(_params, _session, socket) do
     if connected?(socket),
-      do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "cases")
+      do: Cases.subscribe()
 
     cases = Cases.list_cases()
 

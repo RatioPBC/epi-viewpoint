@@ -3,6 +3,7 @@ defmodule EpicenterWeb.AdminLiveTest do
 
   import Phoenix.LiveViewTest
 
+  alias Epicenter.Cases
   alias Epicenter.Cases.Import
 
   test "disconnected and connected render", %{conn: conn} do
@@ -24,7 +25,7 @@ defmodule EpicenterWeb.AdminLiveTest do
       total_lab_result_count: 4
     }
 
-    Phoenix.PubSub.broadcast(Epicenter.PubSub, "cases", {:import, import_info})
+    Cases.broadcast({:import, import_info})
 
     assert_role_text(page_live, "person-count", "3")
     assert_role_text(page_live, "lab-result-count", "4")

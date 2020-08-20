@@ -48,7 +48,7 @@ defmodule Epicenter.Cases.Import do
       total_lab_result_count: Cases.count_lab_results()
     }
 
-    Phoenix.PubSub.broadcast(Epicenter.PubSub, "cases", {:import, import_info})
+    Cases.broadcast({:import, import_info})
 
     {:ok, import_info}
   end

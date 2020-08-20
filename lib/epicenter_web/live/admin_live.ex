@@ -5,9 +5,8 @@ defmodule EpicenterWeb.AdminLive do
   alias Epicenter.Cases.Import.ImportInfo
 
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Phoenix.PubSub.subscribe(Epicenter.PubSub, "cases")
-    end
+    if connected?(socket),
+      do: Cases.subscribe()
 
     {:ok, assign(socket, person_count: Cases.count_people(), lab_result_count: Cases.count_lab_results())}
   end
