@@ -11,13 +11,13 @@
   margin: 2rem auto
   max-width: $hero-width
 
-@mixin level($justify: left)
+@mixin level($justify: flex-start)
   align-items: center
-  justify-items: $justify
+  justify-content: $justify
   display: flex
 
   * + *
-    @if $justify == left
+    @if $justify == flex-start
       margin-right: 1rem
     @else
       margin-left: 1rem

@@ -14,7 +14,8 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    live "/page", PageLive, :index
+    live "/", CasesLive
     live "/admin", AdminLive
     live "/import", ImportLive
     post "/import/upload", ImportController, :create

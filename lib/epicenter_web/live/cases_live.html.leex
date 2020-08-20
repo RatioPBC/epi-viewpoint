@@ -1,0 +1,32 @@
+<section id="cases-page">
+  <h2>Cases</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Last name</th>
+        <th>First name</th>
+        <th>DOB</th>
+        <th>Latest lab status</th>
+        <th>Latest lab date</th>
+      </tr>
+      <tr id="subheader">
+        <th colspan="5">
+          <%= @person_count %> cases.
+          <%= link @reload_message, to: "#", phx_click: "refresh-cases" %>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for case <- @cases do %>
+        <tr>
+          <td><%= case.last_name %></td>
+          <td><%= case.first_name %></td>
+          <td><%= case.dob %></td>
+          <td><%= case.latest_result %></td>
+          <td><%= case.latest_sample_date %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>
