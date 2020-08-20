@@ -5,22 +5,23 @@ defmodule EpicenterWeb.CasesLive do
   alias Epicenter.Cases.Import.ImportInfo
 
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      Phoenix.PubSub.subscribe(Epicenter.PubSub, "cases")
-    end
+    if connected?(socket),
+      do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "cases")
 
-    {:ok, assign(socket, cases: Cases.list_cases(), person_count: Cases.count_people(), reload_message: "")}
+    cases = Cases.list_cases()
+
+    {:ok, assign(socket, cases: cases, case_count: length(cases), reload_message: nil)}
   end
 
   def handle_info({:import, %ImportInfo{imported_person_count: imported_person_count}}, socket) do
-    socket =
-      assign(socket, person_count: imported_person_count, reload_message: "#{imported_person_count} new cases have arrived. Click here to load them.")
+    socket = assign(socket, reload_message: "Show #{imported_person_count} new cases")
 
     {:noreply, socket}
   end
 
   def handle_event("refresh-cases", _, socket) do
-    socket = assign(socket, cases: Cases.list_cases(), reload_message: "")
+    cases = Cases.list_cases()
+    socket = assign(socket, cases: cases, case_count: length(cases), reload_message: nil)
     {:noreply, socket}
   end
 end

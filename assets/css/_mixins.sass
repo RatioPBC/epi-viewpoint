@@ -7,9 +7,18 @@
   color: $link-color
   padding: 0.5rem 2rem
 
+@mixin button-primary-small
+  @include button-primary
+  font-size: $small-font-size
+  padding: 0.25rem 1rem
+
 @mixin hero
   margin: 2rem auto
   max-width: $hero-width
+
+@mixin horizontal-flow
+  * + *
+    margin-right: 1rem
 
 @mixin level($justify: flex-start)
   align-items: center

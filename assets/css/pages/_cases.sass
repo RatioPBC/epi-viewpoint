@@ -2,14 +2,33 @@
 
 #cases-page
   table
-    border: 1px solid #eee
     margin-top: 2rem
+
+    thead
+      tr:last-of-type
+        th, td
+          border-bottom: 1px solid $border-color
+          padding-bottom: 1rem
+
+    tbody
+      tr:first-of-type
+        th, td
+          padding-top: 1rem
 
     tr#subheader
       th
+        font-weight: normal
+
+      th:first-child
         color: $diminished-text-color
+
+      th:last-child
+        text-align: right
+
+        a
+          @include button-primary-small
 
     th, td
       min-width: 8rem
-      padding: 0 0.5rem
+      padding: 0.25rem 1rem 0.25rem 0
       text-align: left
