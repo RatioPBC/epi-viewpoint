@@ -8,8 +8,9 @@ defmodule EpicenterWeb.AdminLiveTest do
 
   test "disconnected and connected render", %{conn: conn} do
     {:ok, page_live, disconnected_html} = live(conn, "/admin")
-    assert disconnected_html =~ "Admin"
-    assert render(page_live) =~ "Admin"
+
+    assert_has_role(disconnected_html, "admin-page")
+    assert_has_role(page_live, "admin-page")
   end
 
   test "mounts with person and lab result count", %{conn: conn} do

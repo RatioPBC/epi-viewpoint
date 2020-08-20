@@ -1,4 +1,4 @@
-section#admin-page
+section#admin-page data-role="admin-page"
   h2 Admin
   table
     tr

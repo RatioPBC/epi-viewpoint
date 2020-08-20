@@ -11,6 +11,9 @@ defmodule Epicenter.Test.Html do
   def attr(html, css_query, attr_name) when is_list(html),
     do: html |> Floki.attribute(css_query, attr_name)
 
+  def has_role?(html, role),
+    do: html |> Floki.find("[data-role=#{role}]") |> Euclid.Exists.present?()
+
   def html(html, css_query) when is_list(html),
     do: html |> Floki.find(css_query) |> Enum.map(&Floki.raw_html/1)
 
