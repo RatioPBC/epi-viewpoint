@@ -24,6 +24,7 @@ defmodule EpicenterWeb.ConnCase do
       import Phoenix.ConnTest
       import EpicenterWeb.ConnCase
       import EpicenterWeb.Test.LiveViewAssertions
+      import Euclid.Test.Extra.Assertions
 
       alias EpicenterWeb.Router.Helpers, as: Routes
 

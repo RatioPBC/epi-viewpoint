@@ -13,7 +13,7 @@ defmodule EpicenterWeb.AdminLiveTest do
     assert_has_role(page_live, "admin-page")
   end
 
-  test "mounts with person and lab result count", %{conn: conn} do
+  test "shows person count and lab result count before and after importing", %{conn: conn} do
     {:ok, page_live, _html} = live(conn, "/admin")
 
     assert_role_text(page_live, "person-count", "0")

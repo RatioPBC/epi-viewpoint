@@ -32,14 +32,15 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
 
   def assert_role_text(%Phoenix.LiveViewTest.View{} = view, data_role, expected_value) do
     selector = "[data-role=#{data_role}]"
+    rendered = view |> element(selector) |> render() |> Test.Html.parse() |> Test.Html.text()
 
-    if has_element?(view, selector, expected_value) do
+    if rendered == expected_value do
       true
     else
       """
-      Expected to find element with selector “#{selector}” and text “#{expected_value}”, but found:
+      Expected to find element with data-role “#{data_role}” and text “#{expected_value}”, but found:
 
-        #{view |> element(selector) |> render()}
+        #{rendered}
       """
       |> flunk()
     end

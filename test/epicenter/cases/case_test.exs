@@ -17,9 +17,36 @@ defmodule Epicenter.Cases.CaseTest do
       [alice, billy]
       |> Case.new()
       |> assert_eq([
-        %Case{dob: ~D[2000-01-01], first_name: "Alice", last_name: "Aliceblat", latest_result: "positive", latest_sample_date: ~D[2020-06-02]},
-        %Case{dob: ~D[2000-01-02], first_name: "Billy", last_name: "Billyblat", latest_result: "negative", latest_sample_date: ~D[2020-07-01]}
+        %Case{
+          dob: ~D[2000-01-01],
+          first_name: "Alice",
+          last_name: "Aliceblat",
+          latest_result: "positive",
+          latest_sample_date: ~D[2020-06-02],
+          tid: "alice"
+        },
+        %Case{
+          dob: ~D[2000-01-02],
+          first_name: "Billy",
+          last_name: "Billyblat",
+          latest_result: "negative",
+          latest_sample_date: ~D[2020-07-01],
+          tid: "billy"
+        }
       ])
+    end
+
+    test "does not blow up if the person has no lab results" do
+      alice = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+
+      assert Case.new(alice) == %Case{
+               dob: ~D[2000-01-01],
+               first_name: "Alice",
+               last_name: "Aliceblat",
+               latest_result: nil,
+               latest_sample_date: nil,
+               tid: "alice"
+             }
     end
   end
 end
