@@ -11,7 +11,7 @@ defmodule EpicenterWeb.CasesLiveTest do
     do: page_live |> render() |> Test.Html.parse_doc() |> Test.Html.all("[data-role=case]", as: :tids)
 
   test "disconnected and connected render", %{conn: conn} do
-    {:ok, page_live, disconnected_html} = live(conn, "/")
+    {:ok, page_live, disconnected_html} = live(conn, "/cases")
 
     assert_has_role(disconnected_html, "cases-page")
     assert_has_role(page_live, "cases-page")
@@ -21,14 +21,14 @@ defmodule EpicenterWeb.CasesLiveTest do
     Test.Fixtures.person_attrs("alice", "06-01-2000") |> Cases.create_person!()
     Test.Fixtures.person_attrs("billy", "06-01-2000") |> Cases.create_person!()
 
-    {:ok, page_live, _html} = live(conn, "/")
+    {:ok, page_live, _html} = live(conn, "/cases")
 
     assert_role_text(page_live, "case-count", "2 cases")
     page_live |> cases() |> assert_eq(~w{alice billy})
   end
 
   test "shows a reload message after an import", %{conn: conn} do
-    {:ok, page_live, _html} = live(conn, "/")
+    {:ok, page_live, _html} = live(conn, "/cases")
 
     # start off with no cases
     assert_role_text(page_live, "case-count", "0 cases")
