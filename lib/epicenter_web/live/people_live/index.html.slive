@@ -8,10 +8,12 @@ section#people-page data-role="people-page"
         th DOB
         th Latest lab status
         th Latest lab date
+        th
+
       tr#subheader
         th colspan="2" data-role="person-count"
           = "#{@person_count} people"
-        th colspan="3" data-role="reload-message"
+        th colspan="4" data-role="reload-message"
           = if @reload_message do
             = link @reload_message, to: "#", phx_click: "refresh-people"
     tbody
@@ -22,3 +24,5 @@ section#people-page data-role="people-page"
           td= person.dob
           td= latest_result(person)
           td= latest_sample_date(person)
+          td= live_redirect "View", to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
+

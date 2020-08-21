@@ -64,6 +64,12 @@ defmodule Epicenter.CasesTest do
       assert person.tid == "alice"
     end
 
+    test "get_person" do
+      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      fetched = Cases.get_person(person.id)
+      assert fetched.tid == "alice"
+    end
+
     test "list_people sorts by last name (then first name, then dob descending)" do
       Test.Fixtures.person_attrs("middle", "06-01-2000", first_name: "Alice", last_name: "Ant") |> Cases.create_person!()
       Test.Fixtures.person_attrs("last", "06-01-2000", first_name: "Billy", last_name: "Ant") |> Cases.create_person!()

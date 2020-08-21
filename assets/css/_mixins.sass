@@ -40,3 +40,20 @@
   display: $display
   margin: 1rem
   padding: 1rem
+
+@mixin table
+  thead
+    tr:last-of-type
+      th, td
+        border-bottom: 1px solid $border-color
+        padding-bottom: 1rem
+
+  tbody
+    tr:first-of-type
+      th, td
+        padding-top: 1rem
+
+  th, td
+    min-width: 8rem
+    padding: 0.25rem 1rem 0.25rem 0
+    text-align: left

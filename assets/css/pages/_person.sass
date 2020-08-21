@@ -1,0 +1,16 @@
+@import "../mixins"
+
+#person-page
+  #subnav
+    margin-bottom: 1rem
+
+    a
+      font-size: $small-font-size
+      text-transform: uppercase
+
+  table
+    @include table
+    margin-top: 2rem
+
+    & + table
+      margin-top: 2rem

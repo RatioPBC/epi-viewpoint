@@ -20,6 +20,7 @@ defmodule EpicenterWeb.Router do
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
     live "/people", PeopleLive.Index, :index
+    live "/people/:id", PeopleLive.Show, :show
     live "/page", PageLive, :index
   end
 
