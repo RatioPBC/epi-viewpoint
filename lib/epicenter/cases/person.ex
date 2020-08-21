@@ -48,6 +48,13 @@ defmodule Epicenter.Cases.Person do
     end
   end
 
+  def latest_lab_result(person, field) do
+    case latest_lab_result(person) do
+      nil -> nil
+      lab_result -> Map.get(lab_result, field)
+    end
+  end
+
   defmodule Query do
     import Ecto.Query
 

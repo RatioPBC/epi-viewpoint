@@ -7,35 +7,35 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Cases.Import
   alias Epicenter.Test
 
-  defp cases(page_live),
-    do: page_live |> render() |> Test.Html.parse_doc() |> Test.Html.all("[data-role=case]", as: :tids)
+  defp people(page_live),
+    do: page_live |> render() |> Test.Html.parse_doc() |> Test.Html.all("[data-role=person]", as: :tids)
 
   test "disconnected and connected render", %{conn: conn} do
     {:ok, page_live, disconnected_html} = live(conn, "/people")
 
-    assert_has_role(disconnected_html, "cases-page")
-    assert_has_role(page_live, "cases-page")
+    assert_has_role(disconnected_html, "people-page")
+    assert_has_role(page_live, "people-page")
   end
 
-  test "shows cases and case count", %{conn: conn} do
+  test "shows people and person count", %{conn: conn} do
     Test.Fixtures.person_attrs("alice", "06-01-2000") |> Cases.create_person!()
     Test.Fixtures.person_attrs("billy", "06-01-2000") |> Cases.create_person!()
 
     {:ok, page_live, _html} = live(conn, "/people")
 
-    assert_role_text(page_live, "case-count", "2 cases")
-    page_live |> cases() |> assert_eq(~w{alice billy})
+    assert_role_text(page_live, "person-count", "2 people")
+    page_live |> people() |> assert_eq(~w{alice billy})
   end
 
   test "shows a reload message after an import", %{conn: conn} do
     {:ok, page_live, _html} = live(conn, "/people")
 
-    # start off with no cases
-    assert_role_text(page_live, "case-count", "0 cases")
+    # start off with no people
+    assert_role_text(page_live, "person-count", "0 people")
     assert_role_text(page_live, "reload-message", "")
-    page_live |> cases() |> assert_eq(~w{})
+    page_live |> people() |> assert_eq(~w{})
 
-    # import 2 cases
+    # import 2 people
     Test.Fixtures.person_attrs("alice", "06-01-2000") |> Cases.create_person!()
     Test.Fixtures.person_attrs("billy", "06-01-2000") |> Cases.create_person!()
 
@@ -48,15 +48,15 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
     Cases.broadcast({:import, import_info})
 
-    # show a button to make the cases visible
-    assert_role_text(page_live, "case-count", "0 cases")
-    assert_role_text(page_live, "reload-message", "Show 2 new cases")
-    page_live |> cases() |> assert_eq(~w{})
+    # show a button to make the people visible
+    assert_role_text(page_live, "person-count", "0 people")
+    assert_role_text(page_live, "reload-message", "Show 2 new people")
+    page_live |> people() |> assert_eq(~w{})
 
-    # show the new cases after the button is clicked
-    render_click(page_live, "refresh-cases")
-    assert_role_text(page_live, "case-count", "2 cases")
+    # show the new people after the button is clicked
+    render_click(page_live, "refresh-people")
+    assert_role_text(page_live, "person-count", "2 people")
     assert_role_text(page_live, "reload-message", "")
-    page_live |> cases() |> assert_eq(~w{alice billy})
+    page_live |> people() |> assert_eq(~w{alice billy})
   end
 end

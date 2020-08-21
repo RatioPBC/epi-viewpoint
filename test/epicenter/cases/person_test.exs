@@ -104,5 +104,20 @@ defmodule Epicenter.Cases.PersonTest do
 
       assert Person.latest_lab_result(alice).tid == "newer"
     end
+
+    test "when given a field, returns the value of that field for the latest lab result" do
+      alice = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
+
+      assert Person.latest_lab_result(alice, :result) == "positive"
+      assert Person.latest_lab_result(alice, :sample_date) == ~D[2020-06-02]
+    end
+
+    test "when given a field but there is no lab result, returns nil" do
+      alice = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      assert Person.latest_lab_result(alice, :result) == nil
+      assert Person.latest_lab_result(alice, :sample_date) == nil
+    end
   end
 end
