@@ -9,7 +9,7 @@ defmodule EpicenterWeb.PeopleLive.Index do
     if connected?(socket),
       do: Cases.subscribe()
 
-    people = Cases.list_people()
+    people = Cases.list_people() |> Cases.preload_lab_results()
 
     {:ok, assign(socket, people: people, person_count: length(people), reload_message: nil)}
   end
@@ -21,7 +21,7 @@ defmodule EpicenterWeb.PeopleLive.Index do
   end
 
   def handle_event("refresh-people", _, socket) do
-    people = Cases.list_people()
+    people = Cases.list_people() |> Cases.preload_lab_results()
     socket = assign(socket, people: people, person_count: length(people), reload_message: nil)
     {:noreply, socket}
   end
