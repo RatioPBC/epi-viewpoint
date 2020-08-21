@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.CaseLive.Show do
+defmodule EpicenterWeb.PeopleLive.Show do
   use EpicenterWeb, :live_view
 
   def mount(_params, _session, socket) do

@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.CaseLive.Index do
+defmodule EpicenterWeb.PeopleLive.Index do
   use EpicenterWeb, :live_view
 
   alias Epicenter.Cases

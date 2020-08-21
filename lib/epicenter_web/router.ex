@@ -15,7 +15,7 @@ defmodule EpicenterWeb.Router do
     pipe_through :browser
 
     live "/admin", AdminLive
-    live "/cases", CaseLive.Index, :index
+    live "/people", PeopleLive.Index, :index
     live "/import", ImportLive
     live "/page", PageLive, :index
 
