@@ -11,7 +11,7 @@ html lang="en"
   body
     header#nav
       #nav-left
-        = link "Epicenter", to: "/people"
+        = link "Epicenter", to: "/"
       #nav-right
         = live_redirect "Import", to: "/import"
         = live_redirect "Admin", to: "/admin"

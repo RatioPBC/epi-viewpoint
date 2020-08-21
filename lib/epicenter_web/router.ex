@@ -14,13 +14,13 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through :browser
 
+    get "/", SessionController, :new
     live "/admin", AdminLive
-    live "/people", PeopleLive.Index, :index
     live "/import", ImportLive
-    live "/page", PageLive, :index
-
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
+    live "/people", PeopleLive.Index, :index
+    live "/page", PageLive, :index
   end
 
   # Other scopes may use custom stacks.
