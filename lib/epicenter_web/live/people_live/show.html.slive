@@ -5,9 +5,21 @@ section#person-page data-role="person-page"
   h2 data-role="name"= "#{@person.first_name} #{@person.last_name}"
 
   table#demographics
-    tr
-      th DOB
-      td= @person.dob
+    tbody
+      tr
+        th First Name
+        td= @person.first_name
+      tr
+        th Last Name
+        td= @person.last_name
+
+    tbody
+      tr
+        th DOB
+        td= @person.dob
+      tr
+        th Age
+        td= age(@person)
 
   table#lab-results
     thead
