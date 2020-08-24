@@ -2,15 +2,21 @@
 
 #person-page
   #subnav
+    @include level
     margin-bottom: 1rem
 
-    a
+    *
       font-size: $small-font-size
       text-transform: uppercase
 
+    * + *:before
+      content: "/"
+      margin-right: 1rem
+
   table
     @include table
-    margin-top: 2rem
+    border-collapse: collapse
+    margin-top: 0.5rem
 
     & + table
       margin-top: 2rem

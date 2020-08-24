@@ -20,16 +20,16 @@
   * + *
     margin-right: 1rem
 
-@mixin level($justify: flex-start)
+@mixin level($justify: left)
   align-items: center
   justify-content: $justify
   display: flex
 
   * + *
-    @if $justify == flex-start
-      margin-right: 1rem
-    @else
+    @if $justify == left
       margin-left: 1rem
+    @else
+      margin-right: 1rem
 
 // https://1linelayouts.glitch.me
 @mixin pancake-stack

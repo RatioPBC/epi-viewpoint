@@ -1,35 +1,42 @@
-section#person-page data-role="person-page"
-  header#subnav
-    = live_redirect "< People", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
+#person-page data-role="person-page"
 
-  h2 data-role="name"= "#{@person.first_name} #{@person.last_name}"
+  section
+    header#subnav
+      = live_redirect "People", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
+      span data-role="name" = "#{@person.first_name} #{@person.last_name}"
 
-  table#demographics
-    tbody
-      tr
-        th First Name
-        td= @person.first_name
-      tr
-        th Last Name
-        td= @person.last_name
+  section
+    h3 Identifying Information
 
-    tbody
-      tr
-        th DOB
-        td= @person.dob
-      tr
-        th Age
-        td= age(@person)
-
-  table#lab-results
-    thead
-      tr
-        th Sample Date
-        th Result
-
-    tbody
-      = for lab_result <- @person.lab_results do
+    table
+      tbody
         tr
-          td= lab_result.sample_date
-          td= lab_result.result
+          th First Name
+          td= @person.first_name
+        tr
+          th Last Name
+          td= @person.last_name
+
+      tbody
+        tr
+          th DOB
+          td= @person.dob
+        tr
+          th Age
+          td= age(@person)
+
+  section
+    h3 Lab Results
+
+    table#lab-results
+      thead
+        tr
+          th Sample Date
+          th Result
+
+      tbody
+        = for lab_result <- @person.lab_results do
+          tr
+            td= lab_result.sample_date
+            td= lab_result.result
 
