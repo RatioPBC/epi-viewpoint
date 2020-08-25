@@ -6,7 +6,9 @@
       span data-role="name" = "#{@person.first_name} #{@person.last_name}"
 
   section
-    h3 Identifying Information
+    h3#identifying-information
+      span Identifying Information
+      span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person)
 
     table
       tbody
