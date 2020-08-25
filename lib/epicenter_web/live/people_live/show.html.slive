@@ -12,10 +12,10 @@
       tbody
         tr
           th First Name
-          td= @person.first_name
+          td data-role="first-name"= @person.first_name
         tr
           th Last Name
-          td= @person.last_name
+          td data-role="last-name"= @person.last_name
 
       tbody
         tr

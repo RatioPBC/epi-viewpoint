@@ -100,6 +100,13 @@ defmodule Epicenter.CasesTest do
       Cases.list_people(:call_list) |> tids() |> assert_eq(~w{recent-positive-result})
     end
 
+    test "update_person updates a person" do
+      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      {:ok, updated_person} = person |> Cases.update_person(%{first_name: "Aaron"})
+
+      assert updated_person.first_name == "Aaron"
+    end
+
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
       person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.upsert_person!()
 

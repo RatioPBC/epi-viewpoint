@@ -45,9 +45,8 @@ defmodule EpicenterWeb do
   def live_view do
     quote do
       use PhoenixSlime.LiveView.CollocatedTemplate, extension: :slive
-
-      use Phoenix.LiveView,
-        layout: {EpicenterWeb.LayoutView, "live.html"}
+      use Phoenix.HTML
+      use Phoenix.LiveView, layout: {EpicenterWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
     end

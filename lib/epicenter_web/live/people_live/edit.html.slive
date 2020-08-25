@@ -1,2 +1,13 @@
 section#person-edit-page data-role="person-edit-page"
-  h1 New Template
+  h3 Identifying Information
+
+  = form_for @changeset, "#", [id: "person-form", phx_submit: "save"], fn f ->
+    = label f, :first_name
+    = text_input f, :first_name
+    = error_tag f, :first_name
+
+    = label f, :last_name
+    = text_input f, :last_name
+    = error_tag f, :last_name
+
+    = submit "Save", phx_disable_with: "Saving..."
