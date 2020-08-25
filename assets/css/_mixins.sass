@@ -33,6 +33,24 @@
   font-size: $small-font-size
   padding: 0.25rem 1rem
 
+@mixin form
+  margin-top: 1rem
+
+  label, input, span.invalid-feedback
+    display: block
+
+  fieldset
+    margin-top: 1rem
+
+    label
+      font-weight: bold
+
+    input
+      margin-top: 0.25rem
+
+  button
+    margin-top: 1rem
+
 @mixin hero
   margin: 2rem auto
   max-width: $hero-width
@@ -56,6 +74,18 @@
 @mixin pancake-stack
   display: grid
   grid-template-rows: auto 1fr auto
+
+@mixin subnav
+  @include level
+  margin-bottom: 1rem
+
+  *
+    font-size: $small-font-size
+    text-transform: uppercase
+
+  * + *:before
+    content: "/"
+    margin-right: 1rem
 
 @mixin slab($centered: false, $display: block)
   display: $display

@@ -2,16 +2,7 @@
 
 #person-page
   #subnav
-    @include level
-    margin-bottom: 1rem
-
-    *
-      font-size: $small-font-size
-      text-transform: uppercase
-
-    * + *:before
-      content: "/"
-      margin-right: 1rem
+    @include subnav
 
   #identifying-information
     @include level
@@ -28,3 +19,10 @@
       tr:first-child
         th, td
           padding-top: 1.5rem
+
+#person-edit-page
+  #subnav
+    @include subnav
+
+  #person-form
+    @include form

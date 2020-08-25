@@ -1,13 +1,24 @@
-section#person-edit-page data-role="person-edit-page"
-  h3 Identifying Information
+#person-edit-page data-role="person-edit-page"
 
-  = form_for @changeset, "#", [id: "person-form", phx_submit: "save"], fn f ->
-    = label f, :first_name
-    = text_input f, :first_name
-    = error_tag f, :first_name
+  section
+    header#subnav
+      = live_redirect "People", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
+      = live_redirect "#{@person.first_name} #{@person.last_name}", to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, @person), data: [role: "name"]
+      span Edit
 
-    = label f, :last_name
-    = text_input f, :last_name
-    = error_tag f, :last_name
+  section
+    h3 Identifying Information
 
-    = submit "Save", phx_disable_with: "Saving..."
+    = form_for @changeset, "#", [id: "person-form", phx_submit: "save"], fn f ->
+
+      fieldset
+        = label f, :first_name, "First Name"
+        = text_input f, :first_name
+        = error_tag f, :first_name
+
+      fieldset
+        = label f, :last_name, "Last Name"
+        = text_input f, :last_name
+        = error_tag f, :last_name
+
+      = submit "Save", phx_disable_with: "Saving..."

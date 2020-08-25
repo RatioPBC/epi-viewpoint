@@ -1,12 +1,9 @@
 @import "variables"
 @import "mixins"
 
-html
-  position: relative
-  background-color: white
-  font-size: $em-base
-  -webkit-font-smoothing: antialiased
-  min-height: 100%
+a
+  text-decoration: none
+  color: $link-color
 
 body
   font-size: $medium-font-size
@@ -14,18 +11,13 @@ body
   line-height: $medium-line-height
   @include pancake-stack
 
-main
-  background-color: white
+fieldset
+  border: none
+  margin: 0
+  padding: 0
 
 footer
   font-size: $small-font-size
-
-section
-  @include slab
-
-a
-  text-decoration: none
-  color: $link-color
 
 h1, h2, h3, h4, h5, h6
   margin: 0
@@ -34,6 +26,19 @@ h1
   font-weight: 800
   font-size: $very-large-font-size
   line-height: $very-large-line-height
+
+html
+  position: relative
+  background-color: white
+  font-size: $em-base
+  -webkit-font-smoothing: antialiased
+  min-height: 100%
+
+main
+  background-color: white
+
+section
+  @include slab
 
 ul
   list-style-type: none
