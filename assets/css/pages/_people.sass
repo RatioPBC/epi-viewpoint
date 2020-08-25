@@ -1,6 +1,14 @@
 @import "../mixins"
 
 #people-page
+  h2
+    @include level($justify: none)
+
+  #filter
+    @include button-list
+    display: inline-block
+    margin-left: 1rem
+
   table
     @include table
 

@@ -1,7 +1,7 @@
 defmodule Epicenter.DateParser do
   @mm_dd_yyyy_regex ~r|(?<mm>\d{2})[-/](?<dd>\d{2})[-/](?<yyyy>\d{4})|
 
-  def parse_mm_dd_yyyy(mm_dd_yyyy) do
+  def parse_mm_dd_yyyy(mm_dd_yyyy) when is_binary(mm_dd_yyyy) do
     captures = Regex.named_captures(@mm_dd_yyyy_regex, String.trim(mm_dd_yyyy))
 
     year = captures["yyyy"] |> to_integer()
@@ -11,6 +11,10 @@ defmodule Epicenter.DateParser do
     if [{year, 1850..2050}, {month, 1..12}, {day, 1..31}] |> Enum.all?(&valid?/1),
       do: Date.new(year, month, day),
       else: {:error, "Invalid mm-dd-yyyy format: #{mm_dd_yyyy}"}
+  end
+
+  def parse_mm_dd_yyyy(%Date{} = date) do
+    {:ok, date}
   end
 
   def parse_mm_dd_yyyy!(mm_dd_yyyy) do

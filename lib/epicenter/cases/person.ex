@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
+  alias Epicenter.Extra
 
   schema "people" do
     field :dob, :date
@@ -59,7 +60,17 @@ defmodule Epicenter.Cases.Person do
     import Ecto.Query
 
     def all() do
-      from person in Person, order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.id]
+      from person in Person,
+        order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.id]
+    end
+
+    def call_list() do
+      fifteen_days_ago = Extra.Date.days_ago(15)
+
+      from person in all(),
+        join: lab_result in assoc(person, :lab_results),
+        where: lab_result.result == "positive",
+        where: lab_result.sample_date > ^fifteen_days_ago
     end
 
     def opts_for_upsert() do

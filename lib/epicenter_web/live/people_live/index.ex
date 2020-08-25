@@ -9,22 +9,37 @@ defmodule EpicenterWeb.PeopleLive.Index do
     if connected?(socket),
       do: Cases.subscribe()
 
-    people = Cases.list_people() |> Cases.preload_lab_results()
-
-    {:ok, assign(socket, people: people, person_count: length(people), reload_message: nil)}
+    socket |> set_reload_message(nil) |> set_filter(:all) |> load_people() |> ok()
   end
 
-  def handle_info({:import, %ImportInfo{imported_person_count: imported_person_count}}, socket) do
-    socket = assign(socket, reload_message: "Show #{imported_person_count} new people")
+  def handle_info({:import, %ImportInfo{imported_person_count: imported_person_count}}, socket),
+    do: socket |> set_reload_message("Show #{imported_person_count} new people") |> noreply()
 
-    {:noreply, socket}
+  def handle_event("filter-all", _, socket),
+    do: socket |> set_filter(:all) |> load_people() |> noreply()
+
+  def handle_event("filter-call-list", _, socket),
+    do: socket |> set_filter(:call_list) |> load_people() |> noreply()
+
+  def handle_event("refresh-people", _, socket),
+    do: socket |> set_reload_message(nil) |> load_people() |> noreply()
+
+  defp set_filter(socket, filter),
+    do: socket |> assign(filter: filter)
+
+  defp set_reload_message(socket, message),
+    do: socket |> assign(reload_message: message)
+
+  defp load_people(socket) do
+    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results()
+    socket |> assign(people: people, person_count: length(people))
   end
 
-  def handle_event("refresh-people", _, socket) do
-    people = Cases.list_people() |> Cases.preload_lab_results()
-    socket = assign(socket, people: people, person_count: length(people), reload_message: nil)
-    {:noreply, socket}
-  end
+  defp ok(socket),
+    do: {:ok, socket}
+
+  defp noreply(socket),
+    do: {:noreply, socket}
 
   def latest_result(person),
     do: Person.latest_lab_result(person, :result)

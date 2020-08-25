@@ -27,7 +27,9 @@ defmodule Epicenter.Cases do
   def create_person(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert()
   def create_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert!()
   def get_person(id), do: Person |> Repo.get(id)
-  def list_people(), do: Person.Query.all() |> Repo.all()
+  def list_people(), do: list_people(:all)
+  def list_people(:all), do: Person.Query.all() |> Repo.all()
+  def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:lab_results])
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert!(Person.Query.opts_for_upsert())
 

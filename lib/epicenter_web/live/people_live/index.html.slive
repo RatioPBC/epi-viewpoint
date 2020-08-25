@@ -1,5 +1,11 @@
 section#people-page data-role="people-page"
-  h2 People
+  h2
+    | People
+    #filter
+      button class="#{@filter == :all && "active"}" phx-click="filter-all" All
+      button class="#{@filter == :call_list && "active"}" phx-click="filter-call-list" Call List
+      button disabled=true class="#{@filter == :contacts && "active"}" phx-click="filter-contacts" Contacts
+
   table
     thead
       tr

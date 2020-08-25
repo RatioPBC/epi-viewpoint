@@ -16,6 +16,10 @@ defmodule Epicenter.DateParserTest do
       assert DateParser.parse_mm_dd_yyyy("glorp") == {:error, "Invalid mm-dd-yyyy format: glorp"}
     end
 
+    test "accepts a Date" do
+      assert DateParser.parse_mm_dd_yyyy(~D[2020-06-01]) == {:ok, ~D[2020-06-01]}
+    end
+
     test "has a ! version" do
       assert DateParser.parse_mm_dd_yyyy!("06-01-2020") == ~D[2020-06-01]
       assert_raise RuntimeError, "Invalid mm-dd-yyyy format: glorp", fn -> DateParser.parse_mm_dd_yyyy!("glorp") end

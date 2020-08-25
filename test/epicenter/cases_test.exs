@@ -5,6 +5,7 @@ defmodule Epicenter.CasesTest do
 
   alias Epicenter.Cases
   alias Epicenter.Cases.Import.ImportInfo
+  alias Epicenter.Extra
   alias Epicenter.Test
 
   describe "importing" do
@@ -76,6 +77,27 @@ defmodule Epicenter.CasesTest do
       Test.Fixtures.person_attrs("first", "06-02-2000", first_name: "Alice", last_name: "Ant") |> Cases.create_person!()
 
       Cases.list_people() |> tids() |> assert_eq(~w{first middle last})
+    end
+
+    test "list_people can be filtered by call-list (recent positive lab results)" do
+      Test.Fixtures.person_attrs("no-results", "06-01-2000") |> Cases.create_person!()
+
+      Test.Fixtures.person_attrs("old-positive-result", "06-01-2000")
+      |> Cases.create_person!()
+      |> Test.Fixtures.lab_result_attrs("old-positive-result", Extra.Date.days_ago(20), result: "positive")
+      |> Cases.create_lab_result!()
+
+      Test.Fixtures.person_attrs("recent-negative-result", "06-01-2000")
+      |> Cases.create_person!()
+      |> Test.Fixtures.lab_result_attrs("recent-negative-result", Extra.Date.days_ago(1), result: "negative")
+      |> Cases.create_lab_result!()
+
+      Test.Fixtures.person_attrs("recent-positive-result", "06-01-2000")
+      |> Cases.create_person!()
+      |> Test.Fixtures.lab_result_attrs("recent-positive-result", Extra.Date.days_ago(1), result: "positive")
+      |> Cases.create_lab_result!()
+
+      Cases.list_people(:call_list) |> tids() |> assert_eq(~w{recent-positive-result})
     end
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
