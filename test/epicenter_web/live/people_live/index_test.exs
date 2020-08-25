@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.PeopleLiveTest do
+defmodule EpicenterWeb.PeopleLive.IndexTest do
   use EpicenterWeb.ConnCase
 
   import Phoenix.LiveViewTest
