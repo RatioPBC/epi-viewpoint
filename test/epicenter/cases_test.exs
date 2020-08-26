@@ -7,7 +7,6 @@ defmodule Epicenter.CasesTest do
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Extra
   alias Epicenter.Test
-  alias Epicenter.Version
 
   describe "importing" do
     test "import_lab_results imports lab results and creates lab_result and person records" do
@@ -66,13 +65,13 @@ defmodule Epicenter.CasesTest do
       assert person.tid == "alice"
       assert person.fingerprint == "2000-01-01 alice aliceblat"
 
-      assert %{"fingerprint" => "2000-01-01 alice aliceblat"} = Version.latest_version(person).item_changes
+      assert %{"fingerprint" => "2000-01-01 alice aliceblat"} = Repo.Versioned.last_version(person).item_changes
     end
 
     test "create_person creates a person" do
       {:ok, person} = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person()
       assert person.fingerprint == "2000-01-01 alice aliceblat"
-      assert %{"fingerprint" => "2000-01-01 alice aliceblat"} = Version.latest_version(person).item_changes
+      assert %{"fingerprint" => "2000-01-01 alice aliceblat"} = Repo.Versioned.last_version(person).item_changes
     end
 
     test "get_person" do
@@ -116,18 +115,21 @@ defmodule Epicenter.CasesTest do
 
       assert updated_person.first_name == "version-2"
 
-      assert Version.latest_version(updated_person).item_changes == %{
+      assert Repo.Versioned.last_version(updated_person).item_changes == %{
                "fingerprint" => "2000-01-01 version-2 versionedblat",
                "first_name" => "version-2"
              }
 
       {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-3"})
 
-      assert Version.all_versions(updated_person) |> Euclid.Extra.Enum.pluck(:item_changes) == [
-               %{"fingerprint" => "2000-01-01 version-3 versionedblat", "first_name" => "version-3"},
-               %{"fingerprint" => "2000-01-01 version-2 versionedblat", "first_name" => "version-2"},
-               %{"fingerprint" => "2000-01-01 version-1 versionedblat", "first_name" => "version-1"}
-             ]
+      updated_person
+      |> Repo.Versioned.all_versions()
+      |> Enum.map(& &1.item_changes["fingerprint"])
+      |> assert_eq([
+        "2000-01-01 version-3 versionedblat",
+        "2000-01-01 version-2 versionedblat",
+        "2000-01-01 version-1 versionedblat"
+      ])
     end
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do

@@ -24,14 +24,14 @@ defmodule Epicenter.Cases do
   #
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
   def count_people(), do: Person |> Repo.aggregate(:count)
-  def create_person(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert_with_version()
-  def create_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert_with_version!()
+  def create_person(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert()
+  def create_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!()
   def get_person(id), do: Person |> Repo.get(id)
   def list_people(), do: list_people(:all)
   def list_people(:all), do: Person.Query.all() |> Repo.all()
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:lab_results])
-  def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.update_with_version()
+  def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert!(Person.Query.opts_for_upsert())
 
   #

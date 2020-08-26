@@ -3,9 +3,17 @@ defmodule Epicenter.Repo do
     otp_app: :epicenter,
     adapter: Ecto.Adapters.Postgres
 
-  alias Epicenter.Version
+  defmodule Versioned do
+    def all_versions(record), do: PaperTrail.get_versions(record) |> Enum.sort_by(& &1.id, :desc)
+    def last_version(record), do: PaperTrail.get_version(record)
 
-  def insert_with_version(changeset), do: changeset |> Version.insert()
-  def insert_with_version!(changeset), do: changeset |> Version.insert!()
-  def update_with_version(changeset), do: changeset |> Version.update()
+    def insert(changeset), do: changeset |> PaperTrail.insert() |> unwrap_result()
+    def insert!(changeset), do: changeset |> PaperTrail.insert!()
+    def update(changeset), do: changeset |> PaperTrail.update() |> unwrap_result()
+
+    # # #
+
+    defp unwrap_result({:ok, result}), do: {:ok, result |> Map.get(:model)}
+    defp unwrap_result({:error, changeset}), do: {:error, changeset}
+  end
 end
