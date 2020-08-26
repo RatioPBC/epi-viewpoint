@@ -4,7 +4,7 @@ section#people-page data-role="people-page"
     #filter
       = live_patch "All", to: Routes.people_index_path(@socket, :index, filter: :all), class: "button", data: [active: @filter in [:all, nil]]
       = live_patch "Call list", to: Routes.people_index_path(@socket, :index, filter: :call_list), class: "button", data: [active: @filter == :call_list]
-      = live_patch "Contacts", to: Routes.people_index_path(@socket, :index, filter: :contacts), class: "button", data: [active: @filter == :contacts, disabled: true]
+      = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
   table
     thead
