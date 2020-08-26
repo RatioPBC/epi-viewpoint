@@ -25,6 +25,11 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
+  def user_attrs(tid, attrs \\ %{}) do
+    %{tid: tid, username: tid}
+    |> merge_attrs(attrs)
+  end
+
   defp merge_attrs(defaults, attrs) do
     Map.merge(defaults, Enum.into(attrs, %{}))
   end
