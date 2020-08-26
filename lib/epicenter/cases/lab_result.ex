@@ -6,12 +6,15 @@ defmodule Epicenter.Cases.LabResult do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "lab_results" do
     field :request_accession_number, :string
     field :request_facility_code, :string
     field :request_facility_name, :string
     field :result, :string
     field :sample_date, :date
+    field :seq, :integer
     field :tid, :string
 
     timestamps()
@@ -33,7 +36,7 @@ defmodule Epicenter.Cases.LabResult do
     import Ecto.Query
 
     def all() do
-      from lab_result in LabResult, order_by: [asc: lab_result.sample_date, asc: lab_result.id]
+      from lab_result in LabResult, order_by: [asc: lab_result.sample_date, asc: lab_result.seq]
     end
   end
 end

@@ -18,6 +18,7 @@ defmodule Epicenter.Cases.LabResultTest do
           {:request_facility_name, :string},
           {:result, :string},
           {:sample_date, :date},
+          {:seq, :integer},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]

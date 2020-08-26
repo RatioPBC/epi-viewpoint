@@ -8,11 +8,14 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
   schema "people" do
     field :dob, :date
     field :fingerprint, :string
     field :first_name, :string
     field :last_name, :string
+    field :seq, :integer
     field :tid, :string
 
     timestamps()
@@ -61,7 +64,7 @@ defmodule Epicenter.Cases.Person do
 
     def all() do
       from person in Person,
-        order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.id]
+        order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.seq]
     end
 
     def call_list() do

@@ -3,7 +3,7 @@ defmodule Epicenter.Repo.Migrations.AddPersonIdToLabResults do
 
   def change do
     alter table(:lab_results) do
-      add :person_id, references(:people)
+      add :person_id, references(:people, type: :uuid)
     end
   end
 end

@@ -18,6 +18,7 @@ defmodule Epicenter.Cases.PersonTest do
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:last_name, :string},
+          {:seq, :integer},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]
