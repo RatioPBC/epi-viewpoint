@@ -12,10 +12,10 @@ defmodule Epicenter.Accounts.UserTest do
         [
           {:id, :binary_id},
           {:inserted_at, :naive_datetime},
-          {:username, :string},
           {:seq, :bigserial},
           {:tid, :string},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :naive_datetime},
+          {:username, :string}
         ]
       )
     end
