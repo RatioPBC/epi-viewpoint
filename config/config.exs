@@ -23,6 +23,12 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :paper_trail,
+  item_type: Ecto.UUID,
+  originator: [name: :user, model: Epicenter.Accounts.User],
+  originator_type: Ecto.UUID,
+  repo: Epicenter.Repo
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
