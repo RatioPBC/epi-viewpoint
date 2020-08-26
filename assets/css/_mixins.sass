@@ -1,14 +1,19 @@
 @import "variables"
 
 @mixin button-list
-  button
+  .button
     @include button-primary-small
     border-radius: 0
     border-right-width: 0
+    font-weight: normal
 
-    &:disabled
+    &[data-active=true]
+      text-decoration: underline
+
+    &[data-disabled=true]
       border-color: $disabled-control-color
       color: $disabled-control-color
+      cursor: default
 
     &:first-of-type
       border-radius: 2px 0 0 2px
@@ -17,9 +22,6 @@
     &:last-of-type
       border-radius: 0 2px 2px 0
       border-right-width: 1px
-
-    &.active
-      text-decoration: underline
 
 @mixin button-primary
   background-color: white

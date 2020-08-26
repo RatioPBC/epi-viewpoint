@@ -2,9 +2,9 @@ section#people-page data-role="people-page"
   h2
     | People
     #filter
-      button class="#{@filter == :all && "active"}" phx-click="filter-all" All
-      button class="#{@filter == :call_list && "active"}" phx-click="filter-call-list" Call List
-      button disabled=true class="#{@filter == :contacts && "active"}" phx-click="filter-contacts" Contacts
+      = live_patch "All", to: Routes.people_index_path(@socket, :index, filter: :all), class: "button", data: [active: @filter in [:all, nil]]
+      = live_patch "Call list", to: Routes.people_index_path(@socket, :index, filter: :call_list), class: "button", data: [active: @filter == :call_list]
+      = live_patch "Contacts", to: Routes.people_index_path(@socket, :index, filter: :contacts), class: "button", data: [active: @filter == :contacts, disabled: true]
 
   table
     thead
