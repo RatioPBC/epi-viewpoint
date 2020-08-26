@@ -19,5 +19,6 @@ defmodule Epicenter.Accounts.User do
     user
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+    |> unique_constraint(:username)
   end
 end

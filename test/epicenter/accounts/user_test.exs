@@ -29,5 +29,12 @@ defmodule Epicenter.Accounts.UserTest do
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "username is required", do: assert_invalid(new_changeset(username: nil))
+
+    test "username must be unique" do
+      Test.Fixtures.user_attrs("alice") |> Accounts.create_user!()
+
+      {:error, changeset} = Test.Fixtures.user_attrs("alice") |> Accounts.create_user()
+      assert errors_on(changeset).username == ["has already been taken"]
+    end
   end
 end
