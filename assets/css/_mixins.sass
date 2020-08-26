@@ -36,8 +36,11 @@
 @mixin form
   margin-top: 1rem
 
-  label, input, span.invalid-feedback
+  label, input
     display: block
+
+  button
+    margin-top: 1rem
 
   fieldset
     margin-top: 1rem
@@ -48,8 +51,11 @@
     input
       margin-top: 0.25rem
 
-  button
-    margin-top: 1rem
+  .invalid-feedback
+    color: $error-color
+    font-size: $small-font-size
+    font-weight: normal
+    padding-left: 0.5rem
 
 @mixin hero
   margin: 2rem auto

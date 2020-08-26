@@ -19,4 +19,13 @@ defmodule EpicenterWeb.PeopleLive.Edit do
         {:noreply, assign(socket, :changeset, changeset)}
     end
   end
+
+  def handle_event("validate", %{"person" => person_params}, socket) do
+    socket
+    |> assign(changeset: Cases.change_person(socket.assigns.person, person_params) |> Map.put(:action, :validate))
+    |> noreply()
+  end
+
+  defp noreply(socket),
+    do: {:noreply, socket}
 end
