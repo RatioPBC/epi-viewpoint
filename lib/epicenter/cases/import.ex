@@ -1,4 +1,5 @@
 defmodule Epicenter.Cases.Import do
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Csv
   alias Epicenter.DateParser
@@ -17,7 +18,7 @@ defmodule Epicenter.Cases.Import do
     defstruct ~w{imported_person_count imported_lab_result_count total_person_count total_lab_result_count}a
   end
 
-  def from_csv(csv_string) do
+  def from_csv(csv_string, %Accounts.User{} = originator) do
     {:ok, rows} = Csv.read(csv_string, @fields)
 
     result =
@@ -27,6 +28,7 @@ defmodule Epicenter.Cases.Import do
             row
             |> Map.take(@required_person_fields ++ @optional_person_fields)
             |> Map.update!("dob", &DateParser.parse_mm_dd_yyyy!/1)
+            |> Map.put("originator", originator)
             |> Euclid.Extra.Map.rename_key("person_tid", "tid")
             |> Cases.upsert_person!()
 

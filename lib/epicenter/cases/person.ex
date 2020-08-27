@@ -15,6 +15,7 @@ defmodule Epicenter.Cases.Person do
     field :fingerprint, :string
     field :first_name, :string
     field :last_name, :string
+    field :originator, :map, virtual: true
     field :seq, :integer
     field :tid, :string
 
@@ -23,7 +24,7 @@ defmodule Epicenter.Cases.Person do
     has_many :lab_results, LabResult
   end
 
-  @required_attrs ~w{dob first_name last_name}a
+  @required_attrs ~w{dob first_name last_name originator}a
   @optional_attrs ~w{tid}a
 
   def changeset(person, attrs) do

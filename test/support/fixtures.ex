@@ -15,11 +15,12 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def person_attrs(tid, dob, attrs \\ %{}) do
+  def person_attrs(user, tid, dob, attrs \\ %{}) do
     %{
       dob: dob |> DateParser.parse_mm_dd_yyyy!(),
       first_name: String.capitalize(tid),
       last_name: String.capitalize(tid <> "blat"),
+      originator: user,
       tid: tid
     }
     |> merge_attrs(attrs)

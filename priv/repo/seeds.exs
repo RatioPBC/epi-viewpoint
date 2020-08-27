@@ -10,5 +10,11 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-IO.puts("Creating superuser!")
-Epicenter.Accounts.create_user!(%{username: "superuser"})
+if Application.get_env(:epicenter, :seeds_enabled?) do
+  IO.puts("RUNNING SEEDS...")
+
+  for username <- ["superuser"] do
+    IO.puts("Creating user: #{username} with tid #{username}")
+    Epicenter.Accounts.create_user!(%{username: username, tid: username})
+  end
+end

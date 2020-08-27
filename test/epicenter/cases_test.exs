@@ -3,6 +3,7 @@ defmodule Epicenter.CasesTest do
 
   import Euclid.Extra.Enum, only: [tids: 1]
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Extra
@@ -10,12 +11,14 @@ defmodule Epicenter.CasesTest do
 
   describe "importing" do
     test "import_lab_results imports lab results and creates lab_result and person records" do
+      originator = Test.Fixtures.user_attrs("originator") |> Accounts.create_user!()
+
       """
       first_name , last_name , dob        , sample_date , result_date , result
       Alice      , Ant       , 01/02/1970 , 06/01/2020  , 06/03/2020  , positive
       Billy      , Bat       , 03/04/1990 , 06/06/2020  , 06/07/2020  , negative
       """
-      |> Cases.import_lab_results()
+      |> Cases.import_lab_results(originator)
       |> assert_eq(
         {:ok,
          %ImportInfo{
@@ -33,7 +36,8 @@ defmodule Epicenter.CasesTest do
 
   describe "lab results" do
     test "create_lab_result! creates a lab result" do
-      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
       lab_result = Test.Fixtures.lab_result_attrs(person, "result1", "06-01-2020") |> Cases.create_lab_result!()
 
       assert lab_result.request_accession_number == "accession-result1"
@@ -45,7 +49,8 @@ defmodule Epicenter.CasesTest do
     end
 
     test "list_lab_results sorts by sample date" do
-      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
 
       Test.Fixtures.lab_result_attrs(person, "newer", "06-03-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(person, "older", "06-01-2020") |> Cases.create_lab_result!()
@@ -57,7 +62,8 @@ defmodule Epicenter.CasesTest do
 
   describe "people" do
     test "create_person! creates a person" do
-      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
 
       assert person.dob == ~D[2000-01-01]
       assert person.first_name == "Alice"
@@ -69,39 +75,43 @@ defmodule Epicenter.CasesTest do
     end
 
     test "create_person creates a person" do
-      {:ok, person} = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person()
       assert person.fingerprint == "2000-01-01 alice aliceblat"
       assert_versioned(person)
     end
 
     test "get_person" do
-      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
       fetched = Cases.get_person(person.id)
       assert fetched.tid == "alice"
     end
 
     test "list_people sorts by last name (then first name, then dob descending)" do
-      Test.Fixtures.person_attrs("middle", "06-01-2000", first_name: "Alice", last_name: "Ant") |> Cases.create_person!()
-      Test.Fixtures.person_attrs("last", "06-01-2000", first_name: "Billy", last_name: "Ant") |> Cases.create_person!()
-      Test.Fixtures.person_attrs("first", "06-02-2000", first_name: "Alice", last_name: "Ant") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      Test.Fixtures.person_attrs(user, "middle", "06-01-2000", first_name: "Alice", last_name: "Ant") |> Cases.create_person!()
+      Test.Fixtures.person_attrs(user, "last", "06-01-2000", first_name: "Billy", last_name: "Ant") |> Cases.create_person!()
+      Test.Fixtures.person_attrs(user, "first", "06-02-2000", first_name: "Alice", last_name: "Ant") |> Cases.create_person!()
 
       Cases.list_people() |> tids() |> assert_eq(~w{first middle last})
     end
 
     test "list_people can be filtered by call-list (recent positive lab results)" do
-      Test.Fixtures.person_attrs("no-results", "06-01-2000") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      Test.Fixtures.person_attrs(user, "no-results", "06-01-2000") |> Cases.create_person!()
 
-      Test.Fixtures.person_attrs("old-positive-result", "06-01-2000")
+      Test.Fixtures.person_attrs(user, "old-positive-result", "06-01-2000")
       |> Cases.create_person!()
       |> Test.Fixtures.lab_result_attrs("old-positive-result", Extra.Date.days_ago(20), result: "positive")
       |> Cases.create_lab_result!()
 
-      Test.Fixtures.person_attrs("recent-negative-result", "06-01-2000")
+      Test.Fixtures.person_attrs(user, "recent-negative-result", "06-01-2000")
       |> Cases.create_person!()
       |> Test.Fixtures.lab_result_attrs("recent-negative-result", Extra.Date.days_ago(1), result: "negative")
       |> Cases.create_lab_result!()
 
-      Test.Fixtures.person_attrs("recent-positive-result", "06-01-2000")
+      Test.Fixtures.person_attrs(user, "recent-positive-result", "06-01-2000")
       |> Cases.create_person!()
       |> Test.Fixtures.lab_result_attrs("recent-positive-result", Extra.Date.days_ago(1), result: "positive")
       |> Cases.create_lab_result!()
@@ -110,30 +120,47 @@ defmodule Epicenter.CasesTest do
     end
 
     test "update_person updates a person" do
-      person = Test.Fixtures.person_attrs("versioned", "01-01-2000", first_name: "version-1") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "versioned", "01-01-2000", first_name: "version-1") |> Cases.create_person!()
       {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-2"})
 
       assert updated_person.first_name == "version-2"
-
       assert_versioned(updated_person, expected_count: 2)
 
       {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-3"})
-
       assert_versioned(updated_person, expected_count: 3)
     end
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
-      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.upsert_person!()
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(creator, "alice", "01-01-2000") |> Cases.upsert_person!()
 
       assert person.dob == ~D[2000-01-01]
       assert person.first_name == "Alice"
       assert person.last_name == "Aliceblat"
       assert person.tid == "alice"
+
+      assert_versions(person, [
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 alice aliceblat",
+            "first_name" => "Alice",
+            "last_name" => "Aliceblat",
+            "originator" => %{"id" => creator.id},
+            "tid" => "alice"
+          },
+          by: "creator"
+        ]
+      ])
     end
 
     test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
-      Test.Fixtures.person_attrs("alice", "01-01-2000", tid: "first-insert") |> Cases.upsert_person!()
-      Test.Fixtures.person_attrs("alice", "01-01-2000", tid: "second-insert") |> Cases.upsert_person!()
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
+      Test.Fixtures.person_attrs(creator, "alice", "01-01-2000", tid: "first-insert") |> Cases.upsert_person!()
+
+      updater = Test.Fixtures.user_attrs("updater") |> Accounts.create_user!()
+      Test.Fixtures.person_attrs(updater, "alice", "01-01-2000", tid: "second-insert") |> Cases.upsert_person!()
 
       assert [person] = Cases.list_people()
 

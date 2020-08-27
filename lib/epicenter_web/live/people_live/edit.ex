@@ -2,9 +2,10 @@ defmodule EpicenterWeb.PeopleLive.Edit do
   use EpicenterWeb, :live_view
 
   alias Epicenter.Cases
+  alias EpicenterWeb.Session
 
   def mount(%{"id" => id}, _session, socket) do
-    person = Cases.get_person(id)
+    person = %{Cases.get_person(id) | originator: Session.get_current_user()}
     changeset = Cases.change_person(person, %{})
 
     {:ok, assign(socket, person: person, changeset: changeset)}

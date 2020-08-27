@@ -16,7 +16,7 @@ defmodule Epicenter.Cases do
   def change_lab_result(%LabResult{} = lab_result, attrs), do: LabResult.changeset(lab_result, attrs)
   def count_lab_results(), do: LabResult |> Repo.aggregate(:count)
   def create_lab_result!(attrs), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!()
-  def import_lab_results(lab_result_csv_string), do: Import.from_csv(lab_result_csv_string)
+  def import_lab_results(lab_result_csv_string, originator), do: Import.from_csv(lab_result_csv_string, originator)
   def list_lab_results(), do: LabResult.Query.all() |> Repo.all()
 
   #
@@ -32,7 +32,7 @@ defmodule Epicenter.Cases do
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:lab_results])
   def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
-  def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.insert!(Person.Query.opts_for_upsert())
+  def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
 
   #
   # pubsub

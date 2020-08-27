@@ -1,80 +1,182 @@
 defmodule Epicenter.RepoTest do
   use Epicenter.DataCase, async: true
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Repo
   alias Epicenter.Test
 
   describe "Versioned" do
-    test "insert creates a version" do
-      %Cases.Person{}
-      |> Cases.Person.changeset(Test.Fixtures.person_attrs("alice", "01-01-2000"))
+    setup do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person_changeset = %Cases.Person{} |> Cases.Person.changeset(Test.Fixtures.person_attrs(user, "version-1", "01-01-2000"))
+      [person_changeset: person_changeset, user: user]
+    end
+
+    test "insert creates a version", %{person_changeset: person_changeset, user: user} do
+      person_changeset
       |> Repo.Versioned.insert()
-      |> changed_tids()
-      |> assert_eq(~w{alice})
+      |> assert_versions([
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "first_name" => "Version-1",
+            "last_name" => "Version-1blat",
+            "originator" => %{"id" => user.id},
+            "tid" => "version-1"
+          },
+          by: "user"
+        ]
+      ])
     end
 
-    test "insert! creates a version" do
-      %Cases.Person{}
-      |> Cases.Person.changeset(Test.Fixtures.person_attrs("alice", "01-01-2000"))
+    test "insert! creates a version", %{person_changeset: person_changeset, user: user} do
+      person_changeset
       |> Repo.Versioned.insert!()
-      |> changed_tids()
-      |> assert_eq(~w{alice})
+      |> assert_versions([
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "first_name" => "Version-1",
+            "last_name" => "Version-1blat",
+            "originator" => %{"id" => user.id},
+            "tid" => "version-1"
+          },
+          by: "user"
+        ]
+      ])
     end
 
-    test "update creates a version" do
-      person = Test.Fixtures.person_attrs("version-1", "01-01-2000") |> Cases.create_person!()
+    test "update creates a version", %{person_changeset: person_changeset, user: user} do
+      person = person_changeset |> Repo.Versioned.insert!()
 
       person
       |> Cases.Person.changeset(%{tid: "version-2"})
       |> Repo.Versioned.update()
-      |> changed_tids()
-      |> assert_eq(~w{version-2 version-1})
+      |> assert_versions([
+        [change: %{"tid" => "version-2"}, by: "user"],
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "first_name" => "Version-1",
+            "last_name" => "Version-1blat",
+            "originator" => %{"id" => user.id},
+            "tid" => "version-1"
+          },
+          by: "user"
+        ]
+      ])
     end
 
-    test "update! creates a version" do
-      person = Test.Fixtures.person_attrs("version-1", "01-01-2000") |> Cases.create_person!()
+    test "update! creates a version", %{person_changeset: person_changeset, user: user} do
+      person = person_changeset |> Repo.Versioned.insert!()
 
       person
       |> Cases.Person.changeset(%{tid: "version-2"})
       |> Repo.Versioned.update!()
-      |> changed_tids()
-      |> assert_eq(~w{version-2 version-1})
+      |> assert_versions([
+        [change: %{"tid" => "version-2"}, by: "user"],
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "first_name" => "Version-1",
+            "last_name" => "Version-1blat",
+            "originator" => %{"id" => user.id},
+            "tid" => "version-1"
+          },
+          by: "user"
+        ]
+      ])
     end
 
-    test "does not version empty changes" do
-      person = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+    test "does not version empty changes", %{person_changeset: person_changeset, user: user} do
+      person = person_changeset |> Repo.Versioned.insert!()
 
       person
-      |> changed_tids()
-      |> assert_eq(~w{alice})
+      |> assert_versions([
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "first_name" => "Version-1",
+            "last_name" => "Version-1blat",
+            "originator" => %{"id" => user.id},
+            "tid" => "version-1"
+          },
+          by: "user"
+        ]
+      ])
 
       person
       |> Cases.change_person(%{tid: person.tid})
       |> Repo.Versioned.update!()
-      |> changed_tids()
-      |> assert_eq(~w{alice})
+      |> assert_versions([
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "first_name" => "Version-1",
+            "last_name" => "Version-1blat",
+            "originator" => %{"id" => user.id},
+            "tid" => "version-1"
+          },
+          by: "user"
+        ]
+      ])
     end
 
-    test "all_versions returns all versions sorted by id desc" do
-      person = Test.Fixtures.person_attrs("version-1", "01-01-2000") |> Cases.create_person!()
-      person |> Cases.Person.changeset(%{tid: "version-2"}) |> Repo.Versioned.update!()
+    test "all_versions returns all versions sorted by id desc", %{person_changeset: person_changeset, user: user} do
+      person = person_changeset |> Repo.Versioned.insert!()
 
-      person |> changed_tids() |> assert_eq(~w{version-2 version-1})
+      person
+      |> Cases.Person.changeset(%{tid: "version-2"})
+      |> Repo.Versioned.update!()
+
+      person
+      |> assert_versions([
+        [change: %{"tid" => "version-2"}, by: "user"],
+        [
+          change: %{
+            "dob" => "2000-01-01",
+            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "first_name" => "Version-1",
+            "last_name" => "Version-1blat",
+            "originator" => %{"id" => user.id},
+            "tid" => "version-1"
+          },
+          by: "user"
+        ]
+      ])
     end
 
-    test "last_version returns most recent version" do
-      person = Test.Fixtures.person_attrs("version-1", "01-01-2000") |> Cases.create_person!()
-      assert Repo.Versioned.last_version(person) |> Map.get(:item_changes) |> Map.get("tid") == "version-1"
+    test "last_version returns most recent version", %{person_changeset: person_changeset, user: user} do
+      person = person_changeset |> Repo.Versioned.insert!()
 
-      person |> Cases.Person.changeset(%{tid: "version-2"}) |> Repo.Versioned.update!()
-      assert Repo.Versioned.last_version(person) |> Map.get(:item_changes) |> Map.get("tid") == "version-2"
+      person
+      |> Repo.Versioned.last_version()
+      |> assert_version(
+        change: %{
+          "dob" => "2000-01-01",
+          "fingerprint" => "2000-01-01 version-1 version-1blat",
+          "first_name" => "Version-1",
+          "last_name" => "Version-1blat",
+          "originator" => %{"id" => user.id},
+          "tid" => "version-1"
+        },
+        by: "user"
+      )
+
+      person
+      |> Cases.Person.changeset(%{tid: "version-2"})
+      |> Repo.Versioned.update!()
+
+      person
+      |> Repo.Versioned.last_version()
+      |> assert_version(change: %{"tid" => "version-2"}, by: "user")
     end
   end
-
-  defp changed_tids({:ok, schema}),
-    do: schema |> Repo.Versioned.all_versions() |> Euclid.Extra.Enum.pluck(:item_changes) |> Enum.map(& &1["tid"])
-
-  defp changed_tids(schema),
-    do: schema |> Repo.Versioned.all_versions() |> Euclid.Extra.Enum.pluck(:item_changes) |> Enum.map(& &1["tid"])
 end

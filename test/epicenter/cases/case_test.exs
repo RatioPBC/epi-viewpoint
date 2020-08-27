@@ -1,17 +1,19 @@
 defmodule Epicenter.Cases.CaseTest do
   use Epicenter.DataCase, async: true
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Case
   alias Epicenter.Test
 
   describe "new" do
     test "with a list of people, creates cases with person and lab_results" do
-      alice = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, "alice_result_1", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, "alice_result_2", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
 
-      billy = Test.Fixtures.person_attrs("billy", "01-02-2000") |> Cases.create_person!()
+      billy = Test.Fixtures.person_attrs(user, "billy", "01-02-2000") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(billy, "billy_result_1", "07-01-2020", result: "negative") |> Cases.create_lab_result!()
 
       [alice, billy]
@@ -37,7 +39,8 @@ defmodule Epicenter.Cases.CaseTest do
     end
 
     test "does not blow up if the person has no lab results" do
-      alice = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
 
       assert Case.new(alice) == %Case{
                dob: ~D[2000-01-01],

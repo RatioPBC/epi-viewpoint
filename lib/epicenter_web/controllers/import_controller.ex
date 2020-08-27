@@ -10,14 +10,14 @@ defmodule EpicenterWeb.ImportController do
   alias EpicenterWeb.Session
 
   def create(conn, %{"file" => %Plug.Upload{path: path}}) do
-    {:ok, import_info} = path |> File.read!() |> Cases.import_lab_results()
+    {:ok, import_info} = path |> File.read!() |> Cases.import_lab_results(Session.get_current_user())
 
     conn
-    |> Session.put_last_csv_import_info(import_info)
+    |> Session.set_last_csv_import_info(import_info)
     |> redirect(to: Routes.import_path(conn, :show))
   end
 
   def show(conn, _params) do
-    conn |> render(last_csv_import_info: Session.last_csv_import_info(conn))
+    conn |> render(last_csv_import_info: Session.get_last_csv_import_info(conn))
   end
 end

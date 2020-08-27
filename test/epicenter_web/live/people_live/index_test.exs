@@ -3,6 +3,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
   import Phoenix.LiveViewTest
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Import
   alias Epicenter.Test
@@ -18,8 +19,9 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
   end
 
   test "shows people and person count", %{conn: conn} do
-    Test.Fixtures.person_attrs("alice", "06-01-2000") |> Cases.create_person!()
-    Test.Fixtures.person_attrs("billy", "06-01-2000") |> Cases.create_person!()
+    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+    Test.Fixtures.person_attrs(user, "alice", "06-01-2000") |> Cases.create_person!()
+    Test.Fixtures.person_attrs(user, "billy", "06-01-2000") |> Cases.create_person!()
 
     {:ok, page_live, _html} = live(conn, "/people")
 
@@ -36,8 +38,9 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     page_live |> people() |> assert_eq(~w{})
 
     # import 2 people
-    Test.Fixtures.person_attrs("alice", "06-01-2000") |> Cases.create_person!()
-    Test.Fixtures.person_attrs("billy", "06-01-2000") |> Cases.create_person!()
+    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+    Test.Fixtures.person_attrs(user, "alice", "06-01-2000") |> Cases.create_person!()
+    Test.Fixtures.person_attrs(user, "billy", "06-01-2000") |> Cases.create_person!()
 
     import_info = %Import.ImportInfo{
       imported_person_count: 2,

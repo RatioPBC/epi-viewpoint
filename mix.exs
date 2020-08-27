@@ -41,7 +41,7 @@ defmodule Epicenter.MixProject do
       {:jason, "~> 1.0"},
       {:mix_audit, "~> 0.1", only: [:dev, :test], runtime: false},
       {:nimble_csv, "~> 0.7"},
-      {:paper_trail, "~> 0.8.7"},
+      {:paper_trail, git: "https://github.com/hdtafur/paper_trail.git", branch: "eh-ht/ecto-options"},
       {:phoenix, "~> 1.5.4"},
       {:phoenix_ecto, "~> 4.1"},
       {:phoenix_html, "~> 2.11"},

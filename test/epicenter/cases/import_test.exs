@@ -3,17 +3,23 @@ defmodule Epicenter.Cases.ImportTest do
 
   import Euclid.Extra.Enum, only: [tids: 1]
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Import
+  alias Epicenter.Test
 
   describe "from_csv" do
-    test "creates LabResult records and Person records from csv data" do
+    setup do
+      [originator: Test.Fixtures.user_attrs("originator") |> Accounts.create_user!()]
+    end
+
+    test "creates LabResult records and Person records from csv data", %{originator: originator} do
       """
       first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
       Alice      , Ant       , 01/02/1970 , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1
       Billy      , Bat       , 03/04/1990 , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1
       """
-      |> Import.from_csv()
+      |> Import.from_csv(originator)
       |> assert_eq(
         {:ok,
          %Epicenter.Cases.Import.ImportInfo{
@@ -34,11 +40,14 @@ defmodule Epicenter.Cases.ImportTest do
       [alice, billy] = Cases.list_people()
       assert alice.tid == "alice"
       assert alice.first_name == "Alice"
+      assert_versioned(alice, expected_count: 1)
+
       assert billy.tid == "billy"
       assert billy.first_name == "Billy"
+      assert_versioned(billy, expected_count: 1)
     end
 
-    test "if two lab results have the same first_name, last_name, and dob, they are considered the same person" do
+    test "if two lab results have the same first_name, last_name, and dob, they are considered the same person", %{originator: originator} do
       """
       first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
       Alice      , Ant       , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
@@ -46,7 +55,7 @@ defmodule Epicenter.Cases.ImportTest do
       Billy      , Bat       , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive , billy-1    , billy-1-newer-result
       Billy      , Bat       , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
       """
-      |> Import.from_csv()
+      |> Import.from_csv(originator)
       |> assert_eq(
         {:ok,
          %Epicenter.Cases.Import.ImportInfo{

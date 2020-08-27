@@ -1,5 +1,8 @@
 use Mix.Config
 
+config :epicenter,
+  seeds_enabled?: true
+
 # Configure your database
 config :epicenter, Epicenter.Repo,
   username: "postgres",

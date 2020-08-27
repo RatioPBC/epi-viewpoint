@@ -8,7 +8,8 @@
 use Mix.Config
 
 config :epicenter,
-  ecto_repos: [Epicenter.Repo]
+  ecto_repos: [Epicenter.Repo],
+  seeds_enabled?: false
 
 # Configures the endpoint
 config :epicenter, EpicenterWeb.Endpoint,
