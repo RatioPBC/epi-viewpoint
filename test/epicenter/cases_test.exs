@@ -65,13 +65,13 @@ defmodule Epicenter.CasesTest do
       assert person.tid == "alice"
       assert person.fingerprint == "2000-01-01 alice aliceblat"
 
-      assert %{"fingerprint" => "2000-01-01 alice aliceblat"} = Repo.Versioned.last_version(person).item_changes
+      assert_versioned(person)
     end
 
     test "create_person creates a person" do
       {:ok, person} = Test.Fixtures.person_attrs("alice", "01-01-2000") |> Cases.create_person()
       assert person.fingerprint == "2000-01-01 alice aliceblat"
-      assert %{"fingerprint" => "2000-01-01 alice aliceblat"} = Repo.Versioned.last_version(person).item_changes
+      assert_versioned(person)
     end
 
     test "get_person" do
@@ -109,27 +109,17 @@ defmodule Epicenter.CasesTest do
       Cases.list_people(:call_list) |> tids() |> assert_eq(~w{recent-positive-result})
     end
 
-    test "update_person updates a person and saves the old version" do
+    test "update_person updates a person" do
       person = Test.Fixtures.person_attrs("versioned", "01-01-2000", first_name: "version-1") |> Cases.create_person!()
       {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-2"})
 
       assert updated_person.first_name == "version-2"
 
-      assert Repo.Versioned.last_version(updated_person).item_changes == %{
-               "fingerprint" => "2000-01-01 version-2 versionedblat",
-               "first_name" => "version-2"
-             }
+      assert_versioned(updated_person, expected_count: 2)
 
       {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-3"})
 
-      updated_person
-      |> Repo.Versioned.all_versions()
-      |> Enum.map(& &1.item_changes["fingerprint"])
-      |> assert_eq([
-        "2000-01-01 version-3 versionedblat",
-        "2000-01-01 version-2 versionedblat",
-        "2000-01-01 version-1 versionedblat"
-      ])
+      assert_versioned(updated_person, expected_count: 3)
     end
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do

@@ -26,6 +26,7 @@ defmodule Epicenter.DataCase do
       import Epicenter.DataCase
       import Epicenter.Test.ChangesetAssertions
       import Epicenter.Test.SchemaAssertions
+      import Epicenter.Test.VersionAssertions
       import Euclid.Test.Extra.Assertions
     end
   end
