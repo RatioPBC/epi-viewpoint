@@ -4,6 +4,7 @@
 
 * Repo: https://gitlab.com/geometerio/resolve/epicenter
 * CI: https://gitlab.com/geometerio/resolve/epicenter/-/pipelines
+* Staging: https://geometer-epicenter.herokuapp.com/ (basic auth username and password are in the Epicenter vault in 1Password)
 
 ## Terminology (work-in-progress)
 * case - a person with confirmed or suspected covid
