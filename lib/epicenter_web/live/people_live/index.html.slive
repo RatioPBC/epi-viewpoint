@@ -1,7 +1,12 @@
 section#people-page data-role="people-page"
   h2
-    | People
+    #title
+      span People
+
     #filter
+      span data-role="reload-message"
+        = if @reload_message do
+          = link @reload_message, to: "#", phx_click: "refresh-people", id: "reload-message"
       = live_patch "All", to: Routes.people_index_path(@socket, :index, filter: :all), class: "button", data: [active: @filter in [:all, nil]]
       = live_patch "Call list", to: Routes.people_index_path(@socket, :index, filter: :call_list), class: "button", data: [active: @filter == :call_list]
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
@@ -9,26 +14,15 @@ section#people-page data-role="people-page"
   table
     thead
       tr
-        th Last name
-        th First name
+        th Name
         th DOB
         th Latest lab status
         th Latest lab date
-        th
 
-      tr#subheader
-        th colspan="2" data-role="person-count"
-          = "#{@person_count} people"
-        th colspan="4" data-role="reload-message"
-          = if @reload_message do
-            = link @reload_message, to: "#", phx_click: "refresh-people"
     tbody
       = for person <- @people do
         tr data-role="person" data-tid=person.tid
-          td= person.last_name
-          td= person.first_name
+          td= live_redirect "#{person.first_name} #{person.last_name}", to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
           td= person.dob
           td= latest_result(person)
           td= latest_sample_date(person)
-          td= live_redirect "View", to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
-

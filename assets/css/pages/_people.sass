@@ -4,26 +4,21 @@
   h2
     @include level($justify: space-between)
 
+    #title
+      @include level($justify: left)
+
   #filter
     @include button-list
     display: inline-block
     margin-left: 1rem
+
+  #reload-message
+    @include button-primary-small
+    margin-right: 1rem
+    font-weight: normal
 
   table
     @include table
 
     margin-top: 2rem
     width: 100%
-
-    tr#subheader
-      th
-        font-weight: normal
-
-      th:first-child
-        color: $diminished-text-color
-
-      th:last-child
-        text-align: right
-
-        a
-          @include button-primary-small

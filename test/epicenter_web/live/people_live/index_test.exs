@@ -25,7 +25,6 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
     {:ok, page_live, _html} = live(conn, "/people")
 
-    assert_role_text(page_live, "person-count", "2 people")
     page_live |> people() |> assert_eq(~w{alice billy})
   end
 
@@ -33,7 +32,6 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     {:ok, page_live, _html} = live(conn, "/people")
 
     # start off with no people
-    assert_role_text(page_live, "person-count", "0 people")
     assert_role_text(page_live, "reload-message", "")
     page_live |> people() |> assert_eq(~w{})
 
@@ -52,13 +50,11 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     Cases.broadcast({:import, import_info})
 
     # show a button to make the people visible
-    assert_role_text(page_live, "person-count", "0 people")
     assert_role_text(page_live, "reload-message", "Show 2 new people")
     page_live |> people() |> assert_eq(~w{})
 
     # show the new people after the button is clicked
     render_click(page_live, "refresh-people")
-    assert_role_text(page_live, "person-count", "2 people")
     assert_role_text(page_live, "reload-message", "")
     page_live |> people() |> assert_eq(~w{alice billy})
   end

@@ -2,12 +2,17 @@
 @import "variables"
 
 #nav
-  justify-content: space-between
-  @include slab($display: flex)
+  @include slab
 
-  #nav-left
-    font-weight: bold
-    @include level
+  #nav-border
+    border-bottom: 1px solid $border-color
+    display: flex
+    justify-content: space-between
+    padding-bottom: 1rem
 
-  #nav-right
-    @include level
+    #nav-left
+      font-weight: bold
+      @include level
+
+    #nav-right
+      @include level
