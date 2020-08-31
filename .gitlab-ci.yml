@@ -4,6 +4,8 @@ clone:
 services:
   - postgres:12.2-alpine
 variables:
+  GIT_DEPTH: 0
+  GIT_STRATEGY: clone
   POSTGRES_DB: epicenter_test
   POSTGRES_HOST: postgres
   POSTGRES_HOST_AUTH_METHOD: trust
