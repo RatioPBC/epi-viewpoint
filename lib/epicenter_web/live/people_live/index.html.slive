@@ -16,13 +16,11 @@ section#people-page data-role="people-page"
       tr data-role="table-column-names"
         th Name
         th DOB
-        th Latest lab status
-        th Latest lab date
+        th Latest test result
 
     tbody
       = for person <- @people do
         tr data-role="person" data-tid=person.tid
-          td= live_redirect "#{person.first_name} #{person.last_name}", to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
+          td= live_redirect full_name(person), to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
           td= person.dob
           td= latest_result(person)
-          td= latest_sample_date(person)

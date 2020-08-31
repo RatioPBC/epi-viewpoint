@@ -3,6 +3,12 @@ defmodule Epicenter.Extra.StringTest do
 
   alias Epicenter.Extra
 
+  describe "pluralize" do
+    test "zero", do: assert(Extra.String.pluralize(0, "nerd", "nerds") == "0 nerds")
+    test "one", do: assert(Extra.String.pluralize(1, "nerd", "nerds") == "1 nerd")
+    test "many", do: assert(Extra.String.pluralize(2, "nerd", "nerds") == "2 nerds")
+  end
+
   describe "squish" do
     test "removes whitespace" do
       assert " foo  BAR  \t baz \n FEz    " |> Extra.String.squish() == "foo BAR baz FEz"

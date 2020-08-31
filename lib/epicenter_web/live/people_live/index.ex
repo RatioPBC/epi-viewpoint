@@ -4,6 +4,7 @@ defmodule EpicenterWeb.PeopleLive.Index do
   alias Epicenter.Cases
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Cases.Person
+  alias Epicenter.Extra
 
   def mount(_params, _session, socket) do
     if connected?(socket),
@@ -43,16 +44,28 @@ defmodule EpicenterWeb.PeopleLive.Index do
 
   # # #
 
+  def full_name(person),
+    do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
+
+  def latest_result(person) do
+    result = Person.latest_lab_result(person, :result)
+
+    if result do
+      days_ago =
+        Person.latest_lab_result(person, :sample_date)
+        |> Extra.Date.days_ago()
+        |> Extra.String.pluralize("day ago", "days ago")
+
+      "#{result}, #{days_ago}"
+    else
+      ""
+    end
+  end
+
   defp load_people(socket) do
     people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results()
     socket |> assign(people: people, person_count: length(people))
   end
-
-  def latest_result(person),
-    do: Person.latest_lab_result(person, :result)
-
-  def latest_sample_date(person),
-    do: Person.latest_lab_result(person, :sample_date)
 
   def page_title(:all), do: "People"
   def page_title(:call_list), do: "Call List"
