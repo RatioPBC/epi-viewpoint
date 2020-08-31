@@ -1,4 +1,6 @@
 image: circleci/elixir:1.10.4-node-browsers
+clone:
+  depth: full
 services:
   - postgres:12.2-alpine
 variables:
