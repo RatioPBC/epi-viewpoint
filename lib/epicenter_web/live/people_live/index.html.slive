@@ -11,9 +11,9 @@ section#people-page data-role="people-page"
       = live_patch "Call list", to: Routes.people_index_path(@socket, :index, filter: :call_list), class: "button", data: [active: @filter == :call_list]
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
-  table
+  table data-role="people"
     thead
-      tr
+      tr data-role="table-column-names"
         th Name
         th DOB
         th Latest lab status

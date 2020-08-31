@@ -11,6 +11,9 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
   defp people(page_live),
     do: page_live |> render() |> Test.Html.parse_doc() |> Test.Html.all("[data-role=person]", as: :tids)
 
+  defp table_contents(page_live),
+    do: page_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "people")
+
   test "disconnected and connected render", %{conn: conn} do
     {:ok, page_live, disconnected_html} = live(conn, "/people")
 
@@ -25,7 +28,13 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
     {:ok, page_live, _html} = live(conn, "/people")
 
-    page_live |> people() |> assert_eq(~w{alice billy})
+    page_live
+    |> table_contents()
+    |> assert_eq([
+      ["Name", "DOB", "Latest lab status", "Latest lab date"],
+      ["Alice Aliceblat", "2000-06-01", "", ""],
+      ["Billy Billyblat", "2000-06-01", "", ""]
+    ])
   end
 
   test "shows a reload message after an import", %{conn: conn} do
@@ -33,7 +42,12 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
     # start off with no people
     assert_role_text(page_live, "reload-message", "")
-    page_live |> people() |> assert_eq(~w{})
+
+    page_live
+    |> table_contents()
+    |> assert_eq([
+      ["Name", "DOB", "Latest lab status", "Latest lab date"]
+    ])
 
     # import 2 people
     user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
@@ -56,6 +70,13 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     # show the new people after the button is clicked
     render_click(page_live, "refresh-people")
     assert_role_text(page_live, "reload-message", "")
-    page_live |> people() |> assert_eq(~w{alice billy})
+
+    page_live
+    |> table_contents()
+    |> assert_eq([
+      ["Name", "DOB", "Latest lab status", "Latest lab date"],
+      ["Alice Aliceblat", "2000-06-01", "", ""],
+      ["Billy Billyblat", "2000-06-01", "", ""]
+    ])
   end
 end
