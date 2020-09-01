@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source "bin/_support/cecho.sh"
+source "bin/_support/confirm.sh"
+
+echo ""
+cecho --bold-bright-yellow "This migration script is for manual migrations to Heroku."
+cecho --yellow "Normally, migrations are handled during Heroku releases (see Procfile),"
+cecho --yellow "but maybe you need to run them manually sometimes."
+
+confirm "Run migrations manually"
+
+heroku run "POOL_SIZE=2 mix ecto.migrate"
