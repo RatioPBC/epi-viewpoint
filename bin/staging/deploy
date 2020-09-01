@@ -26,7 +26,7 @@ deploy() {
 
   check "heroku: POOL_SIZE is set" \
     "heroku config | grep -s POOL_SIZE" \
-    "heroku config:set POOL_SIZE=18"
+    "heroku config:set POOL_SIZE=10"
 
   envrc_variables=$(sed -E 's/export ([^=]+)=.+/\1/' .envrc.sample)
   while IFS= read -r var; do
