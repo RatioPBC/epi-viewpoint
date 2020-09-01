@@ -7,7 +7,7 @@ defmodule Epicenter.Cases.Import do
   @required_lab_result_fields ~w{result result_date sample_date}
   @optional_lab_result_fields ~w{lab_result_tid}
   @required_person_fields ~w{dob first_name last_name}
-  @optional_person_fields ~w{person_tid}
+  @optional_person_fields ~w{case_id person_tid}
 
   @fields [
     required: @required_lab_result_fields ++ @required_person_fields,
@@ -29,6 +29,7 @@ defmodule Epicenter.Cases.Import do
             |> Map.take(@required_person_fields ++ @optional_person_fields)
             |> Map.update!("dob", &DateParser.parse_mm_dd_yyyy!/1)
             |> Map.put("originator", originator)
+            |> Euclid.Extra.Map.rename_key("case_id", "external_id")
             |> Euclid.Extra.Map.rename_key("person_tid", "tid")
             |> Cases.upsert_person!()
 
