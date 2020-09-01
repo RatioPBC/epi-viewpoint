@@ -13,6 +13,7 @@ defmodule Epicenter.Cases.Person do
   @foreign_key_type :binary_id
   schema "people" do
     field :dob, :date
+    field :external_id, :string
     field :fingerprint, :string
     field :first_name, :string
     field :last_name, :string
@@ -26,7 +27,7 @@ defmodule Epicenter.Cases.Person do
   end
 
   @required_attrs ~w{dob first_name last_name originator}a
-  @optional_attrs ~w{tid}a
+  @optional_attrs ~w{external_id tid}a
 
   def changeset(person, attrs) do
     person

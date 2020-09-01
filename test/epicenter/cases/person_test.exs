@@ -15,6 +15,7 @@ defmodule Epicenter.Cases.PersonTest do
         Person,
         [
           {:dob, :date},
+          {:external_id, :string},
           {:fingerprint, :string},
           {:first_name, :string},
           {:id, :id},
@@ -53,7 +54,18 @@ defmodule Epicenter.Cases.PersonTest do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       default_attrs = Test.Fixtures.person_attrs(user, "alice")
-      Cases.change_person(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
+      Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
+    end
+
+    test "attributes" do
+      changeset = new_changeset(%{external_id: "10000"})
+      assert changeset.changes.dob == ~D[2000-01-01]
+      assert changeset.changes.external_id == "10000"
+      assert changeset.changes.fingerprint == "2000-01-01 alice testuser"
+      assert changeset.changes.first_name == "Alice"
+      assert changeset.changes.last_name == "Testuser"
+      assert changeset.changes.originator.tid == "user"
+      assert changeset.changes.tid == "alice"
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))

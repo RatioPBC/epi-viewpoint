@@ -126,7 +126,7 @@ defmodule Epicenter.CasesTest do
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
       creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
-      person = Test.Fixtures.person_attrs(creator, "alice") |> Cases.upsert_person!()
+      person = Test.Fixtures.person_attrs(creator, "alice", external_id: "10000") |> Cases.upsert_person!()
 
       assert person.dob == ~D[2000-01-01]
       assert person.first_name == "Alice"
@@ -137,6 +137,7 @@ defmodule Epicenter.CasesTest do
         [
           change: %{
             "dob" => "2000-01-01",
+            "external_id" => "10000",
             "fingerprint" => "2000-01-01 alice testuser",
             "first_name" => "Alice",
             "last_name" => "Testuser",

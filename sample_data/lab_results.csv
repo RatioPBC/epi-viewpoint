@@ -1,32 +1,32 @@
-first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
-Alice      , Testuser  , 01/01/1970 , 08/01/2020  , 08/03/2020  , positive , alice      , alice-result-1
-Alice      , Testuser  , 01/01/1970 , 07/01/2020  , 07/03/2020  , negative , alice      , alice-result-2
-Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-3
-Alice      , Testuser  , 01/01/1970 , 05/01/2020  , 05/03/2020  , negative , alice      , alice-result-4
-Billy      , Testuser  , 01/01/1971 , 08/02/2020  , 08/04/2020  , negative , billy      , billy-result-1
-Billy      , Testuser  , 01/01/1971 , 07/02/2020  , 07/04/2020  , negative , billy      , billy-result-2
-Billy      , Testuser  , 01/01/1971 , 06/02/2020  , 06/04/2020  , positive , billy      , billy-result-3
-Cindy      , Testuser  , 01/01/1972 , 08/03/2020  , 08/05/2020  , positive , cindy      , cindy-result-1
-David      , Testuser  , 01/01/1973 , 08/04/2020  , 08/06/2020  , negative , david      , david-result-1
-Emily      , Testuser  , 01/01/1974 , 08/05/2020  , 08/07/2020  , positive , emily      , emily-result-1
-Frank      , Testuser  , 01/01/1975 , 08/06/2020  , 08/08/2020  , positive , frank      , frank-result-1
-Greta      , Testuser  , 01/01/1976 , 08/07/2020  , 08/09/2020  , positive , greta      , greta-result-1
-Howie      , Testuser  , 01/01/1977 , 08/08/2020  , 08/10/2020  , negative , howie      , howie-result-1
-Irene      , Testuser  , 01/01/1978 , 08/09/2020  , 08/11/2020  , negative , irene      , irene-result-1
-James      , Testuser  , 01/01/1979 , 08/10/2020  , 08/12/2020  , negative , james      , james-result-1
-Kelly      , Testuser  , 01/01/1980 , 08/11/2020  , 08/13/2020  , negative , kelly      , kelly-result-1
-Louis      , Testuser  , 01/01/1981 , 08/12/2020  , 08/14/2020  , positive , louis      , louis-result-1
-Maria      , Testuser  , 01/01/1982 , 08/13/2020  , 08/15/2020  , positive , maria      , maria-result-1
-Nevin      , Testuser  , 01/01/1983 , 08/14/2020  , 08/16/2020  , positive , nevin      , nevin-result-1
-Olive      , Testuser  , 01/01/1984 , 08/15/2020  , 08/17/2020  , negative , olive      , olive-result-1
-Peter      , Testuser  , 01/01/1985 , 08/16/2020  , 08/18/2020  , negative , peter      , peter-result-1
-Quinn      , Testuser  , 01/01/1986 , 08/17/2020  , 08/19/2020  , positive , quinn      , quinn-result-1
-Robby      , Testuser  , 01/01/1987 , 08/18/2020  , 08/20/2020  , positive , robby      , robby-result-1
-Susan      , Testuser  , 01/01/1988 , 08/19/2020  , 08/21/2020  , positive , susan      , susan-result-1
-Tommy      , Testuser  , 01/01/1989 , 08/20/2020  , 08/22/2020  , negative , tommy      , tommy-result-1
-Ursla      , Testuser  , 01/01/1990 , 08/21/2020  , 08/23/2020  , negative , ursla      , ursla-result-1
-Vlaad      , Testuser  , 01/01/1991 , 08/22/2020  , 08/24/2020  , positive , vlaad      , vlaad-result-1
-Wendy      , Testuser  , 01/01/1992 , 08/23/2020  , 08/25/2020  , positive , wendy      , wendy-result-1
-Xavir      , Testuser  , 01/01/1993 , 08/24/2020  , 08/26/2020  , positive , xavir      , xavir-result-1
-Yancy      , Testuser  , 01/01/1994 , 08/25/2020  , 08/27/2020  , negative , yancy      , yancy-result-1
-Zelda      , Testuser  , 01/01/1995 , 08/26/2020  , 08/28/2020  , negative , zelda      , zelda-result-1
+first_name , last_name , dob        , case_id, sample_date , result_date , result   , person_tid , lab_result_tid
+Alice      , Testuser  , 01/01/1970 , 10000  , 08/01/2020  , 08/03/2020  , positive , alice      , alice-result-1
+Alice      , Testuser  , 01/01/1970 , 10001  , 07/01/2020  , 07/03/2020  , negative , alice      , alice-result-2
+Alice      , Testuser  , 01/01/1970 , 10002  , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-3
+Alice      , Testuser  , 01/01/1970 , 10003  , 05/01/2020  , 05/03/2020  , negative , alice      , alice-result-4
+Billy      , Testuser  , 01/01/1971 , 10004  , 08/02/2020  , 08/04/2020  , negative , billy      , billy-result-1
+Billy      , Testuser  , 01/01/1971 , 10005  , 07/02/2020  , 07/04/2020  , negative , billy      , billy-result-2
+Billy      , Testuser  , 01/01/1971 , 10006  , 06/02/2020  , 06/04/2020  , positive , billy      , billy-result-3
+Cindy      , Testuser  , 01/01/1972 , 10007  , 08/03/2020  , 08/05/2020  , positive , cindy      , cindy-result-1
+David      , Testuser  , 01/01/1973 , 10008  , 08/04/2020  , 08/06/2020  , negative , david      , david-result-1
+Emily      , Testuser  , 01/01/1974 , 10009  , 08/05/2020  , 08/07/2020  , positive , emily      , emily-result-1
+Frank      , Testuser  , 01/01/1975 , 10010  , 08/06/2020  , 08/08/2020  , positive , frank      , frank-result-1
+Greta      , Testuser  , 01/01/1976 , 10011  , 08/07/2020  , 08/09/2020  , positive , greta      , greta-result-1
+Howie      , Testuser  , 01/01/1977 , 10012  , 08/08/2020  , 08/10/2020  , negative , howie      , howie-result-1
+Irene      , Testuser  , 01/01/1978 , 10013  , 08/09/2020  , 08/11/2020  , negative , irene      , irene-result-1
+James      , Testuser  , 01/01/1979 , 10014  , 08/10/2020  , 08/12/2020  , negative , james      , james-result-1
+Kelly      , Testuser  , 01/01/1980 , 10015  , 08/11/2020  , 08/13/2020  , negative , kelly      , kelly-result-1
+Louis      , Testuser  , 01/01/1981 , 10016  , 08/12/2020  , 08/14/2020  , positive , louis      , louis-result-1
+Maria      , Testuser  , 01/01/1982 , 10017  , 08/13/2020  , 08/15/2020  , positive , maria      , maria-result-1
+Nevin      , Testuser  , 01/01/1983 , 10018  , 08/14/2020  , 08/16/2020  , positive , nevin      , nevin-result-1
+Olive      , Testuser  , 01/01/1984 , 10019  , 08/15/2020  , 08/17/2020  , negative , olive      , olive-result-1
+Peter      , Testuser  , 01/01/1985 , 10020  , 08/16/2020  , 08/18/2020  , negative , peter      , peter-result-1
+Quinn      , Testuser  , 01/01/1986 , 10021  , 08/17/2020  , 08/19/2020  , positive , quinn      , quinn-result-1
+Robby      , Testuser  , 01/01/1987 , 10022  , 08/18/2020  , 08/20/2020  , positive , robby      , robby-result-1
+Susan      , Testuser  , 01/01/1988 , 10023  , 08/19/2020  , 08/21/2020  , positive , susan      , susan-result-1
+Tommy      , Testuser  , 01/01/1989 , 10024  , 08/20/2020  , 08/22/2020  , negative , tommy      , tommy-result-1
+Ursla      , Testuser  , 01/01/1990 , 10025  , 08/21/2020  , 08/23/2020  , negative , ursla      , ursla-result-1
+Vlaad      , Testuser  , 01/01/1991 , 10026  , 08/22/2020  , 08/24/2020  , positive , vlaad      , vlaad-result-1
+Wendy      , Testuser  , 01/01/1992 , 10027  , 08/23/2020  , 08/25/2020  , positive , wendy      , wendy-result-1
+Xavir      , Testuser  , 01/01/1993 , 10028  , 08/24/2020  , 08/26/2020  , positive , xavir      , xavir-result-1
+Yancy      , Testuser  , 01/01/1994 , 10029  , 08/25/2020  , 08/27/2020  , negative , yancy      , yancy-result-1
+Zelda      , Testuser  , 01/01/1995 , 10030  , 08/26/2020  , 08/28/2020  , negative , zelda      , zelda-result-1
