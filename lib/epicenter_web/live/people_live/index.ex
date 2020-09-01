@@ -10,10 +10,10 @@ defmodule EpicenterWeb.PeopleLive.Index do
     if connected?(socket),
       do: Cases.subscribe()
 
-    socket |> set_reload_message(nil) |> set_filter(:all) |> load_people() |> ok()
+    socket |> set_reload_message(nil) |> set_filter(:with_lab_results) |> load_people() |> ok()
   end
 
-  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{all call_list contacts},
+  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_lab_results},
     do: socket |> set_filter(filter) |> noreply()
 
   def handle_params(_, _url, socket),
@@ -67,7 +67,7 @@ defmodule EpicenterWeb.PeopleLive.Index do
     socket |> assign(people: people, person_count: length(people))
   end
 
-  def page_title(:all), do: "People"
   def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"
+  def page_title(:with_lab_results), do: "People"
 end

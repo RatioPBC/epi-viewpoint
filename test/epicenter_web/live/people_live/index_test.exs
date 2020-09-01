@@ -14,14 +14,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     defp table_contents(page_live),
       do: page_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "people")
 
-    test "disconnected and connected render", %{conn: conn} do
-      {:ok, page_live, disconnected_html} = live(conn, "/people")
-
-      assert_has_role(disconnected_html, "people-page")
-      assert_has_role(page_live, "people-page")
-    end
-
-    test "shows people and their lab tests", %{conn: conn} do
+    defp create_people_and_lab_results() do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
 
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
@@ -30,6 +23,17 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
       billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(billy, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
+    end
+
+    test "disconnected and connected render", %{conn: conn} do
+      {:ok, page_live, disconnected_html} = live(conn, "/people")
+
+      assert_has_role(disconnected_html, "people-page")
+      assert_has_role(page_live, "people-page")
+    end
+
+    test "shows people and their lab tests", %{conn: conn} do
+      create_people_and_lab_results()
 
       {:ok, page_live, _html} = live(conn, "/people")
 
@@ -37,8 +41,8 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       |> table_contents()
       |> assert_eq([
         ["Name", "DOB", "Latest test result"],
-        ["Alice Testuser", "2000-01-01", "positive, 1 day ago"],
-        ["Billy Testuser", "2000-01-01", "negative, 3 days ago"]
+        ["Billy Testuser", "2000-01-01", "negative, 3 days ago"],
+        ["Alice Testuser", "2000-01-01", "positive, 1 day ago"]
       ])
     end
 
@@ -55,9 +59,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       ])
 
       # import 2 people
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+      create_people_and_lab_results()
 
       import_info = %Import.ImportInfo{
         imported_person_count: 2,
@@ -85,8 +87,8 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       |> table_contents()
       |> assert_eq([
         ["Name", "DOB", "Latest test result"],
-        ["Alice Testuser", "2000-01-01", ""],
-        ["Billy Testuser", "2000-01-01", ""]
+        ["Billy Testuser", "2000-01-01", "negative, 3 days ago"],
+        ["Alice Testuser", "2000-01-01", "positive, 1 day ago"]
       ])
     end
   end

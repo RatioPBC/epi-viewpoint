@@ -97,6 +97,22 @@ defmodule Epicenter.CasesTest do
       Cases.list_people() |> tids() |> assert_eq(~w{first middle last})
     end
 
+    test "list_people sorts by lab result sample date (oldest first)" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+
+      middle = Test.Fixtures.person_attrs(user, "middle", dob: ~D[2000-06-01], first_name: "Middle", last_name: "Testuser") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(middle, "middle-1", ~D[2020-06-03]) |> Cases.create_lab_result!()
+
+      last = Test.Fixtures.person_attrs(user, "last", dob: ~D[2000-06-01], first_name: "Last", last_name: "Testuser") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(last, "last-1", ~D[2020-06-04]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(last, "last-1", ~D[2020-06-01]) |> Cases.create_lab_result!()
+
+      first = Test.Fixtures.person_attrs(user, "first", dob: ~D[2000-06-01], first_name: "First", last_name: "Testuser") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(first, "first-1", ~D[2020-06-02]) |> Cases.create_lab_result!()
+
+      Cases.list_people(:with_lab_results) |> tids() |> assert_eq(~w{first middle last})
+    end
+
     test "list_people can be filtered by call-list (recent positive lab results)" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       Test.Fixtures.person_attrs(user, "no-results") |> Cases.create_person!()

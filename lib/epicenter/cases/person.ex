@@ -70,6 +70,22 @@ defmodule Epicenter.Cases.Person do
         order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.seq]
     end
 
+    def with_lab_results() do
+      from person in Person,
+        join: lab_result in subquery(newest_lab_result()),
+        on: lab_result.person_id == person.id,
+        order_by: [asc: lab_result.max_sample_date, asc: person.seq]
+    end
+
+    defp newest_lab_result() do
+      from lab_result in LabResult,
+        select: %{
+          person_id: lab_result.person_id,
+          max_sample_date: max(lab_result.sample_date)
+        },
+        group_by: lab_result.person_id
+    end
+
     def call_list() do
       fifteen_days_ago = Extra.Date.days_ago(15)
 

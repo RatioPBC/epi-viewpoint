@@ -66,7 +66,7 @@ defmodule Epicenter.Cases.ImportTest do
          }}
       )
 
-      [alice, billy_2, billy_1] = Cases.list_people() |> Enum.map(&Cases.preload_lab_results/1)
+      [alice, billy_2, billy_1] = Cases.list_people(:all) |> Enum.map(&Cases.preload_lab_results/1)
       assert alice.tid == "alice"
       assert alice.lab_results |> tids() == ~w{alice-result}
       assert billy_1.lab_results |> tids() == ~w{billy-1-older-result billy-1-newer-result}
