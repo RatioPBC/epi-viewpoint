@@ -9,7 +9,7 @@ defmodule EpicenterWeb.PeopleLive.EditTest do
 
   test "disconnected and connected render", %{conn: conn} do
     user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-    %Cases.Person{id: id} = Test.Fixtures.person_attrs(user, "alice", "06-01-2000") |> Cases.create_person!()
+    %Cases.Person{id: id} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
     {:ok, page_live, disconnected_html} = live(conn, "/people/#{id}/edit")
 
@@ -19,15 +19,15 @@ defmodule EpicenterWeb.PeopleLive.EditTest do
 
   test "editing person identifying information", %{conn: conn} do
     user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-    person = Test.Fixtures.person_attrs(user, "alice", "06-01-2000") |> Cases.create_person!()
+    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
     {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
 
-    params = %{"person" => %{"first_name" => "Aaron", "last_name" => "Aaronblat"}}
+    params = %{"person" => %{"first_name" => "Aaron"}}
     {:ok, redirected_view, _} = page_live |> render_submit("save", params) |> follow_redirect(conn)
 
     assert_role_text(redirected_view, "first-name", "Aaron")
-    assert_role_text(redirected_view, "last-name", "Aaronblat")
+    assert_role_text(redirected_view, "last-name", "Testuser")
     assert_versioned(person, expected_count: 2)
   end
 end

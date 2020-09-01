@@ -30,7 +30,7 @@ defmodule Epicenter.Cases.LabResultTest do
   describe "changeset" do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      person = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       default_attrs = Test.Fixtures.lab_result_attrs(person, "result1", "06-01-2020")
       Cases.change_lab_result(%LabResult{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end

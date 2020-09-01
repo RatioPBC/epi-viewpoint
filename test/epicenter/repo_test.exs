@@ -9,7 +9,7 @@ defmodule Epicenter.RepoTest do
   describe "Versioned" do
     setup do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      person_changeset = %Cases.Person{} |> Cases.Person.changeset(Test.Fixtures.person_attrs(user, "version-1", "01-01-2000"))
+      person_changeset = %Cases.Person{} |> Cases.Person.changeset(Test.Fixtures.person_attrs(user, "version-1"))
       [person_changeset: person_changeset, user: user]
     end
 
@@ -20,9 +20,9 @@ defmodule Epicenter.RepoTest do
         [
           change: %{
             "dob" => "2000-01-01",
-            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "fingerprint" => "2000-01-01 version-1 testuser",
             "first_name" => "Version-1",
-            "last_name" => "Version-1blat",
+            "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "tid" => "version-1"
           },
@@ -38,9 +38,9 @@ defmodule Epicenter.RepoTest do
         [
           change: %{
             "dob" => "2000-01-01",
-            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "fingerprint" => "2000-01-01 version-1 testuser",
             "first_name" => "Version-1",
-            "last_name" => "Version-1blat",
+            "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "tid" => "version-1"
           },
@@ -60,9 +60,9 @@ defmodule Epicenter.RepoTest do
         [
           change: %{
             "dob" => "2000-01-01",
-            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "fingerprint" => "2000-01-01 version-1 testuser",
             "first_name" => "Version-1",
-            "last_name" => "Version-1blat",
+            "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "tid" => "version-1"
           },
@@ -82,9 +82,9 @@ defmodule Epicenter.RepoTest do
         [
           change: %{
             "dob" => "2000-01-01",
-            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "fingerprint" => "2000-01-01 version-1 testuser",
             "first_name" => "Version-1",
-            "last_name" => "Version-1blat",
+            "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "tid" => "version-1"
           },
@@ -101,9 +101,9 @@ defmodule Epicenter.RepoTest do
         [
           change: %{
             "dob" => "2000-01-01",
-            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "fingerprint" => "2000-01-01 version-1 testuser",
             "first_name" => "Version-1",
-            "last_name" => "Version-1blat",
+            "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "tid" => "version-1"
           },
@@ -118,9 +118,9 @@ defmodule Epicenter.RepoTest do
         [
           change: %{
             "dob" => "2000-01-01",
-            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "fingerprint" => "2000-01-01 version-1 testuser",
             "first_name" => "Version-1",
-            "last_name" => "Version-1blat",
+            "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "tid" => "version-1"
           },
@@ -142,9 +142,9 @@ defmodule Epicenter.RepoTest do
         [
           change: %{
             "dob" => "2000-01-01",
-            "fingerprint" => "2000-01-01 version-1 version-1blat",
+            "fingerprint" => "2000-01-01 version-1 testuser",
             "first_name" => "Version-1",
-            "last_name" => "Version-1blat",
+            "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "tid" => "version-1"
           },
@@ -161,9 +161,9 @@ defmodule Epicenter.RepoTest do
       |> assert_version(
         change: %{
           "dob" => "2000-01-01",
-          "fingerprint" => "2000-01-01 version-1 version-1blat",
+          "fingerprint" => "2000-01-01 version-1 testuser",
           "first_name" => "Version-1",
-          "last_name" => "Version-1blat",
+          "last_name" => "Testuser",
           "originator" => %{"id" => user.id},
           "tid" => "version-1"
         },

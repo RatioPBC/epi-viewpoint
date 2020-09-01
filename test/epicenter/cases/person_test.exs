@@ -30,13 +30,13 @@ defmodule Epicenter.Cases.PersonTest do
   describe "associations" do
     test "can have zero lab_results" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       alice |> Cases.preload_lab_results() |> Map.get(:lab_results) |> assert_eq([])
     end
 
     test "has many lab_results" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, "result1", "06-01-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, "result2", "06-02-2020") |> Cases.create_lab_result!()
 
@@ -51,7 +51,7 @@ defmodule Epicenter.Cases.PersonTest do
   describe "changeset" do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      default_attrs = Test.Fixtures.person_attrs(user, "alice", "01-01-2000")
+      default_attrs = Test.Fixtures.person_attrs(user, "alice")
       Cases.change_person(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
@@ -60,8 +60,10 @@ defmodule Epicenter.Cases.PersonTest do
     test "first name is required", do: assert_invalid(new_changeset(first_name: nil))
     test "last name is required", do: assert_invalid(new_changeset(last_name: nil))
     test "originator is required", do: assert_invalid(new_changeset(originator: nil))
+    test "validates personal health information on dob", do: assert_invalid(new_changeset(dob: "01-10-2000"))
+    test "validates personal health information on last_name", do: assert_invalid(new_changeset(last_name: "Aliceblat"))
 
-    test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice aliceblat")
+    test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice testuser")
     test "has originator virtual field", do: assert(new_changeset(%{}).changes.originator.tid == "user")
   end
 
@@ -80,7 +82,7 @@ defmodule Epicenter.Cases.PersonTest do
 
     test "case-insensitive unique constraint on first_name + last_name + dob" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice_attrs = Test.Fixtures.person_attrs(user, "alice", "01-01-2000")
+      alice_attrs = Test.Fixtures.person_attrs(user, "alice")
       assert {:ok, %Person{} = _} = alice_attrs |> Cases.create_person()
 
       assert fingerprint_contstraint_error?(alice_attrs)
@@ -89,11 +91,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "aLiCe"))
       refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "Alice2"))
 
-      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:last_name, "ALICEBLAT"))
-      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:last_name, "AlIcEbLaT"))
-      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:last_name, "Aliceblat2"))
-
-      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:dob, ~D[1999-09-09]))
+      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:dob, ~D[1999-09-01]))
     end
   end
 
@@ -101,7 +99,7 @@ defmodule Epicenter.Cases.PersonTest do
     test "returns nil if no lab results" do
       Test.Fixtures.user_attrs("user")
       |> Accounts.create_user!()
-      |> Test.Fixtures.person_attrs("alice", "01-01-2000")
+      |> Test.Fixtures.person_attrs("alice")
       |> Cases.create_person!()
       |> Person.latest_lab_result()
       |> assert_eq(nil)
@@ -109,7 +107,7 @@ defmodule Epicenter.Cases.PersonTest do
 
     test "returns the lab result with the most recent sample date" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, "newer", "06-02-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, "older", "06-01-2020") |> Cases.create_lab_result!()
 
@@ -118,7 +116,7 @@ defmodule Epicenter.Cases.PersonTest do
 
     test "when given a field, returns the value of that field for the latest lab result" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
 
@@ -128,7 +126,7 @@ defmodule Epicenter.Cases.PersonTest do
 
     test "when given a field but there is no lab result, returns nil" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice", "01-01-2000") |> Cases.create_person!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       assert Person.latest_lab_result(alice, :result) == nil
       assert Person.latest_lab_result(alice, :sample_date) == nil
     end

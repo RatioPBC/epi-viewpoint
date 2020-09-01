@@ -16,8 +16,8 @@ defmodule Epicenter.Cases.ImportTest do
     test "creates LabResult records and Person records from csv data", %{originator: originator} do
       """
       first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
-      Alice      , Ant       , 01/02/1970 , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1
-      Billy      , Bat       , 03/04/1990 , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1
+      Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1
+      Billy      , Testuser  , 03/01/1990 , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1
       """
       |> Import.from_csv(originator)
       |> assert_eq(
@@ -50,10 +50,10 @@ defmodule Epicenter.Cases.ImportTest do
     test "if two lab results have the same first_name, last_name, and dob, they are considered the same person", %{originator: originator} do
       """
       first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
-      Alice      , Ant       , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
-      Billy      , Bat       , 01/01/1990 , 07/01/2020  , 07/02/2020  , negative , billy-1    , billy-1-older-result
-      Billy      , Bat       , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive , billy-1    , billy-1-newer-result
-      Billy      , Bat       , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
+      Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
+      Billy      , Testuser  , 01/01/1990 , 07/01/2020  , 07/02/2020  , negative , billy-1    , billy-1-older-result
+      Billy      , Testuser  , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive , billy-1    , billy-1-newer-result
+      Billy      , Testuser  , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
       """
       |> Import.from_csv(originator)
       |> assert_eq(
