@@ -186,5 +186,24 @@ defmodule Epicenter.Cases.PersonTest do
 
       Person.Query.with_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end
+
+    test "excludes people without lab results" do
+      user =
+        Test.Fixtures.user_attrs("user")
+        |> Accounts.create_user!()
+
+      Test.Fixtures.person_attrs(user, "with-lab-result")
+      |> Cases.create_person!()
+      |> Test.Fixtures.lab_result_attrs("lab-result", ~D[2020-06-02])
+      |> Cases.create_lab_result!()
+
+      Test.Fixtures.person_attrs(user, "without-lab-result")
+      |> Cases.create_person!()
+
+      Person.Query.with_lab_results()
+      |> Epicenter.Repo.all()
+      |> tids()
+      |> assert_eq(~w{with-lab-result})
+    end
   end
 end
