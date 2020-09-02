@@ -31,21 +31,27 @@ defmodule Epicenter.Cases.ImportTest do
       )
 
       [lab_result_1, lab_result_2] = Cases.list_lab_results()
-      assert lab_result_1.tid == "alice-result-1"
       assert lab_result_1.result == "positive"
+      assert lab_result_1.sample_date == ~D[2020-06-01]
+      assert lab_result_1.tid == "alice-result-1"
 
-      assert lab_result_2.tid == "billy-result-1"
       assert lab_result_2.result == "negative"
+      assert lab_result_2.sample_date == ~D[2020-06-06]
+      assert lab_result_2.tid == "billy-result-1"
 
       [alice, billy] = Cases.list_people()
-      assert alice.tid == "alice"
-      assert alice.first_name == "Alice"
+      assert alice.dob == ~D[1970-01-01]
       assert alice.external_id == "10000"
+      assert alice.first_name == "Alice"
+      assert alice.last_name == "Testuser"
+      assert alice.tid == "alice"
       assert_versioned(alice, expected_count: 1)
 
-      assert billy.tid == "billy"
-      assert billy.first_name == "Billy"
+      assert billy.dob == ~D[1990-03-01]
       assert billy.external_id == "10001"
+      assert billy.first_name == "Billy"
+      assert billy.last_name == "Testuser"
+      assert billy.tid == "billy"
       assert_versioned(billy, expected_count: 1)
     end
 
