@@ -2,17 +2,18 @@
 @import "variables"
 
 #nav
-  @include slab
-
-  #nav-border
+  #nav-inner
     border-bottom: 1px solid $border-color
-    display: flex
-    justify-content: space-between
-    padding-bottom: 1rem
+    padding: 1rem
 
-    #nav-left
-      font-weight: bold
-      @include level
+    #nav-items
+      display: flex
+      justify-content: space-between
+      padding: 0 1rem
 
-    #nav-right
-      @include level
+      #nav-left
+        font-weight: bold
+        @include level
+
+      #nav-right
+        @include level

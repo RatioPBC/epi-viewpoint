@@ -1,44 +1,53 @@
 #person-page data-role="person-page"
 
-  section
-    header#subnav
-      = live_redirect "People", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
-      span data-role="name" = "#{@person.first_name} #{@person.last_name}"
+  #sidebar
+    section
+      h3 data-role="full-name"= full_name(@person)
+      #external-id data-role="external-id"= @person.external_id
+      #phone-number data-role="phone"
+        = phone_icon(8, 8)
+        | 415-555-1234
 
-  section
-    h3#identifying-information
-      span Identifying Information
-      span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person)
+  #main-content
+    section
+      header#subnav
+        = live_redirect "People", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
+        span data-role="name" = "#{@person.first_name} #{@person.last_name}"
 
-    table
-      tbody
-        tr
-          th First Name
-          td data-role="first-name"= @person.first_name
-        tr
-          th Last Name
-          td data-role="last-name"= @person.last_name
+    section
+      h3#identifying-information
+        span Identifying Information
+        span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person)
 
-      tbody
-        tr
-          th DOB
-          td= @person.dob
-        tr
-          th Age
-          td= age(@person)
-
-  section
-    h3 Lab Results
-
-    table#lab-results
-      thead
-        tr
-          th Sample Date
-          th Result
-
-      tbody
-        = for lab_result <- @person.lab_results do
+      table
+        tbody
           tr
-            td= lab_result.sample_date
-            td= lab_result.result
+            th First Name
+            td data-role="first-name"= @person.first_name
+          tr
+            th Last Name
+            td data-role="last-name"= @person.last_name
+
+        tbody
+          tr
+            th DOB
+            td= @person.dob
+          tr
+            th Age
+            td= age(@person)
+
+    section
+      h3 Lab Results
+
+      table#lab-results
+        thead
+          tr
+            th Sample Date
+            th Result
+
+        tbody
+          = for lab_result <- @person.lab_results do
+            tr
+              td= lab_result.sample_date
+              td= lab_result.result
 

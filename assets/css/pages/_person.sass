@@ -1,6 +1,23 @@
 @import "../mixins"
 
 #person-page
+  @include sidebar-layout
+
+  #sidebar
+    background-color: $secondary-background-color
+
+    #external-id
+      color: $diminished-text-color
+
+    #phone-number
+      background-color: $dark-background-color
+      color: white
+      font-size: $small-font-size
+      padding: 0.5rem 1rem
+      box-sizing: border-box
+      border-radius: 2px
+      display: inline-block
+
   #subnav
     @include subnav
 

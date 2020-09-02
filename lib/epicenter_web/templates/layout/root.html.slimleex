@@ -10,14 +10,12 @@ html lang="en"
     script defer=true phx-track-static=true type="text/javascript" src="#{ Routes.static_path(@conn, "/js/app.js") }"
   body
     header#nav
-      #nav-border
-        #nav-left
-          = link "Epicenter", to: "/"
-        #nav-right
-          = live_redirect "Import", to: "/import"
-          = live_redirect "Admin", to: "/admin"
-    main
+      #nav-inner
+        #nav-items
+          #nav-left
+            = link "Epicenter", to: "/"
+          #nav-right
+            = live_redirect "Import", to: "/import"
+            = live_redirect "Admin", to: "/admin"
+    main role="main"
       = @inner_content
-    footer
-      section
-        | &copy; 2020 Epicenter

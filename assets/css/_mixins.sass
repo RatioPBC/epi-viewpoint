@@ -95,6 +95,12 @@
     content: "/"
     margin-right: 1rem
 
+// https://1linelayouts.glitch.me
+@mixin sidebar-layout
+  display: grid
+  grid-template-columns: minmax(150px, 25%) 1fr
+  height: 100%
+
 @mixin slab($centered: false, $display: block)
   display: $display
   margin: 1rem

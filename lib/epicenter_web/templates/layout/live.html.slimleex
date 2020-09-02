@@ -1,2 +1,1 @@
-main role="main"
-  = @inner_content
+= @inner_content

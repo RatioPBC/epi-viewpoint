@@ -11,6 +11,9 @@ body
   line-height: $medium-line-height
   @include pancake-stack
 
+body, html, main, main > *
+  height: 100%
+
 fieldset
   border: none
   margin: 0
@@ -29,10 +32,9 @@ h1
 
 html
   position: relative
-  background-color: white
+  background-color: $primary-background-color
   font-size: $em-base
   -webkit-font-smoothing: antialiased
-  min-height: 100%
 
 main
   background-color: white
