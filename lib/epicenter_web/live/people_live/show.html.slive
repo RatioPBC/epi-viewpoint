@@ -1,49 +1,48 @@
 #person-page data-role="person-page"
 
-  #main-content
-    section
-      header#subnav
-        = live_redirect "Records", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
-        = carat_right_icon(6, 9)
-        span data-role="name" = "#{@person.first_name} #{@person.last_name}"
+  section
+    header#subnav
+      = live_redirect "Records", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
+      = carat_right_icon(6, 9)
+      span data-role="name" = "#{@person.first_name} #{@person.last_name}"
 
-    section
-      h2 data-role="full-name"= full_name(@person)
-      #external-id data-role="external-id"= @person.external_id
+  section
+    h2 data-role="full-name"= full_name(@person)
+    #external-id data-role="external-id"= @person.external_id
 
-    section#profile
-      h3#profile-header
-        span Profile
-        span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person), id: "edit-button"
+  section#profile
+    header
+      span Profile
+      span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person), id: "edit-button"
 
-      table#profile-data
-        tbody
+    table#profile-data
+      tbody
+        tr
+          th Date of birth
+          th Phone
+          th Preferred language
+        tr
+          td= @person.dob
+          td
+          td
+      tbody
+        tr
+          th colspan=3 Address
+        tr
+          td colspan=3
+
+  section#lab-results
+    header Lab Results
+
+    table#lab-results-data
+      thead
+        tr
+          th Sample Date
+          th Result
+
+      tbody
+        = for lab_result <- @person.lab_results do
           tr
-            th Date of birth
-            th Phone
-            th Preferred language
-          tr
-            td= @person.dob
-            td
-            td
-        tbody
-          tr
-            th colspan=3 Address
-          tr
-            td colspan=3
-
-    section#lab-results
-      h3#lab-results-header Lab Results
-
-      table#lab-results-data
-        thead
-          tr
-            th Sample Date
-            th Result
-
-        tbody
-          = for lab_result <- @person.lab_results do
-            tr
-              td= lab_result.sample_date
-              td= lab_result.result
+            td= lab_result.sample_date
+            td= lab_result.result
 

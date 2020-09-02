@@ -1,56 +1,21 @@
 @import "../mixins"
 
 #person-page
+  @include vertical-flow
   #subnav
     @include subnav
 
   section#profile
-    border: 2px solid $border-color
-    padding: 2rem
-    margin: 0 2rem
-
-    #profile-header
-      font-size: $very-large-font-size
-      @include level($justify: space-between)
-
-      #edit-button
-        @include button-primary
+    @include card
 
     table#profile-data
-      border-collapse: collapse
-      margin-top: 3rem
-
-      th, td
-        border: none
-        text-align: left
-        padding-left: 0
-        padding-right: 3rem
-
-      tbody:not(:first-of-type)
-        tr:first-of-type
-          th, td
-            padding-top: 2rem
+      @include detail-table
 
   section#lab-results
-    border: 2px solid $border-color
-    padding: 2rem
-    margin: 2rem 2rem 0 2rem
+    @include card
 
     table#lab-results-data
-      @include table
-      border-collapse: collapse
-      margin-top: 3rem
-      width: 100%
-
-      & + table
-        margin-top: 2rem
-
-      tbody + tbody
-        tr:first-child
-          th, td
-            padding-top: 1.5rem
-
-
+      @include data-table
 
 #person-edit-page
   #subnav
