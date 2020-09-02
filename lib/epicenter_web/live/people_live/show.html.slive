@@ -1,45 +1,41 @@
 #person-page data-role="person-page"
 
-  #sidebar
-    section
-      h3 data-role="full-name"= full_name(@person)
-      #external-id data-role="external-id"= @person.external_id
-      #phone-number data-role="phone"
-        = phone_icon(8, 8)
-        | 415-555-1234
-
   #main-content
     section
       header#subnav
-        = live_redirect "People", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
+        = live_redirect "Records", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
+        = carat_right_icon(6, 9)
         span data-role="name" = "#{@person.first_name} #{@person.last_name}"
 
     section
-      h3#identifying-information
-        span Identifying Information
-        span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person)
+      h2 data-role="full-name"= full_name(@person)
+      #external-id data-role="external-id"= @person.external_id
 
-      table
+    section#profile
+      h3#profile-header
+        span Profile
+        span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person), id: "edit-button"
+
+      table#profile-data
         tbody
           tr
-            th First Name
-            td data-role="first-name"= @person.first_name
+            th Date of birth
+            th Phone
+            th Preferred language
           tr
-            th Last Name
-            td data-role="last-name"= @person.last_name
-
-        tbody
-          tr
-            th DOB
             td= @person.dob
+            td
+            td
+        tbody
           tr
-            th Age
-            td= age(@person)
+            th colspan=3 Address
+          tr
+            td colspan=3
 
-    section
-      h3 Lab Results
+    section#lab-results
+      h3#lab-results-header Lab Results
 
-      table#lab-results
+      table#lab-results-data
         thead
           tr
             th Sample Date

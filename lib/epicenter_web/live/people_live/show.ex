@@ -16,6 +16,15 @@ defmodule EpicenterWeb.PeopleLive.Show do
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
+  def carat_right_icon(width, height) do
+    """
+    <svg width="#{width}" height="#{height}" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.00009 0L0.590088 1.41L5.17009 6L0.590088 10.59L2.00009 12L8.00009 6L2.00009 0Z" fill="#B0B0B0"/>
+    </svg>
+    """
+    |> raw()
+  end
+
   def phone_icon(width, height) do
     """
     <svg width="#{width}" height="#{height}" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">

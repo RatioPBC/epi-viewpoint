@@ -26,8 +26,7 @@ defmodule EpicenterWeb.PeopleLive.EditTest do
     params = %{"person" => %{"first_name" => "Aaron"}}
     {:ok, redirected_view, _} = page_live |> render_submit("save", params) |> follow_redirect(conn)
 
-    assert_role_text(redirected_view, "first-name", "Aaron")
-    assert_role_text(redirected_view, "last-name", "Testuser")
+    assert_role_text(redirected_view, "full-name", "Aaron Testuser")
     assert_versioned(person, expected_count: 2)
   end
 end

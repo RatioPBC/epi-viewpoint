@@ -3,8 +3,10 @@
 @mixin button-list
   .button
     @include button-primary-small
+    background-color: white
     border-radius: 0
     border-right-width: 0
+    color: $primary-color
     font-weight: normal
 
     &[data-active=true]
@@ -24,10 +26,12 @@
       border-right-width: 1px
 
 @mixin button-primary
-  background-color: white
+  background-color: $primary-color
   border: 1px solid $link-color
   border-radius: 2px
-  color: $link-color
+  color: white
+  font-size: $medium-font-size
+  font-weight: normal
   padding: 0.5rem 2rem
 
 @mixin button-primary-small
@@ -85,15 +89,10 @@
 
 @mixin subnav
   @include level
-  margin-bottom: 1rem
+  margin-bottom: 0
 
   *
     font-size: $small-font-size
-    text-transform: uppercase
-
-  * + *:before
-    content: "/"
-    margin-right: 1rem
 
 // https://1linelayouts.glitch.me
 @mixin sidebar-layout
