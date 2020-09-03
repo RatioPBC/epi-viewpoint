@@ -2,6 +2,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Phone
   alias Epicenter.Repo
 
   #
@@ -26,8 +27,16 @@ defmodule Epicenter.Cases do
   def list_people(:with_lab_results), do: Person.Query.with_lab_results() |> Repo.all()
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:lab_results])
+  def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:phones])
   def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
+
+  #
+  # phone
+  #
+  def change_phone(%Phone{} = phone, attrs), do: Phone.changeset(phone, attrs)
+  def create_phone(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert()
+  def create_phone!(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!()
 
   #
   # pubsub

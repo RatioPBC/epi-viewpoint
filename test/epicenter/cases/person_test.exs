@@ -48,6 +48,15 @@ defmodule Epicenter.Cases.PersonTest do
       |> tids()
       |> assert_eq(~w{result1 result2}, ignore_order: true)
     end
+
+    test "has many phone numbers" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_lab_results()
+      Test.Fixtures.phone_attrs(alice, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(alice, "phone-2", number: 1_222_111_000) |> Cases.create_phone!()
+
+      assert alice |> Cases.preload_phones() |> Map.get(:phones) |> tids() == ~w{phone-1 phone-2}
+    end
   end
 
   describe "changeset" do

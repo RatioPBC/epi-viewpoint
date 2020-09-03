@@ -7,6 +7,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Phone
   alias Epicenter.Extra
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -24,6 +25,7 @@ defmodule Epicenter.Cases.Person do
     timestamps()
 
     has_many :lab_results, LabResult
+    has_many :phones, Phone
   end
 
   @required_attrs ~w{dob first_name last_name originator}a

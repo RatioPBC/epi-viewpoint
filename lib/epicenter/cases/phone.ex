@@ -4,19 +4,22 @@ defmodule Epicenter.Cases.Phone do
   import Ecto.Changeset
   import Epicenter.Validation, only: [validate_phi: 2]
 
+  alias Epicenter.Cases.Person
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "phones" do
     field :number, :integer
     field :seq, :integer
-    field :originator, :map, virtual: true
     field :tid, :string
     field :type, :string
 
     timestamps()
+
+    belongs_to :person, Person
   end
 
-  @required_attrs ~w{originator number}a
+  @required_attrs ~w{number person_id}a
   @optional_attrs ~w{tid type}a
 
   def changeset(phone, attrs) do

@@ -14,6 +14,7 @@ defmodule Epicenter.Cases.PhoneTest do
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:number, :integer},
+          {:person_id, :id},
           {:seq, :integer},
           {:tid, :string},
           {:type, :string},
@@ -26,7 +27,8 @@ defmodule Epicenter.Cases.PhoneTest do
   describe "changeset" do
     defp new_changeset(attr_updates \\ %{}) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      default_attrs = Test.Fixtures.phone_attrs(user, "phone")
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      default_attrs = Test.Fixtures.phone_attrs(person, "phone")
       Phone.changeset(%Phone{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
@@ -34,7 +36,6 @@ defmodule Epicenter.Cases.PhoneTest do
       changes = new_changeset().changes
       assert changes.number == 5_105_551_000
       assert changes.type == "home"
-      assert changes.originator.tid == "user"
       assert changes.tid == "phone"
     end
 
@@ -42,8 +43,5 @@ defmodule Epicenter.Cases.PhoneTest do
     test "number is required", do: assert_invalid(new_changeset(number: nil))
 
     test "validates personal health information on number", do: assert_invalid(new_changeset(number: 5_105_559_999))
-
-    test "originator is required", do: assert_invalid(new_changeset(originator: nil))
-    test "has originator virtual field", do: assert(new_changeset(%{}).changes.originator.tid == "user")
   end
 end

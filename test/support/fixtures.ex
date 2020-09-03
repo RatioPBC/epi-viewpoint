@@ -15,21 +15,21 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def person_attrs(user, tid, attrs \\ %{}) do
+  def person_attrs(originator, tid, attrs \\ %{}) do
     %{
       dob: ~D[2000-01-01],
       first_name: String.capitalize(tid),
       last_name: "Testuser",
-      originator: user,
+      originator: originator,
       tid: tid
     }
     |> merge_attrs(attrs)
   end
 
-  def phone_attrs(user, tid, attrs \\ %{}) do
+  def phone_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
     %{
       number: 5_105_551_000,
-      originator: user,
+      person_id: person_id,
       type: "home",
       tid: tid
     }
