@@ -72,12 +72,13 @@ defmodule Epicenter.Cases.PersonTest do
     test "dob is required", do: assert_invalid(new_changeset(dob: nil))
     test "first name is required", do: assert_invalid(new_changeset(first_name: nil))
     test "last name is required", do: assert_invalid(new_changeset(last_name: nil))
-    test "originator is required", do: assert_invalid(new_changeset(originator: nil))
     test "validates personal health information on dob", do: assert_invalid(new_changeset(dob: "01-10-2000"))
     test "validates personal health information on last_name", do: assert_invalid(new_changeset(last_name: "Aliceblat"))
 
-    test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice testuser")
+    test "originator is required", do: assert_invalid(new_changeset(originator: nil))
     test "has originator virtual field", do: assert(new_changeset(%{}).changes.originator.tid == "user")
+
+    test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice testuser")
   end
 
   describe "constraints" do

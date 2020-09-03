@@ -2,7 +2,7 @@ defmodule Epicenter.Cases.Person do
   use Ecto.Schema
 
   import Ecto.Changeset
-  import Epicenter.Validation, only: [validate_phi: 1]
+  import Epicenter.Validation, only: [validate_phi: 2]
 
   alias Epicenter.Cases
   alias Epicenter.Cases.LabResult
@@ -33,7 +33,7 @@ defmodule Epicenter.Cases.Person do
     person
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
-    |> validate_phi()
+    |> validate_phi(:person)
     |> change_fingerprint()
     |> unique_constraint(:fingerprint)
   end

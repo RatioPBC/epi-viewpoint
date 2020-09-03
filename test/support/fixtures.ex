@@ -26,6 +26,16 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
+  def phone_attrs(user, tid, attrs \\ %{}) do
+    %{
+      number: 5_105_551_000,
+      originator: user,
+      type: "home",
+      tid: tid
+    }
+    |> merge_attrs(attrs)
+  end
+
   def user_attrs(tid, attrs \\ %{}) do
     %{tid: tid, username: tid}
     |> merge_attrs(attrs)
