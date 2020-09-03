@@ -1,14 +1,8 @@
 defmodule Epicenter.Cases do
-  alias Epicenter.Cases.Case
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Repo
-
-  #
-  # cases
-  #
-  def list_cases(), do: list_people() |> Case.new()
 
   #
   # lab results
