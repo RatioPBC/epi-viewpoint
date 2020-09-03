@@ -1,6 +1,8 @@
 defmodule Epicenter.Validation do
   import Ecto.Changeset, only: [validate_change: 3]
 
+  @seven_leading_ones_followed_by_three_digits ~r|1{7}\d{3}|
+
   def validate_phi(changeset, :person) do
     changeset
     |> validate_change(:last_name, &last_name_validator/2)
@@ -25,8 +27,8 @@ defmodule Epicenter.Validation do
   end
 
   defp phone_number_validator(field, value) do
-    if rem(value, 10000) == 1000,
+    if to_string(value) =~ @seven_leading_ones_followed_by_three_digits,
       do: [],
-      else: [{field, "In non-PHI environment, must end with '1000'"}]
+      else: [{field, "In non-PHI environment, must match '111-111-1xxx'"}]
   end
 end

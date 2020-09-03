@@ -34,7 +34,7 @@ defmodule Epicenter.Cases.PhoneTest do
 
     test "attributes" do
       changes = new_changeset().changes
-      assert changes.number == 5_105_551_000
+      assert changes.number == 1_111_111_000
       assert changes.type == "home"
       assert changes.tid == "phone"
     end
@@ -42,6 +42,6 @@ defmodule Epicenter.Cases.PhoneTest do
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "number is required", do: assert_invalid(new_changeset(number: nil))
 
-    test "validates personal health information on number", do: assert_invalid(new_changeset(number: 5_105_559_999))
+    test "validates personal health information on number", do: assert_invalid(new_changeset(number: 2_111_111_000))
   end
 end

@@ -17,9 +17,9 @@ defmodule Epicenter.ValidationTest do
       assert errors_on(Validation.validate_phi(change, :person)).dob == ["In non-PHI environment, must be the first of the month"]
     end
 
-    test "changest is invalid if phone number does not end in '1000'" do
-      change = Changeset.change(%Phone{}, number: 5_105_551_234)
-      assert errors_on(Validation.validate_phi(change, :phone)).number == ["In non-PHI environment, must end with '1000'"]
+    test "changest is invalid if phone number does not match '111-111-1xxx'" do
+      change = Changeset.change(%Phone{}, number: 12345)
+      assert errors_on(Validation.validate_phi(change, :phone)).number == ["In non-PHI environment, must match '111-111-1xxx'"]
     end
   end
 end

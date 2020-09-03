@@ -7,7 +7,7 @@ defmodule Epicenter.Cases.Import do
   @required_lab_result_fields ~w{result result_date sample_date}
   @optional_lab_result_fields ~w{lab_result_tid}
   @required_person_fields ~w{dob first_name last_name}
-  @optional_person_fields ~w{case_id person_tid}
+  @optional_person_fields ~w{case_id person_tid phone_number}
 
   @fields [
     required: @required_lab_result_fields ++ @required_person_fields,
@@ -32,6 +32,9 @@ defmodule Epicenter.Cases.Import do
             |> Euclid.Extra.Map.rename_key("case_id", "external_id")
             |> Euclid.Extra.Map.rename_key("person_tid", "tid")
             |> Cases.upsert_person!()
+
+          if Euclid.Exists.present?(Map.get(row, "phone_number")),
+            do: Cases.create_phone!(%{number: Map.get(row, "phone_number"), person_id: person.id})
 
           lab_result =
             row

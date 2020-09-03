@@ -1,7 +1,7 @@
 defmodule Epicenter.Cases.ImportTest do
   use Epicenter.DataCase, async: true
 
-  import Euclid.Extra.Enum, only: [tids: 1]
+  import Euclid.Extra.Enum, only: [pluck: 2, tids: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
@@ -15,9 +15,9 @@ defmodule Epicenter.Cases.ImportTest do
 
     test "creates LabResult records and Person records from csv data", %{originator: originator} do
       """
-      first_name , last_name , dob        , case_id , sample_date , result_date , result   , person_tid , lab_result_tid
-      Alice      , Testuser  , 01/01/1970 , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1
-      Billy      , Testuser  , 03/01/1990 , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1
+      first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid
+      Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1
+      Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1
       """
       |> Import.from_csv(originator)
       |> assert_eq(
@@ -39,11 +39,12 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_2.sample_date == ~D[2020-06-06]
       assert lab_result_2.tid == "billy-result-1"
 
-      [alice, billy] = Cases.list_people()
+      [alice, billy] = Cases.list_people() |> Cases.preload_phones()
       assert alice.dob == ~D[1970-01-01]
       assert alice.external_id == "10000"
       assert alice.first_name == "Alice"
       assert alice.last_name == "Testuser"
+      assert alice.phones |> pluck(:number) == [1_111_111_000]
       assert alice.tid == "alice"
       assert_versioned(alice, expected_count: 1)
 
@@ -51,6 +52,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.external_id == "10001"
       assert billy.first_name == "Billy"
       assert billy.last_name == "Testuser"
+      assert billy.phones |> pluck(:number) == [1_111_111_001]
       assert billy.tid == "billy"
       assert_versioned(billy, expected_count: 1)
     end
