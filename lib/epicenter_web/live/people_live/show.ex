@@ -16,6 +16,18 @@ defmodule EpicenterWeb.PeopleLive.Show do
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
+  def phone_number(person) do
+    person
+    |> Cases.preload_phones()
+    |> Map.get(:phones)
+    |> Enum.map(fn %{number: digits} ->
+      digits |> Integer.digits() |> Enum.map(&to_string/1) |> List.insert_at(-5, "-") |> List.insert_at(-9, "-") |> Enum.join()
+    end)
+    |> Enum.join(", ")
+  end
+
+  # # # icons
+
   def carat_right_icon(width, height) do
     """
     <svg width="#{width}" height="#{height}" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">

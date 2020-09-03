@@ -23,7 +23,7 @@
           th Preferred language
         tr
           td= @person.dob
-          td
+          td data-role="phone-number"= phone_number(@person)
           td
       tbody
         tr
