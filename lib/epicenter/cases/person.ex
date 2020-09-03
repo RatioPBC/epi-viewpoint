@@ -75,7 +75,7 @@ defmodule Epicenter.Cases.Person do
 
     def with_lab_results() do
       from person in Person,
-        join: lab_result in subquery(newest_lab_result()),
+        left_join: lab_result in subquery(newest_lab_result()),
         on: lab_result.person_id == person.id,
         order_by: [asc: lab_result.max_sample_date, asc: person.seq]
     end

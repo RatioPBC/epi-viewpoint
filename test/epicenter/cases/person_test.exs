@@ -209,7 +209,7 @@ defmodule Epicenter.Cases.PersonTest do
       Person.Query.with_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end
 
-    test "excludes people without lab results" do
+    test "includes people without lab results" do
       user =
         Test.Fixtures.user_attrs("user")
         |> Accounts.create_user!()
@@ -225,7 +225,7 @@ defmodule Epicenter.Cases.PersonTest do
       Person.Query.with_lab_results()
       |> Epicenter.Repo.all()
       |> tids()
-      |> assert_eq(~w{with-lab-result})
+      |> assert_eq(~w{with-lab-result without-lab-result})
     end
   end
 end
