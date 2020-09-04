@@ -35,6 +35,7 @@ defmodule Epicenter.Cases do
   # phone
   #
   def change_phone(%Phone{} = phone, attrs), do: Phone.changeset(phone, attrs)
+  def count_phones(), do: Phone |> Repo.aggregate(:count)
   def create_phone(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert()
   def create_phone!(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!()
 

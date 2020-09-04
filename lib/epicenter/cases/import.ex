@@ -3,6 +3,7 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.Cases
   alias Epicenter.Csv
   alias Epicenter.DateParser
+  alias Epicenter.Repo
 
   @required_lab_result_fields ~w{result result_date sample_date}
   @optional_lab_result_fields ~w{lab_result_tid}
@@ -19,6 +20,13 @@ defmodule Epicenter.Cases.Import do
   end
 
   def from_csv(csv_string, %Accounts.User{} = originator) do
+    case Repo.transaction(fn -> import_csv(csv_string, originator) end) do
+      {:ok, {:ok, import_info}} -> {:ok, import_info}
+      {:ok, {:error, error}} -> {:error, error}
+    end
+  end
+
+  defp import_csv(csv_string, %Accounts.User{} = originator) do
     {:ok, rows} = Csv.read(csv_string, @fields)
 
     result =
@@ -57,5 +65,7 @@ defmodule Epicenter.Cases.Import do
     Cases.broadcast({:import, import_info})
 
     {:ok, import_info}
+  rescue
+    error -> {:error, error}
   end
 end

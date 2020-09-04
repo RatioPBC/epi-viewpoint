@@ -82,5 +82,21 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy_1.lab_results |> tids() == ~w{billy-1-older-result billy-1-newer-result}
       assert billy_2.lab_results |> tids() == ~w{billy-2-result}
     end
+
+    test "does not create any resource if it blows up", %{originator: originator} do
+      result =
+        """
+        first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
+        Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
+        Billy      , Testuser  , 01/01/1990 ,   ,   ,   ,
+        """
+        |> Import.from_csv(originator)
+
+      assert {:error, _} = result
+
+      assert Cases.count_people() == 0
+      assert Cases.count_lab_results() == 0
+      assert Cases.count_phones() == 0
+    end
   end
 end
