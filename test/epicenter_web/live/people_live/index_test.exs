@@ -17,11 +17,11 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     defp create_people_and_lab_results() do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
 
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      alice = Test.Fixtures.person_attrs(user, "alice", external_id: nil) |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, "alice-result-2", Extra.Date.days_ago(2), result: "negative") |> Cases.create_lab_result!()
 
-      billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+      billy = Test.Fixtures.person_attrs(user, "billy", external_id: "billy-id") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(billy, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
     end
 
@@ -40,9 +40,9 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       page_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "DOB", "Latest test result"],
-        ["Billy Testuser", "2000-01-01", "negative, 3 days ago"],
-        ["Alice Testuser", "2000-01-01", "positive, 1 day ago"]
+        ["Name", "ID", "DOB", "Latest test result"],
+        ["Billy Testuser", "billy-id", "2000-01-01", "negative, 3 days ago"],
+        ["Alice Testuser", "", "2000-01-01", "positive, 1 day ago"]
       ])
     end
 
@@ -55,7 +55,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       page_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "DOB", "Latest test result"]
+        ["Name", "ID", "DOB", "Latest test result"]
       ])
 
       # import 2 people
@@ -76,7 +76,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       page_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "DOB", "Latest test result"]
+        ["Name", "ID", "DOB", "Latest test result"]
       ])
 
       # show the new people after the button is clicked
@@ -86,9 +86,9 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       page_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "DOB", "Latest test result"],
-        ["Billy Testuser", "2000-01-01", "negative, 3 days ago"],
-        ["Alice Testuser", "2000-01-01", "positive, 1 day ago"]
+        ["Name", "ID", "DOB", "Latest test result"],
+        ["Billy Testuser", "billy-id", "2000-01-01", "negative, 3 days ago"],
+        ["Alice Testuser", "", "2000-01-01", "positive, 1 day ago"]
       ])
     end
   end
