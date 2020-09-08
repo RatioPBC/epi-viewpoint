@@ -13,7 +13,7 @@
   section#profile
     header
       span Profile
-      span= live_redirect "Edit", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person), id: "edit-button"
+      span= live_redirect "Update", to: Routes.people_edit_path(EpicenterWeb.Endpoint, :edit, @person), id: "edit-button"
 
     table#profile-data
       tbody
@@ -45,4 +45,3 @@
           tr
             td= lab_result.sample_date
             td= lab_result.result
-
