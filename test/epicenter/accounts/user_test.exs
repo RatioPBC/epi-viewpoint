@@ -1,6 +1,8 @@
 defmodule Epicenter.Accounts.UserTest do
   use Epicenter.DataCase, async: true
 
+  import Euclid.Extra.Enum, only: [tids: 1]
+
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
   alias Epicenter.Cases
@@ -25,15 +27,14 @@ defmodule Epicenter.Accounts.UserTest do
   describe "associations" do
     test "has many assignments" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Cases.create_assignments!(user, [alice])
-
-      assignment = Repo.all(Cases.Assignment) |> List.first()
+      Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.update_assignment(user)
+      Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!() |> Cases.update_assignment(user)
 
       user
-      |> Cases.preload_assignments()
+      |> Accounts.preload_assignments()
       |> Map.get(:assignments)
-      |> assert_eq([assignment])
+      |> tids()
+      |> assert_eq(~w{alice billy}, ignore_order: true)
     end
   end
 

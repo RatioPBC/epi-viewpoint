@@ -7,4 +7,5 @@ defmodule Epicenter.Accounts do
   def create_user(attrs), do: %User{} |> change_user(attrs) |> Repo.insert()
   def create_user!(attrs), do: %User{} |> change_user(attrs) |> Repo.insert!()
   def list_users(), do: User.Query.all() |> Repo.all()
+  def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
 end

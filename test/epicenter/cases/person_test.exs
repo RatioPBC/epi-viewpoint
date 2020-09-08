@@ -14,6 +14,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert_schema(
         Person,
         [
+          {:assigned_to_id, :binary_id},
           {:dob, :date},
           {:external_id, :string},
           {:fingerprint, :string},
@@ -84,8 +85,8 @@ defmodule Epicenter.Cases.PersonTest do
     test "validates personal health information on dob", do: assert_invalid(new_changeset(dob: "01-10-2000"))
     test "validates personal health information on last_name", do: assert_invalid(new_changeset(last_name: "Aliceblat"))
 
-    test "originator is required", do: assert_invalid(new_changeset(originator: nil))
     test "has originator virtual field", do: assert(new_changeset(%{}).changes.originator.tid == "user")
+    test "originator is required", do: assert_invalid(new_changeset(originator: nil))
 
     test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice testuser")
   end

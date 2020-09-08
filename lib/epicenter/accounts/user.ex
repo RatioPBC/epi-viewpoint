@@ -4,7 +4,7 @@ defmodule Epicenter.Accounts.User do
   import Ecto.Changeset
 
   alias Epicenter.Accounts.User
-  alias Epicenter.Cases.Assignment
+  alias Epicenter.Cases.Person
 
   @derive {Jason.Encoder, only: [:id]}
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -16,7 +16,7 @@ defmodule Epicenter.Accounts.User do
 
     timestamps()
 
-    has_many :assignments, Assignment
+    has_many :assignments, Person, foreign_key: :assigned_to_id
   end
 
   @required_attrs ~w{username}a

@@ -1,7 +1,9 @@
 defmodule Epicenter.Repo.Migrations.CreateAssignments do
   use Ecto.Migration
 
-  def change do
+  def change, do: create_assignments_table()
+
+  def create_assignments_table() do
     create table(:assignments, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :tid, :string

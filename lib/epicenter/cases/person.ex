@@ -4,6 +4,7 @@ defmodule Epicenter.Cases.Person do
   import Ecto.Changeset
   import Epicenter.Validation, only: [validate_phi: 2]
 
+  alias Epicenter.Accounts.User
   alias Epicenter.Cases
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
@@ -24,12 +25,14 @@ defmodule Epicenter.Cases.Person do
 
     timestamps()
 
+    belongs_to :assigned_to, User
+
     has_many :lab_results, LabResult
     has_many :phones, Phone
   end
 
   @required_attrs ~w{dob first_name last_name originator}a
-  @optional_attrs ~w{external_id tid}a
+  @optional_attrs ~w{assigned_to_id external_id tid}a
 
   def changeset(person, attrs) do
     person
@@ -38,6 +41,11 @@ defmodule Epicenter.Cases.Person do
     |> validate_phi(:person)
     |> change_fingerprint()
     |> unique_constraint(:fingerprint)
+  end
+
+  def assignment_changeset(%Person{} = person, %User{} = user) do
+    person
+    |> changeset(%{assigned_to_id: user.id})
   end
 
   defp change_fingerprint(%Ecto.Changeset{valid?: true} = changeset) do

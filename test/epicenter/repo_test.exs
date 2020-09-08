@@ -19,6 +19,7 @@ defmodule Epicenter.RepoTest do
       |> assert_versions([
         [
           change: %{
+            "assigned_to_id" => nil,
             "dob" => "2000-01-01",
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 version-1 testuser",
@@ -38,6 +39,7 @@ defmodule Epicenter.RepoTest do
       |> assert_versions([
         [
           change: %{
+            "assigned_to_id" => nil,
             "dob" => "2000-01-01",
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 version-1 testuser",
@@ -61,6 +63,7 @@ defmodule Epicenter.RepoTest do
         [change: %{"tid" => "version-2"}, by: "user"],
         [
           change: %{
+            "assigned_to_id" => nil,
             "dob" => "2000-01-01",
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 version-1 testuser",
@@ -84,6 +87,7 @@ defmodule Epicenter.RepoTest do
         [change: %{"tid" => "version-2"}, by: "user"],
         [
           change: %{
+            "assigned_to_id" => nil,
             "dob" => "2000-01-01",
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 version-1 testuser",
@@ -104,6 +108,7 @@ defmodule Epicenter.RepoTest do
       |> assert_versions([
         [
           change: %{
+            "assigned_to_id" => nil,
             "dob" => "2000-01-01",
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 version-1 testuser",
@@ -122,6 +127,7 @@ defmodule Epicenter.RepoTest do
       |> assert_versions([
         [
           change: %{
+            "assigned_to_id" => nil,
             "dob" => "2000-01-01",
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 version-1 testuser",
@@ -147,6 +153,7 @@ defmodule Epicenter.RepoTest do
         [change: %{"tid" => "version-2"}, by: "user"],
         [
           change: %{
+            "assigned_to_id" => nil,
             "dob" => "2000-01-01",
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 version-1 testuser",
@@ -167,6 +174,7 @@ defmodule Epicenter.RepoTest do
       |> Repo.Versioned.last_version()
       |> assert_version(
         change: %{
+          "assigned_to_id" => nil,
           "dob" => "2000-01-01",
           "external_id" => "10000",
           "fingerprint" => "2000-01-01 version-1 testuser",

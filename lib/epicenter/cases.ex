@@ -1,19 +1,10 @@
 defmodule Epicenter.Cases do
-  alias Epicenter.Cases.Assignment
+  alias Epicenter.Accounts.User
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
   alias Epicenter.Repo
-
-  #
-  # assignments
-  #
-  def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
-  def change_assignment(%Assignment{} = assignment, attrs), do: Assignment.changeset(assignment, attrs)
-
-  def create_assignments!(user, people),
-    do: people |> Enum.map(fn person -> change_assignment(%Assignment{}, %{person_id: person.id, user_id: user.id}) |> Repo.insert!() end)
 
   #
   # lab results
@@ -37,6 +28,7 @@ defmodule Epicenter.Cases do
   def list_people(:all), do: Person.Query.all() |> Repo.all()
   def list_people(:with_lab_results), do: Person.Query.with_lab_results() |> Repo.all()
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
+  def update_assignment(%Person{} = person, %User{} = user), do: person |> Person.assignment_changeset(user) |> Repo.Versioned.update()
   def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
 
