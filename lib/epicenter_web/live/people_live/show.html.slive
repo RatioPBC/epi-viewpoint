@@ -19,12 +19,12 @@
       tbody
         tr
           th Date of birth
-          th Phone
           th Preferred language
+          th Phone
         tr
           td= @person.dob
-          td data-role="phone-number"= phone_number(@person)
           td
+          td data-role="phone-number"= phone_number(@person)
       tbody
         tr
           th colspan=3 Address
