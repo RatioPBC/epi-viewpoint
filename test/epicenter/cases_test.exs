@@ -9,6 +9,17 @@ defmodule Epicenter.CasesTest do
   alias Epicenter.Extra
   alias Epicenter.Test
 
+  describe "assignments" do
+    test "create_assignments! assigns people to user" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      [assignment] = Cases.create_assignments!(user, [person])
+
+      assert assignment.person_id == person.id
+      assert assignment.user_id == user.id
+    end
+  end
+
   describe "importing" do
     test "import_lab_results imports lab results and creates lab_result and person records" do
       originator = Test.Fixtures.user_attrs("originator") |> Accounts.create_user!()

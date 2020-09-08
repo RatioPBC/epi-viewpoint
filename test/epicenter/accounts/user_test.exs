@@ -3,6 +3,7 @@ defmodule Epicenter.Accounts.UserTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
+  alias Epicenter.Cases
   alias Epicenter.Test
 
   describe "schema" do
@@ -18,6 +19,21 @@ defmodule Epicenter.Accounts.UserTest do
           {:username, :string}
         ]
       )
+    end
+  end
+
+  describe "associations" do
+    test "has many assignments" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Cases.create_assignments!(user, [alice])
+
+      assignment = Repo.all(Cases.Assignment) |> List.first()
+
+      user
+      |> Cases.preload_assignments()
+      |> Map.get(:assignments)
+      |> assert_eq([assignment])
     end
   end
 
