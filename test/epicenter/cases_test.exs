@@ -152,6 +152,7 @@ defmodule Epicenter.CasesTest do
             "first_name" => "Alice",
             "last_name" => "Testuser",
             "originator" => %{"id" => creator.id},
+            "preferred_language" => "English",
             "tid" => "alice"
           },
           by: "creator"

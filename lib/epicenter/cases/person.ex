@@ -21,6 +21,7 @@ defmodule Epicenter.Cases.Person do
     field :first_name, :string
     field :last_name, :string
     field :originator, :map, virtual: true
+    field :preferred_language, :string
     field :seq, :integer
     field :tid, :string
 
@@ -33,7 +34,7 @@ defmodule Epicenter.Cases.Person do
   end
 
   @required_attrs ~w{dob first_name last_name originator}a
-  @optional_attrs ~w{assigned_to_id external_id tid}a
+  @optional_attrs ~w{assigned_to_id external_id preferred_language tid}a
 
   def assignment_changeset(%Person{} = person, %User{} = user) do
     person

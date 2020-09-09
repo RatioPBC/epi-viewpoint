@@ -26,6 +26,7 @@ defmodule Epicenter.RepoTest do
             "first_name" => "Version-1",
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
             "tid" => "version-1"
           },
           by: "user"
@@ -46,6 +47,7 @@ defmodule Epicenter.RepoTest do
             "first_name" => "Version-1",
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
             "tid" => "version-1"
           },
           by: "user"
@@ -70,6 +72,7 @@ defmodule Epicenter.RepoTest do
             "first_name" => "Version-1",
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
             "tid" => "version-1"
           },
           by: "user"
@@ -94,6 +97,7 @@ defmodule Epicenter.RepoTest do
             "first_name" => "Version-1",
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
             "tid" => "version-1"
           },
           by: "user"
@@ -115,6 +119,7 @@ defmodule Epicenter.RepoTest do
             "first_name" => "Version-1",
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
             "tid" => "version-1"
           },
           by: "user"
@@ -134,6 +139,7 @@ defmodule Epicenter.RepoTest do
             "first_name" => "Version-1",
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
             "tid" => "version-1"
           },
           by: "user"
@@ -160,6 +166,7 @@ defmodule Epicenter.RepoTest do
             "first_name" => "Version-1",
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
             "tid" => "version-1"
           },
           by: "user"
@@ -181,6 +188,7 @@ defmodule Epicenter.RepoTest do
           "first_name" => "Version-1",
           "last_name" => "Testuser",
           "originator" => %{"id" => user.id},
+          "preferred_language" => "English",
           "tid" => "version-1"
         },
         by: "user"

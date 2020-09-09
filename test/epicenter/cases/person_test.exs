@@ -22,6 +22,7 @@ defmodule Epicenter.Cases.PersonTest do
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:last_name, :string},
+          {:preferred_language, :string},
           {:seq, :integer},
           {:tid, :string},
           {:updated_at, :naive_datetime}
@@ -93,6 +94,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert changeset.first_name == "Alice"
       assert changeset.last_name == "Testuser"
       assert changeset.originator.tid == "user"
+      assert changeset.preferred_language == "English"
       assert changeset.tid == "alice"
     end
 

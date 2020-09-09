@@ -21,6 +21,7 @@ defmodule Epicenter.Test.Fixtures do
       first_name: String.capitalize(tid),
       last_name: "Testuser",
       originator: originator,
+      preferred_language: "English",
       tid: tid
     }
     |> merge_attrs(attrs)
