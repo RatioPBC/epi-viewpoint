@@ -40,6 +40,7 @@ defmodule Epicenter.MixProject do
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.0"},
       {:mix_audit, "~> 0.1", only: [:dev, :test], runtime: false},
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:nimble_csv, "~> 0.7"},
       {:paper_trail, "~> 0.8"},
       {:phoenix, "~> 1.5.4"},
