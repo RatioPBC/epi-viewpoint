@@ -4,6 +4,7 @@ defmodule Epicenter.ValidationTest do
   alias Ecto.Changeset
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
+  alias Epicenter.Cases.Email
   alias Epicenter.Validation
 
   describe "validate_phi" do
@@ -20,6 +21,11 @@ defmodule Epicenter.ValidationTest do
     test "changest is invalid if phone number does not match '111-111-1xxx'" do
       change = Changeset.change(%Phone{}, number: 12345)
       assert errors_on(Validation.validate_phi(change, :phone)).number == ["In non-PHI environment, must match '111-111-1xxx'"]
+    end
+
+    test "changeset is invalid if email address does not end with '@example.com'" do
+      change = Changeset.change(%Email{}, address: "test@google.com")
+      assert errors_on(Validation.validate_phi(change, :email)).address == ["In non-PHI environment, must end with '@example.com'"]
     end
   end
 end

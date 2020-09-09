@@ -36,6 +36,15 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
+  def email_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
+    %{
+      address: "#{tid}@example.com",
+      person_id: person_id,
+      tid: tid
+    }
+    |> merge_attrs(attrs)
+  end
+
   def user_attrs(tid, attrs \\ %{}) do
     %{tid: tid, username: tid}
     |> merge_attrs(attrs)

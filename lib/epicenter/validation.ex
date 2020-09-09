@@ -14,6 +14,11 @@ defmodule Epicenter.Validation do
     |> validate_change(:number, &phone_number_validator/2)
   end
 
+  def validate_phi(changeset, :email) do
+    changeset
+    |> validate_change(:address, &email_address_validator/2)
+  end
+
   defp date_validator(field, date) do
     if date.day == 1,
       do: [],
@@ -30,5 +35,11 @@ defmodule Epicenter.Validation do
     if to_string(value) =~ @seven_leading_ones_followed_by_three_digits,
       do: [],
       else: [{field, "In non-PHI environment, must match '111-111-1xxx'"}]
+  end
+
+  defp email_address_validator(field, value) do
+    if value |> String.ends_with?("@example.com"),
+      do: [],
+      else: [{field, "In non-PHI environment, must end with '@example.com'"}]
   end
 end
