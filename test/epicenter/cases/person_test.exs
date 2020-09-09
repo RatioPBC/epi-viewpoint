@@ -52,11 +52,20 @@ defmodule Epicenter.Cases.PersonTest do
 
     test "has many phone numbers" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_lab_results()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.phone_attrs(alice, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
       Test.Fixtures.phone_attrs(alice, "phone-2", number: 1_111_111_001) |> Cases.create_phone!()
 
       assert alice |> Cases.preload_phones() |> Map.get(:phones) |> tids() == ~w{phone-1 phone-2}
+    end
+
+    test "has many email addresses" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.email_attrs(alice, "email-1") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(alice, "email-2") |> Cases.create_email!()
+
+      assert alice |> Cases.preload_emails() |> Map.get(:emails) |> tids() == ~w{email-1 email-2}
     end
   end
 

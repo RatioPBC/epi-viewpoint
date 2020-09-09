@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.Person do
 
   alias Epicenter.Accounts.User
   alias Epicenter.Cases
+  alias Epicenter.Cases.Email
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
@@ -26,7 +27,7 @@ defmodule Epicenter.Cases.Person do
     timestamps()
 
     belongs_to :assigned_to, User
-
+    has_many :emails, Email
     has_many :lab_results, LabResult
     has_many :phones, Phone
   end

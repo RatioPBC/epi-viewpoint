@@ -1,5 +1,6 @@
 defmodule Epicenter.Cases do
   alias Epicenter.Accounts.User
+  alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
@@ -40,6 +41,13 @@ defmodule Epicenter.Cases do
   def create_phone(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert()
   def create_phone!(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!()
   def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:phones])
+
+  #
+  # email
+  #
+  def change_email(%Email{} = email, attrs), do: Email.changeset(email, attrs)
+  def create_email!(attrs), do: %Email{} |> change_email(attrs) |> Repo.insert!()
+  def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:emails])
 
   #
   # pubsub
