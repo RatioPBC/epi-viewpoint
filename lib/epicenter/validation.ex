@@ -9,6 +9,11 @@ defmodule Epicenter.Validation do
     |> validate_change(:dob, &date_validator/2)
   end
 
+  def validate_phi(changeset, :address) do
+    changeset
+    |> validate_change(:full_address, &address_full_address_validator/2)
+  end
+
   def validate_phi(changeset, :phone) do
     changeset
     |> validate_change(:number, &phone_number_validator/2)
@@ -29,6 +34,12 @@ defmodule Epicenter.Validation do
     if value == "Testuser",
       do: [],
       else: [{field, "In non-PHI environment, must be equal to 'Testuser'"}]
+  end
+
+  defp address_full_address_validator(field, value) do
+    if value |> String.ends_with?("TestAddress"),
+      do: [],
+      else: [{field, "In non-PHI environment, must end with 'TestAddress'"}]
   end
 
   defp phone_number_validator(field, value) do

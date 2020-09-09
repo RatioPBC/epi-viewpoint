@@ -27,6 +27,16 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
+  def address_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
+    %{
+      full_address: "123 #{tid} st, TestAddress",
+      type: "home",
+      person_id: person_id,
+      tid: tid
+    }
+    |> merge_attrs(attrs)
+  end
+
   def phone_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
     %{
       number: 1_111_111_000,
