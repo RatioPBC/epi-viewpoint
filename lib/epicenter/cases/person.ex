@@ -35,6 +35,11 @@ defmodule Epicenter.Cases.Person do
   @required_attrs ~w{dob first_name last_name originator}a
   @optional_attrs ~w{assigned_to_id external_id tid}a
 
+  def assignment_changeset(%Person{} = person, %User{} = user) do
+    person
+    |> changeset(%{assigned_to_id: user.id})
+  end
+
   def changeset(person, attrs) do
     person
     |> cast(attrs, @required_attrs ++ @optional_attrs)
@@ -42,11 +47,6 @@ defmodule Epicenter.Cases.Person do
     |> validate_phi(:person)
     |> change_fingerprint()
     |> unique_constraint(:fingerprint)
-  end
-
-  def assignment_changeset(%Person{} = person, %User{} = user) do
-    person
-    |> changeset(%{assigned_to_id: user.id})
   end
 
   defp change_fingerprint(%Ecto.Changeset{valid?: true} = changeset) do

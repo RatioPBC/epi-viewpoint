@@ -77,15 +77,24 @@ defmodule Epicenter.Cases.PersonTest do
       Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
+    test "assignment" do
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
+      assigned_to = Test.Fixtures.user_attrs("assigned-to") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
+
+      changeset = Person.assignment_changeset(alice, assigned_to)
+      assert changeset.changes.assigned_to_id == assigned_to.id
+    end
+
     test "attributes" do
-      changeset = new_changeset(%{external_id: "10000"})
-      assert changeset.changes.dob == ~D[2000-01-01]
-      assert changeset.changes.external_id == "10000"
-      assert changeset.changes.fingerprint == "2000-01-01 alice testuser"
-      assert changeset.changes.first_name == "Alice"
-      assert changeset.changes.last_name == "Testuser"
-      assert changeset.changes.originator.tid == "user"
-      assert changeset.changes.tid == "alice"
+      changeset = new_changeset(%{external_id: "10000"}).changes
+      assert changeset.dob == ~D[2000-01-01]
+      assert changeset.external_id == "10000"
+      assert changeset.fingerprint == "2000-01-01 alice testuser"
+      assert changeset.first_name == "Alice"
+      assert changeset.last_name == "Testuser"
+      assert changeset.originator.tid == "user"
+      assert changeset.tid == "alice"
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
