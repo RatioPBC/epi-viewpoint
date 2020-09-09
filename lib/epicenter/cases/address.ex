@@ -1,7 +1,10 @@
 defmodule Epicenter.Cases.Address do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
   import Epicenter.Validation, only: [validate_phi: 2]
+
+  alias Epicenter.Cases.Address
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -21,8 +24,14 @@ defmodule Epicenter.Cases.Address do
   @doc false
   def changeset(address, attrs) do
     address
-    |> cast(attrs, @required_attrs ++ @optional_attrs)
+    |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
     |> validate_phi(:address)
+  end
+
+  defmodule Query do
+    def order_by_full_address(direction) do
+      from(a in Address, order_by: [{^direction, :full_address}])
+    end
   end
 end

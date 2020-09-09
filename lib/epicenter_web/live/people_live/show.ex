@@ -18,12 +18,26 @@ defmodule EpicenterWeb.PeopleLive.Show do
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
+  def address(person, field_name) do
+    person
+    |> Cases.preload_addresses()
+    |> Map.get(:addresses)
+    |> List.first()
+    |> case do
+      nil -> nil
+      address -> Map.get(address, field_name)
+    end
+  end
+
   def email_address(person) do
     person
     |> Cases.preload_emails()
     |> Map.get(:emails)
     |> Enum.map(& &1.address)
-    |> Enum.join(", ")
+    |> case do
+      [] -> nil
+      emails -> Enum.join(emails, ", ")
+    end
   end
 
   def phone_number(person) do
@@ -33,6 +47,9 @@ defmodule EpicenterWeb.PeopleLive.Show do
     |> Enum.map(fn %{number: digits} ->
       digits |> Integer.digits() |> Enum.map(&to_string/1) |> List.insert_at(-5, "-") |> List.insert_at(-9, "-") |> Enum.join()
     end)
-    |> Enum.join(", ")
+    |> case do
+      [] -> nil
+      phones -> Enum.join(phones, ", ")
+    end
   end
 end

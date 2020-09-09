@@ -1,5 +1,6 @@
 defmodule Epicenter.Cases do
   alias Epicenter.Accounts.User
+  alias Epicenter.Cases.Address
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.LabResult
@@ -32,6 +33,13 @@ defmodule Epicenter.Cases do
   def update_assignment(%Person{} = person, %User{} = user), do: person |> Person.assignment_changeset(user) |> Repo.Versioned.update()
   def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
+
+  #
+  # address
+  #
+  def change_address(%Address{} = address, attrs), do: Address.changeset(address, attrs)
+  def create_address!(attrs), do: %Address{} |> change_address(attrs) |> Repo.insert!()
+  def preload_addresses(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(addresses: Address.Query.order_by_full_address(:asc))
 
   #
   # phone

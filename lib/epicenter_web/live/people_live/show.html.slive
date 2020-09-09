@@ -29,9 +29,11 @@
           td data-role="email-address"= email_address(@person)
       tbody
         tr
-          th colspan=3 Address
+          th colspan=4 Address
         tr
-          td colspan=3
+          td colspan=4 data-role="address"= address(@person, :full_address)
+        tr
+          td colspan=4 data-role="address-type"= address(@person, :type)
 
   section#lab-results
     header Lab Results

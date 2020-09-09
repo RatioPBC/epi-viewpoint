@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.Person do
 
   alias Epicenter.Accounts.User
   alias Epicenter.Cases
+  alias Epicenter.Cases.Address
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
@@ -28,6 +29,7 @@ defmodule Epicenter.Cases.Person do
     timestamps()
 
     belongs_to :assigned_to, User
+    has_many :addresses, Address
     has_many :emails, Email
     has_many :lab_results, LabResult
     has_many :phones, Phone
@@ -43,7 +45,7 @@ defmodule Epicenter.Cases.Person do
 
   def changeset(person, attrs) do
     person
-    |> cast(attrs, @required_attrs ++ @optional_attrs)
+    |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
     |> validate_phi(:person)
     |> change_fingerprint()
