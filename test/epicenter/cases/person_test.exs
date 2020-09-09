@@ -59,6 +59,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert alice |> Cases.preload_phones() |> Map.get(:phones) |> tids() == ~w{phone-1 phone-2}
     end
 
+    @tag :skip
     test "has many email addresses" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
