@@ -22,7 +22,6 @@ defmodule EpicenterWeb.Router do
     live "/people", PeopleLive.Index, :index
     live "/people/:id", PeopleLive.Show, :show
     live "/people/:id/edit", PeopleLive.Edit, :edit
-    live "/page", PageLive, :index
   end
 
   # Other scopes may use custom stacks.
