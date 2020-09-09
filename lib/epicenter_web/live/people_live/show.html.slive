@@ -21,10 +21,12 @@
           th Date of birth
           th Preferred language
           th Phone
+          th Email
         tr
           td= @person.dob
           td
           td data-role="phone-number"= phone_number(@person)
+          td data-role="email-address"= email_address(@person)
       tbody
         tr
           th colspan=3 Address

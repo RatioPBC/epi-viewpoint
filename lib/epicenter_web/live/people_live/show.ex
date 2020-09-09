@@ -18,6 +18,14 @@ defmodule EpicenterWeb.PeopleLive.Show do
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
+  def email_address(person) do
+    person
+    |> Cases.preload_emails()
+    |> Map.get(:emails)
+    |> Enum.map(& &1.address)
+    |> Enum.join(", ")
+  end
+
   def phone_number(person) do
     person
     |> Cases.preload_phones()
