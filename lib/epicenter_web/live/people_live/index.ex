@@ -1,16 +1,19 @@
 defmodule EpicenterWeb.PeopleLive.Index do
   use EpicenterWeb, :live_view
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
+  alias Epicenter.Repo
+  alias EpicenterWeb.Session
 
   def mount(_params, _session, socket) do
     if connected?(socket),
       do: Cases.subscribe()
 
-    socket |> set_reload_message(nil) |> set_filter(:with_lab_results) |> load_people() |> ok()
+    socket |> set_reload_message(nil) |> set_filter(:with_lab_results) |> load_people() |> load_users() |> set_selected() |> ok()
   end
 
   def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_lab_results},
@@ -24,6 +27,39 @@ defmodule EpicenterWeb.PeopleLive.Index do
 
   def handle_event("refresh-people", _, socket),
     do: socket |> set_reload_message(nil) |> load_people() |> noreply()
+
+  def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
+    do: socket |> select_person(person_id) |> noreply()
+
+  def handle_event("checkbox-click", %{"person-id" => person_id} = _value, socket),
+    do: socket |> deselect_person(person_id) |> noreply()
+
+  def handle_event("form-save", value, socket) do
+    # grab the selected people from the socket
+    ids = socket.assigns.selected_people |> Map.keys()
+    selected_user = value |> Map.get("user") |> Accounts.get_user()
+
+    # iterate through each
+    Repo.all(Cases.Person, ids)
+    |> Enum.each(fn person ->
+      person = %{person | originator: Session.get_current_user()}
+      Cases.update_assignment(person, selected_user)
+    end)
+
+    socket |> noreply()
+  end
+
+  defp set_selected(socket) do
+    socket |> assign(selected_people: %{})
+  end
+
+  defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id) do
+    assign(socket, selected_people: Map.put(selected_people, person_id, true))
+  end
+
+  defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id) do
+    assign(socket, selected_people: Map.delete(selected_people, person_id))
+  end
 
   defp set_filter(socket, filter) when is_binary(filter),
     do: socket |> set_filter(Euclid.Extra.Atom.from_string(filter))
@@ -65,6 +101,11 @@ defmodule EpicenterWeb.PeopleLive.Index do
   defp load_people(socket) do
     people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results()
     socket |> assign(people: people, person_count: length(people))
+  end
+
+  defp load_users(socket) do
+    users = Accounts.list_users()
+    socket |> assign(users: users)
   end
 
   def page_title(:call_list), do: "Call List"

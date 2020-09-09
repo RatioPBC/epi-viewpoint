@@ -1,11 +1,19 @@
 @import "../mixins"
 
 #people-page
+  @include vertical-flow
+
   h2
     @include level($justify: space-between)
 
     #title
       @include level($justify: left)
+
+  #assign
+    @include level
+
+  #assign-submit
+    @include button-primary-small
 
   #filter
     @include button-list

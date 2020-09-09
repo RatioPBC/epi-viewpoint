@@ -11,8 +11,11 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
   alias EpicenterWeb.PeopleLive.Index
 
   describe "rendering" do
-    defp table_contents(page_live),
-      do: page_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "people")
+    defp table_contents(index_live),
+      do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "people")
+
+    defp assignment_selector(index_live),
+      do: index_live |> render() |> Test.Html.parse_doc() |> Floki.find("[data-role=users] option") |> Enum.map(&Test.Html.text(&1))
 
     defp create_people_and_lab_results() do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
@@ -23,39 +26,56 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
       billy = Test.Fixtures.person_attrs(user, "billy", external_id: "billy-id") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(billy, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
+      [users: [user], people: [alice, billy]]
     end
 
     test "disconnected and connected render", %{conn: conn} do
-      {:ok, page_live, disconnected_html} = live(conn, "/people")
+      {:ok, index_live, disconnected_html} = live(conn, "/people")
 
       assert_has_role(disconnected_html, "people-page")
-      assert_has_role(page_live, "people-page")
+      assert_has_role(index_live, "people-page")
+    end
+
+    test "shows users in the assignment selector", %{conn: conn} do
+      [users: [user], people: [alice, _]] = create_people_and_lab_results()
+
+      {:ok, index_live, _} = live(conn, "/people")
+
+      # assert users are in dropdown
+      index_live |> assignment_selector() |> assert_eq(["Choose user", "user"])
+
+      # "select" person from table
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click()
+
+      # submit form and expect user to be assigned to selected person
+      index_live |> element("#assignment-form") |> render_submit(%{"user" => user.id})
+      assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "user"
     end
 
     test "shows people and their lab tests", %{conn: conn} do
       create_people_and_lab_results()
 
-      {:ok, page_live, _html} = live(conn, "/people")
+      {:ok, index_live, _html} = live(conn, "/people")
 
-      page_live
+      index_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "ID", "Latest test result"],
-        ["Billy Testuser", "billy-id", "negative, 3 days ago"],
-        ["Alice Testuser", "", "positive, 1 day ago"]
+        ["", "Name", "ID", "Latest test result"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago"],
+        ["", "Alice Testuser", "", "positive, 1 day ago"]
       ])
     end
 
     test "shows a reload message after an import", %{conn: conn} do
-      {:ok, page_live, _html} = live(conn, "/people")
+      {:ok, index_live, _html} = live(conn, "/people")
 
       # start off with no people
-      assert_role_text(page_live, "reload-message", "")
+      assert_role_text(index_live, "reload-message", "")
 
-      page_live
+      index_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "ID", "Latest test result"]
+        ["", "Name", "ID", "Latest test result"]
       ])
 
       # import 2 people
@@ -71,24 +91,24 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       Cases.broadcast({:import, import_info})
 
       # show a button to make the people visible
-      assert_role_text(page_live, "reload-message", "Show 2 new people")
+      assert_role_text(index_live, "reload-message", "Show 2 new people")
 
-      page_live
+      index_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "ID", "Latest test result"]
+        ["", "Name", "ID", "Latest test result"]
       ])
 
       # show the new people after the button is clicked
-      render_click(page_live, "refresh-people")
-      assert_role_text(page_live, "reload-message", "")
+      render_click(index_live, "refresh-people")
+      assert_role_text(index_live, "reload-message", "")
 
-      page_live
+      index_live
       |> table_contents()
       |> assert_eq([
-        ["Name", "ID", "Latest test result"],
-        ["Billy Testuser", "billy-id", "negative, 3 days ago"],
-        ["Alice Testuser", "", "positive, 1 day ago"]
+        ["", "Name", "ID", "Latest test result"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago"],
+        ["", "Alice Testuser", "", "positive, 1 day ago"]
       ])
     end
   end

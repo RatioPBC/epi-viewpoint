@@ -11,17 +11,30 @@ section#people-page data-role="people-page"
       = live_patch "Call list", to: Routes.people_index_path(@socket, :index, filter: :call_list), class: "button", data: [active: @filter == :call_list]
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
+
+  form id="assignment-form" phx-submit="form-save"
+    #assign
+      label Assign to:
+      select name="user" id="user-list" data-role="users"
+        option value="" Choose user
+        = for user <- @users do
+          option value="#{user.id}" #{user.username}
+      = submit "Save", id: "assign-submit"
+
+
   table data-role="people"
     thead
       tr data-role="table-column-names"
+        th
         th Name
         th ID
         th Latest test result
 
     tbody
       = for person <- @people do
-        tr data-role="person" data-tid=person.tid
-
+        tr data-role="person"
+          td
+            input type="checkbox" checked=false phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
           td= live_redirect full_name(person), to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
           td= person.external_id
           td= latest_result(person)
