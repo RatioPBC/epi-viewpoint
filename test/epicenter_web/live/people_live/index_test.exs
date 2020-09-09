@@ -41,7 +41,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       |> table_contents()
       |> assert_eq([
         ["Name", "ID", "Latest test result"],
-        ["Billy Testuser", "billy-id","negative, 3 days ago"],
+        ["Billy Testuser", "billy-id", "negative, 3 days ago"],
         ["Alice Testuser", "", "positive, 1 day ago"]
       ])
     end
