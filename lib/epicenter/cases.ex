@@ -40,14 +40,14 @@ defmodule Epicenter.Cases do
   def count_phones(), do: Phone |> Repo.aggregate(:count)
   def create_phone(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert()
   def create_phone!(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!()
-  def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:phones])
+  def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(phones: Phone.Query.order_by_number(:asc))
 
   #
   # email
   #
   def change_email(%Email{} = email, attrs), do: Email.changeset(email, attrs)
   def create_email!(attrs), do: %Email{} |> change_email(attrs) |> Repo.insert!()
-  def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:emails])
+  def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(emails: Email.Query.order_by_address(:asc))
 
   #
   # pubsub

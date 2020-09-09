@@ -2,9 +2,11 @@ defmodule Epicenter.Cases.Phone do
   use Ecto.Schema
 
   import Ecto.Changeset
+  import Ecto.Query
   import Epicenter.Validation, only: [validate_phi: 2]
 
   alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Phone
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -27,5 +29,11 @@ defmodule Epicenter.Cases.Phone do
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
     |> validate_phi(:phone)
+  end
+
+  defmodule Query do
+    def order_by_number(direction) do
+      from(e in Phone, order_by: [{^direction, :number}])
+    end
   end
 end
