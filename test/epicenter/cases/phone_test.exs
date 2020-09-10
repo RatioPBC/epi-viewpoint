@@ -13,6 +13,7 @@ defmodule Epicenter.Cases.PhoneTest do
         [
           {:id, :id},
           {:inserted_at, :naive_datetime},
+          {:is_preferred, :boolean},
           {:number, :integer},
           {:person_id, :id},
           {:seq, :integer},
@@ -25,7 +26,7 @@ defmodule Epicenter.Cases.PhoneTest do
   end
 
   describe "changeset" do
-    defp new_changeset(attr_updates \\ %{}) do
+    defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       default_attrs = Test.Fixtures.phone_attrs(person, "phone")
@@ -33,7 +34,8 @@ defmodule Epicenter.Cases.PhoneTest do
     end
 
     test "attributes" do
-      changes = new_changeset().changes
+      changes = new_changeset(is_preferred: true).changes
+      assert changes.is_preferred == true
       assert changes.number == 1_111_111_000
       assert changes.type == "home"
       assert changes.tid == "phone"

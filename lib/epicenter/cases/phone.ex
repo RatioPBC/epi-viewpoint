@@ -12,6 +12,7 @@ defmodule Epicenter.Cases.Phone do
   @foreign_key_type :binary_id
   schema "phones" do
     field :number, :integer
+    field :is_preferred, :boolean
     field :seq, :integer
     field :tid, :string
     field :type, :string
@@ -22,7 +23,7 @@ defmodule Epicenter.Cases.Phone do
   end
 
   @required_attrs ~w{number person_id}a
-  @optional_attrs ~w{tid type}a
+  @optional_attrs ~w{is_preferred tid type}a
 
   def changeset(phone, attrs) do
     phone
