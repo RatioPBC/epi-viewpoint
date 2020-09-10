@@ -14,12 +14,13 @@ defmodule Epicenter.Cases.Address do
     field :tid, :string
     field :type, :string
     field :person_id, :binary_id
+    field :is_preferred, :boolean
 
     timestamps()
   end
 
   @required_attrs ~w{full_address person_id}a
-  @optional_attrs ~w(type tid)a
+  @optional_attrs ~w(type tid is_preferred)a
 
   @doc false
   def changeset(address, attrs) do

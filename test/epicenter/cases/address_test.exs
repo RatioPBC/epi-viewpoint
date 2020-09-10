@@ -18,14 +18,15 @@ defmodule Epicenter.Cases.AddressTest do
           {:person_id, :id},
           {:seq, :integer},
           {:tid, :string},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :naive_datetime},
+          {:is_preferred, :boolean}
         ]
       )
     end
   end
 
   describe "changeset" do
-    defp new_changeset(attr_updates \\ %{}) do
+    defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       default_attrs = Test.Fixtures.address_attrs(person, "alice-address")
@@ -33,10 +34,11 @@ defmodule Epicenter.Cases.AddressTest do
     end
 
     test "attributes" do
-      changes = new_changeset().changes
+      changes = new_changeset(is_preferred: true).changes
       assert changes.full_address == "123 alice-address st, TestAddress"
       assert changes.tid == "alice-address"
       assert changes.type == "home"
+      assert changes.is_preferred == true
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
