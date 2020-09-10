@@ -14,7 +14,7 @@ defmodule Epicenter.Cases do
   def change_lab_result(%LabResult{} = lab_result, attrs), do: LabResult.changeset(lab_result, attrs)
   def count_lab_results(), do: LabResult |> Repo.aggregate(:count)
   def create_lab_result!(attrs), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!()
-  def import_lab_results(lab_result_csv_string, originator), do: Import.from_csv(lab_result_csv_string, originator)
+  def import_lab_results(lab_result_csv_string, originator), do: Import.import_csv(lab_result_csv_string, originator)
   def list_lab_results(), do: LabResult.Query.all() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:lab_results])
 
@@ -54,7 +54,7 @@ defmodule Epicenter.Cases do
   # email
   #
   def change_email(%Email{} = email, attrs), do: Email.changeset(email, attrs)
-  def create_email!(attrs), do: %Email{} |> change_email(attrs) |> Repo.insert!()
+  def create_email!(email_attrs), do: %Email{} |> change_email(email_attrs) |> Repo.insert!()
   def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(emails: Email.Query.order_by_address(:asc))
 
   #

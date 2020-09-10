@@ -8,7 +8,7 @@ defmodule Epicenter.Cases.Import do
   @required_lab_result_fields ~w{result result_date sample_date}
   @optional_lab_result_fields ~w{lab_result_tid}
   @required_person_fields ~w{dob first_name last_name}
-  @optional_person_fields ~w{case_id person_tid phone_number}
+  @optional_person_fields ~w{case_id person_tid phone_number full_address}
 
   @fields [
     required: @required_lab_result_fields ++ @required_person_fields,
@@ -19,14 +19,14 @@ defmodule Epicenter.Cases.Import do
     defstruct ~w{imported_person_count imported_lab_result_count total_person_count total_lab_result_count}a
   end
 
-  def from_csv(csv_string, %Accounts.User{} = originator) do
-    case Repo.transaction(fn -> import_csv(csv_string, originator) end) do
+  def import_csv(csv_string, %Accounts.User{} = originator) do
+    case Repo.transaction(fn -> import_csv_catching_exceptions(csv_string, originator) end) do
       {:ok, {:ok, import_info}} -> {:ok, import_info}
       {:ok, {:error, error}} -> {:error, error}
     end
   end
 
-  defp import_csv(csv_string, %Accounts.User{} = originator) do
+  defp import_csv_catching_exceptions(csv_string, %Accounts.User{} = originator) do
     {:ok, rows} = Csv.read(csv_string, @fields)
 
     result =
@@ -43,6 +43,9 @@ defmodule Epicenter.Cases.Import do
 
           if Euclid.Exists.present?(Map.get(row, "phone_number")),
             do: Cases.create_phone!(%{number: Map.get(row, "phone_number"), person_id: person.id})
+
+          if Euclid.Exists.present?(Map.get(row, "full_address")),
+            do: Cases.create_address!(%{full_address: Map.get(row, "full_address"), person_id: person.id})
 
           lab_result =
             row

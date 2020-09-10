@@ -8,18 +8,18 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Cases.Import
   alias Epicenter.Test
 
-  describe "from_csv" do
+  describe "import_csv" do
     setup do
       [originator: Test.Fixtures.user_attrs("originator") |> Accounts.create_user!()]
     end
 
     test "creates LabResult records and Person records from csv data", %{originator: originator} do
       """
-      first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid
-      Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1
-      Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1
+      first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
+      Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
+      Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  , 123 Billy St. TestAddress
       """
-      |> Import.from_csv(originator)
+      |> Import.import_csv(originator)
       |> assert_eq(
         {:ok,
          %Epicenter.Cases.Import.ImportInfo{
@@ -39,7 +39,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_2.sample_date == ~D[2020-06-06]
       assert lab_result_2.tid == "billy-result-1"
 
-      [alice, billy] = Cases.list_people() |> Cases.preload_phones()
+      [alice, billy] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
       assert alice.dob == ~D[1970-01-01]
       assert alice.external_id == "10000"
       assert alice.first_name == "Alice"
@@ -54,6 +54,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.last_name == "Testuser"
       assert billy.phones |> pluck(:number) == [1_111_111_001]
       assert billy.tid == "billy"
+      assert billy.addresses |> pluck(:full_address)== ["123 Billy St. TestAddress"]
       assert_versioned(billy, expected_count: 1)
     end
 
@@ -65,7 +66,7 @@ defmodule Epicenter.Cases.ImportTest do
       Billy      , Testuser  , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive , billy-1    , billy-1-newer-result
       Billy      , Testuser  , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
       """
-      |> Import.from_csv(originator)
+      |> Import.import_csv(originator)
       |> assert_eq(
         {:ok,
          %Epicenter.Cases.Import.ImportInfo{
@@ -90,7 +91,7 @@ defmodule Epicenter.Cases.ImportTest do
         Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
         Billy      , Testuser  , 01/01/1990 ,   ,   ,   ,
         """
-        |> Import.from_csv(originator)
+        |> Import.import_csv(originator)
 
       assert {:error, _} = result
 
