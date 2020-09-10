@@ -31,7 +31,7 @@ defmodule Epicenter.Cases do
       |> Enum.map(fn person ->
         {:ok, updated} =
           person
-          |> Repo.Versioned.originated_by(originator)
+          |> Repo.Versioned.with_originator(originator)
           |> Person.assignment_changeset(user)
           |> Repo.Versioned.update()
 
