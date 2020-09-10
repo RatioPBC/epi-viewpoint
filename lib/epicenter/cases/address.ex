@@ -31,6 +31,11 @@ defmodule Epicenter.Cases.Address do
   end
 
   defmodule Query do
+    def display_order() do
+      from a in Address,
+        order_by: [fragment("case when is_preferred=true then 0 else 1 end"), asc_nulls_last: :full_address]
+    end
+
     def order_by_full_address(direction) do
       from(a in Address, order_by: [{^direction, :full_address}])
     end

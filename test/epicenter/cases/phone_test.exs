@@ -47,4 +47,18 @@ defmodule Epicenter.Cases.PhoneTest do
 
     test "validates personal health information on number", do: assert_invalid(new_changeset(number: 2_111_111_000))
   end
+
+  describe "query" do
+    import Euclid.Extra.Enum, only: [tids: 1]
+
+    test "display_order sorts preferred first, then by number" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.phone_attrs(person, "preferred", is_preferred: true, number: 1_111_111_222) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(person, "phone-333", is_preferred: false, number: 1_111_111_333) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(person, "phone-111", is_preferred: nil, number: 1_111_111_111) |> Cases.create_phone!()
+
+      Phone.Query.display_order() |> Repo.all() |> tids() |> assert_eq(~w{preferred phone-111 phone-333})
+    end
+  end
 end

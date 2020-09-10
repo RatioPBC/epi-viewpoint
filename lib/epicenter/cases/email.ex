@@ -30,6 +30,11 @@ defmodule Epicenter.Cases.Email do
   end
 
   defmodule Query do
+    def display_order() do
+      from email in Email,
+        order_by: [fragment("case when is_preferred=true then 0 else 1 end"), asc_nulls_last: :address]
+    end
+
     def order_by_address(direction) do
       from(e in Email, order_by: [{^direction, :address}])
     end

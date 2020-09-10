@@ -33,6 +33,11 @@ defmodule Epicenter.Cases.Phone do
   end
 
   defmodule Query do
+    def display_order() do
+      from phone in Phone,
+        order_by: [fragment("case when is_preferred=true then 0 else 1 end"), asc_nulls_last: :number]
+    end
+
     def order_by_number(direction) do
       from(e in Phone, order_by: [{^direction, :number}])
     end

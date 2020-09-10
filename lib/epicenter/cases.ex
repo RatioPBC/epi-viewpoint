@@ -39,7 +39,7 @@ defmodule Epicenter.Cases do
   #
   def change_address(%Address{} = address, attrs), do: Address.changeset(address, attrs)
   def create_address!(attrs), do: %Address{} |> change_address(attrs) |> Repo.insert!()
-  def preload_addresses(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(addresses: Address.Query.order_by_full_address(:asc))
+  def preload_addresses(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(addresses: Address.Query.display_order())
 
   #
   # phone
@@ -48,14 +48,14 @@ defmodule Epicenter.Cases do
   def count_phones(), do: Phone |> Repo.aggregate(:count)
   def create_phone(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert()
   def create_phone!(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!()
-  def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(phones: Phone.Query.order_by_number(:asc))
+  def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(phones: Phone.Query.display_order())
 
   #
   # email
   #
   def change_email(%Email{} = email, attrs), do: Email.changeset(email, attrs)
   def create_email!(email_attrs), do: %Email{} |> change_email(email_attrs) |> Repo.insert!()
-  def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(emails: Email.Query.order_by_address(:asc))
+  def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(emails: Email.Query.display_order())
 
   #
   # pubsub

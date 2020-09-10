@@ -47,4 +47,18 @@ defmodule Epicenter.Cases.AddressTest do
 
     test "validates personal health information on address", do: assert_invalid(new_changeset(full_address: "123 main st, sf ca"))
   end
+
+  describe "query" do
+    import Euclid.Extra.Enum, only: [tids: 1]
+
+    test "display_order sorts preferred first, then by full address" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.address_attrs(person, "preferred", is_preferred: true, full_address: "m TestAddress") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "address-z", is_preferred: false, full_address: "z TestAddress") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "address-a", is_preferred: nil, full_address: "a TestAddress") |> Cases.create_address!()
+
+      Address.Query.display_order() |> Repo.all() |> tids() |> assert_eq(~w{preferred address-a address-z})
+    end
+  end
 end
