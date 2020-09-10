@@ -36,14 +36,17 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       assert_has_role(index_live, "people-page")
     end
 
-    test "shows users in the assignment selector", %{conn: conn} do
+    test "user is assigned to people", %{conn: conn} do
       [users: [user], people: [alice, billy]] = create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
 
       index_live |> assignment_selector() |> assert_eq(["Choose user", "user"])
-      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      index_live |> element("#assignment-form") |> render_submit(%{"user" => user.id})
 
+      assert_is_not_checked(index_live, alice.tid)
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      assert_is_checked(index_live, alice.tid)
+
+      index_live |> element("#assignment-form") |> render_submit(%{"user" => user.id})
       assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "user"
       assert Cases.get_person(billy.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
     end

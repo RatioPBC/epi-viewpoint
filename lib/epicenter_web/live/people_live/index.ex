@@ -35,16 +35,13 @@ defmodule EpicenterWeb.PeopleLive.Index do
     do: socket |> deselect_person(person_id) |> noreply()
 
   def handle_event("form-save", value, socket) do
-    people_ids = socket.assigns.selected_people |> Map.keys()
-    selected_user_id = Map.get(value, "user")
+    Cases.assign_user_to_people(
+      user_id: Map.get(value, "user"),
+      people_ids: Map.keys(socket.assigns.selected_people),
+      originator: Session.get_current_user()
+    )
 
-    Cases.assign_user_to_people(user_id: selected_user_id, people_ids: people_ids, originator: Session.get_current_user())
-
-    socket |> noreply()
-  end
-
-  defp set_selected(socket) do
-    socket |> assign(selected_people: %{})
+    socket |> set_selected() |> noreply()
   end
 
   defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id) do
@@ -64,6 +61,10 @@ defmodule EpicenterWeb.PeopleLive.Index do
   defp set_reload_message(socket, message),
     do: socket |> assign(reload_message: message)
 
+  defp set_selected(socket) do
+    socket |> assign(selected_people: %{})
+  end
+
   # # #
 
   defp ok(socket),
@@ -76,6 +77,8 @@ defmodule EpicenterWeb.PeopleLive.Index do
 
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
+
+  def is_checked?(selected_people, person), do: Map.has_key?(selected_people, person.id)
 
   def latest_result(person) do
     result = Person.latest_lab_result(person, :result)
