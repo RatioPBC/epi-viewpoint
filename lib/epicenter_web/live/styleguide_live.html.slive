@@ -6,16 +6,41 @@
   .styleguide-section
     .styleguide-title Text
 
-    div
+    .styleguide-example
       span#primary-text Primary text
-      code $primary-text-color
+      code color: $primary-text-color
 
-    div
+    .styleguide-example
       span#secondary-text Secondary text
-      code $secondary-text-color
-    div
+      code color: $secondary-text-color
+
+    .styleguide-example
       span#disabled-text Disabled text
-      code $disabled-text-color
+      code color: $disabled-text-color
+
+    .styleguide-example
+      h1 Heading 1
+      code h1 (or @include h1)
+
+    .styleguide-example
+      h2 Heading 2
+      code h2 (or @include h2)
+
+    .styleguide-example
+      h3 Heading 3
+      code h3 (or @include h3)
+
+    .styleguide-example
+      h4 Heading 4
+      code h4 (or @include h4)
+
+    .styleguide-example
+      #body-text-size Body text size
+      code font-size: $body-text-size
+
+    .styleguide-example
+      #small-body-text-size Small body text size
+      code font-size: $small-body-text-size
 
   //
   // buttons & links
@@ -23,31 +48,31 @@
   .styleguide-section
     .styleguide-title Buttons & links
 
-    div
+    .styleguide-example
       a#primary-button Primary button
       code @include button-primary
 
-    div
+    .styleguide-example
       a#primary-button-small Primary button (small)
       code @include button-primary($size: small)
 
-    div
+    .styleguide-example
       a#secondary-button Secondary button
       code @include button-secondary
 
-    div
+    .styleguide-example
       a#secondary-button-small Secondary button (small)
       code @include button-secondary($size: small)
 
-    div
+    .styleguide-example
       a#outline-button Outline button
       code @include button-outline
 
-    div
+    .styleguide-example
       a#outline-button-small Outline button (small)
       code @include button-outline($size: small)
 
-    div
+    .styleguide-example
       span#button-list
         a.button Button
         a.button List
@@ -55,6 +80,6 @@
         a.button data-disabled="true" Disabled
       code @include button-list
 
-    div
+    .styleguide-example
       a#link Link
       code a

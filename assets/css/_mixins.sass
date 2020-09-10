@@ -30,12 +30,12 @@
   border-radius: 2px
   color: $button-color
   display: inline-block
-  font-size: $medium-font-size
+  font-size: $body-text-size
   font-weight: normal
   padding: 0.5rem 2rem
 
   @if $size == small
-    font-size: $small-font-size
+    font-size: $small-body-text-size
     padding: 0.25rem 1rem
 
 @mixin button-primary($size: regular)
@@ -61,8 +61,8 @@
 
   header
     @include level($justify: space-between)
-    font-size: $very-large-font-size
-    font-weight: bold
+    @include h4
+    margin-top: inherit
 
     a
       @include button-primary
@@ -123,9 +123,30 @@
 
   .invalid-feedback
     color: $error-color
-    font-size: $small-font-size
+    font-size: $small-body-text-size
     font-weight: normal
     padding-left: 0.5rem
+
+@mixin -heading
+  font-weight: bold
+  line-height: 1.5
+  margin: 0
+
+@mixin h1
+  @include -heading
+  font-size: 4.8rem
+
+@mixin h2
+  @include -heading
+  font-size: 3.2rem
+
+@mixin h3
+  @include -heading
+  font-size: 2.4rem
+
+@mixin h4
+  @include -heading
+  font-size: 2rem
 
 @mixin hero
   margin: 2rem auto
@@ -155,7 +176,7 @@
   @include level
 
   *
-    font-size: $small-font-size
+    font-size: $small-body-text-size
 
 // https://1linelayouts.glitch.me
 @mixin sidebar-layout

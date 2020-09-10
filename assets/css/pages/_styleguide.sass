@@ -1,10 +1,6 @@
 @import "../mixins"
 
 #styleguide-page
-  code
-    color: purple
-    padding: 0 2rem
-
   .styleguide-section
     margin: 2rem
 
@@ -19,6 +15,18 @@
     font-weight: bold
     margin-bottom: 2rem
 
+  .styleguide-example
+    align-items: center
+    display: grid
+    grid-template-columns: 50% 50%
+    grid-gap: 1rem
+    justify-items: start
+
+  code
+    color: purple
+    padding: 0 2rem
+
+
   //
   // text
   //
@@ -30,6 +38,12 @@
 
   #disabled-text
     color: $disabled-text-color
+
+  #body-text-size
+    font-size: $body-text-size
+
+  #small-body-text-size
+    font-size: $small-body-text-size
 
   //
   // buttons & links

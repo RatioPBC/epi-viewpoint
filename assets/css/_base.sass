@@ -7,9 +7,9 @@ a
 
 body
   color: $primary-text-color
-  font-size: $medium-font-size
+  font-size: $body-text-size
   font-family: $system-font
-  line-height: $medium-line-height
+  line-height: 1.5
   @include pancake-stack
 
 body, html, main, main > *
@@ -20,16 +20,17 @@ fieldset
   margin: 0
   padding: 0
 
-footer
-  font-size: $small-font-size
-
-h1, h2, h3, h4, h5, h6
-  margin: 0
-
 h1
-  font-weight: 800
-  font-size: $very-large-font-size
-  line-height: $very-large-line-height
+  @include h1
+
+h2
+  @include h2
+
+h3
+  @include h3
+
+h4
+  @include h4
 
 html
   position: relative
