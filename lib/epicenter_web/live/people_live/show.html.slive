@@ -34,8 +34,9 @@
           td colspan=4 data-role="address"
             = if Euclid.Exists.present?(@addresses) do
               = for address <- @addresses do
-                div = address.full_address
-                div = address.type
+                div class="address-details"
+                  div = address.full_address
+                  div = address.type
             - else
               = unknown_value()
 

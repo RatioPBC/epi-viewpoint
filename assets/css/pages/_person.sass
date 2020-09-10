@@ -11,6 +11,11 @@
     table#profile-data
       @include detail-table
 
+      .address-details
+        padding-top: .5rem
+        & + .address-details
+          padding-top: 1.5rem
+
   section#lab-results
     @include card
 
