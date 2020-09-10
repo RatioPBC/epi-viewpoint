@@ -29,33 +29,39 @@ defmodule EpicenterWeb.PeopleLive.Show do
     end
   end
 
-  def email_address(person) do
+  def email_addresses(person) do
     person
     |> Cases.preload_emails()
     |> Map.get(:emails)
     |> Enum.map(& &1.address)
-    |> case do
-      [] -> nil
-      emails -> Enum.join(emails, ", ")
-    end
   end
 
-  def phone_number(person) do
+  def phone_numbers(person) do
     person
     |> Cases.preload_phones()
     |> Map.get(:phones)
     |> Enum.map(fn %{number: digits} ->
       digits |> Integer.digits() |> Enum.map(&to_string/1) |> List.insert_at(-5, "-") |> List.insert_at(-9, "-") |> Enum.join()
     end)
-    |> case do
-      [] -> nil
-      phones -> Enum.join(phones, ", ")
-    end
   end
 
   def string_or_unknown(value) do
     if Euclid.Exists.present?(value),
       do: value,
-      else: Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
+    else: unknown_value()
+  end
+
+  def list_or_unknown(values) do
+    if Euclid.Exists.present?(values) do
+      Phoenix.HTML.Tag.content_tag(:ul) do
+        Enum.map(values, & Phoenix.HTML.Tag.content_tag(:li, &1))
+      end
+    else
+      unknown_value()
+    end
+  end
+
+  def unknown_value do
+    Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
   end
 end
