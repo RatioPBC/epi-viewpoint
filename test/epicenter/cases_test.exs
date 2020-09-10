@@ -81,6 +81,13 @@ defmodule Epicenter.CasesTest do
       assert_versioned(person)
     end
 
+    test "get_people" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+      Cases.get_people([alice.id]) |> tids() |> assert_eq(["alice"])
+    end
+
     test "get_person" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
@@ -112,13 +119,24 @@ defmodule Epicenter.CasesTest do
       Cases.list_people(:with_lab_results) |> tids() |> assert_eq(~w{first middle last})
     end
 
-    test "update_assignment updates a person's assigned user" do
+    test "assign_user_to_people updates people's assigned user" do
       creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
-      assigned_to_user = Test.Fixtures.user_attrs("assigned-to") |> Accounts.create_user!()
-      person = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
-      {:ok, updated_person} = person |> Cases.update_assignment(assigned_to_user)
+      updater = Test.Fixtures.user_attrs("updater") |> Accounts.create_user!()
 
-      updated_person |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) |> Map.get(:tid) |> assert_eq("assigned-to")
+      assigned_to_user = Test.Fixtures.user_attrs("assigned-to") |> Accounts.create_user!()
+      alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
+      bobby = Test.Fixtures.person_attrs(creator, "bobby") |> Cases.create_person!()
+
+      {:ok, [updated_alice]} = Cases.assign_user_to_people(user_id: assigned_to_user.id, people_ids: [alice.id], originator: updater)
+
+      assert updated_alice |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) |> Map.get(:tid) == "assigned-to"
+
+      assert_last_version(updated_alice,
+        change: %{"assigned_to_id" => assigned_to_user.id, "originator" => %{"id" => updater.id}},
+        by: "updater"
+      )
+
+      assert bobby |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) == nil
     end
 
     test "update_person updates a person" do

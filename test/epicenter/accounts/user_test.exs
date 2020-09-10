@@ -27,8 +27,9 @@ defmodule Epicenter.Accounts.UserTest do
   describe "associations" do
     test "has many assignments" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.update_assignment(user)
-      Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!() |> Cases.update_assignment(user)
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+      Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id], originator: user)
 
       user
       |> Accounts.preload_assignments()

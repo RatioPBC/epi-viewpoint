@@ -13,6 +13,10 @@ defmodule Epicenter.Test.VersionAssertions do
     schema |> describe_versions() |> assert_eq(expected)
   end
 
+  def assert_last_version(schema, expected) do
+    assert describe_last_version(schema) == expected
+  end
+
   def assert_versioned(schema) do
     if Repo.Versioned.last_version(schema) == nil, do: flunk("Expected schema to have a version, but found none.")
   end
@@ -23,6 +27,8 @@ defmodule Epicenter.Test.VersionAssertions do
   end
 
   # # #
+
+  defp describe_last_version(schema), do: schema |> Repo.Versioned.last_version() |> describe_version()
 
   defp describe_version(version),
     do: [change: version.item_changes |> Map.drop(["id", "inserted_at", "seq", "updated_at"]), by: Accounts.get_user(version.originator_id).tid]

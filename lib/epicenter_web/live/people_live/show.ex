@@ -41,13 +41,13 @@ defmodule EpicenterWeb.PeopleLive.Show do
   def string_or_unknown(value) do
     if Euclid.Exists.present?(value),
       do: value,
-    else: unknown_value()
+      else: unknown_value()
   end
 
   def list_or_unknown(values) do
     if Euclid.Exists.present?(values) do
-      Phoenix.HTML.Tag.content_tag(:ul) do
-        Enum.map(values, & Phoenix.HTML.Tag.content_tag(:li, &1))
+      Phoenix.HTML.Tag.content_tag :ul do
+        Enum.map(values, &Phoenix.HTML.Tag.content_tag(:li, &1))
       end
     else
       unknown_value()

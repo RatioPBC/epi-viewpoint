@@ -37,19 +37,15 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     end
 
     test "shows users in the assignment selector", %{conn: conn} do
-      [users: [user], people: [alice, _]] = create_people_and_lab_results()
-
+      [users: [user], people: [alice, billy]] = create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
 
-      # assert users are in dropdown
       index_live |> assignment_selector() |> assert_eq(["Choose user", "user"])
-
-      # "select" person from table
-      index_live |> element("[data-tid=#{alice.tid}]") |> render_click()
-
-      # submit form and expect user to be assigned to selected person
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
       index_live |> element("#assignment-form") |> render_submit(%{"user" => user.id})
+
       assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "user"
+      assert Cases.get_person(billy.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
     end
 
     test "shows people and their lab tests", %{conn: conn} do

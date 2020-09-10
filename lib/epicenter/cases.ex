@@ -1,4 +1,5 @@
 defmodule Epicenter.Cases do
+  alias Epicenter.Accounts
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Email
@@ -21,17 +22,36 @@ defmodule Epicenter.Cases do
   #
   # people
   #
+  def assign_user_to_people(user_id: user_id, people_ids: people_ids, originator: %User{} = originator) do
+    user = Accounts.get_user(user_id)
+
+    all_updated =
+      people_ids
+      |> get_people()
+      |> Enum.map(fn person ->
+        {:ok, updated} =
+          person
+          |> Repo.Versioned.originated_by(originator)
+          |> Person.assignment_changeset(user)
+          |> Repo.Versioned.update()
+
+        updated
+      end)
+
+    {:ok, all_updated}
+  end
+
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
   def count_people(), do: Person |> Repo.aggregate(:count)
-  def create_person(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert()
   def create_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!()
+  def create_person(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert()
+  def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)
-  def list_people(), do: list_people(:all)
   def list_people(:all), do: Person.Query.all() |> Repo.all()
-  def list_people(:with_lab_results), do: Person.Query.with_lab_results() |> Repo.all()
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
+  def list_people(:with_lab_results), do: Person.Query.with_lab_results() |> Repo.all()
+  def list_people(), do: list_people(:all)
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
-  def update_assignment(%Person{} = person, %User{} = user), do: person |> Person.assignment_changeset(user) |> Repo.Versioned.update()
   def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
 

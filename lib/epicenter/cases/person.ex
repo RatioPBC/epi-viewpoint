@@ -38,10 +38,7 @@ defmodule Epicenter.Cases.Person do
   @required_attrs ~w{dob first_name last_name originator}a
   @optional_attrs ~w{assigned_to_id external_id preferred_language tid}a
 
-  def assignment_changeset(%Person{} = person, %User{} = user) do
-    person
-    |> changeset(%{assigned_to_id: user.id})
-  end
+  def assignment_changeset(person, %User{} = user), do: person |> changeset(%{assigned_to_id: user.id})
 
   def changeset(person, attrs) do
     person
@@ -83,6 +80,11 @@ defmodule Epicenter.Cases.Person do
     def all() do
       from person in Person,
         order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.seq]
+    end
+
+    def get_people(ids) do
+      from person in Person,
+        where: person.id in ^ids
     end
 
     def with_lab_results() do

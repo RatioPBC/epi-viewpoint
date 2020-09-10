@@ -6,7 +6,6 @@ defmodule EpicenterWeb.PeopleLive.Index do
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
-  alias Epicenter.Repo
   alias EpicenterWeb.Session
 
   def mount(_params, _session, socket) do
@@ -28,23 +27,18 @@ defmodule EpicenterWeb.PeopleLive.Index do
   def handle_event("refresh-people", _, socket),
     do: socket |> set_reload_message(nil) |> load_people() |> noreply()
 
-  def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
-    do: socket |> select_person(person_id) |> noreply()
+  def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket) do
+    socket |> select_person(person_id) |> noreply()
+  end
 
   def handle_event("checkbox-click", %{"person-id" => person_id} = _value, socket),
     do: socket |> deselect_person(person_id) |> noreply()
 
   def handle_event("form-save", value, socket) do
-    # grab the selected people from the socket
-    ids = socket.assigns.selected_people |> Map.keys()
-    selected_user = value |> Map.get("user") |> Accounts.get_user()
+    people_ids = socket.assigns.selected_people |> Map.keys()
+    selected_user_id = Map.get(value, "user")
 
-    # iterate through each
-    Repo.all(Cases.Person, ids)
-    |> Enum.each(fn person ->
-      person = %{person | originator: Session.get_current_user()}
-      Cases.update_assignment(person, selected_user)
-    end)
+    Cases.assign_user_to_people(user_id: selected_user_id, people_ids: people_ids, originator: Session.get_current_user())
 
     socket |> noreply()
   end

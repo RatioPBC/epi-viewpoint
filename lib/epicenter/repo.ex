@@ -14,16 +14,18 @@ defmodule Epicenter.Repo do
     def insert!(changeset, options \\ []),
       do: changeset |> PaperTrail.insert!(originator: get_originator!(changeset), ecto_options: options[:ecto_options])
 
+    def originated_by(data, originator), do: data |> Ecto.Changeset.change(originator: originator)
+
     def update(changeset),
       do: changeset |> update_if_changes(&PaperTrail.update(&1, originator: get_originator!(changeset))) |> unwrap_result()
 
     def update!(changeset),
       do: changeset |> update_if_changes(&PaperTrail.update!(&1, originator: get_originator!(changeset)))
 
-    # # #
-
-    defp get_originator!(changeset),
+    def get_originator!(changeset),
       do: Ecto.Changeset.get_field(changeset, :originator) || raise("originator not in changeset!")
+
+    # # #
 
     defp update_if_changes(changeset, update_fn) do
       case changeset do

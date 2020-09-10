@@ -202,5 +202,11 @@ defmodule Epicenter.RepoTest do
       |> Repo.Versioned.last_version()
       |> assert_version(change: %{"tid" => "version-2"}, by: "user")
     end
+
+    test "originated_by sets the originator", %{person_changeset: person_changeset} do
+      new_user = Test.Fixtures.user_attrs("new_user") |> Accounts.create_user!()
+      new_changeset = Repo.Versioned.originated_by(person_changeset, new_user)
+      assert Repo.Versioned.get_originator!(new_changeset) == new_user
+    end
   end
 end
