@@ -29,7 +29,8 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       assert_role_text(page_live, "preferred-language", "Unknown")
       assert_role_text(page_live, "phone-number", "Unknown")
       assert_role_text(page_live, "email-address", "Unknown")
-      assert_role_text(page_live, "address", "")
+      assert_role_text(page_live, "address", "Unknown")
+      assert_role_text(page_live, "address-type", "")
     end
 
     test("address", %{person: person}, do: person |> Show.address(:full_address) |> assert_eq(nil))
