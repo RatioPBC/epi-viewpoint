@@ -27,53 +27,24 @@ defmodule EpicenterWeb.PeopleLive.Index do
   def handle_event("refresh-people", _, socket),
     do: socket |> set_reload_message(nil) |> load_people() |> noreply()
 
-  def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket) do
-    socket |> select_person(person_id) |> noreply()
-  end
+  def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
+    do: socket |> select_person(person_id) |> noreply()
 
   def handle_event("checkbox-click", %{"person-id" => person_id} = _value, socket),
     do: socket |> deselect_person(person_id) |> noreply()
 
   def handle_event("form-save", value, socket) do
-    Cases.assign_user_to_people(
-      user_id: Map.get(value, "user"),
-      people_ids: Map.keys(socket.assigns.selected_people),
-      originator: Session.get_current_user()
-    )
+    {:ok, updated_people} =
+      Cases.assign_user_to_people(
+        user_id: Map.get(value, "user"),
+        people_ids: Map.keys(socket.assigns.selected_people),
+        originator: Session.get_current_user()
+      )
 
-    socket |> set_selected() |> load_people() |> noreply()
+    socket |> set_selected() |> refresh_people(updated_people) |> noreply()
   end
 
-  defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id) do
-    assign(socket, selected_people: Map.put(selected_people, person_id, true))
-  end
-
-  defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id) do
-    assign(socket, selected_people: Map.delete(selected_people, person_id))
-  end
-
-  defp set_filter(socket, filter) when is_binary(filter),
-    do: socket |> set_filter(Euclid.Extra.Atom.from_string(filter))
-
-  defp set_filter(socket, filter) when is_atom(filter),
-    do: socket |> assign(filter: filter, page_title: page_title(filter)) |> load_people()
-
-  defp set_reload_message(socket, message),
-    do: socket |> assign(reload_message: message)
-
-  defp set_selected(socket) do
-    socket |> assign(selected_people: %{})
-  end
-
-  # # #
-
-  defp ok(socket),
-    do: {:ok, socket}
-
-  defp noreply(socket),
-    do: {:noreply, socket}
-
-  # # #
+  # # # View helpers
 
   def assigned_to_name(%Person{assigned_to: nil}),
     do: ""
@@ -84,7 +55,8 @@ defmodule EpicenterWeb.PeopleLive.Index do
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
-  def is_checked?(selected_people, person), do: Map.has_key?(selected_people, person.id)
+  def is_checked?(selected_people, person),
+    do: Map.has_key?(selected_people, person.id)
 
   def latest_result(person) do
     result = Person.latest_lab_result(person, :result)
@@ -101,17 +73,50 @@ defmodule EpicenterWeb.PeopleLive.Index do
     end
   end
 
-  defp load_people(socket) do
-    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results() |> Cases.preload_assigned_to()
-    socket |> assign(people: people, person_count: length(people))
-  end
-
-  defp load_users(socket) do
-    users = Accounts.list_users()
-    socket |> assign(users: users)
-  end
-
   def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"
   def page_title(:with_lab_results), do: "People"
+
+  # # # Private
+
+  defp assign_people(socket, people),
+    do: assign(socket, people: people, person_count: length(people))
+
+  defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
+    do: assign(socket, selected_people: Map.delete(selected_people, person_id))
+
+  defp load_people(socket) do
+    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results() |> Cases.preload_assigned_to()
+    assign_people(socket, people)
+  end
+
+  defp load_users(socket),
+    do: socket |> assign(users: Accounts.list_users())
+
+  defp noreply(socket),
+    do: {:noreply, socket}
+
+  defp ok(socket),
+    do: {:ok, socket}
+
+  defp refresh_people(socket, updated_people) do
+    id_to_people_map = updated_people |> Enum.reduce(%{}, fn person, acc -> acc |> Map.put(person.id, person) end)
+    refreshed_people = socket.assigns.people |> Enum.map(fn person -> Map.get(id_to_people_map, person.id, person) end)
+    assign_people(socket, refreshed_people)
+  end
+
+  defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
+    do: assign(socket, selected_people: Map.put(selected_people, person_id, true))
+
+  defp set_filter(socket, filter) when is_binary(filter),
+    do: socket |> set_filter(Euclid.Extra.Atom.from_string(filter))
+
+  defp set_filter(socket, filter) when is_atom(filter),
+    do: socket |> assign(filter: filter, page_title: page_title(filter)) |> load_people()
+
+  defp set_reload_message(socket, message),
+    do: socket |> assign(reload_message: message)
+
+  defp set_selected(socket),
+    do: socket |> assign(selected_people: %{})
 end

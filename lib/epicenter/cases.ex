@@ -35,7 +35,7 @@ defmodule Epicenter.Cases do
           |> Person.assignment_changeset(user)
           |> Repo.Versioned.update()
 
-        updated
+        %{updated | assigned_to: user}
       end)
 
     {:ok, all_updated}

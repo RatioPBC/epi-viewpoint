@@ -130,6 +130,7 @@ defmodule Epicenter.CasesTest do
       {:ok, [updated_alice]} = Cases.assign_user_to_people(user_id: assigned_to_user.id, people_ids: [alice.id], originator: updater)
 
       assert updated_alice |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) |> Map.get(:tid) == "assigned-to"
+      assert updated_alice.assigned_to.tid == "assigned-to"
 
       assert_last_version(updated_alice,
         change: %{"assigned_to_id" => assigned_to_user.id, "originator" => %{"id" => updater.id}},
