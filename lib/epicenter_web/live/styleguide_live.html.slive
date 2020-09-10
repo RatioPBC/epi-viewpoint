@@ -1,0 +1,60 @@
+#styleguide-page
+
+  //
+  // text
+  //
+  .styleguide-section
+    .styleguide-title Text
+
+    div
+      span#primary-text Primary text
+      code $primary-text-color
+
+    div
+      span#secondary-text Secondary text
+      code $secondary-text-color
+    div
+      span#disabled-text Disabled text
+      code $disabled-text-color
+
+  //
+  // buttons & links
+  //
+  .styleguide-section
+    .styleguide-title Buttons & links
+
+    div
+      a#primary-button Primary button
+      code @include button-primary
+
+    div
+      a#primary-button-small Primary button (small)
+      code @include button-primary($size: small)
+
+    div
+      a#secondary-button Secondary button
+      code @include button-secondary
+
+    div
+      a#secondary-button-small Secondary button (small)
+      code @include button-secondary($size: small)
+
+    div
+      a#outline-button Outline button
+      code @include button-outline
+
+    div
+      a#outline-button-small Outline button (small)
+      code @include button-outline($size: small)
+
+    div
+      span#button-list
+        a.button Button
+        a.button List
+        a.button data-active="true" Active
+        a.button data-disabled="true" Disabled
+      code @include button-list
+
+    div
+      a#link Link
+      code a

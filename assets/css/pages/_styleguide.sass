@@ -1,0 +1,58 @@
+@import "../mixins"
+
+#styleguide-page
+  code
+    color: purple
+    padding: 0 2rem
+
+  .styleguide-section
+    margin: 2rem
+
+    & + .styleguide-section
+      margin-top: 4rem
+
+    & > *
+      margin-top: 1rem
+
+  .styleguide-title
+    font-size: 3rem
+    font-weight: bold
+    margin-bottom: 2rem
+
+  //
+  // text
+  //
+  #primary-text
+    color: $primary-text-color
+
+  #secondary-text
+    color: $secondary-text-color
+
+  #disabled-text
+    color: $disabled-text-color
+
+  //
+  // buttons & links
+  //
+  #primary-button
+    @include button-primary
+
+  #primary-button-small
+    @include button-primary($size: small)
+
+  #secondary-button
+    @include button-secondary
+
+  #secondary-button-small
+    @include button-secondary($size: small)
+
+  #outline-button
+    @include button-outline
+
+  #outline-button-small
+    @include button-outline($size: small)
+
+  #button-list
+    @include button-list
+
+
