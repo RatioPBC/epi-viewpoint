@@ -30,10 +30,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       assert_role_text(page_live, "phone-number", "Unknown")
       assert_role_text(page_live, "email-address", "Unknown")
       assert_role_text(page_live, "address", "Unknown")
-      assert_role_text(page_live, "address-type", "")
     end
-
-    test("address", %{person: person}, do: person |> Show.address(:full_address) |> assert_eq(nil))
 
     test("email_addresses", %{person: person}, do: person |> Show.email_addresses() |> assert_eq([]))
 
@@ -47,7 +44,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
       Test.Fixtures.phone_attrs(person, "phone-2", number: 1_111_111_001) |> Cases.create_phone!()
       Test.Fixtures.address_attrs(person, "alice-address-1", type: "home") |> Cases.create_address!()
-      Test.Fixtures.address_attrs(person, "alice-address-2") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "alice-address-2", type: nil) |> Cases.create_address!()
       :ok
     end
 
@@ -58,14 +55,13 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       assert_role_text(page_live, "preferred-language", "English")
       assert_role_text(page_live, "phone-number", "111-111-1000 111-111-1001")
       assert_role_text(page_live, "email-address", "alice-1@example.com alice-2@example.com")
-      assert_role_text(page_live, "address", "123 alice-address-1 st, TestAddress")
-      assert_role_text(page_live, "address-type", "home")
+      assert_role_text(page_live, "address", "123 alice-address-1 st, TestAddress home 123 alice-address-2 st, TestAddress")
     end
 
-    test("address", %{person: person}, do: person |> Show.address(:full_address) |> assert_eq("123 alice-address-1 st, TestAddress"))
+    test("email_addresses", %{person: person},
+      do: person |> Show.email_addresses() |> assert_eq(["alice-1@example.com", "alice-2@example.com"]))
 
-    test("email_addresses", %{person: person}, do: person |> Show.email_addresses() |> assert_eq(["alice-1@example.com", "alice-2@example.com"]))
-
-    test("phone_numbers", %{person: person}, do: person |> Show.phone_numbers() |> assert_eq(["111-111-1000", "111-111-1001"]))
+    test("phone_numbers", %{person: person},
+      do: person |> Show.phone_numbers() |> assert_eq(["111-111-1000", "111-111-1001"]))
   end
 end

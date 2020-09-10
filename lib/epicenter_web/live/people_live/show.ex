@@ -7,8 +7,12 @@ defmodule EpicenterWeb.PeopleLive.Show do
   alias Epicenter.Cases.Person
 
   def mount(%{"id" => id}, _session, socket) do
-    person = Cases.get_person(id) |> Cases.preload_lab_results()
-    {:ok, assign(socket, person: person)}
+    person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses()
+    socket = socket
+    |> assign(person: person)
+    |> assign(addresses: person.addresses)
+
+    {:ok, socket}
   end
 
   def age(%Person{dob: dob}) do
@@ -17,17 +21,6 @@ defmodule EpicenterWeb.PeopleLive.Show do
 
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
-
-  def address(person, field_name) do
-    person
-    |> Cases.preload_addresses()
-    |> Map.get(:addresses)
-    |> List.first()
-    |> case do
-      nil -> nil
-      address -> Map.get(address, field_name)
-    end
-  end
 
   def email_addresses(person) do
     person

@@ -1,7 +1,7 @@
 first_name , last_name , dob        , phone_number , case_id , sample_date , result_date , result   , person_tid , lab_result_tid , full_address
 Alice      , Testuser  , 01/01/1970 , 1111111000   , 10000   , 08/01/2020  , 08/03/2020  , positive , alice      , alice-result-1 , 123 Test St Middletown RI 02842 TestAddress
 Alice      , Testuser  , 01/01/1970 , 1111111001   , 10001   , 07/01/2020  , 07/03/2020  , negative , alice      , alice-result-2 ,
-Alice      , Testuser  , 01/01/1970 , 1111111002   , 10002   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-3 , 123 Test St Middletown RI 02842 TestAddress
+Alice      , Testuser  , 01/01/1970 , 1111111002   , 10002   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-3 , 401 Test St Middletown RI 02842 TestAddress
 Alice      , Testuser  , 01/01/1970 , 1111111003   , 10003   , 05/01/2020  , 05/03/2020  , negative , alice      , alice-result-4 ,
 Billy      , Testuser  , 01/01/1971 , 1111111004   , 10004   , 08/02/2020  , 08/04/2020  , negative , billy      , billy-result-1 , 123 Test St Middletown RI 02842 TestAddress
 Billy      , Testuser  , 01/01/1971 , 1111111005   , 10005   , 07/02/2020  , 07/04/2020  , negative , billy      , billy-result-2 , 123 Test St Middletown RI 02842 TestAddress

@@ -31,9 +31,13 @@
         tr
           th colspan=4 Address
         tr
-          td colspan=4
-            div data-role="address"= string_or_unknown(address(@person, :full_address))
-            div data-role="address-type"= address(@person, :type)
+          td colspan=4 data-role="address"
+            = if Euclid.Exists.present?(@addresses) do
+              = for address <- @addresses do
+                div = address.full_address
+                div = address.type
+            - else
+              = unknown_value()
 
   section#lab-results
     header Lab Results
