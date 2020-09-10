@@ -26,9 +26,9 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       {:ok, _} = Cases.update_person(person, preferred_language: nil)
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
-      assert_role_text(page_live, "preferred-language", "")
-      assert_role_text(page_live, "phone-number", "")
-      assert_role_text(page_live, "email-address", "")
+      assert_role_text(page_live, "preferred-language", "Unknown")
+      assert_role_text(page_live, "phone-number", "Unknown")
+      assert_role_text(page_live, "email-address", "Unknown")
       assert_role_text(page_live, "address", "")
     end
 

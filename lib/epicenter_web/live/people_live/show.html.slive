@@ -24,9 +24,9 @@
           th Email
         tr
           td= @person.dob
-          td data-role="preferred-language"= @person.preferred_language
-          td data-role="phone-number"= phone_number(@person)
-          td data-role="email-address"= email_address(@person)
+          td data-role="preferred-language"= string_or_unknown(@person.preferred_language)
+          td data-role="phone-number"= string_or_unknown(phone_number(@person))
+          td data-role="email-address"= string_or_unknown(email_address(@person))
       tbody
         tr
           th colspan=4 Address

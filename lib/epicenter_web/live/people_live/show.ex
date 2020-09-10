@@ -52,4 +52,10 @@ defmodule EpicenterWeb.PeopleLive.Show do
       phones -> Enum.join(phones, ", ")
     end
   end
+
+  def string_or_unknown(value) do
+    if Euclid.Exists.present?(value),
+      do: value,
+      else: Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
+  end
 end
