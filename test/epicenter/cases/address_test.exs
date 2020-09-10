@@ -11,15 +11,15 @@ defmodule Epicenter.Cases.AddressTest do
       assert_schema(
         Cases.Address,
         [
+          {:full_address, :string},
           {:id, :id},
           {:inserted_at, :naive_datetime},
-          {:full_address, :string},
-          {:type, :string},
+          {:is_preferred, :boolean},
           {:person_id, :id},
           {:seq, :integer},
           {:tid, :string},
-          {:updated_at, :naive_datetime},
-          {:is_preferred, :boolean}
+          {:type, :string},
+          {:updated_at, :naive_datetime}
         ]
       )
     end

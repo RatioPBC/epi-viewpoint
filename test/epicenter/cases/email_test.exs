@@ -11,9 +11,10 @@ defmodule Epicenter.Cases.EmailTest do
       assert_schema(
         Cases.Email,
         [
+          {:address, :string},
           {:id, :id},
           {:inserted_at, :naive_datetime},
-          {:address, :string},
+          {:is_preferred, :boolean},
           {:person_id, :id},
           {:seq, :integer},
           {:tid, :string},
@@ -24,7 +25,7 @@ defmodule Epicenter.Cases.EmailTest do
   end
 
   describe "changeset" do
-    defp new_changeset(attr_updates \\ %{}) do
+    defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       default_attrs = Test.Fixtures.email_attrs(person, "alice-email")
@@ -32,8 +33,9 @@ defmodule Epicenter.Cases.EmailTest do
     end
 
     test "attributes" do
-      changes = new_changeset().changes
+      changes = new_changeset(is_preferred: true).changes
       assert changes.address == "alice-email@example.com"
+      assert changes.is_preferred == true
       assert changes.tid == "alice-email"
     end
 

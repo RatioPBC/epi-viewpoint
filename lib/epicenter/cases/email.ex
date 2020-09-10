@@ -10,6 +10,7 @@ defmodule Epicenter.Cases.Email do
   @foreign_key_type :binary_id
   schema "emails" do
     field :address, :string
+    field :is_preferred, :boolean
     field :seq, :integer
     field :tid, :string
     field :person_id, :binary_id
@@ -18,7 +19,7 @@ defmodule Epicenter.Cases.Email do
   end
 
   @required_attrs ~w{address person_id}a
-  @optional_attrs ~w{tid}a
+  @optional_attrs ~w{is_preferred tid}a
 
   @doc false
   def changeset(email, attrs) do
