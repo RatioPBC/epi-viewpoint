@@ -41,7 +41,7 @@ defmodule EpicenterWeb.PeopleLive.Index do
       originator: Session.get_current_user()
     )
 
-    socket |> set_selected() |> noreply()
+    socket |> set_selected() |> load_people() |> noreply()
   end
 
   defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id) do
@@ -75,6 +75,12 @@ defmodule EpicenterWeb.PeopleLive.Index do
 
   # # #
 
+  def assigned_to_name(%Person{assigned_to: nil}),
+    do: ""
+
+  def assigned_to_name(%Person{assigned_to: assignee}),
+    do: assignee.username
+
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
@@ -96,7 +102,7 @@ defmodule EpicenterWeb.PeopleLive.Index do
   end
 
   defp load_people(socket) do
-    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results()
+    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results() |> Cases.preload_assigned_to()
     socket |> assign(people: people, person_count: length(people))
   end
 

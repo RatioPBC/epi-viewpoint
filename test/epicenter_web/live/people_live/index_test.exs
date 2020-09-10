@@ -19,6 +19,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
     defp create_people_and_lab_results() do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
 
       alice = Test.Fixtures.person_attrs(user, "alice", external_id: nil) |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
@@ -26,7 +27,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
       billy = Test.Fixtures.person_attrs(user, "billy", external_id: "billy-id") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(billy, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
-      [users: [user], people: [alice, billy]]
+      [users: [user, assignee], people: [alice, billy]]
     end
 
     test "disconnected and connected render", %{conn: conn} do
@@ -37,18 +38,32 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     end
 
     test "user is assigned to people", %{conn: conn} do
-      [users: [user], people: [alice, billy]] = create_people_and_lab_results()
+      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
 
-      index_live |> assignment_selector() |> assert_eq(["Choose user", "user"])
+      index_live
+      |> table_contents()
+      |> assert_eq([
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", ""]
+      ])
+
+      index_live |> assignment_selector() |> assert_eq(["Choose user", "assignee", "user"])
 
       assert_is_not_checked(index_live, alice.tid)
       index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
       assert_is_checked(index_live, alice.tid)
 
-      index_live |> element("#assignment-form") |> render_submit(%{"user" => user.id})
-      assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "user"
-      assert Cases.get_person(billy.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
+      index_live |> element("#assignment-form") |> render_submit(%{"user" => assignee.id})
+
+      index_live
+      |> table_contents()
+      |> assert_eq([
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", "assignee"]
+      ])
     end
 
     test "shows people and their lab tests", %{conn: conn} do
@@ -59,9 +74,9 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       index_live
       |> table_contents()
       |> assert_eq([
-        ["", "Name", "ID", "Latest test result"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago"],
-        ["", "Alice Testuser", "", "positive, 1 day ago"]
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
     end
 
@@ -74,7 +89,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       index_live
       |> table_contents()
       |> assert_eq([
-        ["", "Name", "ID", "Latest test result"]
+        ["", "Name", "ID", "Latest test result", "Assignee"]
       ])
 
       # import 2 people
@@ -95,7 +110,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       index_live
       |> table_contents()
       |> assert_eq([
-        ["", "Name", "ID", "Latest test result"]
+        ["", "Name", "ID", "Latest test result", "Assignee"]
       ])
 
       # show the new people after the button is clicked
@@ -105,9 +120,9 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       index_live
       |> table_contents()
       |> assert_eq([
-        ["", "Name", "ID", "Latest test result"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago"],
-        ["", "Alice Testuser", "", "positive, 1 day ago"]
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
     end
   end

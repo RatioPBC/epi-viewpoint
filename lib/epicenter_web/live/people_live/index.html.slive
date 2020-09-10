@@ -28,6 +28,7 @@ section#people-page data-role="people-page"
         th Name
         th ID
         th Latest test result
+        th Assignee
 
     tbody
       = for person <- @people do
@@ -37,3 +38,4 @@ section#people-page data-role="people-page"
           td= live_redirect full_name(person), to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
           td= person.external_id
           td= latest_result(person)
+          td= assigned_to_name(person)
