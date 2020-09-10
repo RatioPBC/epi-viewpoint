@@ -14,13 +14,12 @@ section#people-page data-role="people-page"
 
   form id="assignment-form" phx-submit="form-save"
     #assign
-      label Assign to:
+      label for="user-list" Assign to:
       select name="user" id="user-list" data-role="users"
         option value="" Choose user
         = for user <- @users do
           option value="#{user.id}" #{user.username}
-      = submit "Save", id: "assign-submit"
-
+      = submit "Save", phx_disable_with: "Saving...", id: "assign-submit"
 
   table data-role="people"
     thead
