@@ -11,15 +11,18 @@ defmodule Epicenter.Cases.LabResultTest do
       assert_schema(
         LabResult,
         [
+          {:analyzed_on, :date},
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:person_id, :id},
+          {:reported_on, :date},
           {:request_accession_number, :string},
           {:request_facility_code, :string},
           {:request_facility_name, :string},
           {:result, :string},
-          {:sample_date, :date},
+          {:sampled_on, :date},
           {:seq, :integer},
+          {:test_type, :string},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]
@@ -38,6 +41,13 @@ defmodule Epicenter.Cases.LabResultTest do
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
     test "result is required", do: assert_invalid(new_changeset(result: nil))
-    test "sample date is required", do: assert_invalid(new_changeset(sample_date: nil))
+    test "sample date is required", do: assert_invalid(new_changeset(sampled_on: nil))
+
+    test "attributes" do
+      changes = new_changeset(analyzed_on: ~D[2020-09-10], reported_on: ~D[2020-09-11], test_type: "PCR").changes
+      assert changes.analyzed_on == ~D[2020-09-10]
+      assert changes.reported_on == ~D[2020-09-11]
+      assert changes.test_type == "PCR"
+    end
   end
 end

@@ -2,14 +2,14 @@ defmodule Epicenter.Test.Fixtures do
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
 
-  def lab_result_attrs(%Person{id: person_id}, tid, sample_date, attrs \\ %{}) do
+  def lab_result_attrs(%Person{id: person_id}, tid, sampled_on, attrs \\ %{}) do
     %{
       person_id: person_id,
       request_accession_number: "accession-" <> tid,
       request_facility_code: "facility-" <> tid,
       request_facility_name: tid <> " Lab, Inc.",
       result: "positive",
-      sample_date: sample_date |> DateParser.parse_mm_dd_yyyy!(),
+      sampled_on: sampled_on |> DateParser.parse_mm_dd_yyyy!(),
       tid: tid
     }
     |> merge_attrs(attrs)

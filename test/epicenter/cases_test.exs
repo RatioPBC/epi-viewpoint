@@ -44,7 +44,7 @@ defmodule Epicenter.CasesTest do
       assert lab_result.request_facility_code == "facility-result1"
       assert lab_result.request_facility_name == "result1 Lab, Inc."
       assert lab_result.result == "positive"
-      assert lab_result.sample_date == ~D[2020-06-01]
+      assert lab_result.sampled_on == ~D[2020-06-01]
       assert lab_result.tid == "result1"
     end
 

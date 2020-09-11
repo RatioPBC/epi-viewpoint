@@ -53,6 +53,7 @@ defmodule Epicenter.Cases.Import do
             |> Map.update!("sample_date", &DateParser.parse_mm_dd_yyyy!/1)
             |> Map.put("person_id", person.id)
             |> Euclid.Extra.Map.rename_key("lab_result_tid", "tid")
+            |> Euclid.Extra.Map.rename_key("sample_date", "sampled_on")
             |> Cases.create_lab_result!()
 
           %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}

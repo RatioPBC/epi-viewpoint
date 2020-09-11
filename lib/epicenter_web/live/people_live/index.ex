@@ -52,7 +52,7 @@ defmodule EpicenterWeb.PeopleLive.Index do
 
     if result do
       days_ago =
-        Person.latest_lab_result(person, :sample_date)
+        Person.latest_lab_result(person, :sampled_on)
         |> Extra.Date.days_ago()
         |> Extra.String.pluralize("day ago", "days ago")
 

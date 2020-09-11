@@ -66,4 +66,50 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       person |> Show.phone_numbers() |> assert_eq(["111-111-1001", "111-111-1000"])
     end
   end
+
+  describe "when the person has no test results" do
+    test "", %{conn: conn, person: person} do
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
+
+      page_live
+      |> assert_role_text("lab-results", "Lab Results No lab results")
+    end
+  end
+
+  defp test_result_table_contents(page_live),
+       do: page_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "lab-result-table")
+
+  describe "when the person has test results" do
+    setup %{person: person} do
+      Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-10], %{
+        result: "positive",
+        request_facility_name: "Big Big Hospital",
+        analyzed_on: ~D[2020-04-11],
+        reported_on: ~D[2020-04-12],
+        test_type: "PCR"
+      })
+      |> Cases.create_lab_result!()
+
+      Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-12], %{
+        result: "positive",
+        request_facility_name: "Big Big Hospital",
+        analyzed_on: ~D[2020-04-13],
+        reported_on: ~D[2020-04-14],
+        test_type: "PCR"
+      }) |> Cases.create_lab_result!()
+      :ok
+    end
+
+    test "", %{conn: conn, person: person} do
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
+
+      page_live
+      |> test_result_table_contents()
+      |> assert_eq([
+        ["Collection", "Result", "Ordering Facility", "Analysis", "Reported", "Type"],
+        ["2020-04-10", "positive", "Big Big Hospital", "2020-04-11", "2020-04-12", "PCR"],
+        ["2020-04-12", "positive", "Big Big Hospital", "2020-04-13", "2020-04-14", "PCR"]
+      ])
+    end
+  end
 end

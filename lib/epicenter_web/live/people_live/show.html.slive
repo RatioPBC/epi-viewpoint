@@ -40,17 +40,29 @@
             - else
               = unknown_value()
 
-  section#lab-results
+  section#lab-results data-role="lab-results"
     header Lab Results
 
-    table#lab-results-data
-      thead
-        tr
-          th Sample Date
-          th Result
+    = if !Euclid.Exists.present?(@person.lab_results) do
+      div#empty-lab-results No lab results
 
-      tbody
-        = for lab_result <- @person.lab_results do
-          tr
-            td= lab_result.sample_date
-            td= lab_result.result
+    - else
+      table#lab-results-data data-role="lab-result-table"
+        thead
+          tr data-role="table-column-names"
+            th Collection
+            th Result
+            th Ordering Facility
+            th Analysis
+            th Reported
+            th Type
+
+        tbody
+          = for lab_result <- @person.lab_results do
+            tr
+              td= lab_result.sampled_on
+              td= lab_result.result
+              td= lab_result.request_facility_name
+              td= lab_result.analyzed_on
+              td= lab_result.reported_on
+              td= lab_result.test_type

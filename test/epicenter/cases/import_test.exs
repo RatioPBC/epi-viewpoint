@@ -32,11 +32,11 @@ defmodule Epicenter.Cases.ImportTest do
 
       [lab_result_1, lab_result_2] = Cases.list_lab_results()
       assert lab_result_1.result == "positive"
-      assert lab_result_1.sample_date == ~D[2020-06-01]
+      assert lab_result_1.sampled_on == ~D[2020-06-01]
       assert lab_result_1.tid == "alice-result-1"
 
       assert lab_result_2.result == "negative"
-      assert lab_result_2.sample_date == ~D[2020-06-06]
+      assert lab_result_2.sampled_on == ~D[2020-06-06]
       assert lab_result_2.tid == "billy-result-1"
 
       [alice, billy] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()

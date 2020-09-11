@@ -165,14 +165,14 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.lab_result_attrs(alice, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
 
       assert Person.latest_lab_result(alice, :result) == "positive"
-      assert Person.latest_lab_result(alice, :sample_date) == ~D[2020-06-02]
+      assert Person.latest_lab_result(alice, :sampled_on) == ~D[2020-06-02]
     end
 
     test "when given a field but there is no lab result, returns nil" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       assert Person.latest_lab_result(alice, :result) == nil
-      assert Person.latest_lab_result(alice, :sample_date) == nil
+      assert Person.latest_lab_result(alice, :sampled_on) == nil
     end
   end
 

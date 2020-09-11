@@ -66,7 +66,7 @@ defmodule Epicenter.Cases.Person do
     case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do
       nil -> nil
       [] -> nil
-      lab_results -> lab_results |> Enum.max_by(& &1.sample_date, Date)
+      lab_results -> lab_results |> Enum.max_by(& &1.sampled_on, Date)
     end
   end
 
@@ -89,14 +89,14 @@ defmodule Epicenter.Cases.Person do
       from person in Person,
         left_join: lab_result in subquery(newest_lab_result()),
         on: lab_result.person_id == person.id,
-        order_by: [asc: lab_result.max_sample_date, asc: person.seq]
+        order_by: [asc: lab_result.max_sampled_on, asc: person.seq]
     end
 
     defp newest_lab_result() do
       from lab_result in LabResult,
         select: %{
           person_id: lab_result.person_id,
-          max_sample_date: max(lab_result.sample_date)
+          max_sampled_on: max(lab_result.sampled_on)
         },
         group_by: lab_result.person_id
     end
@@ -107,7 +107,7 @@ defmodule Epicenter.Cases.Person do
       from person in all(),
         join: lab_result in assoc(person, :lab_results),
         where: lab_result.result == "positive",
-        where: lab_result.sample_date > ^fifteen_days_ago
+        where: lab_result.sampled_on > ^fifteen_days_ago
     end
 
     def opts_for_upsert() do
