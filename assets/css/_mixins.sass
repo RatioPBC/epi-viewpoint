@@ -154,20 +154,25 @@
   margin: 2rem auto
   max-width: $hero-width
 
-@mixin horizontal-flow
-  * + *
-    margin-right: 1rem
+@mixin horizontal-flow($justify: left)
+  align-items: flex-start
+  display: flex
+  justify-content: $justify
+
+  @if $justify == left
+    justify-content: flex-start
+  @else if $justify == right
+    justify-content: flex-end
+
+  & > *
+    display: inline-block
+
+  & > *:not(:first-child)
+    margin-left: 1rem
 
 @mixin level($justify: left)
+  @include horizontal-flow($justify: $justify)
   align-items: center
-  justify-content: $justify
-  display: flex
-
-  * + *
-    @if $justify == left
-      margin-left: 1rem
-    @else if $justify == right
-      margin-right: 1rem
 
 // https://1linelayouts.glitch.me
 @mixin pancake-stack
@@ -192,5 +197,11 @@
   padding: 1rem
 
 @mixin vertical-flow
+  & > table
+    display: table
+
   & > *
-    margin-top: 2rem
+    display: block
+
+    &:not(:first-child)
+      margin-top: 2rem

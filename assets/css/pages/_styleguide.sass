@@ -69,4 +69,35 @@
   #button-list
     @include button-list
 
+  //
+  // layout
+  //
+  #level
+    @include level
 
+  #horizontal-flow, #inner-horizontal-flow-1, #inner-horizontal-flow-2, #inner-horizontal-flow-3
+    @include horizontal-flow
+
+  #horizontal-flow-right
+    @include horizontal-flow($justify: right)
+    width: 200px
+
+  #horizontal-flow-space-between
+    @include horizontal-flow($justify: space-between)
+    width: 200px
+
+  #vertical-flow, #outer-vertical-flow
+    @include vertical-flow
+
+  #level, #horizontal-flow, #horizontal-flow-right, #horizontal-flow-space-between, #vertical-flow, #outer-vertical-flow
+    border: 1px dashed purple
+    padding: 0.5rem
+
+    button
+      @include button-outline
+
+    & > a, & > div, & > span
+      border: 1px dashed orange
+
+      & > *
+        border: 1px dashed mediumseagreen

@@ -83,3 +83,70 @@
     .styleguide-example
       a#link Link
       code a
+
+  //
+  // layout
+  //
+  .styleguide-section
+    .styleguide-title Layout
+
+    .styleguide-example
+      #level
+        button Item 1
+        div style="height: 40px" Tall item
+        span
+          span 3a
+          span 3b
+          span 3c
+        a Item 4
+      code @include level
+
+    .styleguide-example
+      #horizontal-flow
+        button Item 1
+        div style="height: 40px" Tall item
+        span
+          span 3a
+          span 3b
+          span 3c
+        a Item 4
+      code @include horizontal-flow
+
+    .styleguide-example
+      #horizontal-flow-right
+        span a
+        span b
+        span c
+      code @include horizontal-flow($justify: right)
+
+    .styleguide-example
+      #horizontal-flow-space-between
+        span a
+        span b
+        span c
+      code @include horizontal-flow($justify: space-between)
+
+    .styleguide-example
+      #vertical-flow
+        button Item 1
+        div style="height: 40px" Tall item
+        span
+          span 3a
+          span 3b
+          span 3c
+        a Item 4
+      code @include vertical-flow
+
+    .styleguide-example
+      #nested-flows
+        #outer-vertical-flow
+          #inner-horizontal-flow-1
+            span Nested
+            span example
+          #inner-horizontal-flow-2
+            span 2A
+            span 2B
+            span 2C
+          #inner-horizontal-flow-3
+            span The end
+      code @include vertical-flow, @include horizontal-flow
