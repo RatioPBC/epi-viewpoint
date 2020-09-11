@@ -3,7 +3,7 @@ defmodule Epicenter.Repo.Migrations.AddSampleDateToLabResults do
 
   def change do
     alter table(:lab_results) do
-      add :sampled_on, :date, null: false
+      add :sample_date, :date, null: false
     end
   end
 end
