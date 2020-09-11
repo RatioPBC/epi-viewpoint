@@ -127,6 +127,22 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     end
   end
 
+  describe "save button" do
+    test "it is disabled by default", %{conn: conn} do
+      create_people_and_lab_results()
+      {:ok, index_live, _} = live(conn, "/people")
+      assert_is_disabled(index_live, "save-button")
+    end
+
+    test "it is enabled after selecting a person", %{conn: conn} do
+      [users: _users, people: [alice, _billy]] = create_people_and_lab_results()
+      {:ok, index_live, _} = live(conn, "/people")
+      assert_is_disabled(index_live, "save-button")
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      assert_is_enabled(index_live, "save-button")
+    end
+  end
+
   describe "full_name" do
     test "renders first and last name",
       do: assert(Index.full_name(%{first_name: "First", last_name: "Last"}) == "First Last")

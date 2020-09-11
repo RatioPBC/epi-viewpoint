@@ -13,7 +13,12 @@
     @include level
 
   #assign-submit
-    @include button-primary($size: small)
+    @include button-outline($size: small)
+
+    &[data-disabled=true]
+      border-color: $disabled-text-color
+      color: $disabled-text-color
+      cursor: default
 
   #filter
     @include button-list
