@@ -55,8 +55,8 @@ defmodule EpicenterWeb.PeopleLive.Index do
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
-  def is_checked?(selected_people, person),
-    do: Map.has_key?(selected_people, person.id)
+  def is_selected?(selected_people, %Person{id: person_id}),
+    do: Map.has_key?(selected_people, person_id)
 
   def latest_result(person) do
     result = Person.latest_lab_result(person, :result)
