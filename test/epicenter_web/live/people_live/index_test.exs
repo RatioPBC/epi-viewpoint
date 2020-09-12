@@ -66,6 +66,30 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       ])
     end
 
+    test "shows assignee update from different client", %{conn: conn} do
+      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results()
+      {:ok, index_live, _} = live(conn, "/people")
+
+      index_live
+      |> table_contents()
+      |> assert_eq([
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", ""]
+      ])
+
+      updated_people = [%{alice | assigned_to: assignee}]
+      Cases.broadcast({:assign_users, updated_people})
+
+      index_live
+      |> table_contents()
+      |> assert_eq([
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", "assignee"]
+      ])
+    end
+
     test "shows people and their lab tests", %{conn: conn} do
       create_people_and_lab_results()
 

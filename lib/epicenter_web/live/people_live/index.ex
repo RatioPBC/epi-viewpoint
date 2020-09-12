@@ -21,6 +21,9 @@ defmodule EpicenterWeb.PeopleLive.Index do
   def handle_params(_, _url, socket),
     do: socket |> noreply()
 
+  def handle_info({:assign_users, updated_people}, socket),
+    do: socket |> set_selected() |> refresh_people(updated_people) |> noreply()
+
   def handle_info({:import, %ImportInfo{imported_person_count: imported_person_count}}, socket),
     do: socket |> set_reload_message("Show #{imported_person_count} new people") |> noreply()
 
@@ -41,6 +44,8 @@ defmodule EpicenterWeb.PeopleLive.Index do
         originator: Session.get_current_user()
       )
 
+    Cases.broadcast({:assign_users, updated_people})
+
     socket |> set_selected() |> refresh_people(updated_people) |> noreply()
   end
 
@@ -54,6 +59,9 @@ defmodule EpicenterWeb.PeopleLive.Index do
 
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
+
+  def is_disabled?(selected_people),
+    do: selected_people == %{}
 
   def is_selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)

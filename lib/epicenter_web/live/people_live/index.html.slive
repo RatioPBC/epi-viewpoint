@@ -19,7 +19,7 @@ section#people-page data-role="people-page"
         option value="" Choose user
         = for user <- @users do
           option value="#{user.id}" #{user.username}
-      = submit "Save", phx_disable_with: "Saving...", id: "assign-submit", data: [role: "save-button", disabled: @selected_people == %{}], disabled: @selected_people == %{}
+      = submit "Save", phx_disable_with: "Saving...", id: "assign-submit", data: [role: "save-button", disabled: is_disabled?(@selected_people)], disabled: is_disabled?(@selected_people)
 
   table data-role="people"
     thead
