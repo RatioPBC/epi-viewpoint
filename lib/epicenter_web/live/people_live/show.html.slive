@@ -43,7 +43,7 @@
   section#lab-results data-role="lab-results"
     header Lab Results
 
-    = if !Euclid.Exists.present?(@person.lab_results) do
+    = if Euclid.Exists.blank?(@person.lab_results) do
       div#empty-lab-results No lab results
 
     - else
