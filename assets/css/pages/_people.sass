@@ -20,6 +20,19 @@
     display: inline-block
     margin-left: 1rem
 
+  #user-list
+    @include level($justify: space-between)
+
+    #select-wrapper
+      padding: 0.5rem 1rem
+      border: 1px solid $button-color
+      border-radius: 2px
+
+      select
+        border: none
+        color: $button-color
+        font-size: $body-text-size
+
   #reload-message
     @include button-outline($size: small)
     margin-right: 1rem

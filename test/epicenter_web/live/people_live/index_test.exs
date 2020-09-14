@@ -49,13 +49,13 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
 
-      index_live |> assignment_selector() |> assert_eq(["Choose user", "assignee", "user"])
+      index_live |> assignment_selector() |> assert_eq(["", "Unassigned", "assignee", "user"])
 
-      assert_unselected(index_live, alice.tid)
+      assert_unchecked(index_live, alice.tid)
       index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      assert_selected(index_live, alice.tid)
+      assert_checked(index_live, alice.tid)
 
-      index_live |> element("#assignment-form") |> render_submit(%{"user" => assignee.id})
+      index_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
 
       index_live
       |> table_contents()
@@ -64,6 +64,8 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
         ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "assignee"]
       ])
+
+      assert_unchecked(index_live, alice.tid)
     end
 
     test "shows assignee update from different client", %{conn: conn} do
@@ -155,15 +157,15 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     test "it is disabled by default", %{conn: conn} do
       create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
-      assert_disabled(index_live, "save-button")
+      assert_disabled(index_live, "users")
     end
 
     test "it is enabled after selecting a person", %{conn: conn} do
       [users: _users, people: [alice, _billy]] = create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
-      assert_disabled(index_live, "save-button")
+      assert_disabled(index_live, "users")
       index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      assert_enabled(index_live, "save-button")
+      assert_enabled(index_live, "users")
     end
   end
 

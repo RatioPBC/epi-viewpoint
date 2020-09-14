@@ -12,14 +12,16 @@ section#people-page data-role="people-page"
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
 
-  form id="assignment-form" phx-submit="form-save"
+  form id="assignment-form" phx-submit="form-save" phx-change="form-change"
     #assign
-      label for="user-list" Assign to:
-      select name="user" id="user-list" data-role="users"
-        option value="" Choose user
-        = for user <- @users do
-          option value="#{user.id}" #{user.username}
-      = submit "Save", phx_disable_with: "Saving...", id: "assign-submit", data: [role: "save-button", disabled: is_disabled?(@selected_people)], disabled: is_disabled?(@selected_people)
+      #user-list
+        span Assign To
+        #select-wrapper
+          select name="user" data-role="users" disabled=is_disabled?(@selected_people)
+            option value=""
+            option value="" Unassigned
+            = for user <- @users do
+              option value="#{user.id}" #{user.username}
 
   table data-role="people"
     thead

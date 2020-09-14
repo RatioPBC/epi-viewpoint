@@ -20,12 +20,20 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
     end
   end
 
+  def assert_checked(%Phoenix.LiveViewTest.View{} = view, data_role) do
+    assert_attribute(view, data_role, "checked", ["checked"])
+  end
+
+  def assert_unchecked(%Phoenix.LiveViewTest.View{} = view, data_role) do
+    assert_attribute(view, data_role, "checked", [])
+  end
+
   def assert_disabled(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "data-disabled", ["true"])
+    assert_attribute(view, data_role, "disabled", ["disabled"])
   end
 
   def assert_enabled(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "data-disabled", ["false"])
+    assert_attribute(view, data_role, "disabled", [])
   end
 
   def assert_has_role(%Phoenix.LiveViewTest.View{} = view, data_role) do
@@ -68,13 +76,5 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
       """
       |> flunk()
     end
-  end
-
-  def assert_selected(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "checked", ["checked"])
-  end
-
-  def assert_unselected(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "checked", [])
   end
 end

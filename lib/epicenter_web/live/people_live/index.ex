@@ -36,10 +36,10 @@ defmodule EpicenterWeb.PeopleLive.Index do
   def handle_event("checkbox-click", %{"person-id" => person_id} = _value, socket),
     do: socket |> deselect_person(person_id) |> noreply()
 
-  def handle_event("form-save", value, socket) do
+  def handle_event("form-change", %{"user" => user_id}, socket) do
     {:ok, updated_people} =
       Cases.assign_user_to_people(
-        user_id: Map.get(value, "user"),
+        user_id: user_id,
         people_ids: Map.keys(socket.assigns.selected_people),
         originator: Session.get_current_user()
       )
