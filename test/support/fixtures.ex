@@ -61,6 +61,14 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
+  def imported_file_attrs(tid, attrs \\ %{}) do
+    %{
+      file_name: "test_results_september_14_2020",
+      tid: tid
+    }
+    |> merge_attrs(attrs)
+  end
+
   defp merge_attrs(defaults, attrs) do
     Map.merge(defaults, Enum.into(attrs, %{}))
   end

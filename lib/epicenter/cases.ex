@@ -4,6 +4,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
+  alias Epicenter.Cases.ImportedFile
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
@@ -83,4 +84,9 @@ defmodule Epicenter.Cases do
   #
   def broadcast(message), do: Phoenix.PubSub.broadcast(Epicenter.PubSub, "cases", message)
   def subscribe(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "cases")
+
+  #
+  # imported files
+  #
+  def create_imported_file(attrs), do: %ImportedFile{} |> ImportedFile.changeset(attrs) |> Repo.insert!()
 end
