@@ -129,9 +129,9 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       {:ok, index_page_live, _html} = live(conn, "/people")
       {:ok, show_page_live, _html} = live(conn, "/people/#{person.id}")
 
-      assert_select_dropdown_options(show_page_live, "users", ["Unassigned", "assignee", "user"])
-
+      assert_select_dropdown_options(view: show_page_live, data_role: "users", expected: ["Unassigned", "assignee", "user"])
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
+      assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
       assert Cases.get_person(person.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
 
       index_page_live
@@ -142,6 +142,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       ])
 
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
+      assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["Unassigned"])
       assert Cases.get_person(person.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
 
       index_page_live

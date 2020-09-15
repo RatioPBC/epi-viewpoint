@@ -16,9 +16,9 @@
         div#assignee-label Assignee
         #select-wrapper
           select name="user" data-role="users"
-            option value="-unassigned-" Unassigned
+            option selected=is_selected?(nil, @person) value="-unassigned-" Unassigned
             = for user <- @users do
-              option value="#{user.id}" #{user.username}
+              option selected=is_selected?(user, @person) value="#{user.id}" #{user.username}
 
   section#profile
     header

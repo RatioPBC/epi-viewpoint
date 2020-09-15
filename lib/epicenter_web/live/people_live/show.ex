@@ -10,11 +10,12 @@ defmodule EpicenterWeb.PeopleLive.Show do
   alias EpicenterWeb.Session
 
   def mount(%{"id" => id}, _session, socket) do
-    person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses()
+    person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
 
     socket =
       socket
       |> assign(addresses: person.addresses)
+      |> assign(assigned_to: person.assigned_to)
       |> assign(person: person)
       |> assign(users: Accounts.list_users())
 
@@ -25,16 +26,17 @@ defmodule EpicenterWeb.PeopleLive.Show do
     do: handle_event("form-change", %{"user" => nil}, socket)
 
   def handle_event("form-change", %{"user" => user_id}, socket) do
-    {:ok, updated_people} =
+    {:ok, [updated_person]} =
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids: [socket.assigns.person.id],
         originator: Session.get_current_user()
       )
 
-    Cases.broadcast({:assign_users, updated_people})
+    Cases.broadcast({:assign_users, [updated_person]})
 
-    {:noreply, socket}
+    updated_person = updated_person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
+    {:noreply, assign(socket, person: updated_person)}
   end
 
   # # #
@@ -51,6 +53,10 @@ defmodule EpicenterWeb.PeopleLive.Show do
     |> Cases.preload_emails()
     |> Map.get(:emails)
     |> Enum.map(& &1.address)
+  end
+
+  def is_selected?(user, person) do
+    user == person.assigned_to
   end
 
   def phone_numbers(person) do

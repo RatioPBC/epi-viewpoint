@@ -46,7 +46,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
 
-      assert_select_dropdown_options(index_live, "users", ["", "Unassigned", "assignee", "user"])
+      assert_select_dropdown_options(view: index_live, data_role: "users", expected: ["", "Unassigned", "assignee", "user"])
 
       assert_unchecked(index_live, alice.tid)
       index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})

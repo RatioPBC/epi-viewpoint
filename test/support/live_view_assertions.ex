@@ -78,7 +78,7 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
     end
   end
 
-  def assert_select_dropdown_options(%Phoenix.LiveViewTest.View{} = view, data_role, expected_values) do
+  def assert_select_dropdown_options(view: %Phoenix.LiveViewTest.View{} = view, data_role: data_role, expected: expected_values) do
     rendered = view |> render() |> Test.Html.parse_doc() |> Floki.find("[data-role=#{data_role}] option") |> Enum.map(&Test.Html.text(&1))
 
     if rendered == expected_values do
@@ -87,7 +87,22 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
       """
       Expected to find element with data-role “#{data_role}” and options “#{inspect(expected_values)}”, but found:
 
-        #{rendered}
+        #{inspect(rendered)}
+      """
+      |> flunk()
+    end
+  end
+
+  def assert_selected_dropdown_option(view: %Phoenix.LiveViewTest.View{} = view, data_role: data_role, expected: expected_value) do
+    rendered = view |> render() |> Test.Html.parse_doc() |> Floki.find("[data-role=#{data_role}] option[selected]") |> Enum.map(&Test.Html.text(&1))
+
+    if rendered == expected_value do
+      true
+    else
+      """
+      Expected to find element with data-role “#{data_role}” and options “#{inspect(expected_value)}”, but found:
+
+        #{inspect(rendered)}
       """
       |> flunk()
     end
