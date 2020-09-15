@@ -27,31 +27,34 @@ defmodule Epicenter.Validation do
 
   defp date_validator(field, date) do
     if date.day == 1,
-      do: [],
-      else: [{field, "In non-PHI environment, must be the first of the month"}]
+      do: valid(),
+      else: invalid(field, "must be the first of the month")
   end
 
   defp last_name_validator(field, value) do
     if value == "Testuser",
-      do: [],
-      else: [{field, "In non-PHI environment, must be equal to 'Testuser'"}]
+      do: valid(),
+      else: invalid(field, "must be equal to 'Testuser'")
   end
 
   defp address_full_address_validator(field, value) do
     if value =~ @four_digits_followed_by_fake_address,
-      do: [],
-      else: [{field, "In non-PHI environment, must match '#### Test St, City, TS 00000'"}]
+      do: valid(),
+      else: invalid(field, "must match '#### Test St, City, TS 00000'")
   end
 
   defp phone_number_validator(field, value) do
     if to_string(value) =~ @seven_leading_ones_followed_by_three_digits,
-      do: [],
-      else: [{field, "In non-PHI environment, must match '111-111-1xxx'"}]
+      do: valid(),
+      else: invalid(field, "must match '111-111-1xxx'")
   end
 
   defp email_address_validator(field, value) do
     if value |> String.ends_with?("@example.com"),
-      do: [],
-      else: [{field, "In non-PHI environment, must end with '@example.com'"}]
+      do: valid(),
+      else: invalid(field, "must end with '@example.com'")
   end
+
+  defp valid(), do: []
+  defp invalid(field, message), do: [{field, "In non-PHI environment, #{message}"}]
 end
