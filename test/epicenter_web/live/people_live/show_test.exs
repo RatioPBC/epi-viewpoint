@@ -69,7 +69,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
   end
 
   describe "when the person has no test results" do
-    test "", %{conn: conn, person: person} do
+    test "renders no lab result text", %{conn: conn, person: person} do
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
       page_live
@@ -113,6 +113,21 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
         ["04/10/2020", "positive", "Big Big Hospital", "04/11/2020", "04/12/2020", "PCR"],
         ["04/12/2020", "positive", "Big Big Hospital", "04/13/2020", "04/14/2020", "PCR"]
       ])
+    end
+  end
+
+  describe "assigning user to person" do
+    setup %{person: person} do
+      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
+      [person: person, assignee: assignee]
+    end
+
+    test "renders select user dropdown", %{conn: conn, person: person, assignee: assignee} do
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
+      assert_select_dropdown_options(page_live, "users", ["Unassigned", "assignee", "user"])
+
+      page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
+      assert Cases.get_person(person.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
     end
   end
 end

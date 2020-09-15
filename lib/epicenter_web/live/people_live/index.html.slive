@@ -12,7 +12,7 @@ section#people-page data-role="people-page"
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
 
-  form id="assignment-form" phx-submit="form-save" phx-change="form-change"
+  form id="assignment-form" phx-change="form-change"
     #user-list data-disabled=is_disabled?(@selected_people)
       span#assign-to-label Assign to
       #select-wrapper

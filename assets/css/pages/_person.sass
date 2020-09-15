@@ -5,6 +5,30 @@
   #subnav
     @include subnav
 
+  #heading
+    @include vertical-flow
+
+  #user-list
+    #assignee-label
+      font-weight: bold
+
+    #select-wrapper
+      border-color: $tertiary-button-color
+      border-radius: 0 2px 2px 0
+      border-style: solid
+      border-width: 1px
+      display: inline-block
+      margin: 1rem 0 0 0
+      padding: 0.5rem 1rem
+
+      select
+        border: none
+        color: $primary-text-color
+        font-size: $body-text-size
+
+      select:focus
+        outline: 0
+
   section#profile
     @include card
 

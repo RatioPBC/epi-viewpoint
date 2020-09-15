@@ -14,9 +14,6 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     defp table_contents(index_live, opts \\ []),
       do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
-    defp assignment_select_options(index_live),
-      do: index_live |> render() |> Test.Html.parse_doc() |> Floki.find("[data-role=users] option") |> Enum.map(&Test.Html.text(&1))
-
     defp create_people_and_lab_results() do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
@@ -49,7 +46,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
 
-      index_live |> assignment_select_options() |> assert_eq(["", "Unassigned", "assignee", "user"])
+      assert_select_dropdown_options(index_live, "users", ["", "Unassigned", "assignee", "user"])
 
       assert_unchecked(index_live, alice.tid)
       index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})

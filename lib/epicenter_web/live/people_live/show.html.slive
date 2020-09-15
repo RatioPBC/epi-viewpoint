@@ -6,9 +6,19 @@
       = carat_right_icon(6, 9)
       span data-role="name" = "#{@person.first_name} #{@person.last_name}"
 
-  section
-    h2 data-role="full-name"= full_name(@person)
-    #external-id data-role="external-id"= @person.external_id
+  section#heading
+    div
+      h2 data-role="full-name"= full_name(@person)
+      #external-id data-role="external-id"= @person.external_id
+
+    form id="assignment-form" phx-change="form-change"
+      #user-list
+        div#assignee-label Assignee
+        #select-wrapper
+          select name="user" data-role="users"
+            option value="-unassigned-" Unassigned
+            = for user <- @users do
+              option value="#{user.id}" #{user.username}
 
   section#profile
     header

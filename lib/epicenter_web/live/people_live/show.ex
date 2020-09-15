@@ -3,18 +3,35 @@ defmodule EpicenterWeb.PeopleLive.Show do
 
   import EpicenterWeb.IconView, only: [carat_right_icon: 2]
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
+  alias EpicenterWeb.Session
 
   def mount(%{"id" => id}, _session, socket) do
     person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses()
-    socket = socket
-    |> assign(person: person)
-    |> assign(addresses: person.addresses)
+
+    socket =
+      socket
+      |> assign(addresses: person.addresses)
+      |> assign(person: person)
+      |> assign(users: Accounts.list_users())
 
     {:ok, socket}
   end
+
+  def handle_event("form-change", %{"user" => user_id}, socket) do
+    Cases.assign_user_to_people(
+      user_id: user_id,
+      people_ids: [socket.assigns.person.id],
+      originator: Session.get_current_user()
+    )
+
+    {:noreply, socket}
+  end
+
+  # # #
 
   def age(%Person{dob: dob}) do
     Date.diff(Date.utc_today(), dob) |> Integer.floor_div(365)
