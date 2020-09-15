@@ -85,6 +85,23 @@
       code a
 
   //
+  // messaging
+  //
+  .styleguide-section
+    .styleguide-title Messaging
+
+    .styleguide-example
+      #tooltip-when-disabled
+        #button-1-container
+          a#button-1 Button 1's container is not disabled
+          div#button-1-tooltip Tooltip for button 1
+        #button-2-container data-disabled="true"
+          a#button-2 data-disabled="true" Button 2's container is disabled
+          div#button-2-tooltip Tooltip for button 2
+      code @include has-tooltip-when-disabled(#button-2-tooltip)
+
+
+  //
   // layout
   //
   .styleguide-section

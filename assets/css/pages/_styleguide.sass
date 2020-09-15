@@ -70,6 +70,24 @@
     @include button-list
 
   //
+  // messaging
+  //
+  #tooltip-when-disabled
+    @include vertical-flow
+
+    #button-1, #button-2
+      @include button-outline
+
+    #button-1-container, #button-2-container
+      border: 1px dashed purple
+
+    #button-1-container
+      @include has-tooltip-when-disabled(#button-1-tooltip)
+
+    #button-2-container
+      @include has-tooltip-when-disabled(#button-2-tooltip)
+
+  //
   // layout
   //
   #level

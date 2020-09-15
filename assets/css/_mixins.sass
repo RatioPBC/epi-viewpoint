@@ -196,6 +196,20 @@
   margin: 1rem
   padding: 1rem
 
+@mixin has-tooltip-when-disabled($tooltip)
+  #{$tooltip}
+    color: $secondary-text-color
+    font-size: $small-body-text-size
+    opacity: 0
+    visibility: hidden
+
+  &[data-disabled=true]
+    &:hover
+      #{$tooltip}
+        animation: 0.3s show
+        opacity: 1
+        visibility: visible
+
 @mixin vertical-flow
   & > table
     display: table
