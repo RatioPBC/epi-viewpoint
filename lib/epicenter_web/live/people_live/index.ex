@@ -52,6 +52,9 @@ defmodule EpicenterWeb.PeopleLive.Index do
     socket |> set_selected() |> refresh_people(updated_people) |> noreply()
   end
 
+  def handle_event("form-change", _, socket),
+    do: socket |> noreply()
+
   # # # View helpers
 
   def assigned_to_name(%Person{assigned_to: nil}),
