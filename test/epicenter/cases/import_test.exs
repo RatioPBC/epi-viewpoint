@@ -145,5 +145,21 @@ defmodule Epicenter.Cases.ImportTest do
       assert Cases.count_lab_results() == 0
       assert Cases.count_phones() == 0
     end
+
+    test "can successfully import sample_data/lab_results.csv", %{originator: originator} do
+      file_name = "sample_data/lab_results.csv"
+
+      %{file_name: file_name, contents: File.read!(file_name)}
+      |> Import.import_csv(originator)
+      |> assert_eq(
+        {:ok,
+         %Epicenter.Cases.Import.ImportInfo{
+           imported_lab_result_count: 31,
+           imported_person_count: 26,
+           total_lab_result_count: 31,
+           total_person_count: 26
+         }}
+      )
+    end
   end
 end

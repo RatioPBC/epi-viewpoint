@@ -1,4 +1,5 @@
 defmodule Epicenter.Csv do
+  alias Epicenter.Extra
   alias NimbleCSV.RFC4180, as: NimbleCsv
 
   def read(string, headers) when is_binary(string),
@@ -27,7 +28,7 @@ defmodule Epicenter.Csv do
         data =
           for row <- rows, into: [] do
             for {header_key, header_index} <- header_indices, into: %{} do
-              {header_key, Enum.at(row, header_index) |> String.trim()}
+              {header_key, Enum.at(row, header_index) |> Extra.String.trim()}
             end
           end
 
