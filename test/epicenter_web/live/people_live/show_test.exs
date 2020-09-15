@@ -52,6 +52,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
       assert_role_text(page_live, "full-name", "Alice Testuser")
+      assert_role_text(page_live, "date-of-birth", "01/01/2000")
       assert_role_text(page_live, "preferred-language", "English")
       assert_role_text(page_live, "phone-number", "111-111-1001 111-111-1000")
       assert_role_text(page_live, "email-address", "alice-preferred@example.com alice-a@example.com")
@@ -107,8 +108,8 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       |> test_result_table_contents()
       |> assert_eq([
         ["Collection", "Result", "Ordering Facility", "Analysis", "Reported", "Type"],
-        ["2020-04-10", "positive", "Big Big Hospital", "2020-04-11", "2020-04-12", "PCR"],
-        ["2020-04-12", "positive", "Big Big Hospital", "2020-04-13", "2020-04-14", "PCR"]
+        ["04/10/2020", "positive", "Big Big Hospital", "04/11/2020", "04/12/2020", "PCR"],
+        ["04/12/2020", "positive", "Big Big Hospital", "04/13/2020", "04/14/2020", "PCR"]
       ])
     end
   end

@@ -23,7 +23,7 @@
           th Phone
           th Email
         tr
-          td= @person.dob
+          td data-role="date-of-birth"= Extra.Date.render(@person.dob)
           td data-role="preferred-language"= string_or_unknown(@person.preferred_language)
           td data-role="phone-number"= list_or_unknown(phone_numbers(@person))
           td data-role="email-address"= list_or_unknown(email_addresses(@person))
@@ -60,9 +60,9 @@
         tbody
           = for lab_result <- @person.lab_results do
             tr
-              td= lab_result.sampled_on
+              td= Extra.Date.render(lab_result.sampled_on)
               td= lab_result.result
               td= lab_result.request_facility_name
-              td= lab_result.analyzed_on
-              td= lab_result.reported_on
+              td= Extra.Date.render(lab_result.analyzed_on)
+              td= Extra.Date.render(lab_result.reported_on)
               td= lab_result.test_type

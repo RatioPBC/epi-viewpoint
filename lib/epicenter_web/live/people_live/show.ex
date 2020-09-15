@@ -5,6 +5,7 @@ defmodule EpicenterWeb.PeopleLive.Show do
 
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
+  alias Epicenter.Extra
 
   def mount(%{"id" => id}, _session, socket) do
     person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses()

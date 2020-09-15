@@ -14,4 +14,11 @@ defmodule Epicenter.Extra.Date do
     from = Keyword.get(opts, :from, Date.utc_today())
     Date.diff(from, date)
   end
+
+  def render(%Date{} = date), do: "#{padded_number(date.month)}/#{padded_number(date.day)}/#{date.year}"
+  def render(nil), do: ""
+
+  defp padded_number(number) do
+    String.pad_leading(to_string(number), 2, "0")
+  end
 end
