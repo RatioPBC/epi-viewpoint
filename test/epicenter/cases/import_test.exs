@@ -84,20 +84,47 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy_2.lab_results |> tids() == ~w{billy-2-result}
     end
 
-    test "does not create any resource if it blows up", %{originator: originator} do
+    test "does not create any resource if there are csv cells missing", %{originator: originator} do
+      # NOTE:
+      # We think this test is misleading becuase the crash happens before any rows are created
+      # so it looks like the rollback succeeded, when really there was nothing to roll back...
       result =
         """
         first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
         Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
-        Billy      , Testuser  , 01/01/1990 ,   ,   ,   ,
+        Billy      , Testuser  , 01/02/1980 ,             ,             ,          ,
         """
         |> Import.import_csv(originator)
 
-      assert {:error, _} = result
+      assert {:error,_} = result
 
       assert Cases.count_people() == 0
       assert Cases.count_lab_results() == 0
       assert Cases.count_phones() == 0
     end
+
+    test "does not create any resource if it blows up AFTER creating a row", %{originator: originator} do
+      # NOTE:
+      # To test the rollback behavior we must test that at least one successful call to
+      # add a row is made before the exception happens.
+      # It is important that this import fails due to a DB constraint violation and not due to
+      # a csv parsing violation. csv parsing happens completely before any rows are added,
+      # which renders  verifying that no rows are added uninformative.
+
+      result =
+        """
+        first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
+        Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
+                   ,           , 01/02/1980 ,             ,             ,          ,            ,
+        """
+        |> Import.import_csv(originator)
+
+      assert {:error, %Ecto.InvalidChangesetError{}} = result
+
+      assert Cases.count_people() == 0
+      assert Cases.count_lab_results() == 0
+      assert Cases.count_phones() == 0
+    end
+
   end
 end

@@ -20,10 +20,7 @@ defmodule Epicenter.Cases.Import do
   end
 
   def import_csv(csv_string, %Accounts.User{} = originator) do
-    case Repo.transaction(fn -> import_csv_catching_exceptions(csv_string, originator) end) do
-      {:ok, {:ok, import_info}} -> {:ok, import_info}
-      {:ok, {:error, error}} -> {:error, error}
-    end
+    Repo.transaction(fn -> import_csv_catching_exceptions(csv_string, originator) end)
   end
 
   defp import_csv_catching_exceptions(csv_string, %Accounts.User{} = originator) do
@@ -68,8 +65,8 @@ defmodule Epicenter.Cases.Import do
 
     Cases.broadcast({:import, import_info})
 
-    {:ok, import_info}
+    import_info
   rescue
-    error -> {:error, error}
+    error -> Repo.rollback(error)
   end
 end
