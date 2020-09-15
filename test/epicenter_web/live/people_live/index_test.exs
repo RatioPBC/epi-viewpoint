@@ -11,10 +11,10 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
   alias EpicenterWeb.PeopleLive.Index
 
   describe "rendering" do
-    defp table_contents(index_live),
-      do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "people")
+    defp table_contents(index_live, opts \\ []),
+      do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
-    defp assignment_selector(index_live),
+    defp assignment_select_options(index_live),
       do: index_live |> render() |> Test.Html.parse_doc() |> Floki.find("[data-role=users] option") |> Enum.map(&Test.Html.text(&1))
 
     defp create_people_and_lab_results() do
@@ -37,7 +37,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       assert_has_role(index_live, "people-page")
     end
 
-    test "user is assigned to people", %{conn: conn} do
+    test "user can be assigned to people", %{conn: conn} do
       [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
 
@@ -49,7 +49,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
 
-      index_live |> assignment_selector() |> assert_eq(["", "Unassigned", "assignee", "user"])
+      index_live |> assignment_select_options() |> assert_eq(["", "Unassigned", "assignee", "user"])
 
       assert_unchecked(index_live, alice.tid)
       index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
@@ -66,6 +66,33 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
       ])
 
       assert_unchecked(index_live, alice.tid)
+    end
+
+    test "users can be unassigned from people", %{conn: conn} do
+      [users: [user, assignee], people: [alice, billy]] = create_people_and_lab_results()
+      Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id, billy.id], originator: user)
+
+      {:ok, index_live, _} = live(conn, "/people")
+
+      index_live
+      |> table_contents(columns: ["Name", "Assignee"])
+      |> assert_eq([
+        ["Name", "Assignee"],
+        ["Billy Testuser", "assignee"],
+        ["Alice Testuser", "assignee"]
+      ])
+
+      index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      index_live |> element("[data-role=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
+
+      index_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
+      assert_unchecked(index_live, alice.tid)
+      assert_unchecked(index_live, billy.tid)
+
+      Cases.get_people([alice.id, billy.id])
+      |> Cases.preload_assigned_to()
+      |> Euclid.Extra.Enum.pluck(:assigned_to)
+      |> assert_eq([nil, nil])
     end
 
     test "shows assignee update from different client", %{conn: conn} do

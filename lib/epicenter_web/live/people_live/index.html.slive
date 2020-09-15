@@ -18,7 +18,7 @@ section#people-page data-role="people-page"
       #select-wrapper
         select name="user" data-role="users" disabled=is_disabled?(@selected_people)
           option value=""
-          option value="" Unassigned
+          option value="-unassigned-" Unassigned
           = for user <- @users do
             option value="#{user.id}" #{user.username}
 

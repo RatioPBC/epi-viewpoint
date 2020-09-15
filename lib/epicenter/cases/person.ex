@@ -38,6 +38,7 @@ defmodule Epicenter.Cases.Person do
   @required_attrs ~w{dob first_name last_name originator}a
   @optional_attrs ~w{assigned_to_id external_id preferred_language tid}a
 
+  def assignment_changeset(person, nil = _user), do: person |> changeset(%{assigned_to_id: nil})
   def assignment_changeset(person, %User{} = user), do: person |> changeset(%{assigned_to_id: user.id})
 
   def changeset(person, attrs) do

@@ -23,9 +23,13 @@ defmodule Epicenter.Cases do
   #
   # people
   #
-  def assign_user_to_people(user_id: user_id, people_ids: people_ids, originator: %User{} = originator) do
-    user = Accounts.get_user(user_id)
+  def assign_user_to_people(user_id: nil, people_ids: people_ids, originator: %User{} = originator),
+    do: assign_user_to_people(user: nil, people_ids: people_ids, originator: %User{} = originator)
 
+  def assign_user_to_people(user_id: user_id, people_ids: people_ids, originator: %User{} = originator),
+    do: assign_user_to_people(user: Accounts.get_user(user_id), people_ids: people_ids, originator: %User{} = originator)
+
+  def assign_user_to_people(user: user, people_ids: people_ids, originator: %User{} = originator) do
     all_updated =
       people_ids
       |> get_people()

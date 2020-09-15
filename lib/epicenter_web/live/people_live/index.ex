@@ -36,6 +36,9 @@ defmodule EpicenterWeb.PeopleLive.Index do
   def handle_event("checkbox-click", %{"person-id" => person_id} = _value, socket),
     do: socket |> deselect_person(person_id) |> noreply()
 
+  def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
+    do: handle_event("form-change", %{"user" => nil}, socket)
+
   def handle_event("form-change", %{"user" => user_id}, socket) do
     {:ok, updated_people} =
       Cases.assign_user_to_people(

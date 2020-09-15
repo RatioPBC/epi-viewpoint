@@ -77,13 +77,16 @@ defmodule Epicenter.Cases.PersonTest do
       Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
-    test "assignment" do
+    test "assignment_changeset can assign or unassign a user to a person" do
       creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
       assigned_to = Test.Fixtures.user_attrs("assigned-to") |> Accounts.create_user!()
       alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
 
       changeset = Person.assignment_changeset(alice, assigned_to)
       assert changeset.changes.assigned_to_id == assigned_to.id
+
+      changeset = Person.assignment_changeset(changeset, nil)
+      assert changeset.changes.assigned_to_id == nil
     end
 
     test "attributes" do
