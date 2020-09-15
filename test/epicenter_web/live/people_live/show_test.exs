@@ -117,17 +117,29 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
   end
 
   describe "assigning user to person" do
+    defp table_contents(live, opts),
+      do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
+
     setup %{person: person} do
       assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
       [person: person, assignee: assignee]
     end
 
     test "renders select user dropdown", %{conn: conn, person: person, assignee: assignee} do
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
-      assert_select_dropdown_options(page_live, "users", ["Unassigned", "assignee", "user"])
+      {:ok, index_page_live, _html} = live(conn, "/people")
+      {:ok, show_page_live, _html} = live(conn, "/people/#{person.id}")
 
-      page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
+      assert_select_dropdown_options(show_page_live, "users", ["Unassigned", "assignee", "user"])
+
+      show_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
       assert Cases.get_person(person.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
+
+      index_page_live
+      |> table_contents(columns: ["Name", "Assignee"])
+      |> assert_eq([
+        ["Name", "Assignee"],
+        ["Alice Testuser", "assignee"]
+      ])
     end
   end
 end

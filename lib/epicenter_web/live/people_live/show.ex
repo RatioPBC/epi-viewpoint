@@ -22,11 +22,14 @@ defmodule EpicenterWeb.PeopleLive.Show do
   end
 
   def handle_event("form-change", %{"user" => user_id}, socket) do
-    Cases.assign_user_to_people(
-      user_id: user_id,
-      people_ids: [socket.assigns.person.id],
-      originator: Session.get_current_user()
-    )
+    {:ok, updated_people} =
+      Cases.assign_user_to_people(
+        user_id: user_id,
+        people_ids: [socket.assigns.person.id],
+        originator: Session.get_current_user()
+      )
+
+    Cases.broadcast({:assign_users, updated_people})
 
     {:noreply, socket}
   end
