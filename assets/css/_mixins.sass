@@ -29,6 +29,12 @@
   font-weight: normal
   padding: 0.5rem 2rem
 
+  &[data-disabled]
+    background-color: $disabled-button-color
+    border-color: $disabled-text-color
+    color: $disabled-text-color
+    cursor: default
+
   @if $size == small
     font-size: $small-body-text-size
     padding: 0.25rem 1rem
@@ -47,10 +53,8 @@
   @include -button($size: $size)
   background-color: inherit
 
-  &[data-disabled=true]
-    border-color: $disabled-text-color
-    color: $disabled-text-color
-    cursor: default
+  &[data-disabled]
+    background-color: white
 
 @mixin card
   @include vertical-flow
@@ -203,7 +207,7 @@
     opacity: 0
     visibility: hidden
 
-  &[data-disabled=true]
+  &[data-disabled]
     &:hover
       #{$tooltip}
         animation: 0.3s show

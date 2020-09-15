@@ -26,7 +26,6 @@
     color: purple
     padding: 0 2rem
 
-
   //
   // text
   //
@@ -48,19 +47,22 @@
   //
   // buttons & links
   //
-  #primary-button
+  #disabled-buttons
+    @include horizontal-flow
+
+  #primary-button, #primary-button-disabled
     @include button-primary
 
   #primary-button-small
     @include button-primary($size: small)
 
-  #secondary-button
+  #secondary-button, #secondary-button-disabled
     @include button-secondary
 
   #secondary-button-small
     @include button-secondary($size: small)
 
-  #outline-button
+  #outline-button, #outline-button-disabled
     @include button-outline
 
   #outline-button-small
