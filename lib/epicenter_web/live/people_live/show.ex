@@ -21,6 +21,9 @@ defmodule EpicenterWeb.PeopleLive.Show do
     {:ok, socket}
   end
 
+  def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
+    do: handle_event("form-change", %{"user" => nil}, socket)
+
   def handle_event("form-change", %{"user" => user_id}, socket) do
     {:ok, updated_people} =
       Cases.assign_user_to_people(

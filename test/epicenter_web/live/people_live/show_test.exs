@@ -116,7 +116,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
     end
   end
 
-  describe "assigning user to person" do
+  describe "assigning and unassigning user to a person" do
     defp table_contents(live, opts),
       do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
@@ -125,7 +125,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       [person: person, assignee: assignee]
     end
 
-    test "renders select user dropdown", %{conn: conn, person: person, assignee: assignee} do
+    test "user can assign", %{conn: conn, person: person, assignee: assignee} do
       {:ok, index_page_live, _html} = live(conn, "/people")
       {:ok, show_page_live, _html} = live(conn, "/people/#{person.id}")
 
@@ -139,6 +139,16 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       |> assert_eq([
         ["Name", "Assignee"],
         ["Alice Testuser", "assignee"]
+      ])
+
+      show_page_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
+      assert Cases.get_person(person.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
+
+      index_page_live
+      |> table_contents(columns: ["Name", "Assignee"])
+      |> assert_eq([
+        ["Name", "Assignee"],
+        ["Alice Testuser", ""]
       ])
     end
   end
