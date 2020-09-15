@@ -43,8 +43,8 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       Test.Fixtures.email_attrs(person, "alice-preferred", is_preferred: true) |> Cases.create_email!()
       Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
       Test.Fixtures.phone_attrs(person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
-      Test.Fixtures.address_attrs(person, "alice-address", type: "home") |> Cases.create_address!()
-      Test.Fixtures.address_attrs(person, "alice-address-preferred", type: nil, is_preferred: true) |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "alice-address", 1000, type: "home") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
       :ok
     end
 
@@ -56,7 +56,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       assert_role_text(page_live, "preferred-language", "English")
       assert_role_text(page_live, "phone-number", "111-111-1001 111-111-1000")
       assert_role_text(page_live, "email-address", "alice-preferred@example.com alice-a@example.com")
-      assert_role_text(page_live, "address", "123 alice-address-preferred st, TestAddress 123 alice-address st, TestAddress home")
+      assert_role_text(page_live, "address", "2000 Test St, City, TS 00000 1000 Test St, City, TS 00000 home")
     end
 
     test "email_addresses", %{person: person} do
@@ -78,7 +78,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
   end
 
   defp test_result_table_contents(page_live),
-       do: page_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "lab-result-table")
+    do: page_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "lab-result-table")
 
   describe "when the person has test results" do
     setup %{person: person} do
@@ -97,7 +97,9 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
         analyzed_on: ~D[2020-04-13],
         reported_on: ~D[2020-04-14],
         test_type: "PCR"
-      }) |> Cases.create_lab_result!()
+      })
+      |> Cases.create_lab_result!()
+
       :ok
     end
 

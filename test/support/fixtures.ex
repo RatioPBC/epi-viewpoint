@@ -27,9 +27,9 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def address_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
+  def address_attrs(%Person{id: person_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
     %{
-      full_address: "123 #{tid} st, TestAddress",
+      full_address: "#{street_number} Test St, City, TS 00000",
       type: "home",
       person_id: person_id,
       tid: tid

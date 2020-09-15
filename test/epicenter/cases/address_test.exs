@@ -29,13 +29,13 @@ defmodule Epicenter.Cases.AddressTest do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      default_attrs = Test.Fixtures.address_attrs(person, "alice-address")
+      default_attrs = Test.Fixtures.address_attrs(person, "alice-address", 1234)
       Address.changeset(%Address{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
     test "attributes" do
       changes = new_changeset(is_preferred: true).changes
-      assert changes.full_address == "123 alice-address st, TestAddress"
+      assert changes.full_address == "1234 Test St, City, TS 00000"
       assert changes.tid == "alice-address"
       assert changes.type == "home"
       assert changes.is_preferred == true
@@ -54,9 +54,9 @@ defmodule Epicenter.Cases.AddressTest do
     test "display_order sorts preferred first, then by full address" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.address_attrs(person, "preferred", is_preferred: true, full_address: "m TestAddress") |> Cases.create_address!()
-      Test.Fixtures.address_attrs(person, "address-z", is_preferred: false, full_address: "z TestAddress") |> Cases.create_address!()
-      Test.Fixtures.address_attrs(person, "address-a", is_preferred: nil, full_address: "a TestAddress") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "preferred", 2000, is_preferred: true) |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "address-z", 3000, is_preferred: false) |> Cases.create_address!()
+      Test.Fixtures.address_attrs(person, "address-a", 1000, is_preferred: nil) |> Cases.create_address!()
 
       Address.Query.display_order() |> Repo.all() |> tids() |> assert_eq(~w{preferred address-a address-z})
     end

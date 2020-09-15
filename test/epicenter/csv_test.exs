@@ -60,5 +60,28 @@ defmodule Epicenter.CsvTest do
       |> Csv.read(required: ~w{column_a column_b}, optional: ~w{optional_c optional_d})
       |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b", "optional_c" => "value_c"}]})
     end
+
+    test "handles quoted values" do
+      """
+      column_a   ,"column b", column_c
+      "value, a","value b", value c
+      """
+      |> Csv.read(required: ["column_a", "column b", "column_c"], optional: [])
+      |> assert_eq({:ok, [%{"column_a" => "value, a", "column b" => "value b", "column_c" => "value c"}]})
+    end
+
+    test "gives a nicer error message when there are spaces between commas and quotes" do
+      expected_message =
+        "unexpected escape character \" in \"column_a   , \\\"column b\\\" , column_c\\n\"" <>
+          " (make sure there are no spaces between the field separators (commas) and the quotes around field contents)"
+
+      assert_raise NimbleCSV.ParseError, expected_message, fn ->
+        """
+        column_a   , "column b" , column_c
+        "value, a" , "value b" , value c
+        """
+        |> Csv.read(required: ["column_a", "column b", "column_c"], optional: [])
+      end
+    end
   end
 end

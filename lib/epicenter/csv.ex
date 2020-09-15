@@ -8,7 +8,7 @@ defmodule Epicenter.Csv do
     do: read(stream, headers, &NimbleCsv.parse_stream/2)
 
   def read(input, [required: required_headers, optional: optional_headers], parser) do
-    [provided_headers | rows] = parser.(input, skip_headers: false)
+    [provided_headers | rows] = parse(input, parser)
     provided_headers = provided_headers |> Enum.map(&String.trim/1)
 
     case required_headers -- provided_headers do
@@ -36,5 +36,13 @@ defmodule Epicenter.Csv do
       missing_headers ->
         {:error, "Missing required columns: #{missing_headers |> Enum.sort() |> Enum.join(", ")}"}
     end
+  end
+
+  defp parse(input, parser) do
+    parser.(input, skip_headers: false)
+  rescue
+    e ->
+      hint = "make sure there are no spaces between the field separators (commas) and the quotes around field contents"
+      raise NimbleCSV.ParseError, "#{e.message} (#{hint})"
   end
 end
