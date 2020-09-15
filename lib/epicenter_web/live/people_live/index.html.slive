@@ -13,15 +13,14 @@ section#people-page data-role="people-page"
 
 
   form id="assignment-form" phx-submit="form-save" phx-change="form-change"
-    #assign
-      #user-list
-        span Assign To
-        #select-wrapper
-          select name="user" data-role="users" disabled=is_disabled?(@selected_people)
-            option value=""
-            option value="" Unassigned
-            = for user <- @users do
-              option value="#{user.id}" #{user.username}
+    #user-list data-disabled=is_disabled?(@selected_people)
+      span#assign-to-label Assign to
+      #select-wrapper
+        select name="user" data-role="users" disabled=is_disabled?(@selected_people)
+          option value=""
+          option value="" Unassigned
+          = for user <- @users do
+            option value="#{user.id}" #{user.username}
 
   table data-role="people"
     thead
