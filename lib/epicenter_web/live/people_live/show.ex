@@ -45,6 +45,10 @@ defmodule EpicenterWeb.PeopleLive.Show do
     Date.diff(Date.utc_today(), dob) |> Integer.floor_div(365)
   end
 
+  def is_unassigned?(person) do
+    person.assigned_to == nil
+  end
+
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
