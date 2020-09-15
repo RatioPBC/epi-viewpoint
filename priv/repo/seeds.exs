@@ -13,8 +13,13 @@
 if Application.get_env(:epicenter, :seeds_enabled?) do
   IO.puts("RUNNING SEEDS...")
 
-  for username <- ["superuser"] do
-    IO.puts("Creating user: #{username} with tid #{username}")
-    Epicenter.Accounts.create_user!(%{username: username, tid: username})
+  usernames = ["superuser", "Amy Admin", "Ida Investigator", "Tom Tracer"]
+  existing_usernames = Epicenter.Accounts.list_users() |> Euclid.Extra.Enum.pluck(:username)
+  new_usernames = usernames -- existing_usernames
+
+  for username <- new_usernames do
+    tid = Inflex.parameterize(username)
+    IO.puts("Creating user: #{username} with tid #{tid}")
+    Epicenter.Accounts.create_user!(%{username: username, tid: tid})
   end
 end
