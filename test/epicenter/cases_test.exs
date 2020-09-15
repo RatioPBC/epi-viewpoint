@@ -13,11 +13,14 @@ defmodule Epicenter.CasesTest do
     test "import_lab_results imports lab results and creates lab_result and person records" do
       originator = Test.Fixtures.user_attrs("originator") |> Accounts.create_user!()
 
-      """
-      first_name , last_name , dob        , sample_date , result_date , result
-      Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/03/2020  , positive
-      Billy      , Testuser  , 03/01/1990 , 06/06/2020  , 06/07/2020  , negative
-      """
+      %{
+        file_name: "test.csv",
+        contents: """
+        first_name , last_name , dob        , sample_date , result_date , result
+        Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/03/2020  , positive
+        Billy      , Testuser  , 03/01/1990 , 06/06/2020  , 06/07/2020  , negative
+        """
+      }
       |> Cases.import_lab_results(originator)
       |> assert_eq(
         {:ok,

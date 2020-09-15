@@ -11,6 +11,5 @@ defmodule Epicenter.Repo.Migrations.CreateImportedFiles do
 
       timestamps()
     end
-
   end
 end

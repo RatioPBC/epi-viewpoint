@@ -6,6 +6,8 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Import
+  alias Epicenter.Cases.ImportedFile
+  alias Epicenter.Repo
   alias Epicenter.Test
 
   describe "import_csv" do
@@ -14,11 +16,14 @@ defmodule Epicenter.Cases.ImportTest do
     end
 
     test "creates LabResult records and Person records from csv data", %{originator: originator} do
-      """
-      first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
-      Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
-      Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  ,"1234 Test St, City, TS 00000"
-      """
+      %{
+        file_name: "test.csv",
+        contents: """
+        first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
+        Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
+        Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  ,"1234 Test St, City, TS 00000"
+        """
+      }
       |> Import.import_csv(originator)
       |> assert_eq(
         {:ok,
@@ -58,14 +63,45 @@ defmodule Epicenter.Cases.ImportTest do
       assert_versioned(billy, expected_count: 1)
     end
 
+    test "saves an ImportedFile record for the imported CSV", %{originator: originator} do
+      in_file_attrs = %{
+        file_name: "test_file.csv",
+        contents: """
+        first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
+        Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
+        Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  ,"1234 Test St, City, TS 00000"
+        """
+      }
+
+      {:ok, _} = Import.import_csv(in_file_attrs, originator)
+      assert ImportedFile |> Repo.all() |> Enum.count() == 1
+      assert in_file_attrs == Repo.one(ImportedFile) |> Map.take([:file_name, :contents])
+    end
+
+    test "returns an error if the file is missing required values", %{originator: originator} do
+      in_file_attrs = %{
+        file_name: "",
+        contents: """
+        first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
+        Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
+        Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  ,"1234 Test St, City, TS 00000"
+        """
+      }
+
+      assert {:error, %Ecto.InvalidChangesetError{changeset: %{errors: [file_name: _]}}} = Import.import_csv(in_file_attrs, originator)
+    end
+
     test "if two lab results have the same first_name, last_name, and dob, they are considered the same person", %{originator: originator} do
-      """
-      first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
-      Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
-      Billy      , Testuser  , 01/01/1990 , 07/01/2020  , 07/02/2020  , negative , billy-1    , billy-1-older-result
-      Billy      , Testuser  , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive , billy-1    , billy-1-newer-result
-      Billy      , Testuser  , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
-      """
+      %{
+        file_name: "test.csv",
+        contents: """
+        first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
+        Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
+        Billy      , Testuser  , 01/01/1990 , 07/01/2020  , 07/02/2020  , negative , billy-1    , billy-1-older-result
+        Billy      , Testuser  , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive , billy-1    , billy-1-newer-result
+        Billy      , Testuser  , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
+        """
+      }
       |> Import.import_csv(originator)
       |> assert_eq(
         {:ok,
@@ -93,11 +129,14 @@ defmodule Epicenter.Cases.ImportTest do
       # which renders  verifying that no rows are added uninformative.
 
       result =
-        """
-        first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
-        Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
-                   ,           , 01/02/1980 ,             ,             ,          ,            ,
-        """
+        %{
+          file_name: "test.csv",
+          contents: """
+          first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
+          Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
+                     ,           , 01/02/1980 ,             ,             ,          ,            ,
+          """
+        }
         |> Import.import_csv(originator)
 
       assert {:error, %Ecto.InvalidChangesetError{}} = result

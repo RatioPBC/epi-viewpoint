@@ -19,12 +19,13 @@ defmodule Epicenter.Cases.Import do
     defstruct ~w{imported_person_count imported_lab_result_count total_person_count total_lab_result_count}a
   end
 
-  def import_csv(csv_string, %Accounts.User{} = originator) do
-    Repo.transaction(fn -> import_csv_catching_exceptions(csv_string, originator) end)
+  def import_csv(file, %Accounts.User{} = originator) do
+    Repo.transaction(fn -> import_csv_catching_exceptions(file, originator) end)
   end
 
-  defp import_csv_catching_exceptions(csv_string, %Accounts.User{} = originator) do
-    {:ok, rows} = Csv.read(csv_string, @fields)
+  defp import_csv_catching_exceptions(file, %Accounts.User{} = originator) do
+    Cases.create_imported_file(file)
+    {:ok, rows} = Csv.read(file.contents, @fields)
 
     result =
       for row <- rows, reduce: %{people: [], lab_results: []} do

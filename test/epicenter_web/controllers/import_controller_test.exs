@@ -21,7 +21,7 @@ defmodule EpicenterWeb.ImportControllerTest do
 
       Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
 
-      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path}})
+      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 
       assert conn |> redirected_to() == "/import/complete"
 
