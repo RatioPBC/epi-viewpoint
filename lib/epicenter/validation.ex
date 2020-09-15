@@ -1,7 +1,7 @@
 defmodule Epicenter.Validation do
   import Ecto.Changeset, only: [validate_change: 3]
 
-  @four_digits_followed_by_fake_address ~r|\d{4} Test St, City, TS 00000|
+  @four_digits_followed_by_fake_address ~r|\d{4} Test St, City, TS,? 00000|
   @seven_leading_ones_followed_by_three_digits ~r|1{7}\d{3}|
 
   def validate_phi(changeset, :person) do

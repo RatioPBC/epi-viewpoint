@@ -5,10 +5,10 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.DateParser
   alias Epicenter.Repo
 
-  @required_lab_result_fields ~w{result result_date sample_date}
+  @required_lab_result_fields ~w{result_39 resultdate_42 datecollected_36}
   @optional_lab_result_fields ~w{lab_result_tid}
-  @required_person_fields ~w{dob first_name last_name}
-  @optional_person_fields ~w{case_id person_tid phone_number full_address}
+  @required_person_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
+  @optional_person_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7}
 
   @fields [
     required: @required_lab_result_fields ++ @required_person_fields,
@@ -33,25 +33,39 @@ defmodule Epicenter.Cases.Import do
           person =
             row
             |> Map.take(@required_person_fields ++ @optional_person_fields)
-            |> Map.update!("dob", &DateParser.parse_mm_dd_yyyy!/1)
             |> Map.put("originator", originator)
-            |> Euclid.Extra.Map.rename_key("case_id", "external_id")
+            |> Euclid.Extra.Map.rename_key("search_firstname_2", "first_name")
+            |> Euclid.Extra.Map.rename_key("search_lastname_1", "last_name")
+            |> Euclid.Extra.Map.rename_key("dateofbirth_8", "dob")
+            |> Euclid.Extra.Map.rename_key("caseid_0", "external_id")
             |> Euclid.Extra.Map.rename_key("person_tid", "tid")
+            |> Map.update!("dob", &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.upsert_person!()
 
-          if Euclid.Exists.present?(Map.get(row, "phone_number")),
-            do: Cases.create_phone!(%{number: Map.get(row, "phone_number"), person_id: person.id})
+          if Euclid.Exists.present?(Map.get(row, "phonenumber_7")),
+            do: Cases.create_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id})
 
-          if Euclid.Exists.present?(Map.get(row, "full_address")),
-            do: Cases.create_address!(%{full_address: Map.get(row, "full_address"), person_id: person.id})
+          address_fields = ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
+
+          full_address =
+            address_fields
+            |> Enum.map(&Map.get(row, &1))
+            |> Euclid.Exists.filter()
+            |> Enum.join(", ")
+
+          if Euclid.Exists.present?(full_address),
+            do: Cases.create_address!(%{full_address: full_address, person_id: person.id})
 
           lab_result =
             row
             |> Map.take(@required_lab_result_fields ++ @optional_lab_result_fields)
-            |> Map.update!("sample_date", &DateParser.parse_mm_dd_yyyy!/1)
             |> Map.put("person_id", person.id)
+            |> Euclid.Extra.Map.rename_key("result_39", "result")
+            |> Euclid.Extra.Map.rename_key("resultdate_42", "analyzed_on")
             |> Euclid.Extra.Map.rename_key("lab_result_tid", "tid")
-            |> Euclid.Extra.Map.rename_key("sample_date", "sampled_on")
+            |> Euclid.Extra.Map.rename_key("datecollected_36", "sampled_on")
+            |> Map.update!("analyzed_on", &DateParser.parse_mm_dd_yyyy!/1)
+            |> Map.update!("sampled_on", &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.create_lab_result!()
 
           %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}

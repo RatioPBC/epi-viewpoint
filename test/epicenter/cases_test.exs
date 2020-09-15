@@ -16,9 +16,9 @@ defmodule Epicenter.CasesTest do
       %{
         file_name: "test.csv",
         contents: """
-        first_name , last_name , dob        , sample_date , result_date , result
-        Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/03/2020  , positive
-        Billy      , Testuser  , 03/01/1990 , 06/06/2020  , 06/07/2020  , negative
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39
+        Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/03/2020    , positive
+        Billy              , Testuser          , 03/01/1990    , 06/06/2020       , 06/07/2020    , negative
         """
       }
       |> Cases.import_lab_results(originator)

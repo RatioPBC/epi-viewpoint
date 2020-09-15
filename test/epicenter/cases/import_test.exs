@@ -19,9 +19,9 @@ defmodule Epicenter.Cases.ImportTest do
       %{
         file_name: "test.csv",
         contents: """
-        first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
-        Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
-        Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  ,"1234 Test St, City, TS 00000"
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , alice      , alice-result-1 ,                       ,                    ,                     ,
+        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000
         """
       }
       |> Import.import_csv(originator)
@@ -59,7 +59,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.last_name == "Testuser"
       assert billy.phones |> pluck(:number) == [1_111_111_001]
       assert billy.tid == "billy"
-      assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
+      assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS, 00000"]
       assert_versioned(billy, expected_count: 1)
     end
 
@@ -67,9 +67,9 @@ defmodule Epicenter.Cases.ImportTest do
       in_file_attrs = %{
         file_name: "test_file.csv",
         contents: """
-        first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
-        Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
-        Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  ,"1234 Test St, City, TS 00000"
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , alice      , alice-result-1 ,                       ,                    ,                     ,
+        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000
         """
       }
 
@@ -82,9 +82,9 @@ defmodule Epicenter.Cases.ImportTest do
       in_file_attrs = %{
         file_name: "",
         contents: """
-        first_name , last_name , dob        , phone_number, case_id , sample_date , result_date , result   , person_tid , lab_result_tid  , full_address
-        Alice      , Testuser  , 01/01/1970 , 1111111000  , 10000   , 06/01/2020  , 06/03/2020  , positive , alice      , alice-result-1  ,
-        Billy      , Testuser  , 03/01/1990 , 1111111001  , 10001   , 06/06/2020  , 06/07/2020  , negative , billy      , billy-result-1  ,"1234 Test St, City, TS 00000"
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , alice      , alice-result-1 ,                       ,                    ,                     ,
+        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000
         """
       }
 
@@ -95,11 +95,11 @@ defmodule Epicenter.Cases.ImportTest do
       %{
         file_name: "test.csv",
         contents: """
-        first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
-        Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
-        Billy      , Testuser  , 01/01/1990 , 07/01/2020  , 07/02/2020  , negative , billy-1    , billy-1-older-result
-        Billy      , Testuser  , 01/01/1990 , 08/01/2020  , 08/02/2020  , positive , billy-1    , billy-1-newer-result
-        Billy      , Testuser  , 01/01/2000 , 09/01/2020  , 09/02/2020  , positive , billy-2    , billy-2-result
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid
+        Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/02/2020    , positive  , alice      , alice-result
+        Billy              , Testuser          , 01/01/1990    , 07/01/2020       , 07/02/2020    , negative  , billy-1    , billy-1-older-result
+        Billy              , Testuser          , 01/01/1990    , 08/01/2020       , 08/02/2020    , positive  , billy-1    , billy-1-newer-result
+        Billy              , Testuser          , 01/01/2000    , 09/01/2020       , 09/02/2020    , positive  , billy-2    , billy-2-result
         """
       }
       |> Import.import_csv(originator)
@@ -132,9 +132,9 @@ defmodule Epicenter.Cases.ImportTest do
         %{
           file_name: "test.csv",
           contents: """
-          first_name , last_name , dob        , sample_date , result_date , result   , person_tid , lab_result_tid
-          Alice      , Testuser  , 01/01/1970 , 06/01/2020  , 06/02/2020  , positive , alice      , alice-result
-                     ,           , 01/02/1980 ,             ,             ,          ,            ,
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid
+          Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/02/2020    , positive  , alice      , alice-result
+                             ,                   , 01/02/1980    ,                  ,               ,           ,            ,
           """
         }
         |> Import.import_csv(originator)

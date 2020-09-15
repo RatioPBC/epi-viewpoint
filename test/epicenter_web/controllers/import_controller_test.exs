@@ -11,9 +11,9 @@ defmodule EpicenterWeb.ImportControllerTest do
     test "accepts file upload", %{conn: conn} do
       temp_file_path =
         """
-        first_name , last_name , dob        , thing, sample_date , result_date , result   , glorp
-        Alice      , Testuser  , 01/01/1970 , graz , 06/01/2020  , 06/03/2020  , positive , 393
-        Billy      , Testuser  , 03/01/1990 , fnord, 06/06/2020  , 06/07/2020  , negative , sn3
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39  , glorp
+        Alice              , Testuser          , 01/01/1970    , 06/02/2020       , 06/01/2020    , 06/03/2020 , positive , 393
+        Billy              , Testuser          , 03/01/1990    , 06/05/2020       , 06/06/2020    , 06/07/2020 , negative , sn3
         """
         |> Tempfile.write!("csv")
 
