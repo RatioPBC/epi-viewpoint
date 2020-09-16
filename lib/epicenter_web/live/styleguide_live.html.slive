@@ -174,3 +174,65 @@
           #inner-horizontal-flow-3
             span The end
       code @include vertical-flow, @include horizontal-flow
+
+    .styleguide-example
+      #pancake-stack
+        ' coming soon
+      code @include pancake-stack
+
+  //
+  // containers
+  //
+
+  .styleguide-section
+    .styleguide-title Containers
+
+    .styleguide-example
+      #section-container
+        section
+          ' Here is some text in a section
+      code section
+
+    .styleguide-example
+      #card-container
+        #card
+          ' Here is some text in a card
+      code @include card
+
+    .styleguide-example
+      #subnav-container
+        #subnav
+          a Item 1
+          = carat_right_icon(6, 9)
+          a Item 2
+      code @include subnav
+
+
+  //
+  // data
+  //
+
+  .styleguide-section
+    .styleguide-title Data
+
+    .styleguide-example
+      #data-table
+        ' coming soon
+      code @include data-table
+
+    .styleguide-example
+      #detail-table
+        ' coming soon
+      code @include detail-table
+
+  //
+  // form
+  //
+
+  .styleguide-section
+    .styleguide-title Form
+
+    .styleguide-example
+      #form
+        ' coming soon
+      code @include form
