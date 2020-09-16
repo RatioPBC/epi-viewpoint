@@ -45,9 +45,10 @@ defmodule Epicenter.Cases.Import do
           if Euclid.Exists.present?(Map.get(row, "phonenumber_7")),
             do: Cases.create_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id})
 
-          address_field_names = ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
-
-          [street, city, state, zip] = address_components = Enum.map(address_field_names, &Map.get(row, &1))
+          [street, city, state, zip] =
+            address_components =
+            ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
+            |> Enum.map(&Map.get(row, &1))
 
           if Euclid.Exists.any?(address_components),
             do: Cases.create_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id})
