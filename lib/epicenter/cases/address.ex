@@ -28,6 +28,7 @@ defmodule Epicenter.Cases.Address do
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
     |> validate_phi(:address)
+    |> unique_constraint([:person_id, :full_address], name: :addresses_full_address_person_id_index)
   end
 
   defmodule Query do
@@ -38,6 +39,10 @@ defmodule Epicenter.Cases.Address do
 
     def order_by_full_address(direction) do
       from(a in Address, order_by: [{^direction, :full_address}])
+    end
+
+    def opts_for_upsert() do
+      [returning: true, on_conflict: {:replace, ~w{updated_at}a}, conflict_target: [:person_id, :full_address]]
     end
   end
 end

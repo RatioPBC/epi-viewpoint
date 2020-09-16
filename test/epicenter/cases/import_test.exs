@@ -87,6 +87,25 @@ defmodule Epicenter.Cases.ImportTest do
       assert Cases.count_phones() == 1
     end
 
+    test "updates existing address when importing a duplicate for the same person", %{originator: originator} do
+      alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+      {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+      Cases.create_address!(Test.Fixtures.address_attrs(alice, "0", 4250, %{}))
+      assert Cases.count_addresses() == 1
+
+      import_output = %{
+        file_name: "test.csv",
+        contents: """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4250 Test St                , City               , TS                   , 00000
+        """
+      }
+      |> Import.import_csv(originator)
+
+      assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
+      assert Cases.count_addresses() == 1
+    end
+
     test "saves an ImportedFile record for the imported CSV", %{originator: originator} do
       in_file_attrs = %{
         file_name: "test_file.csv",

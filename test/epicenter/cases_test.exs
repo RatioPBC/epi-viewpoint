@@ -250,4 +250,49 @@ defmodule Epicenter.CasesTest do
       assert person.phones |> tids == ["phone2"]
     end
   end
+
+  describe "upsert_address!" do
+    setup do
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+
+      %{creator: creator, person: person}
+    end
+
+    test "when the address already exists for the same person", %{creator: _creator, person: person} do
+      original_address = Test.Fixtures.address_attrs(person, "address1", 4250) |> Cases.create_address!()
+
+      {:ok, sql_safe_id} = Ecto.UUID.dump(original_address.id)
+      Ecto.Adapters.SQL.query!(Epicenter.Repo, "UPDATE addresses SET updated_at = $1 WHERE id = $2", [~N[1970-01-01 10:30:00Z], sql_safe_id])
+
+      Cases.upsert_address!(Map.from_struct(%{original_address | tid: "address2"}))
+
+      %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
+      assert length(addresses) == 1
+      assert hd(addresses).updated_at != ~N[1970-01-01 10:30:00Z]
+    end
+
+    test "when the address already exists for a different person", %{creator: creator, person: person} do
+      {:ok, other_person} = Test.Fixtures.person_attrs(creator, "other person") |> Cases.create_person()
+      original_address = Test.Fixtures.address_attrs(other_person, "other address", 4250) |> Cases.create_address!()
+
+      Cases.upsert_address!(Map.from_struct(%{original_address | tid: "address2", person_id: person.id}))
+
+      %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
+      assert hd(addresses).tid == "address2"
+
+      %Cases.Person{addresses: addresses} = Cases.preload_addresses(other_person)
+      assert hd(addresses).tid == "other address"
+    end
+
+    test "when the address does not yet exist", %{creator: _creator, person: person} do
+      original_address = Test.Fixtures.address_attrs(person, "address1", 4250) |> Cases.create_address!()
+
+      Cases.upsert_address!(Map.from_struct(original_address))
+
+      %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
+      assert length(addresses) == 1
+      assert hd(addresses).tid == "address1"
+    end
+  end
 end
