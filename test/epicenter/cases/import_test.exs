@@ -59,7 +59,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.last_name == "Testuser"
       assert billy.phones |> pluck(:number) == [1_111_111_001]
       assert billy.tid == "billy"
-      assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS, 00000"]
+      assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
       assert_versioned(billy, expected_count: 1)
     end
 
