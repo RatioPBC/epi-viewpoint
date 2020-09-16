@@ -19,9 +19,9 @@ defmodule Epicenter.Cases.ImportTest do
       %{
         file_name: "test.csv",
         contents: """
-        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
-        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , alice      , alice-result-1 ,                       ,                    ,                     ,
-        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 ,                       ,                    ,                     ,
+        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                        , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000
         """
       }
       |> Import.import_csv(originator)
@@ -39,10 +39,12 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.result == "positive"
       assert lab_result_1.sampled_on == ~D[2020-06-01]
       assert lab_result_1.tid == "alice-result-1"
+      assert lab_result_1.request_facility_name == "Lab Co South"
 
       assert lab_result_2.result == "negative"
       assert lab_result_2.sampled_on == ~D[2020-06-06]
       assert lab_result_2.tid == "billy-result-1"
+      assert lab_result_2.request_facility_name == nil
 
       [alice, billy] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
       assert alice.dob == ~D[1970-01-01]
