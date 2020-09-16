@@ -20,13 +20,23 @@ defmodule Epicenter.Cases.Import do
   end
 
   def import_csv(file, %Accounts.User{} = originator) do
-    Repo.transaction(fn -> import_csv_catching_exceptions(file, originator) end)
+    Repo.transaction(fn ->
+      try do
+        Cases.create_imported_file(file)
+
+        Csv.read(file.contents, @fields)
+        |> case do
+          {:ok, rows} -> import_rows(rows, originator)
+          {:error, message} -> Repo.rollback(message)
+        end
+      rescue
+        error in Ecto.InvalidChangesetError ->
+          Repo.rollback(error)
+      end
+    end)
   end
 
-  defp import_csv_catching_exceptions(file, %Accounts.User{} = originator) do
-    Cases.create_imported_file(file)
-    {:ok, rows} = Csv.read(file.contents, @fields)
-
+  defp import_rows(rows, originator) do
     result =
       for row <- rows, reduce: %{people: [], lab_results: []} do
         %{people: people, lab_results: lab_results} ->
@@ -84,7 +94,5 @@ defmodule Epicenter.Cases.Import do
     Cases.broadcast({:import, import_info})
 
     import_info
-  rescue
-    error -> Repo.rollback(error)
   end
 end

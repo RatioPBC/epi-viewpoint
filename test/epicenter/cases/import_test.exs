@@ -121,7 +121,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert in_file_attrs == Repo.one(ImportedFile) |> Map.take([:file_name, :contents])
     end
 
-    test "returns an error if the file is missing required values", %{originator: originator} do
+    test "returns an error if the file is missing required values (file_name or contents)", %{originator: originator} do
       in_file_attrs = %{
         file_name: "",
         contents: """
@@ -188,6 +188,20 @@ defmodule Epicenter.Cases.ImportTest do
       assert Cases.count_lab_results() == 0
       assert Cases.count_phones() == 0
     end
+
+    test "returns an error message if the CSV is missing columns", %{originator: originator} do
+      result =
+        %{
+          file_name: "test.csv",
+          contents: "missing columns"
+        }
+        |> Import.import_csv(originator)
+
+      error_message = "Missing required columns: datecollected_36, dateofbirth_8, result_39, resultdate_42, search_firstname_2, search_lastname_1"
+      assert {:error, error_message} == result
+    end
+
+    #    test "returns an error message when the CSV is poorly formatted"
 
     test "can successfully import sample_data/lab_results.csv", %{originator: originator} do
       file_name = "sample_data/lab_results.csv"
