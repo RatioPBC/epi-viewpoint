@@ -13,7 +13,7 @@
 
     form id="assignment-form" phx-change="form-change"
       #user-list
-        div#assignee-label Assignee
+        #assignee-label Assignee
         #select-wrapper
           select name="user" data-role="users" data-unassigned=is_unassigned?(@person)
             option id="unassigned" selected=is_selected?(nil, @person) value="-unassigned-" Unassigned
