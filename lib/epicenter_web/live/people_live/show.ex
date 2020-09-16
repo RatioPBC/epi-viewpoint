@@ -10,6 +10,9 @@ defmodule EpicenterWeb.PeopleLive.Show do
   alias EpicenterWeb.Session
 
   def mount(%{"id" => id}, _session, socket) do
+    if connected?(socket),
+      do: Cases.subscribe()
+
     person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
 
     socket =
@@ -20,6 +23,16 @@ defmodule EpicenterWeb.PeopleLive.Show do
       |> assign(users: Accounts.list_users())
 
     {:ok, socket}
+  end
+
+  def handle_info({:assign_users, updated_people}, socket) do
+    person = socket.assigns.person
+
+    case updated_people |> Enum.find(&(&1.id == person.id)) do
+      nil -> socket
+      updated_person -> socket |> assign(person: updated_person |> Cases.preload_lab_results())
+    end
+    |> noreply()
   end
 
   def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
@@ -38,6 +51,11 @@ defmodule EpicenterWeb.PeopleLive.Show do
     updated_person = updated_person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
     {:noreply, assign(socket, person: updated_person)}
   end
+
+  # # #
+
+  defp noreply(socket),
+    do: {:noreply, socket}
 
   # # #
 

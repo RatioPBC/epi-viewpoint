@@ -103,7 +103,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       :ok
     end
 
-    test "", %{conn: conn, person: person} do
+    test "lab result table", %{conn: conn, person: person} do
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
       page_live
@@ -125,32 +125,71 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       [person: person, assignee: assignee]
     end
 
-    test "user can assign", %{conn: conn, person: person, assignee: assignee} do
-      {:ok, index_page_live, _html} = live(conn, "/people")
-      {:ok, show_page_live, _html} = live(conn, "/people/#{person.id}")
+    test "people can be assigned to users on index and show page, with cross-client updating", %{conn: conn, person: alice, assignee: assignee} do
+      billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
 
+      {:ok, index_page_live, _html} = live(conn, "/people")
+      {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
+
+      index_page_live
+      |> table_contents(columns: ["Name", "Assignee"])
+      |> assert_eq([
+        ["Name", "Assignee"],
+        ["Alice Testuser", ""],
+        ["Billy Testuser", ""]
+      ])
+
+      # choose "assignee" via show page
       assert_select_dropdown_options(view: show_page_live, data_role: "users", expected: ["Unassigned", "assignee", "user"])
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
-      assert Cases.get_person(person.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
+      assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
 
+      # "assignee" shows up on index page
       index_page_live
       |> table_contents(columns: ["Name", "Assignee"])
       |> assert_eq([
         ["Name", "Assignee"],
-        ["Alice Testuser", "assignee"]
+        ["Alice Testuser", "assignee"],
+        ["Billy Testuser", ""]
       ])
 
+      # unassign "assignee" via show page
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["Unassigned"])
-      assert Cases.get_person(person.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
+      assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
 
+      # "assignee" disappears from index page
       index_page_live
       |> table_contents(columns: ["Name", "Assignee"])
       |> assert_eq([
         ["Name", "Assignee"],
-        ["Alice Testuser", ""]
+        ["Alice Testuser", ""],
+        ["Billy Testuser", ""]
       ])
+
+      # choose "assignee" via index page
+      index_page_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      index_page_live |> element("[data-role=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
+      index_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
+
+      assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
+    end
+
+    test "handles assign_users message when the changed people include the current person", %{person: alice, assignee: assignee} do
+      billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
+
+      {:noreply, updated_socket} = Show.handle_info({:assign_users, [%{alice | tid: "updated-alice"}, billy]}, socket)
+      assert updated_socket.assigns.person.tid == "updated-alice"
+    end
+
+    test "handles assign_users message when the changed people do not include the current person", %{person: alice, assignee: assignee} do
+      billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
+
+      {:noreply, updated_socket} = Show.handle_info({:assign_users, [%{billy | tid: "updated-billy"}]}, socket)
+      assert updated_socket.assigns.person.tid == "alice"
     end
   end
 end
