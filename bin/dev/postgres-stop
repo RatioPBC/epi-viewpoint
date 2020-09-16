@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# Stops postgres using pg_ctl.
+#
+# Pass '-q' option if you don't want it to complain when it thinks postgres is not running.
+
+source "bin/_support/cecho.sh"
+
 set -e
 
-eval "$(ps -o command | grep '[/]bin/postgres -D' | sed 's/bin\/postgres/bin\/pg_ctl/') stop"
+if ps -x -o command | grep '[/]bin/postgres -D'; then
+  cecho --yellow "${0}:" --green "Stopping postgres..."
+  eval "$(ps -x -o command | grep '[/]bin/postgres -D' | sed 's/bin\/postgres/bin\/pg_ctl/') stop"
+else
+  if [[ $1 != "-q" ]]; then
+    cecho --yellow "${0}:" --red "Postgres does not seem to be running"
+    exit 1
+  fi
+fi

@@ -119,4 +119,4 @@ check "postgres: role exists" \
 
 check "postgres: dev database exists" \
   "psql -c '\l' epicenter_dev" \
-  "mix ecto.setup"
+  "mix ecto.setup # or if you have per-project postgres versions, perhaps: bin/dev/postgres-stop -q && bin/dev/postgres-start"

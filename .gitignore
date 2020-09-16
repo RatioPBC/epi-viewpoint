@@ -11,6 +11,7 @@
 /cover/
 /deps/
 /doc/
+/priv/postgres/
 /priv/static/
 /tmp/
 Brewfile.lock.json

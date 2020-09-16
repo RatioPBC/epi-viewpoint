@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
 
+# Starts postgres with certain assumptions:
+#   * assumes postgres is installed via asdf
+#   * assumes you want the database to be stored in ./priv/postgres/data/
+#   * assumes you want the database log to be stored in ./priv/postgres/logfile
+#
+# This may not be the script for you if you like to run postgres some other way.
+
+source "bin/_support/cecho.sh"
+
 set -e
 
-mkdir -p ./tmp
-touch ./tmp/postgres-logfile
+pgdir="$(pwd)/priv/postgres"
+datadir="${pgdir}/data"
+mkdir -p ${datadir}
 
-"$(asdf where postgres)/bin/pg_ctl" -D "$(asdf where postgres)/data" -l tmp/postgres-logfile start
+if [[ -f ${datadir}/PG_VERSION ]]; then
+  $(asdf where postgres)/bin/pg_ctl -D ${datadir} -l ${pgdir}/logfile start
+else
+  cecho --yellow "${0}:" --bright-bold-red "${datadir}" --red "does not seem to be a postgres data directory"
+  cecho --yellow "Try running" --bright-bold-white "pg_ctl -D ${datadir} initdb"
+fi
