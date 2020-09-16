@@ -74,7 +74,9 @@ defmodule Epicenter.Cases do
   def count_phones(), do: Phone |> Repo.aggregate(:count)
   def create_phone(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert()
   def create_phone!(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!()
+  def get_phone(id), do: Phone |> Repo.get(id)
   def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(phones: Phone.Query.display_order())
+  def upsert_phone!(%{person_id: _}= attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!(Phone.Query.opts_for_upsert())
 
   #
   # email

@@ -30,6 +30,7 @@ defmodule Epicenter.Cases.Phone do
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
     |> validate_phi(:phone)
+    |> unique_constraint([:person_id, :number], name: :phone_number_person_id_index)
   end
 
   defmodule Query do
@@ -40,6 +41,10 @@ defmodule Epicenter.Cases.Phone do
 
     def order_by_number(direction) do
       from(e in Phone, order_by: [{^direction, :number}])
+    end
+
+    def opts_for_upsert() do
+      [returning: true, on_conflict: {:replace, ~w{updated_at}a}, conflict_target: [:person_id, :number]]
     end
   end
 end

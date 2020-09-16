@@ -42,8 +42,11 @@ defmodule Epicenter.Cases.Import do
             |> Map.update!("dob", &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.upsert_person!()
 
-          if Euclid.Exists.present?(Map.get(row, "phonenumber_7")),
-            do: Cases.create_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id})
+          if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
+            Cases.upsert_phone!(
+              %{number: Map.get(row, "phonenumber_7"), person_id: person.id}
+            )
+          end
 
           [street, city, state, zip] =
             address_components =

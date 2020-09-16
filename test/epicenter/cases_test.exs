@@ -1,7 +1,7 @@
 defmodule Epicenter.CasesTest do
   use Epicenter.DataCase, async: true
 
-  import Euclid.Extra.Enum, only: [tids: 1]
+  import Euclid.Extra.Enum, only: [tids: 1, pluck: 2]
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
@@ -195,6 +195,59 @@ defmodule Epicenter.CasesTest do
       assert person.first_name == "Alice"
       assert person.last_name == "Testuser"
       assert person.tid == "second-insert"
+    end
+  end
+
+  describe "upsert_phone!" do
+    setup do
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.create_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+
+      %{creator: creator, person: person}
+    end
+
+    defp add_phone_for_person(tid, person) do
+      original_phone = Test.Fixtures.phone_attrs(person, tid, %{}) |> Cases.create_phone!();
+      {:ok, sql_safe_id} = Ecto.UUID.dump(original_phone.id)
+
+      Ecto.Adapters.SQL.query!(
+        Epicenter.Repo,
+        "UPDATE phones SET updated_at = $1 WHERE id = $2",
+        [~U[1970-01-01 10:30:00Z], sql_safe_id]
+      )
+      original_phone
+    end
+
+    test "when the phone number already exists for the same person", %{creator: _creator, person: person} do
+      original_phone = add_phone_for_person("phone1", person)
+
+      assert Cases.get_phone(original_phone.id).updated_at == ~N[1970-01-01 10:30:00Z]
+
+      Cases.upsert_phone!(%{person_id: person.id, tid: "phone2", number: original_phone.number})
+
+      person = Cases.preload_phones(person)
+      assert person.phones |> tids == ["phone1"]
+      assert person.phones |> pluck(:updated_at) != ~N[1970-01-01 10:30:00Z]
+    end
+
+    test "when the phone number already exists for a different person", %{creator: creator, person: person} do
+      {:ok, other_person} = Test.Fixtures.person_attrs(creator, "person2") |> Cases.create_person()
+      other_persons_phone = add_phone_for_person("phone3", other_person)
+
+      Cases.upsert_phone!(%{person_id: person.id, tid: "phone2", number: other_persons_phone.number})
+
+      other_person = Cases.preload_phones(other_person)
+      assert other_person.phones |> tids == ["phone3"]
+      person = Cases.preload_phones(person)
+      assert person.phones |> tids == ["phone2"]
+    end
+
+    test "when the phone number does not yet exist", %{creator: _creator, person: person} do
+      phone_attrs = Test.Fixtures.phone_attrs(person, "", %{})
+      Cases.upsert_phone!(%{person_id: person.id, tid: "phone2", number: phone_attrs.number})
+
+      person = Cases.preload_phones(person)
+      assert person.phones |> tids == ["phone2"]
     end
   end
 end
