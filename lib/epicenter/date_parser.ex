@@ -1,6 +1,10 @@
 defmodule Epicenter.DateParser do
   @mm_dd_yyyy_regex ~r|(?<mm>\d{2})[-/](?<dd>\d{2})[-/](?<yyyy>\d{4})|
 
+  def parse_mm_dd_yyyy("") do
+    {:ok, nil}
+  end
+
   def parse_mm_dd_yyyy(mm_dd_yyyy) when is_binary(mm_dd_yyyy) do
     captures = Regex.named_captures(@mm_dd_yyyy_regex, String.trim(mm_dd_yyyy))
 

@@ -6,7 +6,7 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.Repo
 
   @required_lab_result_fields ~w{result_39 resultdate_42 datecollected_36}
-  @optional_lab_result_fields ~w{lab_result_tid orderingfacilityname_37}
+  @optional_lab_result_fields ~w{lab_result_tid orderingfacilityname_37 testname_38 datereportedtolhd_44}
   @required_person_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
   @optional_person_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7}
 
@@ -58,11 +58,14 @@ defmodule Epicenter.Cases.Import do
             |> Map.take(@required_lab_result_fields ++ @optional_lab_result_fields)
             |> Map.put("person_id", person.id)
             |> Euclid.Extra.Map.rename_key("datecollected_36", "sampled_on")
+            |> Euclid.Extra.Map.rename_key("datereportedtolhd_44", "reported_on")
             |> Euclid.Extra.Map.rename_key("lab_result_tid", "tid")
             |> Euclid.Extra.Map.rename_key("orderingfacilityname_37", "request_facility_name")
             |> Euclid.Extra.Map.rename_key("result_39", "result")
             |> Euclid.Extra.Map.rename_key("resultdate_42", "analyzed_on")
-            |> Map.update!("analyzed_on", &DateParser.parse_mm_dd_yyyy!/1)
+            |> Euclid.Extra.Map.rename_key("testname_38", "test_type")
+            |> Map.update("analyzed_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
+            |> Map.update("reported_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
             |> Map.update!("sampled_on", &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.create_lab_result!()
 
