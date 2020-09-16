@@ -5,8 +5,8 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.DateParser
   alias Epicenter.Repo
 
-  @required_lab_result_fields ~w{result_39 resultdate_42 datecollected_36}
-  @optional_lab_result_fields ~w{lab_result_tid orderingfacilityname_37 testname_38 datereportedtolhd_44}
+  @required_lab_result_fields ~w{datecollected_36 result_39 resultdate_42}
+  @optional_lab_result_fields ~w{datereportedtolhd_44 lab_result_tid orderingfacilityname_37 testname_38}
   @required_person_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
   @optional_person_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7}
 
