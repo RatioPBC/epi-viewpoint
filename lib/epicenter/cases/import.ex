@@ -30,6 +30,9 @@ defmodule Epicenter.Cases.Import do
           {:error, message} -> Repo.rollback(message)
         end
       rescue
+        error in NimbleCSV.ParseError ->
+          Repo.rollback(error.message)
+
         error in Ecto.InvalidChangesetError ->
           Repo.rollback(error)
       end

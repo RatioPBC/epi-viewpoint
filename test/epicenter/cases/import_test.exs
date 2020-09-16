@@ -201,7 +201,19 @@ defmodule Epicenter.Cases.ImportTest do
       assert {:error, error_message} == result
     end
 
-    #    test "returns an error message when the CSV is poorly formatted"
+    test "returns an error message when the CSV is poorly formatted", %{originator: originator} do
+      {:error, message} =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid
+          \"Alice\"          , Testuser          , 01/01/1970    , 06/01/2020       , 06/02/2020    , positive  , alice      , alice-result
+          """
+        }
+        |> Import.import_csv(originator)
+
+      assert message =~ "unexpected escape character"
+    end
 
     test "can successfully import sample_data/lab_results.csv", %{originator: originator} do
       file_name = "sample_data/lab_results.csv"
