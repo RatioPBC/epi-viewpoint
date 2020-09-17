@@ -26,11 +26,11 @@ section#people-page data-role="people-page"
   table data-role="people"
     thead
       tr data-role="table-column-names"
-        th
-        th Name
-        th ID
-        th Latest test result
-        th Assignee
+        th width="1%"
+        th width="25%" Name
+        th width="25%" ID
+        th width="25%" Latest test result
+        th width="25%" Assignee
 
     tbody
       = for person <- @people do
