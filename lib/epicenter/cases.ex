@@ -46,6 +46,7 @@ defmodule Epicenter.Cases do
     {:ok, all_updated}
   end
 
+  def broadcast_people(people), do: Phoenix.PubSub.broadcast(Epicenter.PubSub, "people", {:people, people})
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
   def count_people(), do: Person |> Repo.aggregate(:count)
   def create_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!()
@@ -57,6 +58,7 @@ defmodule Epicenter.Cases do
   def list_people(:with_lab_results), do: Person.Query.with_lab_results() |> Repo.all()
   def list_people(), do: list_people(:all)
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
+  def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
   def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
 
@@ -78,7 +80,7 @@ defmodule Epicenter.Cases do
   def create_phone!(attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!()
   def get_phone(id), do: Phone |> Repo.get(id)
   def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(phones: Phone.Query.display_order())
-  def upsert_phone!(%{person_id: _}= attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!(Phone.Query.opts_for_upsert())
+  def upsert_phone!(%{person_id: _} = attrs), do: %Phone{} |> change_phone(attrs) |> Repo.insert!(Phone.Query.opts_for_upsert())
 
   #
   # email
@@ -86,12 +88,6 @@ defmodule Epicenter.Cases do
   def change_email(%Email{} = email, attrs), do: Email.changeset(email, attrs)
   def create_email!(email_attrs), do: %Email{} |> change_email(email_attrs) |> Repo.insert!()
   def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(emails: Email.Query.display_order())
-
-  #
-  # pubsub
-  #
-  def broadcast(message), do: Phoenix.PubSub.broadcast(Epicenter.PubSub, "cases", message)
-  def subscribe(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "cases")
 
   #
   # imported files

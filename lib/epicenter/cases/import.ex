@@ -78,7 +78,8 @@ defmodule Epicenter.Cases.Import do
       total_lab_result_count: Cases.count_lab_results()
     }
 
-    Cases.broadcast({:import, import_info})
+    # TODO: Decide where to broadcast, and test it!
+    # Cases.broadcast_people({:import, import_info})
 
     import_info
   end

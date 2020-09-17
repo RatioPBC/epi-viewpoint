@@ -5,7 +5,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
-  alias Epicenter.Cases.Import
   alias Epicenter.Extra
   alias Epicenter.Test
   alias EpicenterWeb.PeopleLive
@@ -105,7 +104,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
 
       updated_people = [%{alice | assigned_to: assignee}]
-      Cases.broadcast({:assign_users, updated_people})
+      Cases.broadcast_people(updated_people)
 
       index_live
       |> table_contents()
@@ -130,7 +129,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
     end
 
-    test "shows a reload message after an import", %{conn: conn} do
+    test "shows a reload message after broadcasting with a new list of people", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, "/people")
 
       # start off with no people
@@ -143,16 +142,9 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
 
       # import 2 people
-      create_people_and_lab_results()
+      [users: _, people: people] = create_people_and_lab_results()
 
-      import_info = %Import.ImportInfo{
-        imported_person_count: 2,
-        imported_lab_result_count: 0,
-        total_person_count: 2,
-        total_lab_result_count: 0
-      }
-
-      Cases.broadcast({:import, import_info})
+      Cases.broadcast_people(people)
 
       # show a button to make the people visible
       assert_role_text(index_live, "reload-message", "Show 2 new people")
@@ -164,7 +156,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
 
       # show the new people after the button is clicked
-      render_click(index_live, "refresh-people")
+      render_click(index_live, "reload-people")
       assert_role_text(index_live, "reload-message", "")
 
       index_live

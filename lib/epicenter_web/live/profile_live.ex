@@ -11,7 +11,7 @@ defmodule EpicenterWeb.ProfileLive do
 
   def mount(%{"id" => id}, _session, socket) do
     if connected?(socket),
-      do: Cases.subscribe()
+      do: Cases.subscribe_to_people()
 
     person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
 
@@ -25,7 +25,7 @@ defmodule EpicenterWeb.ProfileLive do
     {:ok, socket}
   end
 
-  def handle_info({:assign_users, updated_people}, socket) do
+  def handle_info({:people, updated_people}, socket) do
     person = socket.assigns.person
 
     case updated_people |> Enum.find(&(&1.id == person.id)) do
@@ -46,7 +46,7 @@ defmodule EpicenterWeb.ProfileLive do
         originator: Session.get_current_user()
       )
 
-    Cases.broadcast({:assign_users, [updated_person]})
+    Cases.broadcast_people([updated_person])
 
     updated_person = updated_person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
     {:noreply, assign(socket, person: updated_person)}

@@ -2,17 +2,19 @@ defmodule EpicenterWeb.AdminLive do
   use EpicenterWeb, :live_view
 
   alias Epicenter.Cases
-  alias Epicenter.Cases.Import.ImportInfo
 
   def mount(_params, _session, socket) do
     if connected?(socket),
-      do: Cases.subscribe()
+      do: Cases.subscribe_to_people()
 
-    {:ok, assign(socket, person_count: Cases.count_people(), lab_result_count: Cases.count_lab_results())}
+    {:ok, assign_counts(socket)}
   end
 
-  def handle_info({:import, %ImportInfo{total_person_count: person_count, total_lab_result_count: lab_result_count}}, socket) do
-    socket = assign(socket, person_count: person_count, lab_result_count: lab_result_count)
-    {:noreply, socket}
+  def handle_info({:people, _people}, socket) do
+    {:noreply, assign_counts(socket)}
+  end
+
+  defp assign_counts(socket) do
+    assign(socket, person_count: Cases.count_people(), lab_result_count: Cases.count_lab_results())
   end
 end

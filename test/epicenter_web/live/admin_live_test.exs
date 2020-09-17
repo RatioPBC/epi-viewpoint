@@ -3,8 +3,9 @@ defmodule EpicenterWeb.AdminLiveTest do
 
   import Phoenix.LiveViewTest
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
-  alias Epicenter.Cases.Import
+  alias Epicenter.Test
 
   test "disconnected and connected render", %{conn: conn} do
     {:ok, page_live, disconnected_html} = live(conn, "/admin")
@@ -19,16 +20,17 @@ defmodule EpicenterWeb.AdminLiveTest do
     assert_role_text(page_live, "person-count", "0")
     assert_role_text(page_live, "lab-result-count", "0")
 
-    import_info = %Import.ImportInfo{
-      imported_person_count: 1,
-      imported_lab_result_count: 2,
-      total_person_count: 3,
-      total_lab_result_count: 4
-    }
+    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
 
-    Cases.broadcast({:import, import_info})
+    alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    Test.Fixtures.lab_result_attrs(alice, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
+
+    Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+    Test.Fixtures.person_attrs(user, "cindy") |> Cases.create_person!()
+
+    Cases.broadcast_people([alice])
 
     assert_role_text(page_live, "person-count", "3")
-    assert_role_text(page_live, "lab-result-count", "4")
+    assert_role_text(page_live, "lab-result-count", "1")
   end
 end

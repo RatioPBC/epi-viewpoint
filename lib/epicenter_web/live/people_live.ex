@@ -3,14 +3,13 @@ defmodule EpicenterWeb.PeopleLive do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
-  alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
   alias EpicenterWeb.Session
 
   def mount(_params, _session, socket) do
     if connected?(socket),
-      do: Cases.subscribe()
+      do: Cases.subscribe_to_people()
 
     socket |> set_reload_message(nil) |> set_filter(:with_lab_results) |> load_people() |> load_users() |> set_selected() |> ok()
   end
@@ -21,13 +20,10 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_params(_, _url, socket),
     do: socket |> noreply()
 
-  def handle_info({:assign_users, updated_people}, socket),
-    do: socket |> set_selected() |> refresh_people(updated_people) |> noreply()
+  def handle_info({:people, updated_people}, socket),
+    do: socket |> set_selected() |> refresh_existing_people(updated_people) |> maybe_prompt_to_reload(updated_people) |> noreply()
 
-  def handle_info({:import, %ImportInfo{imported_person_count: imported_person_count}}, socket),
-    do: socket |> set_reload_message("Show #{imported_person_count} new people") |> noreply()
-
-  def handle_event("refresh-people", _, socket),
+  def handle_event("reload-people", _, socket),
     do: socket |> set_reload_message(nil) |> load_people() |> noreply()
 
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
@@ -47,9 +43,9 @@ defmodule EpicenterWeb.PeopleLive do
         originator: Session.get_current_user()
       )
 
-    Cases.broadcast({:assign_users, updated_people})
+    Cases.broadcast_people(updated_people)
 
-    socket |> set_selected() |> refresh_people(updated_people) |> noreply()
+    socket |> set_selected() |> refresh_existing_people(updated_people) |> noreply()
   end
 
   def handle_event("form-change", _, socket),
@@ -107,13 +103,25 @@ defmodule EpicenterWeb.PeopleLive do
   defp load_users(socket),
     do: socket |> assign(users: Accounts.list_users())
 
+  defp maybe_prompt_to_reload(socket, people) do
+    existing_people_ids = socket.assigns.people |> Euclid.Extra.Enum.pluck(:id) |> MapSet.new()
+    new_people_ids = people |> Euclid.Extra.Enum.pluck(:id) |> MapSet.new()
+
+    if MapSet.subset?(new_people_ids, existing_people_ids) do
+      socket
+    else
+      new_people_count = MapSet.difference(new_people_ids, existing_people_ids) |> MapSet.size()
+      set_reload_message(socket, "Show #{new_people_count} new people")
+    end
+  end
+
   defp noreply(socket),
     do: {:noreply, socket}
 
   defp ok(socket),
     do: {:ok, socket}
 
-  defp refresh_people(socket, updated_people) do
+  defp refresh_existing_people(socket, updated_people) do
     id_to_people_map = updated_people |> Enum.reduce(%{}, fn person, acc -> acc |> Map.put(person.id, person) end)
     refreshed_people = socket.assigns.people |> Enum.map(fn person -> Map.get(id_to_people_map, person.id, person) end)
     assign_people(socket, refreshed_people)

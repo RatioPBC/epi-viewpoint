@@ -180,7 +180,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
 
-      {:noreply, updated_socket} = ProfileLive.handle_info({:assign_users, [%{alice | tid: "updated-alice"}, billy]}, socket)
+      {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}, billy]}, socket)
       assert updated_socket.assigns.person.tid == "updated-alice"
     end
 
@@ -188,7 +188,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
 
-      {:noreply, updated_socket} = ProfileLive.handle_info({:assign_users, [%{billy | tid: "updated-billy"}]}, socket)
+      {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{billy | tid: "updated-billy"}]}, socket)
       assert updated_socket.assigns.person.tid == "alice"
     end
   end
