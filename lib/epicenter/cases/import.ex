@@ -86,8 +86,8 @@ defmodule Epicenter.Cases.Import do
   defp import_row(row, originator) do
     person = import_person(row, originator)
     lab_result = import_lab_result(row, person)
-    import_phone_numbers(row, person)
-    import_addresses(row, person)
+    import_phone_number(row, person)
+    import_address(row, person)
     %{person: person, lab_result: lab_result}
   end
 
@@ -106,13 +106,13 @@ defmodule Epicenter.Cases.Import do
     |> Cases.create_lab_result!()
   end
 
-  defp import_phone_numbers(row, person) do
+  defp import_phone_number(row, person) do
     if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
       Cases.upsert_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id})
     end
   end
 
-  defp import_addresses(row, person) do
+  defp import_address(row, person) do
     [street, city, state, zip] =
       address_components =
       ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
