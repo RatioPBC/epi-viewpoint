@@ -35,7 +35,7 @@ deploy() {
       "heroku config:set ${var}=VALUE-GOES-HERE"
   done <<<"$envrc_variables"
 
-  step "Deploying" "git push heroku master"
+  step "Deploying" "git push heroku main:master"
 }
 
 case $1 in
