@@ -55,37 +55,23 @@ defmodule Epicenter.Cases.Import do
     end)
   end
 
+  defp rename_rows(rows) do
+    Enum.map(rows, &Euclid.Extra.Map.rename_keys(&1, @key_map))
+  end
+
+  defp transform_dates(rows) do
+    date_parser = &DateParser.parse_mm_dd_yyyy!/1
+    Enum.map(rows, &Euclid.Extra.Map.transform(&1, @date_fields, date_parser))
+  end
+
   defp import_rows(rows, originator) do
     result =
       for row <- rows, reduce: %{people: [], lab_results: []} do
         %{people: people, lab_results: lab_results} ->
-          person =
-            row
-            |> Map.take(~w{person_tid dob first_name last_name external_id preferred_language})
-            |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-            |> Map.put("originator", originator)
-            |> Cases.upsert_person!()
-
-          if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
-            Cases.upsert_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id})
-          end
-
-          [street, city, state, zip] =
-            address_components =
-            ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
-            |> Enum.map(&Map.get(row, &1))
-
-          if Euclid.Exists.any?(address_components) do
-            Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id})
-          end
-
-          lab_result =
-            row
-            |> Map.take(
-              ~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}
-            )
-            |> Map.put("person_id", person.id)
-            |> Cases.create_lab_result!()
+          person = import_person(row, originator)
+          import_phone_numbers(row, person)
+          import_addresses(row, person)
+          lab_result = import_lab_result(row, person)
 
           %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}
       end
@@ -102,12 +88,35 @@ defmodule Epicenter.Cases.Import do
     import_info
   end
 
-  defp rename_rows(rows) do
-    Enum.map(rows, &Euclid.Extra.Map.rename_keys(&1, @key_map))
+  defp import_person(row, originator) do
+    row
+    |> Map.take(~w{person_tid dob first_name last_name external_id preferred_language})
+    |> Euclid.Extra.Map.rename_key("person_tid", "tid")
+    |> Map.put("originator", originator)
+    |> Cases.upsert_person!()
   end
 
-  defp transform_dates(rows) do
-    date_parser = &DateParser.parse_mm_dd_yyyy!/1
-    Enum.map(rows, &Euclid.Extra.Map.transform(&1, @date_fields, date_parser))
+  defp import_lab_result(row, person) do
+    row
+    |> Map.take(~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid})
+    |> Map.put("person_id", person.id)
+    |> Cases.create_lab_result!()
+  end
+
+  defp import_phone_numbers(row, person) do
+    if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
+      Cases.upsert_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id})
+    end
+  end
+
+  defp import_addresses(row, person) do
+    [street, city, state, zip] =
+      address_components =
+      ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
+      |> Enum.map(&Map.get(row, &1))
+
+    if Euclid.Exists.any?(address_components) do
+      Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id})
+    end
   end
 end
