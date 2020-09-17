@@ -8,9 +8,12 @@ defmodule Epicenter.ValidationTest do
   alias Epicenter.Validation
 
   describe "validate_phi" do
-    test "changeset in invalid if last_name is not 'Testuser'" do
+    test "changeset in invalid if last_name does not start with 'Testuser'" do
       change = Changeset.change(%Person{}, last_name: "Baz")
-      assert errors_on(Validation.validate_phi(change, :person)).last_name == ["In non-PHI environment, must be equal to 'Testuser'"]
+      assert errors_on(Validation.validate_phi(change, :person)).last_name == ["In non-PHI environment, must start with 'Testuser'"]
+
+      change = Changeset.change(%Person{}, last_name: "Testuser2")
+      assert Validation.validate_phi(change, :person).valid?
     end
 
     test "changeset in invalid if date of birth is not first of month" do

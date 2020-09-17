@@ -32,9 +32,9 @@ defmodule Epicenter.Validation do
   end
 
   defp last_name_validator(field, value) do
-    if value == "Testuser",
+    if value |> String.starts_with?("Testuser"),
       do: valid(),
-      else: invalid(field, "must be equal to 'Testuser'")
+      else: invalid(field, "must start with 'Testuser'")
   end
 
   defp address_full_address_validator(field, value) do
