@@ -17,6 +17,7 @@ defmodule EpicenterWeb.PeopleLive.EditTest do
     assert_has_role(page_live, "person-edit-page")
   end
 
+  @tag :skip
   test "editing person identifying information", %{conn: conn} do
     user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
