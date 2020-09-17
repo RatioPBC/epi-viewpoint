@@ -177,7 +177,9 @@
 
     .styleguide-example
       #pancake-stack
-        ' coming soon
+        div Top
+        div Middle
+        div Bottom
       code @include pancake-stack
 
   //
