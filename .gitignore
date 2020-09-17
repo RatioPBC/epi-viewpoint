@@ -12,6 +12,7 @@
 /deps/
 /doc/
 /priv/postgres/
+/priv/repo/structure.sql
 /priv/static/
 /tmp/
 Brewfile.lock.json
