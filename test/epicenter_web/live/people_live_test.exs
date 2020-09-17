@@ -23,7 +23,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
       billy = Test.Fixtures.person_attrs(user, "billy", external_id: "billy-id") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(billy, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
-      [users: [user, assignee], people: [alice, billy]]
+      [users: [user, assignee], people: [alice, billy] |> Cases.preload_assigned_to() |> Cases.preload_lab_results()]
     end
 
     test "disconnected and connected render", %{conn: conn} do
@@ -166,6 +166,10 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
+
+      # refresh the people
+      Cases.broadcast_people(people)
+      assert_role_text(index_live, "reload-message", "")
     end
   end
 

@@ -64,7 +64,4 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
 
     assert_selected_dropdown_option(view: show_page, data_role: "users", expected: ["assignee"])
   end
-
-  @tag :skip
-  test "renders changes when updating existing person and prompts to refresh when importing new person"
 end
