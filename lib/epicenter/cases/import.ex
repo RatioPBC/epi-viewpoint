@@ -67,11 +67,7 @@ defmodule Epicenter.Cases.Import do
     result =
       for row <- rows, reduce: %{people: [], lab_results: []} do
         %{people: people, lab_results: lab_results} ->
-          person = import_person(row, originator)
-          import_phone_numbers(row, person)
-          import_addresses(row, person)
-          lab_result = import_lab_result(row, person)
-
+          %{person: person, lab_result: lab_result} = import_row(row, originator)
           %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}
       end
 
@@ -85,6 +81,14 @@ defmodule Epicenter.Cases.Import do
     Cases.broadcast({:import, import_info})
 
     import_info
+  end
+
+  defp import_row(row, originator) do
+    person = import_person(row, originator)
+    lab_result = import_lab_result(row, person)
+    import_phone_numbers(row, person)
+    import_addresses(row, person)
+    %{person: person, lab_result: lab_result}
   end
 
   defp import_person(row, originator) do
