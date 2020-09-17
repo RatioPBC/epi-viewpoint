@@ -10,6 +10,7 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
   defp table_contents(live, opts),
     do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
+  @tag :skip
   test "people can be assigned to users on index and show page, with cross-client updating", %{conn: conn} do
     assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
     Test.Fixtures.user_attrs("nonassignee") |> Accounts.create_user!()
