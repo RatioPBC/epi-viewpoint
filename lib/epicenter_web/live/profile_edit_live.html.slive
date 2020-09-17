@@ -13,15 +13,21 @@
 
       fieldset
         = label f, :first_name do
-          | First Name
+          | First name
           = error_tag f, :first_name
         = text_input f, :first_name
 
 
       fieldset
         = label f, :last_name do
-          | Last Name
+          | Last name
           = error_tag f, :last_name
         = text_input f, :last_name
+
+      fieldset
+        = label f, :dob do
+          | Date of birth
+          = error_tag f, :dob
+        = text_input f, :dob
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
