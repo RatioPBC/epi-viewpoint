@@ -65,15 +65,15 @@ defmodule Epicenter.Cases.Import do
 
   defp import_rows(rows, originator) do
     result =
-      for row <- rows, reduce: %{people: [], lab_results: []} do
+      for row <- rows, reduce: %{people: MapSet.new(), lab_results: MapSet.new()} do
         %{people: people, lab_results: lab_results} ->
           %{person: person, lab_result: lab_result} = import_row(row, originator)
-          %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}
+          %{people: MapSet.put(people, person.id), lab_results: MapSet.put(lab_results, lab_result.id)}
       end
 
     import_info = %ImportInfo{
-      imported_person_count: result.people |> Enum.uniq() |> length(),
-      imported_lab_result_count: result.lab_results |> Enum.uniq() |> length(),
+      imported_person_count: MapSet.size(result.people),
+      imported_lab_result_count: MapSet.size(result.lab_results),
       total_person_count: Cases.count_people(),
       total_lab_result_count: Cases.count_lab_results()
     }
