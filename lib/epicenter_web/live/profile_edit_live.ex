@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.PeopleLive.Edit do
+defmodule EpicenterWeb.ProfileEditLive do
   use EpicenterWeb, :live_view
 
   alias Epicenter.Cases
@@ -14,7 +14,7 @@ defmodule EpicenterWeb.PeopleLive.Edit do
   def handle_event("save", %{"person" => person_params}, socket) do
     case Cases.update_person(socket.assigns.person, person_params) do
       {:ok, person} ->
-        {:noreply, socket |> push_redirect(to: Routes.people_show_path(socket, :show, person))}
+        {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}

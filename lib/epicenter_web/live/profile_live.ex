@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.PeopleLive.Show do
+defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [carat_right_icon: 2]

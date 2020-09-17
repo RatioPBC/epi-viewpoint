@@ -15,14 +15,14 @@ defmodule EpicenterWeb.Router do
     pipe_through :browser
 
     get "/", SessionController, :new
-    live "/admin", AdminLive
-    live "/import", ImportLive
+    live "/admin", AdminLive, as: :admin
+    live "/import", ImportLive, as: :import
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
-    live "/people", PeopleLive.Index, :index
-    live "/people/:id", PeopleLive.Show, :show
-    live "/people/:id/edit", PeopleLive.Edit, :edit
-    live "/styleguide", StyleguideLive
+    live "/people", PeopleLive, as: :people
+    live "/people/:id", ProfileLive, as: :profile
+    live "/people/:id/edit", ProfileEditLive, as: :profile_edit
+    live "/styleguide", StyleguideLive, as: :styleguide
   end
 
   # Other scopes may use custom stacks.

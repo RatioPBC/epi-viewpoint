@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.PeopleLive.ShowTest do
+defmodule EpicenterWeb.ProfileLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
@@ -6,7 +6,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Test
-  alias EpicenterWeb.PeopleLive.Show
+  alias EpicenterWeb.ProfileLive
 
   setup do
     user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
@@ -32,9 +32,9 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       assert_role_text(page_live, "address", "Unknown")
     end
 
-    test("email_addresses", %{person: person}, do: person |> Show.email_addresses() |> assert_eq([]))
+    test("email_addresses", %{person: person}, do: person |> ProfileLive.email_addresses() |> assert_eq([]))
 
-    test("phone_numbers", %{person: person}, do: person |> Show.phone_numbers() |> assert_eq([]))
+    test("phone_numbers", %{person: person}, do: person |> ProfileLive.phone_numbers() |> assert_eq([]))
   end
 
   describe "when the person has identifying information" do
@@ -60,11 +60,11 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
     end
 
     test "email_addresses", %{person: person} do
-      person |> Show.email_addresses() |> assert_eq(["alice-preferred@example.com", "alice-a@example.com"])
+      person |> ProfileLive.email_addresses() |> assert_eq(["alice-preferred@example.com", "alice-a@example.com"])
     end
 
     test "phone_numbers", %{person: person} do
-      person |> Show.phone_numbers() |> assert_eq(["111-111-1001", "111-111-1000"])
+      person |> ProfileLive.phone_numbers() |> assert_eq(["111-111-1001", "111-111-1000"])
     end
   end
 
@@ -180,7 +180,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
 
-      {:noreply, updated_socket} = Show.handle_info({:assign_users, [%{alice | tid: "updated-alice"}, billy]}, socket)
+      {:noreply, updated_socket} = ProfileLive.handle_info({:assign_users, [%{alice | tid: "updated-alice"}, billy]}, socket)
       assert updated_socket.assigns.person.tid == "updated-alice"
     end
 
@@ -188,7 +188,7 @@ defmodule EpicenterWeb.PeopleLive.ShowTest do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
 
-      {:noreply, updated_socket} = Show.handle_info({:assign_users, [%{billy | tid: "updated-billy"}]}, socket)
+      {:noreply, updated_socket} = ProfileLive.handle_info({:assign_users, [%{billy | tid: "updated-billy"}]}, socket)
       assert updated_socket.assigns.person.tid == "alice"
     end
   end

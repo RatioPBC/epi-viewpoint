@@ -2,8 +2,8 @@
 
   section
     header#subnav
-      = live_redirect "People", to: Routes.people_index_path(EpicenterWeb.Endpoint, :index)
-      = live_redirect "#{@person.first_name} #{@person.last_name}", to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, @person), data: [role: "name"]
+      = live_redirect "People", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
+      = live_redirect "#{@person.first_name} #{@person.last_name}", to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "name"]
       span Edit
 
   section

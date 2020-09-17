@@ -3,6 +3,6 @@ defmodule EpicenterWeb.SessionController do
 
   @doc "At some point, this will handle login but for now, just redirect to /people"
   def new(conn, _params) do
-    conn |> redirect(to: Routes.people_index_path(conn, :index))
+    conn |> redirect(to: Routes.people_path(conn, EpicenterWeb.PeopleLive))
   end
 end

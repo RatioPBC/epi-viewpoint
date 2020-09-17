@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.PeopleLive.IndexTest do
+defmodule EpicenterWeb.PeopleLiveTest do
   use EpicenterWeb.ConnCase
 
   import Phoenix.LiveViewTest
@@ -8,7 +8,7 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
   alias Epicenter.Cases.Import
   alias Epicenter.Extra
   alias Epicenter.Test
-  alias EpicenterWeb.PeopleLive.Index
+  alias EpicenterWeb.PeopleLive
 
   describe "rendering" do
     defp table_contents(index_live, opts \\ []),
@@ -195,16 +195,16 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
 
   describe "full_name" do
     test "renders first and last name",
-      do: assert(Index.full_name(%{first_name: "First", last_name: "Last"}) == "First Last")
+      do: assert(PeopleLive.full_name(%{first_name: "First", last_name: "Last"}) == "First Last")
 
     test "when there's just a first name",
-      do: assert(Index.full_name(%{first_name: "First", last_name: nil}) == "First")
+      do: assert(PeopleLive.full_name(%{first_name: "First", last_name: nil}) == "First")
 
     test "when there's just a last name",
-      do: assert(Index.full_name(%{first_name: nil, last_name: "Last"}) == "Last")
+      do: assert(PeopleLive.full_name(%{first_name: nil, last_name: "Last"}) == "Last")
 
     test "when first name is blank",
-      do: assert(Index.full_name(%{first_name: "", last_name: "Last"}) == "Last")
+      do: assert(PeopleLive.full_name(%{first_name: "", last_name: "Last"}) == "Last")
   end
 
   describe "latest_result" do
@@ -215,12 +215,12 @@ defmodule EpicenterWeb.PeopleLive.IndexTest do
     end
 
     test "when the person has no lab results", %{person: person} do
-      assert Index.latest_result(person) == ""
+      assert PeopleLive.latest_result(person) == ""
     end
 
     test "when there is a result and a sample date", %{person: person} do
       Test.Fixtures.lab_result_attrs(person, "lab-result", ~D[2020-01-01], result: "positive") |> Cases.create_lab_result!()
-      assert Index.latest_result(person) =~ ~r|positive, \d+ days ago|
+      assert PeopleLive.latest_result(person) =~ ~r|positive, \d+ days ago|
     end
   end
 end

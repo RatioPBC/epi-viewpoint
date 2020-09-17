@@ -7,8 +7,8 @@ section#people-page data-role="people-page"
       span data-role="reload-message"
         = if @reload_message do
           = link @reload_message, to: "#", phx_click: "refresh-people", id: "reload-message"
-      = live_patch "All", to: Routes.people_index_path(@socket, :index, filter: :with_lab_results), class: "button", data: [active: @filter in [:with_lab_results, nil]]
-      = live_patch "Call list", to: Routes.people_index_path(@socket, :index, filter: :call_list), class: "button", data: [active: @filter == :call_list]
+      = live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_lab_results), class: "button", data: [active: @filter in [:with_lab_results, nil]]
+      = live_patch "Call list", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :call_list), class: "button", data: [active: @filter == :call_list]
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
 
@@ -37,7 +37,7 @@ section#people-page data-role="people-page"
         tr data-role="person"
           td
             input type="checkbox" checked=is_selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-role="#{person.tid}"
-          td= live_redirect full_name(person), to: Routes.people_show_path(EpicenterWeb.Endpoint, :show, person)
+          td= live_redirect full_name(person), to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)
           td= person.external_id
           td= latest_result(person)
           td= assigned_to_name(person)
