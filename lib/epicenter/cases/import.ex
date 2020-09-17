@@ -54,7 +54,7 @@ defmodule Epicenter.Cases.Import do
               "search_firstname_2" => "first_name",
               "search_lastname_1" => "last_name"
             })
-            |> Map.update("dob", nil, &DateParser.parse_mm_dd_yyyy!/1)
+            |> Euclid.Extra.Map.transform("dob", &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.upsert_person!()
 
           if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
@@ -83,9 +83,7 @@ defmodule Epicenter.Cases.Import do
               "resultdate_42" => "analyzed_on",
               "testname_38" => "test_type"
             })
-            |> Map.update("sampled_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
-            |> Map.update("reported_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
-            |> Map.update("analyzed_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
+            |> Euclid.Extra.Map.transform(["sampled_on", "reported_on", "analyzed_on"], &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.create_lab_result!()
 
           %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}
