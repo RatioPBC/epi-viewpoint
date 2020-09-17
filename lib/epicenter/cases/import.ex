@@ -40,8 +40,7 @@ defmodule Epicenter.Cases.Import do
       try do
         Cases.create_imported_file(file)
 
-        Csv.read(file.contents, @fields)
-        |> case do
+        case Csv.read(file.contents, @fields) do
           {:ok, rows} -> rows |> rename_rows() |> transform_dates() |> import_rows(originator)
           {:error, message} -> Repo.rollback(message)
         end
