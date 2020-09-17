@@ -47,11 +47,14 @@ defmodule Epicenter.Cases.Import do
             row
             |> Map.take(@required_person_fields ++ @optional_person_fields)
             |> Map.put("originator", originator)
-            |> Euclid.Extra.Map.rename_key("caseid_0", "external_id")
-            |> Euclid.Extra.Map.rename_key("dateofbirth_8", "dob", &DateParser.parse_mm_dd_yyyy!/1)
-            |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-            |> Euclid.Extra.Map.rename_key("search_firstname_2", "first_name")
-            |> Euclid.Extra.Map.rename_key("search_lastname_1", "last_name")
+            |> Euclid.Extra.Map.rename_keys(%{
+              "caseid_0" => "external_id",
+              "dateofbirth_8" => "dob",
+              "person_tid" => "tid",
+              "search_firstname_2" => "first_name",
+              "search_lastname_1" => "last_name"
+            })
+            |> Map.update("dob", nil, &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.upsert_person!()
 
           if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
@@ -71,13 +74,18 @@ defmodule Epicenter.Cases.Import do
             row
             |> Map.take(@required_lab_result_fields ++ @optional_lab_result_fields)
             |> Map.put("person_id", person.id)
-            |> Euclid.Extra.Map.rename_key("datecollected_36", "sampled_on", &DateParser.parse_mm_dd_yyyy!/1)
-            |> Euclid.Extra.Map.rename_key("datereportedtolhd_44", "reported_on", &DateParser.parse_mm_dd_yyyy!/1)
-            |> Euclid.Extra.Map.rename_key("lab_result_tid", "tid")
-            |> Euclid.Extra.Map.rename_key("orderingfacilityname_37", "request_facility_name")
-            |> Euclid.Extra.Map.rename_key("result_39", "result")
-            |> Euclid.Extra.Map.rename_key("resultdate_42", "analyzed_on", &DateParser.parse_mm_dd_yyyy!/1)
-            |> Euclid.Extra.Map.rename_key("testname_38", "test_type")
+            |> Euclid.Extra.Map.rename_keys(%{
+              "datecollected_36" => "sampled_on",
+              "datereportedtolhd_44" => "reported_on",
+              "lab_result_tid" => "tid",
+              "orderingfacilityname_37" => "request_facility_name",
+              "result_39" => "result",
+              "resultdate_42" => "analyzed_on",
+              "testname_38" => "test_type"
+            })
+            |> Map.update("sampled_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
+            |> Map.update("reported_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
+            |> Map.update("analyzed_on", nil, &DateParser.parse_mm_dd_yyyy!/1)
             |> Cases.create_lab_result!()
 
           %{people: [person.id | people], lab_results: [lab_result.id | lab_results]}
