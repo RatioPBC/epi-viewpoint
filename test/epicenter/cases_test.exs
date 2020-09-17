@@ -207,7 +207,7 @@ defmodule Epicenter.CasesTest do
     end
 
     defp add_phone_for_person(tid, person) do
-      original_phone = Test.Fixtures.phone_attrs(person, tid, %{}) |> Cases.create_phone!();
+      original_phone = Test.Fixtures.phone_attrs(person, tid, %{}) |> Cases.create_phone!()
       {:ok, sql_safe_id} = Ecto.UUID.dump(original_phone.id)
 
       Ecto.Adapters.SQL.query!(
@@ -215,10 +215,11 @@ defmodule Epicenter.CasesTest do
         "UPDATE phones SET updated_at = $1 WHERE id = $2",
         [~U[1970-01-01 10:30:00Z], sql_safe_id]
       )
+
       original_phone
     end
 
-    test "when the phone number already exists for the same person", %{creator: _creator, person: person} do
+    test "when the phone number already exists for the same person", %{person: person} do
       original_phone = add_phone_for_person("phone1", person)
 
       assert Cases.get_phone(original_phone.id).updated_at == ~N[1970-01-01 10:30:00Z]
@@ -242,7 +243,7 @@ defmodule Epicenter.CasesTest do
       assert person.phones |> tids == ["phone2"]
     end
 
-    test "when the phone number does not yet exist", %{creator: _creator, person: person} do
+    test "when the phone number does not yet exist", %{person: person} do
       phone_attrs = Test.Fixtures.phone_attrs(person, "", %{})
       Cases.upsert_phone!(%{person_id: person.id, tid: "phone2", number: phone_attrs.number})
 
@@ -259,7 +260,7 @@ defmodule Epicenter.CasesTest do
       %{creator: creator, person: person}
     end
 
-    test "when the address already exists for the same person", %{creator: _creator, person: person} do
+    test "when the address already exists for the same person", %{person: person} do
       original_address = Test.Fixtures.address_attrs(person, "address1", 4250) |> Cases.create_address!()
 
       {:ok, sql_safe_id} = Ecto.UUID.dump(original_address.id)
@@ -285,7 +286,7 @@ defmodule Epicenter.CasesTest do
       assert hd(addresses).tid == "other address"
     end
 
-    test "when the address does not yet exist", %{creator: _creator, person: person} do
+    test "when the address does not yet exist", %{person: person} do
       original_address = Test.Fixtures.address_attrs(person, "address1", 4250) |> Cases.create_address!()
 
       Cases.upsert_address!(Map.from_struct(original_address))
