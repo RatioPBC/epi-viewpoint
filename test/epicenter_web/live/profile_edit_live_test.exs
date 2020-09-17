@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.PeopleLive.EditTest do
+defmodule EpicenterWeb.ProfileEditLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
