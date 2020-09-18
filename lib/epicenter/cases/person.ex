@@ -85,7 +85,8 @@ defmodule Epicenter.Cases.Person do
 
     def get_people(ids) do
       from person in Person,
-        where: person.id in ^ids
+        where: person.id in ^ids,
+        order_by: [asc: person.last_name, asc: person.first_name, desc: person.dob, asc: person.seq]
     end
 
     def with_lab_results() do

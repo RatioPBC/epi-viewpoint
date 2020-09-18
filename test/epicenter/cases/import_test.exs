@@ -158,7 +158,7 @@ defmodule Epicenter.Cases.ImportTest do
                }
                |> Import.import_csv(originator)
 
-      assert imported_people |> tids() == ["alice", "billy-1", "billy-2"]
+      assert imported_people |> tids() == ["alice", "billy-2", "billy-1"]
       [alice, billy_2, billy_1] = Cases.list_people(:all) |> Enum.map(&Cases.preload_lab_results/1)
       assert alice.tid == "alice"
       assert alice.lab_results |> tids() == ~w{alice-result}
