@@ -14,9 +14,11 @@ testcomm() {
 
 # run doctor in home directory if present
 if [[ -f "${HOME}/bin/dev/doctor" ]]; then
-  step "Running system doctor" "pushd ${HOME} > /dev/null && ./bin/dev/doctor && popd > /dev/null"
-
-  step_header "Running project doctor steps"
+  if step "Found a doctor script in home directory; running..." "pushd ${HOME} > /dev/null && ./bin/dev/doctor && popd > /dev/null"; then
+    step_header "Running project doctor steps"
+  else
+    exit 1
+  fi
 fi
 
 check "git-duet: installed" \
