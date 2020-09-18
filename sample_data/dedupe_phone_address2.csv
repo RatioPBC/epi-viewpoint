@@ -1,0 +1,2 @@
+search_firstname_2,search_lastname_1,dateofbirth_8,phonenumber_7,caseid_0,datecollected_36,resultdate_42,datereportedtolhd_44,result_39,orderingfacilityname_37,person_tid,lab_result_tid,diagaddress_street1_3,diagaddress_city_4,diagaddress_state_5,diagaddress_zip_6,testname_38
+Annie             ,Testuser         ,01/01/1970   ,1111111000   ,10000   ,08/01/2020      ,08/03/2020   ,08/05/2020          ,positive ,City Hospital Lab      ,alice     ,alice-result-1,2000 Test St         ,City              ,TS                 ,00000            ,TestTest
