@@ -32,7 +32,7 @@ defmodule Epicenter.Cases.Import do
   @date_fields ~w{dob sampled_on reported_on analyzed_on}
 
   defmodule ImportInfo do
-    defstruct ~w{imported_person_count imported_lab_result_count total_person_count total_lab_result_count}a
+    defstruct ~w{imported_people imported_person_count imported_lab_result_count total_person_count total_lab_result_count}a
   end
 
   def import_csv(file, %Accounts.User{} = originator) do
@@ -41,8 +41,14 @@ defmodule Epicenter.Cases.Import do
         Cases.create_imported_file(file)
 
         case Csv.read(file.contents, @fields) do
-          {:ok, rows} -> rows |> rename_rows() |> transform_dates() |> import_rows(originator)
-          {:error, message} -> Repo.rollback(message)
+          {:ok, rows} ->
+            rows
+            |> rename_rows()
+            |> transform_dates()
+            |> import_rows(originator)
+
+          {:error, message} ->
+            Repo.rollback(message)
         end
       rescue
         error in NimbleCSV.ParseError ->
@@ -72,14 +78,12 @@ defmodule Epicenter.Cases.Import do
       end
 
     import_info = %ImportInfo{
+      imported_people: result.people |> MapSet.to_list() |> Cases.get_people(),
       imported_person_count: MapSet.size(result.people),
       imported_lab_result_count: MapSet.size(result.lab_results),
       total_person_count: Cases.count_people(),
       total_lab_result_count: Cases.count_lab_results()
     }
-
-    # TODO: Decide where to broadcast, and test it!
-    # Cases.broadcast_people({:import, import_info})
 
     import_info
   end

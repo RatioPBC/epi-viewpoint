@@ -13,24 +13,25 @@ defmodule Epicenter.CasesTest do
     test "import_lab_results imports lab results and creates lab_result and person records" do
       originator = Test.Fixtures.user_attrs("originator") |> Accounts.create_user!()
 
-      %{
-        file_name: "test.csv",
-        contents: """
-        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39
-        Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/03/2020    , positive
-        Billy              , Testuser          , 03/01/1990    , 06/06/2020       , 06/07/2020    , negative
-        """
-      }
-      |> Cases.import_lab_results(originator)
-      |> assert_eq(
-        {:ok,
-         %ImportInfo{
-           imported_lab_result_count: 2,
-           imported_person_count: 2,
-           total_lab_result_count: 2,
-           total_person_count: 2
-         }}
-      )
+      {:ok,
+       %ImportInfo{
+         imported_people: people,
+         imported_lab_result_count: 2,
+         imported_person_count: 2,
+         total_lab_result_count: 2,
+         total_person_count: 2
+       }} =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39 , person_tid
+          Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/03/2020    , positive  , alice
+          Billy              , Testuser          , 03/01/1990    , 06/06/2020       , 06/07/2020    , negative  , billy
+          """
+        }
+        |> Cases.import_lab_results(originator)
+
+      assert people |> tids() == ["alice", "billy"]
 
       Cases.list_people() |> Enum.map(& &1.first_name) |> assert_eq(["Alice", "Billy"], ignore_order: true)
       Cases.list_lab_results() |> Enum.map(& &1.result) |> assert_eq(["positive", "negative"], ignore_order: true)

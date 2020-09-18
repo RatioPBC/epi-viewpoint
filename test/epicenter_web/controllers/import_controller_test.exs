@@ -2,6 +2,7 @@ defmodule EpicenterWeb.ImportControllerTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Accounts
+  alias Epicenter.Cases
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Tempfile
   alias Epicenter.Test
@@ -9,11 +10,13 @@ defmodule EpicenterWeb.ImportControllerTest do
 
   describe "create" do
     test "accepts file upload", %{conn: conn} do
+      Cases.subscribe_to_people()
+
       temp_file_path =
         """
-        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39  , glorp
-        Alice              , Testuser          , 01/01/1970    , 06/02/2020       , 06/01/2020    , 06/03/2020 , positive , 393
-        Billy              , Testuser          , 03/01/1990    , 06/05/2020       , 06/06/2020    , 06/07/2020 , negative , sn3
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , datereportedtolhd_44 , result_39 , glorp , person_tid
+        Alice              , Testuser          , 01/01/1970    , 06/02/2020       , 06/01/2020    , 06/03/2020           , positive  , 393   , alice
+        Billy              , Testuser          , 03/01/1990    , 06/05/2020       , 06/06/2020    , 06/07/2020           , negative  , sn3   , billy
         """
         |> Tempfile.write!("csv")
 
@@ -23,14 +26,16 @@ defmodule EpicenterWeb.ImportControllerTest do
 
       conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 
+      assert_receive({:people, [%Cases.Person{tid: "alice"}, %Cases.Person{tid: "billy"}]})
+
       assert conn |> redirected_to() == "/import/complete"
 
-      assert conn |> Session.get_last_csv_import_info() == %Epicenter.Cases.Import.ImportInfo{
+      assert %Epicenter.Cases.Import.ImportInfo{
                imported_lab_result_count: 2,
                imported_person_count: 2,
                total_lab_result_count: 2,
                total_person_count: 2
-             }
+             } = Session.get_last_csv_import_info(conn)
     end
   end
 
