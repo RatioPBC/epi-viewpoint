@@ -28,6 +28,6 @@
         = label f, :dob do
           | Date of birth
           = error_tag f, :dob
-        = text_input f, :dob
+        = text_input f, :dob, data_role: "dob-input"
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

@@ -15,6 +15,16 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     assert_has_role(disconnected_html, "person-edit-page")
     assert_has_role(page_live, "person-edit-page")
+    assert_role_attribute_value(page_live, "dob-input", "01/01/2000")
+  end
+
+  test "validating  changes", %{conn: conn} do
+    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+    %Cases.Person{id: id} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+
+    {:ok, page_live, _} = live(conn, "/people/#{id}/edit")
+
+    assert render_change(page_live, "validate", %{"person" => %{"dob" => "01/01/197"}}) =~ "please enter dates as mm/dd/yyyy"
   end
 
   test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn} do
@@ -25,7 +35,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     {:ok, redirected_view, _} =
       page_live
-      |> form("#person-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "2020-01-01"})
+      |> form("#person-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020"})
       |> render_submit()
       |> follow_redirect(conn)
 

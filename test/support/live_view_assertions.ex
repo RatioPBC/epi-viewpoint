@@ -3,6 +3,7 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
   import Phoenix.LiveViewTest
 
   alias Epicenter.Test
+  alias Euclid.Extra
 
   def assert_attribute(view, data_role, attribute, expected) do
     selector = "[data-role=#{data_role}]"
@@ -71,6 +72,22 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
     else
       """
       Expected to find element with data-role “#{data_role}” and text “#{expected_value}”, but found:
+
+        #{rendered}
+      """
+      |> flunk()
+    end
+  end
+
+  def assert_role_attribute_value(%Phoenix.LiveViewTest.View{} = view, data_role, expected_value) do
+    selector = "[data-role=#{data_role}]"
+    rendered = view |> element(selector) |> render() |> Test.Html.parse() |> Test.Html.attr("*", "value") |> Extra.List.only!()
+
+    if rendered == expected_value do
+      true
+    else
+      """
+      Expected to find input with data-role “#{data_role}” and value “#{expected_value}”, but found:
 
         #{rendered}
       """
