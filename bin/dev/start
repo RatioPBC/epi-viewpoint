@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+source "bin/_support/cecho.sh"
+source "bin/_support/step.sh"
+
 start() {
   iex -S mix phx.server
 }
@@ -9,6 +12,7 @@ fast | no-doctor)
   start
   ;;
 *)
+  step_header "Running doctor" "./bin/dev/doctor" "(you can skip by running “${0} fast“)"
   source ./bin/dev/doctor
   start
   ;;

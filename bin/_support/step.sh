@@ -3,7 +3,7 @@
 source "bin/_support/cecho.sh"
 
 step_header() {
-  cecho --green "\n▸" --cyan "${1}:" --yellow "${2}" --orange "${3:-}"
+  cecho --green "\n▸" --cyan "${1}:" --yellow "${2}" --magenta "${3:-}"
 }
 
 step() {
