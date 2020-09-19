@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.ProfileLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import Euclid.Extra.Enum, only: [tids: 1]
   import Phoenix.LiveViewTest
 
   alias Epicenter.Accounts
@@ -121,6 +122,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
     setup %{person: person} do
+      Test.Fixtures.address_attrs(person, "address1", 1000) |> Cases.create_address!()
       assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
       [person: person, assignee: assignee]
     end
@@ -190,6 +192,17 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{billy | tid: "updated-billy"}]}, socket)
       assert updated_socket.assigns.person.tid == "alice"
+    end
+
+    test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice} do
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
+      {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
+      assert_role_text(show_page_live, "address", "1000 Test St, City, TS 00000 home")
+
+      Test.Fixtures.address_attrs(alice, "address2", 2000) |> Cases.create_address!()
+      {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}]}, socket)
+      assert updated_socket.assigns.person.tid == "updated-alice"
+      assert updated_socket.assigns.addresses |> tids() == ["address1", "address2"]
     end
   end
 end

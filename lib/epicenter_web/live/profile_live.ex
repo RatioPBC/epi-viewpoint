@@ -29,8 +29,15 @@ defmodule EpicenterWeb.ProfileLive do
     person = socket.assigns.person
 
     case updated_people |> Enum.find(&(&1.id == person.id)) do
-      nil -> socket
-      updated_person -> socket |> assign(person: updated_person |> Cases.preload_lab_results())
+      nil ->
+        socket
+
+      updated_person ->
+        socket
+        |> assign(
+          person: updated_person |> Cases.preload_lab_results(),
+          addresses: updated_person |> Cases.preload_addresses() |> Map.get(:addresses)
+        )
     end
     |> noreply()
   end
