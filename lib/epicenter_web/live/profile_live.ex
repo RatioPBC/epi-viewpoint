@@ -13,31 +13,18 @@ defmodule EpicenterWeb.ProfileLive do
     if connected?(socket),
       do: Cases.subscribe_to_people()
 
-    person = Cases.get_person(id) |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
-
-    socket =
-      socket
-      |> assign(addresses: person.addresses)
-      |> assign(assigned_to: person.assigned_to)
-      |> assign(person: person)
-      |> assign(users: Accounts.list_users())
-
-    {:ok, socket}
+    {:ok,
+     socket
+     |> assign_person(Cases.get_person(id))
+     |> assign(users: Accounts.list_users())}
   end
 
   def handle_info({:people, updated_people}, socket) do
-    person = socket.assigns.person
-
-    case updated_people |> Enum.find(&(&1.id == person.id)) do
-      nil ->
-        socket
-
-      updated_person ->
-        socket
-        |> assign(
-          person: updated_person |> Cases.preload_lab_results(),
-          addresses: updated_person |> Cases.preload_addresses() |> Map.get(:addresses)
-        )
+    updated_people
+    |> Enum.find(&(&1.id == socket.assigns.person.id))
+    |> case do
+      nil -> socket
+      updated_person -> assign_person(socket, updated_person)
     end
     |> noreply()
   end
@@ -55,11 +42,15 @@ defmodule EpicenterWeb.ProfileLive do
 
     Cases.broadcast_people([updated_person])
 
-    updated_person = updated_person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
-    {:noreply, assign(socket, person: updated_person)}
+    {:noreply, assign_person(socket, updated_person)}
   end
 
   # # #
+
+  defp assign_person(socket, person) do
+    updated_person = person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
+    assign(socket, addresses: updated_person.addresses, person: updated_person)
+  end
 
   defp noreply(socket),
     do: {:noreply, socket}
