@@ -45,12 +45,12 @@ defmodule EpicenterWeb.ProfileLive do
     {:noreply, assign_person(socket, updated_person)}
   end
 
-  # # #
-
-  defp assign_person(socket, person) do
+  def assign_person(socket, person) do
     updated_person = person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
-    assign(socket, addresses: updated_person.addresses, person: updated_person)
+    assign(socket, person: updated_person)
   end
+
+  # # #
 
   defp noreply(socket),
     do: {:noreply, socket}

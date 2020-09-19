@@ -12,7 +12,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   setup do
     user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-    [person: person]
+    [person: person, user: user]
   end
 
   test "disconnected and connected render", %{conn: conn, person: person} do
@@ -123,8 +123,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     setup %{person: person} do
       Test.Fixtures.address_attrs(person, "address1", 1000) |> Cases.create_address!()
+      Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
       assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
       [person: person, assignee: assignee]
+    end
+
+    test "assign_person", %{assignee: assignee, person: alice, user: user} do
+      {:ok, [alice]} = Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id], originator: user)
+      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}} |> ProfileLive.assign_person(alice)
+      assert updated_socket.assigns.person.addresses |> tids() == ["address1"]
+      assert updated_socket.assigns.person.assigned_to.tid == "assignee"
+      assert updated_socket.assigns.person.lab_results |> tids() == ["lab1"]
+      assert updated_socket.assigns.person.tid == "alice"
     end
 
     test "people can be assigned to users on index and show page, with cross-client updating", %{conn: conn, person: alice, assignee: assignee} do
@@ -202,7 +212,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Test.Fixtures.address_attrs(alice, "address2", 2000) |> Cases.create_address!()
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}]}, socket)
       assert updated_socket.assigns.person.tid == "updated-alice"
-      assert updated_socket.assigns.addresses |> tids() == ["address1", "address2"]
+      assert updated_socket.assigns.person.addresses |> tids() == ["address1", "address2"]
     end
   end
 end
