@@ -3,8 +3,10 @@
   section
     header#subnav
       = live_redirect "People", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
+      = arrow_right_icon(6, 9)
       = live_redirect "#{@person.first_name} #{@person.last_name}", to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "name"]
-      span Edit
+      = arrow_right_icon(6, 9)
+      span Update profile
 
   section
     h3 Identifying Information
@@ -34,6 +36,8 @@
         = label f, :preferred_language do
           | Preferred language
           = error_tag f, :preferred_language
-        = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
+        #preferred-language
+          = arrow_down_icon()
+          = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
