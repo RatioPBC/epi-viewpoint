@@ -14,8 +14,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     {:ok, page_live, disconnected_html} = live(conn, "/people/#{id}/edit")
 
-    assert_has_role(disconnected_html, "person-edit-page")
-    assert_has_role(page_live, "person-edit-page")
+    assert_has_role(disconnected_html, "profile-edit-page")
+    assert_has_role(page_live, "profile-edit-page")
     assert_role_attribute_value(page_live, "dob", "01/01/2000")
   end
 
@@ -36,7 +36,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     {:ok, redirected_view, _} =
       page_live
-      |> form("#person-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020", preferred_language: "French"})
+      |> form("#profile-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020", preferred_language: "French"})
       |> render_submit()
       |> follow_redirect(conn)
 

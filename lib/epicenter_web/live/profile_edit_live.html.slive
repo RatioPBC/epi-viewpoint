@@ -1,4 +1,4 @@
-#person-edit-page data-role="person-edit-page"
+#profile-edit-page data-role="profile-edit-page"
 
   section
     header#subnav
@@ -11,7 +11,7 @@
   section
     h3 Identifying Information
 
-    = form_for @changeset, "#", [id: "person-form", phx_change: "validate", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "profile-form", phx_change: "validate", phx_submit: "save"], fn f ->
 
       fieldset
         = label f, :first_name do
