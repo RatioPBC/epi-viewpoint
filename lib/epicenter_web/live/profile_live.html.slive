@@ -1,4 +1,4 @@
-#person-page data-role="person-page"
+#profile-page data-role="profile-page"
 
   section
     header#subnav

@@ -18,8 +18,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
   test "disconnected and connected render", %{conn: conn, person: person} do
     {:ok, page_live, disconnected_html} = live(conn, "/people/#{person.id}")
 
-    assert_has_role(disconnected_html, "person-page")
-    assert_has_role(page_live, "person-page")
+    assert_has_role(disconnected_html, "profile-page")
+    assert_has_role(page_live, "profile-page")
   end
 
   describe "when the person has no identifying information" do
