@@ -205,7 +205,7 @@
       #subnav-container
         #subnav
           a Item 1
-          = carat_right_icon(6, 9)
+          = arrow_right_icon(6, 9)
           a Item 2
       code @include subnav
 
@@ -233,6 +233,24 @@
 
   .styleguide-section
     .styleguide-title Form
+
+    .styleguide-example
+      #select
+        #select-enabled
+          = arrow_down_icon()
+          select
+            option Option 1
+            option Option 2
+            option Option 3
+
+        #select-disabled data-disabled=true
+          = arrow_down_icon()
+          select disabled=true
+            option Disabled 1
+            option Disabled 2
+            option Disabled 3
+
+      code @include select
 
     .styleguide-example
       #form

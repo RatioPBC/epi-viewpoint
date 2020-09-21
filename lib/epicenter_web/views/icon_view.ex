@@ -1,7 +1,18 @@
 defmodule EpicenterWeb.IconView do
   use EpicenterWeb, :view
 
-  def carat_right_icon(width, height) do
+  def arrow_down_icon(), do: arrow_down_icon(20, 20)
+
+  def arrow_down_icon(width, height) do
+    """
+    <svg width="#{width}" height="#{height}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7.41 8.59003L12 13.17L16.59 8.59003L18 10L12 16L6 10L7.41 8.59003Z" fill="black" fill-opacity="0.87"/>
+    </svg>
+    """
+    |> raw()
+  end
+
+  def arrow_right_icon(width, height) do
     """
     <svg width="#{width}" height="#{height}" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M2.00009 0L0.590088 1.41L5.17009 6L0.590088 10.59L2.00009 12L8.00009 6L2.00009 0Z" fill="#B0B0B0"/>

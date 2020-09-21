@@ -3,7 +3,7 @@
   section
     header#subnav
       = live_redirect "Records", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
-      = carat_right_icon(6, 9)
+      = arrow_right_icon(6, 9)
       span data-role="name" = "#{@person.first_name} #{@person.last_name}"
 
   section#heading

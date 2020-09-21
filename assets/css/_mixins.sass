@@ -154,6 +154,20 @@
   @include -heading
   font-size: 2rem
 
+@mixin has-tooltip-when-disabled($tooltip)
+  #{$tooltip}
+    color: $secondary-text-color
+    font-size: $small-body-text-size
+    opacity: 0
+    visibility: hidden
+
+  &[data-disabled]
+    &:hover
+      #{$tooltip}
+        animation: 0.3s show
+        opacity: 1
+        visibility: visible
+
 @mixin horizontal-flow($justify: left)
   align-items: flex-start
   display: flex
@@ -179,11 +193,48 @@
   display: grid
   grid-template-rows: auto 1fr auto
 
-@mixin subnav
-  @include level
+@mixin select
+  align-items: center
+  border-color: $button-color
+  border-radius: 2px
+  border-style: solid
+  border-width: 1px
+  display: flex
+  flex-direction: row-reverse
+  margin: 0
+  padding: 0
 
-  *
-    font-size: $small-body-text-size
+  select
+    &::-ms-expand
+      display: none
+    -moz-appearance: none
+    -webkit-appearance: none
+
+    background-color: transparent
+    border: none
+    color: $button-color
+    cursor: pointer
+    font-size: $body-text-size
+    outline: none
+    padding: 0.5rem 2rem 0.5rem 1rem
+
+  select:focus
+    outline: 0
+
+  svg
+    @include svg-color($button-color)
+    display: inline-block
+    margin-left: -2rem
+    padding-right: 0.5rem
+
+  &[data-disabled]
+    border-color: $disabled-button-color
+
+    select
+      color: $disabled-text-color
+
+    svg
+      @include svg-color($disabled-button-color)
 
 // https://1linelayouts.glitch.me
 @mixin sidebar-layout
@@ -196,19 +247,16 @@
   margin: 1rem
   padding: 1rem
 
-@mixin has-tooltip-when-disabled($tooltip)
-  #{$tooltip}
-    color: $secondary-text-color
-    font-size: $small-body-text-size
-    opacity: 0
-    visibility: hidden
+@mixin subnav
+  @include level
 
-  &[data-disabled]
-    &:hover
-      #{$tooltip}
-        animation: 0.3s show
-        opacity: 1
-        visibility: visible
+  *
+    font-size: $small-body-text-size
+
+@mixin svg-color($color)
+  path
+    fill: $color
+    stroke: $color
 
 @mixin vertical-flow
   & > table
