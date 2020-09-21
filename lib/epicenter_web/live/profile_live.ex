@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.IconView, only: [arrow_right_icon: 2]
+  import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
 
   alias Epicenter.Accounts
   alias Epicenter.Cases

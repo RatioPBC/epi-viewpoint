@@ -250,6 +250,13 @@
             option Disabled 2
             option Disabled 3
 
+        #select-unset data-unset=true
+          = arrow_down_icon()
+          select
+            option Unset option
+            option Option 2
+            option Option 3
+
       code @include select
 
     .styleguide-example

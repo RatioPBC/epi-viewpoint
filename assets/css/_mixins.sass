@@ -235,6 +235,10 @@
     svg
       @include svg-color($disabled-button-color)
 
+  &[data-unset]
+    select
+      color: $disabled-text-color
+
 // https://1linelayouts.glitch.me
 @mixin sidebar-layout
   display: grid
