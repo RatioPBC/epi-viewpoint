@@ -34,6 +34,42 @@ defmodule EpicenterWeb.ProfileEditLive do
     |> noreply()
   end
 
+  def preferred_languages(current \\ nil) do
+    has_current = Euclid.Exists.present?(current)
+
+    first = [
+      {"English", "English"},
+      {"Spanish", "Spanish"}
+    ]
+
+    middle =
+      [
+        {"Arabic", "Arabic"},
+        {"Bengali", "Bengali"},
+        {"Chinese (Cantonese)", "Chinese (Cantonese)"},
+        {"Chinese (Mandarin)", "Chinese (Mandarin)"},
+        {"French", "French"},
+        {"Haitian Creole", "Haitian Creole"},
+        {"Hebrew", "Hebrew"},
+        {"Hindi", "Hindi"},
+        {"Italian", "Italian"},
+        {"Korean", "Korean"},
+        {"Polish", "Polish"},
+        {"Russian", "Russian"},
+        {"Swahili", "Swahili"},
+        {"Yiddish", "Yiddish"}
+      ]
+      |> case do
+        languages when has_current -> [{current, current} | languages]
+        languages -> languages
+      end
+      |> Enum.sort_by(&elem(&1, 0))
+
+    last = [{"Other", "Other"}]
+
+    (first ++ middle ++ last) |> Enum.uniq()
+  end
+
   # replace human readable dates with Date objects
   defp clean_up_dates(person_params) do
     case DateParser.parse_mm_dd_yyyy(person_params["dob"]) do
@@ -58,6 +94,7 @@ defmodule EpicenterWeb.ProfileEditLive do
           {_key, _error} = tuple -> tuple
         end)
       )
+
     changeset
   end
 

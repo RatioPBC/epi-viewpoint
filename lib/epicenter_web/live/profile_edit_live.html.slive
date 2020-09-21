@@ -28,6 +28,12 @@
         = label f, :dob do
           | Date of birth
           = error_tag f, :dob
-        = text_input f, :dob, data_role: "dob-input"
+        = text_input f, :dob, data_role: "dob"
+
+      fieldset
+        = label f, :preferred_language do
+          | Preferred language
+          = error_tag f, :preferred_language
+        = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
