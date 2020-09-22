@@ -1,20 +1,33 @@
 @import "../mixins"
 
 #profile-edit-page
+  @include vertical-flow
+
   #subnav
     @include subnav
 
-  #profile-form
-    @include form
+  #profile-edit
+    header
+      @include h4
 
-    #submit-form
-      @include button-primary
+    #profile-form
+      @include form
 
-  #language-fields
-    @include level
+      #identifying-information
+        border-bottom: 2px solid $divider-color
+        padding-bottom: 2rem
 
-    #preferred-language
-      @include select
+        #language-fields
+          @include level
 
-    #other-preferred-language[data-disabled]
-      display: none
+          #preferred-language
+            @include select
+
+          #other-preferred-language[data-disabled]
+            display: none
+
+        #name-fields
+          @include level
+
+      #submit-form
+        @include button-primary

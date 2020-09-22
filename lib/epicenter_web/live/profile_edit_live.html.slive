@@ -8,43 +8,46 @@
       = arrow_right_icon(6, 9)
       span Update profile
 
-  section
-    h3 Identifying Information
+  section#profile-edit
+    header
+      span Identifying Information
 
     = form_for @changeset, "#", [id: "profile-form", phx_change: "form-change", phx_submit: "save"], fn f ->
 
-      fieldset
-        = label f, :first_name do
-          | First name
-          = error_tag f, :first_name
-        = text_input f, :first_name
+      #identifying-information
+        #name-fields
+          fieldset
+            = label f, :first_name do
+              | First name
+              = error_tag f, :first_name
+            = text_input f, :first_name
 
-      fieldset
-        = label f, :last_name do
-          | Last name
-          = error_tag f, :last_name
-        = text_input f, :last_name
+          fieldset
+            = label f, :last_name do
+              | Last name
+              = error_tag f, :last_name
+            = text_input f, :last_name
 
-      fieldset
-        = label f, :dob do
-          | Date of birth
-          = error_tag f, :dob
-        = text_input f, :dob, data_role: "dob"
-
-      #language-fields
         fieldset
-          = label f, :preferred_language do
-            | Preferred language
-            = error_tag f, :preferred_language
-          #preferred-language
-            = arrow_down_icon()
-            = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
+          = label f, :dob do
+            | Date of birth
+            = error_tag f, :dob
+          = text_input f, :dob, data_role: "dob"
+
+        #language-fields
+          fieldset
+            = label f, :preferred_language do
+              | Preferred language
+              = error_tag f, :preferred_language
+            #preferred-language
+              = arrow_down_icon()
+              = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
 
 
-        fieldset#other-preferred-language data-disabled=!@preferred_language_is_other data-role="other-preferred-language"
-          = label f, :other_specified_language do
-            | Please specify
-            = error_tag f, :other_specified_language
-          = text_input f, :other_specified_language
+          fieldset#other-preferred-language data-disabled=!@preferred_language_is_other data-role="other-preferred-language"
+            = label f, :other_specified_language do
+              | Please specify
+              = error_tag f, :other_specified_language
+            = text_input f, :other_specified_language
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
