@@ -31,13 +31,19 @@
           = error_tag f, :dob
         = text_input f, :dob, data_role: "dob"
 
-      fieldset
-        = label f, :preferred_language do
-          | Preferred language
-          = error_tag f, :preferred_language
-        #preferred-language
-          = arrow_down_icon()
-          = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
-          = text_input f, :other_specified_language, data: [disabled: !@preferred_language_is_other, role: "other-preferred-language"]
+      #language-fields
+        fieldset
+          = label f, :preferred_language do
+            | Preferred language
+            = error_tag f, :preferred_language
+          #preferred-language
+            = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
+            = arrow_down_icon()
+
+        fieldset#other-preferred-language data-disabled=!@preferred_language_is_other
+          = label f, :other_specified_language do
+            | Please specify
+            = error_tag f, :other_specified_language
+          = text_input f, :other_specified_language, data: [role: "other-preferred-language"]
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

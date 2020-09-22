@@ -10,8 +10,11 @@
     #submit-form
       @include button-primary
 
-  #preferred-language
-    @include select
+  #language-fields
+    @include level
 
-    input[data-disabled=true]
+    #preferred-language
+      @include select
+
+    #other-preferred-language[data-disabled]
       display: none
