@@ -237,25 +237,25 @@
     .styleguide-example
       #select
         #select-enabled
+          = arrow_down_icon()
           select
             option Option 1
             option Option 2
             option Option 3
-          = arrow_down_icon()
 
         #select-disabled data-disabled=true
+          = arrow_down_icon()
           select disabled=true
             option Disabled 1
             option Disabled 2
             option Disabled 3
-          = arrow_down_icon()
 
         #select-unset data-unset=true
+          = arrow_down_icon()
           select
             option Unset option
             option Option 2
             option Option 3
-          = arrow_down_icon()
 
       code @include select
 

@@ -45,10 +45,10 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "editing preferred language with other option", %{conn: conn, person: person} do
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
+      {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")
 
-      {:ok, redirected_view, _} =
-        page_live
+      {:ok, redirected_live, _} =
+        profile_edit_live
         |> form("#profile-form",
           person: %{
             first_name: "Aaron",
@@ -61,13 +61,16 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         |> render_submit()
         |> follow_redirect(conn)
 
-      assert_role_text(redirected_view, "full-name", "Aaron Testuser2")
-      assert_role_text(redirected_view, "date-of-birth", "01/01/2020")
-      assert_role_text(redirected_view, "preferred-language", "Welsh")
+      assert_role_text(redirected_live, "full-name", "Aaron Testuser2")
+      assert_role_text(redirected_live, "date-of-birth", "01/01/2020")
+      assert_role_text(redirected_live, "preferred-language", "Welsh")
       assert_versioned(person, expected_count: 2)
-    end
 
-    #    test "renders input box when editing preferred language with other language selected"
+      # the custom option appears in the dropdown if you edit it again after saving
+      {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")
+      assert_selected_dropdown_option(view: profile_edit_live, data_role: "preferred-language", expected: ["Welsh"])
+      assert_attribute(profile_edit_live, "other-preferred-language", "data-disabled", ["data-disabled"])
+    end
   end
 
   describe "preferred_languages" do
