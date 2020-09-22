@@ -11,4 +11,3 @@ step "Authing for geometer deps" "MIX_QUIET=true mix hex.organization auth geome
 step "Updating deps" "MIX_QUIET=true mix deps.get"
 step "Running migrations" "MIX_QUIET=true mix ecto.migrate"
 step "Running doctor" "bin/dev/doctor"
-step "Running migrations" "mix ecto.migrate"
