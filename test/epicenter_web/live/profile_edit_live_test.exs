@@ -8,42 +8,66 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
   alias Epicenter.Test
   alias EpicenterWeb.ProfileEditLive
 
-  test "disconnected and connected render", %{conn: conn} do
-    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-    %Cases.Person{id: id} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+  describe "render" do
+    setup do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      [person: person, user: user]
+    end
 
-    {:ok, page_live, disconnected_html} = live(conn, "/people/#{id}/edit")
+    test "disconnected and connected render", %{conn: conn, person: %Cases.Person{id: id}} do
+      {:ok, page_live, disconnected_html} = live(conn, "/people/#{id}/edit")
 
-    assert_has_role(disconnected_html, "profile-edit-page")
-    assert_has_role(page_live, "profile-edit-page")
-    assert_role_attribute_value(page_live, "dob", "01/01/2000")
-  end
+      assert_has_role(disconnected_html, "profile-edit-page")
+      assert_has_role(page_live, "profile-edit-page")
+      assert_role_attribute_value(page_live, "dob", "01/01/2000")
+    end
 
-  test "validating  changes", %{conn: conn} do
-    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-    %Cases.Person{id: id} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    test "validating changes", %{conn: conn, person: %Cases.Person{id: id}} do
+      {:ok, page_live, _} = live(conn, "/people/#{id}/edit")
 
-    {:ok, page_live, _} = live(conn, "/people/#{id}/edit")
+      assert render_change(page_live, "form-change", %{"person" => %{"dob" => "01/01/197"}}) =~ "please enter dates as mm/dd/yyyy"
+    end
 
-    assert render_change(page_live, "validate", %{"person" => %{"dob" => "01/01/197"}}) =~ "please enter dates as mm/dd/yyyy"
-  end
+    test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
 
-  test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn} do
-    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      {:ok, redirected_view, _} =
+        page_live
+        |> form("#profile-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020", preferred_language: "French"})
+        |> render_submit()
+        |> follow_redirect(conn)
 
-    {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
+      assert_role_text(redirected_view, "full-name", "Aaron Testuser2")
+      assert_role_text(redirected_view, "date-of-birth", "01/01/2020")
+      assert_role_text(redirected_view, "preferred-language", "French")
+      assert_versioned(person, expected_count: 2)
+    end
 
-    {:ok, redirected_view, _} =
-      page_live
-      |> form("#profile-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020", preferred_language: "French"})
-      |> render_submit()
-      |> follow_redirect(conn)
+    test "editing preferred language with other option", %{conn: conn, person: person} do
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
 
-    assert_role_text(redirected_view, "full-name", "Aaron Testuser2")
-    assert_role_text(redirected_view, "date-of-birth", "01/01/2020")
-    assert_role_text(redirected_view, "preferred-language", "French")
-    assert_versioned(person, expected_count: 2)
+      {:ok, redirected_view, _} =
+        page_live
+        |> form("#profile-form",
+          person: %{
+            first_name: "Aaron",
+            last_name: "Testuser2",
+            dob: "01/01/2020",
+            preferred_language: "Other",
+            other_specified_language: "Welsh"
+          }
+        )
+        |> render_submit()
+        |> follow_redirect(conn)
+
+      assert_role_text(redirected_view, "full-name", "Aaron Testuser2")
+      assert_role_text(redirected_view, "date-of-birth", "01/01/2020")
+      assert_role_text(redirected_view, "preferred-language", "Welsh")
+      assert_versioned(person, expected_count: 2)
+    end
+
+    #    test "renders input box when editing preferred language with other language selected"
   end
 
   describe "preferred_languages" do
@@ -68,6 +92,20 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       ProfileEditLive.preferred_languages("English")
       |> Enum.count(fn {lang, lang} -> lang == "English" end)
       |> assert_eq(1)
+    end
+  end
+
+  describe "clean_up_language" do
+    test "updates parameters with other specified language if present" do
+      %{"first_name" => "Aaron", "preferred_language" => "Other", "other_specified_language" => "Piglatin"}
+      |> ProfileEditLive.clean_up_languages()
+      |> assert_eq(%{"first_name" => "Aaron", "preferred_language" => "Piglatin", "other_specified_language" => "Piglatin"})
+    end
+
+    test "noop when preferred_language is not `Other`" do
+      %{"first_name" => "Aaron", "preferred_language" => "English"}
+      |> ProfileEditLive.clean_up_languages()
+      |> assert_eq(%{"first_name" => "Aaron", "preferred_language" => "English"})
     end
   end
 end

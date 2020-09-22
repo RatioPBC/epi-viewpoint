@@ -11,14 +11,13 @@
   section
     h3 Identifying Information
 
-    = form_for @changeset, "#", [id: "profile-form", phx_change: "validate", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "profile-form", phx_change: "form-change", phx_submit: "save"], fn f ->
 
       fieldset
         = label f, :first_name do
           | First name
           = error_tag f, :first_name
         = text_input f, :first_name
-
 
       fieldset
         = label f, :last_name do
@@ -39,5 +38,6 @@
         #preferred-language
           = arrow_down_icon()
           = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
+          = text_input f, :other_specified_language, data: [disabled: !@preferred_language_is_other, role: "other-preferred-language"]
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

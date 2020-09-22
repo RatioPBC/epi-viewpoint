@@ -12,11 +12,19 @@ defmodule EpicenterWeb.ProfileEditLive do
     person = %{Cases.get_person(id) | originator: Session.get_current_user()}
     changeset = Cases.change_person(person, %{})
 
-    {:ok, assign(socket, person: person, changeset: human_readable(changeset))}
+    {
+      :ok,
+      assign(
+        socket,
+        changeset: human_readable(changeset),
+        person: person,
+        preferred_language_is_other: false
+      )
+    }
   end
 
   def handle_event("save", %{"person" => person_params}, socket) do
-    person_params = clean_up_dates(person_params)
+    person_params = person_params |> clean_up_dates() |> clean_up_languages()
 
     case Cases.update_person(socket.assigns.person, person_params) do
       {:ok, person} ->
@@ -27,12 +35,13 @@ defmodule EpicenterWeb.ProfileEditLive do
     end
   end
 
-  def handle_event("validate", %{"person" => person_params}, socket) do
+  def handle_event("form-change", %{"person" => person_params}, socket) do
     person_params = clean_up_dates(person_params)
     updated_person_changeset = Cases.change_person(socket.assigns.person, person_params)
 
     socket
     |> assign(changeset: updated_person_changeset |> human_readable() |> Map.put(:action, :validate))
+    |> assign(preferred_language_is_other: person_params |> Map.get("preferred_language") |> Kernel.==("Other"))
     |> noreply()
   end
 
@@ -71,6 +80,13 @@ defmodule EpicenterWeb.ProfileEditLive do
 
     (first ++ middle ++ last) |> Enum.uniq()
   end
+
+  def clean_up_languages(%{"preferred_language" => "Other"} = person_params),
+    do: person_params |> Map.put("preferred_language", person_params |> Map.get("other_specified_language"))
+
+  def clean_up_languages(person_params), do: person_params
+
+  # # #
 
   # replace human readable dates with Date objects
   defp clean_up_dates(person_params) do
