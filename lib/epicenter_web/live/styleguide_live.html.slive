@@ -235,6 +235,18 @@
     .styleguide-title Form
 
     .styleguide-example
+      form phx-change="suggest-address"
+        #autocomplete
+          input name="address" value=@address placeholder="address" phx-debounce="200" phx-hook="AutocompleteInput" autocapitalize="none" type="text" autocomplete="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="true"
+
+          ul phx-hook="AutocompleteList" role="listbox"
+            = for address <- @suggested_addresses do
+              li phx-click="choose-address" phx-value-address=address tabindex="-1" aria-selected="false" role="option" = address
+
+        input type="text" placeholder="not an autocomplete field" style="width: 400px; margin-top: 2rem"
+      code @include autocomplete
+
+    .styleguide-example
       #select
         #select-enabled
           = arrow_down_icon()
