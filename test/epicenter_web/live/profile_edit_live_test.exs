@@ -41,7 +41,6 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_role_text(redirected_view, "full-name", "Aaron Testuser2")
       assert_role_text(redirected_view, "date-of-birth", "01/01/2020")
       assert_role_text(redirected_view, "preferred-language", "French")
-      assert_versioned(person, expected_count: 2)
     end
 
     test "editing preferred language with other option", %{conn: conn, person: person} do
@@ -64,7 +63,6 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_role_text(redirected_live, "full-name", "Aaron Testuser2")
       assert_role_text(redirected_live, "date-of-birth", "01/01/2020")
       assert_role_text(redirected_live, "preferred-language", "Welsh")
-      assert_versioned(person, expected_count: 2)
 
       # the custom option appears in the dropdown if you edit it again after saving
       {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")

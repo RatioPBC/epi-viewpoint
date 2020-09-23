@@ -59,7 +59,7 @@ defmodule Epicenter.Cases do
   def list_people(), do: list_people(:all)
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
-  def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.Versioned.update()
+  def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.update()
   def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
 
   #

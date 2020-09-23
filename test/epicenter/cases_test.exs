@@ -150,10 +150,6 @@ defmodule Epicenter.CasesTest do
       {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-2"})
 
       assert updated_person.first_name == "version-2"
-      assert_versioned(updated_person, expected_count: 2)
-
-      {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-3"})
-      assert_versioned(updated_person, expected_count: 3)
     end
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
