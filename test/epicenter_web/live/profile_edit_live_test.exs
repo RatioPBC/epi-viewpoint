@@ -67,7 +67,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       # the custom option appears in the dropdown if you edit it again after saving
       {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")
       assert_selected_dropdown_option(view: profile_edit_live, data_role: "preferred-language", expected: ["Welsh"])
-      assert_attribute(profile_edit_live, "other-preferred-language", "data-disabled", ["data-disabled"])
+      assert_attribute(profile_edit_live, "[data-role=other-preferred-language]", "data-disabled", ["data-disabled"])
     end
   end
 

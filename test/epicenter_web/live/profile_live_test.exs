@@ -181,8 +181,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
       ])
 
       # choose "assignee" via index page
-      index_page_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      index_page_live |> element("[data-role=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
+      index_page_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      index_page_live |> element("[data-tid=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
       index_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
 
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])

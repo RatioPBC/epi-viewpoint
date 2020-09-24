@@ -12,7 +12,7 @@ defmodule EpicenterWeb.Test.Pages.People do
 
   def assign(%View{} = view, people, user) do
     for person <- people do
-      view |> element("[data-role=#{person.tid}]") |> render_click(%{"person-id" => person.id, "value" => "on"})
+      view |> element("[data-tid=#{person.tid}]") |> render_click(%{"person-id" => person.id, "value" => "on"})
     end
 
     view |> element("#assignment-form") |> render_change(%{"user" => user.id})

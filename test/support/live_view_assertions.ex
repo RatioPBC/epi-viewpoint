@@ -5,15 +5,14 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
   alias Epicenter.Test
   alias Euclid.Extra
 
-  def assert_attribute(view, data_role, attribute, expected) do
-    selector = "[data-role=#{data_role}]"
+  def assert_attribute(view, selector, attribute, expected) do
     rendered = view |> element(selector) |> render()
 
     if rendered |> Test.Html.parse_doc() |> Floki.attribute(attribute) == expected do
       true
     else
       """
-      Expected to find element with data-role “#{data_role}” with attribute “#{attribute}” as “#{expected}”, but found:
+      Expected to find element with selector “#{selector}” with attribute “#{attribute}” as “#{expected}”, but found:
 
         #{rendered}
       """
@@ -21,20 +20,20 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
     end
   end
 
-  def assert_checked(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "checked", ["checked"])
+  def assert_checked(%Phoenix.LiveViewTest.View{} = view, selector) do
+    assert_attribute(view, selector, "checked", ["checked"])
   end
 
-  def assert_unchecked(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "checked", [])
+  def assert_unchecked(%Phoenix.LiveViewTest.View{} = view, selector) do
+    assert_attribute(view, selector, "checked", [])
   end
 
-  def assert_disabled(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "disabled", ["disabled"])
+  def assert_disabled(%Phoenix.LiveViewTest.View{} = view, selector) do
+    assert_attribute(view, selector, "disabled", ["disabled"])
   end
 
-  def assert_enabled(%Phoenix.LiveViewTest.View{} = view, data_role) do
-    assert_attribute(view, data_role, "disabled", [])
+  def assert_enabled(%Phoenix.LiveViewTest.View{} = view, selector) do
+    assert_attribute(view, selector, "disabled", [])
   end
 
   def assert_has_role(%Phoenix.LiveViewTest.View{} = view, data_role) do

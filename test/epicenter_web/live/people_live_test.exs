@@ -47,9 +47,9 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
       assert_select_dropdown_options(view: index_live, data_role: "users", expected: ["", "Unassigned", "assignee", "user"])
 
-      assert_unchecked(index_live, alice.tid)
-      index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      assert_checked(index_live, alice.tid)
+      assert_unchecked(index_live, "[data-tid=#{alice.tid}]")
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      assert_checked(index_live, "[data-tid=alice.tid]")
 
       index_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
 
@@ -61,7 +61,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ["", "Alice Testuser", "", "positive, 1 day ago", "assignee"]
       ])
 
-      assert_unchecked(index_live, alice.tid)
+      assert_unchecked(index_live, "[data-tid=alice.tid]")
     end
 
     test "users can be unassigned from people", %{conn: conn} do
@@ -78,12 +78,12 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ["Alice Testuser", "assignee"]
       ])
 
-      index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      index_live |> element("[data-role=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      index_live |> element("[data-tid=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
 
       index_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
-      assert_unchecked(index_live, alice.tid)
-      assert_unchecked(index_live, billy.tid)
+      assert_unchecked(index_live, "[data-tid=alice.tid]")
+      assert_unchecked(index_live, "[data-tid=billy.tid]")
 
       Cases.get_people([alice.id, billy.id])
       |> Cases.preload_assigned_to()
@@ -177,15 +177,15 @@ defmodule EpicenterWeb.PeopleLiveTest do
     test "it is disabled by default", %{conn: conn} do
       create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
-      assert_disabled(index_live, "users")
+      assert_disabled(index_live, "[data-role=users]")
     end
 
     test "it is enabled after selecting a person", %{conn: conn} do
       [users: _users, people: [alice, _billy]] = create_people_and_lab_results()
       {:ok, index_live, _} = live(conn, "/people")
-      assert_disabled(index_live, "users")
-      index_live |> element("[data-role=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      assert_enabled(index_live, "users")
+      assert_disabled(index_live, "[data-role=users]")
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      assert_enabled(index_live, "[data-role=users]")
     end
   end
 
