@@ -9,11 +9,11 @@ defmodule Epicenter.Cases.Import do
   @required_lab_result_csv_fields ~w{datecollected_36 result_39 resultdate_42}
   @optional_lab_result_csv_fields ~w{datereportedtolhd_44 lab_result_tid orderingfacilityname_37 testname_38}
   @required_person_csv_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
-  @optional_person_csv_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7 sex_11}
+  @optional_person_csv_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7 sex_11 ethnicity_13 occupation_18 race_12}
 
   # Insert fields
   @lab_result_db_fields_to_insert  ~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}
-  @person_db_fields_to_insert ~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth}
+  @person_db_fields_to_insert ~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth sex ethnicity occupation race}
   @address_db_fields_to_insert ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
 
   @fields [
@@ -27,8 +27,11 @@ defmodule Epicenter.Cases.Import do
     "datecollected_36" => "sampled_on",
     "dateofbirth_8" => "dob",
     "datereportedtolhd_44" => "reported_on",
+    "ethnicity_13" => "ethnicity",
     "lab_result_tid" => "tid",
+    "occupation_18" => "occupation",
     "orderingfacilityname_37" => "request_facility_name",
+    "race_12" => "race",
     "result_39" => "result",
     "resultdate_42" => "analyzed_on",
     "search_firstname_2" => "first_name",
