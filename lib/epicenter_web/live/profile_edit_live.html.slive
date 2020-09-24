@@ -57,7 +57,7 @@
               | Email
               = error_tag email_form, :address
             = hidden_input email_form, :person_id
-            = text_input email_form, :address
+            = text_input email_form, :address, data: [tid: email_form.data.tid]
 
         a#add-email[phx-click="add-email"] Add email
 

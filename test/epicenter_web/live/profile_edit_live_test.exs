@@ -43,7 +43,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_role_text(redirected_view, "preferred-language", "French")
     end
 
-    test "editing person locating information", %{conn: conn, person: person} do
+    test "adding email address to a person", %{conn: conn, person: person} do
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
 
       page_live |> render_click("add-email")
@@ -55,6 +55,21 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         |> follow_redirect(conn)
 
       assert_role_text(redirected_view, "email-address", "alice@example.com")
+    end
+
+    test "updating existing email address", %{conn: conn, person: person} do
+      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
+
+      assert_attribute(page_live, "[data-tid=alice-a]", "value", ["alice-a@example.com"])
+
+      {:ok, redirected_view, _} =
+        page_live
+        |> form("#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
+        |> render_submit()
+        |> follow_redirect(conn)
+
+      assert_role_text(redirected_view, "email-address", "alice-b@example.com")
     end
 
     test "editing preferred language with other option", %{conn: conn, person: person} do
