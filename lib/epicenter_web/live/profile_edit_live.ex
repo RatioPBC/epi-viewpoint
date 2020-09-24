@@ -31,6 +31,17 @@ defmodule EpicenterWeb.ProfileEditLive do
     {:noreply, assign(socket, changeset: changeset)}
   end
 
+  def handle_event("remove-email", %{"remove" => email_id}, socket) do
+    emails =
+      socket.assigns.changeset
+      |> Ecto.Changeset.fetch_field(:emails)
+      |> elem(1)
+      |> Enum.reject(fn %Cases.Email{id: id} -> id == email_id end)
+
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
+    {:noreply, assign(socket, changeset: changeset)}
+  end
+
   def handle_event("save", %{"person" => person_params}, socket) do
     person_params = person_params |> clean_up_dates() |> clean_up_languages()
 

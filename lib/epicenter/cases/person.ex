@@ -30,7 +30,7 @@ defmodule Epicenter.Cases.Person do
 
     belongs_to :assigned_to, User
     has_many :addresses, Address
-    has_many :emails, Email
+    has_many :emails, Email, on_replace: :delete
     has_many :lab_results, LabResult
     has_many :phones, Phone
   end

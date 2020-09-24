@@ -16,27 +16,27 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "disconnected and connected render", %{conn: conn, person: %Cases.Person{id: id}} do
-      {:ok, page_live, disconnected_html} = live(conn, "/people/#{id}/edit")
+      {:ok, profile_edit_live, disconnected_html} = live(conn, "/people/#{id}/edit")
 
       assert_has_role(disconnected_html, "profile-edit-page")
-      assert_has_role(page_live, "profile-edit-page")
-      assert_role_attribute_value(page_live, "dob", "01/01/2000")
+      assert_has_role(profile_edit_live, "profile-edit-page")
+      assert_role_attribute_value(profile_edit_live, "dob", "01/01/2000")
     end
 
     test "validating changes", %{conn: conn, person: %Cases.Person{id: id}} do
-      {:ok, page_live, _} = live(conn, "/people/#{id}/edit")
+      {:ok, profile_edit_live, _} = live(conn, "/people/#{id}/edit")
 
-      assert render_change(page_live, "form-change", %{"person" => %{"dob" => "01/01/197"}}) =~ "please enter dates as mm/dd/yyyy"
+      assert render_change(profile_edit_live, "form-change", %{"person" => %{"dob" => "01/01/197"}}) =~ "please enter dates as mm/dd/yyyy"
 
-      assert render_change(page_live, "form-change", %{"person" => %{"dob" => "01/01/1977", "emails" => %{"0" => %{"address" => ""}}}}) =~
+      assert render_change(profile_edit_live, "form-change", %{"person" => %{"dob" => "01/01/1977", "emails" => %{"0" => %{"address" => ""}}}}) =~
                "can&apos;t be blank"
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
+      {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")
 
       {:ok, redirected_view, _} =
-        page_live
+        profile_edit_live
         |> form("#profile-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020", preferred_language: "French"})
         |> render_submit()
         |> follow_redirect(conn)
@@ -47,12 +47,12 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "adding email address to a person", %{conn: conn, person: person} do
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
+      {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")
 
-      page_live |> render_click("add-email")
+      profile_edit_live |> render_click("add-email")
 
       {:ok, redirected_view, _} =
-        page_live
+        profile_edit_live
         |> form("#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
         |> render_submit()
         |> follow_redirect(conn)
@@ -62,17 +62,32 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     test "updating existing email address", %{conn: conn, person: person} do
       Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}/edit")
+      {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")
 
-      assert_attribute(page_live, "[data-tid=alice-a]", "value", ["alice-a@example.com"])
+      assert_attribute(profile_edit_live, "[data-tid=alice-a]", "value", ["alice-a@example.com"])
 
       {:ok, redirected_view, _} =
-        page_live
+        profile_edit_live
         |> form("#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
         |> render_submit()
         |> follow_redirect(conn)
 
       assert_role_text(redirected_view, "email-address", "alice-b@example.com")
+    end
+
+    test "deleting existing email address", %{conn: conn, person: person} do
+      email = Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+      {:ok, profile_edit_live, _html} = live(conn, "/people/#{person.id}/edit")
+
+      refute profile_edit_live |> render_click("remove-email", %{"remove" => email.id}) =~ "alice-a@example.com"
+
+      {:ok, redirected_view, _} =
+        profile_edit_live
+        |> form("#profile-form", person: %{"emails" => %{}})
+        |> render_submit()
+        |> follow_redirect(conn)
+
+      assert_role_text(redirected_view, "email-address", "Unknown")
     end
 
     test "editing preferred language with other option", %{conn: conn, person: person} do

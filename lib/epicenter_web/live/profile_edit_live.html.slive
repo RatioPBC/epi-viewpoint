@@ -58,6 +58,7 @@
               = error_tag email_form, :address
             = hidden_input email_form, :person_id
             = text_input email_form, :address, data: [tid: email_form.data.tid]
+            a#remove-email[phx-click="remove-email" phx-value-remove="#{email_form.data.id}"] Remove email
 
         a#add-email[phx-click="add-email"] Add email
 
