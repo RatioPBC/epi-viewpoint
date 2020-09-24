@@ -27,6 +27,9 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       {:ok, page_live, _} = live(conn, "/people/#{id}/edit")
 
       assert render_change(page_live, "form-change", %{"person" => %{"dob" => "01/01/197"}}) =~ "please enter dates as mm/dd/yyyy"
+
+      assert render_change(page_live, "form-change", %{"person" => %{"dob" => "01/01/1977", "emails" => %{"0" => %{"address" => ""}}}}) =~
+               "can&apos;t be blank"
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
