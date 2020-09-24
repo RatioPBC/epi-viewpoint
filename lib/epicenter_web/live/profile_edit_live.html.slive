@@ -50,4 +50,15 @@
               = error_tag f, :other_specified_language
             = text_input f, :other_specified_language
 
+      #locating-information
+        fieldset
+          = inputs_for f, :emails, fn email_form ->
+            = label email_form, :address do
+              | Email
+              = error_tag email_form, :address
+            = hidden_input email_form, :person_id
+            = text_input email_form, :address
+
+        a#add-email[phx-click="add-email"] Add email
+
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

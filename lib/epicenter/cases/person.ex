@@ -44,6 +44,7 @@ defmodule Epicenter.Cases.Person do
   def changeset(person, attrs) do
     person
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
+    |> cast_assoc(:emails, with: &Email.changeset/2)
     |> validate_required(@required_attrs)
     |> validate_phi(:person)
     |> change_fingerprint()

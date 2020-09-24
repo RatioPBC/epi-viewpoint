@@ -9,8 +9,8 @@ defmodule EpicenterWeb.ProfileEditLive do
   alias EpicenterWeb.Session
 
   def mount(%{"id" => id}, _session, socket) do
-    person = %{Cases.get_person(id) | originator: Session.get_current_user()}
-    changeset = Cases.change_person(person, %{})
+    person = %{Cases.get_person(id) | originator: Session.get_current_user()} |> Cases.preload_emails()
+    changeset = person |> Cases.change_person(%{})
 
     {
       :ok,
@@ -21,6 +21,14 @@ defmodule EpicenterWeb.ProfileEditLive do
         preferred_language_is_other: false
       )
     }
+  end
+
+  def handle_event("add-email", _value, socket) do
+    person = socket.assigns.person
+    existing_emails = socket.assigns.changeset.changes |> Map.get(:emails, socket.assigns.person.emails)
+    emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{person_id: person.id}, %{})])
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
+    {:noreply, assign(socket, changeset: changeset)}
   end
 
   def handle_event("save", %{"person" => person_params}, socket) do

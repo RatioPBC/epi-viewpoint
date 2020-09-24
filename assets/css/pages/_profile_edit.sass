@@ -14,8 +14,7 @@
       @include form
 
       #identifying-information
-        border-bottom: 2px solid $divider-color
-        padding-bottom: 2rem
+        @include vertical-flow
 
         #language-fields
           @include level
@@ -28,6 +27,14 @@
 
         #name-fields
           @include level
+
+      #locating-information
+        @include vertical-flow
+        border-top: 2px solid $divider-color
+        margin-top: 2rem
+
+        #add-email
+          @include button-secondary
 
       #submit-form
         @include button-primary
