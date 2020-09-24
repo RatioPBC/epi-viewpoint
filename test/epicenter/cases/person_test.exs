@@ -81,7 +81,7 @@ defmodule Epicenter.Cases.PersonTest do
   describe "changeset" do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      default_attrs = Test.Fixtures.person_attrs(user, "alice")
+      default_attrs = Test.Fixtures.person_attrs(user, "alice") |> Test.Fixtures.add_demographic_attrs()
       Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
@@ -107,6 +107,16 @@ defmodule Epicenter.Cases.PersonTest do
       assert changeset.originator.tid == "user"
       assert changeset.preferred_language == "English"
       assert changeset.tid == "alice"
+
+      # Demographic information
+      assert changeset.employment == "Part time"
+      assert changeset.ethnicity ==  "Not Hispanic, Latino/a, or Spanish origin"
+      assert changeset.gender_identity ==  "Female"
+      assert changeset.marital_status ==  "Single"
+      assert changeset.notes ==  "lorem ipsum"
+      assert changeset.occupation ==  "architect"
+      assert changeset.race ==  "Filipino"
+      assert changeset.sex_at_birth ==  "Female"
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))

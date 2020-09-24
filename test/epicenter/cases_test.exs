@@ -166,12 +166,20 @@ defmodule Epicenter.CasesTest do
           change: %{
             "assigned_to_id" => nil,
             "dob" => "2000-01-01",
+            "employment" => nil,
+            "ethnicity" => nil,
             "external_id" => "10000",
             "fingerprint" => "2000-01-01 alice testuser",
             "first_name" => "Alice",
+            "gender_identity" => nil,
             "last_name" => "Testuser",
+            "marital_status" => nil,
+            "notes" => nil,
             "originator" => %{"id" => creator.id},
+            "occupation" => nil,
             "preferred_language" => "English",
+            "race" => nil,
+            "sex_at_birth" => nil,
             "tid" => "alice"
           },
           by: "creator"

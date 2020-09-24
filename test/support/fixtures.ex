@@ -22,9 +22,37 @@ defmodule Epicenter.Test.Fixtures do
       last_name: "Testuser",
       originator: originator,
       preferred_language: "English",
-      tid: tid
+      tid: tid,
     }
     |> merge_attrs(attrs)
+  end
+
+  def add_demographic_attrs(person_attrs) do
+    %{
+      employment: "Part time",
+      ethnicity: "Not Hispanic, Latino/a, or Spanish origin",
+      gender_identity: "Female",
+      marital_status: "Single",
+      notes: "lorem ipsum",
+      occupation: "architect",
+      race: "Filipino",
+      sex_at_birth: "Female",
+    }
+    |> merge_attrs(person_attrs)
+  end
+
+  def add_empty_demographic_attrs(person_attrs) do
+    %{
+      "employment" => nil,
+      "ethnicity" => nil,
+      "gender_identity" => nil,
+      "marital_status" => nil,
+      "notes" => nil,
+      "occupation" => nil,
+      "race" => nil,
+      "sex_at_birth" => nil,
+    }
+    |> merge_attrs(person_attrs)
   end
 
   def address_attrs(%Person{id: person_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do

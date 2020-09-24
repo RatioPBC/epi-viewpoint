@@ -8,7 +8,7 @@ defmodule Epicenter.Cases.Import do
   @required_lab_result_fields ~w{datecollected_36 result_39 resultdate_42}
   @optional_lab_result_fields ~w{datereportedtolhd_44 lab_result_tid orderingfacilityname_37 testname_38}
   @required_person_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
-  @optional_person_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7}
+  @optional_person_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7 sex_11}
 
   @fields [
     required: @required_lab_result_fields ++ @required_person_fields,
@@ -26,6 +26,7 @@ defmodule Epicenter.Cases.Import do
     "resultdate_42" => "analyzed_on",
     "search_firstname_2" => "first_name",
     "search_lastname_1" => "last_name",
+    "sex_11" => "sex_at_birth",
     "testname_38" => "test_type"
   }
 
@@ -98,7 +99,7 @@ defmodule Epicenter.Cases.Import do
 
   defp import_person(row, originator) do
     row
-    |> Map.take(~w{person_tid dob first_name last_name external_id preferred_language})
+    |> Map.take(~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth})
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
     |> Map.put("originator", originator)
     |> Cases.upsert_person!()

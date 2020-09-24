@@ -27,9 +27,9 @@ defmodule Epicenter.Cases.ImportTest do
                %{
                  file_name: "test.csv",
                  contents: """
-                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid
-                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice
-                 Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , billy
+                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11
+                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female
+                 Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,
                  """
                }
                |> Import.import_csv(originator)
@@ -60,6 +60,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.last_name == "Testuser"
       assert alice.phones |> pluck(:number) == [1_111_111_000]
       assert alice.tid == "alice"
+      assert alice.sex_at_birth == "female"
       assert_versioned(alice, expected_count: 1)
 
       assert billy.dob == ~D[1990-03-01]

@@ -27,8 +27,8 @@ defmodule Epicenter.RepoTest do
             "last_name" => "Testuser",
             "originator" => %{"id" => user.id},
             "preferred_language" => "English",
-            "tid" => "version-1"
-          },
+            "tid" => "version-1",
+          } |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -49,7 +49,7 @@ defmodule Epicenter.RepoTest do
             "originator" => %{"id" => user.id},
             "preferred_language" => "English",
             "tid" => "version-1"
-          },
+          } |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -74,7 +74,7 @@ defmodule Epicenter.RepoTest do
             "originator" => %{"id" => user.id},
             "preferred_language" => "English",
             "tid" => "version-1"
-          },
+          } |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -99,7 +99,7 @@ defmodule Epicenter.RepoTest do
             "originator" => %{"id" => user.id},
             "preferred_language" => "English",
             "tid" => "version-1"
-          },
+          } |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -121,7 +121,7 @@ defmodule Epicenter.RepoTest do
             "originator" => %{"id" => user.id},
             "preferred_language" => "English",
             "tid" => "version-1"
-          },
+          } |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -141,7 +141,7 @@ defmodule Epicenter.RepoTest do
             "originator" => %{"id" => user.id},
             "preferred_language" => "English",
             "tid" => "version-1"
-          },
+          } |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -168,7 +168,7 @@ defmodule Epicenter.RepoTest do
             "originator" => %{"id" => user.id},
             "preferred_language" => "English",
             "tid" => "version-1"
-          },
+          } |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -190,7 +190,7 @@ defmodule Epicenter.RepoTest do
           "originator" => %{"id" => user.id},
           "preferred_language" => "English",
           "tid" => "version-1"
-        },
+        } |> Test.Fixtures.add_empty_demographic_attrs(),
         by: "user"
       )
 
