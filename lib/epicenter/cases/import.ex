@@ -5,16 +5,23 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.DateParser
   alias Epicenter.Repo
 
-  @required_lab_result_fields ~w{datecollected_36 result_39 resultdate_42}
-  @optional_lab_result_fields ~w{datereportedtolhd_44 lab_result_tid orderingfacilityname_37 testname_38}
-  @required_person_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
-  @optional_person_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7 sex_11}
+  # Read fields
+  @required_lab_result_csv_fields ~w{datecollected_36 result_39 resultdate_42}
+  @optional_lab_result_csv_fields ~w{datereportedtolhd_44 lab_result_tid orderingfacilityname_37 testname_38}
+  @required_person_csv_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
+  @optional_person_csv_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7 sex_11}
+
+  # Insert fields
+  @lab_result_db_fields_to_insert  ~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}
+  @person_db_fields_to_insert ~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth}
+  @address_db_fields_to_insert ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
 
   @fields [
-    required: @required_lab_result_fields ++ @required_person_fields,
-    optional: @optional_lab_result_fields ++ @optional_person_fields
+    required: @required_lab_result_csv_fields ++ @required_person_csv_fields,
+    optional: @optional_lab_result_csv_fields ++ @optional_person_csv_fields
   ]
 
+  # Mapping from csv column name to internal db column names
   @key_map %{
     "caseid_0" => "external_id",
     "datecollected_36" => "sampled_on",
@@ -99,7 +106,7 @@ defmodule Epicenter.Cases.Import do
 
   defp import_person(row, originator) do
     row
-    |> Map.take(~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth})
+    |> Map.take(@person_db_fields_to_insert)
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
     |> Map.put("originator", originator)
     |> Cases.upsert_person!()
@@ -107,7 +114,7 @@ defmodule Epicenter.Cases.Import do
 
   defp import_lab_result(row, person) do
     row
-    |> Map.take(~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid})
+    |> Map.take(@lab_result_db_fields_to_insert)
     |> Map.put("person_id", person.id)
     |> Cases.create_lab_result!()
   end
@@ -119,10 +126,8 @@ defmodule Epicenter.Cases.Import do
   end
 
   defp import_address(row, person) do
-    [street, city, state, zip] =
-      address_components =
-      ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
-      |> Enum.map(&Map.get(row, &1))
+    [street, city, state, zip] = address_components =
+      @address_db_fields_to_insert |> Enum.map(&Map.get(row, &1))
 
     if Euclid.Exists.any?(address_components) do
       Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id})
