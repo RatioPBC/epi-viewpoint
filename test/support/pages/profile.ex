@@ -23,7 +23,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   def assignable_users(%View{} = view) do
-    view |> render() |> Test.Html.parse() |> Test.Html.all("[data-role=users] option", as: :text)
+    view |> Pages.parse() |> Test.Html.all("[data-role=users] option", as: :text)
   end
 
   def assert_assignable_users(%View{} = view, expected_users) do
@@ -32,7 +32,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   def assigned_user(%View{} = view) do
-    view |> render() |> Test.Html.parse() |> Test.Html.text("[data-role=users] option[selected]")
+    view |> Pages.parse() |> Test.Html.text("[data-role=users] option[selected]")
   end
 
   def assert_assigned_user(%View{} = view, expected_user) do

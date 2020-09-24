@@ -21,7 +21,8 @@ defmodule EpicenterWeb.Test.Pages.People do
 
   def assignees(%View{} = view) do
     view
-    |> table_contents(columns: ["Name", "Assignee"], headers: false)
+    |> Pages.parse()
+    |> Test.Table.table_contents(columns: ["Name", "Assignee"], headers: false, role: "people")
     |> Enum.map(fn [name, assignee] -> {name, assignee} end)
     |> Enum.into(%{})
   end
@@ -30,7 +31,4 @@ defmodule EpicenterWeb.Test.Pages.People do
     assert view |> assignees() == expected_assignees
     view
   end
-
-  defp table_contents(live, opts),
-    do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 end
