@@ -16,14 +16,22 @@ defmodule Epicenter.Cases.PersonTest do
         [
           {:assigned_to_id, :binary_id},
           {:dob, :date},
+          {:employment, :string},
+          {:ethnicity, :string},
           {:external_id, :string},
           {:fingerprint, :string},
           {:first_name, :string},
+          {:gender_identity, :string},
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:last_name, :string},
+          {:marital_status, :string},
+          {:notes, :text},
+          {:occupation, :string},
           {:preferred_language, :string},
+          {:race, :string},
           {:seq, :integer},
+          {:sex_at_birth, :string},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]

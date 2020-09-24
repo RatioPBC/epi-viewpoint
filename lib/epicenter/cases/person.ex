@@ -17,13 +17,21 @@ defmodule Epicenter.Cases.Person do
   @foreign_key_type :binary_id
   schema "people" do
     field :dob, :date
+    field :employment, :string
+    field :ethnicity, :string
     field :external_id, :string
     field :fingerprint, :string
     field :first_name, :string
+    field :gender_identity, :string
     field :last_name, :string
+    field :marital_status, :string
+    field :notes, :string
+    field :occupation, :string
     field :originator, :map, virtual: true
     field :preferred_language, :string
+    field :race, :string
     field :seq, :integer
+    field :sex_at_birth, :string
     field :tid, :string
 
     timestamps()
