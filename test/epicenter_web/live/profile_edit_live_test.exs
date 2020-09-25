@@ -26,8 +26,28 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     test "validates changes when the form is saved (not merely changed)", %{conn: conn, person: %Cases.Person{id: id}} do
       {:ok, view, _} = live(conn, "/people/#{id}/edit")
 
-      render_change(view, "form-change", %{"person" => %{"dob" => "01/01/197", "emails" => %{"0" => %{"address" => ""}}}})
+      changes = %{"person" => %{"dob" => "01/01/197", "emails" => %{"0" => %{"address" => ""}}}}
+
+      view |> render_click("add-email")
+
+      render_change(view, "form-change", changes)
+      |> assert_validation_messages(%{})
+
+      view
+      |> form("#profile-form", changes)
+      |> render_submit()
       |> assert_validation_messages(%{"person_dob" => "please enter dates as mm/dd/yyyy", "person_emails_0_address" => "can't be blank"})
+    end
+
+    test "dob field retains invalid date after failed validation, rather than resetting to the value from the database", %{conn: conn, person: person} do
+      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+
+      assert_attribute(view, "input[data-role=dob]", "value", ["01/01/2000"])
+
+      rendered = view |> form("#profile-form", person: %{"dob" => "Jan 4 1928"}) |> render_submit()
+
+      assert_attribute(view, "input[data-role=dob]", "value", ["Jan 4 1928"])
+      assert_validation_messages(rendered, %{"person_dob" => "please enter dates as mm/dd/yyyy"})
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
@@ -62,7 +82,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
       {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
 
-      assert_attribute(view, "[data-tid=alice-a]", "value", ["alice-a@example.com"])
+      assert_attribute(view, "input[data-tid=alice-a]", "value", ["alice-a@example.com"])
 
       {:ok, redirected_view, _} =
         view

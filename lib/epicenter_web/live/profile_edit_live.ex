@@ -16,7 +16,7 @@ defmodule EpicenterWeb.ProfileEditLive do
       :ok,
       assign(
         socket,
-        changeset: human_readable(changeset),
+        changeset: update_dob_field_for_display(changeset),
         person: person,
         preferred_language_is_other: false
       )
@@ -43,25 +43,23 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("save", %{"person" => person_params}, socket) do
-    person_params = person_params |> clean_up_dates() |> clean_up_languages()
+    person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
 
     case Cases.update_person(socket.assigns.person, person_params) do
       {:ok, person} ->
         {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
+        {:noreply, assign(socket, :changeset, update_dob_field_for_display(changeset))}
     end
   end
 
-  def handle_event("form-change", %{"person" => person_params}, socket) do
-    person_params = clean_up_dates(person_params)
-    updated_person_changeset = Cases.change_person(socket.assigns.person, person_params)
+  def handle_event("form-change", %{"person" => %{"preferred_language" => "Other"}}, socket) do
+    socket |> assign(preferred_language_is_other: true) |> noreply()
+  end
 
-    socket
-    |> assign(changeset: updated_person_changeset |> human_readable() |> Map.put(:action, :validate))
-    |> assign(preferred_language_is_other: person_params |> Map.get("preferred_language") |> Kernel.==("Other"))
-    |> noreply()
+  def handle_event("form-change", _params, socket) do
+    socket |> assign(preferred_language_is_other: false) |> noreply()
   end
 
   def preferred_languages(current \\ nil) do
@@ -108,31 +106,36 @@ defmodule EpicenterWeb.ProfileEditLive do
   # # #
 
   # replace human readable dates with Date objects
-  defp clean_up_dates(person_params) do
+  defp update_dob_field_for_changeset(person_params) do
     case DateParser.parse_mm_dd_yyyy(person_params["dob"]) do
       {:ok, date} -> %{person_params | "dob" => date}
       {:error, _} -> person_params
     end
   end
 
-  # Change date formats and give more specific error messages
-  defp human_readable(changeset) do
-    changeset =
-      case Ecto.Changeset.fetch_field(changeset, :dob) do
-        {:error} -> changeset
-        {_, dob_value} -> Ecto.Changeset.put_change(changeset, :dob, Extra.Date.render(dob_value))
-      end
+  defp update_dob_field_for_display(changeset) do
+    if changeset.errors |> Keyword.has_key?(:dob) do
+      rewrite_changeset_error_message(changeset, :dob, "please enter dates as mm/dd/yyyy")
+    else
+      reformat_date(changeset, :dob)
+    end
+  end
 
-    changeset =
-      update_in(
-        changeset.errors,
-        &Enum.map(&1, fn
-          {:dob, {_, opts}} -> {:dob, {"please enter dates as mm/dd/yyyy", opts}}
-          {_key, _error} = tuple -> tuple
-        end)
-      )
+  defp rewrite_changeset_error_message(changeset, field, new_error_message) do
+    update_in(
+      changeset.errors,
+      &Enum.map(&1, fn
+        {^field, {_, opts}} -> {field, {new_error_message, opts}}
+        {_key, _error} = tuple -> tuple
+      end)
+    )
+  end
 
-    changeset
+  defp reformat_date(changeset, field) do
+    case Ecto.Changeset.fetch_field(changeset, field) do
+      {:error} -> changeset
+      {_, date} -> Ecto.Changeset.put_change(changeset, field, Extra.Date.render(date))
+    end
   end
 
   defp noreply(socket),
