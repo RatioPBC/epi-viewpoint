@@ -10,7 +10,7 @@ defmodule Epicenter.Test.TableTest do
       <tr data-role="table-column-names"><th>Col 0</th><th>Col 1</th><th>Col 2</th></tr>
     <thead>
     <tbody>
-      <tr><td>0,0</td><td>1,0</td><td>2,0</td></tr>
+      <tr data-tid="tid-1"><td>0,0</td><td>1,0</td><td>2,0</td></tr>
       <tr><td>0,1</td><td>1,1</td><td>2,1</td></tr>
     </tbody>
   </table>
@@ -38,6 +38,17 @@ defmodule Epicenter.Test.TableTest do
         ["Col 0", "Col 1", "Col 2"],
         ["0,0", "1,0", "2,0"],
         ["0,1", "1,1", "2,1"]
+      ])
+    end
+
+    test "can include tids" do
+      @table
+      |> Test.Html.parse()
+      |> table_contents(css: ".test-table", columns: ["Col 0", "Col 1"], tids: true)
+      |> assert_eq([
+        ["Col 0", "Col 1", :tid],
+        ["0,0", "1,0", "tid-1"],
+        ["0,1", "1,1", ""]
       ])
     end
 

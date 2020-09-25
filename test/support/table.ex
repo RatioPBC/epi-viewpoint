@@ -8,6 +8,7 @@ defmodule Epicenter.Test.Table do
     css = opts |> Keyword.get(:css)
     role = opts |> Keyword.get(:role)
     include_headers = opts |> Keyword.get(:headers, true)
+    include_tids = opts |> Keyword.get(:tids, false)
 
     table =
       parsed_html
@@ -19,6 +20,7 @@ defmodule Epicenter.Test.Table do
       |> Floki.parse_fragment!()
       |> Floki.find("thead tr[data-role=table-column-names] th")
       |> Enum.map(&Test.Html.text(&1))
+      |> tid_header(include_tids)
 
     body =
       table
@@ -29,18 +31,28 @@ defmodule Epicenter.Test.Table do
         |> Floki.find("th, td")
         |> Enum.map(&Test.Html.text(&1))
         |> Enum.map(&Extra.String.squish(&1))
+        |> tid_column(row, include_tids)
       end)
 
     {headers, body}
-    |> restrict_columns(desired_columns)
+    |> restrict_columns(desired_columns, include_tids)
     |> restrict_row(desired_row)
     |> combine(include_headers)
     |> rotate(!!desired_row)
   end
 
-  defp restrict_columns({headers, body}, nil), do: {headers, body}
+  defp tid_header(headers, false), do: headers
+  defp tid_header(headers, true), do: headers ++ [:tid]
 
-  defp restrict_columns({headers, body}, desired_columns) do
+  defp tid_column(row_contents, _row, false), do: row_contents
+  defp tid_column(row_contents, row, true), do: tid_column(row_contents, row, Test.Html.tid(row))
+  defp tid_column(row_contents, _row, []), do: row_contents ++ [""]
+  defp tid_column(row_contents, _row, [tid]), do: row_contents ++ [tid]
+
+  defp restrict_columns({headers, body}, nil, _include_tids), do: {headers, body}
+
+  defp restrict_columns({headers, body}, desired_columns, include_tids) do
+    desired_columns = if include_tids, do: desired_columns ++ [:tid], else: desired_columns
     column_indices = Extra.Enum.find_indices(headers, desired_columns)
     header_subset = headers |> Extra.Enum.fetch_multiple(column_indices)
     body_subset = body |> Enum.map(&Extra.Enum.fetch_multiple(&1, column_indices))

@@ -116,7 +116,16 @@ defmodule Epicenter.Cases.ImportTest do
 
     @tag :skip
     test "maintains pre-existing demographic information when importing another record for the same person", %{originator: originator} do
-      alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01], sex_at_birth: "female", race: "Asian Indian", occupation: "Rocket Scientist", ethnicity: "Cuban"}
+      alice_attrs = %{
+        first_name: "Alice",
+        last_name: "Testuser",
+        dob: ~D[1970-01-01],
+        sex_at_birth: "female",
+        race: "Asian Indian",
+        occupation: "Rocket Scientist",
+        ethnicity: "Cuban"
+      }
+
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
       import_output =
@@ -213,7 +222,7 @@ defmodule Epicenter.Cases.ImportTest do
       [alice, billy_2, billy_1] = Cases.list_people(:all) |> Enum.map(&Cases.preload_lab_results/1)
       assert alice.tid == "alice"
       assert alice.lab_results |> tids() == ~w{alice-result}
-      assert billy_1.lab_results |> tids() == ~w{billy-1-older-result billy-1-newer-result}
+      assert billy_1.lab_results |> tids() == ~w{billy-1-newer-result billy-1-older-result}
       assert billy_2.lab_results |> tids() == ~w{billy-2-result}
     end
 

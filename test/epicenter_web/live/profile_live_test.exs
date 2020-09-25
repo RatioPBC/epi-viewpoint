@@ -78,41 +78,56 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
   end
 
-  defp test_result_table_contents(page_live),
-    do: page_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(role: "lab-result-table")
+  defp test_result_table_contents(page_live, opts \\ []) do
+    page_live
+    |> render()
+    |> Test.Html.parse_doc()
+    |> Test.Table.table_contents(Keyword.merge([role: "lab-result-table"], opts))
+  end
 
-  describe "when the person has test results" do
-    setup %{person: person} do
-      Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-10], %{
+  describe "lab results table" do
+    defp build_lab_result(person, tid, sampled_on, analyzed_on, reported_on) do
+      Test.Fixtures.lab_result_attrs(person, tid, sampled_on, %{
         result: "positive",
         request_facility_name: "Big Big Hospital",
-        analyzed_on: ~D[2020-04-11],
-        reported_on: ~D[2020-04-12],
+        analyzed_on: analyzed_on,
+        reported_on: reported_on,
         test_type: "PCR"
       })
       |> Cases.create_lab_result!()
-
-      Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-12], %{
-        result: "positive",
-        request_facility_name: "Big Big Hospital",
-        analyzed_on: ~D[2020-04-13],
-        reported_on: ~D[2020-04-14],
-        test_type: "PCR"
-      })
-      |> Cases.create_lab_result!()
-
-      :ok
     end
 
-    test "lab result table", %{conn: conn, person: person} do
+    test "shows lab results", %{conn: conn, person: person} do
+      build_lab_result(person, "lab1", ~D[2020-04-10], ~D[2020-04-11], ~D[2020-04-12])
+      build_lab_result(person, "lab2", ~D[2020-04-12], ~D[2020-04-13], ~D[2020-04-14])
+
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
       page_live
       |> test_result_table_contents()
       |> assert_eq([
         ["Collection", "Result", "Ordering Facility", "Analysis", "Reported", "Type"],
-        ["04/10/2020", "positive", "Big Big Hospital", "04/11/2020", "04/12/2020", "PCR"],
-        ["04/12/2020", "positive", "Big Big Hospital", "04/13/2020", "04/14/2020", "PCR"]
+        ["04/12/2020", "positive", "Big Big Hospital", "04/13/2020", "04/14/2020", "PCR"],
+        ["04/10/2020", "positive", "Big Big Hospital", "04/11/2020", "04/12/2020", "PCR"]
+      ])
+    end
+
+    test "orders by sampled_on (desc) and then reported_on (desc)", %{conn: conn, person: person} do
+      build_lab_result(person, "lab4", ~D[2020-04-13], ~D[2020-04-20], ~D[2020-04-26])
+      build_lab_result(person, "lab1", ~D[2020-04-15], ~D[2020-04-20], ~D[2020-04-25])
+      build_lab_result(person, "lab3", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-23])
+      build_lab_result(person, "lab2", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-24])
+
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
+
+      page_live
+      |> test_result_table_contents(columns: ["Collection", "Reported"], tids: true)
+      |> assert_eq([
+        ["Collection", "Reported", :tid],
+        ["04/15/2020", "04/25/2020", "lab1"],
+        ["04/14/2020", "04/24/2020", "lab2"],
+        ["04/14/2020", "04/23/2020", "lab3"],
+        ["04/13/2020", "04/26/2020", "lab4"]
       ])
     end
   end

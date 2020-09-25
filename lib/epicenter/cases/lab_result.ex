@@ -41,5 +41,10 @@ defmodule Epicenter.Cases.LabResult do
     def all() do
       from lab_result in LabResult, order_by: [asc: lab_result.sampled_on, asc: lab_result.seq]
     end
+
+    def display_order() do
+      from lab_result in LabResult,
+        order_by: [desc: lab_result.sampled_on, desc: lab_result.reported_on, asc: lab_result.seq]
+    end
   end
 end

@@ -50,4 +50,23 @@ defmodule Epicenter.Cases.LabResultTest do
       assert changes.test_type == "PCR"
     end
   end
+
+  describe "query" do
+    import Euclid.Extra.Enum, only: [tids: 1]
+
+    test "display_order sorts by sampled_on (desc) first, then by reported_on (desc)" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+
+      [
+        Test.Fixtures.lab_result_attrs(person, "lab4", ~D[2020-04-13], reported_on: ~D[2020-04-26]),
+        Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-15], reported_on: ~D[2020-04-25]),
+        Test.Fixtures.lab_result_attrs(person, "lab3", ~D[2020-04-14], reported_on: ~D[2020-04-23]),
+        Test.Fixtures.lab_result_attrs(person, "lab2", ~D[2020-04-14], reported_on: ~D[2020-04-24])
+      ]
+      |> Enum.each(&Cases.create_lab_result!/1)
+
+      LabResult.Query.display_order() |> Repo.all() |> tids() |> assert_eq(~w{lab1 lab2 lab3 lab4})
+    end
+  end
 end

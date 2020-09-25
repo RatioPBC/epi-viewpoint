@@ -44,6 +44,6 @@ defmodule Epicenter.Test.Html do
   def text(html, css_query) when not is_binary(html),
     do: html |> Floki.find(css_query) |> Floki.text()
 
-  defp tid(html),
+  def tid(html),
     do: html |> Floki.attribute("data-tid")
 end
