@@ -8,6 +8,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.ProfileLive
+  alias EpicenterWeb.Test.Pages
 
   setup do
     user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
@@ -78,13 +79,6 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
   end
 
-  defp test_result_table_contents(page_live, opts \\ []) do
-    page_live
-    |> render()
-    |> Test.Html.parse_doc()
-    |> Test.Table.table_contents(Keyword.merge([role: "lab-result-table"], opts))
-  end
-
   describe "lab results table" do
     defp build_lab_result(person, tid, sampled_on, analyzed_on, reported_on) do
       Test.Fixtures.lab_result_attrs(person, tid, sampled_on, %{
@@ -101,11 +95,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_lab_result(person, "lab1", ~D[2020-04-10], ~D[2020-04-11], ~D[2020-04-12])
       build_lab_result(person, "lab2", ~D[2020-04-12], ~D[2020-04-13], ~D[2020-04-14])
 
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
-
-      page_live
-      |> test_result_table_contents()
-      |> assert_eq([
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_lab_results([
         ["Collection", "Result", "Ordering Facility", "Analysis", "Reported", "Type"],
         ["04/12/2020", "positive", "Big Big Hospital", "04/13/2020", "04/14/2020", "PCR"],
         ["04/10/2020", "positive", "Big Big Hospital", "04/11/2020", "04/12/2020", "PCR"]
@@ -118,17 +109,17 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_lab_result(person, "lab3", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-23])
       build_lab_result(person, "lab2", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-24])
 
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
-
-      page_live
-      |> test_result_table_contents(columns: ["Collection", "Reported"], tids: true)
-      |> assert_eq([
-        ["Collection", "Reported", :tid],
-        ["04/15/2020", "04/25/2020", "lab1"],
-        ["04/14/2020", "04/24/2020", "lab2"],
-        ["04/14/2020", "04/23/2020", "lab3"],
-        ["04/13/2020", "04/26/2020", "lab4"]
-      ])
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_lab_results(
+        [columns: ["Collection", "Reported"], tids: true],
+        [
+          ["Collection", "Reported", :tid],
+          ["04/15/2020", "04/25/2020", "lab1"],
+          ["04/14/2020", "04/24/2020", "lab2"],
+          ["04/14/2020", "04/23/2020", "lab3"],
+          ["04/13/2020", "04/26/2020", "lab4"]
+        ]
+      )
     end
   end
 

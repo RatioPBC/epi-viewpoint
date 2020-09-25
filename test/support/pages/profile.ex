@@ -1,4 +1,5 @@
 defmodule EpicenterWeb.Test.Pages.Profile do
+  import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
@@ -11,6 +12,10 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   def visit(%Plug.Conn{} = conn, %Person{id: person_id}) do
     conn |> Pages.visit("/people/#{person_id}")
   end
+
+  #
+  # assigning
+  #
 
   def assign(%View{} = view, %User{id: user_id}) do
     view |> element("#assignment-form") |> render_change(%{"user" => user_id})
@@ -37,6 +42,20 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def assert_assigned_user(%View{} = view, expected_user) do
     assert assigned_user(view) == expected_user
+    view
+  end
+
+  #
+  # lab results
+  #
+
+  def assert_lab_results(%View{} = view, table_opts \\ [], expected) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Table.table_contents(Keyword.merge([role: "lab-result-table"], table_opts))
+    |> assert_eq(expected, :simple)
+
     view
   end
 end
