@@ -23,14 +23,11 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_role_attribute_value(view, "dob", "01/01/2000")
     end
 
-    test "validates changes when the form is changed", %{conn: conn, person: %Cases.Person{id: id}} do
+    test "validates changes when the form is saved (not merely changed)", %{conn: conn, person: %Cases.Person{id: id}} do
       {:ok, view, _} = live(conn, "/people/#{id}/edit")
 
-      render_change(view, "form-change", %{"person" => %{"dob" => "01/01/197"}})
-      |> assert_validation_messages(%{"person_dob" => "please enter dates as mm/dd/yyyy"})
-
-      render_change(view, "form-change", %{"person" => %{"dob" => "01/01/1977", "emails" => %{"0" => %{"address" => ""}}}})
-      |> assert_validation_messages(%{"person_emails_0_address" => "can't be blank"})
+      render_change(view, "form-change", %{"person" => %{"dob" => "01/01/197", "emails" => %{"0" => %{"address" => ""}}}})
+      |> assert_validation_messages(%{"person_dob" => "please enter dates as mm/dd/yyyy", "person_emails_0_address" => "can't be blank"})
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
