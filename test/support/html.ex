@@ -1,12 +1,15 @@
 defmodule Epicenter.Test.Html do
   def all(html, css_query, as: :text) when is_list(html),
-    do: html |> Floki.find(css_query) |> Enum.map(&Floki.text/1)
+    do: html |> all(css_query, &Floki.text/1)
 
   def all(html, css_query, as: :tids) when is_list(html),
-    do: html |> Floki.find(css_query) |> Enum.map(&tid/1) |> List.flatten()
+    do: html |> all(css_query, &tid/1) |> List.flatten()
 
   def all(html, css_query, attr: attr) when is_list(html),
-    do: html |> Floki.find(css_query) |> Enum.map(&Floki.attribute(&1, attr)) |> List.flatten()
+    do: html |> all(css_query, &Floki.attribute(&1, attr)) |> List.flatten()
+
+  def all(html, css_query, fun) when is_list(html) and is_function(fun),
+    do: html |> Floki.find(css_query) |> Enum.map(fun)
 
   def attr(html, css_query, attr_name) when is_list(html),
     do: html |> Floki.attribute(css_query, attr_name)
