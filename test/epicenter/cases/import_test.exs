@@ -114,6 +114,52 @@ defmodule Epicenter.Cases.ImportTest do
       assert Cases.count_addresses() == 1
     end
 
+    @tag :skip
+    test "maintains pre-existing demographic information when importing another record for the same person", %{originator: originator} do
+      alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01], sex_at_birth: "female", race: "Asian Indian", occupation: "Rocket Scientist", ethnicity: "Cuban"}
+      {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
+      import_output =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , sex_11, race_12, occupation_18, ethnicity_13
+          Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , male  , White  , Brain Surgeon, Puerto Rican
+          """
+        }
+        |> Import.import_csv(originator)
+
+      assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
+      updated_alice = Cases.get_person(alice.id)
+      assert updated_alice.sex_at_birth == "female"
+      assert updated_alice.race == "Asian Indian"
+      assert updated_alice.occupation == "Rocket Scientist"
+      assert updated_alice.ethnicity == "Cuban"
+    end
+
+    @tag :skip
+    test "fills missing demographic information when importing another record for the same person", %{originator: originator} do
+      alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+      {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
+      import_output =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , sex_11, race_12, occupation_18, ethnicity_13
+          Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , male  , White  , Brain Surgeon, Puerto Rican
+          """
+        }
+        |> Import.import_csv(originator)
+
+      assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
+      updated_alice = Cases.get_person(alice.id)
+      assert updated_alice.sex_at_birth == "male"
+      assert updated_alice.race == "White"
+      assert updated_alice.occupation == "Brain Surgeon"
+      assert updated_alice.ethnicity == "Puerto Rican"
+    end
+
     test "saves an ImportedFile record for the imported CSV", %{originator: originator} do
       in_file_attrs = %{
         file_name: "test_file.csv",
