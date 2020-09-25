@@ -128,9 +128,8 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
   def assert_validation_messages(html_string, expected_messages) do
     html_string
     |> Test.Html.parse()
-    |> Floki.find("[phx-feedback-for]")
-    |> Enum.map(fn validation_message ->
-      {Floki.attribute(validation_message, "phx-feedback-for") |> List.first(), Test.Html.text(validation_message)}
+    |> Test.Html.all("[phx-feedback-for]", fn validation_message ->
+      {Test.Html.attr(validation_message, "phx-feedback-for") |> List.first(), Test.Html.text(validation_message)}
     end)
     |> Enum.into(%{})
     |> assert_eq(expected_messages, :simple)

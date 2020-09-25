@@ -11,7 +11,7 @@ defmodule Epicenter.Test.Html do
   def all(html, css_query, fun) when is_list(html) and is_function(fun),
     do: html |> Floki.find(css_query) |> Enum.map(fun)
 
-  def attr(html, css_query, attr_name) when is_list(html),
+  def attr(html, css_query \\ "*", attr_name) when not is_binary(html),
     do: html |> Floki.attribute(css_query, attr_name)
 
   def has_role?(html, role),
