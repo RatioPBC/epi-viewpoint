@@ -22,7 +22,7 @@ defmodule Epicenter.Test.Fixtures do
       last_name: "Testuser",
       originator: originator,
       preferred_language: "English",
-      tid: tid,
+      tid: tid
     }
     |> merge_attrs(attrs)
   end
@@ -36,7 +36,7 @@ defmodule Epicenter.Test.Fixtures do
       notes: "lorem ipsum",
       occupation: "architect",
       race: "Filipino",
-      sex_at_birth: "Female",
+      sex_at_birth: "Female"
     }
     |> merge_attrs(person_attrs)
   end
@@ -50,7 +50,7 @@ defmodule Epicenter.Test.Fixtures do
       "notes" => nil,
       "occupation" => nil,
       "race" => nil,
-      "sex_at_birth" => nil,
+      "sex_at_birth" => nil
     }
     |> merge_attrs(person_attrs)
   end
@@ -85,7 +85,12 @@ defmodule Epicenter.Test.Fixtures do
   end
 
   def user_attrs(tid, attrs \\ %{}) do
-    %{tid: tid, username: tid}
+    %{
+      email: tid <> "@example.com",
+      password: "password123",
+      tid: tid,
+      username: tid
+    }
     |> merge_attrs(attrs)
   end
 

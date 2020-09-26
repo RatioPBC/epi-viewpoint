@@ -8,7 +8,7 @@ defmodule Epicenter.RepoTest do
 
   describe "Versioned" do
     setup do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person_changeset = %Cases.Person{} |> Cases.Person.changeset(Test.Fixtures.person_attrs(user, "version-1", external_id: "10000"))
       [person_changeset: person_changeset, user: user]
     end
@@ -18,17 +18,19 @@ defmodule Epicenter.RepoTest do
       |> Repo.Versioned.insert()
       |> assert_versions([
         [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 version-1 testuser",
-            "first_name" => "Version-1",
-            "last_name" => "Testuser",
-            "originator" => %{"id" => user.id},
-            "preferred_language" => "English",
-            "tid" => "version-1",
-          } |> Test.Fixtures.add_empty_demographic_attrs(),
+          change:
+            %{
+              "assigned_to_id" => nil,
+              "dob" => "2000-01-01",
+              "external_id" => "10000",
+              "fingerprint" => "2000-01-01 version-1 testuser",
+              "first_name" => "Version-1",
+              "last_name" => "Testuser",
+              "originator" => %{"id" => user.id},
+              "preferred_language" => "English",
+              "tid" => "version-1"
+            }
+            |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -39,17 +41,19 @@ defmodule Epicenter.RepoTest do
       |> Repo.Versioned.insert!()
       |> assert_versions([
         [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 version-1 testuser",
-            "first_name" => "Version-1",
-            "last_name" => "Testuser",
-            "originator" => %{"id" => user.id},
-            "preferred_language" => "English",
-            "tid" => "version-1"
-          } |> Test.Fixtures.add_empty_demographic_attrs(),
+          change:
+            %{
+              "assigned_to_id" => nil,
+              "dob" => "2000-01-01",
+              "external_id" => "10000",
+              "fingerprint" => "2000-01-01 version-1 testuser",
+              "first_name" => "Version-1",
+              "last_name" => "Testuser",
+              "originator" => %{"id" => user.id},
+              "preferred_language" => "English",
+              "tid" => "version-1"
+            }
+            |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -64,17 +68,19 @@ defmodule Epicenter.RepoTest do
       |> assert_versions([
         [change: %{"tid" => "version-2"}, by: "user"],
         [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 version-1 testuser",
-            "first_name" => "Version-1",
-            "last_name" => "Testuser",
-            "originator" => %{"id" => user.id},
-            "preferred_language" => "English",
-            "tid" => "version-1"
-          } |> Test.Fixtures.add_empty_demographic_attrs(),
+          change:
+            %{
+              "assigned_to_id" => nil,
+              "dob" => "2000-01-01",
+              "external_id" => "10000",
+              "fingerprint" => "2000-01-01 version-1 testuser",
+              "first_name" => "Version-1",
+              "last_name" => "Testuser",
+              "originator" => %{"id" => user.id},
+              "preferred_language" => "English",
+              "tid" => "version-1"
+            }
+            |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -89,17 +95,19 @@ defmodule Epicenter.RepoTest do
       |> assert_versions([
         [change: %{"tid" => "version-2"}, by: "user"],
         [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 version-1 testuser",
-            "first_name" => "Version-1",
-            "last_name" => "Testuser",
-            "originator" => %{"id" => user.id},
-            "preferred_language" => "English",
-            "tid" => "version-1"
-          } |> Test.Fixtures.add_empty_demographic_attrs(),
+          change:
+            %{
+              "assigned_to_id" => nil,
+              "dob" => "2000-01-01",
+              "external_id" => "10000",
+              "fingerprint" => "2000-01-01 version-1 testuser",
+              "first_name" => "Version-1",
+              "last_name" => "Testuser",
+              "originator" => %{"id" => user.id},
+              "preferred_language" => "English",
+              "tid" => "version-1"
+            }
+            |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -111,17 +119,19 @@ defmodule Epicenter.RepoTest do
       person
       |> assert_versions([
         [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 version-1 testuser",
-            "first_name" => "Version-1",
-            "last_name" => "Testuser",
-            "originator" => %{"id" => user.id},
-            "preferred_language" => "English",
-            "tid" => "version-1"
-          } |> Test.Fixtures.add_empty_demographic_attrs(),
+          change:
+            %{
+              "assigned_to_id" => nil,
+              "dob" => "2000-01-01",
+              "external_id" => "10000",
+              "fingerprint" => "2000-01-01 version-1 testuser",
+              "first_name" => "Version-1",
+              "last_name" => "Testuser",
+              "originator" => %{"id" => user.id},
+              "preferred_language" => "English",
+              "tid" => "version-1"
+            }
+            |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -131,17 +141,19 @@ defmodule Epicenter.RepoTest do
       |> Repo.Versioned.update!()
       |> assert_versions([
         [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 version-1 testuser",
-            "first_name" => "Version-1",
-            "last_name" => "Testuser",
-            "originator" => %{"id" => user.id},
-            "preferred_language" => "English",
-            "tid" => "version-1"
-          } |> Test.Fixtures.add_empty_demographic_attrs(),
+          change:
+            %{
+              "assigned_to_id" => nil,
+              "dob" => "2000-01-01",
+              "external_id" => "10000",
+              "fingerprint" => "2000-01-01 version-1 testuser",
+              "first_name" => "Version-1",
+              "last_name" => "Testuser",
+              "originator" => %{"id" => user.id},
+              "preferred_language" => "English",
+              "tid" => "version-1"
+            }
+            |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -158,17 +170,19 @@ defmodule Epicenter.RepoTest do
       |> assert_versions([
         [change: %{"tid" => "version-2"}, by: "user"],
         [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 version-1 testuser",
-            "first_name" => "Version-1",
-            "last_name" => "Testuser",
-            "originator" => %{"id" => user.id},
-            "preferred_language" => "English",
-            "tid" => "version-1"
-          } |> Test.Fixtures.add_empty_demographic_attrs(),
+          change:
+            %{
+              "assigned_to_id" => nil,
+              "dob" => "2000-01-01",
+              "external_id" => "10000",
+              "fingerprint" => "2000-01-01 version-1 testuser",
+              "first_name" => "Version-1",
+              "last_name" => "Testuser",
+              "originator" => %{"id" => user.id},
+              "preferred_language" => "English",
+              "tid" => "version-1"
+            }
+            |> Test.Fixtures.add_empty_demographic_attrs(),
           by: "user"
         ]
       ])
@@ -180,17 +194,19 @@ defmodule Epicenter.RepoTest do
       person
       |> Repo.Versioned.last_version()
       |> assert_version(
-        change: %{
-          "assigned_to_id" => nil,
-          "dob" => "2000-01-01",
-          "external_id" => "10000",
-          "fingerprint" => "2000-01-01 version-1 testuser",
-          "first_name" => "Version-1",
-          "last_name" => "Testuser",
-          "originator" => %{"id" => user.id},
-          "preferred_language" => "English",
-          "tid" => "version-1"
-        } |> Test.Fixtures.add_empty_demographic_attrs(),
+        change:
+          %{
+            "assigned_to_id" => nil,
+            "dob" => "2000-01-01",
+            "external_id" => "10000",
+            "fingerprint" => "2000-01-01 version-1 testuser",
+            "first_name" => "Version-1",
+            "last_name" => "Testuser",
+            "originator" => %{"id" => user.id},
+            "preferred_language" => "English",
+            "tid" => "version-1"
+          }
+          |> Test.Fixtures.add_empty_demographic_attrs(),
         by: "user"
       )
 
@@ -204,7 +220,7 @@ defmodule Epicenter.RepoTest do
     end
 
     test "originated_by sets the originator", %{person_changeset: person_changeset} do
-      new_user = Test.Fixtures.user_attrs("new_user") |> Accounts.create_user!()
+      new_user = Test.Fixtures.user_attrs("new_user") |> Accounts.register_user!()
       new_changeset = Repo.Versioned.with_originator(person_changeset, new_user)
       assert Repo.Versioned.get_originator!(new_changeset) == new_user
     end

@@ -16,6 +16,8 @@ html lang="en"
     link phx-track-static=true rel="stylesheet" href="#{ Routes.static_path(@conn, "/css/app.css") }"
     script defer=true phx-track-static=true type="text/javascript" src="#{ Routes.static_path(@conn, "/js/app.js") }"
   body
+    = render "_user_menu.html", assigns
+
     = if Map.get(assigns, :show_nav, true) do
       header#nav
         #nav-inner

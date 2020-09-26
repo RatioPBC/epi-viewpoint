@@ -12,7 +12,7 @@ defmodule Epicenter.Cases.ImportTest do
 
   describe "import_csv" do
     setup do
-      [originator: Test.Fixtures.user_attrs("originator") |> Accounts.create_user!()]
+      [originator: Test.Fixtures.user_attrs("originator") |> Accounts.register_user!()]
     end
 
     test "creates LabResult records and Person records from csv data", %{originator: originator} do

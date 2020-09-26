@@ -32,7 +32,7 @@ defmodule Epicenter.Cases.LabResultTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       default_attrs = Test.Fixtures.lab_result_attrs(person, "result1", "06-01-2020")
       Cases.change_lab_result(%LabResult{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
@@ -55,7 +55,7 @@ defmodule Epicenter.Cases.LabResultTest do
     import Euclid.Extra.Enum, only: [tids: 1]
 
     test "display_order sorts by sampled_on (desc) first, then by reported_on (desc)" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
       [

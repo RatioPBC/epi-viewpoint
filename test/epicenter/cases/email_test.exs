@@ -26,7 +26,7 @@ defmodule Epicenter.Cases.EmailTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       default_attrs = Test.Fixtures.email_attrs(person, "alice-email")
       Email.changeset(%Email{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
@@ -50,7 +50,7 @@ defmodule Epicenter.Cases.EmailTest do
     import Euclid.Extra.Enum, only: [tids: 1]
 
     test "display_order sorts preferred first, then by email address" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.email_attrs(person, "preferred", is_preferred: true, address: "m@example.com") |> Cases.create_email!()
       Test.Fixtures.email_attrs(person, "address-z", is_preferred: false, address: "z@example.com") |> Cases.create_email!()

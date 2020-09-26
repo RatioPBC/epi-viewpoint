@@ -9,13 +9,14 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Test
   alias EpicenterWeb.PeopleLive
 
+  setup :register_and_log_in_user
+
   describe "rendering" do
     defp table_contents(index_live, opts \\ []),
       do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
-    defp create_people_and_lab_results() do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
-      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
+    defp create_people_and_lab_results(user) do
+      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
 
       alice = Test.Fixtures.person_attrs(user, "alice", external_id: nil) |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
@@ -33,8 +34,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
       assert_has_role(index_live, "people-page")
     end
 
-    test "user can be assigned to people", %{conn: conn} do
-      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results()
+    test "user can be assigned to people", %{conn: conn, user: user} do
+      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
 
       index_live
@@ -64,8 +65,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
       assert_unchecked(index_live, "[data-tid=alice.tid]")
     end
 
-    test "users can be unassigned from people", %{conn: conn} do
-      [users: [user, assignee], people: [alice, billy]] = create_people_and_lab_results()
+    test "users can be unassigned from people", %{conn: conn, user: user} do
+      [users: [user, assignee], people: [alice, billy]] = create_people_and_lab_results(user)
       Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id, billy.id], originator: user)
 
       {:ok, index_live, _} = live(conn, "/people")
@@ -91,8 +92,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> assert_eq([nil, nil])
     end
 
-    test "shows assignee update from different client", %{conn: conn} do
-      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results()
+    test "shows assignee update from different client", %{conn: conn, user: user} do
+      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
 
       index_live
@@ -115,8 +116,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
     end
 
-    test "shows people and their lab tests", %{conn: conn} do
-      create_people_and_lab_results()
+    test "shows people and their lab tests", %{conn: conn, user: user} do
+      create_people_and_lab_results(user)
 
       {:ok, index_live, _html} = live(conn, "/people")
 
@@ -129,7 +130,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
     end
 
-    test "shows a reload message after broadcasting with a new list of people", %{conn: conn} do
+    test "shows a reload message after broadcasting with a new list of people", %{conn: conn, user: user} do
       {:ok, index_live, _html} = live(conn, "/people")
 
       # start off with no people
@@ -142,7 +143,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
 
       # import 2 people
-      [users: _, people: people] = create_people_and_lab_results()
+      [users: _, people: people] = create_people_and_lab_results(user)
 
       Cases.broadcast_people(people)
 
@@ -174,14 +175,14 @@ defmodule EpicenterWeb.PeopleLiveTest do
   end
 
   describe "save button" do
-    test "it is disabled by default", %{conn: conn} do
-      create_people_and_lab_results()
+    test "it is disabled by default", %{conn: conn, user: user} do
+      create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
       assert_disabled(index_live, "[data-role=users]")
     end
 
-    test "it is enabled after selecting a person", %{conn: conn} do
-      [users: _users, people: [alice, _billy]] = create_people_and_lab_results()
+    test "it is enabled after selecting a person", %{conn: conn, user: user} do
+      [users: _users, people: [alice, _billy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
       assert_disabled(index_live, "[data-role=users]")
       index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
@@ -204,8 +205,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
   end
 
   describe "latest_result" do
-    setup do
-      person = Test.Fixtures.user_attrs("user") |> Accounts.create_user!() |> Test.Fixtures.person_attrs("person") |> Cases.create_person!()
+    setup %{user: user} do
+      person = user |> Test.Fixtures.person_attrs("person") |> Cases.create_person!()
 
       [person: person]
     end

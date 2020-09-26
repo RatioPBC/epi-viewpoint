@@ -3,16 +3,16 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.ProfileEditLive
 
+  setup :register_and_log_in_user
+
   describe "render" do
-    setup do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+    setup %{user: user} do
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      [person: person, user: user]
+      [person: person]
     end
 
     test "disconnected and connected render", %{conn: conn, person: %Cases.Person{id: id}} do

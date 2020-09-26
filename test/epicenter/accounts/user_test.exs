@@ -13,6 +13,9 @@ defmodule Epicenter.Accounts.UserTest do
       assert_schema(
         User,
         [
+          {:confirmed_at, :naive_datetime},
+          {:email, :string},
+          {:hashed_password, :string},
           {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:seq, :bigserial},
@@ -26,7 +29,7 @@ defmodule Epicenter.Accounts.UserTest do
 
   describe "associations" do
     test "has many assignments" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
       Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id], originator: user)
@@ -49,10 +52,17 @@ defmodule Epicenter.Accounts.UserTest do
     test "username is required", do: assert_invalid(new_changeset(username: nil))
 
     test "username must be unique" do
-      Test.Fixtures.user_attrs("alice") |> Accounts.create_user!()
+      Test.Fixtures.user_attrs("alice") |> Accounts.register_user!()
 
-      {:error, changeset} = Test.Fixtures.user_attrs("alice") |> Accounts.create_user()
+      {:error, changeset} = Test.Fixtures.user_attrs("alice", email: "new@example.com") |> Accounts.register_user()
       assert errors_on(changeset).username == ["has already been taken"]
+    end
+
+    test "email must be unique" do
+      alice = Test.Fixtures.user_attrs("alice") |> Accounts.register_user!()
+
+      {:error, changeset} = Test.Fixtures.user_attrs("billy", email: alice.email) |> Accounts.register_user()
+      assert errors_on(changeset).email == ["has already been taken"]
     end
   end
 end

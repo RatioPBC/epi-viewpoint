@@ -3,9 +3,10 @@ defmodule EpicenterWeb.AdminLiveTest do
 
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Test
+
+  setup :register_and_log_in_user
 
   test "disconnected and connected render", %{conn: conn} do
     {:ok, page_live, disconnected_html} = live(conn, "/admin")
@@ -14,13 +15,11 @@ defmodule EpicenterWeb.AdminLiveTest do
     assert_has_role(page_live, "admin-page")
   end
 
-  test "shows person count and lab result count before and after importing", %{conn: conn} do
+  test "shows person count and lab result count before and after importing", %{conn: conn, user: user} do
     {:ok, page_live, _html} = live(conn, "/admin")
 
     assert_role_text(page_live, "person-count", "0")
     assert_role_text(page_live, "lab-result-count", "0")
-
-    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
 
     alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
     Test.Fixtures.lab_result_attrs(alice, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()

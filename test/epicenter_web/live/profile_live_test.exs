@@ -10,10 +10,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
   alias EpicenterWeb.ProfileLive
   alias EpicenterWeb.Test.Pages
 
-  setup do
-    user = Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
+  setup :register_and_log_in_user
+
+  setup %{user: user} do
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-    [person: person, user: user]
+    [person: person]
   end
 
   test "disconnected and connected render", %{conn: conn, person: person} do
@@ -130,7 +131,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     setup %{person: person} do
       Test.Fixtures.address_attrs(person, "address1", 1000) |> Cases.create_address!()
       Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
-      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
+      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
       [person: person, assignee: assignee]
     end
 

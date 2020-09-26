@@ -1,12 +1,12 @@
 defmodule EpicenterWeb.ImportControllerTest do
   use EpicenterWeb.ConnCase, async: true
 
-  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Tempfile
-  alias Epicenter.Test
   alias EpicenterWeb.Session
+
+  setup :register_and_log_in_user
 
   describe "create" do
     test "accepts file upload", %{conn: conn} do
@@ -21,8 +21,6 @@ defmodule EpicenterWeb.ImportControllerTest do
         |> Tempfile.write!("csv")
 
       on_exit(fn -> File.rm!(temp_file_path) end)
-
-      Test.Fixtures.user_attrs("user") |> Accounts.create_user!()
 
       conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 

@@ -6,9 +6,11 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
+  setup :register_and_log_in_user
+
   test "people can be assigned to users on people and profile page, with cross-client updating", %{conn: conn} do
-    assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.create_user!()
-    Test.Fixtures.user_attrs("nonassignee") |> Accounts.create_user!()
+    assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
+    Test.Fixtures.user_attrs("nonassignee") |> Accounts.register_user!()
 
     alice = Test.Fixtures.person_attrs(assignee, "alice") |> Cases.create_person!()
     billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
@@ -29,7 +31,7 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
     #
 
     profile_page
-    |> Pages.Profile.assert_assignable_users(~w{Unassigned assignee nonassignee})
+    |> Pages.Profile.assert_assignable_users(~w{Unassigned assignee nonassignee user})
     |> Pages.Profile.assign(assignee)
 
     #

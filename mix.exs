@@ -34,6 +34,7 @@ defmodule Epicenter.MixProject do
   defp deps do
     [
       local_or_remote(:remote, :euclid, version: "~> 1.0", organization: "geometer", path: "../euclid"),
+      {:bcrypt_elixir, "~> 2.1.0"},
       {:ecto_sql, "~> 3.4"},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.11"},
@@ -51,6 +52,7 @@ defmodule Epicenter.MixProject do
       {:phoenix_live_view, "~> 0.13.0"},
       {:phoenix_slime, "~> 0.13.1"},
       {:phoenix_slime_live_view_collocated_template, "~> 0.1.0"},
+      {:phx_gen_auth, "~> 0.5.0"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
       {:table_rex, "~> 3.0"},
