@@ -77,6 +77,7 @@
   font-size: $body-text-size
   font-weight: normal
   padding: 0.5rem 2rem
+  text-align: center
 
   &[data-disabled]
     background-color: $disabled-button-color
@@ -105,6 +106,11 @@
   &[data-disabled]
     background-color: white
 
+@mixin button-link($size: regular)
+  @include -button($size: $size)
+  background-color: inherit
+  border: 1px solid transparent
+
 @mixin card
   @include vertical-flow
   border: 2px solid $divider-color
@@ -119,6 +125,10 @@
 
     a
       @include button-primary
+
+@mixin centered
+  display: grid
+  place-items: center
 
 @mixin data-table
   border-collapse: collapse

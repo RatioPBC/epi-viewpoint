@@ -1,0 +1,33 @@
+main#login-page
+  section
+    = form_for @conn, Routes.user_session_path(@conn, :create), [as: :user], fn f ->
+
+      header
+        #branding
+          h4 Epi
+          h2 Viewpoint
+        = logo_icon()
+
+      h4#title Log into your account
+
+      = if @error_message do
+        .alert.alert-danger
+          p
+            = @error_message
+      fieldset
+        = label f, :email
+        = email_input f, :email, required: true
+
+      fieldset
+        = label f, :password
+        = password_input f, :password, required: true
+
+      fieldset
+        = label f, :remember_me, "Keep me logged in for 60 days"
+        = checkbox f, :remember_me
+
+      fieldset
+        = submit "Log in", id: "submit"
+
+      fieldset
+        = link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new), id: "forgot-password"

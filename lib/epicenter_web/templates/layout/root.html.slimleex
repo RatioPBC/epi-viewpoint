@@ -15,7 +15,7 @@ html lang="en"
 
     link phx-track-static=true rel="stylesheet" href="#{ Routes.static_path(@conn, "/css/app.css") }"
     script defer=true phx-track-static=true type="text/javascript" src="#{ Routes.static_path(@conn, "/js/app.js") }"
-  body
+  body class="body-background-#{Map.get(assigns, :body_background, "none")}"
     = if @current_user && Map.get(assigns, :show_nav, true) do
       header#nav
         #nav-inner
@@ -30,5 +30,7 @@ html lang="en"
                 ul
                   li = link "Settings", to: Routes.user_settings_path(@conn, :edit)
                   li = link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete
-    main role="main"
+      main role="main"
+        = @inner_content
+    - else
       = @inner_content

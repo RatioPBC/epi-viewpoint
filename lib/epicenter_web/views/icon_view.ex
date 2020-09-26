@@ -21,6 +21,25 @@ defmodule EpicenterWeb.IconView do
     |> raw()
   end
 
+  def logo_icon(width \\ 96, height \\ 96) do
+    """
+    <svg width="#{width}" height="#{height}" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="96" height="96">
+        <circle cx="48.137" cy="48.019" r="45.9172" transform="rotate(2.48248 48.137 48.019)" fill="#4F4F4F"/>
+      </mask>
+      <g mask="url(#mask0)">
+        <rect x="-27.4771" y="-29.9447" width="152.101" height="152.101" transform="rotate(2.48248 -27.4771 -29.9447)" fill="#B9CCF2"/>
+        <path d="M33.3788 22.4121L-29.3358 80.7228L110.841 77.4644L73.0436 45.095L70.7612 57.7735L33.3788 22.4121Z" fill="#162033" stroke="#162033" stroke-width="3" stroke-linejoin="round"/>
+        <rect x="-26.3755" y="78.6969" width="119.098" height="31.5681" transform="rotate(2.48248 -26.3755 78.6969)" fill="#507CD1"/>
+        <path d="M33.0501 22.3864L-29.3355 80.7229L102.553 86.4408L72.7198 45.1649L59.6419 59.2586L33.0501 22.3864Z" fill="#507CD1" stroke="#507CD1" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M32.4622 28.4782L18.9657 41.2501L32.1178 39.805L46.7397 48.5022L32.4622 28.4782Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M72.3206 51.3629L64.3485 59.9653L72.5723 58.511L82.1414 63.3839L72.3206 51.3629Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </svg>
+    """
+    |> raw()
+  end
+
   def phone_icon(width, height) do
     """
     <svg width="#{width}" height="#{height}" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">

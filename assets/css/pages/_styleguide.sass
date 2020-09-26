@@ -22,9 +22,17 @@
     grid-gap: 1rem
     justify-items: start
 
+    & + .styleguide-example
+      margin-top: 3rem
+
   code
     color: purple
+    line-height: 1.1
     padding: 0 2rem
+
+    small
+      color: #777
+      display: block
 
   //
   // text
@@ -68,6 +76,9 @@
   #outline-button-small
     @include button-outline($size: small)
 
+  #link-button
+    @include button-link
+
   #button-list
     @include button-list
 
@@ -92,6 +103,16 @@
   //
   // layout
   //
+  #centered
+    @include centered
+    border: 1px dashed purple
+    height: 200px
+    width: 200px
+
+    #centered-contents
+      border: 1px dashed orange
+      padding: 1rem
+
   #level
     @include level
 

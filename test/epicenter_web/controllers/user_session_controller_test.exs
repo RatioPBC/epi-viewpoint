@@ -11,8 +11,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
     test "renders log in page", %{conn: conn} do
       conn = get(conn, Routes.user_session_path(conn, :new))
       response = html_response(conn, 200)
-      assert response =~ "<h1>Log in</h1>"
-      assert response =~ "Register</a>"
+      assert response =~ "Log into your account"
     end
 
     test "redirects if already logged in", %{conn: conn, user: user} do
@@ -60,7 +59,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
         })
 
       response = html_response(conn, 200)
-      assert response =~ "<h1>Log in</h1>"
+      assert response =~ "Log into your account"
       assert response =~ "Invalid email or password"
     end
   end

@@ -5,7 +5,7 @@ defmodule EpicenterWeb.UserSessionController do
   alias EpicenterWeb.UserAuth
 
   def new(conn, _params) do
-    render(conn, "new.html", error_message: nil)
+    render(conn, "new.html", body_background: "color", error_message: nil)
   end
 
   def create(conn, %{"user" => user_params}) do

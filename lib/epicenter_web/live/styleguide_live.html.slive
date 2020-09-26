@@ -73,6 +73,12 @@
       code @include button-outline($size: small)
 
     .styleguide-example
+      a#link-button Link button
+      code
+        ' @include button-link
+        small Has the same display properties of a button, but without the border
+
+    .styleguide-example
       #disabled-buttons
         a#primary-button-disabled data-disabled=true Primary
         a#secondary-button-disabled data-disabled=true Secondary
@@ -115,6 +121,16 @@
     .styleguide-title Layout
 
     .styleguide-example
+      #centered
+        #centered-contents
+          ' This is in
+          br
+          ' the middle
+      code
+        ' @include centered
+        small The contents are centered horizontally and vertically within the element that includes the mixin
+
+    .styleguide-example
       #level
         button Item 1
         div style="height: 40px" Tall item
@@ -123,7 +139,9 @@
           span 3b
           span 3c
         a Item 4
-      code @include level
+      code
+        ' @include level
+        small Like horizontal-flow, but the contents are vertically aligned
 
     .styleguide-example
       #horizontal-flow
@@ -134,21 +152,27 @@
           span 3b
           span 3c
         a Item 4
-      code @include horizontal-flow
+      code
+        ' @include horizontal-flow
+        small The children have a horizontal space between them
 
     .styleguide-example
       #horizontal-flow-right
         span a
         span b
         span c
-      code @include horizontal-flow($justify: right)
+      code
+        ' @include horizontal-flow($justify: right)
+        small The children are right-aligned
 
     .styleguide-example
       #horizontal-flow-space-between
         span a
         span b
         span c
-      code @include horizontal-flow($justify: space-between)
+      code
+        ' @include horizontal-flow($justify: space-between)
+        small The children are spaced apart evenly
 
     .styleguide-example
       #vertical-flow
@@ -159,7 +183,9 @@
           span 3b
           span 3c
         a Item 4
-      code @include vertical-flow
+      code
+        ' @include vertical-flow
+        small The children have a vertical space between them
 
     .styleguide-example
       #nested-flows
@@ -180,7 +206,9 @@
         div Top
         div Middle
         div Bottom
-      code @include pancake-stack
+      code
+        ' @include pancake-stack
+        small The middle child is stretched vertically to take up all remaining space
 
   //
   // containers
