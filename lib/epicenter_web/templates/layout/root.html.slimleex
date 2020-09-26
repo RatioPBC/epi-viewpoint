@@ -16,9 +16,7 @@ html lang="en"
     link phx-track-static=true rel="stylesheet" href="#{ Routes.static_path(@conn, "/css/app.css") }"
     script defer=true phx-track-static=true type="text/javascript" src="#{ Routes.static_path(@conn, "/js/app.js") }"
   body
-    = render "_user_menu.html", assigns
-
-    = if Map.get(assigns, :show_nav, true) do
+    = if @current_user && Map.get(assigns, :show_nav, true) do
       header#nav
         #nav-inner
           #nav-items
@@ -27,5 +25,10 @@ html lang="en"
             #nav-right
               = live_redirect "Import", to: "/import"
               = live_redirect "Admin", to: "/admin"
+              #user-menu
+                div= @current_user.username
+                ul
+                  li = link "Settings", to: Routes.user_settings_path(@conn, :edit)
+                  li = link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete
     main role="main"
       = @inner_content

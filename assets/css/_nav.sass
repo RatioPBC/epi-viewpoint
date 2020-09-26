@@ -17,3 +17,35 @@
 
       #nav-right
         @include level
+
+      #user-menu
+        position: relative
+
+        div
+          color: $link-color
+
+        &:hover
+          & > ul
+            display: block
+
+        & > ul
+          margin-top: 0
+          border-top: 1px solid $divider-color
+          display: none
+          position: absolute
+          background-color: white
+          width: 100%
+          box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
+
+          li
+            a
+              padding: 0.5rem 1rem
+              display: inline-block
+
+            &:hover
+              background-color: $link-color
+              color: white
+
+              a
+                color: white
+

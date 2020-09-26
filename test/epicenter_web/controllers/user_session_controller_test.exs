@@ -12,7 +12,6 @@ defmodule EpicenterWeb.UserSessionControllerTest do
       conn = get(conn, Routes.user_session_path(conn, :new))
       response = html_response(conn, 200)
       assert response =~ "<h1>Log in</h1>"
-      assert response =~ "Log in</a>"
       assert response =~ "Register</a>"
     end
 
@@ -35,7 +34,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
       # Now do a logged in request and assert on the menu
       conn = get(conn, "/people")
       response = html_response(conn, 200)
-      assert response =~ user.email
+      assert response =~ user.username
       assert response =~ "Settings</a>"
       assert response =~ "Log out</a>"
     end
