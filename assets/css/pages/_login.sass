@@ -7,30 +7,32 @@
 
   form
     @include form
-    @include vertical-flow
     background-color: white
     border-radius: 8px
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25)
     margin-top: 0
     min-width: 30rem
-    padding: 5rem
+    padding: 5rem 8rem
 
-    header
-      @include level($justify: space-between)
+    #form-contents
+      @include vertical-flow
 
-      #branding
-        h2, h4
-          line-height: 1.1
+      header
+        @include level($justify: space-between)
 
-    #title
-      font-weight: normal
+        #branding
+          h2, h4
+            line-height: 1.1
 
-    input, #submit, #forgot-password
-      box-sizing: border-box
-      width: 100%
+      #title
+        font-weight: normal
 
-    #submit
-      @include button-primary
+      input, #submit, #forgot-password
+        box-sizing: border-box
+        width: 100%
 
-    #forgot-password
-      @include button-link
+      #submit
+        @include button-primary
+
+      #forgot-password
+        @include button-link
