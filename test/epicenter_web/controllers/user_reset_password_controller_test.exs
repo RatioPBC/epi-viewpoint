@@ -9,7 +9,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
     %{user: user_fixture()}
   end
 
-  describe "GET /users/reset_password" do
+  describe "GET /users/reset-password" do
     test "renders the reset password page", %{conn: conn} do
       conn = get(conn, Routes.user_reset_password_path(conn, :new))
       response = html_response(conn, 200)
@@ -17,7 +17,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
     end
   end
 
-  describe "POST /users/reset_password" do
+  describe "POST /users/reset-password" do
     @tag :capture_log
     test "sends a new reset password token", %{conn: conn, user: user} do
       conn =
@@ -42,7 +42,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
     end
   end
 
-  describe "GET /users/reset_password/:token" do
+  describe "GET /users/reset-password/:token" do
     setup %{user: user} do
       token =
         extract_user_token(fn url ->
@@ -64,7 +64,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
     end
   end
 
-  describe "PUT /users/reset_password/:token" do
+  describe "PUT /users/reset-password/:token" do
     setup %{user: user} do
       token =
         extract_user_token(fn url ->
