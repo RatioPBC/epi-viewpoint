@@ -128,7 +128,9 @@
 
 @mixin centered
   display: grid
-  place-items: center
+
+  & > *
+    place-self: center
 
 @mixin data-table
   border-collapse: collapse
