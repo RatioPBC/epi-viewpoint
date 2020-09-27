@@ -1,6 +1,6 @@
 @import "../mixins"
 
-#login-page
+#login-page, #reset-password-page
   @include centered
   height: 100%
   width: 100%
@@ -27,12 +27,18 @@
       #title
         font-weight: normal
 
-      input, #submit, #forgot-password
+      #flash
+        color: $success-color
+
+      #flash-extra
+        color: $error-color
+
+      input, #submit, #forgot-password, #back-to-login
         box-sizing: border-box
         width: 100%
 
       #submit
         @include button-primary
 
-      #forgot-password
+      #forgot-password, #back-to-login
         @include button-link

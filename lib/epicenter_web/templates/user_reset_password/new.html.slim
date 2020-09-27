@@ -1,0 +1,20 @@
+#reset-password-page
+  = form_for :user, Routes.user_reset_password_path(@conn, :create), fn f ->
+    #form-contents
+      header
+        #branding
+          h4 Epi
+          h2 Viewpoint
+        = logo_icon(80, 80)
+
+      h4#title Reset your password
+
+      fieldset
+        = label f, :email
+        = email_input f, :email, required: true
+
+      fieldset
+        = submit "Send instructions to reset password", id: "submit"
+
+      fieldset
+        = link "Back to login", to: Routes.user_session_path(@conn, :new), id: "back-to-login"

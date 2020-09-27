@@ -7,6 +7,12 @@ defmodule EpicenterWeb.Session do
   def get_current_user(),
     do: Accounts.list_users() |> List.first() || raise("get_current_user() requires at least 1 user in the database")
 
+  def append_fake_mail(conn, to, body),
+    do: Conn.put_session(conn, :fake_mail, [%{to: to, body: body, sent: NaiveDateTime.utc_now()} | get_fake_mail(conn)])
+
+  def get_fake_mail(conn),
+    do: Conn.get_session(conn, :fake_mail) || []
+
   def get_last_csv_import_info(conn),
     do: Conn.get_session(conn, :last_csv_import_info)
 

@@ -2,27 +2,32 @@ defmodule EpicenterWeb.UserResetPasswordController do
   use EpicenterWeb, :controller
 
   alias Epicenter.Accounts
+  alias EpicenterWeb.Session
 
   plug :get_user_by_reset_password_token when action in [:edit, :update]
 
   def new(conn, _params) do
-    render(conn, "new.html")
+    render(conn, "new.html", body_background: "color")
   end
 
   def create(conn, %{"user" => %{"email" => email}}) do
-    if user = Accounts.get_user_by_email(email) do
-      Accounts.deliver_user_reset_password_instructions(
-        user,
-        &Routes.user_reset_password_url(conn, :edit, &1)
-      )
-    end
-
     # Regardless of the outcome, show an impartial success/error message.
-    conn
-    |> put_flash(
-      :info,
-      "If your email is in our system, you will receive instructions to reset your password shortly."
-    )
+    message = "An email with instructions was sent"
+
+    if user = Accounts.get_user_by_email(email) do
+      {:ok, %{to: to, body: body}} =
+        Accounts.deliver_user_reset_password_instructions(
+          user,
+          &Routes.user_reset_password_url(conn, :edit, &1)
+        )
+
+      conn
+      |> Session.append_fake_mail(to, body)
+      |> put_flash(:extra, "(Check your mail in /fakemail)")
+    else
+      conn
+    end
+    |> put_flash(:info, message)
     |> redirect(to: "/")
   end
 

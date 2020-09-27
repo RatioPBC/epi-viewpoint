@@ -47,6 +47,7 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through [:browser]
 
+    get "/fakemail", FakeMailController, :show
     live "/styleguide", StyleguideLive, as: :styleguide
     delete "/users/log_out", UserSessionController, :delete
     get "/users/confirm", UserConfirmationController, :new

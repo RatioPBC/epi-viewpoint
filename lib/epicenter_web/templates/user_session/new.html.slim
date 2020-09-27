@@ -10,10 +10,17 @@
 
       h4#title Log into your account
 
+      = if get_flash(@conn, :info) do
+        div#flash = get_flash(@conn, :info)
+
+      = if get_flash(@conn, :extra) do
+        div#flash-extra = get_flash(@conn, :extra)
+
       = if @error_message do
         .alert.alert-danger
           p
             = @error_message
+
       fieldset
         = label f, :email
         = email_input f, :email, required: true
