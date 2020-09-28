@@ -1,5 +1,5 @@
 defmodule EpicenterWeb.UserSessionView do
   use EpicenterWeb, :view
 
-  import EpicenterWeb.IconView, only: [logo_icon: 2]
+  import EpicenterWeb.IconView, only: [error_icon: 0, logo_icon: 2]
 end

@@ -17,9 +17,9 @@
         div#flash-extra = get_flash(@conn, :extra)
 
       = if @error_message do
-        .alert.alert-danger
-          p
-            = @error_message
+        #form-error-message
+          = error_icon()
+          div= @error_message
 
       fieldset
         = label f, :email

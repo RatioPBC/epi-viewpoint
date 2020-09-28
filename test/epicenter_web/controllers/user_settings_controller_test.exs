@@ -49,7 +49,7 @@ defmodule EpicenterWeb.UserSettingsControllerTest do
 
       response = html_response(old_password_conn, 200)
       assert response =~ "<h1>Settings</h1>"
-      assert response =~ "should be at least 10 character(s)"
+      assert response =~ "must be between 10 and 80 characters"
       assert response =~ "does not match password"
       assert response =~ "is not valid"
 

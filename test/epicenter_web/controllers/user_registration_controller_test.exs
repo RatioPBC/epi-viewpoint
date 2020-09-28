@@ -47,7 +47,7 @@ defmodule EpicenterWeb.UserRegistrationControllerTest do
       response = html_response(conn, 200)
       assert response =~ "<h1>Register</h1>"
       assert response =~ "must have the @ sign and no spaces"
-      assert response =~ "should be at least 10 character"
+      assert response =~ "must be between 10 and 80 characters"
     end
   end
 end

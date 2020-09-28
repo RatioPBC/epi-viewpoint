@@ -33,6 +33,13 @@
       #flash-extra
         color: $error-color
 
+      #form-error-message
+        @include level($spacing: 0.5rem)
+        color: $error-color
+
+        svg
+          @include svg-color($error-color)
+
       input, #submit, #forgot-password, #back-to-login
         box-sizing: border-box
         width: 100%

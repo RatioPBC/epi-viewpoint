@@ -54,7 +54,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
 
     test "renders reset password", %{conn: conn, token: token} do
       conn = get(conn, Routes.user_reset_password_path(conn, :edit, token))
-      assert html_response(conn, 200) =~ "<h1>Reset password</h1>"
+      assert html_response(conn, 200) =~ "Reset your password"
     end
 
     test "does not render reset password with invalid token", %{conn: conn} do
@@ -99,8 +99,8 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
         })
 
       response = html_response(conn, 200)
-      assert response =~ "<h1>Reset password</h1>"
-      assert response =~ "should be at least 10 character(s)"
+      assert response =~ "Reset your password"
+      assert response =~ "must be between 10 and 80 characters"
       assert response =~ "does not match password"
     end
 

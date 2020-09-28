@@ -231,7 +231,7 @@
         opacity: 1
         visibility: visible
 
-@mixin horizontal-flow($justify: left)
+@mixin horizontal-flow($justify: left, $spacing: 1rem)
   align-items: flex-start
   display: flex
   justify-content: $justify
@@ -245,10 +245,10 @@
     display: inline-block
 
   & > *:not(:first-child)
-    margin-left: 1rem
+    margin-left: $spacing
 
-@mixin level($justify: left)
-  @include horizontal-flow($justify: $justify)
+@mixin level($justify: left, $spacing: 1rem)
+  @include horizontal-flow($justify: $justify, $spacing: $spacing)
   align-items: center
 
 // https://1linelayouts.glitch.me

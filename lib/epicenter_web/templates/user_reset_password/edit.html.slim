@@ -1,19 +1,32 @@
-h1
-  | Reset password
-= form_for @changeset, Routes.user_reset_password_path(@conn, :update, @token), fn f ->
-  = if @changeset.action do
-    .alert.alert-danger
-      p
-        | Oops, something went wrong! Please check the errors below.
-  = label f, :password, "New password"
-  = password_input f, :password, required: true
-  = error_tag f, :password
-  = label f, :password_confirmation, "Confirm new password"
-  = password_input f, :password_confirmation, required: true
-  = error_tag f, :password_confirmation
-  div
-    = submit "Reset password"
-p
-  = link "Register", to: Routes.user_registration_path(@conn, :new)
-  | |
-  = link "Log in", to: Routes.user_session_path(@conn, :new)
+#reset-password-page
+  = form_for @changeset, Routes.user_reset_password_path(@conn, :update, @token), fn f ->
+    #form-contents
+      header
+        #branding
+          h4 Epi
+          h2 Viewpoint
+        = logo_icon(80, 80)
+
+      h4#title Reset your password
+
+      = if @changeset.action do
+        #form-error-message
+          = error_icon()
+          div Please check the errors below
+
+      fieldset
+        = label f, :password, "New password"
+        = error_tag f, :password
+        = password_input f, :password, required: true
+
+      fieldset
+        = label f, :password_confirmation, "Confirm new password"
+        = error_tag f, :password_confirmation
+        = password_input f, :password_confirmation, required: true
+
+      fieldset
+        = submit "Reset password", id: "submit"
+
+      fieldset
+        = link "Back to login", to: Routes.user_session_path(@conn, :new), id: "back-to-login"
+

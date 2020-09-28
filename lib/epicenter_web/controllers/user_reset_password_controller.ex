@@ -6,8 +6,10 @@ defmodule EpicenterWeb.UserResetPasswordController do
 
   plug :get_user_by_reset_password_token when action in [:edit, :update]
 
+  @common_assigns [body_background: "color", page_title: "Reset Password"]
+
   def new(conn, _params) do
-    render(conn, "new.html", body_background: "color")
+    render_with_common_assigns(conn, "new.html")
   end
 
   def create(conn, %{"user" => %{"email" => email}}) do
@@ -32,7 +34,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
   end
 
   def edit(conn, _params) do
-    render(conn, "edit.html", changeset: Accounts.change_user_password(conn.assigns.user))
+    render_with_common_assigns(conn, "edit.html", changeset: Accounts.change_user_password(conn.assigns.user))
   end
 
   # Do not log in the user after reset password to avoid a
@@ -41,11 +43,11 @@ defmodule EpicenterWeb.UserResetPasswordController do
     case Accounts.reset_user_password(conn.assigns.user, user_params) do
       {:ok, _} ->
         conn
-        |> put_flash(:info, "Password reset successfully.")
+        |> put_flash(:info, "Password reset successfully — please log in")
         |> redirect(to: Routes.user_session_path(conn, :new))
 
       {:error, changeset} ->
-        render(conn, "edit.html", changeset: changeset)
+        render_with_common_assigns(conn, "edit.html", changeset: changeset)
     end
   end
 
@@ -60,5 +62,9 @@ defmodule EpicenterWeb.UserResetPasswordController do
       |> redirect(to: "/")
       |> halt()
     end
+  end
+
+  defp render_with_common_assigns(conn, template, assigns \\ []) do
+    render(conn, template, Keyword.merge(@common_assigns, assigns))
   end
 end
