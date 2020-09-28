@@ -222,4 +222,25 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert updated_socket.assigns.person.addresses |> tids() == ["address1", "address2"]
     end
   end
+
+  describe "demographics" do
+    setup %{person: person} do
+      person_attrs = Test.Fixtures.add_demographic_attrs(%{})
+      Cases.update_person(person, person_attrs)
+      :ok
+    end
+
+    test "showing person demographics", %{conn: conn, person: person} do
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
+
+      assert_role_text(page_live, "gender-identity", "Female")
+      assert_role_text(page_live, "sex-at-birth", "Female")
+      assert_role_text(page_live, "ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
+      assert_role_text(page_live, "race", "Filipino")
+      assert_role_text(page_live, "marital-status", "Single")
+      assert_role_text(page_live, "employment", "Part time")
+      assert_role_text(page_live, "occupation", "architect")
+      assert_role_text(page_live, "notes", "lorem ipsum")
+    end
+  end
 end

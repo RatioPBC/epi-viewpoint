@@ -78,3 +78,33 @@
               td= Extra.Date.render(lab_result.analyzed_on)
               td= Extra.Date.render(lab_result.reported_on)
               td= lab_result.test_type
+
+  section#demographics
+    header Demographics
+
+    table#demographics-data
+      tbody
+        tr
+          th Gender identity
+          th Sex at birth
+          th Ethnicity
+          th Race
+        tr
+          td data-role="gender-identity"= @person.gender_identity
+          td data-role="sex-at-birth"= @person.sex_at_birth
+          td data-role="ethnicity"= @person.ethnicity
+          td data-role="race"= @person.race
+      tbody
+        tr
+          th Marital status
+          th Employment
+          th Occupation
+        tr
+          td data-role="marital-status"= @person.marital_status
+          td data-role="employment"= @person.employment
+          td data-role="occupation"= @person.occupation
+      tbody
+        tr
+          th Notes
+        tr
+          td data-role="notes"= @person.notes
