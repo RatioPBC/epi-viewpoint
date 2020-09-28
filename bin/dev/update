@@ -4,6 +4,8 @@ set -e
 
 : "${HEX_GEOMETER_READ_ONLY_KEY:?Variable not set or empty}"
 
+trap "exit" INT
+
 source "bin/_support/step.sh"
 
 step "Pulling" "git pull --rebase"
