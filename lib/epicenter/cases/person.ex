@@ -123,8 +123,9 @@ defmodule Epicenter.Cases.Person do
         where: lab_result.sampled_on > ^fifteen_days_ago
     end
 
+    @fields_to_not_be_replaced ~w{id dob ethnicity fingerprint first_name last_name occupation race sex_at_birth}a
     def opts_for_upsert() do
-      [returning: true, on_conflict: {:replace_all_except, ~w{id dob fingerprint first_name last_name}a}, conflict_target: :fingerprint]
+      [returning: true, on_conflict: {:replace_all_except, @fields_to_not_be_replaced}, conflict_target: :fingerprint]
     end
   end
 end
