@@ -25,9 +25,13 @@ check "git-duet: installed" \
   "command -v git-duet" \
   "open https://github.com/git-duet/git-duet#installation"
 
-check "homebrew: up to date" \
-  "brew bundle check" \
-  "brew bundle"
+if hash brew 2>/dev/null; then
+  check "homebrew: up to date" \
+    "brew bundle check" \
+    "brew bundle"
+else
+  cecho --yellow "[checking] brew: Skipping brew check - not installed."
+fi
 
 check "direnv: installed" \
   "command -v direnv" \
