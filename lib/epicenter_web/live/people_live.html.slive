@@ -3,27 +3,29 @@ section#people-page data-role="people-page"
     #title
       span Index Cases
 
-    #filter
-      span data-role="reload-message"
-        = if @reload_message do
-          = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
+    / #filter
       = live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_lab_results), class: "button", data: [active: @filter in [:with_lab_results, nil]]
       = live_patch "Call list", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :call_list), class: "button", data: [active: @filter == :call_list]
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
   #toolbar
-    form id="assignment-form" phx-change="form-change"
-      #user-list data-disabled=is_disabled?(@selected_people)
-        span#assign-to-label Assign to
-        #select-wrapper
-          select name="user" data-role="users" disabled=is_disabled?(@selected_people)
-            option value=""
-            option value="-unassigned-" Unassigned
-            = for user <- @users do
-              option value="#{user.id}" #{user.username}
-        #assignment-dropdown-tooltip Select people below then assign them to a user
+    #toolbar-left
+      form id="assignment-form" phx-change="form-change"
+        #user-list data-disabled=is_disabled?(@selected_people)
+          span#assign-to-label Assign to
+          #select-wrapper
+            select name="user" data-role="users" disabled=is_disabled?(@selected_people)
+              option value=""
+              option value="-unassigned-" Unassigned
+              = for user <- @users do
+                option value="#{user.id}" #{user.username}
+          #assignment-dropdown-tooltip Select people below then assign them to a user
 
-    = live_redirect "Import labs", to: "/import", id: "import-labs"
+    #toolbar-right
+      div data-role="reload-message"
+        = if @reload_message do
+          = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
+      = live_redirect "Import labs", to: "/import", id: "import-labs"
 
 
   table data-role="people"

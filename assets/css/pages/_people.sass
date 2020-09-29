@@ -17,8 +17,17 @@
   #toolbar
     @include level($justify: space-between)
 
-    #import-labs
-      @include button-secondary
+    #toolbar-left
+      @include level($justify: left)
+
+    #toolbar-right
+      @include level($justify: right)
+
+      #reload-message
+        @include button-secondary
+
+      #import-labs
+        @include button-secondary
 
   #user-list
     @include has-tooltip-when-disabled(#assignment-dropdown-tooltip)
@@ -51,11 +60,6 @@
 
       select:focus
         outline: 0
-
-  #reload-message
-    @include button-outline($size: small)
-    margin-right: 1rem
-    font-weight: normal
 
   table
     @include data-table
