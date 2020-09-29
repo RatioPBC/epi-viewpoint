@@ -102,19 +102,6 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def revision_attrs(tid, attrs \\ %{}) do
-    %{
-#      after_change: ,
-      author_id: "author",
-#      before_change: ,
-#      change: ,
-      changed_type: "Epicenter.Cases.Person",
-      reason_action: "reason_action",
-      reason_event: "reason_event",
-      tid: tid,
-    }
-  end
-
   defp merge_attrs(defaults, attrs) do
     Map.merge(defaults, Enum.into(attrs, %{}))
   end
