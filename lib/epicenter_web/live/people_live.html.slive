@@ -1,7 +1,7 @@
 section#people-page data-role="people-page"
   h2
     #title
-      span People
+      span Index Cases
 
     #filter
       span data-role="reload-message"
