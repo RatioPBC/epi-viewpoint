@@ -13,6 +13,11 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
 
+  @required_attrs ~w{dob first_name last_name originator}a
+  @optional_attrs ~w{assigned_to_id external_id preferred_language tid employment ethnicity gender_identity marital_status notes occupation race sex_at_birth}a
+
+  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "people" do
@@ -42,9 +47,6 @@ defmodule Epicenter.Cases.Person do
     has_many :lab_results, LabResult
     has_many :phones, Phone
   end
-
-  @required_attrs ~w{dob first_name last_name originator}a
-  @optional_attrs ~w{assigned_to_id external_id preferred_language tid employment ethnicity gender_identity marital_status notes occupation race sex_at_birth}a
 
   def assignment_changeset(person, nil = _user), do: person |> changeset(%{assigned_to_id: nil})
   def assignment_changeset(person, %User{} = user), do: person |> changeset(%{assigned_to_id: user.id})
