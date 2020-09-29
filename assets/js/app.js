@@ -18,11 +18,18 @@ import "../css/app.sass";
 document.querySelector("#user-menu").addEventListener("click", function (event) {
   let target = document.querySelector("#user-menu-list");
   target.style.display = target.style.display === "block" ? "none" : "block";
-  event.stopPropagation();
+  event.preventDefault();
 });
 
 document.addEventListener("click", (e) => {
-  document.querySelectorAll("[role=menu]").forEach((menu) => (menu.style.display = "none"));
+  let userMenu = document.querySelector("#user-menu");
+  if (!userMenu.contains(e.target)) {
+    document.querySelectorAll("[role=menu]").forEach(function (menu) {
+      if (menu.style.display === "block") {
+        menu.style.display = "none";
+      }
+    });
+  }
 });
 
 //
