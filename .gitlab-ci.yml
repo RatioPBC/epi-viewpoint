@@ -28,6 +28,7 @@ before_script:
   - mix hex.organization auth geometer --key "$HEX_GEOMETER_READ_ONLY_KEY"
   - mix deps.get
   - mix deps.audit
+  - npm audit --audit-level=moderate --prefix assets
 test:
   stage: test
   script:

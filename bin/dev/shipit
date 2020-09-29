@@ -9,5 +9,6 @@ source "bin/_support/step.sh"
 
 bin/dev/update
 bin/dev/test
-step "Auditing" "mix deps.audit"
+step "Auditing elixir deps" "mix deps.audit"
+step "Auditing javascript deps" "npm audit --audit-level=moderate --prefix assets"
 step "Pushing" "git push origin HEAD"
