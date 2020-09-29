@@ -179,6 +179,9 @@
   button
     margin-top: 1rem
 
+  [type=submit]
+    @include button-primary
+
   fieldset
     margin-top: 1rem
 
@@ -195,6 +198,9 @@
     font-size: $small-body-text-size
     font-weight: normal
     padding-left: 0.5rem
+
+  .form-error-message
+    @include has-icon($error-color)
 
 @mixin -heading
   font-weight: bold

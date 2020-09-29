@@ -1,0 +1,16 @@
+@import "../mixins"
+
+#user-settings-page
+  @include vertical-flow
+
+  #flash
+    color: $success-color
+
+  #flash-extra, #flash-error
+    color: $error-color
+
+  #change-email, #change-password
+    @include card
+
+    form
+      @include form

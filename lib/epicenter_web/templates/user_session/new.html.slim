@@ -17,7 +17,7 @@
         div#flash-extra = get_flash(@conn, :extra)
 
       = if @error_message do
-        #form-error-message
+        .form-error-message
           = error_icon()
           div= @error_message
 
