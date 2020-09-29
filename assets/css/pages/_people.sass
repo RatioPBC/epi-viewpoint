@@ -14,6 +14,12 @@
     display: inline-block
     margin-left: 1rem
 
+  #toolbar
+    @include level($justify: space-between)
+
+    #import-labs
+      @include button-secondary
+
   #user-list
     @include has-tooltip-when-disabled(#assignment-dropdown-tooltip)
     @include level

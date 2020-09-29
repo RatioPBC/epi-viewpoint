@@ -11,17 +11,20 @@ section#people-page data-role="people-page"
       = live_patch "Call list", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :call_list), class: "button", data: [active: @filter == :call_list]
       = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
 
+  #toolbar
+    form id="assignment-form" phx-change="form-change"
+      #user-list data-disabled=is_disabled?(@selected_people)
+        span#assign-to-label Assign to
+        #select-wrapper
+          select name="user" data-role="users" disabled=is_disabled?(@selected_people)
+            option value=""
+            option value="-unassigned-" Unassigned
+            = for user <- @users do
+              option value="#{user.id}" #{user.username}
+        #assignment-dropdown-tooltip Select people below then assign them to a user
 
-  form id="assignment-form" phx-change="form-change"
-    #user-list data-disabled=is_disabled?(@selected_people)
-      span#assign-to-label Assign to
-      #select-wrapper
-        select name="user" data-role="users" disabled=is_disabled?(@selected_people)
-          option value=""
-          option value="-unassigned-" Unassigned
-          = for user <- @users do
-            option value="#{user.id}" #{user.username}
-      #assignment-dropdown-tooltip Select people below then assign them to a user
+    = live_redirect "Import labs", to: "/import", id: "import-labs"
+
 
   table data-role="people"
     thead

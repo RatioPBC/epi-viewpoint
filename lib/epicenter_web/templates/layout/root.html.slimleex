@@ -23,7 +23,6 @@ html lang="en"
             #nav-left
               = link "Epicenter", to: "/"
             #nav-right
-              = live_redirect "Import", to: "/import"
               #user-menu
                 #user-menu-title
                   = person_icon()
