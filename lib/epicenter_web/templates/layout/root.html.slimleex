@@ -24,10 +24,14 @@ html lang="en"
               = link "Epicenter", to: "/"
             #nav-right
               = live_redirect "Import", to: "/import"
-              = live_redirect "Admin", to: "/admin"
               #user-menu
-                div= @current_user.username
-                ul
+                #user-menu-title
+                  = person_icon()
+                  div= @current_user.username
+                  = arrow_down_icon()
+
+                ul#user-menu-list role="menu"
+                  li = live_redirect "Admin", to: "/admin"
                   li = link "Settings", to: Routes.user_settings_path(@conn, :edit)
                   li = link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete
       main role="main"

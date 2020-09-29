@@ -217,6 +217,13 @@
   @include -heading
   font-size: 2rem
 
+@mixin has-icon($color: $primary-text-color)
+  @include level($spacing: 0.5rem)
+  color: $color
+
+  svg
+    @include svg-color($color)
+
 @mixin has-tooltip-when-disabled($tooltip)
   #{$tooltip}
     color: $secondary-text-color
@@ -323,7 +330,6 @@
 @mixin svg-color($color)
   path
     fill: $color
-    stroke: $color
 
 @mixin vertical-flow
   & > table

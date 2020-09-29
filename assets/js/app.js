@@ -11,6 +11,22 @@ import "../css/app.sass";
 //
 //     import {Socket} from "phoenix"
 //     import socket from "./socket"
+
+//
+// User menu
+//
+document.querySelector("#user-menu").addEventListener("click", function (event) {
+  let target = document.querySelector("#user-menu-list");
+  target.style.display = target.style.display === "block" ? "none" : "block";
+  event.stopPropagation();
+});
+
+document.addEventListener("click", (e) => {
+  document.querySelectorAll("[role=menu]").forEach((menu) => (menu.style.display = "none"));
+});
+
+//
+// LiveView
 //
 import "phoenix_html";
 import { Socket } from "phoenix";
@@ -22,8 +38,6 @@ let Hooks = {};
 Hooks.AutocompleteInput = {
   mounted() {
     this.el.addEventListener("keyup", (e) => {
-      console.log("keyup in input", e.code);
-
       switch (e.code) {
         case "ArrowLeft":
         case "ArrowRight":
@@ -60,8 +74,6 @@ Hooks.AutocompleteList = {
     });
 
     document.addEventListener("click", (e) => {
-      console.log("click event in document", e);
-
       if (e.target.getAttribute("role") !== "option") {
         while (this.el.firstChild) {
           this.el.removeChild(this.el.firstChild);
@@ -70,8 +82,6 @@ Hooks.AutocompleteList = {
     });
 
     this.el.addEventListener("keyup", (e) => {
-      console.log("keyup in list", e.code);
-
       let select = function (listbox, direction) {
         let selectedItem = listbox.querySelector("[aria-selected=true]");
         let toSelect;

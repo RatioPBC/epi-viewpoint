@@ -34,11 +34,7 @@
         color: $error-color
 
       #form-error-message
-        @include level($spacing: 0.5rem)
-        color: $error-color
-
-        svg
-          @include svg-color($error-color)
+        @include has-icon($error-color)
 
       input, #submit, #forgot-password, #back-to-login
         box-sizing: border-box

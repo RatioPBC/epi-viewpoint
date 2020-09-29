@@ -21,17 +21,19 @@
       #user-menu
         position: relative
 
-        div
-          color: $link-color
+        #user-menu-title
+          @include has-icon
+          user-select: none
 
-        &:hover
-          & > ul
-            display: block
+          &:hover
+            @include svg-color($link-color)
+            color: $link-color
+            cursor: pointer
 
         & > ul
-          margin-top: 0
-          border-top: 1px solid $divider-color
           display: none
+          margin-top: 1rem
+          border-top: 1px solid $divider-color
           position: absolute
           background-color: white
           width: 100%
@@ -43,9 +45,6 @@
               display: inline-block
 
             &:hover
-              background-color: $link-color
-              color: white
+              background-color: $background-color
 
-              a
-                color: white
 
