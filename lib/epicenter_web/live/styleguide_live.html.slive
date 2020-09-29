@@ -49,52 +49,52 @@
     .styleguide-title Buttons & links
 
     .styleguide-example
-      a#primary-button Primary button
+      a#primary-button href="#" Primary button
       code @include button-primary
 
     .styleguide-example
-      a#primary-button-small Primary button (small)
+      a#primary-button-small href="#" Primary button (small)
       code @include button-primary($size: small)
 
     .styleguide-example
-      a#secondary-button Secondary button
+      a#secondary-button href="#" Secondary button
       code @include button-secondary
 
     .styleguide-example
-      a#secondary-button-small Secondary button (small)
+      a#secondary-button-small href="#" Secondary button (small)
       code @include button-secondary($size: small)
 
     .styleguide-example
-      a#outline-button Outline button
+      a#outline-button href="#" Outline button
       code @include button-outline
 
     .styleguide-example
-      a#outline-button-small Outline button (small)
+      a#outline-button-small href="#" Outline button (small)
       code @include button-outline($size: small)
 
     .styleguide-example
-      a#link-button Link button
+      a#link-button href="#" Link button
       code
         ' @include button-link
         small Has the same display properties of a button, but without the border
 
     .styleguide-example
       #disabled-buttons
-        a#primary-button-disabled data-disabled=true Primary
-        a#secondary-button-disabled data-disabled=true Secondary
-        a#outline-button-disabled data-disabled=true Outline
+        a#primary-button-disabled href="#" data-disabled=true Primary
+        a#secondary-button-disabled href="#" data-disabled=true Secondary
+        a#outline-button-disabled href="#" data-disabled=true Outline
       code a data-disabled=true
 
     .styleguide-example
       span#button-list
-        a.button Button
-        a.button List
-        a.button data-active="true" Active
-        a.button data-disabled="true" Disabled
+        a.button href="#" Button
+        a.button href="#" List
+        a.button href="#" data-active="true" Active
+        a.button href="#" data-disabled="true" Disabled
       code @include button-list
 
     .styleguide-example
-      a#link Link
+      a#link href="#" Link
       code a
 
   //
