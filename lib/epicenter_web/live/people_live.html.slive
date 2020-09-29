@@ -1,7 +1,7 @@
 section#people-page data-role="people-page"
   h2
     #title
-      span Index Cases
+      span Index cases
 
     / #filter
       = live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_lab_results), class: "button", data: [active: @filter in [:with_lab_results, nil]]
