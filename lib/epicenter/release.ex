@@ -3,6 +3,52 @@ defmodule Epicenter.Release do
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
+  @app :epicenter
+
+  #
+  # DB management
+  #
+
+  def migrate do
+    ensure_started()
+
+    for repo <- repos() do
+      {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
+    end
+  end
+
+  def rollback(repo, version) do
+    ensure_started()
+    {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
+  end
+
+  def seeds do
+    IO.puts("RUNNING SEEDS...")
+
+    existing_user_tids = Epicenter.Accounts.list_users() |> Euclid.Extra.Enum.pluck(:tid)
+
+    new_users =
+      [{"superuser", "Sal Superuser"}, {"admin", "Amy Admin"}, {"investigator", "Ida Investigator"}, {"tracer", "Tom Tracer"}]
+      |> Enum.reject(fn {tid, _name} -> tid in existing_user_tids end)
+
+    for {tid, name} <- new_users do
+      email = "#{tid}@example.com"
+      password = "password123"
+
+      IO.puts("Creating #{name} / #{email} / #{password}")
+      Epicenter.Accounts.register_user!(%{email: email, password: password, tid: tid, name: name})
+    end
+  end
+
+  defp repos do
+    Application.load(@app)
+    Application.fetch_env!(@app, :ecto_repos)
+  end
+
+  #
+  # User management
+  #
+
   def create_user(name, email, opts \\ []) do
     ensure_started()
 
@@ -32,6 +78,10 @@ defmodule Epicenter.Release do
     [_body, url] = Regex.run(~r|\n(https?://[^\n]+)\n|, body)
     url
   end
+
+  #
+  # other stuff
+  #
 
   defp ensure_started do
     Application.ensure_all_started(:ssl)

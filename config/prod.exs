@@ -10,10 +10,12 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :epicenter, EpicenterWeb.Endpoint,
-  http: [port: {:system, "PORT"}],
-  url: [scheme: "https", host: "epicenter.geometer.dev", port: 443],
-  force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+   cache_static_manifest: "priv/static/cache_manifest.json",
+   check_origin: false,
+   force_ssl: [rewrite_on: [:x_forwarded_proto]],
+   http: [port: 4000],
+   server: true,
+   url: [host: {:system, "CANONICAL_HOST"}, port: {:system, "PORT"}]
 
 config :epicenter, mfa_issuer: "Viewpoint-staging"
 
@@ -56,4 +58,3 @@ config :logger, level: :info
 
 # Finally import the config/prod.secret.exs which loads secrets
 # and configuration from environment variables.
-import_config "prod.secret.exs"

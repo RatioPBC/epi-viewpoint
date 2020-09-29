@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: cc
+      POSTGRES_PASSWORD: abc123
+      POSTGRES_DB: epicenter_dev
+    ports:
+      - 5432:5432
+  runner:
+    image: epicenter
+    ports:
+      - 4000:4000
+    environment:
+      ALLOW_PRIVATE_WEB: "true"
+      CANONICAL_HOST: "localhost"
+      DATABASE_URL: "ecto://cc:abc123@postgres:5432/epicenter_dev"
+      DBSSL: "false"
+      LIVE_VIEW_SIGNING_SALT: "xbK8/I1ibfroHQvkZTMKbO7NOLAHtbdP"
+      RELEASE_LEVEL: "dev"
+      SECRET_KEY_BASE: "3TjNgvbwkybwa/wmAHz6kgakyAZ5ETIBCGuKRFW1s/ebkOqElLgtQrJrPZqY51cr"
+
+    depends_on:
+      - postgres
