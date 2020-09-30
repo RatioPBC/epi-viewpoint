@@ -46,6 +46,17 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   #
+  # email addresses
+  #
+  def assert_email_addresses(%View{} = view, expected_email_addresses) do
+    assert email_addresses(view) == expected_email_addresses
+  end
+
+  def email_addresses(%View{} = view) do
+    view |> Pages.parse() |> Test.Html.all("[data-role=email-addresses] li", as: :text)
+  end
+
+  #
   # lab results
   #
 

@@ -31,7 +31,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       assert_role_text(page_live, "preferred-language", "Unknown")
       assert_role_text(page_live, "phone-number", "Unknown")
-      assert_role_text(page_live, "email-address", "Unknown")
+      assert_role_text(page_live, "email-addresses", "Unknown")
       assert_role_text(page_live, "address", "Unknown")
     end
 
@@ -58,7 +58,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_role_text(page_live, "date-of-birth", "01/01/2000")
       assert_role_text(page_live, "preferred-language", "English")
       assert_role_text(page_live, "phone-number", "111-111-1001 111-111-1000")
-      assert_role_text(page_live, "email-address", "alice-preferred@example.com alice-a@example.com")
+      assert_role_text(page_live, "email-addresses", "alice-preferred@example.com alice-a@example.com")
       assert_role_text(page_live, "address", "2000 Test St, City, TS 00000 1000 Test St, City, TS 00000 home")
     end
 

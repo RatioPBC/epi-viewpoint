@@ -5,6 +5,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias EpicenterWeb.Test.Pages
   alias EpicenterWeb.ProfileEditLive
 
   setup :register_and_log_in_user
@@ -36,7 +37,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       view
       |> form("#profile-form", changes)
       |> render_submit()
-      |> assert_validation_messages(%{"person_dob" => "please enter dates as mm/dd/yyyy", "person_emails_0_address" => "can't be blank"})
+      |> assert_validation_messages(%{"person_dob" => "please enter dates as mm/dd/yyyy"})
     end
 
     test "dob field retains invalid date after failed validation, rather than resetting to the value from the database", %{conn: conn, person: person} do
@@ -75,7 +76,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         |> render_submit()
         |> follow_redirect(conn)
 
-      assert_role_text(redirected_view, "email-address", "alice@example.com")
+      assert_role_text(redirected_view, "email-addresses", "alice@example.com")
     end
 
     test "updating existing email address", %{conn: conn, person: person} do
@@ -90,7 +91,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         |> render_submit()
         |> follow_redirect(conn)
 
-      assert_role_text(redirected_view, "email-address", "alice-b@example.com")
+      assert_role_text(redirected_view, "email-addresses", "alice-b@example.com")
     end
 
     test "deleting existing email address", %{conn: conn, person: person} do
@@ -105,7 +106,17 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         |> render_submit()
         |> follow_redirect(conn)
 
-      assert_role_text(redirected_view, "email-address", "Unknown")
+      assert_role_text(redirected_view, "email-addresses", "Unknown")
+    end
+
+    test "blank email addresses are ignored (rather than being validation errors)", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
+        "emails" => %{"0" => %{"address" => "alice-0@example.com"}, "1" => %{"address" => ""}}
+      })
+      |> Pages.Profile.assert_email_addresses(["alice-0@example.com"])
     end
 
     test "editing preferred language with other option", %{conn: conn, person: person} do
@@ -172,6 +183,26 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       %{"first_name" => "Aaron", "preferred_language" => "English"}
       |> ProfileEditLive.clean_up_languages()
       |> assert_eq(%{"first_name" => "Aaron", "preferred_language" => "English"})
+    end
+  end
+
+  describe "remove_blank_email_addresses" do
+    test "removes empty email addresses from the params" do
+      %{"first_name" => "Alice", "emails" => %{"0" => %{"address" => "alice-0@example.com"}, "1" => %{"address" => ""}}}
+      |> ProfileEditLive.remove_blank_email_addresses()
+      |> assert_eq(%{"first_name" => "Alice", "emails" => %{"0" => %{"address" => "alice-0@example.com"}}}, :simple)
+    end
+
+    test "removes blank email addresses from the params" do
+      %{"first_name" => "Alice", "emails" => %{"0" => %{"address" => "  "}, "1" => %{"address" => nil}}}
+      |> ProfileEditLive.remove_blank_email_addresses()
+      |> assert_eq(%{"first_name" => "Alice", "emails" => %{}}, :simple)
+    end
+
+    test "does nothing when there are no email addresses" do
+      %{"first_name" => "Alice"}
+      |> ProfileEditLive.remove_blank_email_addresses()
+      |> assert_eq(%{"first_name" => "Alice"})
     end
   end
 end

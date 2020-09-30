@@ -32,7 +32,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("save", %{"person" => person_params}, socket) do
-    person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
+    person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages() |> remove_blank_email_addresses()
 
     case Cases.update_person(socket.assigns.person, person_params) do
       {:ok, person} ->
@@ -91,6 +91,18 @@ defmodule EpicenterWeb.ProfileEditLive do
     do: person_params |> Map.put("preferred_language", person_params |> Map.get("other_specified_language"))
 
   def clean_up_languages(person_params), do: person_params
+
+  def remove_blank_email_addresses(%{"emails" => email_params} = person_params) do
+    updated_email_params =
+      email_params
+      |> Enum.reject(fn {_index, %{"address" => address}} -> Euclid.Exists.blank?(address) end)
+      |> Map.new()
+
+    person_params |> Map.put("emails", updated_email_params)
+  end
+
+  def remove_blank_email_addresses(person_params),
+    do: person_params
 
   # # #
 
