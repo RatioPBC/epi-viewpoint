@@ -97,11 +97,11 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       email = Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
       {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
 
-      refute view |> render_click("remove-email", %{"remove" => email.id}) =~ "alice-a@example.com"
-
       {:ok, redirected_view, _} =
         view
-        |> form("#profile-form", person: %{"emails" => %{}})
+        |> form("#profile-form",
+          person: %{"emails" => %{"0" => %{"address" => "alice-a@example.com", "delete" => "true", "id" => email.id, "person_id" => person.id}}}
+        )
         |> render_submit()
         |> follow_redirect(conn)
 

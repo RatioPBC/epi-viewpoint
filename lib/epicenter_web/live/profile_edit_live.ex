@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.ProfileEditLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
+  import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2, trash_icon: 0]
 
   alias Epicenter.Cases
   alias Epicenter.DateParser
@@ -27,17 +27,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     person = socket.assigns.person
     existing_emails = socket.assigns.changeset.changes |> Map.get(:emails, socket.assigns.person.emails)
     emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{person_id: person.id}, %{})])
-    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
-    {:noreply, assign(socket, changeset: changeset)}
-  end
-
-  def handle_event("remove-email", %{"remove" => email_id}, socket) do
-    emails =
-      socket.assigns.changeset
-      |> Ecto.Changeset.fetch_field(:emails)
-      |> elem(1)
-      |> Enum.reject(fn %Cases.Email{id: id} -> id == email_id end)
-
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
     {:noreply, assign(socket, changeset: changeset)}
   end

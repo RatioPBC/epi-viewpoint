@@ -22,7 +22,6 @@ defmodule Epicenter.Cases.Address do
   @required_attrs ~w{full_address person_id}a
   @optional_attrs ~w(type tid is_preferred)a
 
-  @doc false
   def changeset(address, attrs) do
     address
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
