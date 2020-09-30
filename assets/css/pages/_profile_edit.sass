@@ -34,13 +34,19 @@
         margin-top: 2rem
 
         .email-address-wrapper
-          @include level
-
-          label
-            @include centered
 
           input[type=checkbox]
             display: none
+
+          input[type=checkbox]:checked + .email-address-and-trash-can input
+            text-decoration: line-through
+
+          .email-address-and-trash-can
+            @include level
+
+            label
+              @include centered
+
 
         #add-email
           @include button-secondary

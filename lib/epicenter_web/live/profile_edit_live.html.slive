@@ -58,10 +58,11 @@
               = error_tag email_form, :address
             = hidden_input email_form, :person_id
             .email-address-wrapper
-              = text_input email_form, :address, data: [tid: email_form.data.tid]
-              = label email_form, :delete do
-                = checkbox email_form, :delete
-                = trash_icon()
+              = checkbox email_form, :delete
+              .email-address-and-trash-can
+                = text_input email_form, :address, data: [tid: email_form.data.tid]
+                = label email_form, :delete do
+                  = trash_icon()
 
         a#add-email[phx-click="add-email"] Add email
 
