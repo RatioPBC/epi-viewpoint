@@ -2,26 +2,26 @@ defmodule Epicenter.AuditLog do
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Repo
 
-  def insert(changeset, author_id, action, event) do
-    create_revision(changeset, author_id, action, event, &Repo.insert/1)
+  def insert(changeset, author_id, action, event, ecto_options \\ []) do
+    create_revision(changeset, author_id, action, event, &Repo.insert/2, ecto_options)
   end
 
-  def insert!(changeset, author_id, action, event) do
-    create_revision(changeset, author_id, action, event, &Repo.insert!/1)
+  def insert!(changeset, author_id, action, event, ecto_options \\ []) do
+    create_revision(changeset, author_id, action, event, &Repo.insert!/2, ecto_options)
   end
 
-  def update(changeset, author_id, action, event) do
-    create_revision(changeset, author_id, action, event, &Repo.update/1)
+  def update(changeset, author_id, action, event, ecto_options \\ []) do
+    create_revision(changeset, author_id, action, event, &Repo.update/2, ecto_options)
   end
 
-  def update!(changeset, author_id, action, event) do
-    create_revision(changeset, author_id, action, event, &Repo.update!/1)
+  def update!(changeset, author_id, action, event, ecto_options \\ []) do
+    create_revision(changeset, author_id, action, event, &Repo.update!/2, ecto_options)
   end
 
-  def create_revision(changeset, author_id, action, event, repo_fn) when is_function(repo_fn) do
+  def create_revision(changeset, author_id, action, event, repo_fn, ecto_options \\ []) when is_function(repo_fn) do
     %{data: data, changes: changes} = changeset
 
-    result = repo_fn.(changeset)
+    result = repo_fn.(changeset, ecto_options)
 
     after_change =
       case result do
@@ -56,5 +56,9 @@ defmodule Epicenter.AuditLog do
 
   def revisions(changed_type) do
     Revision.Query.with_changed_type(changed_type) |> Repo.all()
+  end
+
+  def entries_for(model_id) do
+    Revision.Query.with_changed_id(model_id) |> Repo.all()
   end
 end

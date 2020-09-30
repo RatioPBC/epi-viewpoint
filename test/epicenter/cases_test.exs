@@ -75,14 +75,14 @@ defmodule Epicenter.CasesTest do
       assert person.tid == "alice"
       assert person.fingerprint == "2000-01-01 alice testuser"
 
-      assert_versioned(person)
+      assert_audit_logged(person)
     end
 
     test "create_person creates a person" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person()
       assert person.fingerprint == "2000-01-01 alice testuser"
-      assert_versioned(person)
+      assert_audit_logged(person)
     end
 
     test "get_people" do
@@ -131,14 +131,20 @@ defmodule Epicenter.CasesTest do
       alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
       bobby = Test.Fixtures.person_attrs(creator, "bobby") |> Cases.create_person!()
 
-      {:ok, [updated_alice]} = Cases.assign_user_to_people(user_id: assigned_to_user.id, people_ids: [alice.id], originator: updater)
+      {:ok, [updated_alice]} =
+        Cases.assign_user_to_people(
+          user_id: assigned_to_user.id,
+          people_ids: [alice.id],
+          audit_meta: Test.Fixtures.audit_meta(updater)
+        )
 
       assert updated_alice |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) |> Map.get(:tid) == "assigned-to"
       assert updated_alice.assigned_to.tid == "assigned-to"
 
-      assert_last_version(updated_alice,
-        change: %{"assigned_to_id" => assigned_to_user.id, "originator" => %{"id" => updater.id}},
-        by: "updater"
+      assert_recent_audit_log(
+        updated_alice,
+        updater,
+        %{"assigned_to_id" => assigned_to_user.id}
       )
 
       assert bobby |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) == nil
@@ -150,6 +156,9 @@ defmodule Epicenter.CasesTest do
       {:ok, updated_person} = person |> Cases.update_person({%{first_name: "version-2"}, %{}})
 
       assert updated_person.first_name == "version-2"
+
+      assert_revision_count(person, 2)
+      assert_recent_audit_log(person, user, %{first_name: "version-2"})
     end
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
@@ -161,30 +170,17 @@ defmodule Epicenter.CasesTest do
       assert person.last_name == "Testuser"
       assert person.tid == "alice"
 
-      assert_versions(person, [
-        [
-          change: %{
-            "assigned_to_id" => nil,
-            "dob" => "2000-01-01",
-            "employment" => nil,
-            "ethnicity" => nil,
-            "external_id" => "10000",
-            "fingerprint" => "2000-01-01 alice testuser",
-            "first_name" => "Alice",
-            "gender_identity" => nil,
-            "last_name" => "Testuser",
-            "marital_status" => nil,
-            "notes" => nil,
-            "originator" => %{"id" => creator.id},
-            "occupation" => nil,
-            "preferred_language" => "English",
-            "race" => nil,
-            "sex_at_birth" => nil,
-            "tid" => "alice"
-          },
-          by: "creator"
-        ]
-      ])
+      assert_revision_count(person, 1)
+
+      assert_recent_audit_log(person, creator, %{
+        "dob" => "2000-01-01",
+        "external_id" => "10000",
+        "fingerprint" => "2000-01-01 alice testuser",
+        "first_name" => "Alice",
+        "last_name" => "Testuser",
+        "preferred_language" => "English",
+        "tid" => "alice"
+      })
     end
 
     test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
@@ -200,6 +196,11 @@ defmodule Epicenter.CasesTest do
       assert person.first_name == "Alice"
       assert person.last_name == "Testuser"
       assert person.tid == "second-insert"
+
+      assert_revision_count(person, 2)
+      assert_recent_audit_log(person, updater, %{
+        "tid" => "second-insert"
+      })
     end
   end
 

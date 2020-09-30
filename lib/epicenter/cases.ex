@@ -1,5 +1,6 @@
 defmodule Epicenter.Cases do
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Email
@@ -23,22 +24,22 @@ defmodule Epicenter.Cases do
   #
   # people
   #
-  def assign_user_to_people(user_id: nil, people_ids: people_ids, originator: %User{} = originator),
-    do: assign_user_to_people(user: nil, people_ids: people_ids, originator: %User{} = originator)
+  def assign_user_to_people(user_id: nil, people_ids: people_ids, audit_meta: audit_meta),
+    do: assign_user_to_people(user: nil, people_ids: people_ids, audit_meta: audit_meta)
 
-  def assign_user_to_people(user_id: user_id, people_ids: people_ids, originator: %User{} = originator),
-    do: assign_user_to_people(user: Accounts.get_user(user_id), people_ids: people_ids, originator: %User{} = originator)
+  def assign_user_to_people(user_id: user_id, people_ids: people_ids, audit_meta: audit_meta),
+    do: assign_user_to_people(user: Accounts.get_user(user_id), people_ids: people_ids, audit_meta: audit_meta)
 
-  def assign_user_to_people(user: user, people_ids: people_ids, originator: %User{} = originator) do
+  def assign_user_to_people(user: user, people_ids: people_ids, audit_meta: audit_meta) do
     all_updated =
       people_ids
       |> get_people()
       |> Enum.map(fn person ->
         {:ok, updated} =
           person
-          |> Repo.Versioned.with_originator(originator)
+          # |> Repo.Versioned.with_originator(originator)
           |> Person.assignment_changeset(user)
-          |> Repo.Versioned.update()
+          |> AuditLog.update(audit_meta.author_id, audit_meta.reason_action, audit_meta.reason_event)
 
         %{updated | assigned_to: user}
       end)
@@ -49,20 +50,28 @@ defmodule Epicenter.Cases do
   def broadcast_people(people), do: Phoenix.PubSub.broadcast(Epicenter.PubSub, "people", {:people, people})
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
   def count_people(), do: Person |> Repo.aggregate(:count)
-  def create_person!({attrs, _audit_meta}), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!()
-  def create_person({attrs, _audit_meta}), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert()
+
+  def create_person!({attrs, %{author_id: author_id, reason_action: action, reason_event: event}}),
+    do: %Person{} |> change_person(attrs) |> AuditLog.insert!(author_id, action, event)
+
+  def create_person({attrs, %{author_id: author_id, reason_action: action, reason_event: event}}),
+    do: %Person{} |> change_person(attrs) |> AuditLog.insert(author_id, action, event)
+
   def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)
   def list_people(:all), do: Person.Query.all() |> Repo.all()
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
+
   def list_people(:with_lab_results), do: Person.Query.with_lab_results() |> Repo.all()
   def list_people(), do: list_people(:all)
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
-  def update_person(%Person{} = person, {attrs, _audit_meta}), do: person |> change_person(attrs) |> Repo.update()
+  def update_person(%Person{} = person, {attrs, _audit_meta}),
+      do: person |> change_person(attrs) |> Repo.update()
 
-  def upsert_person!({attrs, _audit_meta}),
-    do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
+  def upsert_person!({attrs, audit_meta}),
+    do: %Person{} |> change_person(attrs)
+        |> AuditLog.insert!(audit_meta.author_id, audit_meta.reason_action, audit_meta.reason_event, Person.Query.opts_for_upsert())
 
   #
   # address

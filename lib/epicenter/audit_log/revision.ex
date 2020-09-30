@@ -41,6 +41,12 @@ defmodule Epicenter.AuditLog.Revision do
     alias Epicenter.AuditLog
     alias Epicenter.AuditLog.Revision
 
+    def with_changed_id(changed_id) do
+      from revision in Revision,
+        where: revision.changed_id == ^changed_id,
+        order_by: revision.seq
+    end
+
     def with_changed_type(changed_type) do
       changed_type_module_name = AuditLog.module_name(changed_type)
 

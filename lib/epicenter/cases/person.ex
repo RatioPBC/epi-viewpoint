@@ -13,7 +13,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
 
-  @required_attrs ~w{dob first_name last_name originator}a
+  @required_attrs ~w{dob first_name last_name}a
   @optional_attrs ~w{assigned_to_id external_id preferred_language tid employment ethnicity gender_identity marital_status notes occupation race sex_at_birth}a
 
   @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}

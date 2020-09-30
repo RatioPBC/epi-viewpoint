@@ -31,7 +31,10 @@ defmodule Epicenter.Test.VersionAssertions do
   defp describe_last_version(schema), do: schema |> Repo.Versioned.last_version() |> describe_version()
 
   defp describe_version(version),
-    do: [change: version.item_changes |> Map.drop(["id", "inserted_at", "seq", "updated_at"]), by: Accounts.get_user(version.originator_id).tid]
+    do: [
+      change: version.item_changes |> Map.drop(["id", "inserted_at", "seq", "updated_at"]),
+      by: Accounts.get_user(version.originator_id).tid
+    ]
 
   defp describe_versions({:ok, schema}),
     do: schema |> describe_versions()
