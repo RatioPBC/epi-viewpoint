@@ -33,8 +33,14 @@
         border-top: 2px solid $divider-color
         margin-top: 2rem
 
-        fieldset div
+        .email-address-wrapper
           @include level
+
+          label
+            @include centered
+
+          input[type=checkbox]
+            display: none
 
         #add-email
           @include button-secondary
