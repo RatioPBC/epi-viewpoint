@@ -147,7 +147,7 @@ defmodule Epicenter.CasesTest do
     test "update_person updates a person" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "versioned", first_name: "version-1") |> Cases.create_person!()
-      {:ok, updated_person} = person |> Cases.update_person(%{first_name: "version-2"})
+      {:ok, updated_person} = person |> Cases.update_person({%{first_name: "version-2"}, %{}})
 
       assert updated_person.first_name == "version-2"
     end

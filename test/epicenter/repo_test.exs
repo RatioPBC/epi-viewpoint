@@ -9,7 +9,8 @@ defmodule Epicenter.RepoTest do
   describe "Versioned" do
     setup do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
-      person_changeset = %Cases.Person{} |> Cases.Person.changeset(Test.Fixtures.person_attrs(user, "version-1", external_id: "10000"))
+      {person_attrs, _audit_meta} = Test.Fixtures.person_attrs(user, "version-1", external_id: "10000")
+      person_changeset = %Cases.Person{} |> Cases.Person.changeset(person_attrs)
       [person_changeset: person_changeset, user: user]
     end
 

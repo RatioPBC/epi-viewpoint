@@ -57,8 +57,4 @@ defmodule Epicenter.AuditLog do
   def revisions(changed_type) do
     Revision.Query.with_changed_type(changed_type) |> Repo.all()
   end
-
-  # TODO transactions
-
-  # TODO Versioned repo updates here...
 end

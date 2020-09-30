@@ -13,7 +13,7 @@ defmodule Epicenter.AuditLogTest do
       assert [] = AuditLog.revisions(Cases.Person)
 
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
-      attrs_to_change_1 = Test.Fixtures.person_attrs(user, "alice")
+      {attrs_to_change_1, _audit_meta} = Test.Fixtures.person_attrs(user, "alice")
       changeset_1 = Cases.change_person(%Person{}, attrs_to_change_1)
 
       {:ok, inserted_person_1} =
@@ -26,7 +26,7 @@ defmodule Epicenter.AuditLogTest do
 
       assert [revision_1] = AuditLog.revisions(Cases.Person)
 
-      attrs_to_change_2 = Test.Fixtures.person_attrs(user, "billy")
+      {attrs_to_change_2, _audit_meta} = Test.Fixtures.person_attrs(user, "billy")
       changeset_2 = Cases.change_person(%Person{}, attrs_to_change_2)
 
       inserted_person_2 =

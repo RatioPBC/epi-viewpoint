@@ -34,7 +34,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   def handle_event("save", %{"person" => person_params}, socket) do
     person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages() |> remove_blank_email_addresses()
 
-    case Cases.update_person(socket.assigns.person, person_params) do
+    case Cases.update_person(socket.assigns.person, {person_params, %{}}) do
       {:ok, person} ->
         {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
 

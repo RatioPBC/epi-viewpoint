@@ -3,6 +3,7 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.Cases
   alias Epicenter.Csv
   alias Epicenter.DateParser
+  alias Epicenter.Extra
   alias Epicenter.Repo
 
   # Read fields
@@ -12,7 +13,7 @@ defmodule Epicenter.Cases.Import do
   @optional_person_csv_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7 sex_11 ethnicity_13 occupation_18 race_12}
 
   # Insert fields
-  @lab_result_db_fields_to_insert  ~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}
+  @lab_result_db_fields_to_insert ~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}
   @person_db_fields_to_insert ~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth sex ethnicity occupation race}
   @address_db_fields_to_insert ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
 
@@ -112,6 +113,7 @@ defmodule Epicenter.Cases.Import do
     |> Map.take(@person_db_fields_to_insert)
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
     |> Map.put("originator", originator)
+    |> Extra.Tuple.append(%{})
     |> Cases.upsert_person!()
   end
 
@@ -129,8 +131,7 @@ defmodule Epicenter.Cases.Import do
   end
 
   defp import_address(row, person) do
-    [street, city, state, zip] = address_components =
-      @address_db_fields_to_insert |> Enum.map(&Map.get(row, &1))
+    [street, city, state, zip] = address_components = @address_db_fields_to_insert |> Enum.map(&Map.get(row, &1))
 
     if Euclid.Exists.any?(address_components) do
       Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id})

@@ -49,8 +49,8 @@ defmodule Epicenter.Cases do
   def broadcast_people(people), do: Phoenix.PubSub.broadcast(Epicenter.PubSub, "people", {:people, people})
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
   def count_people(), do: Person |> Repo.aggregate(:count)
-  def create_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!()
-  def create_person(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert()
+  def create_person!({attrs, _audit_meta}), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!()
+  def create_person({attrs, _audit_meta}), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert()
   def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)
   def list_people(:all), do: Person.Query.all() |> Repo.all()
@@ -59,8 +59,10 @@ defmodule Epicenter.Cases do
   def list_people(), do: list_people(:all)
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
-  def update_person(%Person{} = person, attrs), do: person |> change_person(attrs) |> Repo.update()
-  def upsert_person!(attrs), do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
+  def update_person(%Person{} = person, {attrs, _audit_meta}), do: person |> change_person(attrs) |> Repo.update()
+
+  def upsert_person!({attrs, _audit_meta}),
+    do: %Person{} |> change_person(attrs) |> Repo.Versioned.insert!(ecto_options: Person.Query.opts_for_upsert())
 
   #
   # address

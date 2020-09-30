@@ -26,7 +26,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "when the person has no identifying information" do
     test "showing person identifying information", %{conn: conn, person: person} do
-      {:ok, _} = Cases.update_person(person, preferred_language: nil)
+      {:ok, _} = Cases.update_person(person, {%{preferred_language: nil}, %{}})
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
       assert_role_text(page_live, "preferred-language", "Unknown")
@@ -226,7 +226,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   describe "demographics" do
     setup %{person: person} do
       person_attrs = Test.Fixtures.add_demographic_attrs(%{})
-      Cases.update_person(person, person_attrs)
+      Cases.update_person(person, {person_attrs, %{}})
       :ok
     end
 

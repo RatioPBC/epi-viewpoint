@@ -133,6 +133,11 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "constraints" do
+    defp fingerprint_contstraint_error?({attrs, audit_meta}, key, new_value) do
+      {attrs |> Map.put(key, new_value), audit_meta}
+      |> fingerprint_contstraint_error?()
+    end
+
     defp fingerprint_contstraint_error?(attrs) do
       case Cases.create_person(attrs) do
         {:ok, %Person{}} ->
@@ -152,11 +157,10 @@ defmodule Epicenter.Cases.PersonTest do
 
       assert fingerprint_contstraint_error?(alice_attrs)
 
-      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "ALICE"))
-      assert fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "aLiCe"))
-      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:first_name, "Alice2"))
-
-      refute fingerprint_contstraint_error?(alice_attrs |> Map.put(:dob, ~D[1999-09-01]))
+      assert fingerprint_contstraint_error?(alice_attrs, :first_name, "ALICE")
+      assert fingerprint_contstraint_error?(alice_attrs, :first_name, "aLiCe")
+      refute fingerprint_contstraint_error?(alice_attrs, :first_name, "Alice2")
+      refute fingerprint_contstraint_error?(alice_attrs, :dob, ~D[1999-09-01])
     end
   end
 

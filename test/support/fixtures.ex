@@ -2,6 +2,14 @@ defmodule Epicenter.Test.Fixtures do
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
 
+  def audit_meta(author) do
+    %{
+      author_id: author.id,
+      reason_action: "test-run",
+      reason_event: "test"
+    }
+  end
+
   def lab_result_attrs(%Person{id: person_id}, tid, sampled_on, attrs \\ %{}) do
     %{
       person_id: person_id,
@@ -16,16 +24,22 @@ defmodule Epicenter.Test.Fixtures do
   end
 
   def person_attrs(originator, tid, attrs \\ %{}) do
-    %{
-      dob: ~D[2000-01-01],
-      first_name: String.capitalize(tid),
-      last_name: "Testuser",
-      originator: originator,
-      preferred_language: "English",
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+    attrs =
+      %{
+        dob: ~D[2000-01-01],
+        first_name: String.capitalize(tid),
+        last_name: "Testuser",
+        originator: originator,
+        preferred_language: "English",
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(originator)}
   end
+
+  def add_demographic_attrs({person_attrs, _audit_meta}),
+    do: add_demographic_attrs(person_attrs)
 
   def add_demographic_attrs(person_attrs) do
     %{
@@ -97,6 +111,17 @@ defmodule Epicenter.Test.Fixtures do
   def imported_file_attrs(tid, attrs \\ %{}) do
     %{
       file_name: "test_results_september_14_2020",
+      tid: tid
+    }
+    |> merge_attrs(attrs)
+  end
+
+  def revision_attrs(tid, attrs \\ %{}) do
+    %{
+      author_id: "author",
+      changed_type: "Epicenter.Cases.Person",
+      reason_action: "reason_action",
+      reason_event: "reason_event",
       tid: tid
     }
     |> merge_attrs(attrs)
