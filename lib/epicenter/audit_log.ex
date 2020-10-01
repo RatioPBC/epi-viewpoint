@@ -18,8 +18,23 @@ defmodule Epicenter.AuditLog do
     create_revision(changeset, author_id, action, event, &Repo.update!/2, ecto_options)
   end
 
+  defp recursively_get_changes_from_changeset(%Ecto.Changeset{changes: changes}),
+       do: recursively_get_changes_from_changeset(changes)
+
+  defp recursively_get_changes_from_changeset(%_struct{} = data), do: data
+
+  defp recursively_get_changes_from_changeset(data) when is_map(data),
+       do: data
+         |> Enum.map(fn {k, v} -> {k, recursively_get_changes_from_changeset(v)} end)
+         |> Map.new()
+
+  defp recursively_get_changes_from_changeset(data) when is_list(data),
+       do: data |> Enum.map(fn v -> recursively_get_changes_from_changeset(v) end)
+
+  defp recursively_get_changes_from_changeset(data), do: data
+
   def create_revision(changeset, author_id, action, event, repo_fn, ecto_options \\ []) when is_function(repo_fn) do
-    %{data: data, changes: changes} = changeset
+    %{data: data} = changeset
 
     result = repo_fn.(changeset, ecto_options)
 
@@ -35,7 +50,7 @@ defmodule Epicenter.AuditLog do
         "after_change" => after_change,
         "author_id" => author_id,
         "before_change" => data,
-        "change" => changes,
+        "change" => recursively_get_changes_from_changeset(changeset),
         "changed_id" => after_change.id,
         "changed_type" => module_name(data),
         "reason_action" => action,

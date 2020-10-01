@@ -62,7 +62,7 @@ defmodule Epicenter.AuditLogTest do
       attrs_to_change = Test.Fixtures.add_demographic_attrs(%{})
       changeset = Cases.change_person(person, attrs_to_change)
 
-      #      assert [%{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
+      assert [%{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
 
       {:ok, updated_person_1} =
         AuditLog.update(
@@ -72,7 +72,7 @@ defmodule Epicenter.AuditLogTest do
           Revision.update_demographics_action()
         )
 
-      assert [%{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
+      assert [%{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
 
       updated_person_2 =
         AuditLog.update!(
@@ -82,7 +82,8 @@ defmodule Epicenter.AuditLogTest do
           Revision.update_demographics_action()
         )
 
-      assert [revision_1, revision_2] = [%{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
+      assert [revision_0, revision_1, revision_2] =
+               [%{changed_id: ^person_id}, %{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
 
       assert revision_1.author_id == user.id
       assert revision_1.before_change["tid"] == "alice"
@@ -104,10 +105,52 @@ defmodule Epicenter.AuditLogTest do
       assert updated_person_2.id == reloaded_person.id
     end
 
-    @tag :skip
-    test "returns {:error, changeset} when changeset is invalid"
 
-    # TODO ^ test error case
+    test "handling nested changesets (adding an email)" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
+
+      person_params = %{
+        "dob" => "1970-01-01",
+        "emails" => %{
+          "0" => %{
+            "address" => "a@example.com",
+            "delete" => "false",
+            "person_id" => person.id
+          }
+        },
+        "first_name" => person.first_name,
+        "last_name" => person.last_name,
+        "other_specified_language" => "",
+        "preferred_language" => "English"
+      }
+
+      changeset = Cases.change_person(person, person_params)
+
+      updated_person = AuditLog.update!(changeset, user.id, "action", "event")
+
+      assert [%{address: "a@example.com"}] = updated_person.emails
+
+      assert_audit_logged(person)
+      assert_recent_audit_log(person, user, %{
+        "dob" => "1970-01-01",
+        "emails" => [%{"address" => "a@example.com", "delete" => false, "person_id" => person.id}],
+        "fingerprint" => "1970-01-01 alice testuser"
+      })
+    end
+
+    test "returns {:error, changeset} when changeset is invalid" do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
+      person_params = %{
+        "first_name" => "",
+      }
+      changeset = Cases.change_person(person, person_params)
+
+      assert {:error, _} = AuditLog.update(changeset, user.id, "action", "event")
+      # only the "create" action should have a revision. not the invalid update.
+      assert_revision_count(person, 1)
+    end
   end
 
   describe "module_name returns the name of a module, without leading application name" do
