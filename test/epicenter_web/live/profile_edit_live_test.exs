@@ -96,17 +96,12 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     test "deleting existing email address", %{conn: conn, person: person} do
       email = Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
 
-      {:ok, redirected_view, _} =
-        view
-        |> form("#profile-form",
-          person: %{"emails" => %{"0" => %{"address" => "alice-a@example.com", "delete" => "true", "id" => email.id, "person_id" => person.id}}}
-        )
-        |> render_submit()
-        |> follow_redirect(conn)
-
-      assert_role_text(redirected_view, "email-addresses", "Unknown")
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
+        "emails" => %{"0" => %{"address" => "alice-a@example.com", "delete" => "true", "id" => email.id, "person_id" => person.id}}
+      })
+      |> Pages.Profile.assert_no_email_addresses()
     end
 
     test "blank email addresses are ignored (rather than being validation errors)", %{conn: conn, person: person} do
