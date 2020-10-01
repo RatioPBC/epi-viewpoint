@@ -1,0 +1,5 @@
+#profile-edit-page data-role="profile-edit-page"
+
+  section#profile-edit
+    header
+      span Demographics

@@ -246,5 +246,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_role_text(page_live, "occupation", "architect")
       assert_role_text(page_live, "notes", "lorem ipsum")
     end
+
+    test "navigating to edit demographics", %{conn: conn, person: person} do
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
+
+      page_live
+      |> element("[data-role=edit-demographics-button]")
+      |> render_click()
+      |> assert_redirects_to("/people/#{person.id}/edit-demographics")
+    end
+
+    defp assert_redirects_to({_, {:live_redirect, %{to: destination_path}}}, expected_path) do
+      assert destination_path == expected_path
+    end
   end
 end
