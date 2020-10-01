@@ -48,6 +48,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   #
   # email addresses
   #
+
   def assert_email_addresses(%View{} = view, expected_email_addresses) do
     assert email_addresses(view) == expected_email_addresses
   end

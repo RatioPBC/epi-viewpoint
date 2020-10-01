@@ -6,7 +6,7 @@ defmodule Epicenter.Test.Html do
     do: html |> all(css_query, &tid/1) |> List.flatten()
 
   def all(html, css_query, attr: attr) when not is_binary(html),
-    do: html |> all(css_query, &Floki.attribute(&1, attr)) |> List.flatten()
+    do: html |> all(css_query, &Floki.attribute(&1, Euclid.Extra.Atom.to_string(attr))) |> List.flatten()
 
   def all(html, css_query, fun) when not is_binary(html) and is_function(fun),
     do: html |> Floki.find(css_query) |> Enum.map(fun)

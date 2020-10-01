@@ -60,7 +60,7 @@
             .email-address-wrapper
               = checkbox email_form, :delete
               .email-address-and-trash-can
-                = text_input email_form, :address, data: [tid: email_form.data.tid]
+                = text_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
                 = label email_form, :delete do
                   = trash_icon()
 

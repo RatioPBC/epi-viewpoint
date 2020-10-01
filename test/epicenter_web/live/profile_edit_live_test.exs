@@ -119,6 +119,15 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.Profile.assert_email_addresses(["alice-0@example.com"])
     end
 
+    test "clicking add email address button does not reset state of form", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.change_form(%{"emails" => %{"0" => %{"address" => "alice-0@example.com"}}})
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-0@example.com", "person[emails][1][address]" => ""})
+      |> Pages.ProfileEdit.assert_validation_messages(%{})
+    end
+
     test "editing preferred language with other option", %{conn: conn, person: person} do
       {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
 
@@ -203,6 +212,40 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       %{"first_name" => "Alice"}
       |> ProfileEditLive.remove_blank_email_addresses()
       |> assert_eq(%{"first_name" => "Alice"})
+    end
+  end
+
+  describe "clear_validation_errors" do
+    test "drops errors from top level changes" do
+      %Ecto.Changeset{errors: [address: {"can't be blank", [validation: :required]}]}
+      |> ProfileEditLive.clear_validation_errors()
+      |> assert_eq(%Ecto.Changeset{errors: []}, :simple)
+    end
+
+    test "drops errors from child changeset" do
+      %Ecto.Changeset{
+        errors: [first_name: {"can't be blank", [validation: :required]}],
+        changes: %{
+          language: %Ecto.Changeset{errors: [name: {"can't be blank", [validation: :required]}]}
+        }
+      }
+      |> ProfileEditLive.clear_validation_errors()
+      |> assert_eq(%Ecto.Changeset{errors: [], changes: %{language: %Ecto.Changeset{errors: []}}}, :simple)
+    end
+
+    test "drops errors from list of child changesets" do
+      %Ecto.Changeset{
+        errors: [first_name: {"can't be blank", [validation: :required]}],
+        changes: %{
+          emails: [
+            %Ecto.Changeset{errors: [name: {"can't be blank", [validation: :required]}]},
+            %Ecto.Changeset{errors: [name: {"can't be blank", [validation: :required]}]}
+          ],
+          foo: [1, 2]
+        }
+      }
+      |> ProfileEditLive.clear_validation_errors()
+      |> assert_eq(%Ecto.Changeset{errors: [], changes: %{emails: [%Ecto.Changeset{errors: []}, %Ecto.Changeset{errors: []}], foo: [1, 2]}}, :simple)
     end
   end
 end
