@@ -101,7 +101,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
         "emails" => %{"0" => %{"address" => "alice-a@example.com", "delete" => "true", "id" => email.id, "person_id" => person.id}}
       })
-      |> Pages.Profile.assert_no_email_addresses()
+      |> Pages.Profile.assert_email_addresses(["Unknown"])
     end
 
     test "blank email addresses are ignored (rather than being validation errors)", %{conn: conn, person: person} do

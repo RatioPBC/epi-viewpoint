@@ -49,20 +49,16 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # email addresses
   #
 
+  def assert_email_addresses(%View{} = view, ["Unknown"] = expected_email_addresses) do
+    assert email_addresses(view, "span") == expected_email_addresses
+  end
+
   def assert_email_addresses(%View{} = view, expected_email_addresses) do
     assert email_addresses(view) == expected_email_addresses
   end
 
-  def assert_no_email_addresses(%View{} = view) do
-    assert no_email_addresses(view) == ["Unknown"]
-  end
-
-  def email_addresses(%View{} = view) do
-    view |> Pages.parse() |> Test.Html.all("[data-role=email-addresses] li", as: :text)
-  end
-
-  def no_email_addresses(%View{} = view) do
-    view |> Pages.parse() |> Test.Html.all("[data-role=email-addresses] span", as: :text)
+  def email_addresses(%View{} = view, selector \\ "li") do
+    view |> Pages.parse() |> Test.Html.all("[data-role=email-addresses] #{selector}", as: :text)
   end
 
   #
