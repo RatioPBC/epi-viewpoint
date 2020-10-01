@@ -65,7 +65,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
-      assert_versioned(alice, expected_count: 1)
+      assert_revision_count(alice, 1)
 
       assert billy.dob == ~D[1990-03-01]
       assert billy.external_id == "10001"
@@ -74,7 +74,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.phones |> pluck(:number) == [1_111_111_001]
       assert billy.tid == "billy"
       assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
-      assert_versioned(billy, expected_count: 1)
+      assert_revision_count(billy, 1)
     end
 
     test "updates existing phone number when importing a duplicate for the same person", %{originator: originator} do

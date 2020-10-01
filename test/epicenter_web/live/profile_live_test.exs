@@ -14,7 +14,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   setup %{user: user} do
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-    [person: person]
+    [person: person, user: user]
   end
 
   test "disconnected and connected render", %{conn: conn, person: person} do
@@ -25,8 +25,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "when the person has no identifying information" do
-    test "showing person identifying information", %{conn: conn, person: person} do
-      {:ok, _} = Cases.update_person(person, {%{preferred_language: nil}, %{}})
+    test "showing person identifying information", %{conn: conn, person: person, user: user} do
+      {:ok, _} = Cases.update_person(person, {%{preferred_language: nil}, Test.Fixtures.audit_meta(user)})
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
       assert_role_text(page_live, "preferred-language", "Unknown")
@@ -136,7 +136,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "assign_person", %{assignee: assignee, person: alice, user: user} do
-      {:ok, [alice]} = Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id], originator: user)
+      {:ok, [alice]} = Cases.assign_user_to_people(
+        user_id: assignee.id,
+        people_ids: [alice.id],
+        audit_meta: Test.Fixtures.audit_meta(user)
+      )
       updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}} |> ProfileLive.assign_person(alice)
       assert updated_socket.assigns.person.addresses |> tids() == ["address1"]
       assert updated_socket.assigns.person.assigned_to.tid == "assignee"
@@ -224,9 +228,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "demographics" do
-    setup %{person: person} do
+    setup %{person: person, user: user} do
       person_attrs = Test.Fixtures.add_demographic_attrs(%{})
-      Cases.update_person(person, {person_attrs, %{}})
+      Cases.update_person(person, {person_attrs, Test.Fixtures.audit_meta(user)})
       :ok
     end
 

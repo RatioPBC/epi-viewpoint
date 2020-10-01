@@ -1,5 +1,6 @@
 defmodule Epicenter.Cases.Import do
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Csv
   alias Epicenter.DateParser
@@ -112,8 +113,11 @@ defmodule Epicenter.Cases.Import do
     row
     |> Map.take(@person_db_fields_to_insert)
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-    |> Map.put("originator", originator)
-    |> Extra.Tuple.append(%{})
+    |> Extra.Tuple.append(%{
+      author_id: originator.id,
+      reason_action: Revision.import_person_action(),
+      reason_event: Revision.import_csv_event()
+    })
     |> Cases.upsert_person!()
   end
 

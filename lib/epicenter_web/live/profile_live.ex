@@ -4,6 +4,7 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
@@ -37,7 +38,11 @@ defmodule EpicenterWeb.ProfileLive do
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids: [socket.assigns.person.id],
-        originator: Session.get_current_user()
+        audit_meta: %{
+          author_id: Session.get_current_user().id,
+          reason_action: Revision.update_assignment_action,
+          reason_event: Revision.profile_selected_assignee_event,
+        }
       )
 
     Cases.broadcast_people([updated_person])

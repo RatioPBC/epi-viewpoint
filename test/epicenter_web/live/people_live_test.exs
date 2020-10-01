@@ -67,7 +67,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
     test "users can be unassigned from people", %{conn: conn, user: user} do
       [users: [user, assignee], people: [alice, billy]] = create_people_and_lab_results(user)
-      Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id, billy.id], originator: user)
+      Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.audit_meta(user))
 
       {:ok, index_live, _} = live(conn, "/people")
 

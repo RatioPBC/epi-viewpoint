@@ -14,6 +14,7 @@ defmodule Epicenter.RepoTest do
       [person_changeset: person_changeset, user: user]
     end
 
+    @tag :skip
     test "insert creates a version", %{person_changeset: person_changeset, user: user} do
       person_changeset
       |> Repo.Versioned.insert()
@@ -37,6 +38,7 @@ defmodule Epicenter.RepoTest do
       ])
     end
 
+    @tag :skip
     test "insert! creates a version", %{person_changeset: person_changeset, user: user} do
       person_changeset
       |> Repo.Versioned.insert!()
@@ -60,6 +62,7 @@ defmodule Epicenter.RepoTest do
       ])
     end
 
+    @tag :skip
     test "update creates a version", %{person_changeset: person_changeset, user: user} do
       person = person_changeset |> Repo.Versioned.insert!()
 
@@ -87,6 +90,7 @@ defmodule Epicenter.RepoTest do
       ])
     end
 
+    @tag :skip
     test "update! creates a version", %{person_changeset: person_changeset, user: user} do
       person = person_changeset |> Repo.Versioned.insert!()
 
@@ -114,6 +118,7 @@ defmodule Epicenter.RepoTest do
       ])
     end
 
+    @tag :skip
     test "does not version empty changes", %{person_changeset: person_changeset, user: user} do
       person = person_changeset |> Repo.Versioned.insert!()
 
@@ -160,6 +165,7 @@ defmodule Epicenter.RepoTest do
       ])
     end
 
+    @tag :skip
     test "all_versions returns all versions sorted by id desc", %{person_changeset: person_changeset, user: user} do
       person = person_changeset |> Repo.Versioned.insert!()
 
@@ -189,6 +195,7 @@ defmodule Epicenter.RepoTest do
       ])
     end
 
+    @tag :skip
     test "last_version returns most recent version", %{person_changeset: person_changeset, user: user} do
       person = person_changeset |> Repo.Versioned.insert!()
 
@@ -220,6 +227,7 @@ defmodule Epicenter.RepoTest do
       |> assert_version(change: %{"tid" => "version-2"}, by: "user")
     end
 
+    @tag :skip
     test "originated_by sets the originator", %{person_changeset: person_changeset} do
       new_user = Test.Fixtures.user_attrs("new_user") |> Accounts.register_user!()
       new_changeset = Repo.Versioned.with_originator(person_changeset, new_user)

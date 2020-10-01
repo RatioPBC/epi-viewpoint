@@ -26,21 +26,25 @@ defmodule Epicenter.AuditLog do
     after_change =
       case result do
         {:ok, change} -> change
+        {:error, _change} -> nil
         change -> change
       end
 
-    attrs = %{
-      "after_change" => after_change,
-      "author_id" => author_id,
-      "before_change" => data,
-      "change" => changes,
-      "changed_id" => after_change.id,
-      "changed_type" => module_name(data),
-      "reason_action" => action,
-      "reason_event" => event
-    }
+    if after_change != nil do
+      attrs = %{
+        "after_change" => after_change,
+        "author_id" => author_id,
+        "before_change" => data,
+        "change" => changes,
+        "changed_id" => after_change.id,
+        "changed_type" => module_name(data),
+        "reason_action" => action,
+        "reason_event" => event
+      }
 
-    {:ok, _revision} = %Revision{} |> Revision.changeset(attrs) |> Repo.insert()
+      {:ok, _revision} = %Revision{} |> Revision.changeset(attrs) |> Repo.insert()
+    end
+
     result
   end
 

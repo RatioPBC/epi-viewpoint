@@ -66,11 +66,14 @@ defmodule Epicenter.Cases do
   def list_people(), do: list_people(:all)
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
-  def update_person(%Person{} = person, {attrs, _audit_meta}),
-      do: person |> change_person(attrs) |> Repo.update()
+  def update_person(%Person{} = person, {attrs, audit_meta}),
+      do: person
+          |> change_person(attrs)
+          |> AuditLog.update(audit_meta.author_id, audit_meta.reason_action, audit_meta.reason_event)
 
   def upsert_person!({attrs, audit_meta}),
-    do: %Person{} |> change_person(attrs)
+    do: %Person{}
+        |> change_person(attrs)
         |> AuditLog.insert!(audit_meta.author_id, audit_meta.reason_action, audit_meta.reason_event, Person.Query.opts_for_upsert())
 
   #

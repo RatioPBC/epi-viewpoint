@@ -106,6 +106,8 @@ defmodule Epicenter.AuditLogTest do
 
     @tag :skip
     test "returns {:error, changeset} when changeset is invalid"
+
+    # TODO ^ test error case
   end
 
   describe "module_name returns the name of a module, without leading application name" do

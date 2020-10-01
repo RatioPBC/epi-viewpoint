@@ -2,6 +2,7 @@ defmodule EpicenterWeb.PeopleLive do
   use EpicenterWeb, :live_view
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
@@ -40,7 +41,11 @@ defmodule EpicenterWeb.PeopleLive do
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids: Map.keys(socket.assigns.selected_people),
-        originator: Session.get_current_user()
+        audit_meta: %{
+          author_id: Session.get_current_user().id,
+          reason_action: Revision.update_assignment_bulk_action(),
+          reason_event: Revision.people_selected_assignee_event()
+        }
       )
 
     Cases.broadcast_people(updated_people)
