@@ -28,7 +28,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     existing_emails = socket.assigns.changeset.changes |> Map.get(:emails, socket.assigns.person.emails)
     emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{person_id: person.id}, %{})])
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
-    {:noreply, assign(socket, changeset: changeset |> clear_validation_errors())}
+    {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
   def handle_event("save", %{"person" => person_params}, socket) do
@@ -59,36 +59,8 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> Cases.change_person(person_params)
       |> Map.put(:action, :insert)
 
-    assign(socket, changeset: changeset |> update_dob_field_for_display() |> clear_validation_errors())
+    assign(socket, changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
   end
-
-  def clear_validation_errors(%Ecto.Changeset{} = changeset) do
-    struct!(
-      Ecto.Changeset,
-      changeset
-      |> Map.from_struct()
-      |> Enum.map(fn
-        {:errors, _val} ->
-          {:errors, []}
-
-        {:changes, map_of_changes} ->
-          {:changes,
-           map_of_changes
-           |> Enum.map(fn
-             {key, value} when is_list(value) -> {key, Enum.map(value, &clear_validation_errors(&1))}
-             {key, %Ecto.Changeset{} = value} -> {key, clear_validation_errors(value)}
-             key_value -> key_value
-           end)
-           |> Map.new()}
-
-        key_value ->
-          key_value
-      end)
-    )
-  end
-
-  def clear_validation_errors(not_a_changeset),
-    do: not_a_changeset
 
   def preferred_languages(current \\ nil) do
     has_current = Euclid.Exists.present?(current)
