@@ -22,4 +22,14 @@ defmodule Epicenter.Extra.Changeset do
       key_value -> key_value
     end)
   end
+
+  def rewrite_changeset_error_message(changeset, field, new_error_message) do
+    update_in(
+      changeset.errors,
+      &Enum.map(&1, fn
+        {^field, {_, opts}} -> {field, {new_error_message, opts}}
+        {_key, _error} = tuple -> tuple
+      end)
+    )
+  end
 end

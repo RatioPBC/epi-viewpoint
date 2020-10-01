@@ -127,20 +127,10 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   defp update_dob_field_for_display(changeset) do
     if changeset.errors |> Keyword.has_key?(:dob) do
-      rewrite_changeset_error_message(changeset, :dob, "please enter dates as mm/dd/yyyy")
+      Extra.Changeset.rewrite_changeset_error_message(changeset, :dob, "please enter dates as mm/dd/yyyy")
     else
       reformat_date(changeset, :dob)
     end
-  end
-
-  defp rewrite_changeset_error_message(changeset, field, new_error_message) do
-    update_in(
-      changeset.errors,
-      &Enum.map(&1, fn
-        {^field, {_, opts}} -> {field, {new_error_message, opts}}
-        {_key, _error} = tuple -> tuple
-      end)
-    )
   end
 
   defp reformat_date(changeset, field) do
