@@ -1,7 +1,6 @@
 defmodule Epicenter.Cases do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
-  alias Epicenter.Accounts.User
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
