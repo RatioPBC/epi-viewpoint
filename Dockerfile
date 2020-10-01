@@ -33,13 +33,22 @@ RUN \
 RUN \
   mkdir -p /usr/local/etc \
   && mkdir -p /opt/bin \
+  && mkdir /opt/ssl \
   && mkdir -p /opt/${ELIXIR_PROJECT}
+
+ARG EPICENTER_SSL_CRT
+ARG EPICENTER_SSL_KEY
+RUN echo "${EPICENTER_SSL_KEY}" > /opt/ssl/viewpoint-staging.gcp.geometer.dev.key
+RUN echo "${EPICENTER_SSL_CRT}" > /opt/ssl/viewpoint-staging.gcp.geometer.dev.crt
 
 WORKDIR /opt/${ELIXIR_PROJECT}
 
 RUN chown -R app:app /usr/local/etc \
   && chown -R app:app /opt/${ELIXIR_PROJECT} \
+  && chown -R app:app /opt/ssl \
   && sed -i 's|root:x:0:0:root:/root:/bin/ash|root:x:0:0:root:/root:/bin/bash|' /etc/passwd
+
+RUN chmod -R 500 /opt/ssl
 
 # ---- Build Stage ----
 FROM elixir:1.10.3-alpine AS app_builder

@@ -7,17 +7,11 @@ defmodule CFG do
   def secret_key_base(), do: System.fetch_env!("SECRET_KEY_BASE")
 
   def database_url() do
-#    database_url =
       System.get_env("DATABASE_URL") ||
         raise """
         environment variable DATABASE_URL is missing.
         For example: ecto://USER:PASS@HOST/DATABASE
         """
-    #    case System.fetch_env("DATABASE_SECRET") do
-#      :error -> System.fetch_env!("DATABASE_URL")
-#      {:ok, "postgres://" <> _ = url} -> url
-#      {:ok, "{" <> _ = secret} -> secret |> Jason.decode!() |> to_url()
-#    end
   end
 
   def to_boolean("true"), do: true
@@ -29,11 +23,11 @@ config :epicenter, Epicenter.Repo,
         ssl: CFG.to_boolean(System.get_env("DBSSL", "true")),
         url: CFG.database_url()
 
-config :nys_etl, EpicenterWeb.Endpoint,
-       http: [
-         port: CFG.application_port(),
-         transport_options: [socket_opts: [:inet6]]
-       ],
+config :epicenter, EpicenterWeb.Endpoint,
+       # http: [
+       #   port: CFG.application_port(),
+       #   transport_options: [socket_opts: [:inet6]]
+       # ],
        live_view: [signing_salt: CFG.live_view_signing_salt()],
        secret_key_base: CFG.secret_key_base(),
        server: true,
@@ -41,4 +35,12 @@ config :nys_etl, EpicenterWeb.Endpoint,
          host: CFG.canonical_host(),
          port: CFG.application_port(),
          scheme: "https"
+       ],
+       https: [
+         port: 4000,
+         cipher_suite: :strong,
+         otp_app: :epicenter,
+         keyfile: "/opt/ssl/viewpoint-staging.gcp.geometer.dev.key",
+         certfile: "/opt/ssl/viewpoint-staging.gcp.geometer.dev.crt"
+         # cacertfile: System.get_env("INTERMEDIATE_CERTFILE_PATH")
        ]
