@@ -54,8 +54,9 @@
           span Locating Information
 
         fieldset
-          header
-            span Email
+          = if has_emails(@changeset) do
+            header
+              span Email
           = inputs_for f, :emails, fn email_form ->
             = error_tag email_form, :address
             = hidden_input email_form, :person_id

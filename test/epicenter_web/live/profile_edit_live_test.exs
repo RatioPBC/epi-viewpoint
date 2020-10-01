@@ -68,6 +68,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     test "adding email address to a person", %{conn: conn, person: person} do
       {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
 
+      refute view |> render() =~ "Email"
+
       view |> render_click("add-email")
 
       {:ok, redirected_view, _} =

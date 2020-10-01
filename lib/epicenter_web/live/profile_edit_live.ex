@@ -35,11 +35,15 @@ defmodule EpicenterWeb.ProfileEditLive do
   def handle_event("save", %{"person" => person_params}, socket) do
     person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages() |> remove_blank_email_addresses()
 
-    case Cases.update_person(socket.assigns.person, {person_params, %{
-      author_id: Session.get_current_user().id,
-      reason_action: Revision.update_profile_action(),
-      reason_event: Revision.edit_profile_saved_event(),
-    }}) do
+    case Cases.update_person(
+           socket.assigns.person,
+           {person_params,
+            %{
+              author_id: Session.get_current_user().id,
+              reason_action: Revision.update_profile_action(),
+              reason_event: Revision.edit_profile_saved_event()
+            }}
+         ) do
       {:ok, person} ->
         {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
 
@@ -119,6 +123,14 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   def remove_blank_email_addresses(person_params),
     do: person_params
+
+  def has_emails(changeset) do
+    case changeset |> Ecto.Changeset.fetch_field(:emails) do
+      :error -> false
+      {_, []} -> false
+      _ -> true
+    end
+  end
 
   # # #
 
