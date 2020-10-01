@@ -7,7 +7,7 @@ defmodule EpicenterWeb.Test.Pages do
   alias Epicenter.Test
   alias Phoenix.LiveViewTest.View
 
-  def follow_liveview_redirect(redirect_response, conn) do
+  def follow_live_view_redirect(redirect_response, conn) do
     follow_redirect(redirect_response, conn)
   end
 

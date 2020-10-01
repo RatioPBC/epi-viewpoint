@@ -55,7 +55,7 @@
 
         fieldset
           = if has_emails(@changeset) do
-            header
+            header data-role="email-fieldset-header"
               span Email
           = inputs_for f, :emails, fn email_form ->
             = error_tag email_form, :address
@@ -64,7 +64,7 @@
               = checkbox email_form, :delete
               .email-address-and-trash-can
                 = text_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
-                = label email_form, :delete do
+                = label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do
                   = trash_icon()
 
         a#add-email[phx-click="add-email"] Add email

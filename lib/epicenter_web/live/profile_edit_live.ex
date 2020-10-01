@@ -32,18 +32,22 @@ defmodule EpicenterWeb.ProfileEditLive do
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
+  def handle_event("remove-email", %{"email-index" => email_index}, socket) do
+    existing_emails = socket.assigns.changeset |> Ecto.Changeset.fetch_field(:emails) |> elem(1)
+    emails = existing_emails |> List.delete_at(email_index |> Euclid.Extra.String.to_integer())
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
+    {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
+  end
+
   def handle_event("save", %{"person" => person_params}, socket) do
     person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages() |> remove_blank_email_addresses()
 
-    case Cases.update_person(
-           socket.assigns.person,
-           {person_params,
-            %{
-              author_id: Session.get_current_user().id,
-              reason_action: Revision.update_profile_action(),
-              reason_event: Revision.edit_profile_saved_event()
-            }}
-         ) do
+    socket.assigns.person
+    |> Cases.update_person(
+      {person_params,
+       %{author_id: Session.get_current_user().id, reason_action: Revision.update_profile_action(), reason_event: Revision.edit_profile_saved_event()}}
+    )
+    |> case do
       {:ok, person} ->
         {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
 

@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.ProfileEditLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import Euclid.Extra.Enum, only: [pluck: 2]
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases
@@ -66,19 +67,15 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "adding email address to a person", %{conn: conn, person: person} do
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.refute_email_label_present()
+      |> Pages.ProfileEdit.assert_email_form(%{})
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.assert_email_label_present()
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
+      |> Pages.Profile.assert_email_addresses(["alice@example.com"])
 
-      refute view |> render() =~ "Email"
-
-      view |> render_click("add-email")
-
-      {:ok, redirected_view, _} =
-        view
-        |> form("#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
-        |> render_submit()
-        |> follow_redirect(conn)
-
-      assert_role_text(redirected_view, "email-addresses", "alice@example.com")
+      Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> pluck(:address) |> assert_eq(["alice@example.com"])
     end
 
     test "updating existing email address", %{conn: conn, person: person} do
@@ -97,13 +94,18 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "deleting existing email address", %{conn: conn, person: person} do
-      email = Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
-        "emails" => %{"0" => %{"address" => "alice-a@example.com", "delete" => "true", "id" => email.id, "person_id" => person.id}}
-      })
+      |> Pages.ProfileEdit.assert_email_label_present()
+      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
+      |> Pages.ProfileEdit.click_remove_email_button(index: "0")
+      |> Pages.ProfileEdit.refute_email_label_present()
+      |> Pages.ProfileEdit.assert_email_form(%{})
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{}})
       |> Pages.Profile.assert_email_addresses(["Unknown"])
+
+      Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> assert_eq([])
     end
 
     test "blank email addresses are ignored (rather than being validation errors)", %{conn: conn, person: person} do

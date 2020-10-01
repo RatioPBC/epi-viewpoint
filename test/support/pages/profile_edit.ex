@@ -26,6 +26,16 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     |> Map.new()
   end
 
+  def assert_email_label_present(%View{} = view) do
+    assert view |> has_element?("[data-role=email-fieldset-header]")
+    view
+  end
+
+  def refute_email_label_present(%View{} = view) do
+    refute view |> has_element?("[data-role=email-fieldset-header]")
+    view
+  end
+
   def assert_validation_messages(%View{} = view, expected_messages) do
     view |> render() |> LiveViewAssertions.assert_validation_messages(expected_messages)
     view
@@ -44,6 +54,11 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     view
   end
 
+  def click_remove_email_button(%View{} = view, index: index) do
+    view |> render_click("remove-email", %{"email-index" => index})
+    view
+  end
+
   def submit(%View{} = view, person_params) do
     view
     |> form("#profile-form", person: person_params)
@@ -57,7 +72,7 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
       view
       |> form("#profile-form", person: person_params)
       |> render_submit()
-      |> Pages.follow_liveview_redirect(conn)
+      |> Pages.follow_live_view_redirect(conn)
 
     view
   end
