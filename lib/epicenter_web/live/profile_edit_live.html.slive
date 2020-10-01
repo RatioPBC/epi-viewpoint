@@ -9,12 +9,11 @@
       span Update profile
 
   section#profile-edit
-    header
-      span Identifying Information
-
     = form_for @changeset, "#", [id: "profile-form", phx_change: "form-change", phx_submit: "save"], fn f ->
 
       #identifying-information
+        header
+          span Identifying Information
         #name-fields
           fieldset
             = label f, :first_name do
@@ -51,11 +50,14 @@
             = text_input f, :other_specified_language
 
       #locating-information
+        header
+          span Locating Information
+
         fieldset
+          header
+            span Email
           = inputs_for f, :emails, fn email_form ->
-            = label email_form, :address do
-              | Email
-              = error_tag email_form, :address
+            = error_tag email_form, :address
             = hidden_input email_form, :person_id
             .email-address-wrapper
               = checkbox email_form, :delete
