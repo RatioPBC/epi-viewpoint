@@ -1,4 +1,6 @@
 defmodule Epicenter.Extra.Changeset do
+  import Ecto.Changeset, only: [get_change: 2]
+
   def clear_validation_errors(%Ecto.Changeset{} = changeset),
     do: struct!(Ecto.Changeset, changeset |> Map.from_struct() |> clear_top_level_changeset_validation_errors())
 
@@ -22,6 +24,12 @@ defmodule Epicenter.Extra.Changeset do
       key_value -> key_value
     end)
   end
+
+  def maybe_mark_for_deletion(%{data: %{id: nil}} = changeset),
+    do: changeset
+
+  def maybe_mark_for_deletion(changeset),
+    do: if(get_change(changeset, :delete), do: %{changeset | action: :delete}, else: changeset)
 
   def rewrite_changeset_error_message(changeset, field, new_error_message) do
     update_in(

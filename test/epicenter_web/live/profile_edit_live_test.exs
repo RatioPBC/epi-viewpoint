@@ -132,6 +132,25 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_email_form(%{})
     end
 
+    test "adding phone number to a person", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_phone_number_form(%{})
+      |> Pages.ProfileEdit.click_add_phone_button()
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111000"}}})
+      |> Pages.Profile.assert_phone_numbers(["111-111-1000"])
+
+      Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones) |> pluck(:number) |> assert_eq([1_111_111_000])
+    end
+
+    test "updating existing phone numbers", %{conn: conn, person: person} do
+      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
+      |> Pages.Profile.assert_email_addresses(["alice-b@example.com"])
+    end
+
     test "editing preferred language with other option", %{conn: conn, person: person} do
       {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
 

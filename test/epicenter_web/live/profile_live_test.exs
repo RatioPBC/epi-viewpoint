@@ -30,7 +30,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
       assert_role_text(page_live, "preferred-language", "Unknown")
-      assert_role_text(page_live, "phone-number", "Unknown")
+      assert_role_text(page_live, "phone-numbers", "Unknown")
       assert_role_text(page_live, "email-addresses", "Unknown")
       assert_role_text(page_live, "address", "Unknown")
     end
@@ -57,7 +57,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_role_text(page_live, "full-name", "Alice Testuser")
       assert_role_text(page_live, "date-of-birth", "01/01/2000")
       assert_role_text(page_live, "preferred-language", "English")
-      assert_role_text(page_live, "phone-number", "111-111-1001 111-111-1000")
+      assert_role_text(page_live, "phone-numbers", "111-111-1001 111-111-1000")
       assert_role_text(page_live, "email-addresses", "alice-preferred@example.com alice-a@example.com")
       assert_role_text(page_live, "address", "2000 Test St, City, TS 00000 1000 Test St, City, TS 00000 home")
     end
@@ -136,11 +136,13 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "assign_person", %{assignee: assignee, person: alice, user: user} do
-      {:ok, [alice]} = Cases.assign_user_to_people(
-        user_id: assignee.id,
-        people_ids: [alice.id],
-        audit_meta: Test.Fixtures.audit_meta(user)
-      )
+      {:ok, [alice]} =
+        Cases.assign_user_to_people(
+          user_id: assignee.id,
+          people_ids: [alice.id],
+          audit_meta: Test.Fixtures.audit_meta(user)
+        )
+
       updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}} |> ProfileLive.assign_person(alice)
       assert updated_socket.assigns.person.addresses |> tids() == ["address1"]
       assert updated_socket.assigns.person.assigned_to.tid == "assignee"

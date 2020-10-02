@@ -5,6 +5,7 @@ defmodule Epicenter.Cases.Email do
   import Epicenter.Validation, only: [validate_phi: 2]
 
   alias Epicenter.Cases.Email
+  alias Epicenter.Extra
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -27,14 +28,8 @@ defmodule Epicenter.Cases.Email do
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
     |> validate_phi(:email)
-    |> maybe_mark_for_deletion()
+    |> Extra.Changeset.maybe_mark_for_deletion()
   end
-
-  defp maybe_mark_for_deletion(%{data: %{id: nil}} = changeset),
-    do: changeset
-
-  defp maybe_mark_for_deletion(changeset),
-    do: if(get_change(changeset, :delete), do: %{changeset | action: :delete}, else: changeset)
 
   defmodule Query do
     def display_order() do

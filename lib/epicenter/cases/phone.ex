@@ -7,11 +7,13 @@ defmodule Epicenter.Cases.Phone do
 
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
+  alias Epicenter.Extra
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "phones" do
     field :number, :integer
+    field :delete, :boolean, virtual: true
     field :is_preferred, :boolean
     field :seq, :integer
     field :tid, :string
@@ -23,7 +25,7 @@ defmodule Epicenter.Cases.Phone do
   end
 
   @required_attrs ~w{number person_id}a
-  @optional_attrs ~w{is_preferred tid type}a
+  @optional_attrs ~w{delete is_preferred tid type}a
 
   def changeset(phone, attrs) do
     phone
@@ -31,6 +33,7 @@ defmodule Epicenter.Cases.Phone do
     |> validate_required(@required_attrs)
     |> validate_phi(:phone)
     |> unique_constraint([:person_id, :number], name: :phone_number_person_id_index)
+    |> Extra.Changeset.maybe_mark_for_deletion()
   end
 
   defmodule Query do

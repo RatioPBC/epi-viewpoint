@@ -54,7 +54,23 @@
           span Locating Information
 
         fieldset
-          = if has_emails?(@changeset) do
+          = if has_field?(@changeset, :phones) do
+            header data-role="phone-fieldset-header"
+              span Phone
+          = inputs_for f, :phones, fn phone_form ->
+            = error_tag phone_form, :number
+            = hidden_input phone_form, :person_id
+            .phone-wrapper
+              = checkbox phone_form, :delete
+              .phone-and-trash-can
+                = text_input phone_form, :number, data: [role: "phone-input", tid: phone_form.data.tid]
+                = label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do
+                  = trash_icon()
+
+        a#add-phone[phx-click="add-phone"] Add phone
+
+        fieldset
+          = if has_field?(@changeset, :emails) do
             header data-role="email-fieldset-header"
               span Email
           = inputs_for f, :emails, fn email_form ->

@@ -26,6 +26,20 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     |> Map.new()
   end
 
+  def assert_phone_number_form(%View{} = view, expected_phone_numbers) do
+    assert phone_numbers(view) == expected_phone_numbers
+    view
+  end
+
+  def phone_numbers(%View{} = view) do
+    view
+    |> Pages.parse()
+    |> Test.Html.all("[data-role=phone-number-input]", fn element ->
+      {Test.Html.attr(element, "name") |> Euclid.Extra.List.first(), Test.Html.attr(element, "value") |> Euclid.Extra.List.first("")}
+    end)
+    |> Map.new()
+  end
+
   def email_address_label(%View{} = view) do
     view |> Pages.parse() |> Test.Html.text("[data-role=email-fieldset-header]")
   end
@@ -55,6 +69,11 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
 
   def click_add_email_button(%View{} = view) do
     view |> render_click("add-email")
+    view
+  end
+
+  def click_add_phone_button(%View{} = view) do
+    view |> render_click("add-phone")
     view
   end
 

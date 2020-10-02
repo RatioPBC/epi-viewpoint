@@ -74,4 +74,20 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
     view
   end
+
+  #
+  # phone numbers
+  #
+
+  def assert_phone_numbers(%View{} = view, ["Unknown"] = expected_phone_numbers) do
+    assert phone_numbers(view, "span") == expected_phone_numbers
+  end
+
+  def assert_phone_numbers(%View{} = view, expected_phone_numbers) do
+    assert phone_numbers(view) == expected_phone_numbers
+  end
+
+  def phone_numbers(%View{} = view, selector \\ "li") do
+    view |> Pages.parse() |> Test.Html.all("[data-role=phone-numbers] #{selector}", as: :text)
+  end
 end
