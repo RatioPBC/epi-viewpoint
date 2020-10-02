@@ -110,9 +110,9 @@ defmodule Epicenter.Test.Fixtures do
   def user_attrs(tid, attrs \\ %{}) do
     %{
       email: tid <> "@example.com",
+      name: tid,
       password: "password123",
-      tid: tid,
-      username: tid
+      tid: tid
     }
     |> merge_attrs(attrs)
   end

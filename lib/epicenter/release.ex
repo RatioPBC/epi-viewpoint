@@ -3,12 +3,12 @@ defmodule Epicenter.Release do
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  def create_user(username, email) do
+  def create_user(name, email) do
     ensure_started()
 
-    IO.puts("Creating user #{username} / #{email}; they must set their password via this URL:")
+    IO.puts("Creating user #{name} / #{email}; they must set their password via this URL:")
 
-    case Accounts.register_user(%{email: email, password: Euclid.Extra.Random.string(), username: username}) do
+    case Accounts.register_user(%{email: email, password: Euclid.Extra.Random.string(), name: name}) do
       {:ok, user} ->
         generated_password_reset_url(user)
         :ok

@@ -17,13 +17,13 @@ if Application.get_env(:epicenter, :seeds_enabled?) do
 
   new_users =
     [{"superuser", "Sal Superuser"}, {"admin", "Amy Admin"}, {"investigator", "Ida Investigator"}, {"tracer", "Tom Tracer"}]
-    |> Enum.reject(fn {tid, _username} -> tid in existing_user_tids end)
+    |> Enum.reject(fn {tid, _name} -> tid in existing_user_tids end)
 
-  for {tid, username} <- new_users do
+  for {tid, name} <- new_users do
     email = "#{tid}@example.com"
     password = "password123"
 
-    IO.puts("Creating #{username} / #{email} / #{password}")
-    Epicenter.Accounts.register_user!(%{email: email, password: password, tid: tid, username: username})
+    IO.puts("Creating #{name} / #{email} / #{password}")
+    Epicenter.Accounts.register_user!(%{email: email, password: password, tid: tid, name: name})
   end
 end

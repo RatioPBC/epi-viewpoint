@@ -62,7 +62,7 @@ defmodule EpicenterWeb.PeopleLive do
     do: ""
 
   def assigned_to_name(%Person{assigned_to: assignee}),
-    do: assignee.username
+    do: assignee.name
 
   def full_name(person),
     do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")

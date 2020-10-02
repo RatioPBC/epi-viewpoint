@@ -18,10 +18,10 @@ defmodule Epicenter.Accounts.UserTest do
           {:hashed_password, :string},
           {:id, :binary_id},
           {:inserted_at, :naive_datetime},
+          {:name, :string},
           {:seq, :bigserial},
           {:tid, :string},
-          {:updated_at, :naive_datetime},
-          {:username, :string}
+          {:updated_at, :naive_datetime}
         ]
       )
     end
@@ -49,14 +49,7 @@ defmodule Epicenter.Accounts.UserTest do
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
-    test "username is required", do: assert_invalid(new_changeset(username: nil))
-
-    test "username must be unique" do
-      Test.Fixtures.user_attrs("alice") |> Accounts.register_user!()
-
-      {:error, changeset} = Test.Fixtures.user_attrs("alice", email: "new@example.com") |> Accounts.register_user()
-      assert errors_on(changeset).username == ["has already been taken"]
-    end
+    test "name is required", do: assert_invalid(new_changeset(name: nil))
 
     test "email must be unique" do
       alice = Test.Fixtures.user_attrs("alice") |> Accounts.register_user!()

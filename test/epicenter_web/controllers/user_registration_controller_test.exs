@@ -24,7 +24,7 @@ defmodule EpicenterWeb.UserRegistrationControllerTest do
 
       conn =
         post(conn, Routes.user_registration_path(conn, :create), %{
-          "user" => %{"email" => email, "password" => valid_user_password(), "username" => "Alice"}
+          "user" => %{"email" => email, "password" => valid_user_password(), "name" => "Alice"}
         })
 
       assert get_session(conn, :user_token)

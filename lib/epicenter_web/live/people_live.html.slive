@@ -18,7 +18,7 @@ section#people-page data-page="people"
               option value=""
               option value="-unassigned-" Unassigned
               = for user <- @users do
-                option value="#{user.id}" #{user.username}
+                option value="#{user.id}" #{user.name}
           #assignment-dropdown-tooltip Select people below then assign them to a user
 
     #toolbar-right

@@ -14,17 +14,17 @@ defmodule Epicenter.Accounts.User do
     field :confirmed_at, :naive_datetime
     field :email, :string
     field :hashed_password, :string
+    field :name, :string
     field :password, :string, virtual: true
     field :seq, :integer
     field :tid, :string
-    field :username, :string
 
     timestamps()
 
     has_many :assignments, Person, foreign_key: :assigned_to_id
   end
 
-  @required_attrs ~w{username}a
+  @required_attrs ~w{name}a
   @optional_attrs ~w{tid}a
   @registration_attrs ~w{email password}a
 
@@ -32,7 +32,6 @@ defmodule Epicenter.Accounts.User do
     user
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
-    |> unique_constraint(:username)
   end
 
   @doc """
@@ -49,7 +48,6 @@ defmodule Epicenter.Accounts.User do
     |> validate_required(@required_attrs)
     |> validate_email()
     |> validate_password()
-    |> unique_constraint(:username)
   end
 
   defp validate_email(changeset) do
@@ -143,7 +141,7 @@ defmodule Epicenter.Accounts.User do
     import Ecto.Query
 
     def all() do
-      from user in User, order_by: [asc: user.username, asc: user.seq]
+      from user in User, order_by: [asc: user.name, asc: user.seq]
     end
   end
 end

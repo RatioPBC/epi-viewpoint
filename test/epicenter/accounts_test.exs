@@ -12,14 +12,14 @@ defmodule Epicenter.AccountsTest do
     {:ok, user} = Test.Fixtures.user_attrs("alice") |> Accounts.register_user()
 
     assert user.tid == "alice"
-    assert user.username == "alice"
+    assert user.name == "alice"
   end
 
   test "create_user! creates a user" do
     user = Test.Fixtures.user_attrs("alice") |> Accounts.register_user!()
 
     assert user.tid == "alice"
-    assert user.username == "alice"
+    assert user.name == "alice"
   end
 
   describe "get_user_by_email/1" do
@@ -112,7 +112,7 @@ defmodule Epicenter.AccountsTest do
   describe "change_user_registration/2" do
     test "returns a changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
-      assert changeset.required == [:password, :email, :username]
+      assert changeset.required == [:password, :email, :name]
     end
   end
 

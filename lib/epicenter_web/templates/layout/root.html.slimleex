@@ -26,7 +26,7 @@ html lang="en"
               #user-menu
                 #user-menu-title
                   = person_icon()
-                  div= @current_user.username
+                  div= @current_user.name
                   = arrow_down_icon()
 
                 ul#user-menu-list role="menu"
