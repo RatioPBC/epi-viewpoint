@@ -9,16 +9,22 @@ defmodule Epicenter.Test.Html do
     do: html |> all(css_query, &Floki.attribute(&1, Euclid.Extra.Atom.to_string(attr))) |> List.flatten()
 
   def all(html, css_query, fun) when not is_binary(html) and is_function(fun),
-    do: html |> Floki.find(css_query) |> Enum.map(fun)
+    do: html |> find(css_query) |> Enum.map(fun)
 
   def attr(html, css_query \\ "*", attr_name) when not is_binary(html),
     do: html |> Floki.attribute(css_query, attr_name)
 
+  def find(html, css_query) when not is_binary(html),
+    do: html |> Floki.find(css_query)
+
+  def find!(html, css_query) when not is_binary(html),
+    do: html |> find(css_query) |> assert_found(html, css_query)
+
   def has_role?(html, role),
-    do: html |> Floki.find("[data-role=#{role}]") |> Euclid.Exists.present?()
+    do: html |> find("[data-role=#{role}]") |> Euclid.Exists.present?()
 
   def html(html, css_query) when not is_binary(html),
-    do: html |> Floki.find(css_query) |> Enum.map(&Floki.raw_html/1)
+    do: html |> find(css_query) |> Enum.map(&Floki.raw_html/1)
 
   def meta_contents(html, name) when not is_binary(html),
     do: html |> Floki.attribute("meta[name=#{name}]", "content") |> Enum.join("")
@@ -42,8 +48,16 @@ defmodule Epicenter.Test.Html do
     do: html |> Floki.text(sep: " ")
 
   def text(html, css_query) when not is_binary(html),
-    do: html |> Floki.find(css_query) |> Floki.text()
+    do: html |> find(css_query) |> Floki.text()
 
   def tid(html),
     do: html |> Floki.attribute("data-tid")
+
+  # # #
+
+  defp assert_found([], html, css_query),
+    do: raise("CSS query “#{css_query}” did not find anything in: \n\n#{Floki.raw_html(html)}")
+
+  defp assert_found(found, _html, _css_query),
+    do: found
 end

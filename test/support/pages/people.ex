@@ -10,6 +10,10 @@ defmodule EpicenterWeb.Test.Pages.People do
     conn |> Pages.visit("/people")
   end
 
+  def assert_here(view_or_conn) do
+    view_or_conn |> Pages.assert_on_page("people")
+  end
+
   def assign(%View{} = view, people, user) do
     for person <- people do
       view |> element("[data-tid=#{person.tid}]") |> render_click(%{"person-id" => person.id, "value" => "on"})

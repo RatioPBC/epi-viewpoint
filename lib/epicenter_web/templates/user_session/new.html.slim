@@ -1,5 +1,5 @@
 #login-page
-  = form_for @conn, Routes.user_session_path(@conn, :create), [as: :user], fn f ->
+  = form_for @conn, Routes.user_session_path(@conn, :create), [as: :user, data: [role: "login-form"]], fn f ->
 
     #form-contents
       header
@@ -19,7 +19,7 @@
       = if @error_message do
         .form-error-message
           = error_icon()
-          div= @error_message
+          div data-form-error-message=@error_message = @error_message
 
       fieldset
         = label f, :email
