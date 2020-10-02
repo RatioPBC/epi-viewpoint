@@ -81,7 +81,7 @@ defmodule Epicenter.Cases.PersonTest do
   describe "changeset" do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
-      default_attrs = Test.Fixtures.person_attrs(user, "alice") |> Test.Fixtures.add_demographic_attrs()
+      default_attrs = Test.Fixtures.raw_person_attrs(user, "alice") |> Test.Fixtures.add_demographic_attrs()
       Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 

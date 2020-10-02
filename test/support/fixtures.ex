@@ -23,23 +23,29 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
+  # annotated with audit_meta
   def person_attrs(originator, tid, attrs \\ %{}) do
     attrs =
-      %{
-        dob: ~D[2000-01-01],
-        first_name: String.capitalize(tid),
-        last_name: "Testuser",
-        originator: originator,
-        preferred_language: "English",
-        tid: tid
-      }
+      raw_person_attrs(originator, tid, attrs)
       |> merge_attrs(attrs)
 
     {attrs, audit_meta(originator)}
   end
 
-  def add_demographic_attrs({person_attrs, _audit_meta}),
-    do: add_demographic_attrs(person_attrs)
+  def raw_person_attrs(originator, tid, attrs \\ %{}) do
+    %{
+      dob: ~D[2000-01-01],
+      first_name: String.capitalize(tid),
+      last_name: "Testuser",
+      originator: originator,
+      preferred_language: "English",
+      tid: tid
+    }
+    |> merge_attrs(attrs)
+  end
+
+  def add_demographic_attrs({person_attrs, audit_meta}),
+    do: {add_demographic_attrs(person_attrs), audit_meta}
 
   def add_demographic_attrs(person_attrs) do
     %{

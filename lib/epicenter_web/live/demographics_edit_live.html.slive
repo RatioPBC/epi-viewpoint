@@ -1,5 +1,14 @@
-#profile-edit-page data-role="profile-edit-page"
+#demographics-edit-page data-role="demographics-edit-page"
 
-  section#profile-edit
+  section#demographics-edit
     header
       span Demographics
+    = form_for @changeset, "#", [id: "demographics-form", phx_change: "form-change", phx_submit: "save"], fn f ->
+      #gender-identity-options
+        = for gender_identity_option <- gender_identity_options() do
+
+          = label f, :gender_identity, data_role: "gender-identity-checkbox-label" do
+            = gender_identity_option
+            = checkbox f, :gender_identity, value: gender_identity_option, checked: true, data_role: "gender-identity-checkbox"
+
+      = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

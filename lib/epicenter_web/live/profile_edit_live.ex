@@ -42,7 +42,7 @@ defmodule EpicenterWeb.ProfileEditLive do
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
 
-    changeset |> Ecto.Changeset.fetch_field(:emails) |> IO.inspect(label: "EMAILS ASSIGNED AFTER EVERYTHING!")
+    changeset |> Ecto.Changeset.fetch_field(:emails)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
