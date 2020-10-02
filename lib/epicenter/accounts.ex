@@ -324,12 +324,13 @@ defmodule Epicenter.Accounts do
   """
   def reset_user_password(user, attrs) do
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, User.password_changeset(user, attrs))
+    |> Ecto.Multi.update(:user_with_new_password, User.password_changeset(user, attrs))
+    |> Ecto.Multi.update(:confirmed_user, User.confirm_changeset(user))
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
     |> Repo.transaction()
     |> case do
-      {:ok, %{user: user}} -> {:ok, user}
-      {:error, :user, changeset, _} -> {:error, changeset}
+      {:ok, %{confirmed_user: user}} -> {:ok, user}
+      {:error, _, changeset, _} -> {:error, changeset}
     end
   end
 end

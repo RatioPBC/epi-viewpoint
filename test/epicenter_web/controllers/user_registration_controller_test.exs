@@ -30,12 +30,9 @@ defmodule EpicenterWeb.UserRegistrationControllerTest do
       assert get_session(conn, :user_token)
       assert redirected_to(conn) =~ "/"
 
-      # Now do a logged in request and assert on the menu
+      # still can't log in until confirmed
       conn = get(conn, "/people")
-      response = html_response(conn, 200)
-      assert response =~ "Alice"
-      assert response =~ "Settings</a>"
-      assert response =~ "Log out</a>"
+      Plug.Conn.get_resp_header(conn, "location") |> assert_eq(["/users/login"])
     end
 
     test "render errors for invalid data", %{conn: conn} do

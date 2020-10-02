@@ -16,6 +16,10 @@
       = if get_flash(@conn, :extra) do
         div#flash-extra = get_flash(@conn, :extra)
 
+      = if get_flash(@conn, :error) do
+        - error = get_flash(@conn, :error)
+        div#flash-error data-form-error-message=error = error
+
       = if @error_message do
         .form-error-message
           = error_icon()

@@ -112,7 +112,7 @@ defmodule EpicenterWeb.UserAuth do
   Used for routes that require the user to not be authenticated.
   """
   def redirect_if_user_is_authenticated(conn, _opts) do
-    if conn.assigns[:current_user] do
+    if user_authentication_status(conn) == :authenticated do
       conn
       |> redirect(to: signed_in_path(conn))
       |> halt()
@@ -128,14 +128,30 @@ defmodule EpicenterWeb.UserAuth do
   they use the application at all, here would be a good place.
   """
   def require_authenticated_user(conn, _opts) do
-    if conn.assigns[:current_user] do
+    error =
+      case user_authentication_status(conn) do
+        :authenticated -> nil
+        :not_logged_in -> "You must log in to access this page"
+        :not_confirmed -> "Your email address must be confirmed before you can log in"
+      end
+
+    if error do
       conn
-    else
-      conn
-      |> put_flash(:error, "You must log in to access this page.")
+      |> renew_session()
+      |> put_flash(:error, error)
       |> maybe_store_return_to()
       |> redirect(to: Routes.user_session_path(conn, :new))
       |> halt()
+    else
+      conn
+    end
+  end
+
+  defp user_authentication_status(conn) do
+    cond do
+      conn.assigns[:current_user] == nil -> :not_logged_in
+      conn.assigns[:current_user].confirmed_at == nil -> :not_confirmed
+      true -> :authenticated
     end
   end
 

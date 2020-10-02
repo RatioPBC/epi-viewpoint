@@ -2,7 +2,7 @@ defmodule EpicenterWeb.UserAuthTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Accounts
-  alias Epicenter.Test
+  alias Epicenter.AccountsFixtures
   alias EpicenterWeb.UserAuth
 
   setup %{conn: conn} do
@@ -11,7 +11,7 @@ defmodule EpicenterWeb.UserAuthTest do
       |> Map.replace!(:secret_key_base, EpicenterWeb.Endpoint.config(:secret_key_base))
       |> init_test_session(%{})
 
-    user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+    user = AccountsFixtures.user_fixture()
 
     %{user: user, conn: conn}
   end
@@ -134,7 +134,15 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
-      assert get_flash(conn, :error) == "You must log in to access this page."
+      assert get_flash(conn, :error) == "You must log in to access this page"
+    end
+
+    test "redirects if user is authenticated but not confirmed", %{conn: conn} do
+      user = AccountsFixtures.unconfirmed_user_fixture(%{tid: "user2"})
+      conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
+      assert conn.halted
+      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert get_flash(conn, :error) == "Your email address must be confirmed before you can log in"
     end
 
     test "stores the path to redirect to on GET", %{conn: conn} do
@@ -164,7 +172,7 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "does not redirect if user is authenticated", %{conn: conn, user: user} do
-      conn = conn |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
+      conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       refute conn.halted
       refute conn.status
     end

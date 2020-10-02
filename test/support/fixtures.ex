@@ -104,6 +104,9 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
+  def user_attrs(%{tid: tid} = attrs),
+    do: user_attrs(tid, Map.delete(attrs, :tid))
+
   def user_attrs(tid, attrs \\ %{}) do
     %{
       email: tid <> "@example.com",

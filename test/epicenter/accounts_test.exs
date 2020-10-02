@@ -476,6 +476,12 @@ defmodule Epicenter.AccountsTest do
       assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
     end
 
+    test "confirms the user", %{user: user} do
+      assert user.confirmed_at == nil
+      {:ok, updated_user} = Accounts.reset_user_password(user, %{password: "new valid password"})
+      assert updated_user.confirmed_at != nil
+    end
+
     test "deletes all tokens for the given user", %{user: user} do
       _ = Accounts.generate_user_session_token(user)
       {:ok, _} = Accounts.reset_user_password(user, %{password: "new valid password"})

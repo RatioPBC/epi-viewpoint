@@ -6,7 +6,7 @@ defmodule EpicenterWeb.UserConfirmationControllerTest do
   import Epicenter.AccountsFixtures
 
   setup do
-    %{user: user_fixture()}
+    %{user: unconfirmed_user_fixture()}
   end
 
   describe "GET /users/confirm" do
