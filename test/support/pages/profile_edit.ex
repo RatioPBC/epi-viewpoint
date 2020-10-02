@@ -26,13 +26,17 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     |> Map.new()
   end
 
+  def email_address_label(%View{} = view) do
+    view |> Pages.parse() |> Test.Html.text("[data-role=email-fieldset-header]")
+  end
+
   def assert_email_label_present(%View{} = view) do
-    assert view |> has_element?("[data-role=email-fieldset-header]")
+    assert view |> email_address_label() == "Email"
     view
   end
 
   def refute_email_label_present(%View{} = view) do
-    refute view |> has_element?("[data-role=email-fieldset-header]")
+    assert view |> email_address_label() == ""
     view
   end
 

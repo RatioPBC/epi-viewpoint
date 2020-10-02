@@ -54,7 +54,7 @@
           span Locating Information
 
         fieldset
-          = if has_emails(@changeset) do
+          = if has_emails?(@changeset) do
             header data-role="email-fieldset-header"
               span Email
           = inputs_for f, :emails, fn email_form ->

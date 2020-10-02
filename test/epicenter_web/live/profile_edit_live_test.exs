@@ -68,10 +68,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     test "adding email address to a person", %{conn: conn, person: person} do
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.refute_email_label_present()
       |> Pages.ProfileEdit.assert_email_form(%{})
       |> Pages.ProfileEdit.click_add_email_button()
-      |> Pages.ProfileEdit.assert_email_label_present()
       |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
       |> Pages.Profile.assert_email_addresses(["alice@example.com"])
 
@@ -125,6 +123,19 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-0@example.com", "person[emails][1][address]" => ""})
       |> Pages.ProfileEdit.assert_validation_messages(%{})
+    end
+
+    test "email label hides when no emails are present", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.refute_email_label_present()
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.assert_email_label_present()
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.click_remove_email_button(index: "1")
+      |> Pages.ProfileEdit.assert_email_label_present()
+      |> Pages.ProfileEdit.click_remove_email_button(index: "0")
+      |> Pages.ProfileEdit.refute_email_label_present()
+      |> Pages.ProfileEdit.assert_email_form(%{})
     end
 
     test "editing preferred language with other option", %{conn: conn, person: person} do

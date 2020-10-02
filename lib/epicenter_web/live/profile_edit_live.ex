@@ -26,16 +26,23 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   def handle_event("add-email", _value, socket) do
     person = socket.assigns.person
-    existing_emails = socket.assigns.changeset.changes |> Map.get(:emails, socket.assigns.person.emails)
+
+    existing_emails = socket.assigns.changeset |> get_emails_from_changeset()
     emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{person_id: person.id}, %{})])
+
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
-  def handle_event("remove-email", %{"email-index" => email_index}, socket) do
-    existing_emails = socket.assigns.changeset |> Ecto.Changeset.fetch_field(:emails) |> elem(1)
-    emails = existing_emails |> List.delete_at(email_index |> Euclid.Extra.String.to_integer())
+  def handle_event("remove-email", %{"email-index" => email_index_param}, socket) do
+    email_index = email_index_param |> Euclid.Extra.String.to_integer()
+
+    existing_emails = socket.assigns.changeset |> get_emails_from_changeset()
+    emails = existing_emails |> List.delete_at(email_index)
+
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
+
+    changeset |> Ecto.Changeset.fetch_field(:emails) |> IO.inspect(label: "EMAILS ASSIGNED AFTER EVERYTHING!")
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
@@ -128,7 +135,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   def remove_blank_email_addresses(person_params),
     do: person_params
 
-  def has_emails(changeset) do
+  def has_emails?(changeset) do
     case changeset |> Ecto.Changeset.fetch_field(:emails) do
       :error -> false
       {_, []} -> false
@@ -137,6 +144,19 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   # # #
+
+  defp get_emails_from_changeset(changeset),
+    do: changeset |> Ecto.Changeset.fetch_field(:emails) |> elem(1)
+
+  defp reformat_date(changeset, field) do
+    case Ecto.Changeset.fetch_field(changeset, field) do
+      {:error} -> changeset
+      {_, date} -> Ecto.Changeset.put_change(changeset, field, Extra.Date.render(date))
+    end
+  end
+
+  defp noreply(socket),
+    do: {:noreply, socket}
 
   # replace human readable dates with Date objects
   defp update_dob_field_for_changeset(person_params) do
@@ -153,14 +173,4 @@ defmodule EpicenterWeb.ProfileEditLive do
       reformat_date(changeset, :dob)
     end
   end
-
-  defp reformat_date(changeset, field) do
-    case Ecto.Changeset.fetch_field(changeset, field) do
-      {:error} -> changeset
-      {_, date} -> Ecto.Changeset.put_change(changeset, field, Extra.Date.render(date))
-    end
-  end
-
-  defp noreply(socket),
-    do: {:noreply, socket}
 end

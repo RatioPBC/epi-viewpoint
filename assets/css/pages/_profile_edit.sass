@@ -39,8 +39,10 @@
         fieldset header
           font-size: $body-text-size
 
-        .email-address-wrapper
+        .email-address-wrapper:not(:first-of-type)
+          @include vertical-flow
 
+        .email-address-wrapper
           input[type=checkbox]
             display: none
 
@@ -52,7 +54,6 @@
 
             label
               @include centered
-
 
         #add-email
           @include button-secondary
