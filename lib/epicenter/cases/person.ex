@@ -45,7 +45,7 @@ defmodule Epicenter.Cases.Person do
     has_many :addresses, Address
     has_many :emails, Email, on_replace: :delete
     has_many :lab_results, LabResult
-    has_many :phones, Phone
+    has_many :phones, Phone, on_replace: :delete
   end
 
   def assignment_changeset(person, nil = _user), do: person |> changeset(%{assigned_to_id: nil})

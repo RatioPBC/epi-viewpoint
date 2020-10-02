@@ -118,10 +118,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_email_label_present()
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
       |> Pages.ProfileEdit.click_remove_email_button(index: "0")
-      |> Pages.ProfileEdit.refute_email_label_present()
       |> Pages.ProfileEdit.assert_email_form(%{})
       |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{}})
       |> Pages.Profile.assert_email_addresses(["Unknown"])
@@ -179,6 +177,29 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
       |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111001"}}})
+      |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
+    end
+
+    test "deleting existing phone numbers", %{conn: conn, person: person} do
+      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
+      |> Pages.ProfileEdit.click_remove_phone_button(index: "0")
+      |> Pages.ProfileEdit.assert_phone_number_form(%{})
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{}})
+      |> Pages.Profile.assert_phone_numbers(["Unknown"])
+
+      Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones) |> assert_eq([])
+    end
+
+    test "blank phone numbers are ignored (rather than being validation errors)", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.click_add_phone_button()
+      |> Pages.ProfileEdit.click_add_phone_button()
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
+        "phones" => %{"0" => %{"number" => "1111111001"}, "1" => %{"number" => ""}}
+      })
       |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
     end
   end
