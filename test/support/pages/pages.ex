@@ -32,9 +32,11 @@ defmodule EpicenterWeb.Test.Pages do
   def follow_conn_redirect(%Plug.Conn{} = conn, _),
     do: conn
 
-  def follow_live_view_redirect(redirect_response, conn) do
-    follow_redirect(redirect_response, conn)
-  end
+  def follow_live_view_redirect(redirect_response, conn),
+    do: follow_redirect(redirect_response, conn)
+
+  def form_errors(conn),
+    do: conn |> parse() |> Test.Html.all("[data-form-error-message]", attr: "data-form-error-message")
 
   def parse(%Plug.Conn{} = conn),
     do: conn |> html_response(200) |> Test.Html.parse_doc()
@@ -60,7 +62,12 @@ defmodule EpicenterWeb.Test.Pages do
       """
     end
 
-    conn |> Phoenix.ConnTest.post(path, %{name => fields}) |> follow_conn_redirect()
+    conn = conn |> Phoenix.ConnTest.post(path, %{name => fields}) |> follow_conn_redirect()
+
+    case form_errors(conn) do
+      [] -> conn
+      errors -> {:error, errors}
+    end
   end
 
   def visit(%Plug.Conn{} = conn, path) do
