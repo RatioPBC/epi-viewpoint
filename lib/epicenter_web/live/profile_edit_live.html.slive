@@ -59,7 +59,6 @@
               span Phone
           = inputs_for f, :phones, fn phone_form ->
             = error_tag phone_form, :number
-            = hidden_input phone_form, :person_id
             .phone-wrapper
               = checkbox phone_form, :delete
               .phone-and-trash-can
@@ -75,7 +74,6 @@
               span Email
           = inputs_for f, :emails, fn email_form ->
             = error_tag email_form, :address
-            = hidden_input email_form, :person_id
             .email-address-wrapper
               = checkbox email_form, :delete
               .email-address-and-trash-can

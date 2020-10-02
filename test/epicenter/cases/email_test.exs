@@ -41,17 +41,8 @@ defmodule Epicenter.Cases.EmailTest do
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "address is required", do: assert_invalid(new_changeset(address: nil))
-    test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
 
     test "validates personal health information on address", do: assert_invalid(new_changeset(address: "test@google.com"))
-
-    test "marks changeset for delete only when delete flag is true" do
-      new_changeset = new_changeset(%{})
-      assert new_changeset.action == nil
-
-      changeset = new_changeset |> Repo.insert!() |> Email.changeset(%{delete: true})
-      assert changeset.action == :delete
-    end
   end
 
   describe "query" do

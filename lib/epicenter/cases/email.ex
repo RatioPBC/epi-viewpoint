@@ -20,8 +20,8 @@ defmodule Epicenter.Cases.Email do
     timestamps()
   end
 
-  @required_attrs ~w{address person_id}a
-  @optional_attrs ~w{delete is_preferred tid}a
+  @required_attrs ~w{address}a
+  @optional_attrs ~w{delete is_preferred person_id tid}a
 
   def changeset(email, attrs) do
     email

@@ -24,8 +24,8 @@ defmodule Epicenter.Cases.Phone do
     belongs_to :person, Person
   end
 
-  @required_attrs ~w{number person_id}a
-  @optional_attrs ~w{delete is_preferred tid type}a
+  @required_attrs ~w{number}a
+  @optional_attrs ~w{delete is_preferred person_id tid type}a
 
   def changeset(phone, attrs) do
     phone

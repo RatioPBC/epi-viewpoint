@@ -26,7 +26,7 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   def handle_event("add-email", _value, socket) do
     existing_emails = socket.assigns.changeset |> get_field_from_changeset(:emails)
-    emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{person_id: socket.assigns.person.id}, %{})])
+    emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
@@ -34,7 +34,7 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   def handle_event("add-phone", _value, socket) do
     existing_phones = socket.assigns.changeset |> get_field_from_changeset(:phones)
-    phones = existing_phones |> Enum.concat([Cases.change_phone(%Cases.Phone{person_id: socket.assigns.person.id}, %{})])
+    phones = existing_phones |> Enum.concat([Cases.change_phone(%Cases.Phone{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
