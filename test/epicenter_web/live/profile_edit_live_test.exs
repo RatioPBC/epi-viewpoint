@@ -78,17 +78,11 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
     test "updating existing email address", %{conn: conn, person: person} do
       Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
 
-      assert_attribute(view, "input[data-tid=alice-a]", "value", ["alice-a@example.com"])
-
-      {:ok, redirected_view, _} =
-        view
-        |> form("#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
-        |> render_submit()
-        |> follow_redirect(conn)
-
-      assert_role_text(redirected_view, "email-addresses", "alice-b@example.com")
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
+      |> Pages.Profile.assert_email_addresses(["alice-b@example.com"])
     end
 
     test "deleting existing email address", %{conn: conn, person: person} do
