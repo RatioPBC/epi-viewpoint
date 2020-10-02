@@ -3,7 +3,6 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
 
   alias Epicenter.Cases.Person
   alias Epicenter.Test
-  alias EpicenterWeb.Test.LiveViewAssertions
   alias EpicenterWeb.Test.Pages
 
   def visit(%Plug.Conn{} = conn, %Person{id: person_id}) do
@@ -11,7 +10,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
   end
 
   def assert_here(view) do
-    LiveViewAssertions.assert_has_role(view, "demographics-edit-page")
+    view |> Pages.assert_on_page("demographics-edit")
   end
 
   def assert_gender_identity_selections(view, expected_selections) do
