@@ -34,7 +34,7 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
   def phone_numbers(%View{} = view) do
     view
     |> Pages.parse()
-    |> Test.Html.all("[data-role=phone-number-input]", fn element ->
+    |> Test.Html.all("[data-role=phone-input]", fn element ->
       {Test.Html.attr(element, "name") |> Euclid.Extra.List.first(), Test.Html.attr(element, "value") |> Euclid.Extra.List.first("")}
     end)
     |> Map.new()

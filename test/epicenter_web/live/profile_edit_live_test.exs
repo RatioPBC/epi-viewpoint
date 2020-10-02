@@ -11,12 +11,12 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
   setup :register_and_log_in_user
 
-  describe "render" do
-    setup %{user: user} do
-      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      [person: person]
-    end
+  setup %{user: user} do
+    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    [person: person]
+  end
 
+  describe "render" do
     test "disconnected and connected render", %{conn: conn, person: %Cases.Person{id: id}} do
       {:ok, view, disconnected_html} = live(conn, "/people/#{id}/edit")
 
@@ -66,6 +66,35 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_role_text(redirected_view, "preferred-language", "French")
     end
 
+    test "editing preferred language with other option", %{conn: conn, person: person} do
+      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+
+      {:ok, redirected_live, _} =
+        view
+        |> form("#profile-form",
+          person: %{
+            first_name: "Aaron",
+            last_name: "Testuser2",
+            dob: "01/01/2020",
+            preferred_language: "Other",
+            other_specified_language: "Welsh"
+          }
+        )
+        |> render_submit()
+        |> follow_redirect(conn)
+
+      assert_role_text(redirected_live, "full-name", "Aaron Testuser2")
+      assert_role_text(redirected_live, "date-of-birth", "01/01/2020")
+      assert_role_text(redirected_live, "preferred-language", "Welsh")
+
+      # the custom option appears in the dropdown if you edit it again after saving
+      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+      assert_selected_dropdown_option(view: view, data_role: "preferred-language", expected: ["Welsh"])
+      assert_attribute(view, "[data-role=other-preferred-language]", "data-disabled", ["data-disabled"])
+    end
+  end
+
+  describe "email addresses" do
     test "adding email address to a person", %{conn: conn, person: person} do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{})
@@ -131,7 +160,9 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.refute_email_label_present()
       |> Pages.ProfileEdit.assert_email_form(%{})
     end
+  end
 
+  describe "phone numbers" do
     test "adding phone number to a person", %{conn: conn, person: person} do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
@@ -143,39 +174,12 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "updating existing phone numbers", %{conn: conn, person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
-      |> Pages.Profile.assert_email_addresses(["alice-b@example.com"])
-    end
-
-    test "editing preferred language with other option", %{conn: conn, person: person} do
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
-
-      {:ok, redirected_live, _} =
-        view
-        |> form("#profile-form",
-          person: %{
-            first_name: "Aaron",
-            last_name: "Testuser2",
-            dob: "01/01/2020",
-            preferred_language: "Other",
-            other_specified_language: "Welsh"
-          }
-        )
-        |> render_submit()
-        |> follow_redirect(conn)
-
-      assert_role_text(redirected_live, "full-name", "Aaron Testuser2")
-      assert_role_text(redirected_live, "date-of-birth", "01/01/2020")
-      assert_role_text(redirected_live, "preferred-language", "Welsh")
-
-      # the custom option appears in the dropdown if you edit it again after saving
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
-      assert_selected_dropdown_option(view: view, data_role: "preferred-language", expected: ["Welsh"])
-      assert_attribute(view, "[data-role=other-preferred-language]", "data-disabled", ["data-disabled"])
+      |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111001"}}})
+      |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
     end
   end
 
