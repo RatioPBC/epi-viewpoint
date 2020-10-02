@@ -202,6 +202,15 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       })
       |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
     end
+
+    test "clicking phone number button does not reset state of form", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.click_add_phone_button()
+      |> Pages.ProfileEdit.change_form(%{"phones" => %{"0" => %{"number" => "1111111001"}}})
+      |> Pages.ProfileEdit.click_add_phone_button()
+      |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111001", "person[phones][1][number]" => ""})
+      |> Pages.ProfileEdit.assert_validation_messages(%{})
+    end
   end
 
   describe "preferred_languages" do
