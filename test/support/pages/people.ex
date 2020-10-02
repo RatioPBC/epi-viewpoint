@@ -10,8 +10,8 @@ defmodule EpicenterWeb.Test.Pages.People do
     conn |> Pages.visit("/people")
   end
 
-  def assert_here(view_or_conn) do
-    view_or_conn |> Pages.assert_on_page("people")
+  def assert_here(view_or_conn_or_html) do
+    view_or_conn_or_html |> Pages.assert_on_page("people")
   end
 
   def assign(%View{} = view, people, user) do

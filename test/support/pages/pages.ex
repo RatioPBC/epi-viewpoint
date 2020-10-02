@@ -8,15 +8,15 @@ defmodule EpicenterWeb.Test.Pages do
   alias Epicenter.Test
   alias Phoenix.LiveViewTest.View
 
-  def assert_on_page(conn_or_view, data_page_value) do
-    conn_or_view
+  def assert_on_page(conn_or_view_or_html, data_page_value) do
+    conn_or_view_or_html
     |> parse()
     |> Test.Html.find!("[data-page]")
     |> Test.Html.attr("data-page")
     |> List.first()
     |> assert_eq(data_page_value, :simple)
 
-    conn_or_view
+    conn_or_view_or_html
   end
 
   def follow_conn_redirect(conn, max_directs \\ 10)
@@ -36,13 +36,14 @@ defmodule EpicenterWeb.Test.Pages do
     follow_redirect(redirect_response, conn)
   end
 
-  def parse(%Plug.Conn{} = conn) do
-    conn |> html_response(200) |> Test.Html.parse_doc()
-  end
+  def parse(%Plug.Conn{} = conn),
+    do: conn |> html_response(200) |> Test.Html.parse_doc()
 
-  def parse(%View{} = view) do
-    view |> render() |> Test.Html.parse()
-  end
+  def parse(%View{} = view),
+    do: view |> render() |> Test.Html.parse()
+
+  def parse(html_string) when is_binary(html_string),
+    do: html_string |> Test.Html.parse_doc()
 
   def submit_form(%Plug.Conn{} = conn, role, name, %{} = fields) do
     form = conn |> parse() |> Test.Html.find!("[data-role=#{role}]")

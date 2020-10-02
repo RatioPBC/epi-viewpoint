@@ -1,4 +1,4 @@
-section#people-page data-role="people-page" data-page="people"
+section#people-page data-page="people"
   h2
     #title
       span Index cases

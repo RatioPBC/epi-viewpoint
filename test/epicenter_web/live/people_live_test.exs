@@ -8,6 +8,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Extra
   alias Epicenter.Test
   alias EpicenterWeb.PeopleLive
+  alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
 
@@ -28,10 +29,10 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "disconnected and connected render", %{conn: conn} do
-      {:ok, index_live, disconnected_html} = live(conn, "/people")
+      {:ok, view, disconnected_html} = live(conn, "/people")
 
-      assert_has_role(disconnected_html, "people-page")
-      assert_has_role(index_live, "people-page")
+      disconnected_html |> Pages.People.assert_here()
+      view |> Pages.People.assert_here()
     end
 
     test "user can be assigned to people", %{conn: conn, user: user} do
