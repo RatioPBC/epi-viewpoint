@@ -39,6 +39,27 @@
         fieldset header
           font-size: $body-text-size
 
+        // TODO: dry me up scotty!
+
+        .phone-wrapper:not(:first-of-type)
+          @include vertical-flow
+
+        .phone-wrapper
+          input[type=checkbox]
+            display: none
+
+          input[type=checkbox]:checked + .phone-and-trash-can
+            display: none
+
+          .phone-and-trash-can
+            @include level
+
+            label
+              @include centered
+
+        #add-phone
+          @include button-secondary
+
         .email-address-wrapper:not(:first-of-type)
           @include vertical-flow
 
