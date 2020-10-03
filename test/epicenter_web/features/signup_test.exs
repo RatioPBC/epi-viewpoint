@@ -19,5 +19,15 @@ defmodule EpicenterWeb.Features.SignupTest do
     |> Pages.Login.log_in("user@example.com", "password123")
     |> Pages.People.assert_here()
     |> Pages.assert_current_user("Test User")
+
+    #
+    # with a fresh connection, the user can log in
+    #
+    conn
+    |> Pages.Root.visit()
+    |> Pages.Login.assert_here()
+    |> Pages.Login.log_in("user@example.com", "password123")
+    |> Pages.People.assert_here()
+    |> Pages.assert_current_user("Test User")
   end
 end

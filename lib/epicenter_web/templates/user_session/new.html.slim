@@ -1,4 +1,4 @@
-#login-page
+#login-page data-page="login"
   = form_for @conn, Routes.user_session_path(@conn, :create), [as: :user, data: [role: "login-form"]], fn f ->
 
     #form-contents

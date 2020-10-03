@@ -6,13 +6,11 @@ defmodule EpicenterWeb.Test.Pages.People do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  def visit(%Plug.Conn{} = conn) do
-    conn |> Pages.visit("/people")
-  end
+  def visit(%Plug.Conn{} = conn),
+    do: conn |> Pages.visit("/people")
 
-  def assert_here(view_or_conn_or_html) do
-    view_or_conn_or_html |> Pages.assert_on_page("people")
-  end
+  def assert_here(view_or_conn_or_html),
+    do: view_or_conn_or_html |> Pages.assert_on_page("people")
 
   def assign(%View{} = view, people, user) do
     for person <- people do
