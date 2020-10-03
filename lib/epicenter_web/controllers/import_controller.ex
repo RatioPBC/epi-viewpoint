@@ -10,7 +10,7 @@ defmodule EpicenterWeb.ImportController do
   alias EpicenterWeb.Session
 
   def create(conn, %{"file" => %Plug.Upload{path: path, filename: file_name}}) do
-    {:ok, import_info} = %{file_name: file_name, contents: File.read!(path)} |> Cases.import_lab_results(Session.get_current_user())
+    {:ok, import_info} = %{file_name: file_name, contents: File.read!(path)} |> Cases.import_lab_results(conn.assigns.current_user)
 
     {imported_people, popped_import_info} = import_info |> Map.pop(:imported_people)
     Cases.broadcast_people(imported_people)

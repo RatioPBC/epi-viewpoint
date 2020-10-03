@@ -2,15 +2,17 @@ defmodule EpicenterWeb.ProfileEditLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2, trash_icon: 0]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1]
 
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.DateParser
   alias Epicenter.Extra
-  alias EpicenterWeb.Session
 
-  def mount(%{"id" => id}, _session, socket) do
-    person = %{Cases.get_person(id) | originator: Session.get_current_user()} |> Cases.preload_emails() |> Cases.preload_phones()
+  def mount(%{"id" => id}, session, socket) do
+    socket = socket |> assign_defaults(session)
+
+    person = %{Cases.get_person(id) | originator: socket.assigns.current_user} |> Cases.preload_emails() |> Cases.preload_phones()
     changeset = person |> Cases.change_person(%{})
 
     {
@@ -75,7 +77,11 @@ defmodule EpicenterWeb.ProfileEditLive do
     socket.assigns.person
     |> Cases.update_person(
       {person_params,
-       %{author_id: Session.get_current_user().id, reason_action: Revision.update_profile_action(), reason_event: Revision.edit_profile_saved_event()}}
+       %{
+         author_id: socket.assigns.current_user.id,
+         reason_action: Revision.update_profile_action(),
+         reason_event: Revision.edit_profile_saved_event()
+       }}
     )
     |> case do
       {:ok, person} ->
@@ -190,10 +196,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     end
   end
 
-  defp noreply(socket),
-    do: {:noreply, socket}
-
-  # replace human readable dates with Date objects
   defp update_dob_field_for_changeset(person_params) do
     case DateParser.parse_mm_dd_yyyy(person_params["dob"]) do
       {:ok, date} -> %{person_params | "dob" => date}

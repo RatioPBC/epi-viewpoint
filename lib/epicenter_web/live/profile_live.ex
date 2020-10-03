@@ -2,22 +2,23 @@ defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
-  alias EpicenterWeb.Session
 
-  def mount(%{"id" => id}, _session, socket) do
+  def mount(%{"id" => person_id}, session, socket) do
     if connected?(socket),
       do: Cases.subscribe_to_people()
 
-    {:ok,
-     socket
-     |> assign_person(Cases.get_person(id))
-     |> assign(users: Accounts.list_users())}
+    socket
+    |> assign_defaults(session)
+    |> assign_person(Cases.get_person(person_id))
+    |> assign_users()
+    |> ok()
   end
 
   def handle_info({:people, updated_people}, socket) do
@@ -39,9 +40,9 @@ defmodule EpicenterWeb.ProfileLive do
         user_id: user_id,
         people_ids: [socket.assigns.person.id],
         audit_meta: %{
-          author_id: Session.get_current_user().id,
-          reason_action: Revision.update_assignment_action,
-          reason_event: Revision.profile_selected_assignee_event,
+          author_id: socket.assigns.current_user.id,
+          reason_action: Revision.update_assignment_action(),
+          reason_event: Revision.profile_selected_assignee_event()
         }
       )
 
@@ -55,10 +56,8 @@ defmodule EpicenterWeb.ProfileLive do
     assign(socket, person: updated_person)
   end
 
-  # # #
-
-  defp noreply(socket),
-    do: {:noreply, socket}
+  defp assign_users(socket),
+    do: socket |> assign(users: Accounts.list_users())
 
   # # #
 

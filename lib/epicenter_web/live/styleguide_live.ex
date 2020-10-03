@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.StyleguideLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.LiveHelpers, only: [noreply: 1, ok: 1]
   import EpicenterWeb.IconView
 
   def mount(_params, _session, socket) do
@@ -28,9 +29,6 @@ defmodule EpicenterWeb.StyleguideLive do
   defp clear_suggestions(socket) do
     socket |> assign(suggested_addresses: [])
   end
-
-  defp ok(socket), do: {:ok, socket}
-  defp noreply(socket), do: {:noreply, socket}
 
   # # #
 

@@ -1,11 +1,13 @@
 defmodule EpicenterWeb.DemographicsEditLive do
   use EpicenterWeb, :live_view
 
-  alias Epicenter.Cases
-  alias EpicenterWeb.Session
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2]
 
-  def mount(%{"id" => id}, _session, socket) do
-    person = %{Cases.get_person(id) | originator: Session.get_current_user()}
+  alias Epicenter.Cases
+
+  def mount(%{"id" => id}, session, socket) do
+    socket = socket |> assign_defaults(session)
+    person = %{Cases.get_person(id) | originator: socket.assigns.current_user.id}
     changeset = person |> Cases.change_person(%{}) |> hard_code_gender_identity()
 
     {

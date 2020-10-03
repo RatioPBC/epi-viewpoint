@@ -1,18 +1,26 @@
 defmodule EpicenterWeb.PeopleLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1, ok: 1]
+
   alias Epicenter.Accounts
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
-  alias EpicenterWeb.Session
 
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     if connected?(socket),
       do: Cases.subscribe_to_people()
 
-    socket |> set_reload_message(nil) |> set_filter(:with_lab_results) |> load_people() |> load_users() |> set_selected() |> ok()
+    socket
+    |> assign_defaults(session)
+    |> set_reload_message(nil)
+    |> set_filter(:with_lab_results)
+    |> load_people()
+    |> load_users()
+    |> set_selected()
+    |> ok()
   end
 
   def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_lab_results},
@@ -42,7 +50,7 @@ defmodule EpicenterWeb.PeopleLive do
         user_id: user_id,
         people_ids: Map.keys(socket.assigns.selected_people),
         audit_meta: %{
-          author_id: Session.get_current_user().id,
+          author_id: socket.assigns.current_user.id,
           reason_action: Revision.update_assignment_bulk_action(),
           reason_event: Revision.people_selected_assignee_event()
         }
@@ -119,12 +127,6 @@ defmodule EpicenterWeb.PeopleLive do
       set_reload_message(socket, "Show #{new_people_count} new people")
     end
   end
-
-  defp noreply(socket),
-    do: {:noreply, socket}
-
-  defp ok(socket),
-    do: {:ok, socket}
 
   defp refresh_existing_people(socket, updated_people) do
     id_to_people_map = updated_people |> Enum.reduce(%{}, fn person, acc -> acc |> Map.put(person.id, person) end)
