@@ -3,5 +3,5 @@ defmodule EpicenterWeb.Test.Pages.Login do
   alias Plug.Conn
 
   def log_in(%Conn{} = conn, email, password),
-    do: Pages.submit_form(conn, "login-form", "user", %{"email" => email, "password" => password})
+    do: Pages.submit_form(conn, :post, "login-form", "user", %{"email" => email, "password" => password})
 end

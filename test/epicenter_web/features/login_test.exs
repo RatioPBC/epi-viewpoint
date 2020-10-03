@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Features.AuthenticationTest do
+defmodule EpicenterWeb.Features.LoginTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Accounts
@@ -12,7 +12,7 @@ defmodule EpicenterWeb.Features.AuthenticationTest do
     do: create_unconfirmed_user() |> Test.Accounts.confirm_user!()
 
   def create_unconfirmed_user(),
-    do: Test.Fixtures.user_attrs("user", email: @good_email_address, password: @good_password) |> Accounts.register_user!()
+    do: Test.Fixtures.user_attrs("test-user", email: @good_email_address, password: @good_password) |> Accounts.register_user!()
 
   test "a user can log in", %{conn: conn} do
     create_confirmed_user()
@@ -20,6 +20,7 @@ defmodule EpicenterWeb.Features.AuthenticationTest do
     Pages.Root.visit(conn)
     |> Pages.Login.log_in(@good_email_address, @good_password)
     |> Pages.People.assert_here()
+    |> Pages.assert_current_user("test-user")
   end
 
   test "a user cannot log in with a non-existant email address", %{conn: conn} do

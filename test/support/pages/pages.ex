@@ -8,6 +8,11 @@ defmodule EpicenterWeb.Test.Pages do
   alias Epicenter.Test
   alias Phoenix.LiveViewTest.View
 
+  def assert_current_user(conn_or_view_or_html, user_name) do
+    conn_or_view_or_html |> parse() |> Test.Html.role_text("current-user-name") |> assert_eq(user_name)
+    conn_or_view_or_html
+  end
+
   def assert_on_page(conn_or_view_or_html, data_page_value) do
     conn_or_view_or_html
     |> parse()
@@ -47,7 +52,8 @@ defmodule EpicenterWeb.Test.Pages do
   def parse(html_string) when is_binary(html_string),
     do: html_string |> Test.Html.parse_doc()
 
-  def submit_form(%Plug.Conn{} = conn, role, name, %{} = fields) do
+  def submit_form(%Plug.Conn{} = conn, http_method, role, name, %{} = fields)
+      when http_method in [:put, :post] do
     form = conn |> parse() |> Test.Html.find!("[data-role=#{role}]")
     [path] = form |> Test.Html.attr("action")
     requested_fields = fields |> Enum.map(fn {k, v} -> {Phoenix.HTML.Form.input_name(name, k), v} end) |> Map.new()
@@ -62,7 +68,10 @@ defmodule EpicenterWeb.Test.Pages do
       """
     end
 
-    conn = conn |> Phoenix.ConnTest.post(path, %{name => fields}) |> follow_conn_redirect()
+    conn =
+      conn
+      |> Phoenix.ConnTest.dispatch(@endpoint, http_method, path, %{name => fields})
+      |> follow_conn_redirect()
 
     case form_errors(conn) do
       [] -> conn
@@ -83,5 +92,9 @@ defmodule EpicenterWeb.Test.Pages do
       {:ok, %View{} = view, _html} -> view
       {:ok, conn} -> conn
     end
+  end
+
+  def visit(%Plug.Conn{} = conn, path, :notlive) do
+    conn |> get(path)
   end
 end

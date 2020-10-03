@@ -3,18 +3,18 @@ defmodule Epicenter.Release do
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  def create_user(name, email) do
+  def create_user(name, email, opts \\ []) do
     ensure_started()
 
-    IO.puts("Creating user #{name} / #{email}; they must set their password via this URL:")
+    puts = Keyword.get(opts, :puts, &IO.puts/1)
+    puts.("Creating user #{name} / #{email}; they must set their password via this URL:")
 
     case Accounts.register_user(%{email: email, password: Euclid.Extra.Random.string(), name: name}) do
       {:ok, user} ->
-        generated_password_reset_url(user)
-        :ok
+        {:ok, generated_password_reset_url(user)}
 
       {:error, %Ecto.Changeset{errors: errors}} ->
-        IO.puts("FAILED!")
+        puts.("FAILED!")
         {:error, errors}
     end
   end
@@ -25,9 +25,13 @@ defmodule Epicenter.Release do
   end
 
   defp generated_password_reset_url(user) do
-    Accounts.deliver_user_reset_password_instructions(user, fn encoded_token ->
-      Routes.user_reset_password_url(Endpoint, :edit, encoded_token) |> IO.puts()
-    end)
+    {:ok, %{body: body}} =
+      Accounts.deliver_user_reset_password_instructions(user, fn encoded_token ->
+        Routes.user_reset_password_url(Endpoint, :edit, encoded_token)
+      end)
+
+    [_body, url] = Regex.run(~r|\n(http://[^\n]+)\n|, body)
+    url
   end
 
   defp ensure_started do
