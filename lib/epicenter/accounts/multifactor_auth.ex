@@ -19,6 +19,12 @@ defmodule Epicenter.Accounts.MultifactorAuth do
     end
   end
 
+  def decode_secret(base_32_encoded_secret),
+    do: base_32_encoded_secret |> Base.decode32()
+
+  def encode_secret(secret),
+    do: secret |> Base.encode32(padding: false)
+
   def generate_secret(),
     do: @totp.secret()
 end

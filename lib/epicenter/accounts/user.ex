@@ -14,6 +14,7 @@ defmodule Epicenter.Accounts.User do
     field :confirmed_at, :naive_datetime
     field :email, :string
     field :hashed_password, :string
+    field :mfa_secret, :string
     field :name, :string
     field :password, :string, virtual: true
     field :seq, :integer
@@ -27,11 +28,17 @@ defmodule Epicenter.Accounts.User do
   @required_attrs ~w{name}a
   @optional_attrs ~w{tid}a
   @registration_attrs ~w{email password}a
+  @mfa_attrs ~w{mfa_secret}a
 
   def changeset(user, attrs) do
     user
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+  end
+
+  def mfa_changeset(user, attrs) do
+    user
+    |> cast(attrs, @mfa_attrs)
   end
 
   @doc """

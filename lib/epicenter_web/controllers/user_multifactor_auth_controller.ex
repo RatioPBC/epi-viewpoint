@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.UserMultifactorAuthController do
   use EpicenterWeb, :controller
 
+  alias Epicenter.Accounts
   alias Epicenter.Accounts.MultifactorAuth
   alias EpicenterWeb.Session
 
@@ -14,8 +15,12 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
     secret = Session.get_multifactor_auth_secret(conn)
 
     case MultifactorAuth.check(secret, totp) do
-      :ok -> conn |> redirect(to: Routes.root_path(conn, :show))
-      {:error, message} -> conn |> render_with_common_assigns("new.html", error_message: message)
+      :ok ->
+        conn.assigns.current_user |> Accounts.update_user_mfa!(MultifactorAuth.encode_secret(secret))
+        conn |> redirect(to: Routes.root_path(conn, :show))
+
+      {:error, message} ->
+        conn |> render_with_common_assigns("new.html", error_message: message)
     end
   end
 
@@ -30,7 +35,7 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
   end
 
   defp assign_multifactor_auth_key(conn) do
-    base_32_encoded_secret = conn |> Session.get_multifactor_auth_secret() |> Base.encode32(padding: false)
+    base_32_encoded_secret = conn |> Session.get_multifactor_auth_secret() |> MultifactorAuth.encode_secret()
     conn |> assign(:secret, base_32_encoded_secret)
   end
 

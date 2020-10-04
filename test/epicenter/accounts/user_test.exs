@@ -18,6 +18,7 @@ defmodule Epicenter.Accounts.UserTest do
           {:hashed_password, :string},
           {:id, :binary_id},
           {:inserted_at, :naive_datetime},
+          {:mfa_secret, :string},
           {:name, :string},
           {:seq, :bigserial},
           {:tid, :string},

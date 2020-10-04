@@ -4,6 +4,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
   import Mox
   setup :verify_on_exit!
 
+  alias Epicenter.Accounts
   alias Epicenter.Test
   alias EpicenterWeb.Session
   alias EpicenterWeb.Test.Pages
@@ -29,7 +30,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
   end
 
   describe "create" do
-    test "redirects to '/' when correct totp code is entered", %{conn: conn} do
+    test "saves the secret & redirects to '/' when correct totp code is entered", %{conn: conn, user: user} do
       params = %{"mfa" => %{"totp" => Test.TOTPStub.valid_otp()}}
 
       conn
@@ -37,9 +38,12 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       |> post(Routes.user_multifactor_auth_path(conn, :create, params))
       |> redirected_to()
       |> assert_eq("/")
+
+      reloaded_user = Accounts.get_user(user.id)
+      assert reloaded_user.mfa_secret == Test.TOTPStub.encoded_secret()
     end
 
-    test "shows an error message and the same qr code and key when an incorrect totp code is entered", %{conn: conn} do
+    test "shows an error message and the same qr code and secret when an incorrect totp code is entered", %{conn: conn, user: user} do
       # secret/0 should not have been called because the same QR code should be shown in case of an invalid totp code
       Test.TOTPMock |> expect(:secret, 0, fn -> Test.TOTPStub.secret() end)
 
@@ -50,6 +54,9 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       |> post(Routes.user_multifactor_auth_path(conn, :create, params))
       |> Pages.form_errors()
       |> assert_eq(["The six-digit code was incorrect"])
+
+      reloaded_user = Accounts.get_user(user.id)
+      assert reloaded_user.mfa_secret == nil
     end
   end
 end

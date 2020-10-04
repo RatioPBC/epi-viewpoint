@@ -4,12 +4,13 @@ defmodule Epicenter.Accounts do
   alias Epicenter.Accounts.UserNotifier
   alias Epicenter.Repo
 
-  def change_user(%User{} = user, attrs), do: User.changeset(user, attrs)
+  def change_user(%User{} = user, attrs), do: User.changeset(user, Enum.into(attrs, %{}))
   def get_user(id), do: User |> Repo.get(id)
   def list_users(), do: User.Query.all() |> Repo.all()
   def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
   def register_user(attrs), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert()
   def register_user!(attrs), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert!()
+  def update_user_mfa!(%User{} = user, mfa_secret), do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> Repo.update!()
 
   ## Database getters
 
