@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.UserMfaController do
+defmodule EpicenterWeb.UserMultifactorAuthController do
   use EpicenterWeb, :controller
 
   alias Epicenter.Accounts.MultifactorAuth

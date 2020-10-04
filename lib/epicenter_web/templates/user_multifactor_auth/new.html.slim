@@ -50,7 +50,7 @@
         | After scanning or entering the code, your authenticator app should show a six-digit number
           that changes every 30 seconds. Type that number below to verify that everything is working.
 
-      = form_tag Routes.user_mfa_path(@conn, :create), method: :post, data: [role: "new-mfa-form"] do
+      = form_tag Routes.user_multifactor_auth_path(@conn, :create), method: :post, data: [role: "new-mfa-form"] do
 
         = if @error_message do
           .form-error-message

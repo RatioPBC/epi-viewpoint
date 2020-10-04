@@ -39,8 +39,8 @@ defmodule EpicenterWeb.Router do
     live "/people/:id", ProfileLive, as: :profile
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
-    get "/users/mfa", UserMfaController, :new
-    post "/users/mfa", UserMfaController, :create
+    get "/users/mfa", UserMultifactorAuthController, :new
+    post "/users/mfa", UserMultifactorAuthController, :create
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update_password", UserSettingsController, :update_password
     put "/users/settings/update_email", UserSettingsController, :update_email

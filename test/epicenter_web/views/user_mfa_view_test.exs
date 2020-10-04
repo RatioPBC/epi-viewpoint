@@ -1,7 +1,7 @@
-defmodule EpicenterWeb.UserMfaViewTest do
+defmodule EpicenterWeb.UserMultifactorAuthViewTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import EpicenterWeb.UserMfaView, only: [colorize_key: 1]
+  import EpicenterWeb.UserMultifactorAuthView, only: [colorize_key: 1]
 
   describe "colorize_key" do
     test "wraps each character in a span with a 'letter' or 'number' class" do

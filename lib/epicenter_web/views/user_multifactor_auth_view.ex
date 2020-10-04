@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.UserMfaView do
+defmodule EpicenterWeb.UserMultifactorAuthView do
   use EpicenterWeb, :view
 
   import EpicenterWeb.IconView, only: [error_icon: 0]
