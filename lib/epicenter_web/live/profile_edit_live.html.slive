@@ -62,7 +62,10 @@
             .phone-wrapper
               = checkbox phone_form, :delete
               .phone-and-trash-can
-                = text_input phone_form, :number, data: [role: "phone-input", tid: phone_form.data.tid]
+                = telephone_input phone_form, :number, data: [role: "phone-input", tid: phone_form.data.tid]
+                .select-wrapper
+                  = arrow_down_icon()
+                  = select phone_form, :type, phone_types(), data: [role: "phone-types"]
                 = label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do
                   = trash_icon()
 
@@ -77,7 +80,7 @@
             .email-address-wrapper
               = checkbox email_form, :delete
               .email-address-and-trash-can
-                = text_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
+                = email_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
                 = label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do
                   = trash_icon()
 

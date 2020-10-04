@@ -94,6 +94,11 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     view
   end
 
+  def assert_phone_number_types(%View{} = view, data_role, expected) do
+    LiveViewAssertions.assert_select_dropdown_options(view: view, data_role: data_role, expected: expected)
+    view
+  end
+
   def click_add_phone_button(%View{} = view) do
     view |> render_click("add-phone")
     view

@@ -147,6 +147,9 @@ defmodule EpicenterWeb.ProfileEditLive do
     (first ++ middle ++ last) |> Enum.uniq()
   end
 
+  def phone_types(),
+    do: ~w{Cell Home Work}
+
   def clean_up_languages(%{"preferred_language" => "Other"} = person_params),
     do: person_params |> Map.put("preferred_language", person_params |> Map.get("other_specified_language"))
 
