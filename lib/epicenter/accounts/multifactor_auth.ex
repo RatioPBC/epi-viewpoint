@@ -6,9 +6,9 @@ defmodule Epicenter.Accounts.MultifactorAuth do
   def auth_uri(%User{email: email}, secret),
     do: @totp.otpauth_uri("Viewpoint:#{email}", secret, issuer: "Viewpoint")
 
-  def check(secret, one_time_password)
-      when is_binary(secret) and is_binary(one_time_password) do
-    with {:check_length, one_time_password} when byte_size(one_time_password) == 6 <- {:check_length, one_time_password},
+  def check(secret, passcode)
+      when is_binary(secret) and is_binary(passcode) do
+    with {:check_length, one_time_password} when byte_size(one_time_password) == 6 <- {:check_length, passcode},
          {:parse_totp, {integer, _}} when is_integer(integer) <- {:parse_totp, Integer.parse(one_time_password)},
          {:validate_totp, true} <- {:validate_totp, @totp.valid?(secret, one_time_password)} do
       :ok

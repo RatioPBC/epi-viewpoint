@@ -60,7 +60,7 @@
         fieldset
           label
             | Six-digit code
-            = number_input :mfa, :totp, required: true, autocapitalize: "none", autocomplete: "off", spellcheck: "false", maxlength: 6, minlength: 6
+            = number_input :mfa, :passcode, required: true, autocapitalize: "none", autocomplete: "off", spellcheck: "false", maxlength: 6, minlength: 6
 
         fieldset
           = submit "Continue", id: "submit"

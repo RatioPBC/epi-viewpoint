@@ -11,10 +11,10 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
     render_with_common_assigns(conn, "new.html", error_message: nil)
   end
 
-  def create(conn, %{"mfa" => %{"totp" => totp}}) do
+  def create(conn, %{"mfa" => %{"passcode" => passcode}}) do
     secret = Session.get_multifactor_auth_secret(conn)
 
-    case MultifactorAuth.check(secret, totp) do
+    case MultifactorAuth.check(secret, passcode) do
       :ok ->
         conn.assigns.current_user |> Accounts.update_user_mfa!(MultifactorAuth.encode_secret(secret))
         conn |> redirect(to: Routes.root_path(conn, :show))

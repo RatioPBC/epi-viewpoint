@@ -8,6 +8,6 @@ defmodule Epicenter.Accounts.TOTP do
     do: NimbleTOTP.secret()
 
   @callback valid?(binary(), binary()) :: boolean()
-  def valid?(secret, otp),
-    do: NimbleTOTP.valid?(secret, otp)
+  def valid?(secret, passcode),
+    do: NimbleTOTP.valid?(secret, passcode)
 end

@@ -22,7 +22,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
   end
 
   describe "new" do
-    test "renders a qr code and key", %{conn: conn} do
+    test "renders a qr code and secret", %{conn: conn} do
       doc =
         conn
         |> get(Routes.user_multifactor_auth_path(conn, :new))
@@ -36,7 +36,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
 
   describe "create" do
     test "saves the secret & redirects to '/' when correct totp code is entered", %{conn: conn, user: user} do
-      params = %{"mfa" => %{"totp" => Test.TOTPStub.valid_otp()}}
+      params = %{"mfa" => %{"passcode" => Test.TOTPStub.valid_passcode()}}
 
       conn
       |> Session.put_multifactor_auth_secret(Test.TOTPStub.raw_secret())
@@ -52,7 +52,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       # secret/0 should not have been called because the same QR code should be shown in case of an invalid totp code
       Test.TOTPMock |> expect(:secret, 0, fn -> Test.TOTPStub.secret() end)
 
-      params = %{"mfa" => %{"totp" => "000000"}}
+      params = %{"mfa" => %{"passcode" => "000000"}}
 
       conn
       |> Session.put_multifactor_auth_secret(Test.TOTPStub.raw_secret())

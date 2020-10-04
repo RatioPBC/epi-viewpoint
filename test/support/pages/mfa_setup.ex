@@ -6,7 +6,7 @@ defmodule EpicenterWeb.Test.Pages.MfaSetup do
     do: view_or_conn_or_html |> Pages.assert_on_page("mfa-setup")
 
   def submit_one_time_password(conn, passcode \\ :default) do
-    passcode = if passcode == :default, do: Test.TOTPStub.valid_otp(), else: passcode
-    conn |> Pages.submit_form(:post, "new-mfa-form", "mfa", %{"totp" => passcode})
+    passcode = if passcode == :default, do: Test.TOTPStub.valid_passcode(), else: passcode
+    conn |> Pages.submit_form(:post, "new-mfa-form", "mfa", %{"passcode" => passcode})
   end
 end
