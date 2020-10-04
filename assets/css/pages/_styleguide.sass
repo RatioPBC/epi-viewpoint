@@ -158,7 +158,10 @@
   #section-container, #card-container, #subnav-container
     border: 1px dashed purple
 
-  #card
+  #card-container
+    @include vertical-flow
+
+  #card1, #card2
     @include card
 
   #subnav

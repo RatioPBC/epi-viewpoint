@@ -225,9 +225,15 @@
 
     .styleguide-example
       #card-container
-        #card
+        #card1
+          header Here is a header
           ' Here is some text in a card
-      code @include card
+        #card2
+          header Here is another header
+          ' Here is some more text in another card
+      code
+        ' @include card
+        small use vertical-flow on a container to make vertical space between cards
 
     .styleguide-example
       #subnav-container

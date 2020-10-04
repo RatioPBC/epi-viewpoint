@@ -21,5 +21,8 @@ config :epicenter, EpicenterWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :epicenter,
+  totp: Epicenter.Test.TOTPMock
+
 # Print only warnings and errors during test
 config :logger, level: :warn

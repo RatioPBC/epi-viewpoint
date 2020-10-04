@@ -111,17 +111,22 @@
   background-color: inherit
   border: 1px solid transparent
 
-@mixin card
+@mixin card($width: regular)
   @include vertical-flow
   border: 2px solid $divider-color
   padding: 0 2rem 2rem 2rem
   margin-left: 2rem
   margin-right: 2rem
 
+  @if $width == narrow
+    max-width: 50rem
+    margin-left: auto
+    margin-right: auto
+
   header
     @include level($justify: space-between)
     @include h4
-    margin-top: inherit
+    margin-top: 2rem
 
     a
       @include button-primary

@@ -30,7 +30,7 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    get "/", SessionController, :new
+    get "/", RootController, :show, as: :root
     live "/admin", AdminLive, as: :admin
     live "/import", ImportLive, as: :import
     get "/import/complete", ImportController, :show
@@ -39,6 +39,8 @@ defmodule EpicenterWeb.Router do
     live "/people/:id", ProfileLive, as: :profile
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
+    get "/users/mfa", UserMfaController, :new
+    post "/users/mfa", UserMfaController, :create
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update_password", UserSettingsController, :update_password
     put "/users/settings/update_email", UserSettingsController, :update_email
@@ -56,18 +58,6 @@ defmodule EpicenterWeb.Router do
     get "/users/confirm/:token", UserConfirmationController, :confirm
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", EpicenterWeb do
-  #   pipe_through :api
-  # end
-
-  # Enables LiveDashboard only for development
-  #
-  # If you want to use the LiveDashboard in production, you should put
-  # it behind authentication and allow only admins to access it.
-  # If your application does not have an admins-only section yet,
-  # you can use Plug.BasicAuth to set up some basic authentication
-  # as long as you are also using SSL (which you should anyway).
   if Mix.env() in [:dev, :test] do
     import Phoenix.LiveDashboard.Router
 

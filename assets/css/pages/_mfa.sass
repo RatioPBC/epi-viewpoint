@@ -1,0 +1,47 @@
+@import "../mixins"
+
+#mfa-setup-page
+  @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@500&display=swap')
+
+  @include vertical-flow
+
+  #steps
+    @include vertical-flow
+
+    #step1, #step2
+      @include card($width: narrow)
+
+  #alternate, code
+    color: $secondary-text-color
+
+  code
+    color: $secondary-text-color
+    display: block
+    font-family: 'Inconsolata', monospace
+    font-size: 150%
+    font-weight: 500
+    letter-spacing: 0.3rem
+    text-align: center
+
+    &#key-legend
+      font-size: 75%
+      letter-spacing: 1px
+
+    .letter, .number
+      text-align: center
+
+    .number
+      color: lighten($secondary-text-color, 30%)
+      border-bottom: 1px dotted lighten($secondary-text-color, 70%)
+
+  #qr-code
+    svg
+      border: 1px solid $divider-color
+      display: block
+      height: 10rem
+      margin: 0 auto
+      padding: 1rem
+      width: 10rem
+
+  form
+    @include form
