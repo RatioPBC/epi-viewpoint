@@ -11,6 +11,11 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
 
   setup :register_and_log_in_user
 
+  setup %{conn: conn} do
+    user = Epicenter.AccountsFixtures.single_factor_user_fixture()
+    %{conn: log_in_user(conn, user), user: user}
+  end
+
   setup do
     stub_with(Test.TOTPMock, Test.TOTPStub)
     :ok

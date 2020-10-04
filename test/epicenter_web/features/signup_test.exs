@@ -1,8 +1,17 @@
 defmodule EpicenterWeb.Features.SignupTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import Mox
+  setup :verify_on_exit!
+
   alias Epicenter.Release
+  alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
+
+  setup do
+    stub_with(Test.TOTPMock, Test.TOTPStub)
+    :ok
+  end
 
   test "an account is made for a user and then they log in", %{conn: conn} do
     #
@@ -11,12 +20,14 @@ defmodule EpicenterWeb.Features.SignupTest do
     {:ok, url} = Release.create_user("Test User", "user@example.com", puts: &Function.identity/1)
 
     #
-    # the user visits the reset-password URL, changes their password, and logs in
+    # the user visits the reset-password URL, changes their password, sets up multifactor auth, and logs in
     #
     conn
     |> Pages.ResetPassword.visit(url)
     |> Pages.ResetPassword.change_password("password123")
     |> Pages.Login.log_in("user@example.com", "password123")
+    |> Pages.MfaSetup.assert_here()
+    |> Pages.MfaSetup.submit_one_time_password()
     |> Pages.People.assert_here()
     |> Pages.assert_current_user("Test User")
 

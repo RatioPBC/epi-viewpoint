@@ -8,5 +8,7 @@ defmodule Epicenter.Test.Accounts do
       {:ok, _} = Accounts.confirm_user(encoded_token)
       Routes.user_confirmation_url(Endpoint, :confirm, encoded_token)
     end)
+
+    user
   end
 end

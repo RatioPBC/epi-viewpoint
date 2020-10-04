@@ -145,6 +145,13 @@ defmodule EpicenterWeb.UserAuthTest do
       assert get_flash(conn, :error) == "Your email address must be confirmed before you can log in"
     end
 
+    test "redirects if the user is authenticated and confirmed but does not have mfa set up", %{conn: conn} do
+      user = AccountsFixtures.single_factor_user_fixture(%{tid: "user2"})
+      conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
+      assert conn.halted
+      assert redirected_to(conn) == Routes.user_multifactor_auth_path(conn, :new)
+    end
+
     test "stores the path to redirect to on GET", %{conn: conn} do
       halted_conn =
         %{conn | request_path: "/foo", query_string: ""}

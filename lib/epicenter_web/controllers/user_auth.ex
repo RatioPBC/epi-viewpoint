@@ -27,13 +27,14 @@ defmodule EpicenterWeb.UserAuth do
   def log_in_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
     user_return_to = get_session(conn, :user_return_to)
+    mfa_path = user.mfa_secret == nil && Routes.user_multifactor_auth_path(conn, :new)
 
     conn
     |> renew_session()
     |> put_session(:user_token, token)
     |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(token)}")
     |> maybe_write_remember_me_cookie(token, params)
-    |> redirect(to: user_return_to || signed_in_path(conn))
+    |> redirect(to: mfa_path || user_return_to || signed_in_path(conn))
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
@@ -111,8 +112,8 @@ defmodule EpicenterWeb.UserAuth do
   @doc """
   Used for routes that require the user to not be authenticated.
   """
-  def redirect_if_user_is_authenticated(conn, _opts) do
-    if user_authentication_status(conn) == :authenticated do
+  def redirect_if_user_is_authenticated(conn, opts) do
+    if user_authentication_status(conn, opts) == :authenticated do
       conn
       |> redirect(to: signed_in_path(conn))
       |> halt()
@@ -121,36 +122,49 @@ defmodule EpicenterWeb.UserAuth do
     end
   end
 
+  def require_authenticated_user_without_mfa(conn, _opts) do
+    require_authenticated_user(conn, mfa_required?: false)
+  end
+
   @doc """
   Used for routes that require the user to be authenticated.
 
   If you want to enforce the user email is confirmed before
   they use the application at all, here would be a good place.
   """
-  def require_authenticated_user(conn, _opts) do
+  def require_authenticated_user(conn, opts) do
+    login_path = Routes.user_session_path(conn, :new)
+    mfa_path = Routes.user_multifactor_auth_path(conn, :new)
+
     error =
-      case user_authentication_status(conn) do
+      case user_authentication_status(conn, opts) do
         :authenticated -> nil
-        :not_logged_in -> "You must log in to access this page"
-        :not_confirmed -> "Your email address must be confirmed before you can log in"
+        :not_logged_in -> {"You must log in to access this page", login_path}
+        :not_confirmed -> {"Your email address must be confirmed before you can log in", login_path}
+        :no_mfa -> {"You must have multi-factor authentication set up before you can continue", mfa_path}
       end
 
-    if error do
-      conn
-      |> renew_session()
-      |> put_flash(:error, error)
-      |> maybe_store_return_to()
-      |> redirect(to: Routes.user_session_path(conn, :new))
-      |> halt()
-    else
-      conn
+    case error do
+      nil ->
+        conn
+
+      {message, redirect_path} ->
+        conn
+        |> renew_session()
+        |> put_flash(:error, message)
+        |> maybe_store_return_to()
+        |> redirect(to: redirect_path)
+        |> halt()
     end
   end
 
-  defp user_authentication_status(conn) do
+  defp user_authentication_status(conn, opts) do
+    mfa_required? = Keyword.get(opts, :mfa_required?, true)
+
     cond do
       conn.assigns[:current_user] == nil -> :not_logged_in
       conn.assigns[:current_user].confirmed_at == nil -> :not_confirmed
+      mfa_required? && conn.assigns[:current_user].mfa_secret == nil -> :no_mfa
       true -> :authenticated
     end
   end

@@ -28,6 +28,13 @@ defmodule EpicenterWeb.Router do
   end
 
   scope "/", EpicenterWeb do
+    pipe_through [:browser, :require_authenticated_user_without_mfa]
+
+    get "/users/mfa", UserMultifactorAuthController, :new
+    post "/users/mfa", UserMultifactorAuthController, :create
+  end
+
+  scope "/", EpicenterWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     get "/", RootController, :show, as: :root
@@ -39,8 +46,6 @@ defmodule EpicenterWeb.Router do
     live "/people/:id", ProfileLive, as: :profile
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
-    get "/users/mfa", UserMultifactorAuthController, :new
-    post "/users/mfa", UserMultifactorAuthController, :create
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update_password", UserSettingsController, :update_password
     put "/users/settings/update_email", UserSettingsController, :update_email

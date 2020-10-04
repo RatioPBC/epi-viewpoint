@@ -12,6 +12,10 @@ defmodule Epicenter.AccountsFixtures do
   def valid_user_password, do: "password123"
 
   def user_fixture(attrs \\ %{tid: "user"}) do
+    attrs |> unconfirmed_user_fixture() |> confirm_user() |> set_mfa()
+  end
+
+  def single_factor_user_fixture(attrs \\ %{tid: "single-factor"}) do
     attrs |> unconfirmed_user_fixture() |> confirm_user()
   end
 
@@ -27,5 +31,9 @@ defmodule Epicenter.AccountsFixtures do
     {:ok, captured} = fun.(&"[TOKEN]#{&1}[TOKEN]")
     [_, token, _] = String.split(captured.body, "[TOKEN]")
     token
+  end
+
+  defp set_mfa(user) do
+    user |> Accounts.update_user_mfa!(Epicenter.Test.TOTPStub.encoded_secret())
   end
 end
