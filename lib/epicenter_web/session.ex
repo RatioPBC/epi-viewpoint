@@ -17,13 +17,13 @@ defmodule EpicenterWeb.Session do
   def ensure_multifactor_auth_secret(conn, if_nil: if_nil_fn) do
     case get_multifactor_auth_secret(conn) do
       nil -> conn |> put_multifactor_auth_secret(if_nil_fn.())
-      {_secret, _key} -> conn
+      _secret -> conn
     end
   end
 
   def get_multifactor_auth_secret(conn),
     do: Conn.get_session(conn, :multifactor_auth_secret)
 
-  def put_multifactor_auth_secret(conn, secret_and_key),
-    do: Conn.put_session(conn, :multifactor_auth_secret, secret_and_key)
+  def put_multifactor_auth_secret(conn, secret),
+    do: Conn.put_session(conn, :multifactor_auth_secret, secret)
 end

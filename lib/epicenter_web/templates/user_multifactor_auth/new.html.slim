@@ -36,11 +36,11 @@
           you can instead type this code into your authenticator app‘s
           “code“ or “secret key“ field:
 
-      code data-role="key" = raw colorize_key(@key)
+      code data-role="secret" = raw colorize_alphanumeric_string(@secret)
 
-      code#key-legend
+      code#secret-legend
         | (
-        = raw colorize_key("1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        = raw colorize_alphanumeric_string("1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ")
         | )
 
     #step2

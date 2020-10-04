@@ -23,7 +23,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
         |> html_response(200)
         |> Test.Html.parse_doc()
 
-      assert doc |> Test.Html.text(role: "key") == Test.TOTPStub.encoded_secret()
+      assert doc |> Test.Html.text(role: "secret") == Test.TOTPStub.encoded_secret()
       assert doc |> Test.Html.present?(role: "qr-code")
     end
   end
@@ -33,7 +33,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       params = %{"mfa" => %{"totp" => Test.TOTPStub.valid_otp()}}
 
       conn
-      |> Session.put_multifactor_auth_secret({Test.TOTPStub.raw_secret(), Test.TOTPStub.encoded_secret()})
+      |> Session.put_multifactor_auth_secret(Test.TOTPStub.raw_secret())
       |> post(Routes.user_multifactor_auth_path(conn, :create, params))
       |> redirected_to()
       |> assert_eq("/")
@@ -46,7 +46,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       params = %{"mfa" => %{"totp" => "000000"}}
 
       conn
-      |> Session.put_multifactor_auth_secret({Test.TOTPStub.raw_secret(), Test.TOTPStub.encoded_secret()})
+      |> Session.put_multifactor_auth_secret(Test.TOTPStub.raw_secret())
       |> post(Routes.user_multifactor_auth_path(conn, :create, params))
       |> Pages.form_errors()
       |> assert_eq(["The six-digit code was incorrect"])

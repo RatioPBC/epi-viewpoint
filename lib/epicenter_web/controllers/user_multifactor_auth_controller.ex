@@ -11,9 +11,9 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
   end
 
   def create(conn, %{"mfa" => %{"totp" => totp}}) do
-    {_secret, key} = Session.get_multifactor_auth_secret(conn)
+    secret = Session.get_multifactor_auth_secret(conn)
 
-    case MultifactorAuth.check(key, totp) do
+    case MultifactorAuth.check(secret, totp) do
       :ok -> conn |> redirect(to: Routes.root_path(conn, :show))
       {:error, message} -> conn |> render_with_common_assigns("new.html", error_message: message)
     end
@@ -30,12 +30,12 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
   end
 
   defp assign_multifactor_auth_key(conn) do
-    {_secret, key} = conn |> Session.get_multifactor_auth_secret()
-    conn |> assign(:key, key)
+    base_32_encoded_secret = conn |> Session.get_multifactor_auth_secret() |> Base.encode32(padding: false)
+    conn |> assign(:secret, base_32_encoded_secret)
   end
 
   defp assign_multifactor_qr_code_svg(conn) do
-    {secret, _key} = conn |> Session.get_multifactor_auth_secret()
+    secret = conn |> Session.get_multifactor_auth_secret()
     uri = MultifactorAuth.auth_uri(conn.assigns.current_user, secret)
     svg = uri |> EQRCode.encode() |> EQRCode.svg(viewbox: true)
     conn |> assign(:svg, svg)

@@ -3,7 +3,7 @@ defmodule EpicenterWeb.UserMultifactorAuthView do
 
   import EpicenterWeb.IconView, only: [error_icon: 0]
 
-  def colorize_key(key) do
+  def colorize_alphanumeric_string(key) do
     key
     |> String.split("", trim: true)
     |> Enum.map(&wrap/1)
