@@ -81,6 +81,7 @@
               = checkbox email_form, :delete
               .email-address-and-trash-can
                 = email_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
+                = radio_button email_form, :is_preferred, false
                 = label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do
                   = trash_icon()
 

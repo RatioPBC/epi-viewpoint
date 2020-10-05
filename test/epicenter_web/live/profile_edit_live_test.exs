@@ -105,6 +105,22 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> pluck(:address) |> assert_eq(["alice@example.com"])
     end
 
+    @tag :skip
+    test "adding preferred email address", %{conn: conn, person: person} do
+      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
+      |> Pages.ProfileEdit.click_add_email_button()
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
+        "emails" => %{
+          "0" => %{"address" => "alice-a@example.com", "is_preferred" => "false"},
+          "1" => %{"address" => "alice-preferred@example.com", "is_preferred" => "true"}
+        }
+      })
+      |> Pages.Profile.assert_email_addresses(["alice-a@example.com", "alice-preferred@example.com"])
+    end
+
     test "updating existing email address", %{conn: conn, person: person} do
       Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
 

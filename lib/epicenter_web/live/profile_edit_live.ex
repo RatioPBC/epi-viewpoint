@@ -42,6 +42,14 @@ defmodule EpicenterWeb.ProfileEditLive do
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
+  def handle_event("form-change", %{"person" => %{"preferred_language" => "Other"} = person_params}, socket) do
+    socket |> assign(preferred_language_is_other: true) |> reassign_changeset(person_params) |> noreply()
+  end
+
+  def handle_event("form-change", %{"person" => person_params} = _params, socket) do
+    socket |> assign(preferred_language_is_other: false) |> reassign_changeset(person_params) |> noreply()
+  end
+
   def handle_event("remove-email", %{"email-index" => email_index_param}, socket) do
     email_index = email_index_param |> Euclid.Extra.String.to_integer()
 
@@ -92,24 +100,23 @@ defmodule EpicenterWeb.ProfileEditLive do
     end
   end
 
-  def handle_event("form-change", %{"person" => %{"preferred_language" => "Other"} = person_params}, socket) do
-    socket |> assign(preferred_language_is_other: true) |> reassign_changeset(person_params) |> noreply()
+  # # #
+
+  def clean_up_languages(%{"preferred_language" => "Other"} = person_params),
+    do: person_params |> Map.put("preferred_language", person_params |> Map.get("other_specified_language"))
+
+  def clean_up_languages(person_params), do: person_params
+
+  def has_field?(changeset, field) do
+    case changeset |> Ecto.Changeset.fetch_field(field) do
+      :error -> false
+      {_, []} -> false
+      _ -> true
+    end
   end
 
-  def handle_event("form-change", %{"person" => person_params} = _params, socket) do
-    socket |> assign(preferred_language_is_other: false) |> reassign_changeset(person_params) |> noreply()
-  end
-
-  defp reassign_changeset(socket, person_params) do
-    person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
-
-    changeset =
-      socket.assigns.person
-      |> Cases.change_person(person_params)
-      |> Map.put(:action, :insert)
-
-    assign(socket, changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
-  end
+  def phone_types(),
+    do: ~w{Cell Home Work}
 
   def preferred_languages(current \\ nil) do
     has_current = Euclid.Exists.present?(current)
@@ -147,14 +154,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     (first ++ middle ++ last) |> Enum.uniq()
   end
 
-  def phone_types(),
-    do: ~w{Cell Home Work}
-
-  def clean_up_languages(%{"preferred_language" => "Other"} = person_params),
-    do: person_params |> Map.put("preferred_language", person_params |> Map.get("other_specified_language"))
-
-  def clean_up_languages(person_params), do: person_params
-
   def remove_blank_email_addresses(%{"emails" => email_params} = person_params) do
     updated_email_params =
       email_params
@@ -179,18 +178,21 @@ defmodule EpicenterWeb.ProfileEditLive do
   def remove_blank_phone_numbers(person_params),
     do: person_params
 
-  def has_field?(changeset, field) do
-    case changeset |> Ecto.Changeset.fetch_field(field) do
-      :error -> false
-      {_, []} -> false
-      _ -> true
-    end
-  end
-
   # # #
 
   defp get_field_from_changeset(changeset, field),
     do: changeset |> Ecto.Changeset.fetch_field(field) |> elem(1)
+
+  defp reassign_changeset(socket, person_params) do
+    person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
+
+    changeset =
+      socket.assigns.person
+      |> Cases.change_person(person_params)
+      |> Map.put(:action, :insert)
+
+    assign(socket, changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
+  end
 
   defp reformat_date(changeset, field) do
     case Ecto.Changeset.fetch_field(changeset, field) do
