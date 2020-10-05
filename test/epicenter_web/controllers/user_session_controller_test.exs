@@ -3,15 +3,17 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
   import Epicenter.AccountsFixtures
 
+  alias EpicenterWeb.Test.Pages
+
   setup do
     %{user: user_fixture()}
   end
 
-  describe "GET /users/login" do
-    test "renders log in page", %{conn: conn} do
+  describe "new" do
+    test "renders login page", %{conn: conn} do
       conn = get(conn, Routes.user_session_path(conn, :new))
-      response = html_response(conn, 200)
-      assert response =~ "Log into your account"
+      assert response = html_response(conn, 200)
+      Pages.Login.assert_here(response)
     end
 
     test "redirects if already logged in", %{conn: conn, user: user} do
@@ -20,7 +22,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
     end
   end
 
-  describe "POST /users/login" do
+  describe "create with email and password" do
     test "logs the user in", %{conn: conn, user: user} do
       conn =
         post(conn, Routes.user_session_path(conn, :create), %{
@@ -30,22 +32,16 @@ defmodule EpicenterWeb.UserSessionControllerTest do
       assert get_session(conn, :user_token)
       assert redirected_to(conn) =~ "/"
 
-      # Now do a logged in request and assert on the menu
-      conn = get(conn, "/people")
-      response = html_response(conn, 200)
-      assert response =~ user.name
-      assert response =~ "Settings</a>"
-      assert response =~ "Log out</a>"
+      conn
+      |> get("/people")
+      |> Pages.People.assert_here()
+      |> Pages.assert_current_user("user")
     end
 
     test "logs the user in with remember me", %{conn: conn, user: user} do
       conn =
         post(conn, Routes.user_session_path(conn, :create), %{
-          "user" => %{
-            "email" => user.email,
-            "password" => valid_user_password(),
-            "remember_me" => "true"
-          }
+          "user" => %{"email" => user.email, "password" => valid_user_password(), "remember_me" => "true"}
         })
 
       assert conn.resp_cookies["user_remember_me"]

@@ -1,7 +1,7 @@
-defmodule EpicenterWeb.UserMultifactorAuthViewTest do
+defmodule EpicenterWeb.UserMultifactorAuthSetupViewTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import EpicenterWeb.UserMultifactorAuthView, only: [colorize_alphanumeric_string: 1]
+  import EpicenterWeb.UserMultifactorAuthSetupView, only: [colorize_alphanumeric_string: 1]
 
   describe "colorize_alphanumeric_string" do
     test "wraps each character in a span with a 'letter' or 'number' class" do

@@ -26,4 +26,10 @@ defmodule EpicenterWeb.Session do
 
   def put_multifactor_auth_secret(conn, secret),
     do: Conn.put_session(conn, :multifactor_auth_secret, secret)
+
+  def multifactor_auth_success?(conn),
+    do: Conn.get_session(conn, :multifactor_auth_success) == true
+
+  def put_multifactor_auth_success(conn, success?),
+    do: Conn.put_session(conn, :multifactor_auth_success, success?)
 end

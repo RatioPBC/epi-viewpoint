@@ -149,7 +149,7 @@ defmodule EpicenterWeb.UserAuthTest do
       user = AccountsFixtures.single_factor_user_fixture(%{tid: "user2"})
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
-      assert redirected_to(conn) == Routes.user_multifactor_auth_path(conn, :new)
+      assert redirected_to(conn) == Routes.user_multifactor_auth_setup_path(conn, :new)
     end
 
     test "stores the path to redirect to on GET", %{conn: conn} do

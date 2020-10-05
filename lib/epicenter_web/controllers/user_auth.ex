@@ -27,7 +27,7 @@ defmodule EpicenterWeb.UserAuth do
   def log_in_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
     user_return_to = get_session(conn, :user_return_to)
-    mfa_path = user.mfa_secret == nil && Routes.user_multifactor_auth_path(conn, :new)
+    mfa_path = user.mfa_secret == nil && Routes.user_multifactor_auth_setup_path(conn, :new)
 
     conn
     |> renew_session()
@@ -134,7 +134,7 @@ defmodule EpicenterWeb.UserAuth do
   """
   def require_authenticated_user(conn, opts) do
     login_path = Routes.user_session_path(conn, :new)
-    mfa_path = Routes.user_multifactor_auth_path(conn, :new)
+    mfa_path = Routes.user_multifactor_auth_setup_path(conn, :new)
 
     error =
       case user_authentication_status(conn, opts) do

@@ -2,49 +2,24 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
   use EpicenterWeb, :controller
 
   alias Epicenter.Accounts
-  alias Epicenter.Accounts.MultifactorAuth
   alias EpicenterWeb.Session
 
-  @common_assigns [page_title: "Multi-factor authentication"]
+  @common_assigns [body_background: "color", page_title: "Multi-factor auth", show_nav: false]
 
-  def new(conn, _params) do
-    render_with_common_assigns(conn, "new.html", error_message: nil)
-  end
+  def new(conn, _params),
+    do: render_with_common_assigns(conn, "new.html", error_message: nil)
 
-  def create(conn, %{"mfa" => %{"passcode" => passcode}}) do
-    secret = Session.get_multifactor_auth_secret(conn)
+  def create(conn, %{"user" => %{"passcode" => passcode}}) do
+    user = conn.assigns.current_user
 
-    case MultifactorAuth.check(secret, passcode) do
-      :ok ->
-        conn.assigns.current_user |> Accounts.update_user_mfa!(MultifactorAuth.encode_secret(secret))
-        conn |> redirect(to: Routes.root_path(conn, :show))
+    {:ok, decoded_secret} = Accounts.MultifactorAuth.decode_secret(user.mfa_secret)
 
-      {:error, message} ->
-        conn
-        |> put_flash(:error, "There was an error—see below")
-        |> render_with_common_assigns("new.html", error_message: message)
+    case Accounts.MultifactorAuth.check(decoded_secret, passcode) do
+      :ok -> conn |> Session.put_multifactor_auth_success(true) |> redirect(to: "/")
+      {:error, message} -> render_with_common_assigns(conn, "new.html", error_message: message)
     end
   end
 
-  defp render_with_common_assigns(conn, template, assigns) do
-    conn
-    |> Session.ensure_multifactor_auth_secret(if_nil: &MultifactorAuth.generate_secret/0)
-    |> assign_multifactor_auth_key()
-    |> assign_multifactor_qr_code_svg()
-    |> merge_assigns(assigns)
-    |> merge_assigns(@common_assigns)
-    |> render(template)
-  end
-
-  defp assign_multifactor_auth_key(conn) do
-    base_32_encoded_secret = conn |> Session.get_multifactor_auth_secret() |> MultifactorAuth.encode_secret()
-    conn |> assign(:secret, base_32_encoded_secret)
-  end
-
-  defp assign_multifactor_qr_code_svg(conn) do
-    secret = conn |> Session.get_multifactor_auth_secret()
-    uri = MultifactorAuth.auth_uri(conn.assigns.current_user, secret)
-    svg = uri |> EQRCode.encode() |> EQRCode.svg(viewbox: true)
-    conn |> assign(:svg, svg)
-  end
+  defp render_with_common_assigns(conn, template, assigns),
+    do: render(conn, template, Keyword.merge(@common_assigns, assigns))
 end
