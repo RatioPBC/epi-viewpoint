@@ -1,10 +1,11 @@
 defmodule Epicenter.Accounts.MultifactorAuth do
   @totp Application.compile_env(:epicenter, :totp, Epicenter.Accounts.TOTP)
+  @issuer Application.compile_env(:epicenter, :mfa_issuer, "Viewpoint")
 
   alias Epicenter.Accounts.User
 
   def auth_uri(%User{email: email}, secret),
-    do: @totp.otpauth_uri("Viewpoint:#{email}", secret, issuer: "Viewpoint")
+    do: @totp.otpauth_uri("Viewpoint:#{email}", secret, issuer: @issuer)
 
   def check(secret, passcode)
       when is_binary(secret) and is_binary(passcode) do

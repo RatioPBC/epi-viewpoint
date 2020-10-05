@@ -68,6 +68,8 @@ config :epicenter, EpicenterWeb.Endpoint,
     ]
   ]
 
+config :epicenter, mfa_issuer: "Viewpoint-dev"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n", level: :warn
 
