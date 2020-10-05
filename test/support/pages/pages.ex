@@ -2,6 +2,7 @@ defmodule EpicenterWeb.Test.Pages do
   @endpoint EpicenterWeb.Endpoint
 
   import Euclid.Test.Extra.Assertions
+  import ExUnit.Assertions
   import Phoenix.ConnTest
   import Phoenix.LiveViewTest
 
@@ -10,6 +11,16 @@ defmodule EpicenterWeb.Test.Pages do
 
   def assert_current_user(conn_or_view_or_html, user_name) do
     conn_or_view_or_html |> parse() |> Test.Html.role_text("current-user-name") |> assert_eq(user_name)
+    conn_or_view_or_html
+  end
+
+  def assert_form_errors({:error, conn, errors}, expected_errors) do
+    assert errors == expected_errors
+    conn
+  end
+
+  def assert_form_errors(conn_or_view_or_html, expected_errors) do
+    assert form_errors(conn_or_view_or_html) == expected_errors
     conn_or_view_or_html
   end
 
@@ -75,7 +86,7 @@ defmodule EpicenterWeb.Test.Pages do
 
     case form_errors(conn) do
       [] -> conn
-      errors -> {:error, errors}
+      errors -> {:error, conn, errors}
     end
   end
 

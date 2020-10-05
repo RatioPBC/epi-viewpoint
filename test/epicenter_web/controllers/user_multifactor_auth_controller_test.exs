@@ -57,8 +57,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       conn
       |> Session.put_multifactor_auth_secret(Test.TOTPStub.raw_secret())
       |> post(Routes.user_multifactor_auth_path(conn, :create, params))
-      |> Pages.form_errors()
-      |> assert_eq(["The six-digit code was incorrect"])
+      |> Pages.assert_form_errors(["There was an error—see below", "The six-digit code was incorrect"])
 
       reloaded_user = Accounts.get_user(user.id)
       assert reloaded_user.mfa_secret == nil
