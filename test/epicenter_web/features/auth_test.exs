@@ -30,7 +30,7 @@ defmodule EpicenterWeb.Features.AuthTest do
     |> Pages.ResetPassword.change_password(@good_password)
     |> Pages.Login.log_in(@good_email_address, @good_password)
     |> Pages.MfaSetup.assert_here()
-    |> Pages.MfaSetup.submit_one_time_password()
+    |> Pages.MfaSetup.submit_passcode()
     |> Pages.People.assert_here()
     |> Pages.assert_current_user("Test User")
 
