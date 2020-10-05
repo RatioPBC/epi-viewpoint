@@ -19,3 +19,4 @@ Brewfile.lock.json
 epicenter-*.tar
 erl_crash.dump
 npm-debug.log
+.vscode/
