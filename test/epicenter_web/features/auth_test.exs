@@ -46,7 +46,27 @@ defmodule EpicenterWeb.Features.AuthTest do
     |> Pages.Login.log_in(@good_email_address, "bad-password")
     |> Pages.assert_form_errors(["Invalid email or password"])
     |> Pages.Login.log_in(@good_email_address, @good_password)
+    |> Pages.Mfa.assert_here()
+    |> Pages.Mfa.submit_passcode()
     |> Pages.People.assert_here()
     |> Pages.assert_current_user("Test User")
+  end
+
+  @tag :skip
+  test "redirecting back to the original page" do
+    #
+    # with a fresh connection, the user visits a page, logs in, and is redirected back to original page
+    #
+    # originator = Test.Fixtures.user_attrs("originator") |> Accounts.register_user!()
+    # person = Test.Fixtures.person_attrs(originator, "person") |> Cases.create_person!()
+    #
+    # conn
+    # |> Pages.Profile.visit(person, :follow_redirect)
+    # |> Pages.Login.assert_here()
+    # |> Pages.Login.log_in(@good_email_address, @good_password)
+    # |> Pages.Mfa.assert_here()
+    # |> Pages.Mfa.submit_passcode()
+    # |> Pages.Profile.assert_here(person)
+    # |> Pages.assert_current_user("Test User")
   end
 end

@@ -3,6 +3,7 @@ defmodule EpicenterWeb.UserAuth do
   import Phoenix.Controller
 
   alias Epicenter.Accounts
+  alias EpicenterWeb.Session
   alias EpicenterWeb.Router.Helpers, as: Routes
 
   # Make the remember me cookie valid for 60 days.
@@ -113,7 +114,7 @@ defmodule EpicenterWeb.UserAuth do
   Used for routes that require the user to not be authenticated.
   """
   def redirect_if_user_is_authenticated(conn, opts) do
-    if user_authentication_status(conn, opts) == :authenticated do
+    if user_authentication_status(conn, opts) in [:authenticated, :needs_second_factor] do
       conn
       |> redirect(to: signed_in_path(conn))
       |> halt()
@@ -134,19 +135,26 @@ defmodule EpicenterWeb.UserAuth do
   """
   def require_authenticated_user(conn, opts) do
     login_path = Routes.user_session_path(conn, :new)
-    mfa_path = Routes.user_multifactor_auth_setup_path(conn, :new)
+    mfa_setup_path = Routes.user_multifactor_auth_setup_path(conn, :new)
+    mfa_path = Routes.user_multifactor_auth_path(conn, :new)
 
     error =
       case user_authentication_status(conn, opts) do
         :authenticated -> nil
         :not_logged_in -> {"You must log in to access this page", login_path}
         :not_confirmed -> {"Your email address must be confirmed before you can log in", login_path}
-        :no_mfa -> {"You must have multi-factor authentication set up before you can continue", mfa_path}
+        :no_mfa -> {"You must have multi-factor authentication set up before you can continue", mfa_setup_path}
+        :needs_second_factor -> :needs_second_factor
       end
 
     case error do
       nil ->
         conn
+
+      :needs_second_factor ->
+        conn
+        |> redirect(to: mfa_path)
+        |> halt()
 
       {message, redirect_path} ->
         conn
@@ -165,6 +173,7 @@ defmodule EpicenterWeb.UserAuth do
       conn.assigns[:current_user] == nil -> :not_logged_in
       conn.assigns[:current_user].confirmed_at == nil -> :not_confirmed
       mfa_required? && conn.assigns[:current_user].mfa_secret == nil -> :no_mfa
+      mfa_required? && !Session.multifactor_auth_success?(conn) -> :needs_second_factor
       true -> :authenticated
     end
   end

@@ -1,5 +1,5 @@
 #multifactor-auth-page data-page="multifactor-auth"
-  = form_for @conn, Routes.user_session_path(@conn, :create), [as: :user, data: [role: "multifactor-auth-form"]], fn f ->
+  = form_for @conn, Routes.user_multifactor_auth_path(@conn, :create), [as: :user, data: [role: "multifactor-auth-form"]], fn f ->
 
     #form-contents
       header
@@ -34,4 +34,8 @@
 
       fieldset
         = submit "Continue", id: "submit"
+
+      fieldset
+        = link "Cancel", to: Routes.user_session_path(@conn, :delete), method: :delete, id: "back-to-login"
+
 

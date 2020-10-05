@@ -13,9 +13,10 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
     user = conn.assigns.current_user
 
     {:ok, decoded_secret} = Accounts.MultifactorAuth.decode_secret(user.mfa_secret)
+    user_return_to = get_session(conn, :user_return_to)
 
     case Accounts.MultifactorAuth.check(decoded_secret, passcode) do
-      :ok -> conn |> Session.put_multifactor_auth_success(true) |> redirect(to: "/")
+      :ok -> conn |> Session.put_multifactor_auth_success(true) |> redirect(to: user_return_to || "/")
       {:error, message} -> render_with_common_assigns(conn, "new.html", error_message: message)
     end
   end

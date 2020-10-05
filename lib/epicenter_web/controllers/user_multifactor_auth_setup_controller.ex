@@ -17,7 +17,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupController do
     case MultifactorAuth.check(secret, passcode) do
       :ok ->
         conn.assigns.current_user |> Accounts.update_user_mfa!(MultifactorAuth.encode_secret(secret))
-        conn |> redirect(to: Routes.root_path(conn, :show))
+        conn |> Session.put_multifactor_auth_success(true) |> redirect(to: Routes.root_path(conn, :show))
 
       {:error, message} ->
         conn

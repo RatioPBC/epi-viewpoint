@@ -20,8 +20,7 @@ defmodule Epicenter.Release do
   end
 
   def reset_password(email) do
-    Accounts.get_user_by_email(email) |> generated_password_reset_url()
-    :ok
+    {:ok, Accounts.get_user_by_email(email) |> generated_password_reset_url()}
   end
 
   defp generated_password_reset_url(user) do

@@ -1,4 +1,4 @@
-#profile-page data-role="profile-page"
+#profile-page data-page="profile" data-tid=@person.tid data-role="profile-page"
 
   section
     header#subnav

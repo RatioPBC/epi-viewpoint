@@ -90,10 +90,7 @@ defmodule EpicenterWeb.Test.Pages do
     end
   end
 
-  def visit(%Plug.Conn{} = conn, path) do
-    {:ok, view, _html} = live(conn, path)
-    view
-  end
+  def visit(conn, path, option \\ nil)
 
   def visit(%Plug.Conn{} = conn, path, :follow_redirect) do
     conn
@@ -107,5 +104,10 @@ defmodule EpicenterWeb.Test.Pages do
 
   def visit(%Plug.Conn{} = conn, path, :notlive) do
     conn |> get(path)
+  end
+
+  def visit(%Plug.Conn{} = conn, path, nil) do
+    {:ok, view, _html} = live(conn, path)
+    view
   end
 end

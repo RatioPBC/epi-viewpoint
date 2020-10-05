@@ -9,8 +9,14 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  def visit(%Plug.Conn{} = conn, %Person{id: person_id}) do
-    conn |> Pages.visit("/people/#{person_id}")
+  def visit(%Plug.Conn{} = conn, %Person{id: person_id}, extra_arg \\ nil) do
+    conn |> Pages.visit("/people/#{person_id}", extra_arg)
+  end
+
+  def assert_here(view_or_conn_or_html, person) do
+    view_or_conn_or_html |> Pages.assert_on_page("profile")
+    if !person.tid, do: raise("Person must have a tid for this assertion: #{inspect(person)}")
+    view_or_conn_or_html |> Pages.parse() |> Test.Html.attr("[data-page=profile]", "data-tid") |> assert_eq(person.tid)
   end
 
   #

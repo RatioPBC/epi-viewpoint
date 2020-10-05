@@ -4,6 +4,7 @@ defmodule EpicenterWeb.UserAuthTest do
   alias Epicenter.Accounts
   alias Epicenter.AccountsFixtures
   alias EpicenterWeb.UserAuth
+  alias EpicenterWeb.Router.Helpers, as: Routes
 
   setup %{conn: conn} do
     conn =
@@ -116,8 +117,24 @@ defmodule EpicenterWeb.UserAuthTest do
   end
 
   describe "redirect_if_user_is_authenticated/2" do
+    test "redirects if user is half-authenticated", %{conn: conn, user: user} do
+      conn =
+        conn
+        |> assign(:current_user, user)
+        |> EpicenterWeb.Session.put_multifactor_auth_success(false)
+        |> UserAuth.redirect_if_user_is_authenticated([])
+
+      assert conn.halted
+      assert redirected_to(conn) == "/"
+    end
+
     test "redirects if user is authenticated", %{conn: conn, user: user} do
-      conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_is_authenticated([])
+      conn =
+        conn
+        |> assign(:current_user, user)
+        |> EpicenterWeb.Session.put_multifactor_auth_success(true)
+        |> UserAuth.redirect_if_user_is_authenticated([])
+
       assert conn.halted
       assert redirected_to(conn) == "/"
     end
@@ -178,8 +195,26 @@ defmodule EpicenterWeb.UserAuthTest do
       refute get_session(halted_conn, :user_return_to)
     end
 
+    test "does redirect if user is half-authenticated", %{conn: conn, user: user} do
+      conn =
+        conn
+        |> fetch_flash()
+        |> assign(:current_user, user)
+        |> EpicenterWeb.Session.put_multifactor_auth_success(false)
+        |> UserAuth.require_authenticated_user([])
+
+      assert conn.halted
+      assert redirected_to(conn) == Routes.user_multifactor_auth_path(conn, :new)
+    end
+
     test "does not redirect if user is authenticated", %{conn: conn, user: user} do
-      conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
+      conn =
+        conn
+        |> fetch_flash()
+        |> assign(:current_user, user)
+        |> EpicenterWeb.Session.put_multifactor_auth_success(true)
+        |> UserAuth.require_authenticated_user([])
+
       refute conn.halted
       refute conn.status
     end

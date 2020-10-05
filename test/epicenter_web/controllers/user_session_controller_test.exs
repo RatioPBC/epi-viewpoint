@@ -31,11 +31,6 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
       assert get_session(conn, :user_token)
       assert redirected_to(conn) =~ "/"
-
-      conn
-      |> get("/people")
-      |> Pages.People.assert_here()
-      |> Pages.assert_current_user("user")
     end
 
     test "logs the user in with remember me", %{conn: conn, user: user} do
