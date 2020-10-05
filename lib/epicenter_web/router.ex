@@ -30,8 +30,8 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through [:browser, :require_authenticated_user_without_mfa]
 
-    get "/users/mfa", UserMultifactorAuthController, :new
-    post "/users/mfa", UserMultifactorAuthController, :create
+    get "/users/mfa-setup", UserMultifactorAuthController, :new
+    post "/users/mfa-setup", UserMultifactorAuthController, :create
   end
 
   scope "/", EpicenterWeb do
