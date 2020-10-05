@@ -29,7 +29,7 @@ defmodule Epicenter.Release do
         Routes.user_reset_password_url(Endpoint, :edit, encoded_token)
       end)
 
-    [_body, url] = Regex.run(~r|\n(http://[^\n]+)\n|, body)
+    [_body, url] = Regex.run(~r|\n(https?://[^\n]+)\n|, body)
     url
   end
 
