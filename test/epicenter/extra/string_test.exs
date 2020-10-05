@@ -9,6 +9,16 @@ defmodule Epicenter.Extra.StringTest do
     test "many", do: assert(Extra.String.pluralize(2, "nerd", "nerds") == "2 nerds")
   end
 
+  describe "remove_non_numbers" do
+    test "doesn't blow up on nil" do
+      assert Extra.String.remove_non_numbers(nil) == nil
+    end
+
+    test "removes things that aren't numbers" do
+      assert " a 1 - b2/34  5?6" |> Extra.String.remove_non_numbers() == "123456"
+    end
+  end
+
   describe "squish" do
     test "removes whitespace" do
       assert " foo  BAR  \t baz \n FEz    " |> Extra.String.squish() == "foo BAR baz FEz"

@@ -3,20 +3,20 @@ defmodule Epicenter.Accounts.MultifactorAuth do
   @issuer Application.compile_env(:epicenter, :mfa_issuer, "Viewpoint")
 
   alias Epicenter.Accounts.User
+  alias Epicenter.Extra
 
   def auth_uri(%User{email: email}, secret),
     do: @totp.otpauth_uri("Viewpoint:#{email}", secret, issuer: @issuer)
 
-  def check(secret, passcode)
-      when is_binary(secret) and is_binary(passcode) do
-    with {:check_length, one_time_password} when byte_size(one_time_password) == 6 <- {:check_length, passcode},
-         {:parse_totp, {integer, _}} when is_integer(integer) <- {:parse_totp, Integer.parse(one_time_password)},
-         {:validate_totp, true} <- {:validate_totp, @totp.valid?(secret, one_time_password)} do
-      :ok
+  def check(secret, passcode) when is_binary(secret) and is_binary(passcode) do
+    passcode = Extra.String.remove_non_numbers(passcode)
+
+    if String.length(passcode) == 6 do
+      if @totp.valid?(secret, passcode),
+        do: :ok,
+        else: {:error, "The six-digit code was incorrect"}
     else
-      {:check_length, _} -> {:error, "The six-digit code must be exactly 6 numbers"}
-      {:parse_totp, _} -> {:error, "The six-digit code must only contain numbers"}
-      {:validate_totp, _} -> {:error, "The six-digit code was incorrect"}
+      {:error, "The six-digit code must be exactly 6 numbers"}
     end
   end
 
