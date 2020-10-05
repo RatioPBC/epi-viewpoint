@@ -82,7 +82,6 @@
   section#demographics
     header
       span Demographics
-      span= live_redirect "Update", to: Routes.demographics_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.DemographicsEditLive, @person), id: "edit-demographics-button", data_role: "edit-demographics-button"
 
     table#demographics-data
       tbody

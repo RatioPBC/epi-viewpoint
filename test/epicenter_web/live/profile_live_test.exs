@@ -249,6 +249,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_role_text(page_live, "notes", "lorem ipsum")
     end
 
+    @tag :skip
     test "navigating to edit demographics", %{conn: conn, person: person} do
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
