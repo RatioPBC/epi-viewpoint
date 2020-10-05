@@ -3,6 +3,10 @@
   section
     h2 Set up multi-factor authentication
 
+    = if get_flash(@conn, :error) do
+      - error = get_flash(@conn, :error)
+      div#flash-error data-form-error-message=error = error
+
     p
       | This site uses
       i<> multi-factor authentication

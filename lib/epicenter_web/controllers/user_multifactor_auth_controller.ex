@@ -20,7 +20,9 @@ defmodule EpicenterWeb.UserMultifactorAuthController do
         conn |> redirect(to: Routes.root_path(conn, :show))
 
       {:error, message} ->
-        conn |> render_with_common_assigns("new.html", error_message: message)
+        conn
+        |> put_flash(:error, "There was an error—see below")
+        |> render_with_common_assigns("new.html", error_message: message)
     end
   end
 
