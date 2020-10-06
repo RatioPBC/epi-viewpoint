@@ -35,15 +35,6 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> put_session(:user_return_to, "/hello") |> UserAuth.log_in_user(user)
       assert redirected_to(conn) == "/hello"
     end
-
-    test "writes a cookie if remember_me is configured", %{conn: conn, user: user} do
-      conn = conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
-      assert get_session(conn, :user_token) == conn.cookies["user_remember_me"]
-
-      assert %{value: signed_token, max_age: max_age} = conn.resp_cookies["user_remember_me"]
-      assert signed_token != get_session(conn, :user_token)
-      assert max_age == 5_184_000
-    end
   end
 
   describe "logout_user/1" do
@@ -53,13 +44,10 @@ defmodule EpicenterWeb.UserAuthTest do
       conn =
         conn
         |> put_session(:user_token, user_token)
-        |> put_req_cookie("user_remember_me", user_token)
         |> fetch_cookies()
         |> UserAuth.log_out_user()
 
       refute get_session(conn, :user_token)
-      refute conn.cookies["user_remember_me"]
-      assert %{max_age: 0} = conn.resp_cookies["user_remember_me"]
       assert redirected_to(conn) == "/"
       refute Accounts.get_user_by_session_token(user_token)
     end
@@ -81,7 +69,6 @@ defmodule EpicenterWeb.UserAuthTest do
     test "works even if user is already logged out", %{conn: conn} do
       conn = conn |> fetch_cookies() |> UserAuth.log_out_user()
       refute get_session(conn, :user_token)
-      assert %{max_age: 0} = conn.resp_cookies["user_remember_me"]
       assert redirected_to(conn) == "/"
     end
   end
@@ -90,21 +77,6 @@ defmodule EpicenterWeb.UserAuthTest do
     test "authenticates user from session", %{conn: conn, user: user} do
       user_token = Accounts.generate_user_session_token(user)
       conn = conn |> put_session(:user_token, user_token) |> UserAuth.fetch_current_user([])
-      assert conn.assigns.current_user.id == user.id
-    end
-
-    test "authenticates user from cookies", %{conn: conn, user: user} do
-      logged_in_conn = conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
-
-      user_token = logged_in_conn.cookies["user_remember_me"]
-      %{value: signed_token} = logged_in_conn.resp_cookies["user_remember_me"]
-
-      conn =
-        conn
-        |> put_req_cookie("user_remember_me", signed_token)
-        |> UserAuth.fetch_current_user([])
-
-      assert get_session(conn, :user_token) == user_token
       assert conn.assigns.current_user.id == user.id
     end
 
