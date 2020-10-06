@@ -184,7 +184,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      Cases.create_phone!(Test.Fixtures.phone_attrs(alice, "0", %{number: 1_111_111_000}))
+      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: 1_111_111_000}))
 
       %{
         file_name: "test.csv",

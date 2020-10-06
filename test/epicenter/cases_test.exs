@@ -264,6 +264,41 @@ defmodule Epicenter.CasesTest do
     end
   end
 
+  describe "create_phone!" do
+    setup do
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+
+      %{creator: creator, person: person}
+    end
+
+    test "persists the values correctly", %{person: person, creator: creator} do
+      phone = Test.Fixtures.phone_attrs(creator, person, "phone1", %{}) |> Cases.create_phone!()
+
+      assert phone.number == 1_111_111_000
+      assert phone.person_id == person.id
+      assert phone.type == "home"
+      assert phone.tid == "phone1"
+    end
+
+    test "has a revision count", %{person: person, creator: creator} do
+      phone = Test.Fixtures.phone_attrs(creator, person, "phone1", %{}) |> Cases.create_phone!()
+
+      assert_revision_count(phone, 1)
+    end
+
+    test "has an audit log", %{person: person, creator: creator} do
+      phone = Test.Fixtures.phone_attrs(creator, person, "phone1", %{}) |> Cases.create_phone!()
+
+      assert_recent_audit_log(phone, creator, %{
+        "tid" => "phone1",
+        "number" => 1111111000,
+        "person_id" => person.id,
+        "type" => "home"
+      })
+    end
+  end
+
   describe "upsert_phone!" do
     setup do
       creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
@@ -290,31 +325,55 @@ defmodule Epicenter.CasesTest do
 
       assert Cases.get_phone(original_phone.id).updated_at == ~N[1970-01-01 10:30:00Z]
 
-      Test.Fixtures.phone_attrs(creator, person, "phone2", %{number: original_phone.number}) |> Cases.upsert_phone!()
+      phone = Test.Fixtures.phone_attrs(creator, person, "phone2", %{number: original_phone.number}) |> Cases.upsert_phone!()
 
       person = Cases.preload_phones(person)
       assert person.phones |> tids == ["phone1"]
       assert person.phones |> pluck(:updated_at) != ~N[1970-01-01 10:30:00Z]
+
+      assert_revision_count(phone, 2)
+      assert_recent_audit_log(phone, creator, %{
+        "tid" => "phone2",
+        "number" => 1111111000,
+        "person_id" => person.id,
+        "type" => "home"
+      })
     end
 
     test "when the phone number already exists for a different person", %{creator: creator, person: person} do
       {:ok, other_person} = Test.Fixtures.person_attrs(creator, "person2") |> Cases.create_person()
       other_persons_phone = add_phone_for_person("phone3", other_person, creator)
 
-      Test.Fixtures.phone_attrs(creator, person, "phone2", %{number: other_persons_phone.number}) |> Cases.upsert_phone!()
+      phone = Test.Fixtures.phone_attrs(creator, person, "phone2", %{number: other_persons_phone.number}) |> Cases.upsert_phone!()
 
       other_person = Cases.preload_phones(other_person)
       assert other_person.phones |> tids == ["phone3"]
       person = Cases.preload_phones(person)
       assert person.phones |> tids == ["phone2"]
+
+      assert_revision_count(phone, 1)
+      assert_recent_audit_log(phone, creator, %{
+        "tid" => "phone2",
+        "number" => 1111111000,
+        "person_id" => person.id,
+        "type" => "home"
+      })
     end
 
     test "when the phone number does not yet exist", %{creator: creator, person: person} do
       assert Cases.preload_phones(person).phones == []
-      Test.Fixtures.phone_attrs(creator, person, "phone2", %{}) |> Cases.upsert_phone!()
+      phone = Test.Fixtures.phone_attrs(creator, person, "phone2", %{}) |> Cases.upsert_phone!()
 
       person = Cases.preload_phones(person)
       assert person.phones |> tids == ["phone2"]
+
+      assert_revision_count(phone, 1)
+      assert_recent_audit_log(phone, creator, %{
+        "tid" => "phone2",
+        "number" => 1111111000,
+        "person_id" => person.id,
+        "type" => "home"
+      })
     end
   end
 
