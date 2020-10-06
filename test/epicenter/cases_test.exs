@@ -39,10 +39,19 @@ defmodule Epicenter.CasesTest do
   end
 
   describe "lab results" do
-    test "create_lab_result! creates a lab result" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
-      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result1", "06-01-2020") |> Cases.create_lab_result!()
+    setup do
+      creator = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+
+      %{creator: creator}
+    end
+
+    setup [:make_person]
+    defp make_person(%{with_person: true, creator: creator}), do: [person: Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()]
+    defp make_person(_), do: :ok
+
+    @tag with_person: true
+    test "create_lab_result! creates a lab result", %{creator: creator, person: person} do
+      lab_result = Test.Fixtures.lab_result_attrs(person, creator, "result1", "06-01-2020") |> Cases.create_lab_result!()
 
       assert lab_result.request_accession_number == "accession-result1"
       assert lab_result.request_facility_code == "facility-result1"
@@ -52,13 +61,33 @@ defmodule Epicenter.CasesTest do
       assert lab_result.tid == "result1"
     end
 
-    test "list_lab_results sorts by sample date" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
-      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    @tag with_person: true
+    test "create_lab_result! results in a correct revision count", %{creator: creator, person: person} do
+      lab_result = Test.Fixtures.lab_result_attrs(person, creator, "result1", "06-01-2020") |> Cases.create_lab_result!()
 
-      Test.Fixtures.lab_result_attrs(person, user, "newer", "06-03-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(person, user, "older", "06-01-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(person, user, "middle", "06-02-2020") |> Cases.create_lab_result!()
+      assert_revision_count(lab_result, 1)
+    end
+
+    @tag with_person: true
+    test "create_lab_result! results in a correct audit log", %{person: person, creator: creator} do
+      lab_result = Test.Fixtures.lab_result_attrs(person, creator, "result1", "06-01-2020") |> Cases.create_lab_result!()
+
+      assert_recent_audit_log(lab_result, creator, %{
+        "person_id" => person.id,
+        "request_accession_number" => "accession-result1",
+        "request_facility_code" => "facility-result1",
+        "request_facility_name" => "result1 Lab, Inc.",
+        "result" => "positive",
+        "sampled_on" => "2020-06-01",
+        "tid" => "result1"
+      })
+    end
+
+    @tag with_person: true
+    test "list_lab_results sorts by sample date", %{person: person, creator: creator} do
+      Test.Fixtures.lab_result_attrs(person, creator, "newer", "06-03-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(person, creator, "older", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(person, creator, "middle", "06-02-2020") |> Cases.create_lab_result!()
 
       Cases.list_lab_results() |> tids() |> assert_eq(~w{older middle newer})
     end
@@ -68,20 +97,22 @@ defmodule Epicenter.CasesTest do
       person_1 = Test.Fixtures.person_attrs(creator, "person-1") |> Cases.create_person!()
       person_2 = Test.Fixtures.person_attrs(creator, "person-2") |> Cases.create_person!()
 
-      Test.Fixtures.lab_result_attrs(person_1, "result-1", "01/01/2020")
-      |> Map.put(:tid, "person-1-result-1")
+      update_first_elem = fn {first, second}, func -> {func.(first), second} end
+
+      Test.Fixtures.lab_result_attrs(person_1, creator, "result-1", "01/01/2020")
+      |> update_first_elem.(&Map.put(&1, :tid, "person-1-result-1"))
       |> Cases.upsert_lab_result!()
 
-      Test.Fixtures.lab_result_attrs(person_1, "result-2", "01/01/2020")
-      |> Map.put(:tid, "person-1-result-2")
+      Test.Fixtures.lab_result_attrs(person_1, creator, "result-2", "01/01/2020")
+      |> update_first_elem.(&Map.put(&1, :tid, "person-1-result-2"))
       |> Cases.upsert_lab_result!()
 
-      Test.Fixtures.lab_result_attrs(person_1, "result-2", "01/01/2020")
-      |> Map.put(:tid, "person-1-result-2-dupe")
+      Test.Fixtures.lab_result_attrs(person_1, creator, "result-2", "01/01/2020")
+      |> update_first_elem.(&Map.put(&1, :tid, "person-1-result-2-dupe"))
       |> Cases.upsert_lab_result!()
 
-      Test.Fixtures.lab_result_attrs(person_2, "result-2", "01/01/2020")
-      |> Map.put(:tid, "person-2-result-2")
+      Test.Fixtures.lab_result_attrs(person_2, creator, "result-2", "01/01/2020")
+      |> update_first_elem.(&Map.put(&1, :tid, "person-2-result-2"))
       |> Cases.upsert_lab_result!()
 
       [person_1 = %{tid: "person-1"}, person_2 = %{tid: "person-2"}] =

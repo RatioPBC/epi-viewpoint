@@ -7,6 +7,11 @@ defmodule Epicenter.Cases.LabResult do
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
 
+  @required_attrs ~w{person_id result sampled_on}a
+  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}a
+
+  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "lab_results" do
@@ -26,9 +31,6 @@ defmodule Epicenter.Cases.LabResult do
 
     belongs_to :person, Person
   end
-
-  @required_attrs ~w{person_id result sampled_on}a
-  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}a
 
   def changeset(lab_result, attrs) do
     lab_result
