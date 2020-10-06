@@ -66,4 +66,39 @@ defmodule Epicenter.Cases.EmailTest do
       Email.Query.display_order() |> Repo.all() |> tids() |> assert_eq(~w{preferred address-a address-z})
     end
   end
+
+  describe "create_email!" do
+    setup do
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
+
+      %{creator: creator, person: person}
+    end
+
+    test "it persists the correct values", %{person: person, creator: creator} do
+      email = Test.Fixtures.email_attrs(creator, person, "preferred", is_preferred: true, address: "email@example.com", tid: "email1") |> Cases.create_email!()
+
+      assert email.address == "email@example.com"
+      assert email.is_preferred == true
+      assert email.tid == "email1"
+      assert email.person_id == person.id
+    end
+
+    test "has a revision count", %{person: person, creator: creator} do
+      email = Test.Fixtures.email_attrs(creator, person, "preferred", is_preferred: true, address: "email@example.com", tid: "email1") |> Cases.create_email!()
+
+      assert_revision_count(email, 1)
+    end
+
+    test "has an audit log", %{person: person, creator: creator} do
+      email = Test.Fixtures.email_attrs(creator, person, "preferred", is_preferred: true, address: "email@example.com", tid: "email1") |> Cases.create_email!()
+
+      assert_recent_audit_log(email, creator, %{
+        "tid" => "email1",
+        "address" => "email@example.com",
+        "person_id" => person.id,
+        "is_preferred" => true
+      })
+    end
+  end
 end

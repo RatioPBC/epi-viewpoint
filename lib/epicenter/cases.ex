@@ -88,7 +88,7 @@ defmodule Epicenter.Cases do
   # email
   #
   def change_email(%Email{} = email, attrs), do: Email.changeset(email, attrs)
-  def create_email!({email_attrs, _audit_meta}), do: %Email{} |> change_email(email_attrs) |> Repo.insert!()
+  def create_email!({email_attrs, audit_meta}), do: %Email{} |> change_email(email_attrs) |> AuditLog.insert!(audit_meta)
   def preload_emails(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(emails: Email.Query.display_order())
 
   #
