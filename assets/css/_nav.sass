@@ -7,13 +7,19 @@
     padding: 1rem
 
     #nav-items
-      display: flex
-      justify-content: space-between
+      @include level($justify: space-between)
       padding: 0 1rem
 
       #nav-left
         font-weight: bold
         @include level
+
+        #logo
+          line-height: initial
+
+          svg
+            height: 35px
+            width: 35px
 
       #nav-right
         @include level

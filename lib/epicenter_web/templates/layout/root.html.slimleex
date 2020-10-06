@@ -21,7 +21,8 @@ html lang="en"
         #nav-inner
           #nav-items
             #nav-left
-              = link "Epicenter", to: "/"
+              = link to: "/", id: "logo" do
+                = logo_icon()
             #nav-right
               #user-menu
                 #user-menu-title

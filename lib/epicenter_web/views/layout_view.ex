@@ -1,5 +1,5 @@
 defmodule EpicenterWeb.LayoutView do
   use EpicenterWeb, :view
 
-  import EpicenterWeb.IconView, only: [arrow_down_icon: 0, person_icon: 0]
+  import EpicenterWeb.IconView, only: [arrow_down_icon: 0, logo_icon: 0, person_icon: 0]
 end
