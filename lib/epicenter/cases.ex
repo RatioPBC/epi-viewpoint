@@ -67,9 +67,9 @@ defmodule Epicenter.Cases do
   #
   def change_address(%Address{} = address, attrs), do: Address.changeset(address, attrs)
   def count_addresses(), do: Address |> Repo.aggregate(:count)
-  def create_address!(attrs), do: %Address{} |> change_address(attrs) |> Repo.insert!()
+  def create_address!({attrs, _audit_meta}), do: %Address{} |> change_address(attrs) |> Repo.insert!()
   def preload_addresses(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(addresses: Address.Query.display_order())
-  def upsert_address!(%{person_id: _} = attrs), do: %Address{} |> change_address(attrs) |> Repo.insert!(Address.Query.opts_for_upsert())
+  def upsert_address!({%{person_id: _} = attrs, _audit_meta}), do: %Address{} |> change_address(attrs) |> Repo.insert!(Address.Query.opts_for_upsert())
 
   #
   # phone

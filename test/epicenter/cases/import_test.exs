@@ -206,7 +206,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      Cases.create_address!(Test.Fixtures.address_attrs(alice, "0", 4250, %{}))
+      Cases.create_address!(Test.Fixtures.address_attrs(originator, alice, "0", 4250, %{}))
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [

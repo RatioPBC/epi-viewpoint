@@ -46,8 +46,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Test.Fixtures.email_attrs(user, person, "alice-preferred", is_preferred: true) |> Cases.create_email!()
       Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
       Test.Fixtures.phone_attrs(user, person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
-      Test.Fixtures.address_attrs(person, "alice-address", 1000, type: "home") |> Cases.create_address!()
-      Test.Fixtures.address_attrs(person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
+      Test.Fixtures.address_attrs(user, person, "alice-address", 1000, type: "home") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(user, person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
       :ok
     end
 
@@ -128,8 +128,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
     defp table_contents(live, opts),
       do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
-    setup %{person: person} do
-      Test.Fixtures.address_attrs(person, "address1", 1000) |> Cases.create_address!()
+    setup %{person: person, user: user} do
+      Test.Fixtures.address_attrs(user, person, "address1", 1000) |> Cases.create_address!()
       Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
       assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
       [person: person, assignee: assignee]
@@ -217,12 +217,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert updated_socket.assigns.person.tid == "alice"
     end
 
-    test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice} do
+    test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice, user: user} do
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
       assert_role_text(show_page_live, "address", "1000 Test St, City, TS 00000 home")
 
-      Test.Fixtures.address_attrs(alice, "address2", 2000) |> Cases.create_address!()
+      Test.Fixtures.address_attrs(user, alice, "address2", 2000) |> Cases.create_address!()
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}]}, socket)
       assert updated_socket.assigns.person.tid == "updated-alice"
       assert updated_socket.assigns.person.addresses |> tids() == ["address1", "address2"]

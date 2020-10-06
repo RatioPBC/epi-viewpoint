@@ -105,7 +105,7 @@ defmodule Epicenter.Cases.Import do
     person = import_person(row, originator)
     lab_result = import_lab_result(row, person)
     import_phone_number(row, person, originator)
-    import_address(row, person)
+    import_address(row, person, originator)
     %{person: person, lab_result: lab_result}
   end
 
@@ -138,11 +138,11 @@ defmodule Epicenter.Cases.Import do
     end
   end
 
-  defp import_address(row, person) do
+  defp import_address(row, person, author) do
     [street, city, state, zip] = address_components = @address_db_fields_to_insert |> Enum.map(&Map.get(row, &1))
 
     if Euclid.Exists.any?(address_components) do
-      Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id})
+      Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id} |> in_audit_tuple(author))
     end
   end
 end

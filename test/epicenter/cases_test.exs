@@ -322,28 +322,29 @@ defmodule Epicenter.CasesTest do
     setup do
       creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+      audit_meta = Test.Fixtures.audit_meta(creator)
 
-      %{creator: creator, person: person}
+      %{creator: creator, person: person, audit_meta: audit_meta}
     end
 
-    test "when the address already exists for the same person", %{person: person} do
-      original_address = Test.Fixtures.address_attrs(person, "address1", 4250) |> Cases.create_address!()
+    test "when the address already exists for the same person", %{creator: creator, person: person, audit_meta: audit_meta} do
+      original_address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
 
       {:ok, sql_safe_id} = Ecto.UUID.dump(original_address.id)
       Ecto.Adapters.SQL.query!(Epicenter.Repo, "UPDATE addresses SET updated_at = $1 WHERE id = $2", [~N[1970-01-01 10:30:00Z], sql_safe_id])
 
-      Cases.upsert_address!(Map.from_struct(%{original_address | tid: "address2"}))
+      Cases.upsert_address!({Map.from_struct(%{original_address | tid: "address2"}), audit_meta})
 
       %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
       assert length(addresses) == 1
       assert hd(addresses).updated_at != ~N[1970-01-01 10:30:00Z]
     end
 
-    test "when the address already exists for a different person", %{creator: creator, person: person} do
+    test "when the address already exists for a different person", %{creator: creator, person: person, audit_meta: audit_meta} do
       {:ok, other_person} = Test.Fixtures.person_attrs(creator, "other person") |> Cases.create_person()
-      original_address = Test.Fixtures.address_attrs(other_person, "other address", 4250) |> Cases.create_address!()
+      original_address = Test.Fixtures.address_attrs(creator, other_person, "other address", 4250) |> Cases.create_address!()
 
-      Cases.upsert_address!(Map.from_struct(%{original_address | tid: "address2", person_id: person.id}))
+      Cases.upsert_address!({Map.from_struct(%{original_address | tid: "address2", person_id: person.id}), audit_meta})
 
       %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
       assert hd(addresses).tid == "address2"
@@ -352,10 +353,10 @@ defmodule Epicenter.CasesTest do
       assert hd(addresses).tid == "other address"
     end
 
-    test "when the address does not yet exist", %{person: person} do
-      original_address = Test.Fixtures.address_attrs(person, "address1", 4250) |> Cases.create_address!()
+    test "when the address does not yet exist", %{person: person, creator: creator, audit_meta: audit_meta} do
+      original_address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
 
-      Cases.upsert_address!(Map.from_struct(original_address))
+      Cases.upsert_address!({Map.from_struct(original_address), audit_meta})
 
       %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
       assert length(addresses) == 1
