@@ -15,7 +15,9 @@ config :epicenter, EpicenterWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
-config :epicenter, mfa_issuer: "Viewpoint-staging"
+config :epicenter,
+  mfa_issuer: "Viewpoint-staging",
+  user_input_restrictions: :unrestricted
 
 # Do not print debug messages in production
 config :logger, level: :info
