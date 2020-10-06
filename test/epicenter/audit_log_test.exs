@@ -19,9 +19,11 @@ defmodule Epicenter.AuditLogTest do
       {:ok, inserted_person_1} =
         AuditLog.insert(
           changeset_1,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [revision_1] = AuditLog.revisions(Cases.Person)
@@ -32,9 +34,11 @@ defmodule Epicenter.AuditLogTest do
       inserted_person_2 =
         AuditLog.insert!(
           changeset_2,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [_, revision_2] = AuditLog.revisions(Cases.Person)
@@ -67,9 +71,11 @@ defmodule Epicenter.AuditLogTest do
       {:ok, updated_person_1} =
         AuditLog.update(
           changeset,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [%{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
@@ -77,9 +83,11 @@ defmodule Epicenter.AuditLogTest do
       updated_person_2 =
         AuditLog.update!(
           changeset,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [revision_0, revision_1, revision_2] =
@@ -92,8 +100,8 @@ defmodule Epicenter.AuditLogTest do
       assert revision_1.after_change["occupation"] == "architect"
       assert revision_1.changed_id == person.id
       assert revision_1.changed_type == "Cases.Person"
-      assert revision_1.reason_event == "update-demographics"
-      assert revision_1.reason_action == "edit-profile-demographics"
+      assert revision_1.reason_event == "edit-profile-demographics"
+      assert revision_1.reason_action == "update-demographics"
 
       assert revision_2.changed_id == person.id
       assert revision_2.changed_type == "Cases.Person"
@@ -104,7 +112,6 @@ defmodule Epicenter.AuditLogTest do
       assert updated_person_1.id == reloaded_person.id
       assert updated_person_2.id == reloaded_person.id
     end
-
 
     test "handling nested changesets (adding an email)" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
@@ -127,11 +134,16 @@ defmodule Epicenter.AuditLogTest do
 
       changeset = Cases.change_person(person, person_params)
 
-      updated_person = AuditLog.update!(changeset, user.id, "action", "event")
+      updated_person =
+        AuditLog.update!(
+          changeset,
+          %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
+        )
 
       assert [%{address: "a@example.com"}] = updated_person.emails
 
       assert_audit_logged(person)
+
       assert_recent_audit_log(person, user, %{
         "dob" => "1970-01-01",
         "emails" => [%{"address" => "a@example.com", "delete" => false, "person_id" => person.id}],
@@ -142,12 +154,19 @@ defmodule Epicenter.AuditLogTest do
     test "returns {:error, changeset} when changeset is invalid" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
+
       person_params = %{
-        "first_name" => "",
+        "first_name" => ""
       }
+
       changeset = Cases.change_person(person, person_params)
 
-      assert {:error, _} = AuditLog.update(changeset, user.id, "action", "event")
+      assert {:error, _} =
+               AuditLog.update(
+                 changeset,
+                 %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
+               )
+
       # only the "create" action should have a revision. not the invalid update.
       assert_revision_count(person, 1)
     end

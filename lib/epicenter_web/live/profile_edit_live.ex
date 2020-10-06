@@ -4,7 +4,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2, trash_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1]
 
-  alias Epicenter.AuditLog.Revision
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.DateParser
   alias Epicenter.Extra
@@ -85,10 +85,10 @@ defmodule EpicenterWeb.ProfileEditLive do
     socket.assigns.person
     |> Cases.update_person(
       {person_params,
-       %{
+       %AuditLog.Meta{
          author_id: socket.assigns.current_user.id,
-         reason_action: Revision.update_profile_action(),
-         reason_event: Revision.edit_profile_saved_event()
+         reason_action: AuditLog.Revision.update_profile_action(),
+         reason_event: AuditLog.Revision.edit_profile_saved_event()
        }}
     )
     |> case do

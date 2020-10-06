@@ -1,9 +1,10 @@
 defmodule Epicenter.Test.Fixtures do
+  alias Epicenter.AuditLog
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
 
   def audit_meta(author) do
-    %{
+    %AuditLog.Meta{
       author_id: author.id,
       reason_action: "test-run",
       reason_event: "test"
