@@ -103,7 +103,7 @@ defmodule Epicenter.Cases.Import do
 
   defp import_row(row, originator) do
     person = import_person(row, originator)
-    lab_result = import_lab_result(row, person)
+    lab_result = import_lab_result(row, person, originator)
     import_phone_number(row, person, originator)
     import_address(row, person, originator)
     %{person: person, lab_result: lab_result}
@@ -125,10 +125,11 @@ defmodule Epicenter.Cases.Import do
     })
   end
 
-  defp import_lab_result(row, person) do
+  defp import_lab_result(row, person, author) do
     row
     |> Map.take(@lab_result_db_fields_to_insert)
     |> Map.put("person_id", person.id)
+    |> in_audit_tuple(author)
     |> Cases.upsert_lab_result!()
   end
 

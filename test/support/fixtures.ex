@@ -11,17 +11,20 @@ defmodule Epicenter.Test.Fixtures do
     }
   end
 
-  def lab_result_attrs(%Person{id: person_id}, tid, sampled_on, attrs \\ %{}) do
-    %{
-      person_id: person_id,
-      request_accession_number: "accession-" <> tid,
-      request_facility_code: "facility-" <> tid,
-      request_facility_name: tid <> " Lab, Inc.",
-      result: "positive",
-      sampled_on: sampled_on |> DateParser.parse_mm_dd_yyyy!(),
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def lab_result_attrs(%Person{id: person_id}, author, tid, sampled_on, attrs \\ %{}) do
+    attrs =
+      %{
+        person_id: person_id,
+        request_accession_number: "accession-" <> tid,
+        request_facility_code: "facility-" <> tid,
+        request_facility_name: tid <> " Lab, Inc.",
+        result: "positive",
+        sampled_on: sampled_on |> DateParser.parse_mm_dd_yyyy!(),
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
   # annotated with audit_meta

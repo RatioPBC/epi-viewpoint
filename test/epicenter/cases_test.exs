@@ -42,7 +42,7 @@ defmodule Epicenter.CasesTest do
     test "create_lab_result! creates a lab result" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      lab_result = Test.Fixtures.lab_result_attrs(person, "result1", "06-01-2020") |> Cases.create_lab_result!()
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result1", "06-01-2020") |> Cases.create_lab_result!()
 
       assert lab_result.request_accession_number == "accession-result1"
       assert lab_result.request_facility_code == "facility-result1"
@@ -56,9 +56,9 @@ defmodule Epicenter.CasesTest do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
-      Test.Fixtures.lab_result_attrs(person, "newer", "06-03-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(person, "older", "06-01-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(person, "middle", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(person, user, "newer", "06-03-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(person, user, "older", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(person, user, "middle", "06-02-2020") |> Cases.create_lab_result!()
 
       Cases.list_lab_results() |> tids() |> assert_eq(~w{older middle newer})
     end
@@ -152,17 +152,17 @@ defmodule Epicenter.CasesTest do
 
       Test.Fixtures.person_attrs(user, "middle", dob: ~D[2000-06-01], first_name: "Alice", last_name: "Testuser")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("middle-1", ~D[2020-06-03])
+      |> Test.Fixtures.lab_result_attrs(user, "middle-1", ~D[2020-06-03])
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "last", dob: ~D[2000-06-01], first_name: "Billy", last_name: "Testuser")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("last-1", Extra.Date.days_ago(4))
+      |> Test.Fixtures.lab_result_attrs(user, "last-1", Extra.Date.days_ago(4))
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "first", dob: ~D[2000-07-01], first_name: "Alice", last_name: "Testuser")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("first-1", ~D[2020-06-02])
+      |> Test.Fixtures.lab_result_attrs(user, "first-1", ~D[2020-06-02])
       |> Cases.create_lab_result!()
 
       Cases.list_people() |> tids() |> assert_eq(~w{first middle last})

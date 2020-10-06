@@ -15,11 +15,11 @@ defmodule Epicenter.Cases do
   #
   def change_lab_result(%LabResult{} = lab_result, attrs), do: LabResult.changeset(lab_result, attrs)
   def count_lab_results(), do: LabResult |> Repo.aggregate(:count)
-  def create_lab_result!(attrs), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!()
+  def create_lab_result!({attrs, _audit_meta}), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!()
   def import_lab_results(lab_result_csv_string, originator), do: Import.import_csv(lab_result_csv_string, originator)
   def list_lab_results(), do: LabResult.Query.all() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(lab_results: LabResult.Query.display_order())
-  def upsert_lab_result!(attrs), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!(LabResult.Query.opts_for_upsert())
+  def upsert_lab_result!({attrs, _audit_meta}), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!(LabResult.Query.opts_for_upsert())
 
   #
   # people
@@ -69,7 +69,9 @@ defmodule Epicenter.Cases do
   def count_addresses(), do: Address |> Repo.aggregate(:count)
   def create_address!({attrs, _audit_meta}), do: %Address{} |> change_address(attrs) |> Repo.insert!()
   def preload_addresses(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(addresses: Address.Query.display_order())
-  def upsert_address!({%{person_id: _} = attrs, _audit_meta}), do: %Address{} |> change_address(attrs) |> Repo.insert!(Address.Query.opts_for_upsert())
+
+  def upsert_address!({%{person_id: _} = attrs, _audit_meta}),
+    do: %Address{} |> change_address(attrs) |> Repo.insert!(Address.Query.opts_for_upsert())
 
   #
   # phone

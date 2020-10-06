@@ -81,8 +81,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "lab results table" do
-    defp build_lab_result(person, tid, sampled_on, analyzed_on, reported_on) do
-      Test.Fixtures.lab_result_attrs(person, tid, sampled_on, %{
+    defp build_lab_result(person, user, tid, sampled_on, analyzed_on, reported_on) do
+      Test.Fixtures.lab_result_attrs(person, user, tid, sampled_on, %{
         result: "positive",
         request_facility_name: "Big Big Hospital",
         analyzed_on: analyzed_on,
@@ -92,9 +92,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Cases.create_lab_result!()
     end
 
-    test "shows lab results", %{conn: conn, person: person} do
-      build_lab_result(person, "lab1", ~D[2020-04-10], ~D[2020-04-11], ~D[2020-04-12])
-      build_lab_result(person, "lab2", ~D[2020-04-12], ~D[2020-04-13], ~D[2020-04-14])
+    test "shows lab results", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab1", ~D[2020-04-10], ~D[2020-04-11], ~D[2020-04-12])
+      build_lab_result(person, user, "lab2", ~D[2020-04-12], ~D[2020-04-13], ~D[2020-04-14])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_lab_results([
@@ -104,11 +104,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
       ])
     end
 
-    test "orders by sampled_on (desc) and then reported_on (desc)", %{conn: conn, person: person} do
-      build_lab_result(person, "lab4", ~D[2020-04-13], ~D[2020-04-20], ~D[2020-04-26])
-      build_lab_result(person, "lab1", ~D[2020-04-15], ~D[2020-04-20], ~D[2020-04-25])
-      build_lab_result(person, "lab3", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-23])
-      build_lab_result(person, "lab2", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-24])
+    test "orders by sampled_on (desc) and then reported_on (desc)", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab4", ~D[2020-04-13], ~D[2020-04-20], ~D[2020-04-26])
+      build_lab_result(person, user, "lab1", ~D[2020-04-15], ~D[2020-04-20], ~D[2020-04-25])
+      build_lab_result(person, user, "lab3", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-23])
+      build_lab_result(person, user, "lab2", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-24])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_lab_results(
@@ -130,7 +130,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     setup %{person: person, user: user} do
       Test.Fixtures.address_attrs(user, person, "address1", 1000) |> Cases.create_address!()
-      Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(person, user, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
       assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
       [person: person, assignee: assignee]
     end

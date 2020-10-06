@@ -49,8 +49,8 @@ defmodule Epicenter.Cases.PersonTest do
     test "has many lab_results" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, "result1", "06-01-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, "result2", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "result1", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "result2", "06-02-2020") |> Cases.create_lab_result!()
 
       alice
       |> Cases.preload_lab_results()
@@ -173,8 +173,8 @@ defmodule Epicenter.Cases.PersonTest do
     test "returns the lab result with the most recent sample date" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, "newer", "06-02-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, "older", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
 
       assert Person.latest_lab_result(alice).tid == "newer"
     end
@@ -182,8 +182,8 @@ defmodule Epicenter.Cases.PersonTest do
     test "when given a field, returns the value of that field for the latest lab result" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
 
       assert Person.latest_lab_result(alice, :result) == "positive"
       assert Person.latest_lab_result(alice, :sampled_on) == ~D[2020-06-02]
@@ -217,17 +217,17 @@ defmodule Epicenter.Cases.PersonTest do
 
       Test.Fixtures.person_attrs(user, "old-positive-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("old-positive-result", Extra.Date.days_ago(20), result: "positive")
+      |> Test.Fixtures.lab_result_attrs(user, "old-positive-result", Extra.Date.days_ago(20), result: "positive")
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "recent-negative-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("recent-negative-result", Extra.Date.days_ago(1), result: "negative")
+      |> Test.Fixtures.lab_result_attrs(user, "recent-negative-result", Extra.Date.days_ago(1), result: "negative")
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "recent-positive-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("recent-positive-result", Extra.Date.days_ago(1), result: "positive")
+      |> Test.Fixtures.lab_result_attrs(user, "recent-positive-result", Extra.Date.days_ago(1), result: "positive")
       |> Cases.create_lab_result!()
 
       Person.Query.call_list() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{recent-positive-result})
@@ -239,14 +239,14 @@ defmodule Epicenter.Cases.PersonTest do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
 
       middle = Test.Fixtures.person_attrs(user, "middle", dob: ~D[2000-06-01], first_name: "Middle", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(middle, "middle-1", ~D[2020-06-03]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(middle, user, "middle-1", ~D[2020-06-03]) |> Cases.create_lab_result!()
 
       last = Test.Fixtures.person_attrs(user, "last", dob: ~D[2000-06-01], first_name: "Last", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(last, "last-1", ~D[2020-06-04]) |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(last, "last-1", ~D[2020-06-01]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-04]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-01]) |> Cases.create_lab_result!()
 
       first = Test.Fixtures.person_attrs(user, "first", dob: ~D[2000-06-01], first_name: "First", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(first, "first-1", ~D[2020-06-02]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(first, user, "first-1", ~D[2020-06-02]) |> Cases.create_lab_result!()
 
       Person.Query.with_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end
@@ -258,7 +258,7 @@ defmodule Epicenter.Cases.PersonTest do
 
       Test.Fixtures.person_attrs(user, "with-lab-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("lab-result", ~D[2020-06-02])
+      |> Test.Fixtures.lab_result_attrs(user, "lab-result", ~D[2020-06-02])
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "without-lab-result")

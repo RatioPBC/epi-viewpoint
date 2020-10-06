@@ -35,7 +35,7 @@ defmodule Epicenter.Cases.LabResultTest do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      default_attrs = Test.Fixtures.lab_result_attrs(person, "result1", "06-01-2020")
+      {default_attrs, _} = Test.Fixtures.lab_result_attrs(person, user, "result1", "06-01-2020")
       Cases.change_lab_result(%LabResult{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
@@ -54,7 +54,8 @@ defmodule Epicenter.Cases.LabResultTest do
 
   describe "fingerprint" do
     test "is generated based on field values" do
-      attrs_1 = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "1234567890"}, "result-1", "06-01-2020")
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      {attrs_1, _} = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "1234567890"}, user, "result-1", "06-01-2020")
       fingerprint_1 = Cases.change_lab_result(%LabResult{}, attrs_1) |> LabResult.generate_fingerprint()
 
       assert fingerprint_1 == "79f75f4da6f2bda20cb3712509c0b80b428bcae87874cc7a2522de1d9714c116",
@@ -65,7 +66,7 @@ defmodule Epicenter.Cases.LabResultTest do
              backfill it, start using it for de-duplication, and then drop the original fingerprint column.
              """
 
-      attrs_2 = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "0987654321"}, "result-2", "06-02-2020")
+      {attrs_2, _} = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "0987654321"}, user, "result-2", "06-02-2020")
       fingerprint_2 = Cases.change_lab_result(%LabResult{}, attrs_2) |> LabResult.generate_fingerprint()
       assert fingerprint_2 == "62db806d0670342467c51af7d4049f8c7bf47504f07b8682ec405bf38eea17da"
     end
@@ -79,10 +80,10 @@ defmodule Epicenter.Cases.LabResultTest do
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
       [
-        Test.Fixtures.lab_result_attrs(person, "lab4", ~D[2020-04-13], reported_on: ~D[2020-04-26]),
-        Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-15], reported_on: ~D[2020-04-25]),
-        Test.Fixtures.lab_result_attrs(person, "lab3", ~D[2020-04-14], reported_on: ~D[2020-04-23]),
-        Test.Fixtures.lab_result_attrs(person, "lab2", ~D[2020-04-14], reported_on: ~D[2020-04-24])
+        Test.Fixtures.lab_result_attrs(person, user, "lab4", ~D[2020-04-13], reported_on: ~D[2020-04-26]),
+        Test.Fixtures.lab_result_attrs(person, user, "lab1", ~D[2020-04-15], reported_on: ~D[2020-04-25]),
+        Test.Fixtures.lab_result_attrs(person, user, "lab3", ~D[2020-04-14], reported_on: ~D[2020-04-23]),
+        Test.Fixtures.lab_result_attrs(person, user, "lab2", ~D[2020-04-14], reported_on: ~D[2020-04-24])
       ]
       |> Enum.each(&Cases.create_lab_result!/1)
 
