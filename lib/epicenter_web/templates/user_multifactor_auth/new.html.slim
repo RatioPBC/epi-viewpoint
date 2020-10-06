@@ -21,9 +21,10 @@
         div#flash-error data-form-error-message=error = error
 
       = if @error_message do
-        .form-error-message
-          = error_icon()
-          div data-form-error-message=@error_message = @error_message
+        div
+          .form-error-message
+            = error_icon()
+            div data-form-error-message=@error_message = @error_message
 
       p To continue, enter the six-digit code from your authenticator app
 

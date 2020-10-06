@@ -7,7 +7,7 @@
           h2 Viewpoint
         = logo_icon(80, 80)
 
-      h4#title Reset your password
+      h4#title Set your password
 
       = if @changeset.action do
         .form-error-message
@@ -25,7 +25,7 @@
         = password_input f, :password_confirmation, required: true
 
       fieldset
-        = submit "Reset password", id: "submit"
+        = submit "Continue", id: "submit"
 
       fieldset
         = link "Back to login", to: Routes.user_session_path(@conn, :new), id: "back-to-login"

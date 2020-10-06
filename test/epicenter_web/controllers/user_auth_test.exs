@@ -159,7 +159,7 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
-      assert get_flash(conn, :error) == "Your email address must be confirmed before you can log in"
+      assert get_flash(conn, :error) == "The account you logged into has not yet been activated"
     end
 
     test "redirects if the user is authenticated and confirmed but does not have mfa set up", %{conn: conn} do

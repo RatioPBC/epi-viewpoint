@@ -21,9 +21,10 @@
         div#flash-error data-form-error-message=error = error
 
       = if @error_message do
-        .form-error-message
-          = error_icon()
-          div data-form-error-message=@error_message = @error_message
+        div#error-message-wrapper
+          .form-error-message
+            = error_icon()
+            div data-form-error-message=@error_message = @error_message
 
       fieldset
         = label f, :email
@@ -35,6 +36,3 @@
 
       fieldset
         = submit "Log in", id: "submit"
-
-      fieldset
-        = link "Forgot your password?", to: Routes.user_reset_password_path(@conn, :new), id: "forgot-password"

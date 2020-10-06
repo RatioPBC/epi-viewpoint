@@ -93,7 +93,6 @@ defmodule EpicenterWeb.UserAuth do
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_by_session_token(user_token)
-
     assign(conn, :current_user, user)
   end
 
@@ -144,7 +143,7 @@ defmodule EpicenterWeb.UserAuth do
         :authenticated -> nil
         :not_logged_in -> {"You must log in to access this page", login_path}
         :disabled -> {"Your account has been disabled by an administrator", login_path}
-        :not_confirmed -> {"Your email address must be confirmed before you can log in", login_path}
+        :not_confirmed -> {"The account you logged into has not yet been activated", login_path}
         :no_mfa -> {"You must have multi-factor authentication set up before you can continue", mfa_setup_path}
         :needs_second_factor -> :needs_second_factor
       end
