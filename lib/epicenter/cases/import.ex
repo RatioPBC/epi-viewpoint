@@ -51,7 +51,7 @@ defmodule Epicenter.Cases.Import do
   def import_csv(file, %Accounts.User{} = originator) do
     Repo.transaction(fn ->
       try do
-        Cases.create_imported_file(file)
+        Cases.create_imported_file(in_audit_tuple(file, originator))
 
         case Csv.read(file.contents, @fields) do
           {:ok, rows} ->

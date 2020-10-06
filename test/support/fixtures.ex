@@ -130,12 +130,14 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def imported_file_attrs(tid, attrs \\ %{}) do
-    %{
+  def imported_file_attrs(author, tid, attrs \\ %{}) do
+    attrs = %{
       file_name: "test_results_september_14_2020",
       tid: tid
     }
     |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
   def revision_attrs(tid, attrs \\ %{}) do
