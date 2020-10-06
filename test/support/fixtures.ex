@@ -86,14 +86,17 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def phone_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
-    %{
-      number: 1_111_111_000,
-      person_id: person_id,
-      type: "home",
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def phone_attrs(author, %Person{id: person_id}, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        number: 1_111_111_000,
+        person_id: person_id,
+        type: "home",
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
   def email_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do

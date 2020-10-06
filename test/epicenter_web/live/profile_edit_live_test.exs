@@ -190,8 +190,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       phones |> pluck(:type) |> assert_eq(["cell"])
     end
 
-    test "updating existing phone numbers", %{conn: conn, person: person} do
-      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+    test "updating existing phone numbers", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
@@ -199,8 +199,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
     end
 
-    test "deleting existing phone numbers", %{conn: conn, person: person} do
-      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+    test "deleting existing phone numbers", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})

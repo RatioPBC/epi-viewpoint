@@ -41,11 +41,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "when the person has identifying information" do
-    setup %{person: person} do
+    setup %{person: person, user: user} do
       Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
       Test.Fixtures.email_attrs(person, "alice-preferred", is_preferred: true) |> Cases.create_email!()
-      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
-      Test.Fixtures.phone_attrs(person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
       Test.Fixtures.address_attrs(person, "alice-address", 1000, type: "home") |> Cases.create_address!()
       Test.Fixtures.address_attrs(person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
       :ok

@@ -9,6 +9,11 @@ defmodule Epicenter.Cases.Phone do
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
 
+  @required_attrs ~w{number}a
+  @optional_attrs ~w{delete is_preferred person_id tid type}a
+
+  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "phones" do
@@ -23,9 +28,6 @@ defmodule Epicenter.Cases.Phone do
 
     belongs_to :person, Person
   end
-
-  @required_attrs ~w{number}a
-  @optional_attrs ~w{delete is_preferred person_id tid type}a
 
   def changeset(phone, attrs) do
     phone

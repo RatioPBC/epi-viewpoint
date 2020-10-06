@@ -104,7 +104,7 @@ defmodule Epicenter.Cases.Import do
   defp import_row(row, originator) do
     person = import_person(row, originator)
     lab_result = import_lab_result(row, person)
-    import_phone_number(row, person)
+    import_phone_number(row, person, originator)
     import_address(row, person)
     %{person: person, lab_result: lab_result}
   end
@@ -113,12 +113,16 @@ defmodule Epicenter.Cases.Import do
     row
     |> Map.take(@person_db_fields_to_insert)
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-    |> Extra.Tuple.append(%AuditLog.Meta{
-      author_id: originator.id,
+    |> in_audit_tuple(originator)
+    |> Cases.upsert_person!()
+  end
+
+  defp in_audit_tuple(data, author) do
+    Extra.Tuple.append(data, %AuditLog.Meta{
+      author_id: author.id,
       reason_action: AuditLog.Revision.import_person_action(),
       reason_event: AuditLog.Revision.import_csv_event()
     })
-    |> Cases.upsert_person!()
   end
 
   defp import_lab_result(row, person) do
@@ -128,9 +132,9 @@ defmodule Epicenter.Cases.Import do
     |> Cases.upsert_lab_result!()
   end
 
-  defp import_phone_number(row, person) do
+  defp import_phone_number(row, person, author) do
     if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
-      Cases.upsert_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id})
+      Cases.upsert_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id} |> in_audit_tuple(author))
     end
   end
 
