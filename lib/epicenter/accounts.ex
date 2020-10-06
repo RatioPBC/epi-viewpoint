@@ -349,22 +349,7 @@ defmodule Epicenter.Accounts do
   @spec disable_user(%Epicenter.Accounts.User{}) :: {:ok, %Epicenter.Accounts.User{}} | {:error, String.t()}
   def disable_user(%Epicenter.Accounts.User{disabled: true, email: email}), do: {:error, "User #{email} is already disabled"}
 
-  def disable_user(user) do
-    result =
-      user
-      |> Ecto.Changeset.cast(%{disabled: true}, [:disabled])
-      |> Epicenter.Repo.update()
-
-    case result do
-      {:ok, user} ->
-        {:ok, user}
-
-      {:error, changeset} ->
-        {:error,
-         """
-           Error disabling user #{user.username}
-           #{inspect(changeset)}
-         """}
-    end
-  end
+  def disable_user(user), do: user |> User.disable_changeset() |> Epicenter.Repo.update() |> stringify_error()
+  defp stringify_error({:error, error}), do: {:error, "#{inspect(error)}"}
+  defp stringify_error(result), do: result
 end

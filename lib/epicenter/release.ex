@@ -34,7 +34,7 @@ defmodule Epicenter.Release do
            {:ok, user} <- Epicenter.Accounts.disable_user(user) do
         puts.("Disabled user #{user.email}")
       else
-        {:error, error} -> puts.("Error: #{error}")
+        {:error, error} -> puts.("Error disabling #{email}: }#{error}")
       end
     end
 

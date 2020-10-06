@@ -119,6 +119,11 @@ defmodule Epicenter.Accounts.User do
   end
 
   @doc """
+  Disables the user by setting `disabled` to `true`.
+  """
+  def disable_changeset(user), do: cast(user, %{disabled: true}, [:disabled])
+
+  @doc """
   Verifies the password.
 
   If there is no user, the user doesn't have a password, or the user is
