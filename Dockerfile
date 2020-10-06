@@ -38,8 +38,10 @@ RUN \
 
 ARG EPICENTER_SSL_CRT
 ARG EPICENTER_SSL_KEY
-RUN echo "${EPICENTER_SSL_KEY}" > /opt/ssl/viewpoint-staging.gcp.geometer.dev.key
-RUN echo "${EPICENTER_SSL_CRT}" > /opt/ssl/viewpoint-staging.gcp.geometer.dev.crt
+ARG EPICENTER_SSL_INTERMEDIATE_PEM
+RUN echo "${EPICENTER_SSL_KEY}" > /opt/ssl/STAR_network_geometer_dev.key
+RUN echo "${EPICENTER_SSL_CRT}" > /opt/ssl/STAR_network_geometer_dev.pem
+RUN echo "${EPICENTER_SSL_INTERMEDIATE_PEM}" > /opt/ssl/STAR_network_geometer_dev_bundle.pem
 
 WORKDIR /opt/${ELIXIR_PROJECT}
 

@@ -40,7 +40,7 @@ config :epicenter, EpicenterWeb.Endpoint,
          port: 4000,
          cipher_suite: :strong,
          otp_app: :epicenter,
-         keyfile: "/opt/ssl/viewpoint-staging.gcp.geometer.dev.key",
-         certfile: "/opt/ssl/viewpoint-staging.gcp.geometer.dev.crt"
-         # cacertfile: System.get_env("INTERMEDIATE_CERTFILE_PATH")
+         keyfile: "/opt/ssl/STAR_network_geometer_dev.key",
+         certfile: "/opt/ssl/STAR_network_geometer_dev.pem",
+         cacertfile: "/opt/ssl/STAR_network_geometer_dev_bundle.pem"
        ]
