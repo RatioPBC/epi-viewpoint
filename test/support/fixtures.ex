@@ -99,13 +99,16 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(author)}
   end
 
-  def email_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
-    %{
-      address: "#{tid}@example.com",
-      person_id: person_id,
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def email_attrs(author, %Person{id: person_id}, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        address: "#{tid}@example.com",
+        person_id: person_id,
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
   def user_attrs(%{tid: tid} = attrs),

@@ -106,8 +106,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     @tag :skip
-    test "adding preferred email address", %{conn: conn, person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+    test "adding preferred email address", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
@@ -121,8 +121,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.Profile.assert_email_addresses(["alice-a@example.com", "alice-preferred@example.com"])
     end
 
-    test "updating existing email address", %{conn: conn, person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+    test "updating existing email address", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
@@ -130,8 +130,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.Profile.assert_email_addresses(["alice-b@example.com"])
     end
 
-    test "deleting existing email address", %{conn: conn, person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+    test "deleting existing email address", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})

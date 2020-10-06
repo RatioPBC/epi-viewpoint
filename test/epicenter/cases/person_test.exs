@@ -71,8 +71,8 @@ defmodule Epicenter.Cases.PersonTest do
     test "has many email addresses" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.email_attrs(alice, "email-1") |> Cases.create_email!()
-      Test.Fixtures.email_attrs(alice, "email-2") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, alice, "email-1") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, alice, "email-2") |> Cases.create_email!()
 
       assert alice |> Cases.preload_emails() |> Map.get(:emails) |> tids() == ~w{email-1 email-2}
     end

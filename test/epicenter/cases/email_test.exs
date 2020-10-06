@@ -28,7 +28,7 @@ defmodule Epicenter.Cases.EmailTest do
     defp new_changeset(attr_updates) do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      default_attrs = Test.Fixtures.email_attrs(person, "alice-email")
+      {default_attrs, _} = Test.Fixtures.email_attrs(user, person, "alice-email")
       Email.changeset(%Email{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
@@ -59,9 +59,9 @@ defmodule Epicenter.Cases.EmailTest do
     test "display_order sorts preferred first, then by email address" do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.email_attrs(person, "preferred", is_preferred: true, address: "m@example.com") |> Cases.create_email!()
-      Test.Fixtures.email_attrs(person, "address-z", is_preferred: false, address: "z@example.com") |> Cases.create_email!()
-      Test.Fixtures.email_attrs(person, "address-a", is_preferred: nil, address: "a@example.com") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, person, "preferred", is_preferred: true, address: "m@example.com") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, person, "address-z", is_preferred: false, address: "z@example.com") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, person, "address-a", is_preferred: nil, address: "a@example.com") |> Cases.create_email!()
 
       Email.Query.display_order() |> Repo.all() |> tids() |> assert_eq(~w{preferred address-a address-z})
     end
