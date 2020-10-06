@@ -1,5 +1,6 @@
-#reset-password-page
-  = form_for :user, Routes.user_reset_password_path(@conn, :create), fn f ->
+/#reset-password-page
+  - path = Routes.user_reset_password_path(@conn, :create)
+  = form_for :user, path, fn f ->
     #form-contents
       header
         #branding
