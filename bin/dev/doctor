@@ -65,6 +65,10 @@ check "asdf: elixir plugin installed" \
   "asdf plugin-list | grep elixir" \
   "asdf plugin-add elixir"
 
+check "gpg: installed" \
+  "command -v gpg" \
+  "# install gpg via package manager"
+
 check "asdf: nodejs plugin exists?" \
   "asdf plugin-list | grep nodejs" \
   "asdf plugin-add nodejs && bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring"
