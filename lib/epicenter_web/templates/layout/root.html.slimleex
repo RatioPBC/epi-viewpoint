@@ -6,7 +6,7 @@ html lang="en"
     meta name="viewport" content="width=device-width, initial-scale=1.0"
 
     = csrf_meta_tag()
-    = live_title_tag assigns[:page_title] || "", suffix: " · Epicenter"
+    = live_title_tag assigns[:page_title] || "", suffix: " · Viewpoint"
 
     link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"
     link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"
