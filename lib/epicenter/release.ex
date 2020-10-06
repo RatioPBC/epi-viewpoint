@@ -23,6 +23,32 @@ defmodule Epicenter.Release do
     {:ok, Accounts.get_user_by_email(email) |> generated_password_reset_url()}
   end
 
+  @spec disable_users(list(String.t())) :: :ok
+  def disable_users(emails, opts \\ []) do
+    ensure_started()
+
+    puts = Keyword.get(opts, :puts, &IO.puts/1)
+
+    for email <- emails do
+      with {:ok, user} <- get_user_by_email(email),
+           {:ok, user} <- Epicenter.Accounts.disable_user(user) do
+        puts.("Disabled user #{user.email}")
+      else
+        {:error, error} -> puts.("Error: #{error}")
+      end
+    end
+
+    :ok
+  end
+
+  @spec get_user_by_email(String.t()) :: {:ok, %Epicenter.Accounts.User{}} | {:error, String.t()}
+  defp get_user_by_email(email) do
+    case Epicenter.Repo.get_by(Epicenter.Accounts.User, email: email) do
+      nil -> {:error, "NOT FOUND: user with email #{email}"}
+      user -> {:ok, user}
+    end
+  end
+
   defp generated_password_reset_url(user) do
     {:ok, %{body: body}} =
       Accounts.deliver_user_reset_password_instructions(user, fn encoded_token ->

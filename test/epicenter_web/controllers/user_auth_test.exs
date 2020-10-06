@@ -169,6 +169,14 @@ defmodule EpicenterWeb.UserAuthTest do
       assert redirected_to(conn) == Routes.user_multifactor_auth_setup_path(conn, :new)
     end
 
+    test "redirects if user is authenticated but disabled", %{conn: conn, user: user} do
+      {:ok, user} = Accounts.disable_user(user)
+      conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
+      assert conn.halted
+      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert get_flash(conn, :error) == "Your account has been disabled by an administrator"
+    end
+
     test "stores the path to redirect to on GET", %{conn: conn} do
       halted_conn =
         %{conn | request_path: "/foo", query_string: ""}

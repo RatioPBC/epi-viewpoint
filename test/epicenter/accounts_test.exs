@@ -489,6 +489,21 @@ defmodule Epicenter.AccountsTest do
     end
   end
 
+  describe "disable_user/1" do
+    setup do
+      [user: Test.Fixtures.user_attrs("user") |> Accounts.register_user!()]
+    end
+
+    test "disables the provided user", %{user: user} do
+      assert {:ok, _} = Accounts.disable_user(user)
+    end
+
+    test "gives an error message if user is already disabled", %{user: user} do
+      {:ok, user} = Accounts.disable_user(user)
+      assert {:error, _} = Accounts.disable_user(user)
+    end
+  end
+
   describe "inspect/2" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""

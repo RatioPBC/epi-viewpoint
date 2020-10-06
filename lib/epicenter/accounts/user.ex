@@ -17,6 +17,7 @@ defmodule Epicenter.Accounts.User do
     field :mfa_secret, :string
     field :name, :string
     field :password, :string, virtual: true
+    field :disabled, :boolean
     field :seq, :integer
     field :tid, :string
 
@@ -120,8 +121,8 @@ defmodule Epicenter.Accounts.User do
   @doc """
   Verifies the password.
 
-  If there is no user or the user doesn't have a password, we call
-  `Bcrypt.no_user_verify/0` to avoid timing attacks.
+  If there is no user, the user doesn't have a password, or the user is
+  disabled, we call `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
   def valid_password?(%Epicenter.Accounts.User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do

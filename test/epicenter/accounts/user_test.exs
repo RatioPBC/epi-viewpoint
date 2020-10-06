@@ -16,6 +16,7 @@ defmodule Epicenter.Accounts.UserTest do
           {:confirmed_at, :naive_datetime},
           {:email, :string},
           {:hashed_password, :string},
+          {:disabled, :boolean},
           {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:mfa_secret, :string},
