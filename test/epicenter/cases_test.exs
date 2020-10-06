@@ -318,6 +318,42 @@ defmodule Epicenter.CasesTest do
     end
   end
 
+  describe "create_address!" do
+    setup do
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+      audit_meta = Test.Fixtures.audit_meta(creator)
+
+      %{creator: creator, person: person, audit_meta: audit_meta}
+    end
+
+    test "persists the values correctly", %{creator: creator, person: person} do
+      address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
+
+      assert address.full_address == "4250 Test St, City, TS 00000"
+      assert address.type == "home"
+      assert address.tid == "address1"
+      assert address.person_id == person.id
+    end
+
+    test "has a revision count", %{creator: creator, person: person} do
+      address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
+
+      assert_revision_count(address, 1)
+    end
+
+    test "has an audit log", %{creator: creator, person: person} do
+      address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
+
+      assert_recent_audit_log(address, creator, %{
+        "tid" => "address1",
+        "full_address" => "4250 Test St, City, TS 00000",
+        "person_id" => person.id,
+        "type" => "home"
+      })
+    end
+  end
+
   describe "upsert_address!" do
     setup do
       creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
@@ -338,29 +374,51 @@ defmodule Epicenter.CasesTest do
       %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
       assert length(addresses) == 1
       assert hd(addresses).updated_at != ~N[1970-01-01 10:30:00Z]
+
+      assert_revision_count(original_address, 2)
+      assert_recent_audit_log(original_address, creator, %{
+        "tid" => "address2",
+        "full_address" => "4250 Test St, City, TS 00000",
+        "person_id" => person.id,
+        "type" => "home"
+      })
     end
 
     test "when the address already exists for a different person", %{creator: creator, person: person, audit_meta: audit_meta} do
       {:ok, other_person} = Test.Fixtures.person_attrs(creator, "other person") |> Cases.create_person()
       original_address = Test.Fixtures.address_attrs(creator, other_person, "other address", 4250) |> Cases.create_address!()
 
-      Cases.upsert_address!({Map.from_struct(%{original_address | tid: "address2", person_id: person.id}), audit_meta})
+      new_address = Cases.upsert_address!({Map.from_struct(%{original_address | tid: "address2", person_id: person.id}), audit_meta})
 
       %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
       assert hd(addresses).tid == "address2"
 
       %Cases.Person{addresses: addresses} = Cases.preload_addresses(other_person)
       assert hd(addresses).tid == "other address"
+
+      assert_revision_count(new_address, 1)
+      assert_recent_audit_log(new_address, creator, %{
+        "tid" => "address2",
+        "full_address" => "4250 Test St, City, TS 00000",
+        "person_id" => person.id,
+        "type" => "home"
+      })
     end
 
-    test "when the address does not yet exist", %{person: person, creator: creator, audit_meta: audit_meta} do
-      original_address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
-
-      Cases.upsert_address!({Map.from_struct(original_address), audit_meta})
+    test "when the address does not yet exist", %{person: person, creator: creator} do
+      new_address = Cases.upsert_address!(Test.Fixtures.address_attrs(creator, person, "address1", 4250))
 
       %Cases.Person{addresses: addresses} = Cases.preload_addresses(person)
       assert length(addresses) == 1
       assert hd(addresses).tid == "address1"
+
+      assert_revision_count(new_address, 1)
+      assert_recent_audit_log(new_address, creator, %{
+        "tid" => "address1",
+        "full_address" => "4250 Test St, City, TS 00000",
+        "person_id" => person.id,
+        "type" => "home"
+      })
     end
   end
 end
