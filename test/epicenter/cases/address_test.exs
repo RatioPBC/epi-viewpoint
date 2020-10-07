@@ -27,7 +27,7 @@ defmodule Epicenter.Cases.AddressTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       {default_attrs, _} = Test.Fixtures.address_attrs(user, person, "alice-address", 1234)
       Address.changeset(%Address{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
@@ -52,7 +52,7 @@ defmodule Epicenter.Cases.AddressTest do
     import Euclid.Extra.Enum, only: [tids: 1]
 
     test "display_order sorts preferred first, then by full address" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.address_attrs(user, person, "preferred", 2000, is_preferred: true) |> Cases.create_address!()
       Test.Fixtures.address_attrs(user, person, "address-z", 3000, is_preferred: false) |> Cases.create_address!()

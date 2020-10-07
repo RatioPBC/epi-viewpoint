@@ -11,7 +11,7 @@ defmodule Epicenter.CasesTest do
 
   describe "importing" do
     test "import_lab_results imports lab results and creates lab_result and person records" do
-      originator = Test.Fixtures.user_attrs("originator") |> Accounts.register_user!()
+      originator = Test.Fixtures.user_attrs(%{id: "superuser"}, "originator") |> Accounts.register_user!()
 
       {:ok,
        %ImportInfo{
@@ -40,7 +40,7 @@ defmodule Epicenter.CasesTest do
 
   describe "lab results" do
     setup do
-      creator = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
 
       %{creator: creator}
     end
@@ -93,7 +93,7 @@ defmodule Epicenter.CasesTest do
     end
 
     test "upsert_lab_result! creates a lab result if one doesn't exist (based on person_id and all lab result fields)" do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
       person_1 = Test.Fixtures.person_attrs(creator, "person-1") |> Cases.create_person!()
       person_2 = Test.Fixtures.person_attrs(creator, "person-2") |> Cases.create_person!()
 
@@ -126,7 +126,7 @@ defmodule Epicenter.CasesTest do
 
   describe "people" do
     test "create_person! creates a person" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
       assert person.dob == ~D[2000-01-01]
@@ -148,7 +148,7 @@ defmodule Epicenter.CasesTest do
     end
 
     test "create_person creates a person" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person()
       assert person.fingerprint == "2000-01-01 alice testuser"
 
@@ -165,21 +165,21 @@ defmodule Epicenter.CasesTest do
     end
 
     test "get_people" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
       Cases.get_people([alice.id]) |> tids() |> assert_eq(["alice"])
     end
 
     test "get_person" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       fetched = Cases.get_person(person.id)
       assert fetched.tid == "alice"
     end
 
     test "list_people" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
 
       Test.Fixtures.person_attrs(user, "middle", dob: ~D[2000-06-01], first_name: "Alice", last_name: "Testuser")
       |> Cases.create_person!()
@@ -203,10 +203,10 @@ defmodule Epicenter.CasesTest do
     end
 
     test "assign_user_to_people updates people's assigned user" do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
-      updater = Test.Fixtures.user_attrs("updater") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
+      updater = Test.Fixtures.user_attrs(%{id: "superuser"}, "updater") |> Accounts.register_user!()
 
-      assigned_to_user = Test.Fixtures.user_attrs("assigned-to") |> Accounts.register_user!()
+      assigned_to_user = Test.Fixtures.user_attrs(%{id: "superuser"}, "assigned-to") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
       bobby = Test.Fixtures.person_attrs(creator, "bobby") |> Cases.create_person!()
 
@@ -232,7 +232,7 @@ defmodule Epicenter.CasesTest do
     end
 
     test "update_person updates a person" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "versioned", first_name: "version-1") |> Cases.create_person!()
       {:ok, updated_person} = person |> Cases.update_person({%{first_name: "version-2"}, Test.Fixtures.audit_meta(user)})
 
@@ -247,7 +247,7 @@ defmodule Epicenter.CasesTest do
     end
 
     test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(creator, "alice", external_id: "10000") |> Cases.upsert_person!()
 
       assert person.dob == ~D[2000-01-01]
@@ -269,10 +269,10 @@ defmodule Epicenter.CasesTest do
     end
 
     test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
       Test.Fixtures.person_attrs(creator, "alice", tid: "first-insert") |> Cases.upsert_person!()
 
-      updater = Test.Fixtures.user_attrs("updater") |> Accounts.register_user!()
+      updater = Test.Fixtures.user_attrs(%{id: "superuser"}, "updater") |> Accounts.register_user!()
       Test.Fixtures.person_attrs(updater, "alice", tid: "second-insert") |> Cases.upsert_person!()
 
       assert [person] = Cases.list_people()
@@ -297,7 +297,7 @@ defmodule Epicenter.CasesTest do
 
   describe "create_phone!" do
     setup do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
 
       %{creator: creator, person: person}
@@ -332,7 +332,7 @@ defmodule Epicenter.CasesTest do
 
   describe "upsert_phone!" do
     setup do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
 
       %{creator: creator, person: person}
@@ -413,7 +413,7 @@ defmodule Epicenter.CasesTest do
 
   describe "create_address!" do
     setup do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
       audit_meta = Test.Fixtures.audit_meta(creator)
 
@@ -449,7 +449,7 @@ defmodule Epicenter.CasesTest do
 
   describe "upsert_address!" do
     setup do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
       audit_meta = Test.Fixtures.audit_meta(creator)
 

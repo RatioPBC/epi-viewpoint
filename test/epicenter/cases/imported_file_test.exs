@@ -25,7 +25,7 @@ defmodule Epicenter.Cases.ImportedFileTest do
 
   describe "changeset" do
     test "file_name is required" do
-      creator = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
 
       {attrs, _} = Test.Fixtures.imported_file_attrs(creator, "created file", %{file_name: nil})
 
@@ -41,7 +41,7 @@ defmodule Epicenter.Cases.ImportedFileTest do
     import Euclid.Extra.Enum, only: [tids: 1]
 
     setup do
-      creator = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
 
       %{creator: creator}
     end

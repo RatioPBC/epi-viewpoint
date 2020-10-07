@@ -27,7 +27,7 @@ defmodule Epicenter.Cases.PhoneTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       {default_attrs, _} = Test.Fixtures.phone_attrs(user, person, "phone")
       Phone.changeset(%Phone{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
@@ -51,7 +51,7 @@ defmodule Epicenter.Cases.PhoneTest do
     import Euclid.Extra.Enum, only: [tids: 1]
 
     test "display_order sorts preferred first, then by number" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.phone_attrs(user, person, "preferred", is_preferred: true, number: 1_111_111_222) |> Cases.create_phone!()
       Test.Fixtures.phone_attrs(user, person, "phone-333", is_preferred: false, number: 1_111_111_333) |> Cases.create_phone!()

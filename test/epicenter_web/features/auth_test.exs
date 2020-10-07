@@ -4,6 +4,7 @@ defmodule EpicenterWeb.Features.AuthTest do
   import Mox
   setup :verify_on_exit!
 
+  alias Epicenter.Accounts.User
   alias Epicenter.Release
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
@@ -20,7 +21,8 @@ defmodule EpicenterWeb.Features.AuthTest do
     #
     # a user is created manually, and a reset-password URL is created
     #
-    {:ok, url} = Release.create_user("Test User", @good_email_address, puts: &Function.identity/1)
+    manual_creator = %User{}
+    {:ok, url} = Release.create_user(manual_creator, "Test User", @good_email_address, puts: &Function.identity/1)
 
     #
     # the user visits the reset-password URL, changes their password, sets up multifactor auth, and logs in
@@ -57,7 +59,7 @@ defmodule EpicenterWeb.Features.AuthTest do
     #
     # with a fresh connection, the user visits a page, logs in, and is redirected back to original page
     #
-    # originator = Test.Fixtures.user_attrs("originator") |> Accounts.register_user!()
+    # originator = Test.Fixtures.user_attrs(%{id: "superuser"}, "originator") |> Accounts.register_user!()
     # person = Test.Fixtures.person_attrs(originator, "person") |> Cases.create_person!()
     #
     # conn

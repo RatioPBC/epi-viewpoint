@@ -9,8 +9,8 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
   setup :register_and_log_in_user
 
   test "people can be assigned to users on people and profile page, with cross-client updating", %{conn: conn} do
-    assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
-    Test.Fixtures.user_attrs("nonassignee") |> Accounts.register_user!()
+    assignee = Test.Fixtures.user_attrs(%{id: "superuser"}, "assignee") |> Accounts.register_user!()
+    Test.Fixtures.user_attrs(%{id: "superuser"}, "nonassignee") |> Accounts.register_user!()
 
     alice = Test.Fixtures.person_attrs(assignee, "alice") |> Cases.create_person!()
     billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()

@@ -2,6 +2,7 @@ defmodule EpicenterWeb.UserSettingsController do
   use EpicenterWeb, :controller
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog.Meta
   alias EpicenterWeb.Session
   alias EpicenterWeb.UserAuth
 
@@ -22,7 +23,8 @@ defmodule EpicenterWeb.UserSettingsController do
           Accounts.deliver_update_email_instructions(
             applied_user,
             user.email,
-            &Routes.user_settings_url(conn, :confirm_email, &1)
+            &Routes.user_settings_url(conn, :confirm_email, &1),
+            %Meta{}
           )
 
         conn
@@ -37,7 +39,7 @@ defmodule EpicenterWeb.UserSettingsController do
   end
 
   def confirm_email(conn, %{"token" => token}) do
-    case Accounts.update_user_email(conn.assigns.current_user, token) do
+    case Accounts.update_user_email(conn.assigns.current_user, {token, %Meta{}}) do
       :ok ->
         conn
         |> put_flash(:info, "Email changed successfully")
@@ -53,7 +55,7 @@ defmodule EpicenterWeb.UserSettingsController do
   def update_password(conn, %{"current_password" => password, "user" => user_params}) do
     user = conn.assigns.current_user
 
-    case Accounts.update_user_password(user, password, user_params) do
+    case Accounts.update_user_password(user, password, {user_params, %Meta{}}) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Password updated successfully")

@@ -8,7 +8,7 @@ defmodule Epicenter.RepoTest do
 
   describe "Versioned" do
     setup do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
       {person_attrs, _audit_meta} = Test.Fixtures.person_attrs(user, "version-1", external_id: "10000")
       person_changeset = %Cases.Person{} |> Cases.Person.changeset(person_attrs)
       [person_changeset: person_changeset, user: user]
@@ -229,7 +229,7 @@ defmodule Epicenter.RepoTest do
 
     @tag :skip
     test "originated_by sets the originator", %{person_changeset: person_changeset} do
-      new_user = Test.Fixtures.user_attrs("new_user") |> Accounts.register_user!()
+      new_user = Test.Fixtures.user_attrs(%{id: "superuser"}, "new_user") |> Accounts.register_user!()
       new_changeset = Repo.Versioned.with_originator(person_changeset, new_user)
       assert Repo.Versioned.get_originator!(new_changeset) == new_user
     end

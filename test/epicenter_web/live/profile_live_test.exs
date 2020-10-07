@@ -131,7 +131,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     setup %{person: person, user: user} do
       Test.Fixtures.address_attrs(user, person, "address1", 1000) |> Cases.create_address!()
       Test.Fixtures.lab_result_attrs(person, user, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
-      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
+      assignee = Test.Fixtures.user_attrs(%{id: "superuser"}, "assignee") |> Accounts.register_user!()
       [person: person, assignee: assignee]
     end
 

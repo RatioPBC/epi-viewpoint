@@ -8,9 +8,9 @@ defmodule Epicenter.Accounts do
   def get_user(id), do: User |> Repo.get(id)
   def list_users(), do: User.Query.all() |> Repo.all()
   def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
-  def register_user(attrs), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert()
-  def register_user!(attrs), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert!()
-  def update_user_mfa!(%User{} = user, mfa_secret), do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> Repo.update!()
+  def register_user({attrs, _audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert()
+  def register_user!({attrs, _audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert!()
+  def update_user_mfa!(%User{} = user, {mfa_secret, _audit_meta}), do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> Repo.update!()
 
   ## Database getters
 
@@ -120,7 +120,7 @@ defmodule Epicenter.Accounts do
   If the token matches, the user email is updated and the token is deleted.
   The confirmed_at date is also updated to the current time.
   """
-  def update_user_email(user, token) do
+  def update_user_email(user, {token, _audit_meta}) do
     context = "change:#{user.email}"
 
     with {:ok, query} <- UserToken.verify_change_email_token_query(token, context),
@@ -149,7 +149,7 @@ defmodule Epicenter.Accounts do
       {:ok, %{to: ..., body: ...}}
 
   """
-  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
+  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun, _audit_meta)
       when is_function(update_email_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
 
@@ -182,7 +182,7 @@ defmodule Epicenter.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_user_password(user, password, attrs) do
+  def update_user_password(user, password, {attrs, _audit_meta}) do
     changeset =
       user
       |> User.password_changeset(attrs)
@@ -203,7 +203,7 @@ defmodule Epicenter.Accounts do
   @doc """
   Generates a session token.
   """
-  def generate_user_session_token(user) do
+  def generate_user_session_token({user, _audit_meta}) do
     {token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token)
     token
@@ -224,7 +224,7 @@ defmodule Epicenter.Accounts do
   @doc """
   Deletes the signed token with the given context.
   """
-  def delete_session_token(token) do
+  def delete_session_token({token, _audit_meta}) do
     Repo.delete_all(UserToken.token_and_context_query(token, "session"))
     :ok
   end

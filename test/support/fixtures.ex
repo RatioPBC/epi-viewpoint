@@ -117,17 +117,20 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(author)}
   end
 
-  def user_attrs(%{tid: tid} = attrs),
-    do: user_attrs(tid, Map.delete(attrs, :tid))
+  def user_attrs(author, %{tid: tid} = attrs),
+    do: user_attrs(author, tid, Map.delete(attrs, :tid))
 
-  def user_attrs(tid, attrs \\ %{}) do
-    %{
-      email: tid <> "@example.com",
-      name: tid,
-      password: "password123",
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def user_attrs(author, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        email: tid <> "@example.com",
+        name: tid,
+        password: "password123",
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
   def imported_file_attrs(author, tid, attrs \\ %{}) do

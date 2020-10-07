@@ -1,15 +1,24 @@
 defmodule Epicenter.Release do
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  def create_user(name, email, opts \\ []) do
+  def create_user(%Epicenter.Accounts.User{} = author, name, email, opts \\ []) do
     ensure_started()
 
     puts = Keyword.get(opts, :puts, &IO.puts/1)
     puts.("Creating user #{name} / #{email}; they must set their password via this URL:")
 
-    case Accounts.register_user(%{email: email, password: Euclid.Extra.Random.string(), name: name}) do
+    attrs = %{email: email, password: Euclid.Extra.Random.string(), name: name}
+
+    audit_meta = %AuditLog.Meta{
+      author_id: author.id,
+      reason_action: AuditLog.Revision.releases_action(),
+      reason_event: AuditLog.Revision.releases_event()
+    }
+
+    case Accounts.register_user({attrs, audit_meta}) do
       {:ok, user} ->
         {:ok, generated_password_reset_url(user)}
 

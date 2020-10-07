@@ -91,7 +91,7 @@ defmodule EpicenterWeb.UserSettingsControllerTest do
 
       token =
         extract_user_token(fn url ->
-          Accounts.deliver_update_email_instructions(%{user | email: email}, user.email, url)
+          Accounts.deliver_update_email_instructions(%{user | email: email}, user.email, url, %{})
         end)
 
       %{token: token, email: email}
