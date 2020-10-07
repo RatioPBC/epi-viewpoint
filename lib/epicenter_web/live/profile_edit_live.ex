@@ -116,7 +116,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def phone_types(),
-    do: ~w{Cell Home Work}
+    do: [{"Cell", "cell"}, {"Home", "home"}, {"Work", "work"}]
 
   def preferred_languages(current \\ nil) do
     has_current = Euclid.Exists.present?(current)

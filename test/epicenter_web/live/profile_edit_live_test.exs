@@ -182,12 +182,12 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Cell", "Home", "Work"])
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "Cell"}}})
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
       |> Pages.Profile.assert_phone_numbers(["111-111-1000"])
 
       phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
       phones |> pluck(:number) |> assert_eq([1_111_111_000])
-      phones |> pluck(:type) |> assert_eq(["Cell"])
+      phones |> pluck(:type) |> assert_eq(["cell"])
     end
 
     test "updating existing phone numbers", %{conn: conn, person: person} do
