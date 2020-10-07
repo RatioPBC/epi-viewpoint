@@ -19,6 +19,7 @@ defmodule Epicenter.Cases do
   def import_lab_results(lab_result_csv_string, originator), do: Import.import_csv(lab_result_csv_string, originator)
   def list_lab_results(), do: LabResult.Query.all() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(lab_results: LabResult.Query.display_order())
+  def upsert_lab_result!(attrs), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!(LabResult.Query.opts_for_upsert())
 
   #
   # people

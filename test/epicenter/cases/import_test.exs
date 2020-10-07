@@ -120,6 +120,33 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy_2.lab_results |> tids() == ~w{billy-2-result}
     end
 
+    test "if two lab results are for the same person and have identical lab result fields, they are considered duplicates", %{originator: originator} do
+      assert {:ok,
+              %Epicenter.Cases.Import.ImportInfo{
+                imported_lab_result_count: 3,
+                imported_person_count: 2
+              }} =
+               %{
+                 file_name: "test.csv",
+                 contents: """
+                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid
+                 Person1            , Testuser          , 01/01/1970    , 06/01/2020       , 06/02/2020    , positive  , person-1   , person-1-result-1
+                 Person2            , Testuser          , 01/01/1990    , 06/01/2020       , 06/02/2020    , positive  , person-2   , person-2-result-1
+                 Person2            , Testuser          , 01/01/1990    , 07/01/2020       , 08/02/2020    , positive  , person-2   , person-2-result-2
+                 Person2            , Testuser          , 01/01/1990    , 07/01/2020       , 08/02/2020    , positive  , person-2   , person-2-result-2-dupe
+                 """
+               }
+               |> Import.import_csv(originator)
+
+      [person_1, person_2] = Cases.list_people(:all) |> Enum.map(&Cases.preload_lab_results/1)
+
+      assert person_1.tid == "person-1"
+      assert person_2.tid == "person-2"
+
+      person_1.lab_results |> tids() |> assert_eq(~w{person-1-result-1}, ignore_order: true)
+      person_2.lab_results |> tids() |> assert_eq(~w{person-2-result-1 person-2-result-2}, ignore_order: true)
+    end
+
     test "updates existing phone number when importing a duplicate for the same person", %{originator: originator} do
       alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))

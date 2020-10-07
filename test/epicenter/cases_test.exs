@@ -62,6 +62,35 @@ defmodule Epicenter.CasesTest do
 
       Cases.list_lab_results() |> tids() |> assert_eq(~w{older middle newer})
     end
+
+    test "upsert_lab_result! creates a lab result if one doesn't exist (based on person_id and all lab result fields)" do
+      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
+      person_1 = Test.Fixtures.person_attrs(creator, "person-1") |> Cases.create_person!()
+      person_2 = Test.Fixtures.person_attrs(creator, "person-2") |> Cases.create_person!()
+
+      Test.Fixtures.lab_result_attrs(person_1, "result-1", "01/01/2020")
+      |> Map.put(:tid, "person-1-result-1")
+      |> Cases.upsert_lab_result!()
+
+      Test.Fixtures.lab_result_attrs(person_1, "result-2", "01/01/2020")
+      |> Map.put(:tid, "person-1-result-2")
+      |> Cases.upsert_lab_result!()
+
+      Test.Fixtures.lab_result_attrs(person_1, "result-2", "01/01/2020")
+      |> Map.put(:tid, "person-1-result-2-dupe")
+      |> Cases.upsert_lab_result!()
+
+      Test.Fixtures.lab_result_attrs(person_2, "result-2", "01/01/2020")
+      |> Map.put(:tid, "person-2-result-2")
+      |> Cases.upsert_lab_result!()
+
+      [person_1 = %{tid: "person-1"}, person_2 = %{tid: "person-2"}] =
+        Cases.list_people(:all)
+        |> Enum.map(&Cases.preload_lab_results/1)
+
+      assert person_1.lab_results |> tids() == ~w{person-1-result-1 person-1-result-2}
+      assert person_2.lab_results |> tids() == ~w{person-2-result-2}
+    end
   end
 
   describe "people" do

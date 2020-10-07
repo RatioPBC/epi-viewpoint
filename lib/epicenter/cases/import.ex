@@ -125,7 +125,7 @@ defmodule Epicenter.Cases.Import do
     row
     |> Map.take(@lab_result_db_fields_to_insert)
     |> Map.put("person_id", person.id)
-    |> Cases.create_lab_result!()
+    |> Cases.upsert_lab_result!()
   end
 
   defp import_phone_number(row, person) do

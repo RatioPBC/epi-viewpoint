@@ -12,6 +12,7 @@ defmodule Epicenter.Cases.LabResultTest do
         LabResult,
         [
           {:analyzed_on, :date},
+          {:fingerprint, :string},
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:person_id, :id},
@@ -48,6 +49,25 @@ defmodule Epicenter.Cases.LabResultTest do
       assert changes.analyzed_on == ~D[2020-09-10]
       assert changes.reported_on == ~D[2020-09-11]
       assert changes.test_type == "PCR"
+    end
+  end
+
+  describe "fingerprint" do
+    test "is generated based on field values" do
+      attrs_1 = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "1234567890"}, "result-1", "06-01-2020")
+      fingerprint_1 = Cases.change_lab_result(%LabResult{}, attrs_1) |> LabResult.generate_fingerprint()
+
+      assert fingerprint_1 == "79f75f4da6f2bda20cb3712509c0b80b428bcae87874cc7a2522de1d9714c116",
+             """
+             If this test starts failing, it might mean that fields were added to (or removed from)
+             the fingerprint. If that happens, the fingerprint column in the table *MAY* not be useful
+             for de-duplication anymore. One fix would be to create a second fingerprint column,
+             backfill it, start using it for de-duplication, and then drop the original fingerprint column.
+             """
+
+      attrs_2 = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "0987654321"}, "result-2", "06-02-2020")
+      fingerprint_2 = Cases.change_lab_result(%LabResult{}, attrs_2) |> LabResult.generate_fingerprint()
+      assert fingerprint_2 == "62db806d0670342467c51af7d4049f8c7bf47504f07b8682ec405bf38eea17da"
     end
   end
 
