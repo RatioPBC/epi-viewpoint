@@ -120,6 +120,7 @@ defmodule EpicenterWeb.UserAuth do
         :not_confirmed -> {"The account you logged into has not yet been activated", login_path}
         :no_mfa -> {"You must have multi-factor authentication set up before you can continue", mfa_setup_path}
         :needs_second_factor -> :needs_second_factor
+        :expired -> {"Your session has expired. Please log in again.", login_path}
       end
 
     case error do
@@ -150,6 +151,7 @@ defmodule EpicenterWeb.UserAuth do
       conn.assigns[:current_user].disabled -> :disabled
       mfa_required? && conn.assigns[:current_user].mfa_secret == nil -> :no_mfa
       mfa_required? && !Session.multifactor_auth_success?(conn) -> :needs_second_factor
+      Accounts.session_token_status(conn.private.plug_session["user_token"]) == :expired -> :expired
       true -> :authenticated
     end
   end

@@ -1,6 +1,10 @@
 defmodule Epicenter.Accounts.UserToken do
   use Ecto.Schema
+
+  import Ecto.Changeset
   import Ecto.Query
+
+  alias Epicenter.Extra.NaiveDateTime, as: Extra
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -22,6 +26,10 @@ defmodule Epicenter.Accounts.UserToken do
     belongs_to :user, Epicenter.Accounts.User
 
     timestamps(updated_at: false)
+  end
+
+  def changeset(user_token, attrs) do
+    user_token |> cast(attrs, [:expires_at])
   end
 
   @doc """
@@ -47,11 +55,10 @@ defmodule Epicenter.Accounts.UserToken do
   def max_token_lifetime(), do: 60 * 60 * 24
 
   def token_validity_status(user_token) do
-    db_now = NaiveDateTime.local_now()
-
+    db_now = NaiveDateTime.utc_now()
     cond do
-      user_token.inserted_at < db_now |> NaiveDateTime.add(-max_token_lifetime()) -> :expired
-      user_token.expires_at < db_now -> :expired
+      Extra.is_before?(user_token.inserted_at, db_now |> NaiveDateTime.add(-max_token_lifetime())) -> :expired
+      Extra.is_before?(user_token.expires_at, db_now) -> :expired
       true -> :valid
     end
   end
@@ -160,5 +167,9 @@ defmodule Epicenter.Accounts.UserToken do
 
   def user_and_contexts_query(user, [_ | _] = contexts) do
     from t in Epicenter.Accounts.UserToken, where: t.user_id == ^user.id and t.context in ^contexts
+  end
+
+  def fetch_user_token_query(token) do
+    from t in Epicenter.Accounts.UserToken, where: t.token == ^token
   end
 end

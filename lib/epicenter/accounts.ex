@@ -209,6 +209,10 @@ defmodule Epicenter.Accounts do
     token
   end
 
+  def session_token_status(token) do
+    UserToken.fetch_user_token_query(token) |> Repo.one() |> UserToken.token_validity_status()
+  end
+
   @doc """
   Gets the user with the given signed token.
   """

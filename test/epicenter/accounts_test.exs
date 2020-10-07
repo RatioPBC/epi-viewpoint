@@ -322,6 +322,33 @@ defmodule Epicenter.AccountsTest do
     end
   end
 
+  describe "session token status" do
+    defp generate_expired_token() do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      {_, user_token} = UserToken.build_session_token(user)
+      expires_at = NaiveDateTime.utc_now() |> NaiveDateTime.add(-1, :second) |> NaiveDateTime.truncate(:second)
+      user_token |> Map.merge(%{expires_at: expires_at}) |> Repo.insert!()
+    end
+
+    defp generate_valid_token() do
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      {_, user_token} = UserToken.build_session_token(user)
+      user_token |> Repo.insert!()
+    end
+
+    test "when the token is expired" do
+      user_token = generate_expired_token()
+
+      assert Accounts.session_token_status(user_token.token) == :expired
+    end
+
+    test "when the token is not expired" do
+      user_token = generate_valid_token()
+
+      assert Accounts.session_token_status(user_token.token) == :valid
+    end
+  end
+
   describe "get_user_by_session_token/1" do
     setup do
       user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
