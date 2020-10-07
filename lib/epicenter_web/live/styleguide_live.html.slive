@@ -61,6 +61,15 @@
       code @include button-secondary
 
     .styleguide-example
+      a#secondary-button-with-icon href="#"
+        = plus_icon()
+        span Secondary button with icon
+      code
+        ' @include button-secondary
+        ' @include has-icon
+        small Text should be wrapped in a span in order to be spaced properly
+
+    .styleguide-example
       a#secondary-button-small href="#" Secondary button (small)
       code @include button-secondary($size: small)
 

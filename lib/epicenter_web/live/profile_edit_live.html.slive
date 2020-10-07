@@ -69,7 +69,9 @@
                 = label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do
                   = trash_icon()
 
-        a#add-phone[phx-click="add-phone"] Add phone
+        a#add-phone[phx-click="add-phone"]
+          = plus_icon()
+          span Add phone
 
         fieldset
           = if has_field?(@changeset, :emails) do

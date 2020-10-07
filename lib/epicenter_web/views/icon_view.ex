@@ -85,6 +85,15 @@ defmodule EpicenterWeb.IconView do
     |> raw()
   end
 
+  def plus_icon(width \\ 16, height \\ 16) do
+    """
+    <svg width="#{width}" height="#{height}" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.5 8H8.5V14H6.5V8H0.5V6H6.5V0H8.5V6H14.5V8Z" fill="black" fill-opacity="0.87"/>
+    </svg>
+    """
+    |> raw()
+  end
+
   def trash_icon(width \\ 24, height \\ 24) do
     """
     <svg width="#{width}" height="#{height}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
