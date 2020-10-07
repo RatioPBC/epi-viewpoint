@@ -294,13 +294,17 @@ defmodule Epicenter.AccountsTest do
 
   describe "generate_user_session_token/1" do
     setup do
-      [user: Test.Fixtures.user_attrs("user") |> Accounts.register_user!()]
+      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      token = Accounts.generate_user_session_token(user)
+      user_token = Repo.get_by(UserToken, token: token)
+      [token: user_token]
     end
 
-    test "generates a token", %{user: user} do
-      token = Accounts.generate_user_session_token(user)
-      assert user_token = Repo.get_by(UserToken, token: token)
+    test "generates a token with the normal 'session' context (not for password-reset)", %{token: user_token} do
       assert user_token.context == "session"
+    end
+
+    test "generates a unique token string (that is tied to exactly one user)", %{token: user_token} do
       other_user = Test.Fixtures.user_attrs("user2") |> Accounts.register_user!()
 
       # Creating the same token for another user should fail
@@ -311,6 +315,10 @@ defmodule Epicenter.AccountsTest do
           context: "session"
         })
       end
+    end
+
+    test "generates a reasonable expiration date", %{token: user_token} do
+      assert user_token.expires_at == user_token.inserted_at |> NaiveDateTime.add(UserToken.default_token_lifetime())
     end
   end
 
