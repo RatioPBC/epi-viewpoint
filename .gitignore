@@ -20,3 +20,4 @@ epicenter-*.tar
 erl_crash.dump
 npm-debug.log
 .vscode/
+.DS_Store
