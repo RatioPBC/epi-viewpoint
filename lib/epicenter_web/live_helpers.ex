@@ -11,6 +11,9 @@ defmodule EpicenterWeb.LiveHelpers do
   def assign_defaults(socket, _session),
     do: socket
 
+  def assign_page_title(socket, page_title),
+    do: socket |> assign(page_title: page_title)
+
   def ok(socket),
     do: {:ok, socket}
 

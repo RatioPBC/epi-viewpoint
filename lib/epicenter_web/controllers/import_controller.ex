@@ -9,6 +9,8 @@ defmodule EpicenterWeb.ImportController do
   alias Epicenter.Cases
   alias EpicenterWeb.Session
 
+  @common_assigns [page_title: "Import labs"]
+
   def create(conn, %{"file" => %Plug.Upload{path: path, filename: file_name}}) do
     {:ok, import_info} = %{file_name: file_name, contents: File.read!(path)} |> Cases.import_lab_results(conn.assigns.current_user)
 
@@ -21,6 +23,9 @@ defmodule EpicenterWeb.ImportController do
   end
 
   def show(conn, _params) do
-    conn |> render(last_csv_import_info: Session.get_last_csv_import_info(conn))
+    conn |> render_with_common_assigns("show.html", last_csv_import_info: Session.get_last_csv_import_info(conn))
   end
+
+  defp render_with_common_assigns(conn, template, assigns),
+    do: render(conn, template, Keyword.merge(@common_assigns, assigns))
 end
