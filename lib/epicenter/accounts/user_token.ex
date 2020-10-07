@@ -4,7 +4,7 @@ defmodule Epicenter.Accounts.UserToken do
   import Ecto.Changeset
   import Ecto.Query
 
-  alias Epicenter.Extra.NaiveDateTime, as: Extra
+  alias Epicenter.Extra.DateTime, as: Extra
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -21,11 +21,11 @@ defmodule Epicenter.Accounts.UserToken do
   schema "users_tokens" do
     field :token, :binary
     field :context, :string
-    field :expires_at, :naive_datetime
+    field :expires_at, :utc_datetime
     field :sent_to, :string
     belongs_to :user, Epicenter.Accounts.User
 
-    timestamps(updated_at: false)
+    timestamps(type: :utc_datetime, updated_at: false)
   end
 
   def changeset(user_token, attrs) do
@@ -38,8 +38,8 @@ defmodule Epicenter.Accounts.UserToken do
   tokens do not need to be hashed.
   """
   def build_session_token(user) do
-    db_now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-    expires_at = db_now |> NaiveDateTime.add(default_token_lifetime())
+    db_now = DateTime.utc_now() |> DateTime.truncate(:second)
+    expires_at = db_now |> DateTime.add(default_token_lifetime())
     token = :crypto.strong_rand_bytes(@rand_size)
 
     {token,
@@ -52,12 +52,13 @@ defmodule Epicenter.Accounts.UserToken do
   end
 
   def default_token_lifetime(), do: 60 * 60
-  def max_token_lifetime(), do: 60 * 60 * 24
+  def max_token_lifetime(), do: 60 * 60 * 23
 
   def token_validity_status(user_token) do
-    db_now = NaiveDateTime.utc_now()
+    db_now = DateTime.utc_now()
+
     cond do
-      Extra.is_before?(user_token.inserted_at, db_now |> NaiveDateTime.add(-max_token_lifetime())) -> :expired
+      Extra.is_before?(user_token.inserted_at, db_now |> DateTime.add(-max_token_lifetime())) -> :expired
       Extra.is_before?(user_token.expires_at, db_now) -> :expired
       true -> :valid
     end
