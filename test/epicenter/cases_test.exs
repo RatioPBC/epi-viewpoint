@@ -323,7 +323,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone1",
-        "number" => 1111111000,
+        "number" => 1_111_111_000,
         "person_id" => person.id,
         "type" => "home"
       })
@@ -363,9 +363,10 @@ defmodule Epicenter.CasesTest do
       assert person.phones |> pluck(:updated_at) != ~N[1970-01-01 10:30:00Z]
 
       assert_revision_count(phone, 2)
+
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1111111000,
+        "number" => 1_111_111_000,
         "person_id" => person.id,
         "type" => "home"
       })
@@ -383,9 +384,10 @@ defmodule Epicenter.CasesTest do
       assert person.phones |> tids == ["phone2"]
 
       assert_revision_count(phone, 1)
+
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1111111000,
+        "number" => 1_111_111_000,
         "person_id" => person.id,
         "type" => "home"
       })
@@ -399,9 +401,10 @@ defmodule Epicenter.CasesTest do
       assert person.phones |> tids == ["phone2"]
 
       assert_revision_count(phone, 1)
+
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1111111000,
+        "number" => 1_111_111_000,
         "person_id" => person.id,
         "type" => "home"
       })
@@ -466,6 +469,7 @@ defmodule Epicenter.CasesTest do
       assert hd(addresses).updated_at != ~N[1970-01-01 10:30:00Z]
 
       assert_revision_count(original_address, 2)
+
       assert_recent_audit_log(original_address, creator, %{
         "tid" => "address2",
         "full_address" => "4250 Test St, City, TS 00000",
@@ -487,6 +491,7 @@ defmodule Epicenter.CasesTest do
       assert hd(addresses).tid == "other address"
 
       assert_revision_count(new_address, 1)
+
       assert_recent_audit_log(new_address, creator, %{
         "tid" => "address2",
         "full_address" => "4250 Test St, City, TS 00000",
@@ -503,6 +508,7 @@ defmodule Epicenter.CasesTest do
       assert hd(addresses).tid == "address1"
 
       assert_revision_count(new_address, 1)
+
       assert_recent_audit_log(new_address, creator, %{
         "tid" => "address1",
         "full_address" => "4250 Test St, City, TS 00000",

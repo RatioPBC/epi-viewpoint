@@ -82,7 +82,9 @@ defmodule Epicenter.Cases do
   def get_phone(id), do: Phone |> Repo.get(id)
   def list_phones(), do: Phone.Query.all() |> Repo.all()
   def preload_phones(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(phones: Phone.Query.display_order())
-  def upsert_phone!({%{person_id: _} = attrs, audit_meta}), do: %Phone{} |> change_phone(attrs) |> AuditLog.insert!(audit_meta, Phone.Query.opts_for_upsert())
+
+  def upsert_phone!({%{person_id: _} = attrs, audit_meta}),
+    do: %Phone{} |> change_phone(attrs) |> AuditLog.insert!(audit_meta, Phone.Query.opts_for_upsert())
 
   #
   # email
