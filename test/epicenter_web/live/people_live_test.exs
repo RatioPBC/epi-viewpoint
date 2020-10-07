@@ -1,5 +1,5 @@
 defmodule EpicenterWeb.PeopleLiveTest do
-  use EpicenterWeb.ConnCase
+  use EpicenterWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
 
