@@ -57,8 +57,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     emails = existing_emails |> List.delete_at(email_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
-
-    changeset |> Ecto.Changeset.fetch_field(:emails)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
@@ -69,8 +67,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     phones = existing_phones |> List.delete_at(phone_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
-
-    changeset |> Ecto.Changeset.fetch_field(:phones)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
