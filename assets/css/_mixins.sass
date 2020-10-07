@@ -73,6 +73,7 @@
   border: 1px solid $button-color
   border-radius: 2px
   color: $button-color
+  cursor: pointer
   display: inline-block
   font-size: $body-text-size
   font-weight: normal
@@ -255,8 +256,10 @@
   justify-content: $justify
 
   @if $justify == left
+    display: inline-flex
     justify-content: flex-start
   @else if $justify == right
+    display: inline-flex
     justify-content: flex-end
 
   & > *

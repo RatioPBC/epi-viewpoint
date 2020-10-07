@@ -60,10 +60,9 @@
           .select-wrapper
             @include select
 
-        #add-phone
+        #add-phone, #add-email
           @include button-secondary
           @include has-icon
-          display: inline-block
 
         .email-address-wrapper:not(:first-of-type)
           @include vertical-flow
@@ -80,9 +79,6 @@
 
             label
               @include centered
-
-        #add-email
-          @include button-secondary
 
       #submit-form
         @include button-primary
