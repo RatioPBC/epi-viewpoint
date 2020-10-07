@@ -321,6 +321,12 @@
     select
       color: $disabled-text-color
 
+@mixin shadow($style: dialog)
+  @if $style == dialog
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25)
+  @else if $style == overlay
+    box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
+
 // https://1linelayouts.glitch.me
 @mixin sidebar-layout
   display: grid

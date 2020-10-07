@@ -1,10 +1,19 @@
 #styleguide-page
+  #nav
+    a href="#text" Text
+    a href="#buttons-and-links" Buttons & links
+    a href="#messaging" Messaging
+    a href="#layout" Layout
+    a href="#containers" Containers
+    a href="#data" Data
+    a href="#form" Form
+    a href="#effects" Effects
 
   //
   // text
   //
   .styleguide-section
-    .styleguide-title Text
+    .styleguide-title#text Text
 
     .styleguide-example
       span#primary-text Primary text
@@ -46,7 +55,7 @@
   // buttons & links
   //
   .styleguide-section
-    .styleguide-title Buttons & links
+    .styleguide-title#buttons-and-links Buttons & links
 
     .styleguide-example
       a#primary-button href="#" Primary button
@@ -110,7 +119,7 @@
   // messaging
   //
   .styleguide-section
-    .styleguide-title Messaging
+    .styleguide-title#messaging Messaging
 
     .styleguide-example
       #tooltip-when-disabled
@@ -127,7 +136,7 @@
   // layout
   //
   .styleguide-section
-    .styleguide-title Layout
+    .styleguide-title#layout Layout
 
     .styleguide-example
       #centered
@@ -224,7 +233,7 @@
   //
 
   .styleguide-section
-    .styleguide-title Containers
+    .styleguide-title#containers Containers
 
     .styleguide-example
       #section-container
@@ -258,7 +267,7 @@
   //
 
   .styleguide-section
-    .styleguide-title Data
+    .styleguide-title#data Data
 
     .styleguide-example
       #data-table
@@ -275,7 +284,7 @@
   //
 
   .styleguide-section
-    .styleguide-title Form
+    .styleguide-title#form Form
 
     .styleguide-example
       form phx-change="suggest-address"
@@ -318,3 +327,21 @@
       #form
         ' coming soon
       code @include form
+
+  //
+  // effects
+  //
+  .styleguide-section
+    .styleguide-title#effects
+      ' Effects
+
+    .styleguide-example
+      #shadow-overlay
+        ' Shadow for overlays
+      code @include shadow($style: overlay)
+
+    .styleguide-example
+      #shadow-dialog
+        ' Shadow for dialogs
+      code @include shadow($style: dialog)
+
