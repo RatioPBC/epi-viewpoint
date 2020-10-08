@@ -4,6 +4,22 @@ defmodule Epicenter.Release do
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
+  @doc """
+  An administrator can use `create_user` to make a user with a name and email.
+
+  To do so, find your administrator's user:
+
+    iex> administrator = Epicenter.Repo.get_by(Epicenter.Accounts.User, email: "admin@example.com")
+
+  NOTE: For the very _first_ user, please use a fake/robot user with UUID "00000000-0000-0000-0000-000000000000"
+
+    iex> administrator = %Epicenter.Accounts.User{id: "00000000-0000-0000-0000-000000000000"}
+
+  Then call this function by providing a list of email addresses of users to disable:
+
+    iex> Epicenter.Release.create_user(administrator, "Fred Durst", "limpbizkit@example.com")
+  """
+
   def create_user(%Epicenter.Accounts.User{} = author, name, email, opts \\ []) do
     ensure_started()
 
