@@ -16,8 +16,6 @@ defmodule Epicenter.Cases.Person do
   @required_attrs ~w{dob first_name last_name}a
   @optional_attrs ~w{assigned_to_id external_id preferred_language tid employment ethnicity gender_identity marital_status notes occupation race sex_at_birth}a
 
-  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
-
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "people" do
@@ -47,6 +45,26 @@ defmodule Epicenter.Cases.Person do
     has_many :lab_results, LabResult
     has_many :phones, Phone, on_replace: :delete
   end
+
+  defimpl Jason.Encoder, for: __MODULE__ do
+    def encode(value, opts) do
+      put_field_if_loaded = fn person_attrs, value, field_name ->
+        case Map.get(value, field_name) do
+          %Ecto.Association.NotLoaded{} -> person_attrs
+          _ -> Map.put(person_attrs, field_name, value.emails)
+        end
+      end
+
+      person_attrs = Map.take(value, Person.required_attrs() ++ Person.optional_attrs())
+
+      person_attrs = put_field_if_loaded.(person_attrs, value, :emails)
+
+      Jason.Encode.map(person_attrs, opts)
+    end
+  end
+
+  def required_attrs(), do: @required_attrs
+  def optional_attrs(), do: @optional_attrs
 
   def assignment_changeset(person, nil = _user), do: person |> changeset(%{assigned_to_id: nil})
   def assignment_changeset(person, %User{} = user), do: person |> changeset(%{assigned_to_id: user.id})
