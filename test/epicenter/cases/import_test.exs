@@ -86,12 +86,15 @@ defmodule Epicenter.Cases.ImportTest do
                 imported_person_count: 26,
                 total_lab_result_count: 31,
                 total_person_count: 26
-              }} = %{file_name: file_name, contents: File.read!(file_name)} |> Import.import_csv(originator)
+              }} =
+               %{file_name: file_name, contents: File.read!(file_name)}
+               |> Import.import_csv(originator)
     end
   end
 
   describe "de-duplication" do
-    test "if two lab results have the same first_name, last_name, and dob, they are considered the same person", %{originator: originator} do
+    test "if two lab results have the same first_name, last_name, and dob, they are considered the same person",
+         %{originator: originator} do
       assert {:ok,
               %Epicenter.Cases.Import.ImportInfo{
                 imported_people: imported_people,
@@ -113,14 +116,17 @@ defmodule Epicenter.Cases.ImportTest do
                |> Import.import_csv(originator)
 
       assert imported_people |> tids() == ["alice", "billy-2", "billy-1"]
+
       [alice, billy_2, billy_1] = Cases.list_people(:all) |> Enum.map(&Cases.preload_lab_results/1)
+
       assert alice.tid == "alice"
       assert alice.lab_results |> tids() == ~w{alice-result}
       assert billy_1.lab_results |> tids() == ~w{billy-1-newer-result billy-1-older-result}
       assert billy_2.lab_results |> tids() == ~w{billy-2-result}
     end
 
-    test "if two lab results are for the same person and have identical lab result fields, they are considered duplicates", %{originator: originator} do
+    test "if two lab results are for the same person and have identical lab result fields, they are considered duplicates",
+         %{originator: originator} do
       assert {:ok,
               %Epicenter.Cases.Import.ImportInfo{
                 imported_lab_result_count: 3,
@@ -144,12 +150,19 @@ defmodule Epicenter.Cases.ImportTest do
       assert person_2.tid == "person-2"
 
       person_1.lab_results |> tids() |> assert_eq(~w{person-1-result-1}, ignore_order: true)
-      person_2.lab_results |> tids() |> assert_eq(~w{person-2-result-1 person-2-result-2}, ignore_order: true)
+
+      person_2.lab_results
+      |> tids()
+      |> assert_eq(~w{person-2-result-1 person-2-result-2}, ignore_order: true)
     end
 
-    test "updates existing phone number when importing a duplicate for the same person", %{originator: originator} do
+    test "updates existing phone number when importing a duplicate for the same person", %{
+      originator: originator
+    } do
       alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
       Cases.create_phone!(Test.Fixtures.phone_attrs(alice, "0", %{number: 1_111_111_000}))
 
       %{
@@ -161,32 +174,96 @@ defmodule Epicenter.Cases.ImportTest do
       }
       |> Import.import_csv(originator)
 
-      assert Cases.count_phones() == 1
+      alice = Cases.get_person(alice.id) |> Cases.preload_phones()
+      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == [1_111_111_000]
     end
 
-    test "updates existing address when importing a duplicate for the same person", %{originator: originator} do
+    test "creates new phone number when importing a duplicate for the same person with a different phone",
+         %{originator: originator} do
       alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
+      Cases.create_phone!(Test.Fixtures.phone_attrs(alice, "0", %{number: 1_111_111_000}))
+
+      %{
+        file_name: "test.csv",
+        contents: """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111111    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 ,                       ,                    ,                     ,
+        """
+      }
+      |> Import.import_csv(originator)
+
+      alice = Cases.get_person(alice.id) |> Cases.preload_phones()
+      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == [1_111_111_000, 1_111_111_111]
+    end
+
+    test "updates existing address when importing a duplicate for the same person", %{
+      originator: originator
+    } do
+      alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+
+      {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
       Cases.create_address!(Test.Fixtures.address_attrs(alice, "0", 4250, %{}))
-      assert Cases.count_addresses() == 1
+      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
-      import_output =
-        %{
-          file_name: "test.csv",
-          contents: """
-          search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
-          Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4250 Test St                , City               , TS                   , 00000
-          """
-        }
-        |> Import.import_csv(originator)
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
+               "4250 Test St, City, TS 00000"
+             ]
 
-      assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
-      assert Cases.count_addresses() == 1
+      %{
+        file_name: "test.csv",
+        contents: """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4250 Test St                , City               , TS                   , 00000
+        """
+      }
+      |> Import.import_csv(originator)
+
+      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
+
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
+               "4250 Test St, City, TS 00000"
+             ]
+    end
+
+    test "creates new address when importing a duplicate for the same person with a different address",
+         %{originator: originator} do
+      alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+
+      {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
+      Cases.create_address!(Test.Fixtures.address_attrs(alice, "0", 4250, %{}))
+      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
+
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
+               "4250 Test St, City, TS 00000"
+             ]
+
+      %{
+        file_name: "test.csv",
+        contents: """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , TS                   , 00000
+        """
+      }
+      |> Import.import_csv(originator)
+
+      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
+
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
+               "4250 Test St, City, TS 00000",
+               "4251 Test St, City, TS 00000"
+             ]
     end
   end
 
   describe "overwriting data" do
-    test "does not overwrite manually entered demographic data when importing csv", %{originator: originator} do
+    test "does not overwrite manually entered demographic data when importing csv", %{
+      originator: originator
+    } do
       alice_attrs = %{
         first_name: "Alice",
         last_name: "Testuser",
@@ -219,8 +296,11 @@ defmodule Epicenter.Cases.ImportTest do
 
     # Ideally we would overwrite nils when importing a new record for an existing person,
     # but it is hard to do that in ecto without also overwriting filled in data (when importing a new record for an existing person).
-    test "does not fill demographic data when importing data for an existing person", %{originator: originator} do
+    test "does not fill demographic data when importing data for an existing person", %{
+      originator: originator
+    } do
       alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
       import_output =
@@ -260,7 +340,9 @@ defmodule Epicenter.Cases.ImportTest do
   end
 
   describe "failure handling" do
-    test "returns an error if the file is missing required values (file_name or contents)", %{originator: originator} do
+    test "returns an error if the file is missing required values (file_name or contents)", %{
+      originator: originator
+    } do
       in_file_attrs = %{
         file_name: "",
         contents: """
@@ -273,7 +355,9 @@ defmodule Epicenter.Cases.ImportTest do
       assert {:error, %Ecto.InvalidChangesetError{changeset: %{errors: [file_name: _]}}} = Import.import_csv(in_file_attrs, originator)
     end
 
-    test "does not create any resource if it blows up AFTER creating a row", %{originator: originator} do
+    test "does not create any resource if it blows up AFTER creating a row", %{
+      originator: originator
+    } do
       # NOTE:
       # To test the rollback behavior we must test that at least one successful call to
       # add a row is made before the exception happens.
@@ -308,6 +392,7 @@ defmodule Epicenter.Cases.ImportTest do
         |> Import.import_csv(originator)
 
       error_message = "Missing required columns: datecollected_36, dateofbirth_8, result_39, resultdate_42, search_firstname_2, search_lastname_1"
+
       assert {:error, error_message} == result
     end
 
