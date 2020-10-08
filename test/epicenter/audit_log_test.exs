@@ -12,7 +12,7 @@ defmodule Epicenter.AuditLogTest do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       {attrs_to_change_1, _audit_meta} = Test.Fixtures.person_attrs(user, "alice")
       changeset_1 = Cases.change_person(%Person{}, attrs_to_change_1)
 
@@ -61,7 +61,7 @@ defmodule Epicenter.AuditLogTest do
       {user_attrs, _} = Test.Fixtures.user_attrs(%{id: ""}, "user", email: email, password: password)
       password_changeset = %Epicenter.Accounts.User{} |> Epicenter.Accounts.User.registration_changeset(user_attrs)
 
-      {:ok, inserted_user} =
+      {:ok, _inserted_user} =
         AuditLog.insert(
           password_changeset,
           %AuditLog.Meta{
@@ -88,7 +88,7 @@ defmodule Epicenter.AuditLogTest do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       person_id = person.id
       attrs_to_change = Test.Fixtures.add_demographic_attrs(%{})
@@ -142,7 +142,7 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "handling nested changesets (adding an email)" do
-      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
 
       person_params = %{
@@ -180,7 +180,7 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "returns {:error, changeset} when changeset is invalid" do
-      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
 
       person_params = %{

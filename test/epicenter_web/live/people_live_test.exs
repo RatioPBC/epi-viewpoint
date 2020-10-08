@@ -17,7 +17,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
     defp create_people_and_lab_results(user) do
-      assignee = Test.Fixtures.user_attrs(%{id: "superuser"}, "assignee") |> Accounts.register_user!()
+      assignee = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "assignee") |> Accounts.register_user!()
 
       alice = Test.Fixtures.person_attrs(user, "alice", external_id: nil) |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, user, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()

@@ -2,7 +2,7 @@ defmodule EpicenterWeb.UserSettingsController do
   use EpicenterWeb, :controller
 
   alias Epicenter.Accounts
-  alias Epicenter.AuditLog.Meta
+  alias Epicenter.AuditLog
   alias EpicenterWeb.Session
   alias EpicenterWeb.UserAuth
 
@@ -24,7 +24,11 @@ defmodule EpicenterWeb.UserSettingsController do
             applied_user,
             user.email,
             &Routes.user_settings_url(conn, :confirm_email, &1),
-            %Meta{}
+            %AuditLog.Meta{
+              author_id: user.id,
+              reason_action: AuditLog.Revision.update_user_email_request_action(),
+              reason_event: AuditLog.Revision.update_user_email_request_event()
+            }
           )
 
         conn
@@ -39,7 +43,17 @@ defmodule EpicenterWeb.UserSettingsController do
   end
 
   def confirm_email(conn, %{"token" => token}) do
-    case Accounts.update_user_email(conn.assigns.current_user, {token, %Meta{}}) do
+    user = conn.assigns.current_user
+
+    case Accounts.update_user_email(
+           user,
+           {token,
+            %AuditLog.Meta{
+              author_id: user.id,
+              reason_action: AuditLog.Revision.update_user_email_action(),
+              reason_event: AuditLog.Revision.update_user_email_event()
+            }}
+         ) do
       :ok ->
         conn
         |> put_flash(:info, "Email changed successfully")
@@ -55,7 +69,16 @@ defmodule EpicenterWeb.UserSettingsController do
   def update_password(conn, %{"current_password" => password, "user" => user_params}) do
     user = conn.assigns.current_user
 
-    case Accounts.update_user_password(user, password, {user_params, %Meta{}}) do
+    case Accounts.update_user_password(
+           user,
+           password,
+           {user_params,
+            %AuditLog.Meta{
+              author_id: user.id,
+              reason_action: AuditLog.Revision.update_user_password_action(),
+              reason_event: AuditLog.Revision.update_user_password_event()
+            }}
+         ) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Password updated successfully")

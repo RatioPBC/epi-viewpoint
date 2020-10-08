@@ -6,6 +6,8 @@ defmodule Epicenter.Cases.LabResultTest do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Test
 
+  @admin Test.Fixtures.admin()
+
   describe "schema" do
     test "fields" do
       assert_schema(
@@ -33,7 +35,7 @@ defmodule Epicenter.Cases.LabResultTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       {default_attrs, _} = Test.Fixtures.lab_result_attrs(person, user, "result1", "06-01-2020")
       Cases.change_lab_result(%LabResult{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
@@ -54,7 +56,7 @@ defmodule Epicenter.Cases.LabResultTest do
 
   describe "fingerprint" do
     test "is generated based on field values" do
-      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       {attrs_1, _} = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "1234567890"}, user, "result-1", "06-01-2020")
       fingerprint_1 = Cases.change_lab_result(%LabResult{}, attrs_1) |> LabResult.generate_fingerprint()
 
@@ -76,7 +78,7 @@ defmodule Epicenter.Cases.LabResultTest do
     import Euclid.Extra.Enum, only: [tids: 1]
 
     test "display_order sorts by sampled_on (desc) first, then by reported_on (desc)" do
-      user = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
       [

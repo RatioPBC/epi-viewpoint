@@ -71,7 +71,24 @@ defmodule Epicenter.AuditLog do
     result
   end
 
-  defp redact(changes), do: Map.drop(changes, ["password", :password])
+  @redacted_fields ["password", :password]
+  defp redact(changes) do
+    Enum.reduce(
+      @redacted_fields,
+      changes,
+      fn key, acc ->
+        Map.get_and_update(
+          acc,
+          key,
+          fn
+            nil -> :pop
+            val -> {val, "<<REDACTED>>"}
+          end
+        )
+        |> elem(1)
+      end
+    )
+  end
 
   def get_revision(id), do: Revision |> Repo.get(id)
 

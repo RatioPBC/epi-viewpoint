@@ -104,9 +104,11 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "redirects if user is authenticated", %{conn: conn, user: user} do
-      expires_at = NaiveDateTime.utc_now |> NaiveDateTime.add(100, :second) |> NaiveDateTime.truncate(:second)
+      expires_at = NaiveDateTime.utc_now() |> NaiveDateTime.add(100, :second) |> NaiveDateTime.truncate(:second)
+
       conn =
-        conn |> setup_user_token(user, expires_at)
+        conn
+        |> setup_user_token(user, expires_at)
         |> assign(:current_user, user)
         |> EpicenterWeb.Session.put_multifactor_auth_success(true)
         |> UserAuth.redirect_if_user_is_authenticated([])
@@ -146,7 +148,7 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "redirects if user is authenticated but disabled", %{conn: conn, user: user} do
-      {:ok, user} = Accounts.disable_user(user)
+      {:ok, user} = Accounts.disable_user(user, Epicenter.Test.Fixtures.admin_audit_meta())
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
@@ -154,11 +156,14 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "redirects if user is authenticated but the token expired", %{conn: conn, user: user} do
-      expires_at = NaiveDateTime.utc_now |> NaiveDateTime.add(-1, :second) |> NaiveDateTime.truncate(:second)
-      conn = conn |> setup_user_token(user, expires_at)
-                  |> fetch_flash()
-                  |> assign(:current_user, user)
-                  |> EpicenterWeb.Session.put_multifactor_auth_success(true)
+      expires_at = NaiveDateTime.utc_now() |> NaiveDateTime.add(-1, :second) |> NaiveDateTime.truncate(:second)
+
+      conn =
+        conn
+        |> setup_user_token(user, expires_at)
+        |> fetch_flash()
+        |> assign(:current_user, user)
+        |> EpicenterWeb.Session.put_multifactor_auth_success(true)
 
       conn = conn |> UserAuth.require_authenticated_user([])
 
@@ -206,9 +211,11 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "does not redirect if user is authenticated", %{conn: conn, user: user} do
-      expires_at = NaiveDateTime.utc_now |> NaiveDateTime.add(100, :second) |> NaiveDateTime.truncate(:second)
+      expires_at = NaiveDateTime.utc_now() |> NaiveDateTime.add(100, :second) |> NaiveDateTime.truncate(:second)
+
       conn =
-        conn |> setup_user_token(user, expires_at)
+        conn
+        |> setup_user_token(user, expires_at)
         |> fetch_flash()
         |> assign(:current_user, user)
         |> EpicenterWeb.Session.put_multifactor_auth_success(true)
@@ -220,7 +227,7 @@ defmodule EpicenterWeb.UserAuthTest do
   end
 
   defp setup_user_token(conn, user, expires_at) do
-    token_string = Accounts.generate_user_session_token(user)
+    token_string = Accounts.generate_user_session_token({user, Epicenter.Test.Fixtures.audit_meta(user)})
     user_token = UserToken.fetch_user_token_query(token_string) |> Repo.one() |> UserToken.changeset(%{expires_at: expires_at}) |> Repo.update!()
     conn |> Conn.merge_private(plug_session: %{"user_token" => user_token.token})
   end

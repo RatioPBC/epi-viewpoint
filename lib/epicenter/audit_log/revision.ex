@@ -38,6 +38,14 @@ defmodule Epicenter.AuditLog.Revision do
   def import_person_action(), do: "import-person"
   def releases_action(), do: "releases"
   def register_user_action(), do: "register-user"
+  def update_user_email_action(), do: "update-user-email"
+  def update_user_email_request_action(), do: "update-user-email-request"
+  def create_user_action(), do: "create-user"
+  def disable_user_action(), do: "disable-user"
+  def update_user_password_action(), do: "update-user-password"
+  def reset_password_action(), do: "reset-password"
+  def update_user_mfa_action(), do: "update-user-mfa"
+  def login_user_action(), do: "login-user"
 
   def edit_profile_demographics_event(), do: "edit-profile-demographics"
   def people_selected_assignee_event(), do: "people-selected-assignee"
@@ -46,6 +54,12 @@ defmodule Epicenter.AuditLog.Revision do
   def import_csv_event(), do: "import-csv"
   def releases_event(), do: "releases"
   def register_user_event(), do: "register-user"
+  def reset_password_submit_event(), do: "reset-password-submit"
+  def update_user_email_event(), do: "update=user-email"
+  def update_user_email_request_event(), do: "update-user-email-request"
+  def update_user_password_event(), do: "update-user-password"
+  def update_user_mfa_event(), do: "update-user-mfa"
+  def login_user_event(), do: "login-user"
 
   defmodule Query do
     import Ecto.Query

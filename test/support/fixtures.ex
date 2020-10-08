@@ -11,6 +11,10 @@ defmodule Epicenter.Test.Fixtures do
     }
   end
 
+  @admin_id Ecto.UUID.generate()
+  def admin(), do: %Epicenter.Accounts.User{id: @admin_id, tid: "admin"}
+  def admin_audit_meta(), do: audit_meta(admin())
+
   def lab_result_attrs(%Person{id: person_id}, author, tid, sampled_on, attrs \\ %{}) do
     attrs =
       %{

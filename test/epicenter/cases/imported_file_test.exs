@@ -6,6 +6,8 @@ defmodule Epicenter.Cases.ImportedFileTest do
   alias Epicenter.Cases.ImportedFile
   alias Epicenter.Test
 
+  @admin Test.Fixtures.admin()
+
   describe "schema" do
     test "fields" do
       assert_schema(
@@ -25,7 +27,7 @@ defmodule Epicenter.Cases.ImportedFileTest do
 
   describe "changeset" do
     test "file_name is required" do
-      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
 
       {attrs, _} = Test.Fixtures.imported_file_attrs(creator, "created file", %{file_name: nil})
 
@@ -41,7 +43,7 @@ defmodule Epicenter.Cases.ImportedFileTest do
     import Euclid.Extra.Enum, only: [tids: 1]
 
     setup do
-      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
 
       %{creator: creator}
     end
@@ -54,15 +56,17 @@ defmodule Epicenter.Cases.ImportedFileTest do
     end
 
     test "has a revision count", %{creator: creator} do
-      imported_file = Test.Fixtures.imported_file_attrs(creator, "created file")
-              |> Cases.create_imported_file()
+      imported_file =
+        Test.Fixtures.imported_file_attrs(creator, "created file")
+        |> Cases.create_imported_file()
 
       assert_revision_count(imported_file, 1)
     end
 
     test "has an audit log", %{creator: creator} do
-      imported_file = Test.Fixtures.imported_file_attrs(creator, "created file")
-              |> Cases.create_imported_file()
+      imported_file =
+        Test.Fixtures.imported_file_attrs(creator, "created file")
+        |> Cases.create_imported_file()
 
       assert_recent_audit_log(imported_file, creator, %{
         "tid" => "created file",

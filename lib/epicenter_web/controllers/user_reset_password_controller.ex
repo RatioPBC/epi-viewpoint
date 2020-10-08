@@ -3,6 +3,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
 
   alias Epicenter.Accounts
   alias EpicenterWeb.Session
+  alias Epicenter.AuditLog
 
   plug :get_user_by_reset_password_token when action in [:edit, :update]
 
@@ -40,7 +41,17 @@ defmodule EpicenterWeb.UserResetPasswordController do
   # Do not log in the user after reset password to avoid a
   # leaked token giving the user access to the account.
   def update(conn, %{"user" => user_params}) do
-    case Accounts.reset_user_password(conn.assigns.user, user_params) do
+    user = conn.assigns.user
+
+    case Accounts.reset_user_password(
+           user,
+           user_params,
+           %AuditLog.Meta{
+             author_id: user.id,
+             reason_action: AuditLog.Revision.reset_password_action(),
+             reason_event: AuditLog.Revision.reset_password_submit_event()
+           }
+         ) do
       {:ok, _} ->
         conn
         |> put_flash(:info, "Password reset successfully — please log in")

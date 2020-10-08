@@ -10,8 +10,9 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Repo
   alias Epicenter.Test
 
+  @admin Test.Fixtures.admin()
   setup do
-    [originator: Test.Fixtures.user_attrs(%{id: "superuser"}, "originator") |> Accounts.register_user!()]
+    [originator: Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()]
   end
 
   describe "happy path" do
