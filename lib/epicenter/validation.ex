@@ -35,7 +35,7 @@ defmodule Epicenter.Validation do
   # # #
 
   @four_digits_followed_by_fake_address ~r|\d{4} Test St, City, TS 00000|
-  @seven_leading_ones_followed_by_three_digits ~r|1{7}\d{3}|
+  @seven_leading_ones_followed_by_three_digits ~r|1{7}\d+|
 
   defp date_validator(field, date) do
     if date.day == 1,
@@ -56,7 +56,7 @@ defmodule Epicenter.Validation do
   end
 
   defp phone_number_validator(field, value) do
-    if to_string(value) =~ @seven_leading_ones_followed_by_three_digits,
+    if value =~ @seven_leading_ones_followed_by_three_digits,
       do: valid(),
       else: invalid(field, "must match '111-111-1xxx'")
   end

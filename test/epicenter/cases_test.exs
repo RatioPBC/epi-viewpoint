@@ -307,7 +307,7 @@ defmodule Epicenter.CasesTest do
     test "persists the values correctly", %{person: person, creator: creator} do
       phone = Test.Fixtures.phone_attrs(creator, person, "phone1", %{}) |> Cases.create_phone!()
 
-      assert phone.number == 1_111_111_000
+      assert phone.number == "1111111000"
       assert phone.person_id == person.id
       assert phone.type == "home"
       assert phone.tid == "phone1"
@@ -324,7 +324,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone1",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -367,7 +367,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -388,7 +388,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -405,7 +405,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })

@@ -17,7 +17,7 @@ defmodule Epicenter.Cases.Phone do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "phones" do
-    field :number, :integer
+    field :number, :string
     field :delete, :boolean, virtual: true
     field :is_preferred, :boolean
     field :seq, :integer
@@ -32,10 +32,28 @@ defmodule Epicenter.Cases.Phone do
   def changeset(phone, attrs) do
     phone
     |> cast(attrs, @required_attrs ++ @optional_attrs)
+    |> strip_non_digits_from_number()
     |> validate_required(@required_attrs)
     |> validate_phi(:phone)
     |> unique_constraint([:person_id, :number], name: :phone_number_person_id_index)
     |> Extra.Changeset.maybe_mark_for_deletion()
+  end
+
+  defp strip_non_digits_from_number(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Ecto.Changeset.fetch_field(:number)
+    |> elem(1)
+    |> case do
+      nil -> changeset
+      number -> Ecto.Changeset.put_change(changeset, :number, strip_non_digits_from_number(number))
+    end
+  end
+
+  defp strip_non_digits_from_number(number) when is_binary(number) do
+    number
+    |> String.graphemes()
+    |> Enum.filter(fn element -> element =~ ~r{\d} end)
+    |> Enum.join()
   end
 
   defmodule Query do

@@ -59,7 +59,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.external_id == "10000"
       assert alice.first_name == "Alice"
       assert alice.last_name == "Testuser"
-      assert alice.phones |> pluck(:number) == [1_111_111_000]
+      assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
       assert alice.ethnicity == "Cuban"
@@ -72,7 +72,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.external_id == "10001"
       assert billy.first_name == "Billy"
       assert billy.last_name == "Testuser"
-      assert billy.phones |> pluck(:number) == [1_111_111_001]
+      assert billy.phones |> pluck(:number) == ["1111111001"]
       assert billy.tid == "billy"
       assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
       assert_revision_count(billy, 1)
@@ -164,7 +164,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: 1_111_111_000}))
+      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: "111-111-1000"}))
 
       %{
         file_name: "test.csv",
@@ -176,7 +176,7 @@ defmodule Epicenter.Cases.ImportTest do
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_phones()
-      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == [1_111_111_000]
+      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000"]
     end
 
     test "creates new phone number when importing a duplicate for the same person with a different phone",
@@ -185,7 +185,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: 1_111_111_000}))
+      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: "111-111-1000"}))
 
       %{
         file_name: "test.csv",
@@ -197,7 +197,7 @@ defmodule Epicenter.Cases.ImportTest do
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_phones()
-      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == [1_111_111_000, 1_111_111_111]
+      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000", "1111111111"]
     end
 
     test "updates existing address when importing a duplicate for the same person", %{

@@ -99,7 +99,7 @@ defmodule Epicenter.Test.Fixtures do
   def phone_attrs(author, %Person{id: person_id}, tid, attrs \\ %{}) do
     attrs =
       %{
-        number: 1_111_111_000,
+        number: "111-111-1000",
         person_id: person_id,
         type: "home",
         tid: tid

@@ -54,8 +54,8 @@ defmodule Epicenter.ValidationTest do
   end
 
   describe "validate_phi: phone number" do
-    @valid_phone_number 1_111_111_567
-    @invalid_phone_number 12345
+    @valid_phone_number "1111111567"
+    @invalid_phone_number "12345"
 
     test "changest is valid if phone number matches '111-111-1xxx'" do
       Changeset.change(%Phone{}, number: @valid_phone_number)

@@ -88,8 +88,24 @@ defmodule EpicenterWeb.ProfileLive do
     person
     |> Cases.preload_phones()
     |> Map.get(:phones)
-    |> Enum.map(fn %{number: digits} ->
-      digits |> Integer.digits() |> Enum.map(&to_string/1) |> List.insert_at(-5, "-") |> List.insert_at(-9, "-") |> Enum.join()
+    |> Enum.map(fn
+      %{number: number_string} when byte_size(number_string) == 10 ->
+        number_string
+        |> String.graphemes()
+        |> List.insert_at(-5, "-")
+        |> List.insert_at(-9, "-")
+        |> Enum.join()
+
+      %{number: number_string} when byte_size(number_string) == 11 ->
+        number_string
+        |> String.graphemes()
+        |> List.insert_at(-5, "-")
+        |> List.insert_at(-9, "-")
+        |> List.insert_at(-13, "-")
+        |> Enum.join()
+
+      %{number: number_string} ->
+        number_string
     end)
   end
 

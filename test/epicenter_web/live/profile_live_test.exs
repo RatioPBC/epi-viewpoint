@@ -44,8 +44,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
     setup %{person: person, user: user} do
       Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
       Test.Fixtures.email_attrs(user, person, "alice-preferred", is_preferred: true) |> Cases.create_email!()
-      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
-      Test.Fixtures.phone_attrs(user, person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-2", number: "111-111-1001", is_preferred: true) |> Cases.create_phone!()
       Test.Fixtures.address_attrs(user, person, "alice-address", 1000, type: "home") |> Cases.create_address!()
       Test.Fixtures.address_attrs(user, person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
       :ok
@@ -66,8 +66,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
       person |> ProfileLive.email_addresses() |> assert_eq(["alice-preferred@example.com", "alice-a@example.com"])
     end
 
-    test "phone_numbers", %{person: person} do
-      person |> ProfileLive.phone_numbers() |> assert_eq(["111-111-1001", "111-111-1000"])
+    test "phone_numbers", %{person: person, user: user} do
+      Test.Fixtures.phone_attrs(user, person, "phone-3", number: "1-111-111-1009") |> Cases.create_phone!()
+      person |> ProfileLive.phone_numbers() |> assert_eq(["111-111-1001", "111-111-1000", "1-111-111-1009"])
     end
   end
 
