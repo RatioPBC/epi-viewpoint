@@ -113,29 +113,24 @@ defmodule Epicenter.Cases.Import do
     row
     |> Map.take(@person_db_fields_to_insert)
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-    |> in_audit_tuple(originator)
+    |> in_audit_tuple(originator, AuditLog.Revision.upsert_person_action())
     |> Cases.upsert_person!()
-  end
-
-  defp in_audit_tuple(data, author) do
-    Extra.Tuple.append(data, %AuditLog.Meta{
-      author_id: author.id,
-      reason_action: AuditLog.Revision.import_person_action(),
-      reason_event: AuditLog.Revision.import_csv_event()
-    })
   end
 
   defp import_lab_result(row, person, author) do
     row
     |> Map.take(@lab_result_db_fields_to_insert)
     |> Map.put("person_id", person.id)
-    |> in_audit_tuple(author)
+    |> in_audit_tuple(author, AuditLog.Revision.upsert_lab_result_action())
     |> Cases.upsert_lab_result!()
   end
 
   defp import_phone_number(row, person, author) do
     if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
-      Cases.upsert_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id} |> in_audit_tuple(author))
+      Cases.upsert_phone!(
+        %{number: Map.get(row, "phonenumber_7"), person_id: person.id}
+        |> in_audit_tuple(author, AuditLog.Revision.upsert_phone_number_action())
+      )
     end
   end
 
@@ -143,7 +138,18 @@ defmodule Epicenter.Cases.Import do
     [street, city, state, zip] = address_components = @address_db_fields_to_insert |> Enum.map(&Map.get(row, &1))
 
     if Euclid.Exists.any?(address_components) do
-      Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id} |> in_audit_tuple(author))
+      Cases.upsert_address!(
+        %{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id}
+        |> in_audit_tuple(author, AuditLog.Revision.upsert_address_action())
+      )
     end
+  end
+
+  defp in_audit_tuple(data, author, reason_action) do
+    Extra.Tuple.append(data, %AuditLog.Meta{
+      author_id: author.id,
+      reason_action: reason_action,
+      reason_event: AuditLog.Revision.import_csv_event()
+    })
   end
 end
