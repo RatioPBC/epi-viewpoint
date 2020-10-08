@@ -91,4 +91,6 @@
           span Add email
 
 
-      = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
+      #form-end
+      #nav
+        = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
