@@ -24,6 +24,10 @@ if Application.get_env(:epicenter, :seeds_enabled?) do
     password = "password123"
 
     IO.puts("Creating #{name} / #{email} / #{password}")
-    Epicenter.Accounts.register_user!(%{email: email, password: password, tid: tid, name: name})
+
+    Epicenter.Accounts.register_user!(
+      {%{email: email, password: password, tid: tid, name: name},
+       %Epicenter.AuditLog.Meta{author_id: "00000000-0000-0000-0000-000000000000", reason_action: "seed-user", reason_event: "seeds.exs"}}
+    )
   end
 end
