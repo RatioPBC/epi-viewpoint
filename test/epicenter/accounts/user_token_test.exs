@@ -44,5 +44,17 @@ defmodule Epicenter.Accounts.UserTokenTest do
 
       assert UserToken.token_validity_status(token) == :expired
     end
+
+    test "with a token that lacks an expiration time" do
+      now = DateTime.utc_now()
+      before_now = now |> DateTime.add(-60 * 60, :second)
+
+      token = %UserToken{
+        inserted_at: before_now,
+        expires_at: nil
+      }
+
+      assert UserToken.token_validity_status(token) == :expired
+    end
   end
 end
