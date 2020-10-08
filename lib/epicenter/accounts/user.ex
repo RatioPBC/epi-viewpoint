@@ -7,7 +7,8 @@ defmodule Epicenter.Accounts.User do
   alias Epicenter.Cases.Person
 
   @derive {Inspect, except: [:password]}
-  @derive {Jason.Encoder, only: [:id]}
+  @audit_logged_fields [:id, :confirmed_at, :email, :name, :disabled, :tid]
+  @derive {Jason.Encoder, only: @audit_logged_fields}
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
