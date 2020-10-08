@@ -224,6 +224,10 @@ defmodule Epicenter.AccountsTest do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       Accounts.update_user_mfa!(user, {"123456", Test.Fixtures.audit_meta(@admin)})
       assert_revision_count(user, 2)
+
+      assert_recent_audit_log(user, @admin, %{
+        "mfa_secret" => "<<REDACTED>>"
+      })
     end
   end
 

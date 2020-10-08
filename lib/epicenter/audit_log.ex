@@ -71,14 +71,14 @@ defmodule Epicenter.AuditLog do
     result
   end
 
-  @redacted_fields ["password", :password]
+  @redacted_fields [:password, :mfa_secret]
   defp redact(changes) do
     Enum.reduce(
       @redacted_fields,
       changes,
       fn key, acc ->
-        Map.get_and_update(
-          acc,
+        acc
+        |> Map.get_and_update(
           key,
           fn
             nil -> :pop
