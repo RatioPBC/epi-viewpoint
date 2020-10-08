@@ -69,7 +69,9 @@
                 = label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do
                   = trash_icon()
 
-        a#add-phone[phx-click="add-phone"] Add phone
+        a#add-phone[phx-click="add-phone"]
+          = plus_icon()
+          span Add phone
 
         fieldset
           = if has_field?(@changeset, :emails) do
@@ -84,6 +86,11 @@
                 = label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do
                   = trash_icon()
 
-        a#add-email[phx-click="add-email"] Add email
+        a#add-email[phx-click="add-email"]
+          = plus_icon()
+          span Add email
 
-      = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
+
+      #form-end
+      #nav
+        = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

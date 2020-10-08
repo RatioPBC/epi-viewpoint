@@ -2,18 +2,22 @@ defmodule Epicenter.Accounts do
   alias Epicenter.Accounts.User
   alias Epicenter.Accounts.UserToken
   alias Epicenter.Accounts.UserNotifier
+  alias Epicenter.AuditLog
   alias Epicenter.Repo
 
   def change_user(%User{} = user, attrs), do: User.changeset(user, Enum.into(attrs, %{}))
   def get_user(id), do: User |> Repo.get(id)
   def list_users(), do: User.Query.all() |> Repo.all()
   def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
-  def register_user(attrs), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert()
-  def register_user!(attrs), do: %User{} |> User.registration_changeset(attrs) |> Repo.insert!()
-  def update_user_mfa!(%User{} = user, mfa_secret), do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> Repo.update!()
+  def register_user({attrs, audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> AuditLog.insert(audit_meta)
+  def register_user!({attrs, audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> AuditLog.insert!(audit_meta)
+
+  def update_user_mfa!(%User{} = user, {mfa_secret, audit_meta}),
+    do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> AuditLog.update!(audit_meta)
 
   ## Database getters
 
+  @spec get_user_by_email(binary) :: any
   @doc """
   Gets a user by email.
 
@@ -120,23 +124,28 @@ defmodule Epicenter.Accounts do
   If the token matches, the user email is updated and the token is deleted.
   The confirmed_at date is also updated to the current time.
   """
-  def update_user_email(user, token) do
+  def update_user_email(user, {token, audit_meta}) do
     context = "change:#{user.email}"
 
     with {:ok, query} <- UserToken.verify_change_email_token_query(token, context),
          %UserToken{sent_to: email} <- Repo.one(query),
-         {:ok, _} <- Repo.transaction(user_email_multi(user, email, context)) do
+         {:ok, _} <- Repo.transaction(user_email_multi(user, email, context, audit_meta)) do
       :ok
     else
       _ -> :error
     end
   end
 
-  defp user_email_multi(user, email, context) do
+  defp user_email_multi(user, email, context, audit_meta) do
     changeset = user |> User.email_changeset(%{email: email}) |> User.confirm_changeset()
 
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, changeset)
+    |> Ecto.Multi.run(
+      :user,
+      fn _repo, _changes ->
+        AuditLog.update(changeset, audit_meta)
+      end
+    )
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
   end
 
@@ -149,7 +158,7 @@ defmodule Epicenter.Accounts do
       {:ok, %{to: ..., body: ...}}
 
   """
-  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
+  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun, _audit_meta)
       when is_function(update_email_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
 
@@ -182,14 +191,19 @@ defmodule Epicenter.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_user_password(user, password, attrs) do
+  def update_user_password(user, password, {attrs, audit_meta}) do
     changeset =
       user
       |> User.password_changeset(attrs)
       |> User.validate_current_password(password)
 
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user, changeset)
+    |> Ecto.Multi.run(
+      :user,
+      fn _repo, _changes ->
+        AuditLog.update(changeset, audit_meta)
+      end
+    )
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
     |> Repo.transaction()
     |> case do
@@ -203,10 +217,14 @@ defmodule Epicenter.Accounts do
   @doc """
   Generates a session token.
   """
-  def generate_user_session_token(user) do
+  def generate_user_session_token({user, _audit_meta}) do
     {token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token)
     token
+  end
+
+  def session_token_status(token) do
+    UserToken.fetch_user_token_query(token) |> Repo.one() |> UserToken.token_validity_status()
   end
 
   @doc """
@@ -220,7 +238,7 @@ defmodule Epicenter.Accounts do
   @doc """
   Deletes the signed token with the given context.
   """
-  def delete_session_token(token) do
+  def delete_session_token({token, _audit_meta}) do
     Repo.delete_all(UserToken.token_and_context_query(token, "session"))
     :ok
   end
@@ -323,15 +341,40 @@ defmodule Epicenter.Accounts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def reset_user_password(user, attrs) do
+  def reset_user_password(user, attrs, audit_meta) do
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:user_with_new_password, User.password_changeset(user, attrs))
-    |> Ecto.Multi.update(:confirmed_user, User.confirm_changeset(user))
+    |> Ecto.Multi.run(
+      :user,
+      fn _repo, _changes ->
+        user
+        |> User.password_changeset(attrs)
+        |> User.confirm_changeset()
+        |> AuditLog.update(audit_meta)
+      end
+    )
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
     |> Repo.transaction()
     |> case do
-      {:ok, %{confirmed_user: user}} -> {:ok, user}
+      {:ok, %{user: user}} -> {:ok, user}
       {:error, _, changeset, _} -> {:error, changeset}
     end
   end
+
+  @doc """
+  Disables a user from being able to log in
+
+  ## Examples
+
+      iex> disable_user(user)
+      :ok
+
+      iex> disable_user(user)
+      {:error, "User alice is already disabled"}
+  """
+  @spec disable_user(%User{}, %AuditLog.Meta{}) :: {:ok, %User{}} | {:error, String.t()}
+  def disable_user(%User{disabled: true, email: email}, _), do: {:error, "User #{email} is already disabled"}
+
+  def disable_user(user, audit_meta), do: user |> User.disable_changeset() |> AuditLog.update(audit_meta) |> stringify_error()
+  defp stringify_error({:error, error}), do: {:error, "#{inspect(error)}"}
+  defp stringify_error(result), do: result
 end

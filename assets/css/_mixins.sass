@@ -73,6 +73,7 @@
   border: 1px solid $button-color
   border-radius: 2px
   color: $button-color
+  cursor: pointer
   display: inline-block
   font-size: $body-text-size
   font-weight: normal
@@ -255,8 +256,10 @@
   justify-content: $justify
 
   @if $justify == left
+    display: inline-flex
     justify-content: flex-start
   @else if $justify == right
+    display: inline-flex
     justify-content: flex-end
 
   & > *
@@ -281,7 +284,7 @@
   border-width: 1px
   display: inline-flex
   flex-direction: row-reverse
-  margin: 0
+  margin: 0.25rem 0 0 0
   padding: 0
 
   select
@@ -320,6 +323,12 @@
   &[data-unset]
     select
       color: $disabled-text-color
+
+@mixin shadow($style: dialog)
+  @if $style == dialog
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25)
+  @else if $style == overlay
+    box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
 
 // https://1linelayouts.glitch.me
 @mixin sidebar-layout

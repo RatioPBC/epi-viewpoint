@@ -2,12 +2,9 @@
   = form_for @changeset, Routes.user_reset_password_path(@conn, :update, @token), [data: [role: "reset-password-form"]], fn f ->
     #form-contents
       header
-        #branding
-          h4 Epi
-          h2 Viewpoint
-        = logo_icon(80, 80)
+        = login_icon()
 
-      h4#title Reset your password
+      h4#title Set your password
 
       = if @changeset.action do
         .form-error-message
@@ -25,7 +22,7 @@
         = password_input f, :password_confirmation, required: true
 
       fieldset
-        = submit "Reset password", id: "submit"
+        = submit "Continue", id: "submit"
 
       fieldset
         = link "Back to login", to: Routes.user_session_path(@conn, :new), id: "back-to-login"

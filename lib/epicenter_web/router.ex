@@ -17,12 +17,10 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-    get "/users/register", UserRegistrationController, :new
-    post "/users/register", UserRegistrationController, :create
     get "/users/login", UserSessionController, :new
     post "/users/login", UserSessionController, :create
-    get "/users/reset-password", UserResetPasswordController, :new
-    post "/users/reset-password", UserResetPasswordController, :create
+    #    get "/users/reset-password", UserResetPasswordController, :new
+    #    post "/users/reset-password", UserResetPasswordController, :create
     get "/users/reset-password/:token", UserResetPasswordController, :edit
     put "/users/reset-password/:token", UserResetPasswordController, :update
   end
@@ -40,7 +38,6 @@ defmodule EpicenterWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     get "/", RootController, :show, as: :root
-    live "/admin", AdminLive, as: :admin
     live "/import", ImportLive, as: :import
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
@@ -60,9 +57,6 @@ defmodule EpicenterWeb.Router do
     get "/fakemail", FakeMailController, :show
     live "/styleguide", StyleguideLive, as: :styleguide
     delete "/users/log_out", UserSessionController, :delete
-    get "/users/confirm", UserConfirmationController, :new
-    post "/users/confirm", UserConfirmationController, :create
-    get "/users/confirm/:token", UserConfirmationController, :confirm
   end
 
   if Mix.env() in [:dev, :test] do

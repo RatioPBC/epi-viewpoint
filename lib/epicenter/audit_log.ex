@@ -1,39 +1,47 @@
 defmodule Epicenter.AuditLog do
+  defmodule Meta do
+    defstruct ~w{author_id reason_action reason_event}a
+  end
+
+  alias Epicenter.AuditLog.Meta
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Repo
 
-  def insert(changeset, author_id, action, event, ecto_options \\ []) do
-    create_revision(changeset, author_id, action, event, &Repo.insert/2, ecto_options)
+  def insert(changeset, %Meta{} = meta, ecto_options \\ []) do
+    create_revision(changeset, %Meta{} = meta, &Repo.insert/2, ecto_options)
   end
 
-  def insert!(changeset, author_id, action, event, ecto_options \\ []) do
-    create_revision(changeset, author_id, action, event, &Repo.insert!/2, ecto_options)
+  def insert!(changeset, %Meta{} = meta, ecto_options \\ []) do
+    create_revision(changeset, %Meta{} = meta, &Repo.insert!/2, ecto_options)
   end
 
-  def update(changeset, author_id, action, event, ecto_options \\ []) do
-    create_revision(changeset, author_id, action, event, &Repo.update/2, ecto_options)
+  def update(changeset, %Meta{} = meta, ecto_options \\ []) do
+    create_revision(changeset, %Meta{} = meta, &Repo.update/2, ecto_options)
   end
 
-  def update!(changeset, author_id, action, event, ecto_options \\ []) do
-    create_revision(changeset, author_id, action, event, &Repo.update!/2, ecto_options)
+  def update!(changeset, %Meta{} = meta, ecto_options \\ []) do
+    create_revision(changeset, %Meta{} = meta, &Repo.update!/2, ecto_options)
   end
 
   defp recursively_get_changes_from_changeset(%Ecto.Changeset{changes: changes}),
-       do: recursively_get_changes_from_changeset(changes)
+    do: recursively_get_changes_from_changeset(changes)
 
-  defp recursively_get_changes_from_changeset(%_struct{} = data), do: data
+  defp recursively_get_changes_from_changeset(%_struct{} = data),
+    do: data
 
   defp recursively_get_changes_from_changeset(data) when is_map(data),
-       do: data
-         |> Enum.map(fn {k, v} -> {k, recursively_get_changes_from_changeset(v)} end)
-         |> Map.new()
+    do:
+      data
+      |> Enum.map(fn {k, v} -> {k, recursively_get_changes_from_changeset(v)} end)
+      |> Map.new()
 
   defp recursively_get_changes_from_changeset(data) when is_list(data),
-       do: data |> Enum.map(fn v -> recursively_get_changes_from_changeset(v) end)
+    do: data |> Enum.map(fn v -> recursively_get_changes_from_changeset(v) end)
 
-  defp recursively_get_changes_from_changeset(data), do: data
+  defp recursively_get_changes_from_changeset(data),
+    do: data
 
-  def create_revision(changeset, author_id, action, event, repo_fn, ecto_options \\ []) when is_function(repo_fn) do
+  def create_revision(changeset, %Meta{} = meta, repo_fn, ecto_options \\ []) when is_function(repo_fn) do
     %{data: data} = changeset
 
     result = repo_fn.(changeset, ecto_options)
@@ -47,20 +55,39 @@ defmodule Epicenter.AuditLog do
 
     if after_change != nil do
       attrs = %{
-        "after_change" => after_change,
-        "author_id" => author_id,
-        "before_change" => data,
-        "change" => recursively_get_changes_from_changeset(changeset),
+        "after_change" => after_change |> redact(),
+        "author_id" => meta.author_id,
+        "before_change" => data |> redact(),
+        "change" => recursively_get_changes_from_changeset(changeset) |> redact(),
         "changed_id" => after_change.id,
         "changed_type" => module_name(data),
-        "reason_action" => action,
-        "reason_event" => event
+        "reason_action" => meta.reason_action,
+        "reason_event" => meta.reason_event
       }
 
       {:ok, _revision} = %Revision{} |> Revision.changeset(attrs) |> Repo.insert()
     end
 
     result
+  end
+
+  @redacted_fields [:password, :mfa_secret]
+  defp redact(changes) do
+    Enum.reduce(
+      @redacted_fields,
+      changes,
+      fn key, acc ->
+        acc
+        |> Map.get_and_update(
+          key,
+          fn
+            nil -> :pop
+            val -> {val, "<<REDACTED>>"}
+          end
+        )
+        |> elem(1)
+      end
+    )
   end
 
   def get_revision(id), do: Revision |> Repo.get(id)

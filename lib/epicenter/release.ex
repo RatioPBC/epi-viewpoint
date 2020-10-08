@@ -1,5 +1,6 @@
 defmodule Epicenter.Release do
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
@@ -36,7 +37,11 @@ defmodule Epicenter.Release do
       password = "password123"
 
       IO.puts("Creating #{name} / #{email} / #{password}")
-      Epicenter.Accounts.register_user!(%{email: email, password: password, tid: tid, name: name})
+
+      Epicenter.Accounts.register_user!(
+        {%{email: email, password: password, tid: tid, name: name},
+         %Epicenter.AuditLog.Meta{author_id: "00000000-0000-0000-0000-000000000000", reason_action: "seed-user", reason_event: "seeds.exs"}}
+      )
     end
   end
 
@@ -49,13 +54,21 @@ defmodule Epicenter.Release do
   # User management
   #
 
-  def create_user(name, email, opts \\ []) do
+  def create_user(%Epicenter.Accounts.User{} = author, name, email, opts \\ []) do
     ensure_started()
 
     puts = Keyword.get(opts, :puts, &IO.puts/1)
     puts.("Creating user #{name} / #{email}; they must set their password via this URL:")
 
-    case Accounts.register_user(%{email: email, password: Euclid.Extra.Random.string(), name: name}) do
+    attrs = %{email: email, password: Euclid.Extra.Random.string(), name: name}
+
+    audit_meta = %AuditLog.Meta{
+      author_id: author.id,
+      reason_action: AuditLog.Revision.create_user_action(),
+      reason_event: AuditLog.Revision.releases_event()
+    }
+
+    case Accounts.register_user({attrs, audit_meta}) do
       {:ok, user} ->
         {:ok, generated_password_reset_url(user)}
 
@@ -67,6 +80,51 @@ defmodule Epicenter.Release do
 
   def reset_password(email) do
     {:ok, Accounts.get_user_by_email(email) |> generated_password_reset_url()}
+  end
+
+  @doc """
+  An administrator can use `disable_users` to disable users from being able to accomplish actions,
+  to do so, find your administrator's user:
+
+  administrator = Epicenter.Repo.get_by(Epicenter.Accounts.User, email: "admin@example.com")
+
+  Then call this function by providing a list of email addresses of users to disable:
+
+  Epicenter.Release.disable_users(administrator, ["some-other-user@example.com"])
+
+  Progress will be logged to stdout.
+  """
+
+  @spec disable_users(%Epicenter.Accounts.User{}, list(String.t())) :: :ok
+  def disable_users(author, emails, opts \\ []) do
+    ensure_started()
+
+    puts = Keyword.get(opts, :puts, &IO.puts/1)
+
+    audit_meta = %AuditLog.Meta{
+      author_id: author.id,
+      reason_action: AuditLog.Revision.disable_user_action(),
+      reason_event: AuditLog.Revision.releases_event()
+    }
+
+    for email <- emails do
+      with {:ok, user} <- get_user_by_email(email),
+           {:ok, user} <- Epicenter.Accounts.disable_user(user, audit_meta) do
+        puts.("Disabled user #{user.email}")
+      else
+        {:error, error} -> puts.("Error disabling #{email}: }#{error}")
+      end
+    end
+
+    :ok
+  end
+
+  @spec get_user_by_email(String.t()) :: {:ok, %Epicenter.Accounts.User{}} | {:error, String.t()}
+  defp get_user_by_email(email) do
+    case Epicenter.Repo.get_by(Epicenter.Accounts.User, email: email) do
+      nil -> {:error, "NOT FOUND: user with email #{email}"}
+      user -> {:ok, user}
+    end
   end
 
   defp generated_password_reset_url(user) do

@@ -1,9 +1,0 @@
-section#admin-page data-role="admin-page"
-  h2 Admin
-  table
-    tr
-      th People
-      td data-role="person-count" = @person_count
-    tr
-      th Lab results
-      td data-role="lab-result-count"= @lab_result_count

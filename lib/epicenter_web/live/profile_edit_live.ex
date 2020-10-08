@@ -1,29 +1,26 @@
 defmodule EpicenterWeb.ProfileEditLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2, trash_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1]
+  import EpicenterWeb.IconView, only: [plus_icon: 0, arrow_down_icon: 0, arrow_right_icon: 2, trash_icon: 0]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
-  alias Epicenter.AuditLog.Revision
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.DateParser
   alias Epicenter.Extra
+  alias Epicenter.Format
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
-
     person = %{Cases.get_person(id) | originator: socket.assigns.current_user} |> Cases.preload_emails() |> Cases.preload_phones()
     changeset = person |> Cases.change_person(%{})
 
-    {
-      :ok,
-      assign(
-        socket,
-        changeset: update_dob_field_for_display(changeset),
-        person: person,
-        preferred_language_is_other: false
-      )
-    }
+    socket
+    |> assign_page_title("#{Format.format(person)} (edit)")
+    |> assign(changeset: update_dob_field_for_display(changeset))
+    |> assign(person: person)
+    |> assign(preferred_language_is_other: false)
+    |> ok()
   end
 
   def handle_event("add-email", _value, socket) do
@@ -31,7 +28,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
-    {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
+    socket |> assign(changeset: changeset |> Extra.Changeset.clear_validation_errors()) |> noreply()
   end
 
   def handle_event("add-phone", _value, socket) do
@@ -39,7 +36,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     phones = existing_phones |> Enum.concat([Cases.change_phone(%Cases.Phone{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
-    {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
+    socket |> assign(changeset: changeset |> Extra.Changeset.clear_validation_errors()) |> noreply()
   end
 
   def handle_event("form-change", %{"person" => %{"preferred_language" => "Other"} = person_params}, socket) do
@@ -57,8 +54,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     emails = existing_emails |> List.delete_at(email_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
-
-    changeset |> Ecto.Changeset.fetch_field(:emails)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
@@ -69,8 +64,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     phones = existing_phones |> List.delete_at(phone_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
-
-    changeset |> Ecto.Changeset.fetch_field(:phones)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
@@ -85,10 +78,10 @@ defmodule EpicenterWeb.ProfileEditLive do
     socket.assigns.person
     |> Cases.update_person(
       {person_params,
-       %{
+       %AuditLog.Meta{
          author_id: socket.assigns.current_user.id,
-         reason_action: Revision.update_profile_action(),
-         reason_event: Revision.edit_profile_saved_event()
+         reason_action: AuditLog.Revision.update_profile_action(),
+         reason_event: AuditLog.Revision.edit_profile_saved_event()
        }}
     )
     |> case do
@@ -116,7 +109,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def phone_types(),
-    do: ~w{Cell Home Work}
+    do: [{"Cell", "cell"}, {"Home", "home"}, {"Work", "work"}]
 
   def preferred_languages(current \\ nil) do
     has_current = Euclid.Exists.present?(current)

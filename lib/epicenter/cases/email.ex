@@ -7,6 +7,11 @@ defmodule Epicenter.Cases.Email do
   alias Epicenter.Cases.Email
   alias Epicenter.Extra
 
+  @required_attrs ~w{address}a
+  @optional_attrs ~w{delete is_preferred person_id tid}a
+
+  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "emails" do
@@ -19,9 +24,6 @@ defmodule Epicenter.Cases.Email do
 
     timestamps()
   end
-
-  @required_attrs ~w{address}a
-  @optional_attrs ~w{delete is_preferred person_id tid}a
 
   def changeset(email, attrs) do
     email

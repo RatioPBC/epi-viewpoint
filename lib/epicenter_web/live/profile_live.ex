@@ -2,21 +2,25 @@ defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
-  alias Epicenter.AuditLog.Revision
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
+  alias Epicenter.Format
 
   def mount(%{"id" => person_id}, session, socket) do
     if connected?(socket),
       do: Cases.subscribe_to_people()
 
+    person = Cases.get_person(person_id)
+
     socket
     |> assign_defaults(session)
-    |> assign_person(Cases.get_person(person_id))
+    |> assign_page_title(Format.format(person))
+    |> assign_person(person)
     |> assign_users()
     |> ok()
   end
@@ -39,10 +43,10 @@ defmodule EpicenterWeb.ProfileLive do
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids: [socket.assigns.person.id],
-        audit_meta: %{
+        audit_meta: %AuditLog.Meta{
           author_id: socket.assigns.current_user.id,
-          reason_action: Revision.update_assignment_action(),
-          reason_event: Revision.profile_selected_assignee_event()
+          reason_action: AuditLog.Revision.update_assignment_action(),
+          reason_event: AuditLog.Revision.profile_selected_assignee_event()
         }
       )
 
@@ -68,9 +72,6 @@ defmodule EpicenterWeb.ProfileLive do
   def is_unassigned?(person) do
     person.assigned_to == nil
   end
-
-  def full_name(person),
-    do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
   def email_addresses(person) do
     person

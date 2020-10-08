@@ -3,6 +3,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupController do
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.MultifactorAuth
+  alias Epicenter.AuditLog
   alias EpicenterWeb.Session
 
   @common_assigns [page_title: "Multi-factor authentication"]
@@ -16,7 +17,18 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupController do
 
     case MultifactorAuth.check(secret, passcode) do
       :ok ->
-        conn.assigns.current_user |> Accounts.update_user_mfa!(MultifactorAuth.encode_secret(secret))
+        user = conn.assigns.current_user
+
+        user
+        |> Accounts.update_user_mfa!(
+          {MultifactorAuth.encode_secret(secret),
+           %AuditLog.Meta{
+             author_id: user.id,
+             reason_action: AuditLog.Revision.update_user_mfa_action(),
+             reason_event: AuditLog.Revision.update_user_mfa_event()
+           }}
+        )
+
         conn |> Session.put_multifactor_auth_success(true) |> redirect(to: Routes.root_path(conn, :show))
 
       {:error, message} ->

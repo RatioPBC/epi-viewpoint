@@ -33,16 +33,6 @@ defmodule EpicenterWeb.UserSessionControllerTest do
       assert redirected_to(conn) =~ "/"
     end
 
-    test "logs the user in with remember me", %{conn: conn, user: user} do
-      conn =
-        post(conn, Routes.user_session_path(conn, :create), %{
-          "user" => %{"email" => user.email, "password" => valid_user_password(), "remember_me" => "true"}
-        })
-
-      assert conn.resp_cookies["user_remember_me"]
-      assert redirected_to(conn) =~ "/"
-    end
-
     test "emits error message with invalid credentials", %{conn: conn, user: user} do
       conn =
         post(conn, Routes.user_session_path(conn, :create), %{

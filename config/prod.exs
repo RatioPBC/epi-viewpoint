@@ -16,7 +16,9 @@ config :epicenter, EpicenterWeb.Endpoint,
    server: true,
    url: [host: {:system, "CANONICAL_HOST"}, port: {:system, "PORT"}]
 
-config :epicenter, mfa_issuer: "Viewpoint-staging"
+config :epicenter,
+  mfa_issuer: "Viewpoint-staging",
+  user_input_restrictions: :unrestricted
 
 # Do not print debug messages in production
 config :logger, level: :info

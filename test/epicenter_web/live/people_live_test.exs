@@ -1,5 +1,5 @@
 defmodule EpicenterWeb.PeopleLiveTest do
-  use EpicenterWeb.ConnCase
+  use EpicenterWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
 
@@ -17,14 +17,14 @@ defmodule EpicenterWeb.PeopleLiveTest do
       do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
     defp create_people_and_lab_results(user) do
-      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
+      assignee = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "assignee") |> Accounts.register_user!()
 
       alice = Test.Fixtures.person_attrs(user, "alice", external_id: nil) |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, "alice-result-2", Extra.Date.days_ago(2), result: "negative") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "alice-result-2", Extra.Date.days_ago(2), result: "negative") |> Cases.create_lab_result!()
 
       billy = Test.Fixtures.person_attrs(user, "billy", external_id: "billy-id") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(billy, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(billy, user, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
       [users: [user, assignee], people: [alice, billy] |> Cases.preload_assigned_to() |> Cases.preload_lab_results()]
     end
 
@@ -216,8 +216,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
       assert PeopleLive.latest_result(person) == ""
     end
 
-    test "when there is a result and a sample date", %{person: person} do
-      Test.Fixtures.lab_result_attrs(person, "lab-result", ~D[2020-01-01], result: "positive") |> Cases.create_lab_result!()
+    test "when there is a result and a sample date", %{person: person, user: user} do
+      Test.Fixtures.lab_result_attrs(person, user, "lab-result", ~D[2020-01-01], result: "positive") |> Cases.create_lab_result!()
       assert PeopleLive.latest_result(person) =~ ~r|positive, \d+ days ago|
     end
   end

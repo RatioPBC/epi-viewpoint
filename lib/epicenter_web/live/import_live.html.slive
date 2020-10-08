@@ -1,7 +1,7 @@
 section#import-page
-  h2 Upload a CSV File
+  h2 Import Labs
 
-  p Choose a file, click “Upload”, and then wait for the file to upload.
+  p Choose a CSV file from your computer, click “Upload”, and then wait for the file to upload.
 
   = form_tag("/import/upload", multipart: true, method: :post)
     input type="file" name="file"

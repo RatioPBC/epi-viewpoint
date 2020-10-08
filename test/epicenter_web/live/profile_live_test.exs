@@ -41,13 +41,13 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "when the person has identifying information" do
-    setup %{person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
-      Test.Fixtures.email_attrs(person, "alice-preferred", is_preferred: true) |> Cases.create_email!()
-      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
-      Test.Fixtures.phone_attrs(person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
-      Test.Fixtures.address_attrs(person, "alice-address", 1000, type: "home") |> Cases.create_address!()
-      Test.Fixtures.address_attrs(person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
+    setup %{person: person, user: user} do
+      Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, person, "alice-preferred", is_preferred: true) |> Cases.create_email!()
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
+      Test.Fixtures.address_attrs(user, person, "alice-address", 1000, type: "home") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(user, person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
       :ok
     end
 
@@ -81,8 +81,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "lab results table" do
-    defp build_lab_result(person, tid, sampled_on, analyzed_on, reported_on) do
-      Test.Fixtures.lab_result_attrs(person, tid, sampled_on, %{
+    defp build_lab_result(person, user, tid, sampled_on, analyzed_on, reported_on) do
+      Test.Fixtures.lab_result_attrs(person, user, tid, sampled_on, %{
         result: "positive",
         request_facility_name: "Big Big Hospital",
         analyzed_on: analyzed_on,
@@ -92,9 +92,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Cases.create_lab_result!()
     end
 
-    test "shows lab results", %{conn: conn, person: person} do
-      build_lab_result(person, "lab1", ~D[2020-04-10], ~D[2020-04-11], ~D[2020-04-12])
-      build_lab_result(person, "lab2", ~D[2020-04-12], ~D[2020-04-13], ~D[2020-04-14])
+    test "shows lab results", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab1", ~D[2020-04-10], ~D[2020-04-11], ~D[2020-04-12])
+      build_lab_result(person, user, "lab2", ~D[2020-04-12], ~D[2020-04-13], ~D[2020-04-14])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_lab_results([
@@ -104,11 +104,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
       ])
     end
 
-    test "orders by sampled_on (desc) and then reported_on (desc)", %{conn: conn, person: person} do
-      build_lab_result(person, "lab4", ~D[2020-04-13], ~D[2020-04-20], ~D[2020-04-26])
-      build_lab_result(person, "lab1", ~D[2020-04-15], ~D[2020-04-20], ~D[2020-04-25])
-      build_lab_result(person, "lab3", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-23])
-      build_lab_result(person, "lab2", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-24])
+    test "orders by sampled_on (desc) and then reported_on (desc)", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab4", ~D[2020-04-13], ~D[2020-04-20], ~D[2020-04-26])
+      build_lab_result(person, user, "lab1", ~D[2020-04-15], ~D[2020-04-20], ~D[2020-04-25])
+      build_lab_result(person, user, "lab3", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-23])
+      build_lab_result(person, user, "lab2", ~D[2020-04-14], ~D[2020-04-20], ~D[2020-04-24])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_lab_results(
@@ -128,10 +128,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
     defp table_contents(live, opts),
       do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 
-    setup %{person: person} do
-      Test.Fixtures.address_attrs(person, "address1", 1000) |> Cases.create_address!()
-      Test.Fixtures.lab_result_attrs(person, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
-      assignee = Test.Fixtures.user_attrs("assignee") |> Accounts.register_user!()
+    setup %{person: person, user: user} do
+      Test.Fixtures.address_attrs(user, person, "address1", 1000) |> Cases.create_address!()
+      Test.Fixtures.lab_result_attrs(person, user, "lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
+      assignee = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "assignee") |> Accounts.register_user!()
       [person: person, assignee: assignee]
     end
 
@@ -217,12 +217,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert updated_socket.assigns.person.tid == "alice"
     end
 
-    test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice} do
+    test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice, user: user} do
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
       assert_role_text(show_page_live, "address", "1000 Test St, City, TS 00000 home")
 
-      Test.Fixtures.address_attrs(alice, "address2", 2000) |> Cases.create_address!()
+      Test.Fixtures.address_attrs(user, alice, "address2", 2000) |> Cases.create_address!()
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}]}, socket)
       assert updated_socket.assigns.person.tid == "updated-alice"
       assert updated_socket.assigns.person.addresses |> tids() == ["address1", "address2"]

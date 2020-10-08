@@ -2,9 +2,12 @@ defmodule EpicenterWeb.UserAuthTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Accounts
+  alias Epicenter.Accounts.UserToken
   alias Epicenter.AccountsFixtures
+  alias Epicenter.Repo
   alias EpicenterWeb.UserAuth
   alias EpicenterWeb.Router.Helpers, as: Routes
+  alias Plug.Conn
 
   setup %{conn: conn} do
     conn =
@@ -35,31 +38,19 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> put_session(:user_return_to, "/hello") |> UserAuth.log_in_user(user)
       assert redirected_to(conn) == "/hello"
     end
-
-    test "writes a cookie if remember_me is configured", %{conn: conn, user: user} do
-      conn = conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
-      assert get_session(conn, :user_token) == conn.cookies["user_remember_me"]
-
-      assert %{value: signed_token, max_age: max_age} = conn.resp_cookies["user_remember_me"]
-      assert signed_token != get_session(conn, :user_token)
-      assert max_age == 5_184_000
-    end
   end
 
   describe "logout_user/1" do
     test "erases session and cookies", %{conn: conn, user: user} do
-      user_token = Accounts.generate_user_session_token(user)
+      user_token = Accounts.generate_user_session_token({user, %{}})
 
       conn =
         conn
         |> put_session(:user_token, user_token)
-        |> put_req_cookie("user_remember_me", user_token)
         |> fetch_cookies()
         |> UserAuth.log_out_user()
 
       refute get_session(conn, :user_token)
-      refute conn.cookies["user_remember_me"]
-      assert %{max_age: 0} = conn.resp_cookies["user_remember_me"]
       assert redirected_to(conn) == "/"
       refute Accounts.get_user_by_session_token(user_token)
     end
@@ -81,35 +72,19 @@ defmodule EpicenterWeb.UserAuthTest do
     test "works even if user is already logged out", %{conn: conn} do
       conn = conn |> fetch_cookies() |> UserAuth.log_out_user()
       refute get_session(conn, :user_token)
-      assert %{max_age: 0} = conn.resp_cookies["user_remember_me"]
       assert redirected_to(conn) == "/"
     end
   end
 
   describe "fetch_current_user/2" do
     test "authenticates user from session", %{conn: conn, user: user} do
-      user_token = Accounts.generate_user_session_token(user)
+      user_token = Accounts.generate_user_session_token({user, %{}})
       conn = conn |> put_session(:user_token, user_token) |> UserAuth.fetch_current_user([])
       assert conn.assigns.current_user.id == user.id
     end
 
-    test "authenticates user from cookies", %{conn: conn, user: user} do
-      logged_in_conn = conn |> fetch_cookies() |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
-
-      user_token = logged_in_conn.cookies["user_remember_me"]
-      %{value: signed_token} = logged_in_conn.resp_cookies["user_remember_me"]
-
-      conn =
-        conn
-        |> put_req_cookie("user_remember_me", signed_token)
-        |> UserAuth.fetch_current_user([])
-
-      assert get_session(conn, :user_token) == user_token
-      assert conn.assigns.current_user.id == user.id
-    end
-
     test "does not authenticate if data is missing", %{conn: conn, user: user} do
-      _ = Accounts.generate_user_session_token(user)
+      _ = Accounts.generate_user_session_token({user, %{}})
       conn = UserAuth.fetch_current_user(conn, [])
       refute get_session(conn, :user_token)
       refute conn.assigns.current_user
@@ -129,8 +104,11 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "redirects if user is authenticated", %{conn: conn, user: user} do
+      expires_at = NaiveDateTime.utc_now() |> NaiveDateTime.add(100, :second) |> NaiveDateTime.truncate(:second)
+
       conn =
         conn
+        |> setup_user_token(user, expires_at)
         |> assign(:current_user, user)
         |> EpicenterWeb.Session.put_multifactor_auth_success(true)
         |> UserAuth.redirect_if_user_is_authenticated([])
@@ -159,7 +137,7 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
-      assert get_flash(conn, :error) == "Your email address must be confirmed before you can log in"
+      assert get_flash(conn, :error) == "The account you logged into has not yet been activated"
     end
 
     test "redirects if the user is authenticated and confirmed but does not have mfa set up", %{conn: conn} do
@@ -167,6 +145,31 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_multifactor_auth_setup_path(conn, :new)
+    end
+
+    test "redirects if user is authenticated but disabled", %{conn: conn, user: user} do
+      {:ok, user} = Accounts.disable_user(user, Epicenter.Test.Fixtures.admin_audit_meta())
+      conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
+      assert conn.halted
+      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert get_flash(conn, :error) == "Your account has been disabled by an administrator"
+    end
+
+    test "redirects if user is authenticated but the token expired", %{conn: conn, user: user} do
+      expires_at = NaiveDateTime.utc_now() |> NaiveDateTime.add(-1, :second) |> NaiveDateTime.truncate(:second)
+
+      conn =
+        conn
+        |> setup_user_token(user, expires_at)
+        |> fetch_flash()
+        |> assign(:current_user, user)
+        |> EpicenterWeb.Session.put_multifactor_auth_success(true)
+
+      conn = conn |> UserAuth.require_authenticated_user([])
+
+      assert conn.halted
+      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert get_flash(conn, :error) == "Your session has expired. Please log in again."
     end
 
     test "stores the path to redirect to on GET", %{conn: conn} do
@@ -208,8 +211,11 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "does not redirect if user is authenticated", %{conn: conn, user: user} do
+      expires_at = NaiveDateTime.utc_now() |> NaiveDateTime.add(100, :second) |> NaiveDateTime.truncate(:second)
+
       conn =
         conn
+        |> setup_user_token(user, expires_at)
         |> fetch_flash()
         |> assign(:current_user, user)
         |> EpicenterWeb.Session.put_multifactor_auth_success(true)
@@ -218,5 +224,11 @@ defmodule EpicenterWeb.UserAuthTest do
       refute conn.halted
       refute conn.status
     end
+  end
+
+  defp setup_user_token(conn, user, expires_at) do
+    token_string = Accounts.generate_user_session_token({user, Epicenter.Test.Fixtures.audit_meta(user)})
+    user_token = UserToken.fetch_user_token_query(token_string) |> Repo.one() |> UserToken.changeset(%{expires_at: expires_at}) |> Repo.update!()
+    conn |> Conn.merge_private(plug_session: %{"user_token" => user_token.token})
   end
 end

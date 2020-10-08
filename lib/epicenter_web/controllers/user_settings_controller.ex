@@ -2,13 +2,16 @@ defmodule EpicenterWeb.UserSettingsController do
   use EpicenterWeb, :controller
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog
   alias EpicenterWeb.Session
   alias EpicenterWeb.UserAuth
 
   plug :assign_email_and_password_changesets
 
+  @common_assigns [page_title: "Settings"]
+
   def edit(conn, _params) do
-    render(conn, "edit.html")
+    render_with_common_assigns(conn, "edit.html")
   end
 
   def update_email(conn, %{"current_password" => password, "user" => user_params}) do
@@ -20,7 +23,12 @@ defmodule EpicenterWeb.UserSettingsController do
           Accounts.deliver_update_email_instructions(
             applied_user,
             user.email,
-            &Routes.user_settings_url(conn, :confirm_email, &1)
+            &Routes.user_settings_url(conn, :confirm_email, &1),
+            %AuditLog.Meta{
+              author_id: user.id,
+              reason_action: AuditLog.Revision.update_user_email_request_action(),
+              reason_event: AuditLog.Revision.update_user_email_request_event()
+            }
           )
 
         conn
@@ -30,12 +38,22 @@ defmodule EpicenterWeb.UserSettingsController do
         |> redirect(to: Routes.user_settings_path(conn, :edit))
 
       {:error, changeset} ->
-        render(conn, "edit.html", email_changeset: changeset)
+        render_with_common_assigns(conn, "edit.html", email_changeset: changeset)
     end
   end
 
   def confirm_email(conn, %{"token" => token}) do
-    case Accounts.update_user_email(conn.assigns.current_user, token) do
+    user = conn.assigns.current_user
+
+    case Accounts.update_user_email(
+           user,
+           {token,
+            %AuditLog.Meta{
+              author_id: user.id,
+              reason_action: AuditLog.Revision.update_user_email_action(),
+              reason_event: AuditLog.Revision.update_user_email_event()
+            }}
+         ) do
       :ok ->
         conn
         |> put_flash(:info, "Email changed successfully")
@@ -51,7 +69,16 @@ defmodule EpicenterWeb.UserSettingsController do
   def update_password(conn, %{"current_password" => password, "user" => user_params}) do
     user = conn.assigns.current_user
 
-    case Accounts.update_user_password(user, password, user_params) do
+    case Accounts.update_user_password(
+           user,
+           password,
+           {user_params,
+            %AuditLog.Meta{
+              author_id: user.id,
+              reason_action: AuditLog.Revision.update_user_password_action(),
+              reason_event: AuditLog.Revision.update_user_password_event()
+            }}
+         ) do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Password updated successfully")
@@ -59,7 +86,7 @@ defmodule EpicenterWeb.UserSettingsController do
         |> UserAuth.log_in_user(user)
 
       {:error, changeset} ->
-        render(conn, "edit.html", password_changeset: changeset)
+        render_with_common_assigns(conn, "edit.html", password_changeset: changeset)
     end
   end
 
@@ -70,4 +97,7 @@ defmodule EpicenterWeb.UserSettingsController do
     |> assign(:email_changeset, Accounts.change_user_email(user))
     |> assign(:password_changeset, Accounts.change_user_password(user))
   end
+
+  defp render_with_common_assigns(conn, template, assigns \\ []),
+    do: render(conn, template, Keyword.merge(@common_assigns, assigns))
 end

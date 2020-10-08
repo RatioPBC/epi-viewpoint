@@ -6,7 +6,7 @@ html lang="en"
     meta name="viewport" content="width=device-width, initial-scale=1.0"
 
     = csrf_meta_tag()
-    = live_title_tag assigns[:page_title] || "", suffix: " · Epicenter"
+    = live_title_tag assigns[:page_title] || "", suffix: " · Viewpoint"
 
     link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"
     link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"
@@ -21,7 +21,8 @@ html lang="en"
         #nav-inner
           #nav-items
             #nav-left
-              = link "Epicenter", to: "/"
+              = link to: "/", id: "logo" do
+                = logo_icon()
             #nav-right
               #user-menu
                 #user-menu-title
@@ -30,7 +31,6 @@ html lang="en"
                   = arrow_down_icon()
 
                 ul#user-menu-list role="menu"
-                  li = live_redirect "Admin", to: "/admin"
                   li = link "Settings", to: Routes.user_settings_path(@conn, :edit)
                   li = link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete
       main role="main"

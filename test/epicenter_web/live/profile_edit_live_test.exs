@@ -106,8 +106,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     @tag :skip
-    test "adding preferred email address", %{conn: conn, person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+    test "adding preferred email address", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
@@ -121,8 +121,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.Profile.assert_email_addresses(["alice-a@example.com", "alice-preferred@example.com"])
     end
 
-    test "updating existing email address", %{conn: conn, person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+    test "updating existing email address", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
@@ -130,8 +130,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.Profile.assert_email_addresses(["alice-b@example.com"])
     end
 
-    test "deleting existing email address", %{conn: conn, person: person} do
-      Test.Fixtures.email_attrs(person, "alice-a") |> Cases.create_email!()
+    test "deleting existing email address", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
@@ -182,16 +182,16 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Cell", "Home", "Work"])
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "Cell"}}})
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
       |> Pages.Profile.assert_phone_numbers(["111-111-1000"])
 
       phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
       phones |> pluck(:number) |> assert_eq([1_111_111_000])
-      phones |> pluck(:type) |> assert_eq(["Cell"])
+      phones |> pluck(:type) |> assert_eq(["cell"])
     end
 
-    test "updating existing phone numbers", %{conn: conn, person: person} do
-      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+    test "updating existing phone numbers", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
@@ -199,8 +199,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
     end
 
-    test "deleting existing phone numbers", %{conn: conn, person: person} do
-      Test.Fixtures.phone_attrs(person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+    test "deleting existing phone numbers", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})

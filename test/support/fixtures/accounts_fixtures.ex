@@ -20,7 +20,7 @@ defmodule Epicenter.AccountsFixtures do
   end
 
   def unconfirmed_user_fixture(attrs \\ %{tid: "unconfirmed"}) do
-    attrs |> Test.Fixtures.user_attrs() |> Accounts.register_user!()
+    Test.Fixtures.user_attrs(Test.Fixtures.admin(), attrs) |> Accounts.register_user!()
   end
 
   defp confirm_user(user) do
@@ -34,6 +34,6 @@ defmodule Epicenter.AccountsFixtures do
   end
 
   defp set_mfa(user) do
-    user |> Accounts.update_user_mfa!(Epicenter.Test.TOTPStub.encoded_secret())
+    user |> Accounts.update_user_mfa!({Epicenter.Test.TOTPStub.encoded_secret(), Epicenter.Test.Fixtures.audit_meta(user)})
   end
 end

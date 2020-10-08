@@ -1,10 +1,10 @@
 defmodule EpicenterWeb.PeopleLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
-  alias Epicenter.AuditLog.Revision
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
@@ -15,6 +15,7 @@ defmodule EpicenterWeb.PeopleLive do
 
     socket
     |> assign_defaults(session)
+    |> assign_page_title("People")
     |> set_reload_message(nil)
     |> set_filter(:with_lab_results)
     |> load_people()
@@ -49,10 +50,10 @@ defmodule EpicenterWeb.PeopleLive do
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids: Map.keys(socket.assigns.selected_people),
-        audit_meta: %{
+        audit_meta: %AuditLog.Meta{
           author_id: socket.assigns.current_user.id,
-          reason_action: Revision.update_assignment_bulk_action(),
-          reason_event: Revision.people_selected_assignee_event()
+          reason_action: AuditLog.Revision.update_assignment_bulk_action(),
+          reason_event: AuditLog.Revision.people_selected_assignee_event()
         }
       )
 

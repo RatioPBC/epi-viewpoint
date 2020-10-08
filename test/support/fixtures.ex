@@ -1,26 +1,34 @@
 defmodule Epicenter.Test.Fixtures do
+  alias Epicenter.AuditLog
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
 
   def audit_meta(author) do
-    %{
+    %AuditLog.Meta{
       author_id: author.id,
       reason_action: "test-run",
       reason_event: "test"
     }
   end
 
-  def lab_result_attrs(%Person{id: person_id}, tid, sampled_on, attrs \\ %{}) do
-    %{
-      person_id: person_id,
-      request_accession_number: "accession-" <> tid,
-      request_facility_code: "facility-" <> tid,
-      request_facility_name: tid <> " Lab, Inc.",
-      result: "positive",
-      sampled_on: sampled_on |> DateParser.parse_mm_dd_yyyy!(),
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  @admin_id Ecto.UUID.generate()
+  def admin(), do: %Epicenter.Accounts.User{id: @admin_id, tid: "admin"}
+  def admin_audit_meta(), do: audit_meta(admin())
+
+  def lab_result_attrs(%Person{id: person_id}, author, tid, sampled_on, attrs \\ %{}) do
+    attrs =
+      %{
+        person_id: person_id,
+        request_accession_number: "accession-" <> tid,
+        request_facility_code: "facility-" <> tid,
+        request_facility_name: tid <> " Lab, Inc.",
+        result: "positive",
+        sampled_on: sampled_on |> DateParser.parse_mm_dd_yyyy!(),
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
   # annotated with audit_meta
@@ -75,54 +83,69 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(person_attrs)
   end
 
-  def address_attrs(%Person{id: person_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
-    %{
-      full_address: "#{street_number} Test St, City, TS 00000",
-      type: "home",
-      person_id: person_id,
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def address_attrs(originator, %Person{id: person_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
+    attrs =
+      %{
+        full_address: "#{street_number} Test St, City, TS 00000",
+        type: "home",
+        person_id: person_id,
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(originator)}
   end
 
-  def phone_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
-    %{
-      number: 1_111_111_000,
-      person_id: person_id,
-      type: "home",
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def phone_attrs(author, %Person{id: person_id}, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        number: 1_111_111_000,
+        person_id: person_id,
+        type: "home",
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
-  def email_attrs(%Person{id: person_id}, tid, attrs \\ %{}) do
-    %{
-      address: "#{tid}@example.com",
-      person_id: person_id,
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def email_attrs(author, %Person{id: person_id}, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        address: "#{tid}@example.com",
+        person_id: person_id,
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
-  def user_attrs(%{tid: tid} = attrs),
-    do: user_attrs(tid, Map.delete(attrs, :tid))
+  def user_attrs(author, %{tid: tid} = attrs),
+    do: user_attrs(author, tid, Map.delete(attrs, :tid))
 
-  def user_attrs(tid, attrs \\ %{}) do
-    %{
-      email: tid <> "@example.com",
-      name: tid,
-      password: "password123",
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def user_attrs(author, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        email: tid <> "@example.com",
+        name: tid,
+        password: "password123",
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
-  def imported_file_attrs(tid, attrs \\ %{}) do
-    %{
-      file_name: "test_results_september_14_2020",
-      tid: tid
-    }
-    |> merge_attrs(attrs)
+  def imported_file_attrs(author, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        file_name: "test_results_september_14_2020",
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
   end
 
   def revision_attrs(tid, attrs \\ %{}) do

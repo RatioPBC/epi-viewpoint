@@ -60,8 +60,9 @@
           .select-wrapper
             @include select
 
-        #add-phone
+        #add-phone, #add-email
           @include button-secondary
+          @include has-icon
 
         .email-address-wrapper:not(:first-of-type)
           @include vertical-flow
@@ -79,8 +80,21 @@
             label
               @include centered
 
-        #add-email
-          @include button-secondary
-
       #submit-form
         @include button-primary
+
+      #form-end
+        margin-bottom: 84px
+
+      #nav
+        @include level
+        border-top: 2px solid $divider-color
+        position: fixed
+        padding: 1rem 2rem 2rem 2rem
+        bottom: 0
+        left: 0
+        right: 0
+        background-color: white
+
+        #submit-form
+          @include button-primary

@@ -9,6 +9,8 @@ defmodule Epicenter.Cases.PersonTest do
   alias Epicenter.Cases.Person
   alias Epicenter.Test
 
+  @admin Test.Fixtures.admin()
+
   describe "schema" do
     test "fields" do
       assert_schema(
@@ -41,16 +43,16 @@ defmodule Epicenter.Cases.PersonTest do
 
   describe "associations" do
     test "can have zero lab_results" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       alice |> Cases.preload_lab_results() |> Map.get(:lab_results) |> assert_eq([])
     end
 
     test "has many lab_results" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, "result1", "06-01-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, "result2", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "result1", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "result2", "06-02-2020") |> Cases.create_lab_result!()
 
       alice
       |> Cases.preload_lab_results()
@@ -60,19 +62,19 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "has many phone numbers" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.phone_attrs(alice, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
-      Test.Fixtures.phone_attrs(alice, "phone-2", number: 1_111_111_001) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, alice, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, alice, "phone-2", number: 1_111_111_001) |> Cases.create_phone!()
 
       assert alice |> Cases.preload_phones() |> Map.get(:phones) |> tids() == ~w{phone-1 phone-2}
     end
 
     test "has many email addresses" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.email_attrs(alice, "email-1") |> Cases.create_email!()
-      Test.Fixtures.email_attrs(alice, "email-2") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, alice, "email-1") |> Cases.create_email!()
+      Test.Fixtures.email_attrs(user, alice, "email-2") |> Cases.create_email!()
 
       assert alice |> Cases.preload_emails() |> Map.get(:emails) |> tids() == ~w{email-1 email-2}
     end
@@ -80,14 +82,14 @@ defmodule Epicenter.Cases.PersonTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       default_attrs = Test.Fixtures.raw_person_attrs(user, "alice") |> Test.Fixtures.add_demographic_attrs()
       Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
     test "assignment_changeset can assign or unassign a user to a person" do
-      creator = Test.Fixtures.user_attrs("creator") |> Accounts.register_user!()
-      assigned_to = Test.Fixtures.user_attrs("assigned-to") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
+      assigned_to = Test.Fixtures.user_attrs(@admin, "assigned-to") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
 
       changeset = Person.assignment_changeset(alice, assigned_to)
@@ -147,7 +149,7 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "case-insensitive unique constraint on first_name + last_name + dob" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice_attrs = Test.Fixtures.person_attrs(user, "alice")
       assert {:ok, %Person{} = _} = alice_attrs |> Cases.create_person()
 
@@ -162,7 +164,7 @@ defmodule Epicenter.Cases.PersonTest do
 
   describe "latest_lab_result" do
     test "returns nil if no lab results" do
-      Test.Fixtures.user_attrs("user")
+      Test.Fixtures.user_attrs(@admin, "user")
       |> Accounts.register_user!()
       |> Test.Fixtures.person_attrs("alice")
       |> Cases.create_person!()
@@ -171,26 +173,26 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "returns the lab result with the most recent sample date" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, "newer", "06-02-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, "older", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
 
       assert Person.latest_lab_result(alice).tid == "newer"
     end
 
     test "when given a field, returns the value of that field for the latest lab result" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
 
       assert Person.latest_lab_result(alice, :result) == "positive"
       assert Person.latest_lab_result(alice, :sampled_on) == ~D[2020-06-02]
     end
 
     test "when given a field but there is no lab result, returns nil" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       assert Person.latest_lab_result(alice, :result) == nil
       assert Person.latest_lab_result(alice, :sampled_on) == nil
@@ -201,7 +203,7 @@ defmodule Epicenter.Cases.PersonTest do
 
   describe "all" do
     test "sorts by last name (then first name, then dob descending)" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       Test.Fixtures.person_attrs(user, "middle", dob: ~D{2000-06-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
       Test.Fixtures.person_attrs(user, "last", dob: ~D{2000-06-01}, first_name: "Billy", last_name: "Testuser") |> Cases.create_person!()
       Test.Fixtures.person_attrs(user, "first", dob: ~D{2000-07-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
@@ -212,22 +214,22 @@ defmodule Epicenter.Cases.PersonTest do
 
   describe "call_list" do
     test "sorts by recent positive lab results" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       Test.Fixtures.person_attrs(user, "no-results") |> Cases.create_person!()
 
       Test.Fixtures.person_attrs(user, "old-positive-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("old-positive-result", Extra.Date.days_ago(20), result: "positive")
+      |> Test.Fixtures.lab_result_attrs(user, "old-positive-result", Extra.Date.days_ago(20), result: "positive")
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "recent-negative-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("recent-negative-result", Extra.Date.days_ago(1), result: "negative")
+      |> Test.Fixtures.lab_result_attrs(user, "recent-negative-result", Extra.Date.days_ago(1), result: "negative")
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "recent-positive-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("recent-positive-result", Extra.Date.days_ago(1), result: "positive")
+      |> Test.Fixtures.lab_result_attrs(user, "recent-positive-result", Extra.Date.days_ago(1), result: "positive")
       |> Cases.create_lab_result!()
 
       Person.Query.call_list() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{recent-positive-result})
@@ -236,29 +238,29 @@ defmodule Epicenter.Cases.PersonTest do
 
   describe "with_lab_results" do
     test "sorts by lab result sample date ascending" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
 
       middle = Test.Fixtures.person_attrs(user, "middle", dob: ~D[2000-06-01], first_name: "Middle", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(middle, "middle-1", ~D[2020-06-03]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(middle, user, "middle-1", ~D[2020-06-03]) |> Cases.create_lab_result!()
 
       last = Test.Fixtures.person_attrs(user, "last", dob: ~D[2000-06-01], first_name: "Last", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(last, "last-1", ~D[2020-06-04]) |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(last, "last-1", ~D[2020-06-01]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-04]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-01]) |> Cases.create_lab_result!()
 
       first = Test.Fixtures.person_attrs(user, "first", dob: ~D[2000-06-01], first_name: "First", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(first, "first-1", ~D[2020-06-02]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(first, user, "first-1", ~D[2020-06-02]) |> Cases.create_lab_result!()
 
       Person.Query.with_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end
 
     test "includes people without lab results" do
       user =
-        Test.Fixtures.user_attrs("user")
+        Test.Fixtures.user_attrs(@admin, "user")
         |> Accounts.register_user!()
 
       Test.Fixtures.person_attrs(user, "with-lab-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs("lab-result", ~D[2020-06-02])
+      |> Test.Fixtures.lab_result_attrs(user, "lab-result", ~D[2020-06-02])
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "without-lab-result")

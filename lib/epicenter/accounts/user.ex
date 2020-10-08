@@ -7,7 +7,8 @@ defmodule Epicenter.Accounts.User do
   alias Epicenter.Cases.Person
 
   @derive {Inspect, except: [:password]}
-  @derive {Jason.Encoder, only: [:id]}
+  @audit_logged_fields [:id, :confirmed_at, :email, :name, :disabled, :tid]
+  @derive {Jason.Encoder, only: @audit_logged_fields}
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
@@ -17,6 +18,7 @@ defmodule Epicenter.Accounts.User do
     field :mfa_secret, :string
     field :name, :string
     field :password, :string, virtual: true
+    field :disabled, :boolean
     field :seq, :integer
     field :tid, :string
 
@@ -118,10 +120,15 @@ defmodule Epicenter.Accounts.User do
   end
 
   @doc """
+  Disables the user by setting `disabled` to `true`.
+  """
+  def disable_changeset(user), do: cast(user, %{disabled: true}, [:disabled])
+
+  @doc """
   Verifies the password.
 
-  If there is no user or the user doesn't have a password, we call
-  `Bcrypt.no_user_verify/0` to avoid timing attacks.
+  If there is no user, the user doesn't have a password, or the user is
+  disabled, we call `Bcrypt.no_user_verify/0` to avoid timing attacks.
   """
   def valid_password?(%Epicenter.Accounts.User{hashed_password: hashed_password}, password)
       when is_binary(hashed_password) and byte_size(password) > 0 do

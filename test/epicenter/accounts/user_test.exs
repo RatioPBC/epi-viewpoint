@@ -8,6 +8,8 @@ defmodule Epicenter.Accounts.UserTest do
   alias Epicenter.Cases
   alias Epicenter.Test
 
+  @admin Test.Fixtures.admin()
+
   describe "schema" do
     test "fields" do
       assert_schema(
@@ -16,6 +18,7 @@ defmodule Epicenter.Accounts.UserTest do
           {:confirmed_at, :naive_datetime},
           {:email, :string},
           {:hashed_password, :string},
+          {:disabled, :boolean},
           {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:mfa_secret, :string},
@@ -30,7 +33,7 @@ defmodule Epicenter.Accounts.UserTest do
 
   describe "associations" do
     test "has many assignments" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
       Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.audit_meta(user))
@@ -45,7 +48,7 @@ defmodule Epicenter.Accounts.UserTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      default_attrs = Test.Fixtures.user_attrs("alice")
+      {default_attrs, _} = Test.Fixtures.user_attrs(@admin, "alice")
       Accounts.change_user(%User{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
@@ -53,9 +56,9 @@ defmodule Epicenter.Accounts.UserTest do
     test "name is required", do: assert_invalid(new_changeset(name: nil))
 
     test "email must be unique" do
-      alice = Test.Fixtures.user_attrs("alice") |> Accounts.register_user!()
+      alice = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user!()
 
-      {:error, changeset} = Test.Fixtures.user_attrs("billy", email: alice.email) |> Accounts.register_user()
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "billy", email: alice.email) |> Accounts.register_user()
       assert errors_on(changeset).email == ["has already been taken"]
     end
   end

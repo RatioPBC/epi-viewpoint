@@ -3,15 +3,9 @@ defmodule EpicenterWeb.UserAuth do
   import Phoenix.Controller
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditLog
   alias EpicenterWeb.Session
   alias EpicenterWeb.Router.Helpers, as: Routes
-
-  # Make the remember me cookie valid for 60 days.
-  # If you want bump or reduce this value, also change
-  # the token expiry itself in UserToken.
-  @max_age 60 * 60 * 24 * 60
-  @remember_me_cookie "user_remember_me"
-  @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
 
   @doc """
   Logs the user in.
@@ -25,8 +19,13 @@ defmodule EpicenterWeb.UserAuth do
   disconnected on log out. The line can be safely removed
   if you are not using LiveView.
   """
-  def log_in_user(conn, user, params \\ %{}) do
-    token = Accounts.generate_user_session_token(user)
+  def log_in_user(conn, user, _params \\ %{}) do
+    token =
+      Accounts.generate_user_session_token(
+        {user,
+         %AuditLog.Meta{author_id: user.id, reason_action: AuditLog.Revision.login_user_action(), reason_event: AuditLog.Revision.login_user_event()}}
+      )
+
     user_return_to = get_session(conn, :user_return_to)
     mfa_path = user.mfa_secret == nil && Routes.user_multifactor_auth_setup_path(conn, :new)
 
@@ -34,16 +33,7 @@ defmodule EpicenterWeb.UserAuth do
     |> renew_session()
     |> put_session(:user_token, token)
     |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(token)}")
-    |> maybe_write_remember_me_cookie(token, params)
     |> redirect(to: mfa_path || user_return_to || signed_in_path(conn))
-  end
-
-  defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
-    put_resp_cookie(conn, @remember_me_cookie, token, @remember_me_options)
-  end
-
-  defp maybe_write_remember_me_cookie(conn, _token, _params) do
-    conn
   end
 
   # This function renews the session ID and erases the whole
@@ -74,7 +64,7 @@ defmodule EpicenterWeb.UserAuth do
   """
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
-    user_token && Accounts.delete_session_token(user_token)
+    user_token && Accounts.delete_session_token({user_token, %AuditLog.Meta{}})
 
     if live_socket_id = get_session(conn, :live_socket_id) do
       EpicenterWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
@@ -82,13 +72,11 @@ defmodule EpicenterWeb.UserAuth do
 
     conn
     |> renew_session()
-    |> delete_resp_cookie(@remember_me_cookie)
     |> redirect(to: "/")
   end
 
   @doc """
   Authenticates the user by looking into the session
-  and remember me token.
   """
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
@@ -97,17 +85,9 @@ defmodule EpicenterWeb.UserAuth do
   end
 
   defp ensure_user_token(conn) do
-    if user_token = get_session(conn, :user_token) do
-      {user_token, conn}
-    else
-      conn = fetch_cookies(conn, signed: [@remember_me_cookie])
-
-      if user_token = conn.cookies[@remember_me_cookie] do
-        {user_token, put_session(conn, :user_token, user_token)}
-      else
-        {nil, conn}
-      end
-    end
+    if user_token = get_session(conn, :user_token),
+      do: {user_token, conn},
+      else: {nil, conn}
   end
 
   @doc """
@@ -142,9 +122,11 @@ defmodule EpicenterWeb.UserAuth do
       case user_authentication_status(conn, opts) do
         :authenticated -> nil
         :not_logged_in -> {"You must log in to access this page", login_path}
-        :not_confirmed -> {"Your email address must be confirmed before you can log in", login_path}
+        :disabled -> {"Your account has been disabled by an administrator", login_path}
+        :not_confirmed -> {"The account you logged into has not yet been activated", login_path}
         :no_mfa -> {"You must have multi-factor authentication set up before you can continue", mfa_setup_path}
         :needs_second_factor -> :needs_second_factor
+        :expired -> {"Your session has expired. Please log in again.", login_path}
       end
 
     case error do
@@ -172,8 +154,10 @@ defmodule EpicenterWeb.UserAuth do
     cond do
       conn.assigns[:current_user] == nil -> :not_logged_in
       conn.assigns[:current_user].confirmed_at == nil -> :not_confirmed
+      conn.assigns[:current_user].disabled -> :disabled
       mfa_required? && conn.assigns[:current_user].mfa_secret == nil -> :no_mfa
       mfa_required? && !Session.multifactor_auth_success?(conn) -> :needs_second_factor
+      Accounts.session_token_status(conn.private.plug_session["user_token"]) == :expired -> :expired
       true -> :authenticated
     end
   end

@@ -4,11 +4,11 @@
     header#subnav
       = live_redirect "Records", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
       = arrow_right_icon(6, 9)
-      span data-role="name" = "#{@person.first_name} #{@person.last_name}"
+      span data-role="name" = Format.format(@person)
 
   section#heading
     div
-      h2 data-role="full-name"= full_name(@person)
+      h2 data-role="full-name"= Format.format(@person)
       #external-id data-role="external-id"= @person.external_id
 
     form id="assignment-form" phx-change="form-change"

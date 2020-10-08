@@ -22,7 +22,6 @@ defmodule EpicenterWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import Epicenter.Test.VersionAssertions
       import EpicenterWeb.ConnCase
       import EpicenterWeb.Test.LiveViewAssertions
       import Euclid.Test.Extra.Assertions
@@ -63,7 +62,7 @@ defmodule EpicenterWeb.ConnCase do
   It returns an updated `conn`.
   """
   def log_in_user(conn, user, opts \\ []) do
-    token = Epicenter.Accounts.generate_user_session_token(user)
+    token = Epicenter.Accounts.generate_user_session_token({user, Epicenter.Test.Fixtures.audit_meta(user)})
 
     conn
     |> Phoenix.ConnTest.init_test_session(%{})

@@ -1,6 +1,10 @@
 defmodule Epicenter.Accounts.UserToken do
   use Ecto.Schema
+
+  import Ecto.Changeset
   import Ecto.Query
+
+  alias Epicenter.Extra.DateTime, as: Extra
 
   @hash_algorithm :sha256
   @rand_size 32
@@ -17,10 +21,15 @@ defmodule Epicenter.Accounts.UserToken do
   schema "users_tokens" do
     field :token, :binary
     field :context, :string
+    field :expires_at, :utc_datetime
     field :sent_to, :string
     belongs_to :user, Epicenter.Accounts.User
 
-    timestamps(updated_at: false)
+    timestamps(type: :utc_datetime, updated_at: false)
+  end
+
+  def changeset(user_token, attrs) do
+    user_token |> cast(attrs, [:expires_at])
   end
 
   @doc """
@@ -29,8 +38,31 @@ defmodule Epicenter.Accounts.UserToken do
   tokens do not need to be hashed.
   """
   def build_session_token(user) do
+    db_now = DateTime.utc_now() |> DateTime.truncate(:second)
+    expires_at = db_now |> DateTime.add(default_token_lifetime())
     token = :crypto.strong_rand_bytes(@rand_size)
-    {token, %Epicenter.Accounts.UserToken{token: token, context: "session", user_id: user.id}}
+
+    {token,
+     %Epicenter.Accounts.UserToken{
+       token: token,
+       context: "session",
+       expires_at: expires_at,
+       user_id: user.id
+     }}
+  end
+
+  def default_token_lifetime(), do: 60 * 60
+  def max_token_lifetime(), do: 60 * 60 * 23
+
+  def token_validity_status(user_token) do
+    db_now = DateTime.utc_now()
+
+    cond do
+      is_nil(user_token.expires_at) -> :expired
+      Extra.is_before?(user_token.inserted_at, db_now |> DateTime.add(-max_token_lifetime())) -> :expired
+      Extra.is_before?(user_token.expires_at, db_now) -> :expired
+      true -> :valid
+    end
   end
 
   @doc """
@@ -137,5 +169,9 @@ defmodule Epicenter.Accounts.UserToken do
 
   def user_and_contexts_query(user, [_ | _] = contexts) do
     from t in Epicenter.Accounts.UserToken, where: t.user_id == ^user.id and t.context in ^contexts
+  end
+
+  def fetch_user_token_query(token) do
+    from t in Epicenter.Accounts.UserToken, where: t.token == ^token
   end
 end

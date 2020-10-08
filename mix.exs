@@ -46,7 +46,6 @@ defmodule Epicenter.MixProject do
       {:mox, "~> 1.0"},
       {:nimble_csv, "~> 0.7"},
       {:nimble_totp, "~> 0.1.0"},
-      {:paper_trail, "~> 0.8"},
       {:phoenix, "~> 1.5.4"},
       {:phoenix_ecto, "~> 4.1"},
       {:phoenix_html, "~> 2.11"},

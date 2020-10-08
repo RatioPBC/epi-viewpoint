@@ -1,6 +1,16 @@
 @import "../mixins"
 
 #styleguide-page
+  #nav
+    @include level
+    @include shadow($style: overlay)
+    background-color: white
+    padding: 1rem 2rem
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+
   .styleguide-section
     margin: 2rem
 
@@ -14,6 +24,7 @@
     font-size: 3rem
     font-weight: bold
     margin-bottom: 2rem
+    padding-top: 5rem
 
   .styleguide-example
     align-items: center
@@ -66,6 +77,10 @@
 
   #secondary-button, #secondary-button-disabled
     @include button-secondary
+
+  #secondary-button-with-icon
+    @include button-secondary
+    @include has-icon
 
   #secondary-button-small
     @include button-secondary($size: small)
@@ -180,3 +195,15 @@
 
   #select-enabled, #select-disabled, #select-unset
     @include select
+
+  //
+  // Effects
+  //
+  #shadow-dialog, #shadow-overlay
+    padding: 2rem
+
+  #shadow-dialog
+    @include shadow($style: dialog)
+
+  #shadow-overlay
+    @include shadow($style: overlay)

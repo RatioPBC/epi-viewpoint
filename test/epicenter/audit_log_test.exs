@@ -12,16 +12,18 @@ defmodule Epicenter.AuditLogTest do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       {attrs_to_change_1, _audit_meta} = Test.Fixtures.person_attrs(user, "alice")
       changeset_1 = Cases.change_person(%Person{}, attrs_to_change_1)
 
       {:ok, inserted_person_1} =
         AuditLog.insert(
           changeset_1,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [revision_1] = AuditLog.revisions(Cases.Person)
@@ -32,9 +34,11 @@ defmodule Epicenter.AuditLogTest do
       inserted_person_2 =
         AuditLog.insert!(
           changeset_2,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [_, revision_2] = AuditLog.revisions(Cases.Person)
@@ -50,13 +54,41 @@ defmodule Epicenter.AuditLogTest do
       assert revision_2.change["tid"] == "billy"
       assert revision_2.after_change["tid"] == "billy"
     end
+
+    test "omits passwords from the revision" do
+      email = Epicenter.AccountsFixtures.unique_user_email()
+      password = Epicenter.AccountsFixtures.valid_user_password()
+      {user_attrs, _} = Test.Fixtures.user_attrs(%{id: ""}, "user", email: email, password: password)
+      password_changeset = %Epicenter.Accounts.User{} |> Epicenter.Accounts.User.registration_changeset(user_attrs)
+
+      {:ok, _inserted_user} =
+        AuditLog.insert(
+          password_changeset,
+          %AuditLog.Meta{
+            author_id: Ecto.UUID.generate(),
+            reason_event: Revision.register_user_event(),
+            reason_action: Revision.register_user_action()
+          }
+        )
+
+      [revision] = AuditLog.revisions(Accounts.User)
+
+      has_password_in_value = fn
+        {_key, value} when is_binary(value) -> String.contains?(value, password)
+        _ -> false
+      end
+
+      refute Enum.any?(revision.after_change, has_password_in_value)
+      refute Enum.any?(revision.before_change, has_password_in_value)
+      refute Enum.any?(revision.change, has_password_in_value)
+    end
   end
 
   describe "updating" do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       person_id = person.id
       attrs_to_change = Test.Fixtures.add_demographic_attrs(%{})
@@ -67,9 +99,11 @@ defmodule Epicenter.AuditLogTest do
       {:ok, updated_person_1} =
         AuditLog.update(
           changeset,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [%{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
@@ -77,9 +111,11 @@ defmodule Epicenter.AuditLogTest do
       updated_person_2 =
         AuditLog.update!(
           changeset,
-          user.id,
-          Revision.edit_profile_demographics_event(),
-          Revision.update_demographics_action()
+          %AuditLog.Meta{
+            author_id: user.id,
+            reason_event: Revision.edit_profile_demographics_event(),
+            reason_action: Revision.update_demographics_action()
+          }
         )
 
       assert [revision_0, revision_1, revision_2] =
@@ -92,8 +128,8 @@ defmodule Epicenter.AuditLogTest do
       assert revision_1.after_change["occupation"] == "architect"
       assert revision_1.changed_id == person.id
       assert revision_1.changed_type == "Cases.Person"
-      assert revision_1.reason_event == "update-demographics"
-      assert revision_1.reason_action == "edit-profile-demographics"
+      assert revision_1.reason_event == "edit-profile-demographics"
+      assert revision_1.reason_action == "update-demographics"
 
       assert revision_2.changed_id == person.id
       assert revision_2.changed_type == "Cases.Person"
@@ -105,9 +141,8 @@ defmodule Epicenter.AuditLogTest do
       assert updated_person_2.id == reloaded_person.id
     end
 
-
     test "handling nested changesets (adding an email)" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
 
       person_params = %{
@@ -127,11 +162,16 @@ defmodule Epicenter.AuditLogTest do
 
       changeset = Cases.change_person(person, person_params)
 
-      updated_person = AuditLog.update!(changeset, user.id, "action", "event")
+      updated_person =
+        AuditLog.update!(
+          changeset,
+          %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
+        )
 
       assert [%{address: "a@example.com"}] = updated_person.emails
 
       assert_audit_logged(person)
+
       assert_recent_audit_log(person, user, %{
         "dob" => "1970-01-01",
         "emails" => [%{"address" => "a@example.com", "delete" => false, "person_id" => person.id}],
@@ -140,14 +180,21 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "returns {:error, changeset} when changeset is invalid" do
-      user = Test.Fixtures.user_attrs("user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
+
       person_params = %{
-        "first_name" => "",
+        "first_name" => ""
       }
+
       changeset = Cases.change_person(person, person_params)
 
-      assert {:error, _} = AuditLog.update(changeset, user.id, "action", "event")
+      assert {:error, _} =
+               AuditLog.update(
+                 changeset,
+                 %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
+               )
+
       # only the "create" action should have a revision. not the invalid update.
       assert_revision_count(person, 1)
     end
