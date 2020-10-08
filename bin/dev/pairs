@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
 
-elixir bin/_support/pairs.exs
+case $1 in
+test)
+  elixir -r bin/_support/pairs.exs bin/_support/pairs_test.exs test
+  ;;
+*)
+  elixir bin/_support/pairs.exs $*
+  ;;
+esac

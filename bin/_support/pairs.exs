@@ -13,13 +13,25 @@ defmodule Pairs do
     """
     |> IO.puts()
 
-    pairings(get_people("Who is sticky?"), get_people("Who is not sticky?"))
+    [get_people("Who is sticky?"), get_people("Who is not sticky?")]
+    |> validate()
+    |> pairings()
   end
 
   def get_people(prompt),
     do: IO.gets("#{prompt} ") |> String.split(~r|\s+|, trim: true) |> Enum.map(&String.trim/1)
 
-  def pairings(sticky, not_sticky) do
+  def validate([sticky, not_sticky] = people) do
+    if Enum.uniq(sticky ++ not_sticky) == sticky ++ not_sticky,
+      do: people,
+      else: :duplicates
+  end
+
+  def pairings(:duplicates) do
+    IO.puts(:stderr, "\nOops, there were duplicate people")
+  end
+
+  def pairings([sticky, not_sticky]) do
     IO.puts("")
 
     reduce_pairs(Enum.shuffle(sticky), Enum.shuffle(not_sticky), [])
@@ -32,7 +44,7 @@ defmodule Pairs do
     okay? = IO.gets("Is this pairing okay? [Y/n] ")
 
     if String.trim(okay?) == "n",
-      do: pairings(sticky, not_sticky),
+      do: pairings([sticky, not_sticky]),
       else: :ok
   end
 
@@ -58,4 +70,8 @@ defmodule Pairs do
     do: [a, b] |> Enum.sort() |> Enum.join(" + ")
 end
 
-Pairs.run()
+case System.argv() do
+  [] -> Pairs.run()
+  ["test"] -> :ok
+  other -> IO.puts(:stderr, "unexpected arguments: #{inspect(other)}")
+end
