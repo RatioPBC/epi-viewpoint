@@ -55,10 +55,10 @@ defmodule Epicenter.AuditLog do
 
     if after_change != nil do
       attrs = %{
-        "after_change" => after_change,
+        "after_change" => after_change |> redact(),
         "author_id" => meta.author_id,
-        "before_change" => data,
-        "change" => recursively_get_changes_from_changeset(changeset),
+        "before_change" => data |> redact(),
+        "change" => recursively_get_changes_from_changeset(changeset) |> redact(),
         "changed_id" => after_change.id,
         "changed_type" => module_name(data),
         "reason_action" => meta.reason_action,
@@ -70,6 +70,8 @@ defmodule Epicenter.AuditLog do
 
     result
   end
+
+  defp redact(changes), do: Map.drop(changes, ["password", :password])
 
   def get_revision(id), do: Revision |> Repo.get(id)
 

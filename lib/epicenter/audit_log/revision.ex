@@ -37,6 +37,7 @@ defmodule Epicenter.AuditLog.Revision do
   def update_profile_action(), do: "update-profile"
   def import_person_action(), do: "import-person"
   def releases_action(), do: "releases"
+  def register_user_action(), do: "register-user"
 
   def edit_profile_demographics_event(), do: "edit-profile-demographics"
   def people_selected_assignee_event(), do: "people-selected-assignee"
@@ -44,6 +45,7 @@ defmodule Epicenter.AuditLog.Revision do
   def edit_profile_saved_event(), do: "edit-profile-saved"
   def import_csv_event(), do: "import-csv"
   def releases_event(), do: "releases"
+  def register_user_event(), do: "register-user"
 
   defmodule Query do
     import Ecto.Query

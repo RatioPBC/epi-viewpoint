@@ -64,6 +64,11 @@ defmodule Epicenter.AccountsTest do
   end
 
   describe "register_user/1" do
+    setup do
+      creator = Test.Fixtures.user_attrs(%{id: "superuser"}, "creator") |> Accounts.register_user!()
+      %{creator: creator}
+    end
+
     test "requires email and password to be set" do
       {:error, changeset} = Accounts.register_user({%{}, %{}})
 
@@ -89,8 +94,8 @@ defmodule Epicenter.AccountsTest do
       assert "must be between 10 and 80 characters" in errors_on(changeset).password
     end
 
-    test "validates email uniqueness" do
-      %{email: email} = Test.Fixtures.user_attrs(%{id: "superuser"}, "user") |> Accounts.register_user!()
+    test "validates email uniqueness", %{creator: creator} do
+      %{email: email} = Test.Fixtures.user_attrs(creator, "user") |> Accounts.register_user!()
       {:error, changeset} = Accounts.register_user({%{email: email}, %{}})
       assert "has already been taken" in errors_on(changeset).email
 
@@ -99,13 +104,25 @@ defmodule Epicenter.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
-    test "registers users with a hashed password" do
+    test "registers users with a hashed password", %{creator: creator} do
       email = unique_user_email()
-      {:ok, user} = Test.Fixtures.user_attrs(%{id: "superuser"}, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
+      {:ok, user} = Test.Fixtures.user_attrs(creator, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
       assert user.email == email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
+    end
+
+    test "has an audit log", %{creator: creator} do
+      email = unique_user_email()
+      {:ok, user} = Test.Fixtures.user_attrs(creator, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
+
+      assert_recent_audit_log(user, creator, %{
+        "tid" => "user",
+        "name" => "user",
+        "email" => email
+      })
+      refute Epicenter.AuditLog.entries_for(user.id) |> List.last() |> Map.get(:change) |> Map.has_key?("password")
     end
   end
 

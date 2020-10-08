@@ -54,6 +54,34 @@ defmodule Epicenter.AuditLogTest do
       assert revision_2.change["tid"] == "billy"
       assert revision_2.after_change["tid"] == "billy"
     end
+
+    test "omits passwords from the revision" do
+      email = Epicenter.AccountsFixtures.unique_user_email()
+      password = Epicenter.AccountsFixtures.valid_user_password()
+      {user_attrs, _} = Test.Fixtures.user_attrs(%{id: ""}, "user", email: email, password: password)
+      password_changeset = %Epicenter.Accounts.User{} |> Epicenter.Accounts.User.registration_changeset(user_attrs)
+
+      {:ok, inserted_user} =
+        AuditLog.insert(
+          password_changeset,
+          %AuditLog.Meta{
+            author_id: Ecto.UUID.generate(),
+            reason_event: Revision.register_user_event(),
+            reason_action: Revision.register_user_action()
+          }
+        )
+
+      [revision] = AuditLog.revisions(Accounts.User)
+
+      has_password_in_value = fn
+        {_key, value} when is_binary(value) -> String.contains?(value, password)
+        _ -> false
+      end
+
+      refute Enum.any?(revision.after_change, has_password_in_value)
+      refute Enum.any?(revision.before_change, has_password_in_value)
+      refute Enum.any?(revision.change, has_password_in_value)
+    end
   end
 
   describe "updating" do
