@@ -91,6 +91,77 @@ defmodule Epicenter.Cases.ImportTest do
                %{file_name: file_name, contents: File.read!(file_name)}
                |> Import.import_csv(originator)
     end
+
+    defp add_randomized_suffix(field), do: "#{field}_#{Enum.random(1..99)}"
+
+    test "ignores number suffixes for columns in csv data", %{originator: originator} do
+      columns = [
+        add_randomized_suffix("search_firstname"),
+        add_randomized_suffix("search_lastname"),
+        add_randomized_suffix("dateofbirth"),
+        add_randomized_suffix("phonenumber"),
+        add_randomized_suffix("caseid"),
+        add_randomized_suffix("datecollected"),
+        add_randomized_suffix("resultdate"),
+        add_randomized_suffix("result"),
+        add_randomized_suffix("orderingfacilityname"),
+        "person_tid",
+        "lab_result_tid",
+        add_randomized_suffix("diagaddress_street1"),
+        add_randomized_suffix("diagaddress_city"),
+        add_randomized_suffix("diagaddress_state"),
+        add_randomized_suffix("diagaddress_zip"),
+        add_randomized_suffix("datereportedtolhd"),
+        add_randomized_suffix("testname"),
+        "person_tid",
+        add_randomized_suffix("sex"),
+        add_randomized_suffix("ethnicity"),
+        add_randomized_suffix("occupation"),
+        add_randomized_suffix("race")
+      ]
+
+      assert {:ok,
+              %Epicenter.Cases.Import.ImportInfo{
+                imported_people: imported_people,
+                imported_lab_result_count: 1,
+                imported_person_count: 1,
+                total_lab_result_count: 1,
+                total_person_count: 1
+              }} =
+               %{
+                 file_name: "test.csv",
+                 contents: """
+                 #{Enum.join(columns, ",")}
+                 Alice              , Testuser          , 01/01/1970, 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
+                 """
+               }
+               |> Import.import_csv(originator)
+
+      assert imported_people |> tids() == ["alice"]
+
+      [lab_result_1] = Cases.list_lab_results()
+      assert lab_result_1.result == "positive"
+      assert lab_result_1.sampled_on == ~D[2020-06-01]
+      assert lab_result_1.analyzed_on == ~D[2020-06-03]
+      assert lab_result_1.reported_on == ~D[2020-06-05]
+      assert lab_result_1.test_type == "TestTest"
+      assert lab_result_1.tid == "alice-result-1"
+      assert lab_result_1.request_facility_name == "Lab Co South"
+
+      [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
+      assert alice.dob == ~D[1970-01-01]
+      assert alice.external_id == "10000"
+      assert alice.first_name == "Alice"
+      assert alice.last_name == "Testuser"
+      assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.tid == "alice"
+      assert alice.sex_at_birth == "female"
+      assert alice.ethnicity == "Cuban"
+      assert alice.occupation == "Rocket Scientist"
+      assert alice.race == "Asian Indian"
+
+      assert_revision_count(alice, 1)
+    end
   end
 
   describe "de-duplication" do
@@ -392,7 +463,7 @@ defmodule Epicenter.Cases.ImportTest do
         }
         |> Import.import_csv(originator)
 
-      error_message = "Missing required columns: datecollected_36, dateofbirth_8, result_39, resultdate_42, search_firstname_2, search_lastname_1"
+      error_message = "Missing required columns: datecollected_xx, dateofbirth_xx, result_xx, resultdate_xx, search_firstname_xx, search_lastname_xx"
 
       assert {:error, error_message} == result
     end

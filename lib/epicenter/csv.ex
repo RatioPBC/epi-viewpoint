@@ -2,15 +2,15 @@ defmodule Epicenter.Csv do
   alias Epicenter.Extra
   alias NimbleCSV.RFC4180, as: NimbleCsv
 
-  def read(string, headers) when is_binary(string),
-    do: read(string, headers, &NimbleCsv.parse_string/2)
+  def read(string, header_transformer, headers) when is_binary(string),
+    do: read(string, header_transformer, headers, &NimbleCsv.parse_string/2)
 
-  def read(stream, headers),
-    do: read(stream, headers, &NimbleCsv.parse_stream/2)
+  def read(stream, header_transformer, headers),
+    do: read(stream, header_transformer, headers, &NimbleCsv.parse_stream/2)
 
-  def read(input, [required: required_headers, optional: optional_headers], parser) do
+  def read(input, header_transformer, [required: required_headers, optional: optional_headers], parser) do
     [provided_headers | rows] = parse(input, parser)
-    provided_headers = provided_headers |> Enum.map(&String.trim/1)
+    provided_headers = provided_headers |> Enum.map(&String.trim/1) |> header_transformer.()
 
     case required_headers -- provided_headers do
       [] ->
@@ -35,7 +35,7 @@ defmodule Epicenter.Csv do
         {:ok, data}
 
       missing_headers ->
-        {:error, "Missing required columns: #{missing_headers |> Enum.sort() |> Enum.join(", ")}"}
+        {:error, :missing_headers, missing_headers |> Enum.sort()}
     end
   end
 
