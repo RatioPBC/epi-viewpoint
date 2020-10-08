@@ -21,7 +21,7 @@ defmodule Epicenter.Cases.Address do
     field :person_id, :binary_id
     field :is_preferred, :boolean
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def changeset(address, attrs) do

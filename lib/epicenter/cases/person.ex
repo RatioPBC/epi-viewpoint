@@ -39,7 +39,7 @@ defmodule Epicenter.Cases.Person do
     field :sex_at_birth, :string
     field :tid, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
 
     belongs_to :assigned_to, User
     has_many :addresses, Address

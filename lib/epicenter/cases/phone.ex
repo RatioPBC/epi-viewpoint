@@ -24,7 +24,7 @@ defmodule Epicenter.Cases.Phone do
     field :tid, :string
     field :type, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
 
     belongs_to :person, Person
   end

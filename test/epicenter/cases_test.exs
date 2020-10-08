@@ -355,7 +355,7 @@ defmodule Epicenter.CasesTest do
     test "when the phone number already exists for the same person", %{person: person, creator: creator} do
       original_phone = add_phone_for_person("phone1", person, creator)
 
-      assert Cases.get_phone(original_phone.id).updated_at == ~N[1970-01-01 10:30:00Z]
+      assert Cases.get_phone(original_phone.id).updated_at == ~U[1970-01-01 10:30:00Z]
 
       phone = Test.Fixtures.phone_attrs(creator, person, "phone2", %{number: original_phone.number}) |> Cases.upsert_phone!()
 

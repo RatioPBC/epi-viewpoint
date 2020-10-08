@@ -22,7 +22,7 @@ defmodule Epicenter.Accounts.User do
     field :seq, :integer
     field :tid, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
 
     has_many :assignments, Person, foreign_key: :assigned_to_id
   end
