@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+elixir bin/_support/pairs.exs
