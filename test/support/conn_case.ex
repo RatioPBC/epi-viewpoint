@@ -22,7 +22,6 @@ defmodule EpicenterWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import Epicenter.Test.VersionAssertions
       import EpicenterWeb.ConnCase
       import EpicenterWeb.Test.LiveViewAssertions
       import Euclid.Test.Extra.Assertions
