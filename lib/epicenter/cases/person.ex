@@ -51,13 +51,15 @@ defmodule Epicenter.Cases.Person do
       put_field_if_loaded = fn person_attrs, value, field_name ->
         case Map.get(value, field_name) do
           %Ecto.Association.NotLoaded{} -> person_attrs
-          _ -> Map.put(person_attrs, field_name, value.emails)
+          _ -> Map.put(person_attrs, field_name, Map.get(value, field_name))
         end
       end
 
       person_attrs = Map.take(value, Person.required_attrs() ++ Person.optional_attrs())
 
       person_attrs = put_field_if_loaded.(person_attrs, value, :emails)
+      person_attrs = put_field_if_loaded.(person_attrs, value, :lab_results)
+      person_attrs = put_field_if_loaded.(person_attrs, value, :phones)
 
       Jason.Encode.map(person_attrs, opts)
     end
