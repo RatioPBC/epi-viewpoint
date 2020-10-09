@@ -2,6 +2,7 @@ defmodule Epicenter.Cases.ImportTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [pluck: 2, tids: 1]
+  import Epicenter.Extra.String, only: [add_numeric_suffix: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
@@ -92,32 +93,30 @@ defmodule Epicenter.Cases.ImportTest do
                |> Import.import_csv(originator)
     end
 
-    defp add_randomized_suffix(field), do: "#{field}_#{Enum.random(1..99)}"
-
     test "ignores number suffixes for columns in csv data", %{originator: originator} do
       columns = [
-        add_randomized_suffix("search_firstname"),
-        add_randomized_suffix("search_lastname"),
-        add_randomized_suffix("dateofbirth"),
-        add_randomized_suffix("phonenumber"),
-        add_randomized_suffix("caseid"),
-        add_randomized_suffix("datecollected"),
-        add_randomized_suffix("resultdate"),
-        add_randomized_suffix("result"),
-        add_randomized_suffix("orderingfacilityname"),
+        add_numeric_suffix("search_firstname"),
+        add_numeric_suffix("search_lastname"),
+        add_numeric_suffix("dateofbirth"),
+        add_numeric_suffix("phonenumber"),
+        add_numeric_suffix("caseid"),
+        add_numeric_suffix("datecollected"),
+        add_numeric_suffix("resultdate"),
+        add_numeric_suffix("result"),
+        add_numeric_suffix("orderingfacilityname"),
         "person_tid",
         "lab_result_tid",
-        add_randomized_suffix("diagaddress_street1"),
-        add_randomized_suffix("diagaddress_city"),
-        add_randomized_suffix("diagaddress_state"),
-        add_randomized_suffix("diagaddress_zip"),
-        add_randomized_suffix("datereportedtolhd"),
-        add_randomized_suffix("testname"),
+        add_numeric_suffix("diagaddress_street1"),
+        add_numeric_suffix("diagaddress_city"),
+        add_numeric_suffix("diagaddress_state"),
+        add_numeric_suffix("diagaddress_zip"),
+        add_numeric_suffix("datereportedtolhd"),
+        add_numeric_suffix("testname"),
         "person_tid",
-        add_randomized_suffix("sex"),
-        add_randomized_suffix("ethnicity"),
-        add_randomized_suffix("occupation"),
-        add_randomized_suffix("race")
+        add_numeric_suffix("sex"),
+        add_numeric_suffix("ethnicity"),
+        add_numeric_suffix("occupation"),
+        add_numeric_suffix("race")
       ]
 
       assert {:ok,

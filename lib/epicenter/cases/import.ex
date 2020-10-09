@@ -66,7 +66,7 @@ defmodule Epicenter.Cases.Import do
               headers
               |> Enum.map(&Map.get(inverse_key_map, &1, &1))
               |> Enum.sort()
-              |> Enum.map(&"#{&1}_xx")
+              |> Enum.map(&Extra.String.add_placeholder_suffix/1)
               |> Enum.join(", ")
 
             Repo.rollback("Missing required columns: #{headers_string}")
@@ -83,7 +83,7 @@ defmodule Epicenter.Cases.Import do
 
   defp rename_headers(headers) do
     headers
-    |> Enum.map(fn h -> String.replace(h, ~r[(\w+)_\d+$], "\\1") end)
+    |> Enum.map(&Extra.String.remove_numeric_suffix/1)
     |> Enum.map(fn h -> Map.get(@key_map, h, h) end)
   end
 
