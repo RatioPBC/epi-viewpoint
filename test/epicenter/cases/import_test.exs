@@ -527,8 +527,8 @@ defmodule Epicenter.Cases.ImportTest do
     end
   end
 
-  describe "reject_rows_with_blank_values" do
-    test "rejects row maps that have blank `result` value" do
+  describe "reject_rows_with_blank_key_values" do
+    test "rejects row maps that have blank value for given key `result`" do
       [
         %{
           "first_name" => "Alice",
@@ -547,7 +547,7 @@ defmodule Epicenter.Cases.ImportTest do
           "tid" => "billy-result-1"
         }
       ]
-      |> Import.reject_rows_with_blank_values()
+      |> Import.reject_rows_with_blank_key_values("result")
       |> assert_eq([
         %{
           "first_name" => "Alice",
@@ -556,6 +556,46 @@ defmodule Epicenter.Cases.ImportTest do
           "request_facility_name" => "Lab Co South",
           "result" => "positive",
           "tid" => "alice-result-1"
+        }
+      ])
+    end
+
+    test "doesn't do anything if row doesn't have given key" do
+      [
+        %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "reported_on" => ~D[2020-06-05],
+          "request_facility_name" => "Lab Co South",
+          "result" => "positive",
+          "tid" => "alice-result-1"
+        },
+        %{
+          "first_name" => "Billy",
+          "last_name" => "Testuser",
+          "reported_on" => nil,
+          "request_facility_name" => "",
+          "result" => "",
+          "tid" => "billy-result-1"
+        }
+      ]
+      |> Import.reject_rows_with_blank_key_values("foobar")
+      |> assert_eq([
+        %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "reported_on" => ~D[2020-06-05],
+          "request_facility_name" => "Lab Co South",
+          "result" => "positive",
+          "tid" => "alice-result-1"
+        },
+        %{
+          "first_name" => "Billy",
+          "last_name" => "Testuser",
+          "reported_on" => nil,
+          "request_facility_name" => "",
+          "result" => "",
+          "tid" => "billy-result-1"
         }
       ])
     end
