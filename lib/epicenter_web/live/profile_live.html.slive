@@ -43,10 +43,10 @@
         tr
           th colspan=4 Address
         tr
-          td colspan=4 data-role="address"
+          td colspan=4 data-role="addresses"
             = if Euclid.Exists.present?(@person.addresses) do
               = for address <- @person.addresses do
-                div class="address-details"
+                div class="address-details" data-role="address-details"
                   div = address.full_address
                   div = address.type
             - else

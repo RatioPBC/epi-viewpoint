@@ -90,19 +90,10 @@ defmodule EpicenterWeb.ProfileLive do
     |> Map.get(:phones)
     |> Enum.map(fn
       %{number: number_string} when byte_size(number_string) == 10 ->
-        number_string
-        |> String.graphemes()
-        |> List.insert_at(-5, "-")
-        |> List.insert_at(-9, "-")
-        |> Enum.join()
+        number_string |> Number.Phone.number_to_phone(area_code: true)
 
       %{number: number_string} when byte_size(number_string) == 11 ->
-        number_string
-        |> String.graphemes()
-        |> List.insert_at(-5, "-")
-        |> List.insert_at(-9, "-")
-        |> List.insert_at(-13, "-")
-        |> Enum.join()
+        number_string |> String.slice(1..-1) |> Number.Phone.number_to_phone(area_code: true, country_code: String.at(number_string, 0))
 
       %{number: number_string} ->
         number_string
