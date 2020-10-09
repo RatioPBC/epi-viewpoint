@@ -57,6 +57,7 @@ defmodule Epicenter.Cases.Import do
           {:ok, rows} ->
             rows
             |> transform_dates()
+            |> reject_rows_with_blank_values()
             |> import_rows(originator)
 
           {:error, :missing_headers, headers} ->
@@ -80,6 +81,11 @@ defmodule Epicenter.Cases.Import do
       end
     end)
   end
+
+  def reject_rows_with_blank_values(rows),
+    do: rows |> Enum.reject(fn row -> row["result"] |> Euclid.Exists.blank?() end)
+
+  # # #
 
   defp rename_headers(headers) do
     headers
