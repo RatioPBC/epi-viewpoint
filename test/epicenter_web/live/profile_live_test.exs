@@ -27,12 +27,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
   describe "when the person has no identifying information" do
     test "showing person identifying information", %{conn: conn, person: person, user: user} do
       {:ok, _} = Cases.update_person(person, {%{preferred_language: nil}, Test.Fixtures.audit_meta(user)})
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
-      assert_role_text(page_live, "preferred-language", "Unknown")
-      assert_role_text(page_live, "phone-numbers", "Unknown")
-      assert_role_text(page_live, "email-addresses", "Unknown")
-      assert_role_text(page_live, "addresses", "Unknown")
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_full_name("Alice Testuser")
+      |> Pages.Profile.assert_date_of_birth("01/01/2000")
+      |> Pages.Profile.assert_preferred_language("Unknown")
+      |> Pages.Profile.assert_phone_numbers(["Unknown"])
+      |> Pages.Profile.assert_email_addresses(["Unknown"])
+      |> Pages.Profile.assert_addresses(["Unknown"])
     end
 
     test("email_addresses", %{person: person}, do: person |> ProfileLive.email_addresses() |> assert_eq([]))
