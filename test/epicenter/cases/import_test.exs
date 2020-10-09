@@ -343,6 +343,10 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
                "4250 Test St, City, TS 00000"
              ]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
     end
 
     test "creates new address when importing a duplicate for the same person with a different address",
@@ -373,6 +377,10 @@ defmodule Epicenter.Cases.ImportTest do
                "4250 Test St, City, TS 00000",
                "4251 Test St, City, TS 00000"
              ]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St", "4251 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City", "City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS", "TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000", "00000"]
     end
   end
 

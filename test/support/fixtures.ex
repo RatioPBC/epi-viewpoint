@@ -87,6 +87,10 @@ defmodule Epicenter.Test.Fixtures do
     attrs =
       %{
         full_address: "#{street_number} Test St, City, TS 00000",
+        street: "#{street_number} Test St",
+        city: "City",
+        state: "TS",
+        postal_code: "00000",
         type: "home",
         person_id: person_id,
         tid: tid

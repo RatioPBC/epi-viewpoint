@@ -20,6 +20,10 @@ defmodule Epicenter.Validation do
   defp validate(changeset, :address) do
     changeset
     |> validate_change(:full_address, &address_full_address_validator/2)
+    |> validate_change(:street, &address_street_validator/2)
+    |> validate_change(:city, &address_city_validator/2)
+    |> validate_change(:state, &address_state_validator/2)
+    |> validate_change(:postal_code, &address_postal_code_validator/2)
   end
 
   defp validate(changeset, :phone) do
@@ -35,6 +39,10 @@ defmodule Epicenter.Validation do
   # # #
 
   @four_digits_followed_by_fake_address ~r|\d{4} Test St, City, TS 00000|
+  @four_digits_followed_by_fake_street ~r|\A\d{4} Test St\z|
+  @city_followed_by_numbers ~r|\ACity\d*\z|
+  @ts_or_starts_with_z ~r/\A(TS|Z[A-Z])\z/
+  @four_leading_zeroes_followed_by_one_digit ~r|\A0000\d\z|
   @seven_leading_ones_followed_by_three_digits ~r|1{7}\d+|
 
   defp date_validator(field, date) do
@@ -53,6 +61,30 @@ defmodule Epicenter.Validation do
     if value =~ @four_digits_followed_by_fake_address,
       do: valid(),
       else: invalid(field, "must match '#### Test St, City, TS 00000'")
+  end
+
+  defp address_street_validator(field, value) do
+    if value =~ @four_digits_followed_by_fake_street,
+      do: valid(),
+      else: invalid(field, "must match '#### Test St'")
+  end
+
+  defp address_city_validator(field, value) do
+    if value =~ @city_followed_by_numbers,
+      do: valid(),
+      else: invalid(field, "must match 'City#'")
+  end
+
+  defp address_state_validator(field, value) do
+    if value =~ @ts_or_starts_with_z,
+      do: valid(),
+      else: invalid(field, "must be TS or end with Z")
+  end
+
+  defp address_postal_code_validator(field, value) do
+    if value =~ @four_leading_zeroes_followed_by_one_digit,
+      do: valid(),
+      else: invalid(field, "must match '0000x'")
   end
 
   defp phone_number_validator(field, value) do

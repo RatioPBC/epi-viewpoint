@@ -425,6 +425,10 @@ defmodule Epicenter.CasesTest do
       address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
 
       assert address.full_address == "4250 Test St, City, TS 00000"
+      assert address.street == "4250 Test St"
+      assert address.city == "City"
+      assert address.state == "TS"
+      assert address.postal_code == "00000"
       assert address.type == "home"
       assert address.tid == "address1"
       assert address.person_id == person.id
