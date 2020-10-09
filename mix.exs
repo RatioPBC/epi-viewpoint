@@ -41,7 +41,7 @@ defmodule Epicenter.MixProject do
       {:gettext, "~> 0.11"},
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.0"},
-      {:mix_audit, "~> 0.1", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 0.1", runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:mox, "~> 1.0"},
       {:nimble_csv, "~> 0.7"},
