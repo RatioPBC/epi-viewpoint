@@ -7,6 +7,7 @@ defmodule EpicenterWeb.ImportLive do
     socket
     |> assign_defaults(session)
     |> assign_page_title("Import labs")
+    |> assign(:import_error_message, session["import_error_message"])
     |> assign(uploading: false)
     |> ok()
   end

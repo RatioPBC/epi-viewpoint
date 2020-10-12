@@ -25,7 +25,7 @@ section#people-page data-page="people"
       div data-role="reload-message"
         = if @reload_message do
           = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
-      = live_redirect "Import labs", to: "/import", id: "import-labs"
+      = live_redirect "Import labs", to: "/import/start", id: "import-labs"
 
 
   table data-role="people"

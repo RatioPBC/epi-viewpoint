@@ -12,14 +12,22 @@ defmodule EpicenterWeb.ImportController do
   @common_assigns [page_title: "Import labs"]
 
   def create(conn, %{"file" => %Plug.Upload{path: path, filename: file_name}}) do
-    {:ok, import_info} = %{file_name: file_name, contents: File.read!(path)} |> Cases.import_lab_results(conn.assigns.current_user)
+    result = %{file_name: file_name, contents: File.read!(path)} |> Cases.import_lab_results(conn.assigns.current_user)
 
-    {imported_people, popped_import_info} = import_info |> Map.pop(:imported_people)
-    Cases.broadcast_people(imported_people)
+    case result do
+      {:ok, import_info} ->
+        {imported_people, popped_import_info} = import_info |> Map.pop(:imported_people)
+        Cases.broadcast_people(imported_people)
 
-    conn
-    |> Session.set_last_csv_import_info(popped_import_info)
-    |> redirect(to: Routes.import_path(conn, :show))
+        conn
+        |> Session.set_last_csv_import_info(popped_import_info)
+        |> redirect(to: Routes.import_path(conn, :show))
+
+      {:error, [user_readable: user_readable_message]} ->
+        conn
+        |> Session.set_import_error_message(user_readable_message)
+        |> redirect(to: Routes.import_start_path(conn, EpicenterWeb.ImportLive))
+    end
   end
 
   def show(conn, _params) do
