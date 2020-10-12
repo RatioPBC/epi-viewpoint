@@ -36,7 +36,6 @@ defmodule EpicenterWeb.ImportControllerTest do
              } = Session.get_last_csv_import_info(conn)
     end
 
-    @tag :skip
     test "when a required column header is missing", %{conn: conn} do
       # remove the dob field
       temp_file_path =
@@ -49,7 +48,26 @@ defmodule EpicenterWeb.ImportControllerTest do
       on_exit(fn -> File.rm!(temp_file_path) end)
 
       conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
-      # TODO add assertions
+
+      assert conn |> redirected_to() == "/import/start"
+      assert "Missing required columns: dateofbirth_xx" = Session.get_import_error_message(conn)
+    end
+
+    test "when a date is poorly formatted", %{conn: conn} do
+      # date collected has a bad year 06/02/bb
+      temp_file_path =
+        """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , datereportedtolhd_44 , result_39 , glorp , person_tid
+        Alice              , Testuser          , 01/01/1970    , 06/02/bb       , 06/01/2020    , 06/03/2020           , positive  , 393   , alice
+        """
+        |> Tempfile.write!("csv")
+
+      on_exit(fn -> File.rm!(temp_file_path) end)
+
+      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
+
+      assert conn |> redirected_to() == "/import/start"
+      assert "Invalid mm-dd-yyyy format: 06/02/bb" = Session.get_import_error_message(conn)
     end
   end
 

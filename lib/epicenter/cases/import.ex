@@ -79,6 +79,9 @@ defmodule Epicenter.Cases.Import do
 
         error in Ecto.InvalidChangesetError ->
           Repo.rollback(error)
+
+        error in Epicenter.DateParsingError ->
+          Repo.rollback(error)
       end
     end)
   end
