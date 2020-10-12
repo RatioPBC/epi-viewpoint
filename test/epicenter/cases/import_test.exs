@@ -596,12 +596,14 @@ defmodule Epicenter.Cases.ImportTest do
         }
       ]
       |> Import.reject_rows_with_blank_key_values("field_b")
-      |> assert_eq([
-        %{
-          "field_a" => "Value A",
-          "field_b" => "Value B"
-        }
-      ])
+      |> assert_eq(
+        {[
+           %{
+             "field_a" => "Value A",
+             "field_b" => "Value B"
+           }
+         ], ["Missing required field: field_b"]}
+      )
     end
 
     test "doesn't do anything if row doesn't have given key" do
@@ -616,16 +618,19 @@ defmodule Epicenter.Cases.ImportTest do
         }
       ]
       |> Import.reject_rows_with_blank_key_values("field_c")
-      |> assert_eq([
-        %{
-          "field_a" => "Value A",
-          "field_b" => nil
-        },
-        %{
-          "field_a" => "Value A",
-          "field_b" => "Value B"
-        }
-      ])
+      |> assert_eq({
+        [
+          %{
+            "field_a" => "Value A",
+            "field_b" => nil
+          },
+          %{
+            "field_a" => "Value A",
+            "field_b" => "Value B"
+          }
+        ],
+        []
+      })
     end
   end
 end
