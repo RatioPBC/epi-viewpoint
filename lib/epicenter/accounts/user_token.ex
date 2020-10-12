@@ -51,7 +51,7 @@ defmodule Epicenter.Accounts.UserToken do
      }}
   end
 
-  def default_token_lifetime(), do: 60 * 60
+  def default_token_lifetime(), do: 60 * 60 * 3
   def max_token_lifetime(), do: 60 * 60 * 23
 
   def token_validity_status(user_token) do
