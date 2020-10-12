@@ -57,6 +57,7 @@ defmodule Epicenter.Cases.Import do
           {:ok, rows} ->
             rows
             |> transform_dates()
+            |> reject_rows_with_blank_key_values("dob")
             |> reject_rows_with_blank_key_values("result")
             |> import_rows(originator)
 
@@ -160,12 +161,7 @@ defmodule Epicenter.Cases.Import do
 
     if Euclid.Exists.any?(address_components) do
       Cases.upsert_address!(
-        %{full_address: "#{street}, #{city}, #{state} #{zip}",
-          street: street,
-          city: city,
-          state: state,
-          postal_code: zip,
-          person_id: person.id}
+        %{full_address: "#{street}, #{city}, #{state} #{zip}", street: street, city: city, state: state, postal_code: zip, person_id: person.id}
         |> in_audit_tuple(author, AuditLog.Revision.upsert_address_action())
       )
     end

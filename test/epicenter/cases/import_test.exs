@@ -208,6 +208,53 @@ defmodule Epicenter.Cases.ImportTest do
     end
   end
 
+  describe "missing values" do
+    test "ignores records with an empty 'dateofbirth'", %{originator: originator} do
+      assert {:ok,
+              %Epicenter.Cases.Import.ImportInfo{
+                imported_people: imported_people,
+                imported_lab_result_count: 1,
+                imported_person_count: 1,
+                total_lab_result_count: 1,
+                total_person_count: 1
+              }} =
+               %{
+                 file_name: "test.csv",
+                 contents: """
+                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
+                 Alice              , Testuser          , 03/01/1990    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
+                 Billy              , Testuser          ,               , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , positive  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 """
+               }
+               |> Import.import_csv(originator)
+
+      assert imported_people |> tids() == ["alice"]
+
+      [lab_result_1] = Cases.list_lab_results()
+      assert lab_result_1.result == "positive"
+      assert lab_result_1.sampled_on == ~D[2020-06-01]
+      assert lab_result_1.analyzed_on == ~D[2020-06-03]
+      assert lab_result_1.reported_on == ~D[2020-06-05]
+      assert lab_result_1.test_type == "TestTest"
+      assert lab_result_1.tid == "alice-result-1"
+      assert lab_result_1.request_facility_name == "Lab Co South"
+
+      [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
+      assert alice.dob == ~D[1990-03-01]
+      assert alice.external_id == "10000"
+      assert alice.first_name == "Alice"
+      assert alice.last_name == "Testuser"
+      assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.tid == "alice"
+      assert alice.sex_at_birth == "female"
+      assert alice.ethnicity == "Cuban"
+      assert alice.occupation == "Rocket Scientist"
+      assert alice.race == "Asian Indian"
+
+      assert_revision_count(alice, 1)
+    end
+  end
+
   describe "de-duplication" do
     test "if two lab results have the same first_name, last_name, and dob, they are considered the same person",
          %{originator: originator} do
