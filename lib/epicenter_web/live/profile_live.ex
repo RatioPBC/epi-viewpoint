@@ -19,7 +19,7 @@ defmodule EpicenterWeb.ProfileLive do
 
     socket
     |> assign_defaults(session)
-    |> assign_page_title(Format.format(person))
+    |> assign_page_title(Format.person(person))
     |> assign_person(person)
     |> assign_users()
     |> ok()

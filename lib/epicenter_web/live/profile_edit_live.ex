@@ -16,7 +16,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     changeset = person |> Cases.change_person(%{})
 
     socket
-    |> assign_page_title("#{Format.format(person)} (edit)")
+    |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign(changeset: update_dob_field_for_display(changeset))
     |> assign(person: person)
     |> assign(preferred_language_is_other: false)
