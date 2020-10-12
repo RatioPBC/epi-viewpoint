@@ -519,7 +519,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       error_message = "Missing required columns: datecollected_xx, dateofbirth_xx, result_xx, resultdate_xx, search_firstname_xx, search_lastname_xx"
 
-      assert {:error, error_message} == result
+      assert {:error, [user_readable: error_message]} == result
     end
 
     test "returns an error message when the CSV is poorly formatted", %{originator: originator} do

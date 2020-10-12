@@ -70,7 +70,7 @@ defmodule Epicenter.Cases.Import do
               |> Enum.map(&Extra.String.add_placeholder_suffix/1)
               |> Enum.join(", ")
 
-            Repo.rollback("Missing required columns: #{headers_string}")
+            Repo.rollback(user_readable: "Missing required columns: #{headers_string}")
         end
       rescue
         error in NimbleCSV.ParseError ->
