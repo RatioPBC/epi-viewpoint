@@ -4,4 +4,6 @@ defmodule Epicenter.DateParsingError do
   formatting.
   """
   defexception [:user_readable]
+
+  def message(%{user_readable: user_readable}), do: user_readable
 end
