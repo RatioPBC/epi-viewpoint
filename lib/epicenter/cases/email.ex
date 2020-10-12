@@ -22,7 +22,7 @@ defmodule Epicenter.Cases.Email do
     field :tid, :string
     field :person_id, :binary_id
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def changeset(email, attrs) do

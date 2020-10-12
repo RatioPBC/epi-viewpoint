@@ -19,7 +19,7 @@ defmodule Epicenter.Cases.ImportedFile do
     field :seq, :integer
     field :tid, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def changeset(imported_file, attrs) do

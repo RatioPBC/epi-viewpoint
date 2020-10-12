@@ -8,15 +8,15 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.Repo
 
   # Read fields
-  @required_lab_result_csv_fields ~w{datecollected_36 result_39 resultdate_42}
-  @optional_lab_result_csv_fields ~w{datereportedtolhd_44 lab_result_tid orderingfacilityname_37 testname_38}
-  @required_person_csv_fields ~w{dateofbirth_8 search_firstname_2 search_lastname_1}
-  @optional_person_csv_fields ~w{caseid_0 diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6 person_tid phonenumber_7 sex_11 ethnicity_13 occupation_18 race_12}
+  @required_lab_result_csv_fields ~w{sampled_on result analyzed_on}
+  @optional_lab_result_csv_fields ~w{reported_on tid request_facility_name test_type}
+  @required_person_csv_fields ~w{dob first_name last_name}
+  @optional_person_csv_fields ~w{external_id diagaddress_street1 diagaddress_city diagaddress_state diagaddress_zip person_tid phonenumber sex_at_birth ethnicity occupation race}
 
   # Insert fields
   @lab_result_db_fields_to_insert ~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}
-  @person_db_fields_to_insert ~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth sex ethnicity occupation race}
-  @address_db_fields_to_insert ~w{diagaddress_street1_3 diagaddress_city_4 diagaddress_state_5 diagaddress_zip_6}
+  @person_db_fields_to_insert ~w{person_tid dob first_name last_name external_id preferred_language sex_at_birth ethnicity occupation race}
+  @address_db_fields_to_insert ~w{diagaddress_street1 diagaddress_city diagaddress_state diagaddress_zip}
 
   @fields [
     required: @required_lab_result_csv_fields ++ @required_person_csv_fields,
@@ -25,21 +25,21 @@ defmodule Epicenter.Cases.Import do
 
   # Mapping from csv column name to internal db column names
   @key_map %{
-    "caseid_0" => "external_id",
-    "datecollected_36" => "sampled_on",
-    "dateofbirth_8" => "dob",
-    "datereportedtolhd_44" => "reported_on",
-    "ethnicity_13" => "ethnicity",
+    "caseid" => "external_id",
+    "datecollected" => "sampled_on",
+    "dateofbirth" => "dob",
+    "datereportedtolhd" => "reported_on",
+    "ethnicity" => "ethnicity",
     "lab_result_tid" => "tid",
-    "occupation_18" => "occupation",
-    "orderingfacilityname_37" => "request_facility_name",
-    "race_12" => "race",
-    "result_39" => "result",
-    "resultdate_42" => "analyzed_on",
-    "search_firstname_2" => "first_name",
-    "search_lastname_1" => "last_name",
-    "sex_11" => "sex_at_birth",
-    "testname_38" => "test_type"
+    "occupation" => "occupation",
+    "orderingfacilityname" => "request_facility_name",
+    "race" => "race",
+    "result" => "result",
+    "resultdate" => "analyzed_on",
+    "search_firstname" => "first_name",
+    "search_lastname" => "last_name",
+    "sex" => "sex_at_birth",
+    "testname" => "test_type"
   }
 
   @date_fields ~w{dob sampled_on reported_on analyzed_on}
@@ -51,17 +51,26 @@ defmodule Epicenter.Cases.Import do
   def import_csv(file, %Accounts.User{} = originator) do
     Repo.transaction(fn ->
       try do
-        Cases.create_imported_file(in_audit_tuple(file, originator))
+        Cases.create_imported_file(file)
 
-        case Csv.read(file.contents, @fields) do
+        case Csv.read(file.contents, &rename_headers/1, @fields) do
           {:ok, rows} ->
             rows
-            |> rename_rows()
             |> transform_dates()
+            |> reject_rows_with_blank_key_values("result")
             |> import_rows(originator)
 
-          {:error, message} ->
-            Repo.rollback(message)
+          {:error, :missing_headers, headers} ->
+            inverse_key_map = @key_map |> Enum.map(fn {k, v} -> {v, k} end) |> Map.new()
+
+            headers_string =
+              headers
+              |> Enum.map(&Map.get(inverse_key_map, &1, &1))
+              |> Enum.sort()
+              |> Enum.map(&Extra.String.add_placeholder_suffix/1)
+              |> Enum.join(", ")
+
+            Repo.rollback("Missing required columns: #{headers_string}")
         end
       rescue
         error in NimbleCSV.ParseError ->
@@ -73,8 +82,20 @@ defmodule Epicenter.Cases.Import do
     end)
   end
 
-  defp rename_rows(rows) do
-    Enum.map(rows, &Euclid.Extra.Map.rename_keys(&1, @key_map))
+  def reject_rows_with_blank_key_values(rows, key) do
+    rows
+    |> Enum.reject(fn
+      row when is_map_key(row, key) -> row |> Map.get(key) |> Euclid.Exists.blank?()
+      _row -> false
+    end)
+  end
+
+  # # #
+
+  defp rename_headers(headers) do
+    headers
+    |> Enum.map(&Extra.String.remove_numeric_suffix/1)
+    |> Enum.map(fn h -> Map.get(@key_map, h, h) end)
   end
 
   defp transform_dates(rows) do
@@ -113,29 +134,24 @@ defmodule Epicenter.Cases.Import do
     row
     |> Map.take(@person_db_fields_to_insert)
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-    |> in_audit_tuple(originator)
+    |> in_audit_tuple(originator, AuditLog.Revision.upsert_person_action())
     |> Cases.upsert_person!()
-  end
-
-  defp in_audit_tuple(data, author) do
-    Extra.Tuple.append(data, %AuditLog.Meta{
-      author_id: author.id,
-      reason_action: AuditLog.Revision.import_person_action(),
-      reason_event: AuditLog.Revision.import_csv_event()
-    })
   end
 
   defp import_lab_result(row, person, author) do
     row
     |> Map.take(@lab_result_db_fields_to_insert)
     |> Map.put("person_id", person.id)
-    |> in_audit_tuple(author)
+    |> in_audit_tuple(author, AuditLog.Revision.upsert_lab_result_action())
     |> Cases.upsert_lab_result!()
   end
 
   defp import_phone_number(row, person, author) do
-    if Euclid.Exists.present?(Map.get(row, "phonenumber_7")) do
-      Cases.upsert_phone!(%{number: Map.get(row, "phonenumber_7"), person_id: person.id} |> in_audit_tuple(author))
+    if Euclid.Exists.present?(Map.get(row, "phonenumber")) do
+      Cases.upsert_phone!(
+        %{number: Map.get(row, "phonenumber"), person_id: person.id}
+        |> in_audit_tuple(author, AuditLog.Revision.upsert_phone_number_action())
+      )
     end
   end
 
@@ -143,7 +159,23 @@ defmodule Epicenter.Cases.Import do
     [street, city, state, zip] = address_components = @address_db_fields_to_insert |> Enum.map(&Map.get(row, &1))
 
     if Euclid.Exists.any?(address_components) do
-      Cases.upsert_address!(%{full_address: "#{street}, #{city}, #{state} #{zip}", person_id: person.id} |> in_audit_tuple(author))
+      Cases.upsert_address!(
+        %{full_address: "#{street}, #{city}, #{state} #{zip}",
+          street: street,
+          city: city,
+          state: state,
+          postal_code: zip,
+          person_id: person.id}
+        |> in_audit_tuple(author, AuditLog.Revision.upsert_address_action())
+      )
     end
+  end
+
+  defp in_audit_tuple(data, author, reason_action) do
+    Extra.Tuple.append(data, %AuditLog.Meta{
+      author_id: author.id,
+      reason_action: reason_action,
+      reason_event: AuditLog.Revision.import_csv_event()
+    })
   end
 end

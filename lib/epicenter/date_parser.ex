@@ -1,5 +1,5 @@
 defmodule Epicenter.DateParser do
-  @mm_dd_yyyy_regex ~r|(?<mm>\d{2})[-/](?<dd>\d{2})[-/](?<yyyy>\d{4})|
+  @mm_dd_yyyy_regex ~r|(?<mm>\d\d?)[-/](?<dd>\d\d?)[-/](?<yyyy>\d{4})|
 
   def parse_mm_dd_yyyy(nil), do: {:ok, nil}
   def parse_mm_dd_yyyy(""), do: {:ok, nil}

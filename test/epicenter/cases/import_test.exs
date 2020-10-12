@@ -2,6 +2,7 @@ defmodule Epicenter.Cases.ImportTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [pluck: 2, tids: 1]
+  import Epicenter.Extra.String, only: [add_numeric_suffix: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
@@ -30,7 +31,7 @@ defmodule Epicenter.Cases.ImportTest do
                  contents: """
                  search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
                  Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
-                 Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
                  """
                }
                |> Import.import_csv(originator)
@@ -59,7 +60,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.external_id == "10000"
       assert alice.first_name == "Alice"
       assert alice.last_name == "Testuser"
-      assert alice.phones |> pluck(:number) == [1_111_111_000]
+      assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
       assert alice.ethnicity == "Cuban"
@@ -72,7 +73,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.external_id == "10001"
       assert billy.first_name == "Billy"
       assert billy.last_name == "Testuser"
-      assert billy.phones |> pluck(:number) == [1_111_111_001]
+      assert length(billy.phones) == 0
       assert billy.tid == "billy"
       assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
       assert_revision_count(billy, 1)
@@ -90,6 +91,120 @@ defmodule Epicenter.Cases.ImportTest do
               }} =
                %{file_name: file_name, contents: File.read!(file_name)}
                |> Import.import_csv(originator)
+    end
+
+    test "ignores number suffixes for columns in csv data", %{originator: originator} do
+      columns = [
+        add_numeric_suffix("search_firstname"),
+        add_numeric_suffix("search_lastname"),
+        add_numeric_suffix("dateofbirth"),
+        add_numeric_suffix("phonenumber"),
+        add_numeric_suffix("caseid"),
+        add_numeric_suffix("datecollected"),
+        add_numeric_suffix("resultdate"),
+        add_numeric_suffix("result"),
+        add_numeric_suffix("orderingfacilityname"),
+        "person_tid",
+        "lab_result_tid",
+        add_numeric_suffix("diagaddress_street1"),
+        add_numeric_suffix("diagaddress_city"),
+        add_numeric_suffix("diagaddress_state"),
+        add_numeric_suffix("diagaddress_zip"),
+        add_numeric_suffix("datereportedtolhd"),
+        add_numeric_suffix("testname"),
+        "person_tid",
+        add_numeric_suffix("sex"),
+        add_numeric_suffix("ethnicity"),
+        add_numeric_suffix("occupation"),
+        add_numeric_suffix("race")
+      ]
+
+      assert {:ok,
+              %Epicenter.Cases.Import.ImportInfo{
+                imported_people: imported_people,
+                imported_lab_result_count: 1,
+                imported_person_count: 1,
+                total_lab_result_count: 1,
+                total_person_count: 1
+              }} =
+               %{
+                 file_name: "test.csv",
+                 contents: """
+                 #{Enum.join(columns, ",")}
+                 Alice              , Testuser          , 01/01/1970, 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
+                 """
+               }
+               |> Import.import_csv(originator)
+
+      assert imported_people |> tids() == ["alice"]
+
+      [lab_result_1] = Cases.list_lab_results()
+      assert lab_result_1.result == "positive"
+      assert lab_result_1.sampled_on == ~D[2020-06-01]
+      assert lab_result_1.analyzed_on == ~D[2020-06-03]
+      assert lab_result_1.reported_on == ~D[2020-06-05]
+      assert lab_result_1.test_type == "TestTest"
+      assert lab_result_1.tid == "alice-result-1"
+      assert lab_result_1.request_facility_name == "Lab Co South"
+
+      [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
+      assert alice.dob == ~D[1970-01-01]
+      assert alice.external_id == "10000"
+      assert alice.first_name == "Alice"
+      assert alice.last_name == "Testuser"
+      assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.tid == "alice"
+      assert alice.sex_at_birth == "female"
+      assert alice.ethnicity == "Cuban"
+      assert alice.occupation == "Rocket Scientist"
+      assert alice.race == "Asian Indian"
+
+      assert_revision_count(alice, 1)
+    end
+
+    test "ignores empty LabResult 'result' records", %{originator: originator} do
+      assert {:ok,
+              %Epicenter.Cases.Import.ImportInfo{
+                imported_people: imported_people,
+                imported_lab_result_count: 1,
+                imported_person_count: 1,
+                total_lab_result_count: 1,
+                total_person_count: 1
+              }} =
+               %{
+                 file_name: "test.csv",
+                 contents: """
+                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
+                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
+                 Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    ,           ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 """
+               }
+               |> Import.import_csv(originator)
+
+      assert imported_people |> tids() == ["alice"]
+
+      [lab_result_1] = Cases.list_lab_results()
+      assert lab_result_1.result == "positive"
+      assert lab_result_1.sampled_on == ~D[2020-06-01]
+      assert lab_result_1.analyzed_on == ~D[2020-06-03]
+      assert lab_result_1.reported_on == ~D[2020-06-05]
+      assert lab_result_1.test_type == "TestTest"
+      assert lab_result_1.tid == "alice-result-1"
+      assert lab_result_1.request_facility_name == "Lab Co South"
+
+      [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
+      assert alice.dob == ~D[1970-01-01]
+      assert alice.external_id == "10000"
+      assert alice.first_name == "Alice"
+      assert alice.last_name == "Testuser"
+      assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.tid == "alice"
+      assert alice.sex_at_birth == "female"
+      assert alice.ethnicity == "Cuban"
+      assert alice.occupation == "Rocket Scientist"
+      assert alice.race == "Asian Indian"
+
+      assert_revision_count(alice, 1)
     end
   end
 
@@ -164,7 +279,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: 1_111_111_000}))
+      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: "111-111-1000"}))
 
       %{
         file_name: "test.csv",
@@ -176,7 +291,7 @@ defmodule Epicenter.Cases.ImportTest do
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_phones()
-      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == [1_111_111_000]
+      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000"]
     end
 
     test "creates new phone number when importing a duplicate for the same person with a different phone",
@@ -185,7 +300,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: 1_111_111_000}))
+      Cases.create_phone!(Test.Fixtures.phone_attrs(originator, alice, "0", %{number: "111-111-1000"}))
 
       %{
         file_name: "test.csv",
@@ -197,7 +312,7 @@ defmodule Epicenter.Cases.ImportTest do
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_phones()
-      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == [1_111_111_000, 1_111_111_111]
+      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000", "1111111111"]
     end
 
     test "updates existing address when importing a duplicate for the same person", %{
@@ -228,6 +343,11 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
                "4250 Test St, City, TS 00000"
              ]
+
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
     end
 
     test "creates new address when importing a duplicate for the same person with a different address",
@@ -258,6 +378,11 @@ defmodule Epicenter.Cases.ImportTest do
                "4250 Test St, City, TS 00000",
                "4251 Test St, City, TS 00000"
              ]
+
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St", "4251 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City", "City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS", "TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000", "00000"]
     end
   end
 
@@ -372,7 +497,7 @@ defmodule Epicenter.Cases.ImportTest do
           contents: """
           search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid
           Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/02/2020    , positive  , alice      , alice-result
-                             ,                   , 01/02/1980    ,                  ,               ,           ,            ,
+                             ,                   , 01/02/1980    ,                  ,               , positive  ,            ,
           """
         }
         |> Import.import_csv(originator)
@@ -392,7 +517,7 @@ defmodule Epicenter.Cases.ImportTest do
         }
         |> Import.import_csv(originator)
 
-      error_message = "Missing required columns: datecollected_36, dateofbirth_8, result_39, resultdate_42, search_firstname_2, search_lastname_1"
+      error_message = "Missing required columns: datecollected_xx, dateofbirth_xx, result_xx, resultdate_xx, search_firstname_xx, search_lastname_xx"
 
       assert {:error, error_message} == result
     end
@@ -409,6 +534,80 @@ defmodule Epicenter.Cases.ImportTest do
         |> Import.import_csv(originator)
 
       assert message =~ "unexpected escape character"
+    end
+  end
+
+  describe "reject_rows_with_blank_key_values" do
+    test "rejects row maps that have blank value for given key `result`" do
+      [
+        %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "reported_on" => ~D[2020-06-05],
+          "request_facility_name" => "Lab Co South",
+          "result" => "positive",
+          "tid" => "alice-result-1"
+        },
+        %{
+          "first_name" => "Billy",
+          "last_name" => "Testuser",
+          "reported_on" => nil,
+          "request_facility_name" => "",
+          "result" => "",
+          "tid" => "billy-result-1"
+        }
+      ]
+      |> Import.reject_rows_with_blank_key_values("result")
+      |> assert_eq([
+        %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "reported_on" => ~D[2020-06-05],
+          "request_facility_name" => "Lab Co South",
+          "result" => "positive",
+          "tid" => "alice-result-1"
+        }
+      ])
+    end
+
+    test "doesn't do anything if row doesn't have given key" do
+      [
+        %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "reported_on" => ~D[2020-06-05],
+          "request_facility_name" => "Lab Co South",
+          "result" => "positive",
+          "tid" => "alice-result-1"
+        },
+        %{
+          "first_name" => "Billy",
+          "last_name" => "Testuser",
+          "reported_on" => nil,
+          "request_facility_name" => "",
+          "result" => "",
+          "tid" => "billy-result-1"
+        }
+      ]
+      |> Import.reject_rows_with_blank_key_values("foobar")
+      |> assert_eq([
+        %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "reported_on" => ~D[2020-06-05],
+          "request_facility_name" => "Lab Co South",
+          "result" => "positive",
+          "tid" => "alice-result-1"
+        },
+        %{
+          "first_name" => "Billy",
+          "last_name" => "Testuser",
+          "reported_on" => nil,
+          "request_facility_name" => "",
+          "result" => "",
+          "tid" => "billy-result-1"
+        }
+      ])
     end
   end
 end

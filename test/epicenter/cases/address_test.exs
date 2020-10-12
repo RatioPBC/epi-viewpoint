@@ -12,6 +12,10 @@ defmodule Epicenter.Cases.AddressTest do
         Cases.Address,
         [
           {:full_address, :string},
+          {:street, :string},
+          {:city, :string},
+          {:state, :string},
+          {:postal_code, :string},
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:is_preferred, :boolean},
@@ -37,6 +41,10 @@ defmodule Epicenter.Cases.AddressTest do
     test "attributes" do
       changes = new_changeset(is_preferred: true).changes
       assert changes.full_address == "1234 Test St, City, TS 00000"
+      assert changes.street == "1234 Test St"
+      assert changes.city == "City"
+      assert changes.state == "TS"
+      assert changes.postal_code == "00000"
       assert changes.tid == "alice-address"
       assert changes.type == "home"
       assert changes.is_preferred == true
@@ -44,6 +52,10 @@ defmodule Epicenter.Cases.AddressTest do
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "full_address is required", do: assert_invalid(new_changeset(full_address: nil))
+    test "street is required", do: assert_invalid(new_changeset(street: nil))
+    test "city is required", do: assert_invalid(new_changeset(city: nil))
+    test "state is required", do: assert_invalid(new_changeset(state: nil))
+    test "postal_code is required", do: assert_invalid(new_changeset(postal_code: nil))
     test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
 
     test "validates personal health information on address", do: assert_invalid(new_changeset(full_address: "123 main st, sf ca"))

@@ -12,7 +12,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     changeset = person |> Cases.change_person(%{}) |> hard_code_gender_identity()
 
     socket
-    |> assign_page_title("#{Format.format(person)} (edit)")
+    |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign(changeset: changeset)
     |> assign(person: person)
     |> ok()

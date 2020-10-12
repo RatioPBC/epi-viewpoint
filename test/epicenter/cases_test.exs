@@ -307,7 +307,7 @@ defmodule Epicenter.CasesTest do
     test "persists the values correctly", %{person: person, creator: creator} do
       phone = Test.Fixtures.phone_attrs(creator, person, "phone1", %{}) |> Cases.create_phone!()
 
-      assert phone.number == 1_111_111_000
+      assert phone.number == "1111111000"
       assert phone.person_id == person.id
       assert phone.type == "home"
       assert phone.tid == "phone1"
@@ -324,7 +324,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone1",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -355,7 +355,7 @@ defmodule Epicenter.CasesTest do
     test "when the phone number already exists for the same person", %{person: person, creator: creator} do
       original_phone = add_phone_for_person("phone1", person, creator)
 
-      assert Cases.get_phone(original_phone.id).updated_at == ~N[1970-01-01 10:30:00Z]
+      assert Cases.get_phone(original_phone.id).updated_at == ~U[1970-01-01 10:30:00Z]
 
       phone = Test.Fixtures.phone_attrs(creator, person, "phone2", %{number: original_phone.number}) |> Cases.upsert_phone!()
 
@@ -367,7 +367,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -388,7 +388,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -405,7 +405,7 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(phone, creator, %{
         "tid" => "phone2",
-        "number" => 1_111_111_000,
+        "number" => "1111111000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -425,6 +425,10 @@ defmodule Epicenter.CasesTest do
       address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
 
       assert address.full_address == "4250 Test St, City, TS 00000"
+      assert address.street == "4250 Test St"
+      assert address.city == "City"
+      assert address.state == "TS"
+      assert address.postal_code == "00000"
       assert address.type == "home"
       assert address.tid == "address1"
       assert address.person_id == person.id

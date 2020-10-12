@@ -27,7 +27,7 @@ defmodule Epicenter.Cases.LabResult do
     field :test_type, :string
     field :tid, :string
 
-    timestamps()
+    timestamps(type: :utc_datetime)
 
     belongs_to :person, Person
   end

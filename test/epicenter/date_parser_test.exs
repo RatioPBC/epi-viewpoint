@@ -7,6 +7,7 @@ defmodule Epicenter.DateParserTest do
     test "mm-dd-yyyy and mm/dd/yyyy work" do
       assert DateParser.parse_mm_dd_yyyy("06-01-2020") == {:ok, ~D[2020-06-01]}
       assert DateParser.parse_mm_dd_yyyy("06/01/2020") == {:ok, ~D[2020-06-01]}
+      assert DateParser.parse_mm_dd_yyyy("6/1/2020") == {:ok, ~D[2020-06-01]}
     end
 
     test "other formats fail" do

@@ -103,24 +103,6 @@ check "yq: correct version is installed" \
   "yq --version 2>&1 | grep -q 'yq version 3'" \
   "brew upgrade yq # you may need to uninstall python-yq"
 
-if darwin; then
-  check "chromedriver: not quarantined by Mac OS" \
-    "test $(xattr "$(command -v chromedriver)" | grep -s -c 'com.apple.quarantine') -eq 0" \
-    "xattr -d com.apple.quarantine $(command -v chromedriver)"
-else
-  cecho --yellow "[checking] chromedriver: Skipping MacOS-specific check."
-fi
-
-if darwin; then
-  chromedriver_rec="brew cask upgrade chromedriver"
-else
-  chromedriver_rec="Google Chrome and Chromedriver versions must match"
-fi
-
-check "chromedriver: version matches Chrome version" \
-  "bin/_support/doctor/compare-chromedriver-and-chrome-versions.sh" \
-  "$chromedriver_rec"
-
 check "postgres: running" \
   "psql -l" \
   "bin/dev/postgres-start"

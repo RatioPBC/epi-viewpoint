@@ -17,4 +17,12 @@ defmodule Epicenter.Test.RevisionAssertions do
     if entry.author_id != author.id, do: flunk("Expected revision to have author #{author.tid} but it did not")
     assert ^change = Map.take(entry.change, Map.keys(change))
   end
+
+  def assert_recent_audit_log_snapshots(%{id: model_id}, author, expected_before, expected_after) do
+    entry = Epicenter.AuditLog.entries_for(model_id) |> List.last()
+    if entry == nil, do: flunk("Expected schema to have an audit log entry, but found none.")
+    if entry.author_id != author.id, do: flunk("Expected revision to have author #{author.tid} but it did not")
+    assert ^expected_before = Map.take(entry.before_change, Map.keys(expected_before))
+    assert ^expected_after = Map.take(entry.after_change, Map.keys(expected_after))
+  end
 end

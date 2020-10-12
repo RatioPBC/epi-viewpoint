@@ -87,6 +87,10 @@ defmodule Epicenter.Test.Fixtures do
     attrs =
       %{
         full_address: "#{street_number} Test St, City, TS 00000",
+        street: "#{street_number} Test St",
+        city: "City",
+        state: "TS",
+        postal_code: "00000",
         type: "home",
         person_id: person_id,
         tid: tid
@@ -99,7 +103,7 @@ defmodule Epicenter.Test.Fixtures do
   def phone_attrs(author, %Person{id: person_id}, tid, attrs \\ %{}) do
     attrs =
       %{
-        number: 1_111_111_000,
+        number: "111-111-1000",
         person_id: person_id,
         type: "home",
         tid: tid
@@ -137,15 +141,12 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(author)}
   end
 
-  def imported_file_attrs(author, tid, attrs \\ %{}) do
-    attrs =
-      %{
-        file_name: "test_results_september_14_2020",
-        tid: tid
-      }
-      |> merge_attrs(attrs)
-
-    {attrs, audit_meta(author)}
+  def imported_file_attrs(tid, attrs \\ %{}) do
+    %{
+      file_name: "test_results_september_14_2020",
+      tid: tid
+    }
+    |> merge_attrs(attrs)
   end
 
   def revision_attrs(tid, attrs \\ %{}) do

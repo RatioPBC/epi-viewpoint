@@ -4,11 +4,11 @@
     header#subnav
       = live_redirect "Records", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
       = arrow_right_icon(6, 9)
-      span data-role="name" = Format.format(@person)
+      span data-role="name" = Format.person(@person)
 
   section#heading
     div
-      h2 data-role="full-name"= Format.format(@person)
+      h2 data-role="full-name"= Format.person(@person)
       #external-id data-role="external-id"= @person.external_id
 
     form id="assignment-form" phx-change="form-change"
@@ -43,10 +43,10 @@
         tr
           th colspan=4 Address
         tr
-          td colspan=4 data-role="address"
+          td colspan=4 data-role="addresses"
             = if Euclid.Exists.present?(@person.addresses) do
               = for address <- @person.addresses do
-                div class="address-details"
+                div class="address-details" data-role="address-details"
                   div = address.full_address
                   div = address.type
             - else

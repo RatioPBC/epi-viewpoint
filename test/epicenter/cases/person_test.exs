@@ -64,8 +64,8 @@ defmodule Epicenter.Cases.PersonTest do
     test "has many phone numbers" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.phone_attrs(user, alice, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
-      Test.Fixtures.phone_attrs(user, alice, "phone-2", number: 1_111_111_001) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, alice, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, alice, "phone-2", number: "111-111-1001") |> Cases.create_phone!()
 
       assert alice |> Cases.preload_phones() |> Map.get(:phones) |> tids() == ~w{phone-1 phone-2}
     end
@@ -270,6 +270,57 @@ defmodule Epicenter.Cases.PersonTest do
       |> Epicenter.Repo.all()
       |> tids()
       |> assert_eq(~w{with-lab-result without-lab-result})
+    end
+  end
+
+  describe "serializing for audit logs" do
+    setup do
+      person =
+        Test.Fixtures.person_attrs(@admin, "old-positive-result")
+        |> Cases.create_person!()
+
+      person
+      |> Test.Fixtures.lab_result_attrs(@admin, "old-positive-result", "09/18/2020", result: "positive")
+      |> Cases.create_lab_result!()
+
+      Test.Fixtures.email_attrs(@admin, person, "email")
+      |> Cases.create_email!()
+
+      Test.Fixtures.phone_attrs(@admin, person, "phone")
+      |> Cases.create_phone!()
+
+      person = Cases.get_person(person.id)
+      [person: person]
+    end
+
+    test "with preloaded email/lab_result/phone", %{person: person} do
+      person = person |> Cases.preload_phones() |> Cases.preload_emails() |> Cases.preload_lab_results()
+
+      result_json = Jason.encode!(person)
+
+      assert result_json =~
+               "\"emails\":[{\"address\":\"email@example.com\",\"delete\":null,\"is_preferred\":null," <>
+                 "\"person_id\":\"#{person.id}\",\"tid\":\"email\"}]"
+
+      assert result_json =~
+               "\"lab_results\":[{\"person_id\":\"#{person.id}\",\"result\":\"positive\"," <>
+                 "\"sampled_on\":\"2020-09-18\",\"analyzed_on\":null,\"reported_on\":null," <>
+                 "\"request_accession_number\":\"accession-old-positive-result\"," <>
+                 "\"request_facility_code\":\"facility-old-positive-result\"," <>
+                 "\"request_facility_name\":\"old-positive-result Lab, Inc.\",\"test_type\":null," <>
+                 "\"tid\":\"old-positive-result\"}]"
+
+      assert result_json =~
+               "\"phones\":[{\"number\":\"1111111000\",\"delete\":null,\"is_preferred\":null," <>
+                 "\"person_id\":\"#{person.id}\",\"tid\":\"phone\",\"type\":\"home\"}]"
+    end
+
+    test "with nothing preloaded", %{person: person} do
+      result_json = Jason.encode!(person)
+
+      refute result_json =~ "emails"
+      refute result_json =~ "lab_results"
+      refute result_json =~ "phones"
     end
   end
 end

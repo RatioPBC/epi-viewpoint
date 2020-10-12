@@ -20,6 +20,24 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   #
+  # address
+  #
+
+  def assert_addresses(%View{} = view, ["Unknown"] = expected_addresses) do
+    assert addresses(view, "span") == expected_addresses
+    view
+  end
+
+  def assert_addresses(%View{} = view, expected_addresses) do
+    assert addresses(view) == expected_addresses
+    view
+  end
+
+  def addresses(%View{} = view, selector \\ "[data-role=address-details]") do
+    view |> Pages.parse() |> Test.Html.all("[data-role=addresses] #{selector}", as: :text)
+  end
+
+  #
   # assigning
   #
 
@@ -52,19 +70,39 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   #
+  # date of birth
+  #
+
+  def assert_date_of_birth(%View{} = view, expected_dob) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=date-of-birth]") == expected_dob
+    view
+  end
+
+  #
   # email addresses
   #
 
   def assert_email_addresses(%View{} = view, ["Unknown"] = expected_email_addresses) do
     assert email_addresses(view, "span") == expected_email_addresses
+    view
   end
 
   def assert_email_addresses(%View{} = view, expected_email_addresses) do
     assert email_addresses(view) == expected_email_addresses
+    view
   end
 
   def email_addresses(%View{} = view, selector \\ "li") do
     view |> Pages.parse() |> Test.Html.all("[data-role=email-addresses] #{selector}", as: :text)
+  end
+
+  #
+  # full name
+  #
+
+  def assert_full_name(%View{} = view, expected_full_name) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=full-name]") == expected_full_name
+    view
   end
 
   #
@@ -87,13 +125,24 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def assert_phone_numbers(%View{} = view, ["Unknown"] = expected_phone_numbers) do
     assert phone_numbers(view, "span") == expected_phone_numbers
+    view
   end
 
   def assert_phone_numbers(%View{} = view, expected_phone_numbers) do
     assert phone_numbers(view) == expected_phone_numbers
+    view
   end
 
   def phone_numbers(%View{} = view, selector \\ "li") do
     view |> Pages.parse() |> Test.Html.all("[data-role=phone-numbers] #{selector}", as: :text)
+  end
+
+  #
+  # preferred language
+  #
+
+  def assert_preferred_language(%View{} = view, expected_preferred_language) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=preferred-language]") == expected_preferred_language
+    view
   end
 end

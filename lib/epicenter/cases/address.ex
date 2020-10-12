@@ -6,7 +6,7 @@ defmodule Epicenter.Cases.Address do
 
   alias Epicenter.Cases.Address
 
-  @required_attrs ~w{full_address person_id}a
+  @required_attrs ~w{full_address street city state postal_code person_id}a
   @optional_attrs ~w(type tid is_preferred)a
 
   @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
@@ -15,13 +15,17 @@ defmodule Epicenter.Cases.Address do
   @foreign_key_type :binary_id
   schema "addresses" do
     field :full_address, :string
+    field :street, :string
+    field :city, :string
+    field :state, :string
+    field :postal_code, :string
     field :seq, :integer
     field :tid, :string
     field :type, :string
     field :person_id, :binary_id
     field :is_preferred, :boolean
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   def changeset(address, attrs) do

@@ -19,7 +19,7 @@ defmodule EpicenterWeb.ProfileLive do
 
     socket
     |> assign_defaults(session)
-    |> assign_page_title(Format.format(person))
+    |> assign_page_title(Format.person(person))
     |> assign_person(person)
     |> assign_users()
     |> ok()
@@ -88,9 +88,7 @@ defmodule EpicenterWeb.ProfileLive do
     person
     |> Cases.preload_phones()
     |> Map.get(:phones)
-    |> Enum.map(fn %{number: digits} ->
-      digits |> Integer.digits() |> Enum.map(&to_string/1) |> List.insert_at(-5, "-") |> List.insert_at(-9, "-") |> Enum.join()
-    end)
+    |> Enum.map(&Format.phone/1)
   end
 
   def string_or_unknown(value) do

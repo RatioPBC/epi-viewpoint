@@ -2,6 +2,7 @@ defmodule Epicenter.ValidationTest do
   use Epicenter.DataCase, async: true
 
   alias Ecto.Changeset
+  alias Epicenter.Cases.Address
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
   alias Epicenter.Cases.Email
@@ -54,8 +55,8 @@ defmodule Epicenter.ValidationTest do
   end
 
   describe "validate_phi: phone number" do
-    @valid_phone_number 1_111_111_567
-    @invalid_phone_number 12345
+    @valid_phone_number "1111111567"
+    @invalid_phone_number "12345"
 
     test "changest is valid if phone number matches '111-111-1xxx'" do
       Changeset.change(%Phone{}, number: @valid_phone_number)
@@ -95,6 +96,101 @@ defmodule Epicenter.ValidationTest do
     test "changeset is valid when there are no user input restrictions" do
       Changeset.change(%Email{}, address: @invalid_email_address)
       |> Validation.validate_phi(:email, :unrestricted)
+      |> assert_valid()
+    end
+  end
+
+  describe "validate_phi: street" do
+    @valid_street "1234 Test St"
+    @invalid_street "44 Main St"
+
+    test "changeset is valid if street is on Test St" do
+      Changeset.change(%Address{}, street: @valid_street)
+      |> Validation.validate_phi(:address)
+      |> assert_valid()
+    end
+
+    test "changeset is invalid if street is not on Test St" do
+      Changeset.change(%Address{}, street: @invalid_street)
+      |> Validation.validate_phi(:address)
+      |> assert_invalid(street: ["In non-PHI environment, must match '#### Test St'"])
+    end
+
+    test "changeset is valid when there are no user input restrictions" do
+      Changeset.change(%Address{}, street: @invalid_street)
+      |> Validation.validate_phi(:address, :unrestricted)
+      |> assert_valid()
+    end
+  end
+
+  describe "validate_phi: city" do
+    @valid_city "City3"
+    @invalid_city "Real City"
+
+    test "changeset is valid if city is City followed by an optional number" do
+      Changeset.change(%Address{}, city: @valid_city)
+      |> Validation.validate_phi(:address)
+      |> assert_valid()
+    end
+
+    test "changeset is invalid if city does not start with City and end in a number" do
+      Changeset.change(%Address{}, city: @invalid_city)
+      |> Validation.validate_phi(:address)
+      |> assert_invalid(city: ["In non-PHI environment, must match 'City#'"])
+    end
+
+    test "changeset is valid when there are no user input restrictions" do
+      Changeset.change(%Address{}, city: @invalid_city)
+      |> Validation.validate_phi(:address, :unrestricted)
+      |> assert_valid()
+    end
+  end
+
+  describe "validate_phi: state" do
+    @valid_state "ZA"
+    @invalid_state "AA"
+
+    test "changeset is valid if state is TS or starts with Z" do
+      Changeset.change(%Address{}, state: "TS")
+      |> Validation.validate_phi(:address)
+      |> assert_valid()
+      Changeset.change(%Address{}, state: @valid_state)
+      |> Validation.validate_phi(:address)
+      |> assert_valid()
+    end
+
+    test "changeset is invalid if state is TS and doesn't start with Z" do
+      Changeset.change(%Address{}, state: @invalid_state)
+      |> Validation.validate_phi(:address)
+      |> assert_invalid(state: ["In non-PHI environment, must be TS or end with Z"])
+    end
+
+    test "changeset is valid when there are no user input restrictions" do
+      Changeset.change(%Address{}, state: @invalid_state)
+      |> Validation.validate_phi(:address, :unrestricted)
+      |> assert_valid()
+    end
+  end
+
+  describe "validate_phi: postal code" do
+    @valid_postal_code "00002"
+    @invalid_postal_code "33333"
+
+    test "changeset is valid if postal_code starts with 4 zeros" do
+      Changeset.change(%Address{}, postal_code: @valid_postal_code)
+      |> Validation.validate_phi(:address)
+      |> assert_valid()
+    end
+
+    test "changeset is invalid if postal_code does not start with 4 zeros" do
+      Changeset.change(%Address{}, postal_code: @invalid_postal_code)
+      |> Validation.validate_phi(:address)
+      |> assert_invalid(postal_code: ["In non-PHI environment, must match '0000x'"])
+    end
+
+    test "changeset is valid when there are no user input restrictions" do
+      Changeset.change(%Address{}, postal_code: @invalid_postal_code)
+      |> Validation.validate_phi(:address, :unrestricted)
       |> assert_valid()
     end
   end

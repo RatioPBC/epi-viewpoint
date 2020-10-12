@@ -183,24 +183,27 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Cell", "Home", "Work"])
       |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
-      |> Pages.Profile.assert_phone_numbers(["111-111-1000"])
+      |> Pages.Profile.assert_phone_numbers(["(111) 111-1000"])
 
       phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
-      phones |> pluck(:number) |> assert_eq([1_111_111_000])
+      phones |> pluck(:number) |> assert_eq(["1111111000"])
       phones |> pluck(:type) |> assert_eq(["cell"])
     end
 
     test "updating existing phone numbers", %{conn: conn, person: person, user: user} do
-      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111001"}}})
-      |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
+      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "11111111009"}}})
+      |> Pages.Profile.assert_phone_numbers(["+1 (111) 111-1009"])
+
+      phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
+      phones |> pluck(:number) |> assert_eq(["11111111009"])
     end
 
     test "deleting existing phone numbers", %{conn: conn, person: person, user: user} do
-      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
@@ -219,7 +222,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
         "phones" => %{"0" => %{"number" => "1111111001"}, "1" => %{"number" => ""}}
       })
-      |> Pages.Profile.assert_phone_numbers(["111-111-1001"])
+      |> Pages.Profile.assert_phone_numbers(["(111) 111-1001"])
     end
 
     test "clicking phone number button does not reset state of form", %{conn: conn, person: person} do

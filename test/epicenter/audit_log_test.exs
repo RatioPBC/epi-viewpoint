@@ -177,6 +177,23 @@ defmodule Epicenter.AuditLogTest do
         "emails" => [%{"address" => "a@example.com", "delete" => false, "person_id" => person.id}],
         "fingerprint" => "1970-01-01 alice testuser"
       })
+
+      assert_recent_audit_log_snapshots(
+        person,
+        user,
+        %{"emails" => []},
+        %{
+          "emails" => [
+            %{
+              "address" => "a@example.com",
+              "delete" => false,
+              "is_preferred" => nil,
+              "person_id" => person.id,
+              "tid" => nil
+            }
+          ]
+        }
+      )
     end
 
     test "returns {:error, changeset} when changeset is invalid" do

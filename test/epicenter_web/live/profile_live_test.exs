@@ -27,12 +27,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
   describe "when the person has no identifying information" do
     test "showing person identifying information", %{conn: conn, person: person, user: user} do
       {:ok, _} = Cases.update_person(person, {%{preferred_language: nil}, Test.Fixtures.audit_meta(user)})
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
-      assert_role_text(page_live, "preferred-language", "Unknown")
-      assert_role_text(page_live, "phone-numbers", "Unknown")
-      assert_role_text(page_live, "email-addresses", "Unknown")
-      assert_role_text(page_live, "address", "Unknown")
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_full_name("Alice Testuser")
+      |> Pages.Profile.assert_date_of_birth("01/01/2000")
+      |> Pages.Profile.assert_preferred_language("Unknown")
+      |> Pages.Profile.assert_phone_numbers(["Unknown"])
+      |> Pages.Profile.assert_email_addresses(["Unknown"])
+      |> Pages.Profile.assert_addresses(["Unknown"])
     end
 
     test("email_addresses", %{person: person}, do: person |> ProfileLive.email_addresses() |> assert_eq([]))
@@ -44,30 +46,30 @@ defmodule EpicenterWeb.ProfileLiveTest do
     setup %{person: person, user: user} do
       Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
       Test.Fixtures.email_attrs(user, person, "alice-preferred", is_preferred: true) |> Cases.create_email!()
-      Test.Fixtures.phone_attrs(user, person, "phone-1", number: 1_111_111_000) |> Cases.create_phone!()
-      Test.Fixtures.phone_attrs(user, person, "phone-2", number: 1_111_111_001, is_preferred: true) |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(user, person, "phone-2", number: "111-111-1001", is_preferred: true) |> Cases.create_phone!()
       Test.Fixtures.address_attrs(user, person, "alice-address", 1000, type: "home") |> Cases.create_address!()
       Test.Fixtures.address_attrs(user, person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
       :ok
     end
 
     test "showing person identifying information", %{conn: conn, person: person} do
-      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
-
-      assert_role_text(page_live, "full-name", "Alice Testuser")
-      assert_role_text(page_live, "date-of-birth", "01/01/2000")
-      assert_role_text(page_live, "preferred-language", "English")
-      assert_role_text(page_live, "phone-numbers", "111-111-1001 111-111-1000")
-      assert_role_text(page_live, "email-addresses", "alice-preferred@example.com alice-a@example.com")
-      assert_role_text(page_live, "address", "2000 Test St, City, TS 00000 1000 Test St, City, TS 00000 home")
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_full_name("Alice Testuser")
+      |> Pages.Profile.assert_date_of_birth("01/01/2000")
+      |> Pages.Profile.assert_preferred_language("English")
+      |> Pages.Profile.assert_phone_numbers(["(111) 111-1001", "(111) 111-1000"])
+      |> Pages.Profile.assert_email_addresses(["alice-preferred@example.com", "alice-a@example.com"])
+      |> Pages.Profile.assert_addresses(["2000 Test St, City, TS 00000", "1000 Test St, City, TS 00000home"])
     end
 
     test "email_addresses", %{person: person} do
       person |> ProfileLive.email_addresses() |> assert_eq(["alice-preferred@example.com", "alice-a@example.com"])
     end
 
-    test "phone_numbers", %{person: person} do
-      person |> ProfileLive.phone_numbers() |> assert_eq(["111-111-1001", "111-111-1000"])
+    test "phone_numbers", %{person: person, user: user} do
+      Test.Fixtures.phone_attrs(user, person, "phone-3", number: "1-111-111-1009") |> Cases.create_phone!()
+      person |> ProfileLive.phone_numbers() |> assert_eq(["(111) 111-1001", "(111) 111-1000", "+1 (111) 111-1009"])
     end
   end
 
@@ -220,7 +222,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice, user: user} do
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
-      assert_role_text(show_page_live, "address", "1000 Test St, City, TS 00000 home")
+      assert_role_text(show_page_live, "addresses", "1000 Test St, City, TS 00000 home")
 
       Test.Fixtures.address_attrs(user, alice, "address2", 2000) |> Cases.create_address!()
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}]}, socket)
