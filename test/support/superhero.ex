@@ -11,5 +11,5 @@ defmodule Superhero do
     field :secret_identity, :string, redact: true
   end
 
-  derive_jason_encoder(Superhero)
+  derive_jason_encoder()
 end

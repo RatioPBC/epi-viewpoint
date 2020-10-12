@@ -26,7 +26,7 @@ defmodule Epicenter.Accounts.User do
     has_many :assignments, Person, foreign_key: :assigned_to_id
   end
 
-  derive_jason_encoder(Epicenter.Accounts.User)
+  derive_jason_encoder()
 
   @required_attrs ~w{name}a
   @optional_attrs ~w{tid}a
