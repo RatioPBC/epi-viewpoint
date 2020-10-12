@@ -23,8 +23,8 @@ defmodule Epicenter.AuditLog do
     create_revision(changeset, %Meta{} = meta, &Repo.update!/2, ecto_options)
   end
 
-  defp recursively_get_changes_from_changeset(%Ecto.Changeset{changes: changes}),
-    do: recursively_get_changes_from_changeset(changes)
+  defp recursively_get_changes_from_changeset(%Ecto.Changeset{changes: changes, data: %{__struct__: type}}),
+    do: changes |> recursively_get_changes_from_changeset() |> redact(type)
 
   defp recursively_get_changes_from_changeset(%_struct{} = data),
     do: data
@@ -41,7 +41,7 @@ defmodule Epicenter.AuditLog do
   defp recursively_get_changes_from_changeset(data),
     do: data
 
-  def create_revision(changeset, %Meta{} = meta, repo_fn, ecto_options \\ []) when is_function(repo_fn) do
+  def create_revision(%Ecto.Changeset{} = changeset, %Meta{} = meta, repo_fn, ecto_options \\ []) when is_function(repo_fn) do
     %{data: data} = changeset
 
     result = repo_fn.(changeset, ecto_options)
@@ -55,10 +55,10 @@ defmodule Epicenter.AuditLog do
 
     if after_change != nil do
       attrs = %{
-        "after_change" => after_change |> redact(),
+        "after_change" => after_change,
         "author_id" => meta.author_id,
-        "before_change" => data |> redact(),
-        "change" => recursively_get_changes_from_changeset(changeset) |> redact(),
+        "before_change" => data,
+        "change" => recursively_get_changes_from_changeset(changeset),
         "changed_id" => after_change.id,
         "changed_type" => module_name(data),
         "reason_action" => meta.reason_action,
@@ -71,11 +71,10 @@ defmodule Epicenter.AuditLog do
     result
   end
 
-  @redacted_fields [:password, :mfa_secret]
-  defp redact(changes) do
+  defp redact(map, type) do
     Enum.reduce(
-      @redacted_fields,
-      changes,
+      type.__schema__(:redact_fields),
+      map,
       fn key, acc ->
         acc
         |> Map.get_and_update(

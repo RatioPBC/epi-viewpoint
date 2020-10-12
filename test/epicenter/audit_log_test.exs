@@ -82,6 +82,33 @@ defmodule Epicenter.AuditLogTest do
       refute Enum.any?(revision.before_change, has_password_in_value)
       refute Enum.any?(revision.change, has_password_in_value)
     end
+
+    test "omits mfa_secret from the revision" do
+      mfa_secret = "123456"
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      mfa_changeset = user |> Epicenter.Accounts.User.mfa_changeset(%{"mfa_secret" => mfa_secret})
+
+      {:ok, _updated_user} =
+        AuditLog.update(
+          mfa_changeset,
+          %AuditLog.Meta{
+            author_id: Ecto.UUID.generate(),
+            reason_event: "event",
+            reason_action: "action"
+          }
+        )
+
+      has_mfa_secret_in_value = fn
+        {_key, value} when is_binary(value) -> String.contains?(value, mfa_secret)
+        _ -> false
+      end
+
+      [_, revision] = AuditLog.revisions(Accounts.User)
+
+      refute Enum.any?(revision.after_change, has_mfa_secret_in_value)
+      refute Enum.any?(revision.before_change, has_mfa_secret_in_value)
+      refute Enum.any?(revision.change, has_mfa_secret_in_value)
+    end
   end
 
   describe "updating" do
