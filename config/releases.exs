@@ -33,11 +33,11 @@ config :epicenter, EpicenterWeb.Endpoint,
        server: true,
        url: [
          host: CFG.canonical_host(),
-         port: CFG.application_port(),
+         port: 443,
          scheme: "https"
        ],
        https: [
-         port: 4000,
+         port: CFG.application_port(),
          cipher_suite: :strong,
          otp_app: :epicenter,
          keyfile: "/opt/ssl/STAR_network_geometer_dev.key",

@@ -14,7 +14,7 @@ config :epicenter, EpicenterWeb.Endpoint,
    check_origin: false,
    force_ssl: [rewrite_on: [:x_forwarded_proto]],
    server: true,
-   url: [host: {:system, "CANONICAL_HOST"}, port: {:system, "PORT"}]
+   url: [host: {:system, "CANONICAL_HOST"}, port: 443, scheme: "https"]
 
 config :epicenter,
   mfa_issuer: "Viewpoint-staging",
