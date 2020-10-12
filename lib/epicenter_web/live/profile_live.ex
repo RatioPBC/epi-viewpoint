@@ -88,16 +88,7 @@ defmodule EpicenterWeb.ProfileLive do
     person
     |> Cases.preload_phones()
     |> Map.get(:phones)
-    |> Enum.map(fn
-      %{number: number_string} when byte_size(number_string) == 10 ->
-        number_string |> Number.Phone.number_to_phone(area_code: true)
-
-      %{number: number_string} when byte_size(number_string) == 11 ->
-        number_string |> String.slice(1..-1) |> Number.Phone.number_to_phone(area_code: true, country_code: String.at(number_string, 0))
-
-      %{number: number_string} ->
-        number_string
-    end)
+    |> Enum.map(&Format.phone/1)
   end
 
   def string_or_unknown(value) do
