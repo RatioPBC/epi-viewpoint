@@ -31,7 +31,7 @@ defmodule Epicenter.Cases.ImportTest do
                  contents: """
                  search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
                  Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
-                 Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
                  """
                }
                |> Import.import_csv(originator)
@@ -73,7 +73,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.external_id == "10001"
       assert billy.first_name == "Billy"
       assert billy.last_name == "Testuser"
-      assert billy.phones |> pluck(:number) == ["1111111001"]
+      assert length(billy.phones) == 0
       assert billy.tid == "billy"
       assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
       assert_revision_count(billy, 1)
@@ -343,6 +343,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
                "4250 Test St, City, TS 00000"
              ]
+
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS"]
@@ -377,6 +378,7 @@ defmodule Epicenter.Cases.ImportTest do
                "4250 Test St, City, TS 00000",
                "4251 Test St, City, TS 00000"
              ]
+
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St", "4251 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City", "City"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS", "TS"]
