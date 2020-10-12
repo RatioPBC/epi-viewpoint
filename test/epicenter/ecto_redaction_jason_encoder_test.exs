@@ -6,4 +6,10 @@ defmodule EctoRedactionJasonEncoderTest do
     assert encoded =~ ~r/Superman/
     refute encoded =~ ~r/Clark Kent/
   end
+
+  test "omits `except` fields" do
+    encoded = Jason.encode!(%Superhero{moniker: "Superman", created_by: "Jerry Seigel"})
+    assert encoded =~ ~r/Superman/
+    refute encoded =~ ~r/Jerry Seigel/
+  end
 end

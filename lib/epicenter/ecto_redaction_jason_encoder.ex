@@ -1,15 +1,16 @@
 defmodule Epicenter.EctoRedactionJasonEncoder do
-  defmacro derive_jason_encoder() do
+  defmacro derive_jason_encoder(opts \\ []) do
     quote do
-      import Epicenter.EctoRedactionJasonEncoder, only: [__derive_jason_encoder__: 1]
+      import Epicenter.EctoRedactionJasonEncoder, only: [__derive_jason_encoder__: 2]
 
-      __derive_jason_encoder__(__MODULE__)
+      __derive_jason_encoder__(__MODULE__, unquote(opts))
     end
   end
 
-  defmacro __derive_jason_encoder__(mod) do
-    quote bind_quoted: [mod: mod] do
-      def __nonredacted_fields__(), do: @ecto_fields |> Keyword.keys() |> Kernel.--(@ecto_redact_fields)
+  defmacro __derive_jason_encoder__(mod, opts) do
+    except = Keyword.get(opts, :except, [])
+    quote bind_quoted: [mod: mod, except: except] do
+      def __nonredacted_fields__(), do: @ecto_fields |> Keyword.keys() |> Kernel.--(@ecto_redact_fields) |> Kernel.--(unquote(except))
 
 
       defimpl Jason.Encoder, for: __MODULE__ do

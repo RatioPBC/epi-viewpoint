@@ -9,7 +9,8 @@ defmodule Superhero do
   schema "superhero" do
     field :moniker, :string
     field :secret_identity, :string, redact: true
+    field :created_by
   end
 
-  derive_jason_encoder()
+  derive_jason_encoder(except: [:created_by])
 end
