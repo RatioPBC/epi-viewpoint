@@ -39,6 +39,7 @@ defmodule Epicenter.AuditLog.Revision do
   def upsert_lab_result_action(), do: "upsert-lab-result"
   def upsert_phone_number_action(), do: "upsert-phone-number"
   def upsert_address_action(), do: "upsert-address"
+  def import_csv_action(), do: "import-csv"
   def releases_action(), do: "releases"
   def register_user_action(), do: "register-user"
   def update_user_email_action(), do: "update-user-email"
