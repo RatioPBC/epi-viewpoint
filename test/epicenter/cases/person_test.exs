@@ -301,21 +301,46 @@ defmodule Epicenter.Cases.PersonTest do
       result_json = Jason.encode!(person)
 
       assert result_json =~
-               "\"emails\":[{\"address\":\"email@example.com\",\"delete\":null,\"is_preferred\":null," <>
-                 "\"person_id\":\"#{person.id}\",\"tid\":\"email\"}]"
+               """
+               "emails":[{
+               "address":"email@example.com",
+               "delete":null,
+               "is_preferred":null,
+               "person_id":"#{person.id}",
+               "tid":"email"
+               }]
+               """
+               |> String.replace("\n", "")
 
       assert result_json =~
-               "\"lab_results\":[{\"person_id\":\"#{person.id}\"," <>
-                 "\"analyzed_on\":null,\"reported_on\":null," <>
-                 "\"request_accession_number\":\"accession-old-positive-result\"," <>
-                 "\"request_facility_code\":\"facility-old-positive-result\"," <>
-                 "\"request_facility_name\":\"old-positive-result Lab, Inc.\"," <>
-                 "\"result\":\"positive\",\"sampled_on\":\"2020-09-18\"," <>
-                 "\"test_type\":null,\"tid\":\"old-positive-result\"}]"
+               """
+               "lab_results":[{
+               "person_id":"#{person.id}",
+               "analyzed_on":null,
+               "reported_on":null,
+               "request_accession_number":"accession-old-positive-result",
+               "request_facility_code":"facility-old-positive-result",
+               "request_facility_name":"old-positive-result Lab, Inc.",
+               "result":"positive",
+               "sampled_on":"2020-09-18",
+               "test_type":null,
+               "tid":"old-positive-result"
+               }]
+               """
+               |> String.replace("\n", "")
 
       assert result_json =~
-               "\"phones\":[{\"number\":\"1111111000\",\"delete\":null,\"is_preferred\":null," <>
-                 "\"person_id\":\"#{person.id}\",\"tid\":\"phone\",\"type\":\"home\"}]"
+               """
+               "phones":[{"
+               number":"1111111000",
+               "delete":null,
+               "is_preferred":null,
+               "person_id":"#{person.id}",
+               "tid":"phone",
+               "type":"home"
+               }]
+               """
+               |> String.replace("\n", "")
     end
 
     test "with nothing preloaded", %{person: person} do
