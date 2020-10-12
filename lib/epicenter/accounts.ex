@@ -158,7 +158,7 @@ defmodule Epicenter.Accounts do
       {:ok, %{to: ..., body: ...}}
 
   """
-  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun, _audit_meta)
+  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
       when is_function(update_email_url_fun, 1) do
     {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
 
@@ -217,7 +217,7 @@ defmodule Epicenter.Accounts do
   @doc """
   Generates a session token.
   """
-  def generate_user_session_token({user, _audit_meta}) do
+  def generate_user_session_token(user) do
     {token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token)
     token
@@ -238,7 +238,7 @@ defmodule Epicenter.Accounts do
   @doc """
   Deletes the signed token with the given context.
   """
-  def delete_session_token({token, _audit_meta}) do
+  def delete_session_token(token) do
     Repo.delete_all(UserToken.token_and_context_query(token, "session"))
     :ok
   end

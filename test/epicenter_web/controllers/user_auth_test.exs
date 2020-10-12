@@ -42,7 +42,7 @@ defmodule EpicenterWeb.UserAuthTest do
 
   describe "logout_user/1" do
     test "erases session and cookies", %{conn: conn, user: user} do
-      user_token = Accounts.generate_user_session_token({user, %{}})
+      user_token = Accounts.generate_user_session_token(user)
 
       conn =
         conn
@@ -78,13 +78,13 @@ defmodule EpicenterWeb.UserAuthTest do
 
   describe "fetch_current_user/2" do
     test "authenticates user from session", %{conn: conn, user: user} do
-      user_token = Accounts.generate_user_session_token({user, %{}})
+      user_token = Accounts.generate_user_session_token(user)
       conn = conn |> put_session(:user_token, user_token) |> UserAuth.fetch_current_user([])
       assert conn.assigns.current_user.id == user.id
     end
 
     test "does not authenticate if data is missing", %{conn: conn, user: user} do
-      _ = Accounts.generate_user_session_token({user, %{}})
+      _ = Accounts.generate_user_session_token(user)
       conn = UserAuth.fetch_current_user(conn, [])
       refute get_session(conn, :user_token)
       refute conn.assigns.current_user
@@ -227,7 +227,7 @@ defmodule EpicenterWeb.UserAuthTest do
   end
 
   defp setup_user_token(conn, user, expires_at) do
-    token_string = Accounts.generate_user_session_token({user, Epicenter.Test.Fixtures.audit_meta(user)})
+    token_string = Accounts.generate_user_session_token(user)
     user_token = UserToken.fetch_user_token_query(token_string) |> Repo.one() |> UserToken.changeset(%{expires_at: expires_at}) |> Repo.update!()
     conn |> Conn.merge_private(plug_session: %{"user_token" => user_token.token})
   end

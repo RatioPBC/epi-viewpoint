@@ -62,7 +62,7 @@ defmodule EpicenterWeb.ConnCase do
   It returns an updated `conn`.
   """
   def log_in_user(conn, user, opts \\ []) do
-    token = Epicenter.Accounts.generate_user_session_token({user, Epicenter.Test.Fixtures.audit_meta(user)})
+    token = Epicenter.Accounts.generate_user_session_token(user)
 
     conn
     |> Phoenix.ConnTest.init_test_session(%{})
