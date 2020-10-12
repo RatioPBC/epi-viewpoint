@@ -124,6 +124,23 @@ defmodule EpicenterWeb.ProfileLiveTest do
         ]
       )
     end
+
+    test "when the person lacks a value for a field of a lab result, show unknown", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.lab_result_attrs(person, user, "lab1", ~D[2020-04-10], %{
+        result: nil,
+        request_facility_name: nil,
+        analyzed_on: nil,
+        reported_on: nil,
+        test_type: nil
+      })
+      |> Cases.create_lab_result!()
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_lab_results([
+        ["Collection", "Result", "Ordering Facility", "Analysis", "Reported", "Type"],
+        ["04/10/2020", "Unknown", "Unknown", "Unknown", "Unknown", "Unknown"]
+      ])
+    end
   end
 
   describe "assigning and unassigning user to a person" do

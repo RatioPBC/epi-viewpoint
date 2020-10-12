@@ -162,7 +162,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert_revision_count(alice, 1)
     end
 
-    test "ignores empty LabResult 'result' records", %{originator: originator} do
+    test "processes empty LabResult 'result' records", %{originator: originator} do
       assert {:ok,
               %Epicenter.Cases.Import.ImportInfo{
                 imported_people: imported_people,
@@ -175,8 +175,7 @@ defmodule Epicenter.Cases.ImportTest do
                  file_name: "test.csv",
                  contents: """
                  search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
-                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
-                 Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    ,           ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    ,   , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
                  """
                }
                |> Import.import_csv(originator)
@@ -184,7 +183,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert imported_people |> tids() == ["alice"]
 
       [lab_result_1] = Cases.list_lab_results()
-      assert lab_result_1.result == "positive"
+      assert lab_result_1.result == nil
       assert lab_result_1.sampled_on == ~D[2020-06-01]
       assert lab_result_1.analyzed_on == ~D[2020-06-03]
       assert lab_result_1.reported_on == ~D[2020-06-05]
@@ -585,34 +584,22 @@ defmodule Epicenter.Cases.ImportTest do
   end
 
   describe "reject_rows_with_blank_key_values" do
-    test "rejects row maps that have blank value for given key `result`" do
+    test "rejects row maps that have blank value for a given key" do
       [
         %{
-          "first_name" => "Alice",
-          "last_name" => "Testuser",
-          "reported_on" => ~D[2020-06-05],
-          "request_facility_name" => "Lab Co South",
-          "result" => "positive",
-          "tid" => "alice-result-1"
+          "field_a" => "Value A",
+          "field_b" => nil
         },
         %{
-          "first_name" => "Billy",
-          "last_name" => "Testuser",
-          "reported_on" => nil,
-          "request_facility_name" => "",
-          "result" => "",
-          "tid" => "billy-result-1"
+          "field_a" => "Value A",
+          "field_b" => "Value B"
         }
       ]
-      |> Import.reject_rows_with_blank_key_values("result")
+      |> Import.reject_rows_with_blank_key_values("field_b")
       |> assert_eq([
         %{
-          "first_name" => "Alice",
-          "last_name" => "Testuser",
-          "reported_on" => ~D[2020-06-05],
-          "request_facility_name" => "Lab Co South",
-          "result" => "positive",
-          "tid" => "alice-result-1"
+          "field_a" => "Value A",
+          "field_b" => "Value B"
         }
       ])
     end
@@ -620,39 +607,23 @@ defmodule Epicenter.Cases.ImportTest do
     test "doesn't do anything if row doesn't have given key" do
       [
         %{
-          "first_name" => "Alice",
-          "last_name" => "Testuser",
-          "reported_on" => ~D[2020-06-05],
-          "request_facility_name" => "Lab Co South",
-          "result" => "positive",
-          "tid" => "alice-result-1"
+          "field_a" => "Value A",
+          "field_b" => nil
         },
         %{
-          "first_name" => "Billy",
-          "last_name" => "Testuser",
-          "reported_on" => nil,
-          "request_facility_name" => "",
-          "result" => "",
-          "tid" => "billy-result-1"
+          "field_a" => "Value A",
+          "field_b" => "Value B"
         }
       ]
-      |> Import.reject_rows_with_blank_key_values("foobar")
+      |> Import.reject_rows_with_blank_key_values("field_c")
       |> assert_eq([
         %{
-          "first_name" => "Alice",
-          "last_name" => "Testuser",
-          "reported_on" => ~D[2020-06-05],
-          "request_facility_name" => "Lab Co South",
-          "result" => "positive",
-          "tid" => "alice-result-1"
+          "field_a" => "Value A",
+          "field_b" => nil
         },
         %{
-          "first_name" => "Billy",
-          "last_name" => "Testuser",
-          "reported_on" => nil,
-          "request_facility_name" => "",
-          "result" => "",
-          "tid" => "billy-result-1"
+          "field_a" => "Value A",
+          "field_b" => "Value B"
         }
       ])
     end

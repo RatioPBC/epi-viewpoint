@@ -58,7 +58,6 @@ defmodule Epicenter.Cases.Import do
             rows
             |> transform_dates()
             |> reject_rows_with_blank_key_values("dob")
-            |> reject_rows_with_blank_key_values("result")
             |> import_rows(originator)
 
           {:error, :missing_headers, headers} ->

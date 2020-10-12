@@ -43,13 +43,14 @@ defmodule Epicenter.Cases.LabResultTest do
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
-    test "result is required", do: assert_invalid(new_changeset(result: nil))
+    test "result is not required", do: assert_valid(new_changeset(result: nil))
     test "sample date is required", do: assert_invalid(new_changeset(sampled_on: nil))
 
     test "attributes" do
-      changes = new_changeset(analyzed_on: ~D[2020-09-10], reported_on: ~D[2020-09-11], test_type: "PCR").changes
+      changes = new_changeset(analyzed_on: ~D[2020-09-10], reported_on: ~D[2020-09-11], result: "positive", test_type: "PCR").changes
       assert changes.analyzed_on == ~D[2020-09-10]
       assert changes.reported_on == ~D[2020-09-11]
+      assert changes.result == "positive"
       assert changes.test_type == "PCR"
     end
   end

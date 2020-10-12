@@ -303,12 +303,12 @@ defmodule Epicenter.Cases.PersonTest do
                  "\"person_id\":\"#{person.id}\",\"tid\":\"email\"}]"
 
       assert result_json =~
-               "\"lab_results\":[{\"person_id\":\"#{person.id}\",\"result\":\"positive\"," <>
+               "\"lab_results\":[{\"person_id\":\"#{person.id}\"," <>
                  "\"sampled_on\":\"2020-09-18\",\"analyzed_on\":null,\"reported_on\":null," <>
                  "\"request_accession_number\":\"accession-old-positive-result\"," <>
                  "\"request_facility_code\":\"facility-old-positive-result\"," <>
-                 "\"request_facility_name\":\"old-positive-result Lab, Inc.\",\"test_type\":null," <>
-                 "\"tid\":\"old-positive-result\"}]"
+                 "\"request_facility_name\":\"old-positive-result Lab, Inc.\",\"result\":\"positive\"," <>
+                 "\"test_type\":null,\"tid\":\"old-positive-result\"}]"
 
       assert result_json =~
                "\"phones\":[{\"number\":\"1111111000\",\"delete\":null,\"is_preferred\":null," <>

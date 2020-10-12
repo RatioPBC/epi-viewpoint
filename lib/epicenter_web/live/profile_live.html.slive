@@ -73,11 +73,11 @@
           = for lab_result <- @person.lab_results do
             tr data-tid=lab_result.tid
               td= Extra.Date.render(lab_result.sampled_on)
-              td= lab_result.result
-              td= lab_result.request_facility_name
-              td= Extra.Date.render(lab_result.analyzed_on)
-              td= Extra.Date.render(lab_result.reported_on)
-              td= lab_result.test_type
+              td= string_or_unknown(lab_result.result)
+              td= string_or_unknown(lab_result.request_facility_name)
+              td= string_or_unknown(Extra.Date.render(lab_result.analyzed_on))
+              td= string_or_unknown(Extra.Date.render(lab_result.reported_on))
+              td= string_or_unknown(lab_result.test_type)
 
   section#demographics
     header

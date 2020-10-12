@@ -7,8 +7,8 @@ defmodule Epicenter.Cases.LabResult do
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
 
-  @required_attrs ~w{person_id result sampled_on}a
-  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}a
+  @required_attrs ~w{person_id sampled_on}a
+  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name result test_type tid}a
 
   @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
 
