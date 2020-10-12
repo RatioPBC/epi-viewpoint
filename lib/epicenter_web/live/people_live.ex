@@ -88,16 +88,14 @@ defmodule EpicenterWeb.PeopleLive do
     if lab_result do
       result = lab_result.result || "unknown"
 
-      days_ago =
-        lab_result.sampled_on
-        |> Extra.Date.days_ago()
-        |> Extra.String.pluralize("day ago", "days ago")
-
-      "#{result}, #{days_ago}"
+      "#{result}, #{days_ago(lab_result)}"
     else
       ""
     end
   end
+
+  defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
+  defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago() |> Extra.String.pluralize("day ago", "days ago")
 
   def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"

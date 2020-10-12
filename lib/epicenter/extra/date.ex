@@ -1,4 +1,11 @@
 defmodule Epicenter.Extra.Date do
+  defmodule NilFirst do
+    def compare(nil, nil), do: :eq
+    def compare(nil, _date2), do: :gt
+    def compare(_date1, nil), do: :lt
+    def compare(date1, date2), do: Date.compare(date1, date2)
+  end
+
   def days_ago(date_or_days, opts \\ [])
 
   def days_ago(nil, _opts) do

@@ -72,7 +72,7 @@
         tbody
           = for lab_result <- @person.lab_results do
             tr data-tid=lab_result.tid
-              td= Extra.Date.render(lab_result.sampled_on)
+              td= string_or_unknown(Extra.Date.render(lab_result.sampled_on))
               td= string_or_unknown(lab_result.result)
               td= string_or_unknown(lab_result.request_facility_name)
               td= string_or_unknown(Extra.Date.render(lab_result.analyzed_on))

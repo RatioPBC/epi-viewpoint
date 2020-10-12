@@ -26,4 +26,18 @@ defmodule Epicenter.Extra.DateTest do
       assert Extra.Date.render(nil) == ""
     end
   end
+
+  describe "NilFirst.compare" do
+    test "nils are considered greater than date values" do
+      assert Extra.Date.NilFirst.compare(nil, ~D[2020-05-19]) == :gt
+      assert Extra.Date.NilFirst.compare(~D[2020-05-19], nil) == :lt
+      assert Extra.Date.NilFirst.compare(nil, nil) == :eq
+    end
+
+    test "date value comparison is as per Date.compare" do
+      assert Extra.Date.NilFirst.compare(~D[2020-05-19], ~D[2020-05-19]) == Date.compare(~D[2020-05-19], ~D[2020-05-19])
+      assert Extra.Date.NilFirst.compare(~D[2020-05-18], ~D[2020-05-19]) == Date.compare(~D[2020-05-18], ~D[2020-05-19])
+      assert Extra.Date.NilFirst.compare(~D[2020-05-19], ~D[2020-05-18]) == Date.compare(~D[2020-05-19], ~D[2020-05-18])
+    end
+  end
 end

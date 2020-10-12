@@ -96,14 +96,7 @@ defmodule Epicenter.Cases.Person do
     case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do
       nil -> nil
       [] -> nil
-      lab_results -> lab_results |> Enum.max_by(& &1.sampled_on, Date)
-    end
-  end
-
-  def latest_lab_result(person, field) do
-    case latest_lab_result(person) do
-      nil -> nil
-      lab_result -> Map.get(lab_result, field)
+      lab_results -> lab_results |> Enum.sort_by(& &1.seq, :desc) |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst)
     end
   end
 

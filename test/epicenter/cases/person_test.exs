@@ -181,21 +181,23 @@ defmodule Epicenter.Cases.PersonTest do
       assert Person.latest_lab_result(alice).tid == "newer"
     end
 
-    test "when given a field, returns the value of that field for the latest lab result" do
+    test "when there is a null sampled_on, returns that record first" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, user, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, user, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
 
-      assert Person.latest_lab_result(alice, :result) == "positive"
-      assert Person.latest_lab_result(alice, :sampled_on) == ~D[2020-06-02]
+      assert Person.latest_lab_result(alice).tid == "unknown"
     end
 
-    test "when given a field but there is no lab result, returns nil" do
+    test "when there are two records with null sampled_on, returns the lab results with the largest seq" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      assert Person.latest_lab_result(alice, :result) == nil
-      assert Person.latest_lab_result(alice, :sampled_on) == nil
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer unknown", nil) |> Cases.create_lab_result!()
+
+      assert Person.latest_lab_result(alice).tid == "newer unknown"
     end
   end
 
@@ -304,10 +306,11 @@ defmodule Epicenter.Cases.PersonTest do
 
       assert result_json =~
                "\"lab_results\":[{\"person_id\":\"#{person.id}\"," <>
-                 "\"sampled_on\":\"2020-09-18\",\"analyzed_on\":null,\"reported_on\":null," <>
+                 "\"analyzed_on\":null,\"reported_on\":null," <>
                  "\"request_accession_number\":\"accession-old-positive-result\"," <>
                  "\"request_facility_code\":\"facility-old-positive-result\"," <>
-                 "\"request_facility_name\":\"old-positive-result Lab, Inc.\",\"result\":\"positive\"," <>
+                 "\"request_facility_name\":\"old-positive-result Lab, Inc.\"," <>
+                 "\"result\":\"positive\",\"sampled_on\":\"2020-09-18\"," <>
                  "\"test_type\":null,\"tid\":\"old-positive-result\"}]"
 
       assert result_json =~

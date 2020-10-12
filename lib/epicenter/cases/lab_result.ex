@@ -7,8 +7,8 @@ defmodule Epicenter.Cases.LabResult do
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
 
-  @required_attrs ~w{person_id sampled_on}a
-  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name result test_type tid}a
+  @required_attrs ~w{person_id}a
+  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name result sampled_on test_type tid}a
 
   @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
 
@@ -76,7 +76,7 @@ defmodule Epicenter.Cases.LabResult do
 
     def display_order() do
       from lab_result in LabResult,
-        order_by: [desc: lab_result.sampled_on, desc: lab_result.reported_on, asc: lab_result.seq]
+        order_by: [desc_nulls_first: lab_result.sampled_on, desc: lab_result.reported_on, asc: lab_result.seq]
     end
 
     def opts_for_upsert() do
