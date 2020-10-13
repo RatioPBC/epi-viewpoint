@@ -17,6 +17,13 @@ defmodule Epicenter.Extra.DateTest do
     end
   end
 
+  describe "days_ago_string" do
+    test "when given a date, returns the number of days ago as a string" do
+      assert Extra.Date.days_ago_string(~D[2020-05-19], from: ~D[2020-06-01]) == "13 days ago"
+      assert Extra.Date.days_ago_string(~D[2020-05-19], from: ~D[2020-05-20]) == "1 day ago"
+    end
+  end
+
   describe "render" do
     test "when given a date, formats it as mm/dd/yyyy" do
       assert Extra.Date.render(~D[2020-05-19]) == "05/19/2020"

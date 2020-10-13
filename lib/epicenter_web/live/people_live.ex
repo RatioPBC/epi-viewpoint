@@ -95,7 +95,7 @@ defmodule EpicenterWeb.PeopleLive do
   end
 
   defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
-  defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago() |> Extra.String.pluralize("day ago", "days ago")
+  defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago_string()
 
   def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"
