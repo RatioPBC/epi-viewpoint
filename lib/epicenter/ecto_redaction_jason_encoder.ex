@@ -1,21 +1,23 @@
 defmodule Epicenter.EctoRedactionJasonEncoder do
+  @moduledoc """
+  Usage:
+  Provides a macro for implementing the Jason.Encoder protocol in a way that respects Ecto's redaction system.
+
+  This macro must be invoked _after_ the Ecto.Schema.schema definition, else the requisite redaction information is unavailable.
+  """
+
   defmacro derive_jason_encoder(opts \\ []) do
-    quote do
-      import Epicenter.EctoRedactionJasonEncoder, only: [__derive_jason_encoder__: 2]
-
-      __derive_jason_encoder__(__MODULE__, unquote(opts))
-    end
-  end
-
-  defmacro __derive_jason_encoder__(mod, opts) do
     except = Keyword.get(opts, :except, [])
-    quote bind_quoted: [mod: mod, except: except] do
+    quote do
+      invoking_module = __MODULE__
+
       def __nonredacted_fields__(), do: @ecto_fields |> Keyword.keys() |> Kernel.--(@ecto_redact_fields) |> Kernel.--(unquote(except))
 
-
       defimpl Jason.Encoder, for: __MODULE__ do
+        @invoking_module invoking_module
+
         def encode(value, opts) do
-          value |> Map.take(unquote(mod).__nonredacted_fields__()) |> Jason.Encode.map(opts)
+          value |> Map.take(@invoking_module.__nonredacted_fields__()) |> Jason.Encode.map(opts)
         end
       end
     end
