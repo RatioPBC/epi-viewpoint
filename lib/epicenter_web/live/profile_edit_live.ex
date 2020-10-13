@@ -190,7 +190,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   defp reformat_date(changeset, field) do
     case Ecto.Changeset.fetch_field(changeset, field) do
       {:error} -> changeset
-      {_, date} -> Ecto.Changeset.put_change(changeset, field, Extra.Date.render(date))
+      {_, date} -> Ecto.Changeset.put_change(changeset, field, Format.date(date))
     end
   end
 

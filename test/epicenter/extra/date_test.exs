@@ -17,13 +17,24 @@ defmodule Epicenter.Extra.DateTest do
     end
   end
 
-  describe "render" do
-    test "when given a date, formats it as mm/dd/yyyy" do
-      assert Extra.Date.render(~D[2020-05-19]) == "05/19/2020"
+  describe "days_ago_string" do
+    test "when given a date, returns the number of days ago as a string" do
+      assert Extra.Date.days_ago_string(~D[2020-05-19], from: ~D[2020-06-01]) == "13 days ago"
+      assert Extra.Date.days_ago_string(~D[2020-05-19], from: ~D[2020-05-20]) == "1 day ago"
+    end
+  end
+
+  describe "NilFirst.compare" do
+    test "nils are considered greater than date values" do
+      assert Extra.Date.NilFirst.compare(nil, ~D[2020-05-19]) == :gt
+      assert Extra.Date.NilFirst.compare(~D[2020-05-19], nil) == :lt
+      assert Extra.Date.NilFirst.compare(nil, nil) == :eq
     end
 
-    test "when given a nil, quietly renders an empty string" do
-      assert Extra.Date.render(nil) == ""
+    test "date value comparison is as per Date.compare" do
+      assert Extra.Date.NilFirst.compare(~D[2020-05-19], ~D[2020-05-19]) == Date.compare(~D[2020-05-19], ~D[2020-05-19])
+      assert Extra.Date.NilFirst.compare(~D[2020-05-18], ~D[2020-05-19]) == Date.compare(~D[2020-05-18], ~D[2020-05-19])
+      assert Extra.Date.NilFirst.compare(~D[2020-05-19], ~D[2020-05-18]) == Date.compare(~D[2020-05-19], ~D[2020-05-18])
     end
   end
 end

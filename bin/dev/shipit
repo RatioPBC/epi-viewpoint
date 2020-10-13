@@ -7,8 +7,10 @@ trap "exit" INT
 
 source "bin/_support/step.sh"
 
-bin/dev/update
-bin/dev/test
+step "Checking for unused elixir deps" 'mix deps.unlock --check-unused'
 step "Auditing elixir deps" "mix deps.audit"
 step "Auditing javascript deps" "npm audit --audit-level=moderate --prefix assets"
+bin/dev/update
+bin/dev/test
+
 step "Pushing" "git push origin HEAD"

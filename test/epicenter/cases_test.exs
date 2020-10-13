@@ -122,6 +122,20 @@ defmodule Epicenter.CasesTest do
 
       assert person_1.lab_results |> tids() == ~w{person-1-result-1 person-1-result-2}
       assert person_2.lab_results |> tids() == ~w{person-2-result-2}
+
+      lab_result = person_1.lab_results |> Enum.at(1)
+
+      assert_revision_count(lab_result, 2)
+
+      assert_recent_audit_log(lab_result, creator, %{
+        "person_id" => person_1.id,
+        "request_accession_number" => "accession-result-2",
+        "request_facility_code" => "facility-result-2",
+        "request_facility_name" => "result-2 Lab, Inc.",
+        "result" => "positive",
+        "sampled_on" => "2020-01-01",
+        "tid" => "person-1-result-2-dupe"
+      })
     end
   end
 
@@ -269,6 +283,9 @@ defmodule Epicenter.CasesTest do
       })
     end
 
+    # We are temporarily disabling updating a person when we see them again in a csv
+    # https://www.pivotaltracker.com/story/show/175239678
+    @tag :skip
     test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
       creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
       Test.Fixtures.person_attrs(creator, "alice", tid: "first-insert") |> Cases.upsert_person!()

@@ -19,7 +19,9 @@ defmodule Epicenter.Cases do
   def import_lab_results(lab_result_csv_string, originator), do: Import.import_csv(lab_result_csv_string, originator)
   def list_lab_results(), do: LabResult.Query.all() |> Repo.all()
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(lab_results: LabResult.Query.display_order())
-  def upsert_lab_result!({attrs, _audit_meta}), do: %LabResult{} |> change_lab_result(attrs) |> Repo.insert!(LabResult.Query.opts_for_upsert())
+
+  def upsert_lab_result!({attrs, audit_meta}),
+    do: %LabResult{} |> change_lab_result(attrs) |> AuditLog.insert!(audit_meta, LabResult.Query.opts_for_upsert())
 
   #
   # people
@@ -96,5 +98,5 @@ defmodule Epicenter.Cases do
   #
   # imported files
   #
-  def create_imported_file(attrs), do: %ImportedFile{} |> ImportedFile.changeset(attrs) |> Repo.insert!()
+  def create_imported_file({attrs, audit_meta}), do: %ImportedFile{} |> ImportedFile.changeset(attrs) |> AuditLog.insert!(audit_meta)
 end

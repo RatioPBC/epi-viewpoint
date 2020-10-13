@@ -208,7 +208,7 @@ defmodule Epicenter.AccountsTest do
     test "sends token through notification", %{user: user} do
       token =
         extract_user_token(fn url ->
-          Accounts.deliver_update_email_instructions(user, "current@example.com", url, %{})
+          Accounts.deliver_update_email_instructions(user, "current@example.com", url)
         end)
 
       {:ok, token} = Base.url_decode64(token, padding: false)
@@ -238,7 +238,7 @@ defmodule Epicenter.AccountsTest do
 
       token =
         extract_user_token(fn url ->
-          Accounts.deliver_update_email_instructions(%{user | email: email}, user.email, url, %{})
+          Accounts.deliver_update_email_instructions(%{user | email: email}, user.email, url)
         end)
 
       %{user: user, token: token, email: email}
@@ -348,7 +348,7 @@ defmodule Epicenter.AccountsTest do
     end
 
     test "deletes all tokens for the given user", %{user: user} do
-      _ = Accounts.generate_user_session_token({user, Test.Fixtures.admin_audit_meta()})
+      _ = Accounts.generate_user_session_token(user)
 
       {:ok, _} =
         Accounts.update_user_password(
@@ -366,7 +366,7 @@ defmodule Epicenter.AccountsTest do
   describe "generate_user_session_token/1" do
     setup do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      token = Accounts.generate_user_session_token({user, Test.Fixtures.audit_meta(user)})
+      token = Accounts.generate_user_session_token(user)
       user_token = Repo.get_by(UserToken, token: token)
       [token: user_token]
     end
@@ -423,7 +423,7 @@ defmodule Epicenter.AccountsTest do
   describe "get_user_by_session_token/1" do
     setup do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      token = Accounts.generate_user_session_token({user, %{}})
+      token = Accounts.generate_user_session_token(user)
       %{user: user, token: token}
     end
 
@@ -445,8 +445,8 @@ defmodule Epicenter.AccountsTest do
   describe "delete_session_token/1" do
     test "deletes the token" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      token = Accounts.generate_user_session_token({user, %{}})
-      assert Accounts.delete_session_token({token, %{}}) == :ok
+      token = Accounts.generate_user_session_token(user)
+      assert Accounts.delete_session_token(token) == :ok
       refute Accounts.get_user_by_session_token(token)
     end
   end
@@ -593,7 +593,7 @@ defmodule Epicenter.AccountsTest do
     end
 
     test "deletes all tokens for the given user", %{user: user} do
-      _ = Accounts.generate_user_session_token({user, %{}})
+      _ = Accounts.generate_user_session_token(user)
       {:ok, _} = Accounts.reset_user_password(user, %{password: "new valid password"}, Test.Fixtures.audit_meta(user))
       refute Repo.get_by(UserToken, user_id: user.id)
     end
@@ -615,18 +615,24 @@ defmodule Epicenter.AccountsTest do
     end
 
     test "disables the provided user", %{user: user} do
-      assert {:ok, _} = Accounts.disable_user(user, Test.Fixtures.audit_meta(@admin))
-
+      assert {:ok, _} = Accounts.disable_user(user, :disable, Test.Fixtures.audit_meta(@admin))
+      assert Accounts.get_user!(user.id).disabled == true
       assert_revision_count(user, 2)
-
-      assert_recent_audit_log(user, @admin, %{
-        "disabled" => true
-      })
+      assert_recent_audit_log(user, @admin, %{"disabled" => true})
     end
 
-    test "gives an error message if user is already disabled", %{user: user} do
-      {:ok, user} = Accounts.disable_user(user, Test.Fixtures.audit_meta(@admin))
-      assert {:error, _} = Accounts.disable_user(user, Test.Fixtures.audit_meta(@admin))
+    test "enables the provided user", %{user: user} do
+      assert {:ok, _} = Accounts.disable_user(user, :enable, Test.Fixtures.audit_meta(@admin))
+      assert Accounts.get_user!(user.id).disabled == false
+      assert_revision_count(user, 2)
+      assert_recent_audit_log(user, @admin, %{"disabled" => false})
+    end
+
+    test "gives an error message if user is already in the requested state", %{user: user} do
+      {:ok, user} = Accounts.disable_user(user, :disable, Test.Fixtures.audit_meta(@admin))
+      assert {:error, _} = Accounts.disable_user(user, :disable, Test.Fixtures.audit_meta(@admin))
+      {:ok, user} = Accounts.disable_user(user, :enable, Test.Fixtures.audit_meta(@admin))
+      assert {:error, _} = Accounts.disable_user(user, :enable, Test.Fixtures.audit_meta(@admin))
     end
   end
 

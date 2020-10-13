@@ -23,12 +23,7 @@ defmodule EpicenterWeb.UserSettingsController do
           Accounts.deliver_update_email_instructions(
             applied_user,
             user.email,
-            &Routes.user_settings_url(conn, :confirm_email, &1),
-            %AuditLog.Meta{
-              author_id: user.id,
-              reason_action: AuditLog.Revision.update_user_email_request_action(),
-              reason_event: AuditLog.Revision.update_user_email_request_event()
-            }
+            &Routes.user_settings_url(conn, :confirm_email, &1)
           )
 
         conn

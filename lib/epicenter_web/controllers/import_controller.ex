@@ -8,6 +8,7 @@ defmodule EpicenterWeb.ImportController do
 
   alias Epicenter.Cases
   alias EpicenterWeb.Session
+  alias Epicenter.DateParsingError
 
   @common_assigns [page_title: "Import labs"]
 
@@ -24,6 +25,11 @@ defmodule EpicenterWeb.ImportController do
         |> redirect(to: Routes.import_path(conn, :show))
 
       {:error, [user_readable: user_readable_message]} ->
+        conn
+        |> Session.set_import_error_message(user_readable_message)
+        |> redirect(to: Routes.import_start_path(conn, EpicenterWeb.ImportLive))
+
+      {:error, %DateParsingError{user_readable: user_readable_message}} ->
         conn
         |> Session.set_import_error_message(user_readable_message)
         |> redirect(to: Routes.import_start_path(conn, EpicenterWeb.ImportLive))

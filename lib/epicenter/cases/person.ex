@@ -55,7 +55,7 @@ defmodule Epicenter.Cases.Person do
         end
       end
 
-      person_attrs = Map.take(value, Person.required_attrs() ++ Person.optional_attrs())
+      person_attrs = Map.take(value, [:id] ++ Person.required_attrs() ++ Person.optional_attrs())
 
       person_attrs = put_field_if_loaded.(person_attrs, value, :emails)
       person_attrs = put_field_if_loaded.(person_attrs, value, :lab_results)
@@ -96,14 +96,7 @@ defmodule Epicenter.Cases.Person do
     case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do
       nil -> nil
       [] -> nil
-      lab_results -> lab_results |> Enum.max_by(& &1.sampled_on, Date)
-    end
-  end
-
-  def latest_lab_result(person, field) do
-    case latest_lab_result(person) do
-      nil -> nil
-      lab_result -> Map.get(lab_result, field)
+      lab_results -> lab_results |> Enum.sort_by(& &1.seq, :desc) |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst)
     end
   end
 
@@ -146,9 +139,9 @@ defmodule Epicenter.Cases.Person do
         where: lab_result.sampled_on > ^fifteen_days_ago
     end
 
-    @fields_to_not_be_replaced ~w{id dob ethnicity fingerprint first_name last_name occupation race sex_at_birth}a
+    @fields_to_replace_from_csv ~w{updated_at}a
     def opts_for_upsert() do
-      [returning: true, on_conflict: {:replace_all_except, @fields_to_not_be_replaced}, conflict_target: :fingerprint]
+      [returning: true, on_conflict: {:replace, @fields_to_replace_from_csv}, conflict_target: :fingerprint]
     end
   end
 end

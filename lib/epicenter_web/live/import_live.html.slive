@@ -2,7 +2,7 @@ section#import-page
   h2 Import Labs
 
   = if Euclid.Exists.present?(@import_error_message) do
-    #import-error-message
+    div class="import-error-message"
       p = @import_error_message
 
   p Choose a CSV file from your computer, click “Upload”, and then wait for the file to upload.

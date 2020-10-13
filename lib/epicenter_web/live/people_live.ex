@@ -83,19 +83,19 @@ defmodule EpicenterWeb.PeopleLive do
     do: Map.has_key?(selected_people, person_id)
 
   def latest_result(person) do
-    result = Person.latest_lab_result(person, :result)
+    lab_result = Person.latest_lab_result(person)
 
-    if result do
-      days_ago =
-        Person.latest_lab_result(person, :sampled_on)
-        |> Extra.Date.days_ago()
-        |> Extra.String.pluralize("day ago", "days ago")
+    if lab_result do
+      result = lab_result.result || "unknown"
 
-      "#{result}, #{days_ago}"
+      "#{result}, #{days_ago(lab_result)}"
     else
       ""
     end
   end
+
+  defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
+  defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago_string()
 
   def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"

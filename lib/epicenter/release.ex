@@ -99,36 +99,42 @@ defmodule Epicenter.Release do
   end
 
   @doc """
-  An administrator can use `disable_users` to disable users from being able to accomplish actions,
-  to do so, find your administrator's user:
+  An administrator can use `update_users` to disable users from being able to accomplish actions,
+  or to re-enable them. To do so, find your administrator's user:
 
   administrator = Epicenter.Repo.get_by(Epicenter.Accounts.User, email: "admin@example.com")
 
-  Then call this function by providing a list of email addresses of users to disable:
+  Then call this function by providing a list of email addresses of users to disable or enable:
 
-  Epicenter.Release.disable_users(administrator, ["some-other-user@example.com"])
+  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :disable)
+  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :enable)
 
   Progress will be logged to stdout.
   """
-
-  @spec disable_users(%Epicenter.Accounts.User{}, list(String.t())) :: :ok
-  def disable_users(author, emails, opts \\ []) do
+  @spec update_users(%Epicenter.Accounts.User{}, list(String.t()), atom()) :: :ok
+  def update_users(author, emails, action, opts \\ []) when action in [:disable, :enable] do
     ensure_started()
 
     puts = Keyword.get(opts, :puts, &IO.puts/1)
 
+    reason_action =
+      case action do
+        :disable -> AuditLog.Revision.disable_user_action()
+        :enable -> AuditLog.Revision.enable_user_action()
+      end
+
     audit_meta = %AuditLog.Meta{
       author_id: author.id,
-      reason_action: AuditLog.Revision.disable_user_action(),
+      reason_action: reason_action,
       reason_event: AuditLog.Revision.releases_event()
     }
 
     for email <- emails do
       with {:ok, user} <- get_user_by_email(email),
-           {:ok, user} <- Epicenter.Accounts.disable_user(user, audit_meta) do
-        puts.("Disabled user #{user.email}")
+           {:ok, _user} <- Epicenter.Accounts.disable_user(user, action, audit_meta) do
+        puts.("OK: #{action} #{email}")
       else
-        {:error, error} -> puts.("Error disabling #{email}: }#{error}")
+        {:error, error} -> puts.("ERROR: #{action} #{email} (#{error})")
       end
     end
 

@@ -62,4 +62,21 @@ defmodule Epicenter.Accounts.UserTest do
       assert errors_on(changeset).email == ["has already been taken"]
     end
   end
+
+  describe "json encoding" do
+    test "it redacts secret values from serialization" do
+      alice_audit_meta_tuple = {_, audit_meta} = Test.Fixtures.user_attrs(@admin, "alice", %{password: "alice's password", mfa_secret: "alice's authenticator"})
+      alice = alice_audit_meta_tuple |> Accounts.register_user!() |> Accounts.update_user_mfa!({"alice's authenticator", audit_meta})
+      json = Jason.encode!(alice)
+      refute json =~ ~r/alice's password/
+      refute json =~ alice.hashed_password
+      refute json =~ ~r/alice's authenticator/
+    end
+
+    test "it omits developer utility values from serialization" do
+      alice = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user!()
+      json = Jason.encode!(alice)
+      refute json =~ ~r/"seq"/
+    end
+  end
 end

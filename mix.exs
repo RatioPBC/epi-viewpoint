@@ -35,7 +35,7 @@ defmodule Epicenter.MixProject do
     [
       local_or_remote(:remote, :euclid, version: "~> 1.0", organization: "geometer", path: System.get_env("EUCLID_PATH", "../euclid")),
       {:bcrypt_elixir, "~> 2.1.0"},
-      {:ecto_sql, "~> 3.4"},
+      {:ecto_sql, "~> 3.5"},
       {:eqrcode, "~> 0.1.7"},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.11"},

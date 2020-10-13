@@ -22,7 +22,17 @@ defmodule Epicenter.Test.RevisionAssertions do
     entry = Epicenter.AuditLog.entries_for(model_id) |> List.last()
     if entry == nil, do: flunk("Expected schema to have an audit log entry, but found none.")
     if entry.author_id != author.id, do: flunk("Expected revision to have author #{author.tid} but it did not")
-    assert ^expected_before = Map.take(entry.before_change, Map.keys(expected_before))
-    assert ^expected_after = Map.take(entry.after_change, Map.keys(expected_after))
+    assert ^expected_before = Map.take(entry.before_change |> remove_ids(), Map.keys(expected_before))
+    assert ^expected_after = Map.take(entry.after_change |> remove_ids(), Map.keys(expected_after))
   end
+
+  defp remove_ids(map) when is_map(map) do
+    map
+    |> Map.drop(["id"])
+    |> Enum.map(fn {k, v} -> {k, remove_ids(v)} end)
+    |> Enum.into(%{})
+  end
+
+  defp remove_ids(list) when is_list(list), do: Enum.map(list, &remove_ids/1)
+  defp remove_ids(other), do: other
 end

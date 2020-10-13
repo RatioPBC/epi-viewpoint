@@ -45,19 +45,27 @@ defmodule Epicenter.Cases.Import do
   @date_fields ~w{dob sampled_on reported_on analyzed_on}
 
   defmodule ImportInfo do
-    defstruct ~w{imported_people imported_person_count imported_lab_result_count total_person_count total_lab_result_count}a
+    defstruct [
+      :imported_people,
+      :imported_person_count,
+      :imported_lab_result_count,
+      :skipped_row_count,
+      :total_person_count,
+      :total_lab_result_count,
+      skipped_row_error_messages: []
+    ]
   end
 
   def import_csv(file, %Accounts.User{} = originator) do
     Repo.transaction(fn ->
       try do
-        Cases.create_imported_file(file)
+        Cases.create_imported_file(in_audit_tuple(file, originator, AuditLog.Revision.import_csv_action()))
 
         case Csv.read(file.contents, &rename_headers/1, @fields) do
           {:ok, rows} ->
             rows
             |> transform_dates()
-            |> reject_rows_with_blank_key_values("result")
+            |> reject_rows_with_blank_key_values("dob")
             |> import_rows(originator)
 
           {:error, :missing_headers, headers} ->
@@ -78,16 +86,27 @@ defmodule Epicenter.Cases.Import do
 
         error in Ecto.InvalidChangesetError ->
           Repo.rollback(error)
+
+        error in Epicenter.DateParsingError ->
+          Repo.rollback(error)
       end
     end)
   end
 
   def reject_rows_with_blank_key_values(rows, key) do
-    rows
-    |> Enum.reject(fn
-      row when is_map_key(row, key) -> row |> Map.get(key) |> Euclid.Exists.blank?()
-      _row -> false
-    end)
+    error_message = "Missing required field: #{key}"
+
+    {importable_rows, error_messages} =
+      rows
+      |> Enum.reduce({[], []}, fn row, {importable_rows, error_messages} ->
+        cond do
+          !is_map_key(row, key) -> {[row | importable_rows], error_messages}
+          row |> Map.get(key) |> Euclid.Exists.blank?() -> {importable_rows, [error_message | error_messages]}
+          true -> {[row | importable_rows], error_messages}
+        end
+      end)
+
+    {Enum.reverse(importable_rows), error_messages}
   end
 
   # # #
@@ -103,9 +122,9 @@ defmodule Epicenter.Cases.Import do
     Enum.map(rows, &Euclid.Extra.Map.transform(&1, @date_fields, date_parser))
   end
 
-  defp import_rows(rows, originator) do
+  defp import_rows({importable_rows, error_messages}, originator) do
     result =
-      for row <- rows, reduce: %{people: MapSet.new(), lab_results: MapSet.new()} do
+      for row <- importable_rows, reduce: %{people: MapSet.new(), lab_results: MapSet.new()} do
         %{people: people, lab_results: lab_results} ->
           %{person: person, lab_result: lab_result} = import_row(row, originator)
           %{people: MapSet.put(people, person.id), lab_results: MapSet.put(lab_results, lab_result.id)}
@@ -115,6 +134,8 @@ defmodule Epicenter.Cases.Import do
       imported_people: result.people |> MapSet.to_list() |> Cases.get_people(),
       imported_person_count: MapSet.size(result.people),
       imported_lab_result_count: MapSet.size(result.lab_results),
+      skipped_row_count: length(error_messages),
+      skipped_row_error_messages: error_messages,
       total_person_count: Cases.count_people(),
       total_lab_result_count: Cases.count_lab_results()
     }
@@ -160,12 +181,7 @@ defmodule Epicenter.Cases.Import do
 
     if Euclid.Exists.any?(address_components) do
       Cases.upsert_address!(
-        %{full_address: "#{street}, #{city}, #{state} #{zip}",
-          street: street,
-          city: city,
-          state: state,
-          postal_code: zip,
-          person_id: person.id}
+        %{full_address: "#{street}, #{city}, #{state} #{zip}", street: street, city: city, state: state, postal_code: zip, person_id: person.id}
         |> in_audit_tuple(author, AuditLog.Revision.upsert_address_action())
       )
     end

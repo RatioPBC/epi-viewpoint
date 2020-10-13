@@ -220,5 +220,20 @@ defmodule EpicenterWeb.PeopleLiveTest do
       Test.Fixtures.lab_result_attrs(person, user, "lab-result", ~D[2020-01-01], result: "positive") |> Cases.create_lab_result!()
       assert PeopleLive.latest_result(person) =~ ~r|positive, \d+ days ago|
     end
+
+    test "when there is a lab result and a sample date, but the lab result lacks a result value", %{person: person, user: user} do
+      Test.Fixtures.lab_result_attrs(person, user, "lab-result", ~D[2020-01-01], result: nil) |> Cases.create_lab_result!()
+      assert PeopleLive.latest_result(person) =~ ~r|unknown, \d+ days ago|
+    end
+
+    test "when there is a result and no sample date", %{person: person, user: user} do
+      Test.Fixtures.lab_result_attrs(person, user, "lab-result", nil, result: "positive") |> Cases.create_lab_result!()
+      assert PeopleLive.latest_result(person) =~ ~r|positive, unknown date|
+    end
+
+    test "when there is a lab result and no result or sample date", %{person: person, user: user} do
+      Test.Fixtures.lab_result_attrs(person, user, "lab-result", nil, result: nil) |> Cases.create_lab_result!()
+      assert PeopleLive.latest_result(person) =~ ~r|unknown, unknown date|
+    end
   end
 end

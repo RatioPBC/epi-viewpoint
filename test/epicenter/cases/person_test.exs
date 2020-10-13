@@ -181,21 +181,23 @@ defmodule Epicenter.Cases.PersonTest do
       assert Person.latest_lab_result(alice).tid == "newer"
     end
 
-    test "when given a field, returns the value of that field for the latest lab result" do
+    test "when there is a null sampled_on, returns that record first" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, user, "earlier-result", "06-01-2020", result: "negative") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, user, "later-result", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
 
-      assert Person.latest_lab_result(alice, :result) == "positive"
-      assert Person.latest_lab_result(alice, :sampled_on) == ~D[2020-06-02]
+      assert Person.latest_lab_result(alice).tid == "unknown"
     end
 
-    test "when given a field but there is no lab result, returns nil" do
+    test "when there are two records with null sampled_on, returns the lab results with the largest seq" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      assert Person.latest_lab_result(alice, :result) == nil
-      assert Person.latest_lab_result(alice, :sampled_on) == nil
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer unknown", nil) |> Cases.create_lab_result!()
+
+      assert Person.latest_lab_result(alice).tid == "newer unknown"
     end
   end
 
@@ -296,23 +298,53 @@ defmodule Epicenter.Cases.PersonTest do
     test "with preloaded email/lab_result/phone", %{person: person} do
       person = person |> Cases.preload_phones() |> Cases.preload_emails() |> Cases.preload_lab_results()
 
-      result_json = Jason.encode!(person)
+      result = person |> Jason.encode!() |> Jason.decode!()
 
-      assert result_json =~
-               "\"emails\":[{\"address\":\"email@example.com\",\"delete\":null,\"is_preferred\":null," <>
-                 "\"person_id\":\"#{person.id}\",\"tid\":\"email\"}]"
+      person_id = person.id
+      first_id = fn list -> Enum.at(list, 0).id end
+      email_id = person.emails |> first_id.()
+      phone_id = person.phones |> first_id.()
+      lab_result_id = person.lab_results |> first_id.()
 
-      assert result_json =~
-               "\"lab_results\":[{\"person_id\":\"#{person.id}\",\"result\":\"positive\"," <>
-                 "\"sampled_on\":\"2020-09-18\",\"analyzed_on\":null,\"reported_on\":null," <>
-                 "\"request_accession_number\":\"accession-old-positive-result\"," <>
-                 "\"request_facility_code\":\"facility-old-positive-result\"," <>
-                 "\"request_facility_name\":\"old-positive-result Lab, Inc.\",\"test_type\":null," <>
-                 "\"tid\":\"old-positive-result\"}]"
-
-      assert result_json =~
-               "\"phones\":[{\"number\":\"1111111000\",\"delete\":null,\"is_preferred\":null," <>
-                 "\"person_id\":\"#{person.id}\",\"tid\":\"phone\",\"type\":\"home\"}]"
+      assert %{
+               "id" => ^person_id,
+               "emails" => [
+                 %{
+                   "id" => ^email_id,
+                   "address" => "email@example.com",
+                   "delete" => nil,
+                   "is_preferred" => nil,
+                   "person_id" => ^person_id,
+                   "tid" => "email"
+                 }
+               ],
+               "lab_results" => [
+                 %{
+                   "id" => ^lab_result_id,
+                   "person_id" => ^person_id,
+                   "analyzed_on" => nil,
+                   "reported_on" => nil,
+                   "request_accession_number" => "accession-old-positive-result",
+                   "request_facility_code" => "facility-old-positive-result",
+                   "request_facility_name" => "old-positive-result Lab, Inc.",
+                   "result" => "positive",
+                   "sampled_on" => "2020-09-18",
+                   "test_type" => nil,
+                   "tid" => "old-positive-result"
+                 }
+               ],
+               "phones" => [
+                 %{
+                   "id" => ^phone_id,
+                   "number" => "1111111000",
+                   "delete" => nil,
+                   "is_preferred" => nil,
+                   "person_id" => ^person_id,
+                   "tid" => "phone",
+                   "type" => "home"
+                 }
+               ]
+             } = result
     end
 
     test "with nothing preloaded", %{person: person} do

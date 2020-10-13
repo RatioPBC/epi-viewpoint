@@ -1,4 +1,12 @@
 section#import-page
   h2 Import Labs
+  h3 Success
   p= "Successfully imported #{@last_csv_import_info.imported_person_count} people and #{@last_csv_import_info.imported_lab_result_count} lab results."
+
+  h3 = "#{@last_csv_import_info.skipped_row_count} row(s) were skipped"
+  #failed-rows
+    = for x <- @last_csv_import_info.skipped_row_error_messages do
+      div class="import-error-message"
+        p= x
+
   p= link "Continue", to: "/", id: "continue-button"

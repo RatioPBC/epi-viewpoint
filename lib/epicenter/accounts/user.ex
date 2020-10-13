@@ -3,21 +3,20 @@ defmodule Epicenter.Accounts.User do
 
   import Ecto.Changeset
 
+  import Epicenter.EctoRedactionJasonEncoder
+
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.Person
 
-  @derive {Inspect, except: [:password]}
-  @audit_logged_fields [:id, :confirmed_at, :email, :name, :disabled, :tid]
-  @derive {Jason.Encoder, only: @audit_logged_fields}
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
     field :confirmed_at, :naive_datetime
     field :email, :string
-    field :hashed_password, :string
-    field :mfa_secret, :string
+    field :hashed_password, :string, redact: true
+    field :mfa_secret, :string, redact: true
     field :name, :string
-    field :password, :string, virtual: true
+    field :password, :string, virtual: true, redact: true
     field :disabled, :boolean
     field :seq, :integer
     field :tid, :string
@@ -26,6 +25,8 @@ defmodule Epicenter.Accounts.User do
 
     has_many :assignments, Person, foreign_key: :assigned_to_id
   end
+
+  derive_jason_encoder(except: [:seq])
 
   @required_attrs ~w{name}a
   @optional_attrs ~w{tid}a
@@ -120,9 +121,9 @@ defmodule Epicenter.Accounts.User do
   end
 
   @doc """
-  Disables the user by setting `disabled` to `true`.
+  Disables or enables the user by setting `disabled`
   """
-  def disable_changeset(user), do: cast(user, %{disabled: true}, [:disabled])
+  def disable_changeset(user, attrs), do: cast(user, Enum.into(attrs, %{}), [:disabled])
 
   @doc """
   Verifies the password.
