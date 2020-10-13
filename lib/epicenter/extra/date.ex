@@ -21,13 +21,4 @@ defmodule Epicenter.Extra.Date do
 
   def days_ago_string(%Date{} = date, opts \\ []),
     do: days_ago(date, opts) |> Extra.String.pluralize("day ago", "days ago")
-
-  def render(%Date{} = date),
-    do: "#{padded_number(date.month)}/#{padded_number(date.day)}/#{date.year}"
-
-  def render(nil),
-    do: ""
-
-  defp padded_number(number),
-    do: String.pad_leading(to_string(number), 2, "0")
 end

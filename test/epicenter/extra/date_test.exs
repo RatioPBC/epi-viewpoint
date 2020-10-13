@@ -24,16 +24,6 @@ defmodule Epicenter.Extra.DateTest do
     end
   end
 
-  describe "render" do
-    test "when given a date, formats it as mm/dd/yyyy" do
-      assert Extra.Date.render(~D[2020-05-19]) == "05/19/2020"
-    end
-
-    test "when given a nil, quietly renders an empty string" do
-      assert Extra.Date.render(nil) == ""
-    end
-  end
-
   describe "NilFirst.compare" do
     test "nils are considered greater than date values" do
       assert Extra.Date.NilFirst.compare(nil, ~D[2020-05-19]) == :gt

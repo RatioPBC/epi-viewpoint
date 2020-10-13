@@ -3,6 +3,18 @@ defmodule Epicenter.FormatTest do
 
   alias Epicenter.Cases.Phone
 
+  describe "date" do
+    import Epicenter.Format, only: [date: 1]
+
+    test "when given a date, formats it as mm/dd/yyyy" do
+      assert date(~D[2020-05-19]) == "05/19/2020"
+    end
+
+    test "when given a nil, quietly renders an empty string" do
+      assert date(nil) == ""
+    end
+  end
+
   describe "person" do
     import Epicenter.Format, only: [person: 1]
 

@@ -8,7 +8,6 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
-  alias Epicenter.Extra
   alias Epicenter.Format
 
   def mount(%{"id" => person_id}, session, socket) do
