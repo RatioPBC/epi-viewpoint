@@ -371,10 +371,13 @@ defmodule Epicenter.Accounts do
       iex> disable_user(user)
       {:error, "User alice is already disabled"}
   """
-  @spec disable_user(%User{}, %AuditLog.Meta{}) :: {:ok, %User{}} | {:error, String.t()}
-  def disable_user(%User{disabled: true, email: email}, _), do: {:error, "User #{email} is already disabled"}
+  @spec disable_user(%User{}, atom(), %AuditLog.Meta{}) :: {:ok, %User{}} | {:error, String.t()}
+  def disable_user(%User{disabled: true, email: email}, :disable, _), do: {:error, "User #{email} is already disabled"}
+  def disable_user(%User{disabled: false, email: email}, :enable, _), do: {:error, "User #{email} is already enabled"}
 
-  def disable_user(user, audit_meta), do: user |> User.disable_changeset() |> AuditLog.update(audit_meta) |> stringify_error()
+  def disable_user(user, action, audit_meta) when action in [:disable, :enable],
+    do: user |> User.disable_changeset(disabled: action == :disable) |> AuditLog.update(audit_meta) |> stringify_error()
+
   defp stringify_error({:error, error}), do: {:error, "#{inspect(error)}"}
   defp stringify_error(result), do: result
 end

@@ -615,18 +615,24 @@ defmodule Epicenter.AccountsTest do
     end
 
     test "disables the provided user", %{user: user} do
-      assert {:ok, _} = Accounts.disable_user(user, Test.Fixtures.audit_meta(@admin))
-
+      assert {:ok, _} = Accounts.disable_user(user, :disable, Test.Fixtures.audit_meta(@admin))
+      assert Accounts.get_user!(user.id).disabled == true
       assert_revision_count(user, 2)
-
-      assert_recent_audit_log(user, @admin, %{
-        "disabled" => true
-      })
+      assert_recent_audit_log(user, @admin, %{"disabled" => true})
     end
 
-    test "gives an error message if user is already disabled", %{user: user} do
-      {:ok, user} = Accounts.disable_user(user, Test.Fixtures.audit_meta(@admin))
-      assert {:error, _} = Accounts.disable_user(user, Test.Fixtures.audit_meta(@admin))
+    test "enables the provided user", %{user: user} do
+      assert {:ok, _} = Accounts.disable_user(user, :enable, Test.Fixtures.audit_meta(@admin))
+      assert Accounts.get_user!(user.id).disabled == false
+      assert_revision_count(user, 2)
+      assert_recent_audit_log(user, @admin, %{"disabled" => false})
+    end
+
+    test "gives an error message if user is already in the requested state", %{user: user} do
+      {:ok, user} = Accounts.disable_user(user, :disable, Test.Fixtures.audit_meta(@admin))
+      assert {:error, _} = Accounts.disable_user(user, :disable, Test.Fixtures.audit_meta(@admin))
+      {:ok, user} = Accounts.disable_user(user, :enable, Test.Fixtures.audit_meta(@admin))
+      assert {:error, _} = Accounts.disable_user(user, :enable, Test.Fixtures.audit_meta(@admin))
     end
   end
 

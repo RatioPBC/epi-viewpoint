@@ -46,6 +46,7 @@ defmodule Epicenter.AuditLog.Revision do
   def update_user_email_request_action(), do: "update-user-email-request"
   def create_user_action(), do: "create-user"
   def disable_user_action(), do: "disable-user"
+  def enable_user_action(), do: "enable-user"
   def update_user_password_action(), do: "update-user-password"
   def reset_password_action(), do: "reset-password"
   def update_user_mfa_action(), do: "update-user-mfa"

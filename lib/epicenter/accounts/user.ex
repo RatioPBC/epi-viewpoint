@@ -121,9 +121,9 @@ defmodule Epicenter.Accounts.User do
   end
 
   @doc """
-  Disables the user by setting `disabled` to `true`.
+  Disables or enables the user by setting `disabled`
   """
-  def disable_changeset(user), do: cast(user, %{disabled: true}, [:disabled])
+  def disable_changeset(user, attrs), do: cast(user, Enum.into(attrs, %{}), [:disabled])
 
   @doc """
   Verifies the password.
