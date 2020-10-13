@@ -69,8 +69,8 @@ defmodule Epicenter.Release do
 
     reason_action =
       case action do
-        :disable -> {true, AuditLog.Revision.disable_user_action()}
-        :enable -> {false, AuditLog.Revision.enable_user_action()}
+        :disable -> AuditLog.Revision.disable_user_action()
+        :enable -> AuditLog.Revision.enable_user_action()
       end
 
     audit_meta = %AuditLog.Meta{
