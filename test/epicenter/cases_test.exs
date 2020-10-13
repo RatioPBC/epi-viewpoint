@@ -283,6 +283,9 @@ defmodule Epicenter.CasesTest do
       })
     end
 
+    # We are temporarily disabling updating a person when we see them again in a csv
+    # https://www.pivotaltracker.com/story/show/175239678
+    @tag :skip
     test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
       creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
       Test.Fixtures.person_attrs(creator, "alice", tid: "first-insert") |> Cases.upsert_person!()

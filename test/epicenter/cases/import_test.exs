@@ -468,12 +468,27 @@ defmodule Epicenter.Cases.ImportTest do
 
     # Ideally we would overwrite nils when importing a new record for an existing person,
     # but it is hard to do that in ecto without also overwriting filled in data (when importing a new record for an existing person).
-    test "does not fill demographic data when importing data for an existing person", %{
+    test "does not delete existing information when importing a new test result for an existing person", %{
       originator: originator
     } do
-      alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
+      alice_attrs = %{
+        first_name: "Alice",
+        last_name: "Testuser",
+        dob: ~D[1970-01-01],
+        preferred_language: "AAA",
+        gender_identity: "AAA",
+        marital_status: "AAA",
+        employment: "AAA",
+        notes: "AAA",
+        sex_at_birth: "AAA",
+        race: "AAA",
+        occupation: "AAA",
+        ethnicity: "AAA"
+      }
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
+      {:ok, [alice]} = Cases.assign_user_to_people(user_id: originator.id, people_ids: [alice.id], audit_meta: Test.Fixtures.audit_meta(originator))
 
       import_output =
         %{
@@ -486,11 +501,17 @@ defmodule Epicenter.Cases.ImportTest do
         |> Import.import_csv(originator)
 
       assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
-      updated_alice = Cases.get_person(alice.id)
-      assert updated_alice.sex_at_birth == nil
-      assert updated_alice.race == nil
-      assert updated_alice.occupation == nil
-      assert updated_alice.ethnicity == nil
+      updated_alice = Cases.get_person(alice.id) |> Cases.preload_assigned_to()
+      assert updated_alice.sex_at_birth == "AAA"
+      assert updated_alice.race == "AAA"
+      assert updated_alice.occupation == "AAA"
+      assert updated_alice.ethnicity == "AAA"
+      assert updated_alice.preferred_language == "AAA"
+      assert updated_alice.gender_identity == "AAA"
+      assert updated_alice.marital_status == "AAA"
+      assert updated_alice.employment == "AAA"
+      assert updated_alice.notes == "AAA"
+      assert updated_alice.assigned_to.tid == originator.tid
     end
   end
 
