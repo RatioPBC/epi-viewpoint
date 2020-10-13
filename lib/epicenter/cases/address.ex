@@ -9,7 +9,7 @@ defmodule Epicenter.Cases.Address do
   @required_attrs ~w{person_id}a
   @optional_attrs ~w(full_address street city state postal_code type tid is_preferred)a
 
-  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
+  @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

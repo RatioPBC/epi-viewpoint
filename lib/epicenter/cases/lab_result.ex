@@ -10,7 +10,7 @@ defmodule Epicenter.Cases.LabResult do
   @required_attrs ~w{person_id}a
   @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name result sampled_on test_type tid}a
 
-  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
+  @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

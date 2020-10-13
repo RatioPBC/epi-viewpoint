@@ -298,49 +298,53 @@ defmodule Epicenter.Cases.PersonTest do
     test "with preloaded email/lab_result/phone", %{person: person} do
       person = person |> Cases.preload_phones() |> Cases.preload_emails() |> Cases.preload_lab_results()
 
-      result_json = Jason.encode!(person)
+      result = person |> Jason.encode!() |> Jason.decode!()
 
-      assert result_json =~
-               """
-               "emails":[{
-               "address":"email@example.com",
-               "delete":null,
-               "is_preferred":null,
-               "person_id":"#{person.id}",
-               "tid":"email"
-               }]
-               """
-               |> String.replace("\n", "")
+      person_id = person.id
+      first_id = fn list -> Enum.at(list, 0).id end
+      email_id = person.emails |> first_id.()
+      phone_id = person.phones |> first_id.()
+      lab_result_id = person.lab_results |> first_id.()
 
-      assert result_json =~
-               """
-               "lab_results":[{
-               "person_id":"#{person.id}",
-               "analyzed_on":null,
-               "reported_on":null,
-               "request_accession_number":"accession-old-positive-result",
-               "request_facility_code":"facility-old-positive-result",
-               "request_facility_name":"old-positive-result Lab, Inc.",
-               "result":"positive",
-               "sampled_on":"2020-09-18",
-               "test_type":null,
-               "tid":"old-positive-result"
-               }]
-               """
-               |> String.replace("\n", "")
-
-      assert result_json =~
-               """
-               "phones":[{"
-               number":"1111111000",
-               "delete":null,
-               "is_preferred":null,
-               "person_id":"#{person.id}",
-               "tid":"phone",
-               "type":"home"
-               }]
-               """
-               |> String.replace("\n", "")
+      assert %{
+               "id" => ^person_id,
+               "emails" => [
+                 %{
+                   "id" => ^email_id,
+                   "address" => "email@example.com",
+                   "delete" => nil,
+                   "is_preferred" => nil,
+                   "person_id" => ^person_id,
+                   "tid" => "email"
+                 }
+               ],
+               "lab_results" => [
+                 %{
+                   "id" => ^lab_result_id,
+                   "person_id" => ^person_id,
+                   "analyzed_on" => nil,
+                   "reported_on" => nil,
+                   "request_accession_number" => "accession-old-positive-result",
+                   "request_facility_code" => "facility-old-positive-result",
+                   "request_facility_name" => "old-positive-result Lab, Inc.",
+                   "result" => "positive",
+                   "sampled_on" => "2020-09-18",
+                   "test_type" => nil,
+                   "tid" => "old-positive-result"
+                 }
+               ],
+               "phones" => [
+                 %{
+                   "id" => ^phone_id,
+                   "number" => "1111111000",
+                   "delete" => nil,
+                   "is_preferred" => nil,
+                   "person_id" => ^person_id,
+                   "tid" => "phone",
+                   "type" => "home"
+                 }
+               ]
+             } = result
     end
 
     test "with nothing preloaded", %{person: person} do

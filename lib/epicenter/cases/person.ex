@@ -55,7 +55,7 @@ defmodule Epicenter.Cases.Person do
         end
       end
 
-      person_attrs = Map.take(value, Person.required_attrs() ++ Person.optional_attrs())
+      person_attrs = Map.take(value, [:id] ++ Person.required_attrs() ++ Person.optional_attrs())
 
       person_attrs = put_field_if_loaded.(person_attrs, value, :emails)
       person_attrs = put_field_if_loaded.(person_attrs, value, :lab_results)

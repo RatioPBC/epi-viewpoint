@@ -12,7 +12,7 @@ defmodule Epicenter.Cases.Phone do
   @required_attrs ~w{number}a
   @optional_attrs ~w{delete is_preferred person_id tid type}a
 
-  @derive {Jason.Encoder, only: @required_attrs ++ @optional_attrs}
+  @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
