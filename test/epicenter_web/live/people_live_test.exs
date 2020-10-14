@@ -61,6 +61,28 @@ defmodule EpicenterWeb.PeopleLiveTest do
       assert_checked(index_live, "[data-tid=assigned-to-me-checkbox]")
     end
 
+    # I check person 1 (who is not assigned to me)
+    # I check person 2 (who is assigned to me)
+    # I toggle so that person 1 is hidden
+    # I try to assign to someone
+    # that shouldn't change the assignment of person 1
+    # but should change the assignment of person 2
+    test "people who have been filtered out should not be assigned during a bulk assignment", %{conn: conn, user: user} do
+      [users: [_user, assignee], people: [alice, billy]] = create_people_and_lab_results(user)
+      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      {:ok, index_live, _} = live(conn, "/people")
+
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      index_live |> element("[data-tid=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
+      index_live |> element("[data-tid=assigned-to-me-checkbox]") |> render_click()
+
+      index_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
+
+      Cases.get_people([alice.id, billy.id])
+      |> Euclid.Extra.Enum.pluck(:assigned_to_id)
+      |> assert_eq([assignee.id, nil])
+    end
+
     test "user can be assigned to people", %{conn: conn, user: user} do
       [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")

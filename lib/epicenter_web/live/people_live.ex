@@ -50,7 +50,10 @@ defmodule EpicenterWeb.PeopleLive do
     {:ok, updated_people} =
       Cases.assign_user_to_people(
         user_id: user_id,
-        people_ids: Map.keys(socket.assigns.selected_people),
+        people_ids:
+          visible_people(socket.assigns[:people], socket.assigns[:only_assigned_to_me], socket.assigns[:current_user])
+          |> Enum.filter(fn person -> Map.get(socket.assigns.selected_people, person.id) end)
+          |> Euclid.Extra.Enum.pluck(:id),
         audit_meta: %AuditLog.Meta{
           author_id: socket.assigns.current_user.id,
           reason_action: AuditLog.Revision.update_assignment_bulk_action(),
@@ -101,7 +104,7 @@ defmodule EpicenterWeb.PeopleLive do
     end
   end
 
-  def visible_people(people, only_assigned_to_me, me)
+  def visible_people(people, only_assigned_to_me, user)
 
   def visible_people(people, true, user) do
     Enum.filter(people, fn person -> person.assigned_to_id == user.id end)
