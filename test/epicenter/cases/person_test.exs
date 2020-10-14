@@ -111,7 +111,7 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "demographic attributes" do
-      changes = new_changeset(%{ethnicity: %{parent: "Hispanic, Latino/a, or Spanish origin", children: ["Cuban", "Puerto Rican"]}}).changes
+      changes = new_changeset(%{ethnicity: %{parent: "hispanic", children: ["cuban", "puerto_rican"]}}).changes
       assert changes.employment == "Part time"
       assert changes.gender_identity == "Female"
       assert changes.marital_status == "Single"
@@ -121,8 +121,8 @@ defmodule Epicenter.Cases.PersonTest do
       assert changes.sex_at_birth == "Female"
 
       ethnicity_changes = changes.ethnicity.changes
-      assert ethnicity_changes.parent == "Hispanic, Latino/a, or Spanish origin"
-      assert ethnicity_changes.children == ["Cuban", "Puerto Rican"]
+      assert ethnicity_changes.parent == "hispanic"
+      assert ethnicity_changes.children == ["cuban", "puerto_rican"]
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))

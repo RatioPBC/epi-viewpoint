@@ -30,6 +30,12 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Genderqueer/gender nonconforming neither exclusively male nor female" => true,
         "Additional gender category (or other)" => true
       })
+      |> Pages.DemographicsEdit.assert_ethnicity_selections(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => true,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
     end
   end
 end
