@@ -18,6 +18,9 @@ defmodule CFG do
   def to_boolean(_), do: false
 end
 
+config :epicenter,
+        mfa_issuer: CFG.canonical_host()
+
 config :epicenter, Epicenter.Repo,
         pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
         ssl: CFG.to_boolean(System.get_env("DBSSL", "true")),
