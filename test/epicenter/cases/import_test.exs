@@ -63,7 +63,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "Cuban"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -155,7 +155,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "Cuban"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -199,7 +199,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "Cuban"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -246,7 +246,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "Cuban"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -436,15 +436,16 @@ defmodule Epicenter.Cases.ImportTest do
     test "does not overwrite manually entered demographic data when importing csv", %{
       originator: originator
     } do
-      alice_attrs = %{
-        first_name: "Alice",
-        last_name: "Testuser",
-        dob: ~D[1970-01-01],
-        sex_at_birth: "female",
-        race: "Asian Indian",
-        occupation: "Rocket Scientist",
-        ethnicity: "Cuban"
-      }
+      alice_attrs =
+        %{
+          first_name: "Alice",
+          last_name: "Testuser",
+          dob: ~D[1970-01-01],
+          sex_at_birth: "female",
+          race: "Asian Indian",
+          occupation: "Rocket Scientist"
+        }
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{parent: "Cuban"}})
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
@@ -463,7 +464,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.sex_at_birth == "female"
       assert updated_alice.race == "Asian Indian"
       assert updated_alice.occupation == "Rocket Scientist"
-      assert updated_alice.ethnicity == "Cuban"
+      assert updated_alice.ethnicity.parent == "Cuban"
     end
 
     # Ideally we would overwrite nils when importing a new record for an existing person,
@@ -471,20 +472,21 @@ defmodule Epicenter.Cases.ImportTest do
     test "does not delete existing information when importing a new test result for an existing person", %{
       originator: originator
     } do
-      alice_attrs = %{
-        first_name: "Alice",
-        last_name: "Testuser",
-        dob: ~D[1970-01-01],
-        preferred_language: "AAA",
-        gender_identity: "AAA",
-        marital_status: "AAA",
-        employment: "AAA",
-        notes: "AAA",
-        sex_at_birth: "AAA",
-        race: "AAA",
-        occupation: "AAA",
-        ethnicity: "AAA"
-      }
+      alice_attrs =
+        %{
+          first_name: "Alice",
+          last_name: "Testuser",
+          dob: ~D[1970-01-01],
+          preferred_language: "AAA",
+          gender_identity: "AAA",
+          marital_status: "AAA",
+          employment: "AAA",
+          notes: "AAA",
+          sex_at_birth: "AAA",
+          race: "AAA",
+          occupation: "AAA"
+        }
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{parent: "AAA"}})
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
@@ -505,7 +507,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.sex_at_birth == "AAA"
       assert updated_alice.race == "AAA"
       assert updated_alice.occupation == "AAA"
-      assert updated_alice.ethnicity == "AAA"
+      assert updated_alice.ethnicity.parent == "AAA"
       assert updated_alice.preferred_language == "AAA"
       assert updated_alice.gender_identity == "AAA"
       assert updated_alice.marital_status == "AAA"
@@ -652,6 +654,20 @@ defmodule Epicenter.Cases.ImportTest do
         ],
         []
       })
+    end
+  end
+
+  describe "build_ethnicity_attrs" do
+    test "creates map of parent and children ethnicity values from row values" do
+      %{"foo" => "bar", "ethnicity" => "Cuban"}
+      |> Import.build_ethnicity_attrs()
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "Cuban", "children" => []}}, :simple)
+    end
+
+    test "does nothing crazy if there is no ethnicity value" do
+      %{"foo" => "bar", "baz" => "bat"}
+      |> Import.build_ethnicity_attrs()
+      |> assert_eq(%{"foo" => "bar", "baz" => "bat"}, :simple)
     end
   end
 end

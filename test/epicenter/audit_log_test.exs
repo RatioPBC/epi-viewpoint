@@ -161,8 +161,11 @@ defmodule Epicenter.AuditLogTest do
       assert revision_2.changed_id == person.id
       assert revision_2.changed_type == "Cases.Person"
 
+      {ethnicity, attrs_to_change_sans_ethnicity} = attrs_to_change |> Map.pop(:ethnicity)
       reloaded_person = Cases.get_person(person.id)
-      reloaded_person |> Map.take(Map.keys(attrs_to_change)) |> assert_eq(attrs_to_change)
+      reloaded_person |> Map.take(Map.keys(attrs_to_change)) |> Map.drop([:ethnicity]) |> assert_eq(attrs_to_change_sans_ethnicity, :simple)
+      assert ethnicity.parent == "Not Hispanic, Latino/a, or Spanish origin"
+      assert ethnicity.children == nil
 
       assert updated_person_1.id == reloaded_person.id
       assert updated_person_2.id == reloaded_person.id

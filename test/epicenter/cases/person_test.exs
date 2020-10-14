@@ -19,7 +19,7 @@ defmodule Epicenter.Cases.PersonTest do
           {:assigned_to_id, :binary_id},
           {:dob, :date},
           {:employment, :string},
-          {:ethnicity, :string},
+          {:ethnicity, :map},
           {:external_id, :string},
           {:fingerprint, :string},
           {:first_name, :string},
@@ -100,26 +100,29 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "identifying attributes" do
-      changeset = new_changeset(%{external_id: "10000"}).changes
-      assert changeset.dob == ~D[2000-01-01]
-      assert changeset.external_id == "10000"
-      assert changeset.fingerprint == "2000-01-01 alice testuser"
-      assert changeset.first_name == "Alice"
-      assert changeset.last_name == "Testuser"
-      assert changeset.preferred_language == "English"
-      assert changeset.tid == "alice"
+      changes = new_changeset(%{external_id: "10000"}).changes
+      assert changes.dob == ~D[2000-01-01]
+      assert changes.external_id == "10000"
+      assert changes.fingerprint == "2000-01-01 alice testuser"
+      assert changes.first_name == "Alice"
+      assert changes.last_name == "Testuser"
+      assert changes.preferred_language == "English"
+      assert changes.tid == "alice"
     end
 
     test "demographic attributes" do
-      changeset = new_changeset(%{}).changes
-      assert changeset.employment == "Part time"
-      assert changeset.ethnicity == "Not Hispanic, Latino/a, or Spanish origin"
-      assert changeset.gender_identity == "Female"
-      assert changeset.marital_status == "Single"
-      assert changeset.notes == "lorem ipsum"
-      assert changeset.occupation == "architect"
-      assert changeset.race == "Filipino"
-      assert changeset.sex_at_birth == "Female"
+      changes = new_changeset(%{ethnicity: %{parent: "Hispanic, Latino/a, or Spanish origin", children: ["Cuban", "Puerto Rican"]}}).changes
+      assert changes.employment == "Part time"
+      assert changes.gender_identity == "Female"
+      assert changes.marital_status == "Single"
+      assert changes.notes == "lorem ipsum"
+      assert changes.occupation == "architect"
+      assert changes.race == "Filipino"
+      assert changes.sex_at_birth == "Female"
+
+      ethnicity_changes = changes.ethnicity.changes
+      assert ethnicity_changes.parent == "Hispanic, Latino/a, or Spanish origin"
+      assert ethnicity_changes.children == ["Cuban", "Puerto Rican"]
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
