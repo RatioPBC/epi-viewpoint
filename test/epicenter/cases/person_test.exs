@@ -99,7 +99,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert changeset.changes.assigned_to_id == nil
     end
 
-    test "attributes" do
+    test "identifying attributes" do
       changeset = new_changeset(%{external_id: "10000"}).changes
       assert changeset.dob == ~D[2000-01-01]
       assert changeset.external_id == "10000"
@@ -108,8 +108,10 @@ defmodule Epicenter.Cases.PersonTest do
       assert changeset.last_name == "Testuser"
       assert changeset.preferred_language == "English"
       assert changeset.tid == "alice"
+    end
 
-      # Demographic information
+    test "demographic attributes" do
+      changeset = new_changeset(%{}).changes
       assert changeset.employment == "Part time"
       assert changeset.ethnicity == "Not Hispanic, Latino/a, or Spanish origin"
       assert changeset.gender_identity == "Female"
