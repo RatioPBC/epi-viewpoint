@@ -656,18 +656,4 @@ defmodule Epicenter.Cases.ImportTest do
       })
     end
   end
-
-  describe "build_ethnicity_attrs" do
-    test "creates map of parent and children ethnicity values from row values" do
-      %{"foo" => "bar", "ethnicity" => "Cuban"}
-      |> Import.build_ethnicity_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "Cuban", "children" => []}}, :simple)
-    end
-
-    test "does nothing crazy if there is no ethnicity value" do
-      %{"foo" => "bar", "baz" => "bat"}
-      |> Import.build_ethnicity_attrs()
-      |> assert_eq(%{"foo" => "bar", "baz" => "bat"}, :simple)
-    end
-  end
 end
