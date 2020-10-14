@@ -35,6 +35,32 @@ defmodule EpicenterWeb.PeopleLiveTest do
       view |> Pages.People.assert_here()
     end
 
+    test "users can limit shown people to just those assigned to themselves", %{conn: conn, user: user} do
+      [users: [_user, _assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
+      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      {:ok, index_live, _} = live(conn, "/people")
+
+      index_live
+      |> table_contents()
+      |> assert_eq([
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", user.name]
+      ])
+
+      assert_unchecked(index_live, "[data-tid=assigned-to-me-checkbox]")
+      index_live |> element("[data-tid=assigned-to-me-checkbox]") |> render_click()
+
+      index_live
+      |> table_contents()
+      |> assert_eq([
+        ["", "Name", "ID", "Latest test result", "Assignee"],
+        ["", "Alice Testuser", "", "positive, 1 day ago", user.name]
+      ])
+
+      assert_checked(index_live, "[data-tid=assigned-to-me-checkbox]")
+    end
+
     test "user can be assigned to people", %{conn: conn, user: user} do
       [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
