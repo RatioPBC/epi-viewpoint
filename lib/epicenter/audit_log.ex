@@ -7,20 +7,20 @@ defmodule Epicenter.AuditLog do
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Repo
 
-  def insert(changeset, %Meta{} = meta, ecto_options \\ []) do
-    create_revision(changeset, %Meta{} = meta, &Repo.insert/2, ecto_options)
+  def insert(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do
+    create_revision(changeset, %Meta{} = meta, &Repo.insert/2, ecto_options, changeset_flattening_function)
   end
 
-  def insert!(changeset, %Meta{} = meta, ecto_options \\ []) do
-    create_revision(changeset, %Meta{} = meta, &Repo.insert!/2, ecto_options)
+  def insert!(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do
+    create_revision(changeset, %Meta{} = meta, &Repo.insert!/2, ecto_options, changeset_flattening_function)
   end
 
-  def update(changeset, %Meta{} = meta, ecto_options \\ []) do
-    create_revision(changeset, %Meta{} = meta, &Repo.update/2, ecto_options)
+  def update(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do
+    create_revision(changeset, %Meta{} = meta, &Repo.update/2, ecto_options, changeset_flattening_function)
   end
 
-  def update!(changeset, %Meta{} = meta, ecto_options \\ []) do
-    create_revision(changeset, %Meta{} = meta, &Repo.update!/2, ecto_options)
+  def update!(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do
+    create_revision(changeset, %Meta{} = meta, &Repo.update!/2, ecto_options, changeset_flattening_function)
   end
 
   defp recursively_get_changes_from_changeset(%Ecto.Changeset{changes: changes, data: %{__struct__: type}}),
@@ -41,34 +41,57 @@ defmodule Epicenter.AuditLog do
   defp recursively_get_changes_from_changeset(data),
     do: data
 
-  def create_revision(%Ecto.Changeset{} = changeset, %Meta{} = meta, repo_fn, ecto_options \\ []) when is_function(repo_fn) do
+  def create_revision(
+        %Ecto.Changeset{} = changeset,
+        %Meta{} = meta,
+        repo_fn,
+        ecto_options \\ [],
+        changeset_flattening_function
+      )
+      when is_function(repo_fn) do
     %{data: data} = changeset
 
-    result = repo_fn.(changeset, ecto_options)
+    all_transaction_results =
+      Ecto.Multi.new()
+      |> Ecto.Multi.run(
+        :non_audit_changeset,
+        fn _repo, _changes ->
+          case repo_fn.(changeset, ecto_options) do
+            {:error, change} -> {:error, change}
+            result -> {:ok, result}
+          end
+        end
+      )
+      |> Ecto.Multi.run(
+        :audit_changeset,
+        fn repo, %{non_audit_changeset: created_row} ->
+          after_change =
+            case created_row do
+              {:ok, change} -> change
+              change -> change
+            end
 
-    after_change =
-      case result do
-        {:ok, change} -> change
-        {:error, _change} -> nil
-        change -> change
-      end
+          attrs = %{
+            "after_change" => after_change,
+            "author_id" => meta.author_id,
+            "before_change" => data,
+            "change" => changeset_flattening_function.(changeset),
+            "changed_id" => after_change.id,
+            "changed_type" => module_name(data),
+            "reason_action" => meta.reason_action,
+            "reason_event" => meta.reason_event
+          }
 
-    if after_change != nil do
-      attrs = %{
-        "after_change" => after_change,
-        "author_id" => meta.author_id,
-        "before_change" => data,
-        "change" => recursively_get_changes_from_changeset(changeset),
-        "changed_id" => after_change.id,
-        "changed_type" => module_name(data),
-        "reason_action" => meta.reason_action,
-        "reason_event" => meta.reason_event
-      }
+          %Revision{} |> Revision.changeset(attrs) |> repo.insert()
+        end
+      )
+      |> Repo.transaction()
 
-      {:ok, _revision} = %Revision{} |> Revision.changeset(attrs) |> Repo.insert()
+    case all_transaction_results do
+      {:ok, %{non_audit_changeset: non_audit_changeset_result}} -> non_audit_changeset_result
+      {:error, :non_audit_changeset, error, _} -> {:error, error}
+      {:error, :audit_changeset, error, _} -> throw(error)
     end
-
-    result
   end
 
   defp redact(map, type) do
