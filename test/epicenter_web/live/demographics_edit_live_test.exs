@@ -72,10 +72,10 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     end
   end
 
-  describe "detailed_ethnicity_option_checked?" do
+  describe "detailed_ethnicity_option_checked" do
     test "it returns true when the given detailed ethnicity option is set for the given person" do
-      assert DemographicsEditLive.detailed_ethnicity_option_checked?(%{ethnicity: %{detailed: ["detailed_a", "detailed_b"]}}, "detailed_b")
-      refute DemographicsEditLive.detailed_ethnicity_option_checked?(%{ethnicity: %{detailed: ["detailed_a", "detailed_b"]}}, "detailed_c")
+      assert DemographicsEditLive.detailed_ethnicity_option_checked(%{ethnicity: %{detailed: ["detailed_a", "detailed_b"]}}, "detailed_b")
+      refute DemographicsEditLive.detailed_ethnicity_option_checked(%{ethnicity: %{detailed: ["detailed_a", "detailed_b"]}}, "detailed_c")
     end
   end
 end

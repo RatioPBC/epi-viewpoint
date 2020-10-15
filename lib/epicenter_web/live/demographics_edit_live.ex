@@ -78,7 +78,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     @detailed_ethnicity_mapping[major_ethnicity] || []
   end
 
-  def detailed_ethnicity_option_checked?(person, detailed_ethnicity) do
+  def detailed_ethnicity_option_checked(person, detailed_ethnicity) do
     if Enum.member?(person.ethnicity.detailed, detailed_ethnicity) do
       "checked"
     end

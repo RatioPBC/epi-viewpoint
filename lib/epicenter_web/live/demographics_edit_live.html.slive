@@ -21,6 +21,6 @@
             = for {detailed_ethnicity_option_value, detailed_ethnicity_option_label} <- detailed_ethnicity_options(major_ethnicity_option_value) do
               = label ethnicity_form, :detailed, data_role: "detailed-ethnicity-label", name: "person[ethnicity][detailed][]" do
                 = detailed_ethnicity_option_label
-                = checkbox ethnicity_form, :detailed, checked: detailed_ethnicity_option_checked?(@person, detailed_ethnicity_option_value), checked_value: detailed_ethnicity_option_value, hidden_input: false, data_role: "detailed-ethnicity-checkbox", name: "person[ethnicity][detailed][]", id: nil
+                = checkbox ethnicity_form, :detailed, checked: detailed_ethnicity_option_checked(@person, detailed_ethnicity_option_value), checked_value: detailed_ethnicity_option_value, hidden_input: false, data_role: "detailed-ethnicity-checkbox", name: "person[ethnicity][detailed][]", id: nil
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
