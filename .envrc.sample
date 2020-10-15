@@ -1,4 +1,4 @@
 export BASIC_AUTH_PASSWORD=""
 export BASIC_AUTH_USERNAME="" # leave blank in dev to disable basic auth
-export HEX_GEOMETER_READ_ONLY_KEY="" # get from https://start.1password.com/open/i?a=VVH6YF3OKZBYFMLWUQR45VM3YA&v=6zxbllmxrpoziscobi7sy6jpby&i=fk553cryw5a2xpwzo5rhdpm6ue&h=geometer.1password.com
 export CANONICAL_HOST="localhost"
+export HEX_GEOMETER_READ_ONLY_KEY="" # get from https://start.1password.com/open/i?a=VVH6YF3OKZBYFMLWUQR45VM3YA&v=6zxbllmxrpoziscobi7sy6jpby&i=fk553cryw5a2xpwzo5rhdpm6ue&h=geometer.1password.com
