@@ -10,8 +10,8 @@ section#people-page data-page="people"
 
   #toolbar
     #toolbar-left
-      form id="assignment-form" phx-change="form-change"
-        #user-list data-disabled=is_disabled?(@selected_people)
+      form id="assignment-form" phx-change="form-change" data-disabled=is_disabled?(@selected_people)
+        #user-list
           span#assign-to-label Assign to
           #select-wrapper
             select name="user" data-role="users" disabled=is_disabled?(@selected_people)
@@ -19,7 +19,7 @@ section#people-page data-page="people"
               option value="-unassigned-" Unassigned
               = for user <- @users do
                 option value="#{user.id}" #{user.name}
-          #assignment-dropdown-tooltip Select people below then assign them to a user
+        #assignment-dropdown-tooltip Select people below, then assign them to a user
 
     #toolbar-right
       div data-role="reload-message"

@@ -33,37 +33,40 @@
       #import-labs
         @include button-secondary
 
-  #user-list
+  #assignment-form
     @include has-tooltip-when-disabled(#assignment-dropdown-tooltip)
-    @include level
-    border-radius: 0
-    border-right-width: 0
 
     &[data-disabled]
-      #assign-to-label, #select-wrapper, #select-wrapper > select
-        color: $disabled-text-color
-        border-color: $disabled-text-color
+      #user-list
+        #assign-to-label, #select-wrapper, #select-wrapper > select
+          color: $disabled-text-color
+          border-color: $disabled-text-color
 
-    #assign-to-label
-      @include button-outline($size: regular)
-      border-radius: 2px 0 0 2px
+    #user-list
+      @include level
+      border-radius: 0
       border-right-width: 0
 
-    #select-wrapper
-      padding: 1.1rem 1rem
-      border-color: $button-color
-      border-radius: 0 2px 2px 0
-      border-width: 1px
-      border-style: solid
-      margin: 0
+      #assign-to-label
+        @include button-outline($size: regular)
+        border-radius: 2px 0 0 2px
+        border-right-width: 0
 
-      select
-        border: none
-        color: $button-color
-        font-size: $body-text-size
+      #select-wrapper
+        padding: 1.1rem 1rem
+        border-color: $button-color
+        border-radius: 0 2px 2px 0
+        border-width: 1px
+        border-style: solid
+        margin: 0
 
-      select:focus
-        outline: 0
+        select
+          border: none
+          color: $button-color
+          font-size: $body-text-size
+
+        select:focus
+          outline: 0
 
   table
     @include data-table
