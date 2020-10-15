@@ -56,21 +56,21 @@ defmodule Epicenter.Release do
 
   Then call this function by providing a list of email addresses of users to disable or enable:
 
-  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :disable)
-  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :enable)
+  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :disabled)
+  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :enabled)
 
   Progress will be logged to stdout.
   """
   @spec update_users(%Epicenter.Accounts.User{}, list(String.t()), atom()) :: :ok
-  def update_users(author, emails, action, opts \\ []) when action in [:disable, :enable] do
+  def update_users(author, emails, action, opts \\ []) when action in [:disabled, :enabled] do
     ensure_started()
 
     puts = Keyword.get(opts, :puts, &IO.puts/1)
 
     reason_action =
       case action do
-        :disable -> AuditLog.Revision.disable_user_action()
-        :enable -> AuditLog.Revision.enable_user_action()
+        :disabled -> AuditLog.Revision.update_disabled_action()
+        :enabled -> AuditLog.Revision.enable_user_action()
       end
 
     audit_meta = %AuditLog.Meta{
@@ -81,7 +81,7 @@ defmodule Epicenter.Release do
 
     for email <- emails do
       with {:ok, user} <- get_user_by_email(email),
-           {:ok, _user} <- Epicenter.Accounts.disable_user(user, action, audit_meta) do
+           {:ok, _user} <- Epicenter.Accounts.update_disabled(user, action, audit_meta) do
         puts.("OK: #{action} #{email}")
       else
         {:error, error} -> puts.("ERROR: #{action} #{email} (#{error})")
