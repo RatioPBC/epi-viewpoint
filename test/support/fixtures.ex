@@ -89,7 +89,6 @@ defmodule Epicenter.Test.Fixtures do
   def address_attrs(originator, %Person{id: person_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
     attrs =
       %{
-        full_address: "#{street_number} Test St, City, TS 00000",
         street: "#{street_number} Test St",
         city: "City",
         state: "TS",

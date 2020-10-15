@@ -441,7 +441,6 @@ defmodule Epicenter.CasesTest do
     test "persists the values correctly", %{creator: creator, person: person} do
       address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
 
-      assert address.full_address == "4250 Test St, City, TS 00000"
       assert address.street == "4250 Test St"
       assert address.city == "City"
       assert address.state == "TS"
@@ -462,7 +461,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(address, creator, %{
         "tid" => "address1",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "TS",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -494,7 +496,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(original_address, creator, %{
         "tid" => "address2",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "TS",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -516,7 +521,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(new_address, creator, %{
         "tid" => "address2",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "TS",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -533,7 +541,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(new_address, creator, %{
         "tid" => "address1",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "TS",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })

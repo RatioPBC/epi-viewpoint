@@ -19,7 +19,6 @@ defmodule Epicenter.Validation do
 
   defp validate(changeset, :address) do
     changeset
-    |> validate_change(:full_address, &address_full_address_validator/2)
     |> validate_change(:street, &address_street_validator/2)
     |> validate_change(:city, &address_city_validator/2)
     |> validate_change(:state, &address_state_validator/2)
@@ -38,7 +37,6 @@ defmodule Epicenter.Validation do
 
   # # #
 
-  @four_digits_followed_by_fake_address ~r|\d{4} Test St, City, TS 00000|
   @four_digits_followed_by_fake_street ~r|\A\d{4} Test St\z|
   @city_followed_by_numbers ~r|\ACity\d*\z|
   @ts_or_starts_with_z ~r/\A(TS|Z[A-Z])\z/
@@ -55,12 +53,6 @@ defmodule Epicenter.Validation do
     if value |> String.starts_with?("Testuser"),
       do: valid(),
       else: invalid(field, "must start with 'Testuser'")
-  end
-
-  defp address_full_address_validator(field, value) do
-    if value =~ @four_digits_followed_by_fake_address,
-      do: valid(),
-      else: invalid(field, "must match '#### Test St, City, TS 00000'")
   end
 
   defp address_street_validator(field, value) do

@@ -76,7 +76,10 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.last_name == "Testuser"
       assert length(billy.phones) == 0
       assert billy.tid == "billy"
-      assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:street) == ["1234 Test St"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
       assert_revision_count(billy, 1)
     end
 
@@ -375,9 +378,10 @@ defmodule Epicenter.Cases.ImportTest do
       Cases.create_address!(Test.Fixtures.address_attrs(originator, alice, "0", 4250, %{}))
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000"
-             ]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
 
       %{
         file_name: "test.csv",
@@ -389,10 +393,6 @@ defmodule Epicenter.Cases.ImportTest do
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
-
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000"
-             ]
 
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
@@ -409,9 +409,10 @@ defmodule Epicenter.Cases.ImportTest do
       Cases.create_address!(Test.Fixtures.address_attrs(originator, alice, "0", 4250, %{}))
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000"
-             ]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
 
       %{
         file_name: "test.csv",
@@ -423,11 +424,6 @@ defmodule Epicenter.Cases.ImportTest do
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
-
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000",
-               "4251 Test St, City, TS 00000"
-             ]
 
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St", "4251 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City", "City"]
