@@ -13,6 +13,6 @@ defmodule Epicenter.Cases.Ethnicity do
   end
 
   def changeset(changeset, attrs) do
-    changeset |> cast(attrs, [:parent, :children])
+    changeset |> cast(attrs, @attrs)
   end
 end

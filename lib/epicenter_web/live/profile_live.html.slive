@@ -93,7 +93,7 @@
         tr
           td data-role="gender-identity"= @person.gender_identity
           td data-role="sex-at-birth"= @person.sex_at_birth
-          td data-role="ethnicity"= ethnicity_value()
+          td data-role="parent-ethnicity"= ethnicity_value()
           td data-role="race"= @person.race
       tbody
         tr

@@ -23,7 +23,7 @@ defmodule Epicenter.Cases.Person do
     field :dob, :date
     field :employment, :string
 
-    embeds_one :ethnicity, Ethnicity
+    embeds_one :ethnicity, Ethnicity, on_replace: :delete
 
     field :external_id, :string
     field :fingerprint, :string

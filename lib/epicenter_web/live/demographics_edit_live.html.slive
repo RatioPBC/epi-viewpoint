@@ -3,7 +3,7 @@
   section#demographics-edit
     header
       span Demographics
-    = form_for @changeset, "#", [id: "demographics-form", phx_change: "form-change", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "demographics-form", phx_submit: "submit"], fn f ->
       #gender-identity-options
         = for gender_identity_option <- gender_identity_options() do
 
