@@ -26,10 +26,10 @@ defmodule Epicenter.Cases.Import.EthnicityTest do
       |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "hispanic", "children" => []}}, :simple)
     end
 
-    test "does nothing crazy if there is no ethnicity value" do
+    test "defaults to unknown if there is no ethnicity value" do
       %{"foo" => "bar", "baz" => "bat"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "baz" => "bat"}, :simple)
+      |> assert_eq(%{"foo" => "bar", "baz" => "bat", "ethnicity" => %{"parent" => "unknown", "children" => []}}, :simple)
     end
   end
 end

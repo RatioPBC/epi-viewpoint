@@ -11,5 +11,5 @@ defmodule Epicenter.Cases.Import.Ethnicity do
     do: attrs |> Map.put("ethnicity", @ethnicity_mapping[ethnicity] || @unknown_ethnicity)
 
   def build_attrs(attrs),
-    do: attrs
+    do: attrs |> Map.put("ethnicity", @unknown_ethnicity)
 end
