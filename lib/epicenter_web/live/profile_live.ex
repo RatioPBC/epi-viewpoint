@@ -106,6 +106,11 @@ defmodule EpicenterWeb.ProfileLive do
     end
   end
 
+  def ethnicity_value() do
+    # Just so that things are not wonky-looking for the user
+    "Under development"
+  end
+
   def unknown_value do
     Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
   end
