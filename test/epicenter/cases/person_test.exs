@@ -133,6 +133,16 @@ defmodule Epicenter.Cases.PersonTest do
     test "validates personal health information on last_name", do: assert_invalid(new_changeset(last_name: "Aliceblat"))
 
     test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice testuser")
+
+    test "associations - emails" do
+      email_changeset = new_changeset(%{emails: [%{address: "othertest@example.com"}]}).changes.emails |> Euclid.Extra.List.first()
+      assert email_changeset.changes.address == "othertest@example.com"
+    end
+
+    test "associations - phones" do
+      phone_changeset = new_changeset(%{phones: [%{number: "1111111003"}]}).changes.phones |> Euclid.Extra.List.first()
+      assert phone_changeset.changes.number == "1111111003"
+    end
   end
 
   describe "constraints" do
