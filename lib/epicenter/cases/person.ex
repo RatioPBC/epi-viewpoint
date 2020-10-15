@@ -8,20 +8,23 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Email
+  alias Epicenter.Cases.Ethnicity
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
 
   @required_attrs ~w{dob first_name last_name}a
-  @optional_attrs ~w{assigned_to_id external_id preferred_language tid employment ethnicity gender_identity marital_status notes occupation race sex_at_birth}a
+  @optional_attrs ~w{assigned_to_id external_id preferred_language tid employment gender_identity marital_status notes occupation race sex_at_birth}a
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "people" do
     field :dob, :date
     field :employment, :string
-    field :ethnicity, :string
+
+    embeds_one :ethnicity, Ethnicity, on_replace: :delete
+
     field :external_id, :string
     field :fingerprint, :string
     field :first_name, :string
@@ -55,7 +58,7 @@ defmodule Epicenter.Cases.Person do
         end
       end
 
-      person_attrs = Map.take(value, [:id] ++ Person.required_attrs() ++ Person.optional_attrs())
+      person_attrs = Map.take(value, [:id, :ethnicity] ++ Person.required_attrs() ++ Person.optional_attrs())
 
       person_attrs = put_field_if_loaded.(person_attrs, value, :emails)
       person_attrs = put_field_if_loaded.(person_attrs, value, :lab_results)
@@ -74,6 +77,7 @@ defmodule Epicenter.Cases.Person do
   def changeset(person, attrs) do
     person
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
+    |> cast_embed(:ethnicity, with: &Ethnicity.changeset/2)
     |> cast_assoc(:emails, with: &Email.changeset/2)
     |> cast_assoc(:phones, with: &Phone.changeset/2)
     |> validate_required(@required_attrs)

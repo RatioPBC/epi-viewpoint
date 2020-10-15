@@ -99,7 +99,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{})
       |> Pages.ProfileEdit.click_add_email_button()
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
       |> Pages.Profile.assert_email_addresses(["alice@example.com"])
 
       Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> pluck(:address) |> assert_eq(["alice@example.com"])
@@ -112,12 +112,14 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
       |> Pages.ProfileEdit.click_add_email_button()
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
-        "emails" => %{
-          "0" => %{"address" => "alice-a@example.com", "is_preferred" => "false"},
-          "1" => %{"address" => "alice-preferred@example.com", "is_preferred" => "true"}
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        person: %{
+          "emails" => %{
+            "0" => %{"address" => "alice-a@example.com", "is_preferred" => "false"},
+            "1" => %{"address" => "alice-preferred@example.com", "is_preferred" => "true"}
+          }
         }
-      })
+      )
       |> Pages.Profile.assert_email_addresses(["alice-a@example.com", "alice-preferred@example.com"])
     end
 
@@ -126,7 +128,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
       |> Pages.Profile.assert_email_addresses(["alice-b@example.com"])
     end
 
@@ -137,7 +139,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
       |> Pages.ProfileEdit.click_remove_email_button(index: "0")
       |> Pages.ProfileEdit.assert_email_form(%{})
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"emails" => %{}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"emails" => %{}})
       |> Pages.Profile.assert_email_addresses(["Unknown"])
 
       Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> assert_eq([])
@@ -147,9 +149,11 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.ProfileEdit.click_add_email_button()
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
-        "emails" => %{"0" => %{"address" => "alice-0@example.com"}, "1" => %{"address" => ""}}
-      })
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        person: %{
+          "emails" => %{"0" => %{"address" => "alice-0@example.com"}, "1" => %{"address" => ""}}
+        }
+      )
       |> Pages.Profile.assert_email_addresses(["alice-0@example.com"])
     end
 
@@ -182,7 +186,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Cell", "Home", "Work"])
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
       |> Pages.Profile.assert_phone_numbers(["(111) 111-1000"])
 
       phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
@@ -195,7 +199,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{"0" => %{"number" => "11111111009"}}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{"0" => %{"number" => "11111111009"}}})
       |> Pages.Profile.assert_phone_numbers(["+1 (111) 111-1009"])
 
       phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
@@ -209,7 +213,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
       |> Pages.ProfileEdit.click_remove_phone_button(index: "0")
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{"phones" => %{}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{}})
       |> Pages.Profile.assert_phone_numbers(["Unknown"])
 
       Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones) |> assert_eq([])
@@ -219,9 +223,11 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.click_add_phone_button()
-      |> Pages.ProfileEdit.submit_and_follow_redirect(conn, %{
-        "phones" => %{"0" => %{"number" => "1111111001"}, "1" => %{"number" => ""}}
-      })
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        person: %{
+          "phones" => %{"0" => %{"number" => "1111111001"}, "1" => %{"number" => ""}}
+        }
+      )
       |> Pages.Profile.assert_phone_numbers(["(111) 111-1001"])
     end
 

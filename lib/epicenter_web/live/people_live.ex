@@ -18,6 +18,7 @@ defmodule EpicenterWeb.PeopleLive do
     |> assign_page_title("People")
     |> set_reload_message(nil)
     |> set_filter(:with_lab_results)
+    |> assign(:only_assigned_to_me, false)
     |> load_people()
     |> load_users()
     |> set_selected()
@@ -49,7 +50,10 @@ defmodule EpicenterWeb.PeopleLive do
     {:ok, updated_people} =
       Cases.assign_user_to_people(
         user_id: user_id,
-        people_ids: Map.keys(socket.assigns.selected_people),
+        people_ids:
+          visible_people(socket.assigns[:people], socket.assigns[:only_assigned_to_me], socket.assigns[:current_user])
+          |> Enum.filter(fn person -> Map.get(socket.assigns.selected_people, person.id) end)
+          |> Euclid.Extra.Enum.pluck(:id),
         audit_meta: %AuditLog.Meta{
           author_id: socket.assigns.current_user.id,
           reason_action: AuditLog.Revision.update_assignment_bulk_action(),
@@ -60,6 +64,12 @@ defmodule EpicenterWeb.PeopleLive do
     Cases.broadcast_people(updated_people)
 
     socket |> set_selected() |> refresh_existing_people(updated_people) |> noreply()
+  end
+
+  def handle_event("toggle-assigned-to-me", _, socket) do
+    socket
+    |> assign(:only_assigned_to_me, !socket.assigns[:only_assigned_to_me])
+    |> noreply()
   end
 
   def handle_event("form-change", _, socket),
@@ -93,6 +103,14 @@ defmodule EpicenterWeb.PeopleLive do
       ""
     end
   end
+
+  def visible_people(people, only_assigned_to_me, user)
+
+  def visible_people(people, true, user) do
+    Enum.filter(people, fn person -> person.assigned_to_id == user.id end)
+  end
+
+  def visible_people(people, false, _), do: people
 
   defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
   defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago_string()

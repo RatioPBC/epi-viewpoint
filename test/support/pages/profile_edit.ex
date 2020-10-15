@@ -29,16 +29,6 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     view |> Pages.ProfileEdit.assert_validation_messages(%{})
   end
 
-  def submit_and_follow_redirect(%View{} = view, conn, person_params) do
-    {:ok, view, _} =
-      view
-      |> form("#profile-form", person: person_params)
-      |> render_submit()
-      |> Pages.follow_live_view_redirect(conn)
-
-    view
-  end
-
   def visit(%Plug.Conn{} = conn, %Person{id: person_id}) do
     conn |> Pages.visit("/people/#{person_id}/edit")
   end

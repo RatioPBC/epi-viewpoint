@@ -30,7 +30,7 @@ defmodule Epicenter.Cases.ImportTest do
                  file_name: "test.csv",
                  contents: """
                  search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
-                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
+                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
                  Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
                  """
                }
@@ -63,7 +63,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "hispanic"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -131,7 +131,7 @@ defmodule Epicenter.Cases.ImportTest do
                  file_name: "test.csv",
                  contents: """
                  #{Enum.join(columns, ",")}
-                 Alice              , Testuser          , 01/01/1970, 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
+                 Alice              , Testuser          , 01/01/1970, 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
                  """
                }
                |> Import.import_csv(originator)
@@ -155,7 +155,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "hispanic"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -174,8 +174,8 @@ defmodule Epicenter.Cases.ImportTest do
                %{
                  file_name: "test.csv",
                  contents: """
-                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
-                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    ,   , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
+                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid , sex_11 , ethnicity_13     , occupation_18    , race_12
+                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    ,           , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice      , female , HispanicOrLatino , Rocket Scientist , Asian Indian
                  """
                }
                |> Import.import_csv(originator)
@@ -199,7 +199,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "hispanic"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -220,9 +220,9 @@ defmodule Epicenter.Cases.ImportTest do
                %{
                  file_name: "test.csv",
                  contents: """
-                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
-                 Alice              , Testuser          , 03/01/1990    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, Cuban       , Rocket Scientist, Asian Indian
-                 Billy              , Testuser          ,               , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , positive  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13,      occupation_18   , race_12
+                 Alice              , Testuser          , 03/01/1990    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino , Rocket Scientist, Asian Indian
+                 Billy              , Testuser          ,               , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , positive  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,                  ,                 ,
                  """
                }
                |> Import.import_csv(originator)
@@ -246,7 +246,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity == "Cuban"
+      assert alice.ethnicity.parent == "hispanic"
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -436,15 +436,16 @@ defmodule Epicenter.Cases.ImportTest do
     test "does not overwrite manually entered demographic data when importing csv", %{
       originator: originator
     } do
-      alice_attrs = %{
-        first_name: "Alice",
-        last_name: "Testuser",
-        dob: ~D[1970-01-01],
-        sex_at_birth: "female",
-        race: "Asian Indian",
-        occupation: "Rocket Scientist",
-        ethnicity: "Cuban"
-      }
+      alice_attrs =
+        %{
+          first_name: "Alice",
+          last_name: "Testuser",
+          dob: ~D[1970-01-01],
+          sex_at_birth: "female",
+          race: "Asian Indian",
+          occupation: "Rocket Scientist"
+        }
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{parent: "not_hispanic"}})
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
@@ -463,7 +464,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.sex_at_birth == "female"
       assert updated_alice.race == "Asian Indian"
       assert updated_alice.occupation == "Rocket Scientist"
-      assert updated_alice.ethnicity == "Cuban"
+      assert updated_alice.ethnicity.parent == "not_hispanic"
     end
 
     # Ideally we would overwrite nils when importing a new record for an existing person,
@@ -471,20 +472,21 @@ defmodule Epicenter.Cases.ImportTest do
     test "does not delete existing information when importing a new test result for an existing person", %{
       originator: originator
     } do
-      alice_attrs = %{
-        first_name: "Alice",
-        last_name: "Testuser",
-        dob: ~D[1970-01-01],
-        preferred_language: "AAA",
-        gender_identity: "AAA",
-        marital_status: "AAA",
-        employment: "AAA",
-        notes: "AAA",
-        sex_at_birth: "AAA",
-        race: "AAA",
-        occupation: "AAA",
-        ethnicity: "AAA"
-      }
+      alice_attrs =
+        %{
+          first_name: "Alice",
+          last_name: "Testuser",
+          dob: ~D[1970-01-01],
+          preferred_language: "AAA",
+          gender_identity: "AAA",
+          marital_status: "AAA",
+          employment: "AAA",
+          notes: "AAA",
+          sex_at_birth: "AAA",
+          race: "AAA",
+          occupation: "AAA"
+        }
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{parent: "AAA"}})
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
@@ -505,7 +507,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.sex_at_birth == "AAA"
       assert updated_alice.race == "AAA"
       assert updated_alice.occupation == "AAA"
-      assert updated_alice.ethnicity == "AAA"
+      assert updated_alice.ethnicity.parent == "AAA"
       assert updated_alice.preferred_language == "AAA"
       assert updated_alice.gender_identity == "AAA"
       assert updated_alice.marital_status == "AAA"

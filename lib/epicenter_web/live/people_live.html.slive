@@ -10,8 +10,8 @@ section#people-page data-page="people"
 
   #toolbar
     #toolbar-left
-      form id="assignment-form" phx-change="form-change"
-        #user-list data-disabled=is_disabled?(@selected_people)
+      form id="assignment-form" phx-change="form-change" data-disabled=is_disabled?(@selected_people)
+        #user-list
           span#assign-to-label Assign to
           #select-wrapper
             select name="user" data-role="users" disabled=is_disabled?(@selected_people)
@@ -19,12 +19,15 @@ section#people-page data-page="people"
               option value="-unassigned-" Unassigned
               = for user <- @users do
                 option value="#{user.id}" #{user.name}
-          #assignment-dropdown-tooltip Select people below then assign them to a user
+        #assignment-dropdown-tooltip Select people below, then assign them to a user
 
     #toolbar-right
       div data-role="reload-message"
         = if @reload_message do
           = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
+      label#assigned-to-me-button
+        input type="checkbox" phx-click="toggle-assigned-to-me" checked=@only_assigned_to_me data-tid="assigned-to-me-checkbox"
+        span My Assignments Only
       = live_redirect "Import labs", to: "/import/start", id: "import-labs"
 
 
@@ -38,7 +41,7 @@ section#people-page data-page="people"
         th width="25%" Assignee
 
     tbody
-      = for person <- @people do
+      = for person <- visible_people(@people, @only_assigned_to_me, @current_user) do
         tr data-role="person"
           td
             input type="checkbox" checked=is_selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"

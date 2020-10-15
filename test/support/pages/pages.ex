@@ -90,6 +90,16 @@ defmodule EpicenterWeb.Test.Pages do
     end
   end
 
+  def submit_and_follow_redirect(%View{} = view, conn, form_selector, params_keyword_list) do
+    {:ok, view, _} =
+      view
+      |> form(form_selector, params_keyword_list)
+      |> render_submit()
+      |> follow_live_view_redirect(conn)
+
+    view
+  end
+
   def visit(conn, path, option \\ nil)
 
   def visit(%Plug.Conn{} = conn, path, :follow_redirect) do

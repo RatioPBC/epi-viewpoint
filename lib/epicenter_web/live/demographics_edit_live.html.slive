@@ -3,12 +3,19 @@
   section#demographics-edit
     header
       span Demographics
-    = form_for @changeset, "#", [id: "demographics-form", phx_change: "form-change", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "demographics-form", phx_submit: "submit"], fn f ->
       #gender-identity-options
         = for gender_identity_option <- gender_identity_options() do
 
           = label f, :gender_identity, data_role: "gender-identity-checkbox-label" do
             = gender_identity_option
             = checkbox f, :gender_identity, value: gender_identity_option, checked: true, data_role: "gender-identity-checkbox"
+
+        = inputs_for f, :ethnicity, fn ethnicity_form ->
+          = for {parent_ethnicity_option_value, parent_ethnicity_option_label} <- parent_ethnicity_options() do
+
+            = label ethnicity_form, :parent, data_role: "parent-ethnicity-label" do
+              = parent_ethnicity_option_label
+              = radio_button ethnicity_form, :parent, parent_ethnicity_option_value, data_role: "parent-ethnicity-radio-button"
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

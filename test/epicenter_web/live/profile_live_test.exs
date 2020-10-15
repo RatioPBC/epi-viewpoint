@@ -260,7 +260,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       assert_role_text(page_live, "gender-identity", "Female")
       assert_role_text(page_live, "sex-at-birth", "Female")
-      assert_role_text(page_live, "ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
+      assert_role_text(page_live, "parent-ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
       assert_role_text(page_live, "race", "Filipino")
       assert_role_text(page_live, "marital-status", "Single")
       assert_role_text(page_live, "employment", "Part time")
@@ -280,6 +280,17 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     defp assert_redirects_to({_, {:live_redirect, %{to: destination_path}}}, expected_path) do
       assert destination_path == expected_path
+    end
+  end
+
+  describe "ethnicity_value" do
+    test "returns human readable ethnicity value for person" do
+      %{ethnicity: %{parent: "hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Hispanic, Latino/a, or Spanish origin")
+      %{ethnicity: %{parent: "not_hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Not Hispanic, Latino/a, or Spanish origin")
+      %{ethnicity: %{parent: "declined_to_answer"}} |> ProfileLive.ethnicity_value() |> assert_eq("Declined to answer")
+      %{ethnicity: %{parent: "unknown"}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
+      %{ethnicity: %{parent: nil}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
+      %{ethnicity: nil} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
     end
   end
 end

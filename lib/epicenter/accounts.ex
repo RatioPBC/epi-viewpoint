@@ -361,22 +361,25 @@ defmodule Epicenter.Accounts do
   end
 
   @doc """
-  Disables a user from being able to log in
+  Disables (or re-enables) a user from being able to log in
 
   ## Examples
 
-      iex> disable_user(user)
+      iex> update_disabled(user, :disabled)
       :ok
 
-      iex> disable_user(user)
+      iex> update_disabled(user, :disabled)
       {:error, "User alice is already disabled"}
-  """
-  @spec disable_user(%User{}, atom(), %AuditLog.Meta{}) :: {:ok, %User{}} | {:error, String.t()}
-  def disable_user(%User{disabled: true, email: email}, :disable, _), do: {:error, "User #{email} is already disabled"}
-  def disable_user(%User{disabled: false, email: email}, :enable, _), do: {:error, "User #{email} is already enabled"}
 
-  def disable_user(user, action, audit_meta) when action in [:disable, :enable],
-    do: user |> User.disable_changeset(disabled: action == :disable) |> AuditLog.update(audit_meta) |> stringify_error()
+      iex> update_disabled(user, :enabled)
+      :ok
+  """
+  @spec update_disabled(%User{}, atom(), %AuditLog.Meta{}) :: {:ok, %User{}} | {:error, String.t()}
+  def update_disabled(%User{disabled: true, email: email}, :disabled, _), do: {:error, "User #{email} is already disabled"}
+  def update_disabled(%User{disabled: false, email: email}, :enabled, _), do: {:error, "User #{email} is already enabled"}
+
+  def update_disabled(user, action, audit_meta) when action in [:disabled, :enabled],
+    do: user |> User.disable_changeset(disabled: action == :disabled) |> AuditLog.update(audit_meta) |> stringify_error()
 
   defp stringify_error({:error, error}), do: {:error, "#{inspect(error)}"}
   defp stringify_error(result), do: result

@@ -161,8 +161,11 @@ defmodule Epicenter.AuditLogTest do
       assert revision_2.changed_id == person.id
       assert revision_2.changed_type == "Cases.Person"
 
+      {ethnicity, attrs_to_change_sans_ethnicity} = attrs_to_change |> Map.pop(:ethnicity)
       reloaded_person = Cases.get_person(person.id)
-      reloaded_person |> Map.take(Map.keys(attrs_to_change)) |> assert_eq(attrs_to_change)
+      reloaded_person |> Map.take(Map.keys(attrs_to_change)) |> Map.drop([:ethnicity]) |> assert_eq(attrs_to_change_sans_ethnicity, :simple)
+      assert ethnicity.parent == "not_hispanic"
+      assert ethnicity.children == []
 
       assert updated_person_1.id == reloaded_person.id
       assert updated_person_2.id == reloaded_person.id
@@ -241,6 +244,60 @@ defmodule Epicenter.AuditLogTest do
 
       # only the "create" action should have a revision. not the invalid update.
       assert_revision_count(person, 1)
+    end
+  end
+
+  describe "audit log and change are in the same transaction" do
+    test "it doesn't save the insert if the audit log entry fails" do
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      changeset = %Person{} |> Cases.change_person(elem(Test.Fixtures.person_attrs(user, "tid"), 0))
+      people_count_before = Cases.count_people()
+      audit_log_count_before = AuditLog.revisions(Cases.Person) |> length()
+
+      assert catch_throw(
+               AuditLog.insert(
+                 changeset,
+                 %AuditLog.Meta{
+                   author_id: Ecto.UUID.generate(),
+                   reason_event: Revision.register_user_event(),
+                   reason_action: Revision.register_user_action()
+                 },
+                 [],
+                 fn _ -> throw("intentional") end
+               )
+             ) == "intentional"
+
+      assert people_count_before == Cases.count_people()
+      assert audit_log_count_before == AuditLog.revisions(Cases.Person) |> length()
+    end
+
+    test "it doesn't save the update if the audit log entry fails" do
+      [] = AuditLog.revisions(Cases.Person)
+
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      person_id = person.id
+      attrs_to_change = Test.Fixtures.add_demographic_attrs(%{preferred_language: "preferred_language"})
+      changeset = Cases.change_person(person, attrs_to_change)
+
+      [%{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
+      audit_log_count_before = AuditLog.entries_for(person_id) |> length()
+
+      assert catch_throw(
+               AuditLog.update(
+                 changeset,
+                 %AuditLog.Meta{
+                   author_id: user.id,
+                   reason_event: Revision.edit_profile_demographics_event(),
+                   reason_action: Revision.update_demographics_action()
+                 },
+                 [],
+                 fn _ -> throw("intentional") end
+               )
+             ) == "intentional"
+
+      refute Cases.get_person(person_id).preferred_language == "preferred_language"
+      assert audit_log_count_before == AuditLog.entries_for(person_id) |> length()
     end
   end
 

@@ -7,16 +7,16 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
   setup :register_and_log_in_user
 
+  setup %{user: user} do
+    person =
+      Test.Fixtures.person_attrs(user, "alice")
+      |> Test.Fixtures.add_demographic_attrs()
+      |> Cases.create_person!()
+
+    [person: person]
+  end
+
   describe "render" do
-    setup %{user: user} do
-      person =
-        Test.Fixtures.person_attrs(user, "alice")
-        |> Test.Fixtures.add_demographic_attrs()
-        |> Cases.create_person!()
-
-      [person: person]
-    end
-
     test "initially shows current demographics values", %{conn: conn, person: person} do
       # TODO don't hardcode all the checkboxes to true
       Pages.DemographicsEdit.visit(conn, person)
@@ -30,6 +30,24 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Genderqueer/gender nonconforming neither exclusively male nor female" => true,
         "Additional gender category (or other)" => true
       })
+      |> Pages.DemographicsEdit.assert_ethnicity_selections(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => true,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
+    end
+  end
+
+  describe "ethnicity" do
+    test "updating ethnicity", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"ethnicity" => %{"parent" => "hispanic"}})
+      |> Pages.Profile.assert_ethnicity("Hispanic, Latino/a, or Spanish origin")
+
+      #      assert_revision_count(person, 2)
+      assert Cases.get_person(person.id).ethnicity.parent == "hispanic"
     end
   end
 end
