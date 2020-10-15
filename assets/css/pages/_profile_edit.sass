@@ -60,16 +60,32 @@
           .select-wrapper
             @include select
 
+        $form-row-inner-margin: 1rem
+
+        #address-form-header
+          display: grid
+          grid-template-columns: 40% 10% 5em 8em
+
+          > * + *
+            margin-left: $form-row-inner-margin
+
         .address-wrapper:not(:first-of-type)
           @include vertical-flow
 
         .address-wrapper
           .address-and-trash-can
-            @include level
+            display: grid
+            grid-template-columns: 40% 10% 5em 8em
+
+            > * + *
+              margin-left: $form-row-inner-margin
+
+            .select-wrapper
+              @include select
+              margin-left: $form-row-inner-margin
+
             label
               @include centered
-          .select-wrapper
-            @include select
 
         .email-address-wrapper:not(:first-of-type)
           @include vertical-flow

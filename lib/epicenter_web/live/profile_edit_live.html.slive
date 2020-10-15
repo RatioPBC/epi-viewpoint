@@ -75,8 +75,11 @@
 
         fieldset
           = if has_field?(@changeset, :addresses) do
-            header data-role="address-fieldset-header"
-              span Address
+            header#address-form-header data-role="address-fieldset-header"
+              span Street address
+              span City
+              span State
+              span Zipcode
           = inputs_for f, :addresses, fn address_form ->
             = error_tag address_form, :street
             = error_tag address_form, :city
