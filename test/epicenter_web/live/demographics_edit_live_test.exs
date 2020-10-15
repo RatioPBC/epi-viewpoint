@@ -44,7 +44,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"ethnicity" => %{"parent" => "hispanic"}})
-      |> Pages.Profile.assert_ethnicity("Under development")
+      |> Pages.Profile.assert_ethnicity("Hispanic, Latino/a, or Spanish origin")
 
       #      assert_revision_count(person, 2)
       assert Cases.get_person(person.id).ethnicity.parent == "hispanic"

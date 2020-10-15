@@ -106,10 +106,20 @@ defmodule EpicenterWeb.ProfileLive do
     end
   end
 
-  def ethnicity_value() do
-    # Just so that things are not wonky-looking for the user
-    "Under development"
-  end
+  @ethnicity_values_map %{
+    "unknown" => "Unknown",
+    "declined_to_answer" => "Declined to answer",
+    "not_hispanic" => "Not Hispanic, Latino/a, or Spanish origin",
+    "hispanic" => "Hispanic, Latino/a, or Spanish origin"
+  }
+  def ethnicity_value(%{ethnicity: nil}),
+    do: @ethnicity_values_map |> Map.get("unknown")
+
+  def ethnicity_value(%{ethnicity: %{parent: nil}}),
+    do: @ethnicity_values_map |> Map.get("unknown")
+
+  def ethnicity_value(%{ethnicity: ethnicity}),
+    do: @ethnicity_values_map |> Map.get(ethnicity.parent)
 
   def unknown_value do
     Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
