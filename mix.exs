@@ -44,7 +44,7 @@ defmodule Epicenter.MixProject do
       {:mix_audit, "~> 0.1", runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:mox, "~> 1.0"},
-      {:nimble_csv, "~> 0.7"},
+      {:nimble_csv, "~> 1.0"},
       {:nimble_totp, "~> 0.1.0"},
       {:number, "~> 1.0.3"},
       {:phoenix, "~> 1.5.4"},
