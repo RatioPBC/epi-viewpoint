@@ -109,8 +109,8 @@ defmodule EpicenterWeb.ProfileLive do
   @ethnicity_values_map %{
     "unknown" => "Unknown",
     "declined_to_answer" => "Declined to answer",
-    "not_hispanic" => "Not Hispanic, Latino/a, or Spanish origin",
-    "hispanic" => "Hispanic, Latino/a, or Spanish origin"
+    "not_hispanic_latinx_or_spanish_origin" => "Not Hispanic, Latino/a, or Spanish origin",
+    "hispanic_latinx_or_spanish_origin" => "Hispanic, Latino/a, or Spanish origin"
   }
   def ethnicity_value(%{ethnicity: nil}),
     do: @ethnicity_values_map |> Map.get("unknown")

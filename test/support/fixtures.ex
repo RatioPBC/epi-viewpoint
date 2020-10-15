@@ -58,7 +58,7 @@ defmodule Epicenter.Test.Fixtures do
   def add_demographic_attrs(person_attrs, demographic_attrs \\ %{}) do
     %{
       employment: "Part time",
-      ethnicity: %{major: "not_hispanic", detailed: []},
+      ethnicity: %{major: "not_hispanic_latinx_or_spanish_origin", detailed: []},
       gender_identity: "Female",
       marital_status: "Single",
       notes: "lorem ipsum",

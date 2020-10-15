@@ -285,8 +285,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "ethnicity_value" do
     test "returns human readable ethnicity value for person" do
-      %{ethnicity: %{major: "hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Hispanic, Latino/a, or Spanish origin")
-      %{ethnicity: %{major: "not_hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Not Hispanic, Latino/a, or Spanish origin")
+      %{ethnicity: %{major: "hispanic_latinx_or_spanish_origin"}}
+      |> ProfileLive.ethnicity_value()
+      |> assert_eq("Hispanic, Latino/a, or Spanish origin")
+
+      %{ethnicity: %{major: "not_hispanic_latinx_or_spanish_origin"}}
+      |> ProfileLive.ethnicity_value()
+      |> assert_eq("Not Hispanic, Latino/a, or Spanish origin")
+
       %{ethnicity: %{major: "declined_to_answer"}} |> ProfileLive.ethnicity_value() |> assert_eq("Declined to answer")
       %{ethnicity: %{major: "unknown"}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
       %{ethnicity: %{major: nil}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")

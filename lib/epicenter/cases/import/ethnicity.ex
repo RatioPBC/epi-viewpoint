@@ -1,8 +1,8 @@
 defmodule Epicenter.Cases.Import.Ethnicity do
   @ethnicity_mapping %{
     "RefusedToAnswer" => %{"major" => "declined_to_answer", "detailed" => []},
-    "NonHispanicOrNonLatino" => %{"major" => "not_hispanic", "detailed" => []},
-    "HispanicOrLatino" => %{"major" => "hispanic", "detailed" => []}
+    "NonHispanicOrNonLatino" => %{"major" => "not_hispanic_latinx_or_spanish_origin", "detailed" => []},
+    "HispanicOrLatino" => %{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => []}
   }
 
   @unknown_ethnicity %{"major" => "unknown", "detailed" => []}

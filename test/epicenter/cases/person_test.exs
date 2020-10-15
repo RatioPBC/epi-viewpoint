@@ -111,7 +111,7 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "demographic attributes" do
-      changes = new_changeset(%{ethnicity: %{major: "hispanic", detailed: ["cuban", "puerto_rican"]}}).changes
+      changes = new_changeset(%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}}).changes
       assert changes.employment == "Part time"
       assert changes.gender_identity == "Female"
       assert changes.marital_status == "Single"
@@ -121,7 +121,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert changes.sex_at_birth == "Female"
 
       ethnicity_changes = changes.ethnicity.changes
-      assert ethnicity_changes.major == "hispanic"
+      assert ethnicity_changes.major == "hispanic_latinx_or_spanish_origin"
       assert ethnicity_changes.detailed == ["cuban", "puerto_rican"]
     end
 

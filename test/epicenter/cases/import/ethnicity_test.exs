@@ -19,11 +19,11 @@ defmodule Epicenter.Cases.Import.EthnicityTest do
 
       %{"foo" => "bar", "ethnicity" => "NonHispanicOrNonLatino"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "not_hispanic", "detailed" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "not_hispanic_latinx_or_spanish_origin", "detailed" => []}}, :simple)
 
       %{"foo" => "bar", "ethnicity" => "HispanicOrLatino"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "hispanic", "detailed" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => []}}, :simple)
     end
 
     test "defaults to unknown if there is no ethnicity value" do
