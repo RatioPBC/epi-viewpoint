@@ -3,7 +3,7 @@ defmodule Epicenter.Repo.Migrations.AddIsPreferredToAddress do
 
   def change() do
     alter table(:addresses) do
-      add :is_preferred, :boolean # [, options]
+      add :is_preferred, :boolean
     end
   end
 end

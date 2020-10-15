@@ -154,6 +154,7 @@ defmodule Epicenter.ValidationTest do
       Changeset.change(%Address{}, state: "TS")
       |> Validation.validate_phi(:address)
       |> assert_valid()
+
       Changeset.change(%Address{}, state: @valid_state)
       |> Validation.validate_phi(:address)
       |> assert_valid()

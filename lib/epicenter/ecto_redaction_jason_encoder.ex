@@ -8,6 +8,7 @@ defmodule Epicenter.EctoRedactionJasonEncoder do
 
   defmacro derive_jason_encoder(opts \\ []) do
     except = Keyword.get(opts, :except, [])
+
     quote do
       invoking_module = __MODULE__
 
