@@ -93,7 +93,11 @@
         tr
           td data-role="gender-identity"= @person.gender_identity
           td data-role="sex-at-birth"= @person.sex_at_birth
-          td data-role="major-ethnicity"= ethnicity_value(@person)
+          td
+            p data-role="major-ethnicity"= ethnicity_value(@person)
+            ul
+              = for detailed_ethnicity <- detailed_ethnicities(@person) do
+                li data-role="detailed-ethnicity"= detailed_ethnicity_value(detailed_ethnicity)
           td data-role="race"= @person.race
       tbody
         tr

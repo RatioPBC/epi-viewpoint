@@ -32,7 +32,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
     view
   end
 
-  def assert_ethnicity_selections(view, expected_selections) do
+  def assert_major_ethnicity_selection(view, expected_selections) do
     actual_selections =
       view
       |> Pages.parse()
@@ -42,6 +42,25 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
           {
             Test.Html.text(element),
             Test.Html.attr(element, "input[type=radio]", "checked") == ["checked"]
+          }
+        end
+      )
+      |> Map.new()
+
+    assert actual_selections == expected_selections
+    view
+  end
+
+  def assert_detailed_ethnicity_selections(view, expected_selections) do
+    actual_selections =
+      view
+      |> Pages.parse()
+      |> Test.Html.all(
+        "[data-role=detailed-ethnicity-label]",
+        fn element ->
+          {
+            Test.Html.text(element),
+            Test.Html.attr(element, "input[type=checkbox]", "checked") == ["checked"]
           }
         end
       )

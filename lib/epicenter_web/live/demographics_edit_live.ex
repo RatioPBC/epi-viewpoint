@@ -65,6 +65,25 @@ defmodule EpicenterWeb.DemographicsEditLive do
     ]
   end
 
+  @detailed_ethnicity_mapping %{
+    "hispanic_latinx_or_spanish_origin" => [
+      {"mexican_mexican_american_chicanx", "Mexican, Mexican American, Chicano/a"},
+      {"puerto_rican", "Puerto Rican"},
+      {"cuban", "Cuban"},
+      {"another_hispanic_latinx_or_spanish_origin", "Another Hispanic, Latino/a or Spanish origin"}
+    ]
+  }
+
+  def detailed_ethnicity_options(major_ethnicity) do
+    @detailed_ethnicity_mapping[major_ethnicity] || []
+  end
+
+  def detailed_ethnicity_option_checked?(person, detailed_ethnicity) do
+    if Enum.member?(person.ethnicity.detailed, detailed_ethnicity) do
+      "checked"
+    end
+  end
+
   def gender_identity_is_checked() do
   end
 end

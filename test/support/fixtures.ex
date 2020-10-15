@@ -52,10 +52,12 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def add_demographic_attrs({person_attrs, audit_meta}),
-    do: {add_demographic_attrs(person_attrs), audit_meta}
+  def add_demographic_attrs(attrs_or_attrs_with_audit_tuple, demographic_attrs \\ %{})
 
-  def add_demographic_attrs(person_attrs, demographic_attrs \\ %{}) do
+  def add_demographic_attrs({person_attrs, audit_meta}, demographic_attrs),
+    do: {add_demographic_attrs(person_attrs, demographic_attrs), audit_meta}
+
+  def add_demographic_attrs(person_attrs, demographic_attrs) do
     %{
       employment: "Part time",
       ethnicity: %{major: "not_hispanic_latinx_or_spanish_origin", detailed: []},
