@@ -47,7 +47,7 @@
             = if Euclid.Exists.present?(@person.addresses) do
               = for address <- @person.addresses do
                 div class="address-details" data-role="address-details"
-                  div = address.full_address
+                  div = Format.address(address)
                   div = address.type
             - else
               = unknown_value()
