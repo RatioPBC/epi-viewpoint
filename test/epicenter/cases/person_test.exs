@@ -143,6 +143,14 @@ defmodule Epicenter.Cases.PersonTest do
       phone_changeset = new_changeset(%{phones: [%{number: "1111111003"}]}).changes.phones |> Euclid.Extra.List.first()
       assert phone_changeset.changes.number == "1111111003"
     end
+
+    test "associations - address" do
+      address_changeset =
+        new_changeset(%{addresses: [%{street: "1023 Test St", city: "City7", state: "ZB", postal_code: "00002"}]}).changes.addresses
+        |> Euclid.Extra.List.first()
+
+      assert %{street: "1023 Test St", city: "City7", state: "ZB", postal_code: "00002"} = address_changeset.changes
+    end
   end
 
   describe "constraints" do

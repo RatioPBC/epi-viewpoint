@@ -78,6 +78,7 @@ defmodule Epicenter.Cases.Person do
     person
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
     |> cast_embed(:ethnicity, with: &Ethnicity.changeset/2)
+    |> cast_assoc(:addresses, with: &Address.changeset/2)
     |> cast_assoc(:emails, with: &Email.changeset/2)
     |> cast_assoc(:phones, with: &Phone.changeset/2)
     |> validate_required(@required_attrs)

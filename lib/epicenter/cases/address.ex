@@ -6,8 +6,8 @@ defmodule Epicenter.Cases.Address do
 
   alias Epicenter.Cases.Address
 
-  @required_attrs ~w{person_id}a
-  @optional_attrs ~w(street city state postal_code type tid is_preferred)a
+  @required_attrs ~w{}a
+  @optional_attrs ~w(street city state postal_code type tid is_preferred person_id)a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 

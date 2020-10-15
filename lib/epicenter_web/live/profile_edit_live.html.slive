@@ -74,6 +74,28 @@
           span Add phone
 
         fieldset
+          = if has_field?(@changeset, :addresses) do
+            header data-role="address-fieldset-header"
+              span Address
+          = inputs_for f, :addresses, fn address_form ->
+            = error_tag address_form, :street
+            = error_tag address_form, :city
+            = error_tag address_form, :state
+            = error_tag address_form, :postal_code
+            .address-wrapper
+              .address-and-trash-can
+                = text_input address_form, :street, data: [role: "street-input", tid: address_form.data.tid]
+                = text_input address_form, :city, data: [role: "city-input", tid: address_form.data.tid]
+                .select-wrapper
+                  = arrow_down_icon()
+                  = select address_form, :state, states(), data_role: "state-input"
+                = text_input address_form, :postal_code, data: [role: "postal-code-input", tid: address_form.data.tid]
+
+        a#add-address[phx-click="add-address"]
+          = plus_icon()
+          span Add address
+
+        fieldset
           = if has_field?(@changeset, :emails) do
             header data-role="email-fieldset-header"
               span Email

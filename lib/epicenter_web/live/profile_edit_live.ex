@@ -12,7 +12,13 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
-    person = %{Cases.get_person(id) | originator: socket.assigns.current_user} |> Cases.preload_emails() |> Cases.preload_phones()
+
+    person =
+      %{Cases.get_person(id) | originator: socket.assigns.current_user}
+      |> Cases.preload_emails()
+      |> Cases.preload_phones()
+      |> Cases.preload_addresses()
+
     changeset = person |> Cases.change_person(%{})
 
     socket
@@ -21,6 +27,14 @@ defmodule EpicenterWeb.ProfileEditLive do
     |> assign(person: person)
     |> assign(preferred_language_is_other: false)
     |> ok()
+  end
+
+  def handle_event("add-address", _value, socket) do
+    existing_addresses = socket.assigns.changeset |> get_field_from_changeset(:addresses)
+    addresses = existing_addresses |> Enum.concat([Cases.change_address(%Cases.Address{}, %{})])
+
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:addresses, addresses)
+    socket |> assign(changeset: changeset |> Extra.Changeset.clear_validation_errors()) |> noreply()
   end
 
   def handle_event("add-email", _value, socket) do
@@ -74,6 +88,7 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> clean_up_languages()
       |> remove_blank_email_addresses()
       |> remove_blank_phone_numbers()
+      |> remove_blank_addresses()
 
     socket.assigns.person
     |> Cases.update_person(
@@ -147,6 +162,10 @@ defmodule EpicenterWeb.ProfileEditLive do
     (first ++ middle ++ last) |> Enum.uniq()
   end
 
+  def states() do
+    ["TS", "ZA", "ZB"]
+  end
+
   def remove_blank_email_addresses(%{"emails" => email_params} = person_params) do
     updated_email_params =
       email_params
@@ -169,6 +188,21 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def remove_blank_phone_numbers(person_params),
+    do: person_params
+
+  def remove_blank_addresses(%{"addresses" => address_params} = person_params) do
+    updated_address_params =
+      address_params
+      |> Enum.reject(fn {_index, address} ->
+        %{"street" => street, "city" => city, "postal_code" => postal_code} = address
+        Euclid.Exists.blank?(street) and Euclid.Exists.blank?(city) and Euclid.Exists.blank?(postal_code)
+      end)
+      |> Map.new()
+
+    person_params |> Map.put("addresses", updated_address_params)
+  end
+
+  def remove_blank_addresses(person_params),
     do: person_params
 
   # # #

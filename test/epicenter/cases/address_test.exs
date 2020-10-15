@@ -54,7 +54,6 @@ defmodule Epicenter.Cases.AddressTest do
     test "city is optional", do: assert_valid(new_changeset(city: nil))
     test "state is optional", do: assert_valid(new_changeset(state: nil))
     test "postal_code is optional", do: assert_valid(new_changeset(postal_code: nil))
-    test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
 
     test "validates personal health information on address", do: assert_invalid(new_changeset(street: "123 main st"))
   end

@@ -48,7 +48,6 @@
               = for address <- @person.addresses do
                 div class="address-details" data-role="address-details"
                   div = Format.address(address)
-                  div = address.type
             - else
               = unknown_value()
 
