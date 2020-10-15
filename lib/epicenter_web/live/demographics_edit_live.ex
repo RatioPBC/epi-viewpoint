@@ -56,12 +56,12 @@ defmodule EpicenterWeb.DemographicsEditLive do
     ]
   end
 
-  def parent_ethnicity_options() do
+  def major_ethnicity_options() do
     [
       {"unknown", "Unknown"},
       {"declined_to_answer", "Declined to answer"},
-      {"not_hispanic", "Not Hispanic, Latino/a, or Spanish origin"},
-      {"hispanic", "Hispanic, Latino/a, or Spanish origin"}
+      {"not_hispanic_latinx_or_spanish_origin", "Not Hispanic, Latino/a, or Spanish origin"},
+      {"hispanic_latinx_or_spanish_origin", "Hispanic, Latino/a, or Spanish origin"}
     ]
   end
 

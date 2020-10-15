@@ -37,7 +37,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
       view
       |> Pages.parse()
       |> Test.Html.all(
-        "[data-role=parent-ethnicity-label]",
+        "[data-role=major-ethnicity-label]",
         fn element ->
           {
             Test.Html.text(element),

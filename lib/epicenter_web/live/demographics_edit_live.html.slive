@@ -12,10 +12,10 @@
             = checkbox f, :gender_identity, value: gender_identity_option, checked: true, data_role: "gender-identity-checkbox"
 
         = inputs_for f, :ethnicity, fn ethnicity_form ->
-          = for {parent_ethnicity_option_value, parent_ethnicity_option_label} <- parent_ethnicity_options() do
+          = for {major_ethnicity_option_value, major_ethnicity_option_label} <- major_ethnicity_options() do
 
-            = label ethnicity_form, :parent, data_role: "parent-ethnicity-label" do
-              = parent_ethnicity_option_label
-              = radio_button ethnicity_form, :parent, parent_ethnicity_option_value, data_role: "parent-ethnicity-radio-button"
+            = label ethnicity_form, :major, data_role: "major-ethnicity-label" do
+              = major_ethnicity_option_label
+              = radio_button ethnicity_form, :major, major_ethnicity_option_value, data_role: "major-ethnicity-radio-button"
 
       = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

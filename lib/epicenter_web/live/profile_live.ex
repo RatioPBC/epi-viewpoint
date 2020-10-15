@@ -109,17 +109,17 @@ defmodule EpicenterWeb.ProfileLive do
   @ethnicity_values_map %{
     "unknown" => "Unknown",
     "declined_to_answer" => "Declined to answer",
-    "not_hispanic" => "Not Hispanic, Latino/a, or Spanish origin",
-    "hispanic" => "Hispanic, Latino/a, or Spanish origin"
+    "not_hispanic_latinx_or_spanish_origin" => "Not Hispanic, Latino/a, or Spanish origin",
+    "hispanic_latinx_or_spanish_origin" => "Hispanic, Latino/a, or Spanish origin"
   }
   def ethnicity_value(%{ethnicity: nil}),
     do: @ethnicity_values_map |> Map.get("unknown")
 
-  def ethnicity_value(%{ethnicity: %{parent: nil}}),
+  def ethnicity_value(%{ethnicity: %{major: nil}}),
     do: @ethnicity_values_map |> Map.get("unknown")
 
   def ethnicity_value(%{ethnicity: ethnicity}),
-    do: @ethnicity_values_map |> Map.get(ethnicity.parent)
+    do: @ethnicity_values_map |> Map.get(ethnicity.major)
 
   def unknown_value do
     Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
