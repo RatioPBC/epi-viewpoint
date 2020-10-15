@@ -91,7 +91,7 @@ defmodule Epicenter.Test.Fixtures do
       %{
         street: "#{street_number} Test St",
         city: "City",
-        state: "TS",
+        state: "OH",
         postal_code: "00000",
         type: "home",
         person_id: person_id,

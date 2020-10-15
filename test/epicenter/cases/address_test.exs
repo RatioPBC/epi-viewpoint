@@ -42,7 +42,7 @@ defmodule Epicenter.Cases.AddressTest do
       changes = new_changeset(is_preferred: true).changes
       assert changes.street == "1234 Test St"
       assert changes.city == "City"
-      assert changes.state == "TS"
+      assert changes.state == "OH"
       assert changes.postal_code == "00000"
       assert changes.tid == "alice-address"
       assert changes.type == "home"

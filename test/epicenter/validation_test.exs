@@ -146,33 +146,6 @@ defmodule Epicenter.ValidationTest do
     end
   end
 
-  describe "validate_phi: state" do
-    @valid_state "ZA"
-    @invalid_state "AA"
-
-    test "changeset is valid if state is TS or starts with Z" do
-      Changeset.change(%Address{}, state: "TS")
-      |> Validation.validate_phi(:address)
-      |> assert_valid()
-
-      Changeset.change(%Address{}, state: @valid_state)
-      |> Validation.validate_phi(:address)
-      |> assert_valid()
-    end
-
-    test "changeset is invalid if state is TS and doesn't start with Z" do
-      Changeset.change(%Address{}, state: @invalid_state)
-      |> Validation.validate_phi(:address)
-      |> assert_invalid(state: ["In non-PHI environment, must be TS or end with Z"])
-    end
-
-    test "changeset is valid when there are no user input restrictions" do
-      Changeset.change(%Address{}, state: @invalid_state)
-      |> Validation.validate_phi(:address, :unrestricted)
-      |> assert_valid()
-    end
-  end
-
   describe "validate_phi: postal code" do
     @valid_postal_code "00002"
     @invalid_postal_code "33333"

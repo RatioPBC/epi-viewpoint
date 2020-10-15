@@ -21,7 +21,6 @@ defmodule Epicenter.Validation do
     changeset
     |> validate_change(:street, &address_street_validator/2)
     |> validate_change(:city, &address_city_validator/2)
-    |> validate_change(:state, &address_state_validator/2)
     |> validate_change(:postal_code, &address_postal_code_validator/2)
   end
 
@@ -39,7 +38,6 @@ defmodule Epicenter.Validation do
 
   @four_digits_followed_by_fake_street ~r|\A\d{4} Test St\z|
   @city_followed_by_numbers ~r|\ACity\d*\z|
-  @ts_or_starts_with_z ~r/\A(TS|Z[A-Z])\z/
   @four_leading_zeroes_followed_by_one_digit ~r|\A0000\d\z|
   @seven_leading_ones_followed_by_three_digits ~r|1{7}\d+|
 
@@ -65,12 +63,6 @@ defmodule Epicenter.Validation do
     if value =~ @city_followed_by_numbers,
       do: valid(),
       else: invalid(field, "must match 'City#'")
-  end
-
-  defp address_state_validator(field, value) do
-    if value =~ @ts_or_starts_with_z,
-      do: valid(),
-      else: invalid(field, "must be TS or end with Z")
   end
 
   defp address_postal_code_validator(field, value) do

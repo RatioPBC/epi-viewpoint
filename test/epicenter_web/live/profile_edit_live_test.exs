@@ -101,10 +101,10 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_address_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
         person: %{
-          "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "TS", "postal_code" => "00000"}}
+          "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "OH", "postal_code" => "00000"}}
         }
       )
-      |> Pages.Profile.assert_addresses(["1001 Test St, City, TS 00000"])
+      |> Pages.Profile.assert_addresses(["1001 Test St, City, OH 00000"])
 
       Cases.get_person(person.id)
       |> Cases.preload_addresses()
@@ -114,7 +114,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         %{
           street: "1001 Test St",
           city: "City",
-          state: "TS",
+          state: "OH",
           postal_code: "00000"
         }
       ])
@@ -127,10 +127,10 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_address_form(%{"person[addresses][0][street]" => "5555 Test St"})
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
         person: %{
-          "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "TS", "postal_code" => "00000"}}
+          "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "OH", "postal_code" => "00000"}}
         }
       )
-      |> Pages.Profile.assert_addresses(["1001 Test St, City, TS 00000"])
+      |> Pages.Profile.assert_addresses(["1001 Test St, City, OH 00000"])
 
       Cases.get_person(person.id)
       |> Cases.preload_addresses()
@@ -140,7 +140,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         %{
           street: "1001 Test St",
           city: "City",
-          state: "TS",
+          state: "OH",
           postal_code: "00000"
         }
       ])
@@ -161,7 +161,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_address_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
         person: %{
-          "addresses" => %{"0" => %{"street" => "", "city" => "", "state" => "TS", "postal_code" => ""}}
+          "addresses" => %{"0" => %{"street" => "", "city" => "", "state" => "OH", "postal_code" => ""}}
         }
       )
 

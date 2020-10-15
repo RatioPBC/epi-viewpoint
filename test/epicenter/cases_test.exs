@@ -443,7 +443,7 @@ defmodule Epicenter.CasesTest do
 
       assert address.street == "4250 Test St"
       assert address.city == "City"
-      assert address.state == "TS"
+      assert address.state == "OH"
       assert address.postal_code == "00000"
       assert address.type == "home"
       assert address.tid == "address1"
@@ -463,7 +463,7 @@ defmodule Epicenter.CasesTest do
         "tid" => "address1",
         "street" => "4250 Test St",
         "city" => "City",
-        "state" => "TS",
+        "state" => "OH",
         "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
@@ -498,7 +498,7 @@ defmodule Epicenter.CasesTest do
         "tid" => "address2",
         "street" => "4250 Test St",
         "city" => "City",
-        "state" => "TS",
+        "state" => "OH",
         "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
@@ -523,7 +523,7 @@ defmodule Epicenter.CasesTest do
         "tid" => "address2",
         "street" => "4250 Test St",
         "city" => "City",
-        "state" => "TS",
+        "state" => "OH",
         "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
@@ -543,7 +543,7 @@ defmodule Epicenter.CasesTest do
         "tid" => "address1",
         "street" => "4250 Test St",
         "city" => "City",
-        "state" => "TS",
+        "state" => "OH",
         "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
