@@ -115,11 +115,11 @@ defmodule EpicenterWeb.ProfileLive do
   def ethnicity_value(%{ethnicity: nil}),
     do: @ethnicity_values_map |> Map.get("unknown")
 
-  def ethnicity_value(%{ethnicity: %{parent: nil}}),
+  def ethnicity_value(%{ethnicity: %{major: nil}}),
     do: @ethnicity_values_map |> Map.get("unknown")
 
   def ethnicity_value(%{ethnicity: ethnicity}),
-    do: @ethnicity_values_map |> Map.get(ethnicity.parent)
+    do: @ethnicity_values_map |> Map.get(ethnicity.major)
 
   def unknown_value do
     Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")

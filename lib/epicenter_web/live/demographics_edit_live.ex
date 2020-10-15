@@ -56,7 +56,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     ]
   end
 
-  def parent_ethnicity_options() do
+  def major_ethnicity_options() do
     [
       {"unknown", "Unknown"},
       {"declined_to_answer", "Declined to answer"},

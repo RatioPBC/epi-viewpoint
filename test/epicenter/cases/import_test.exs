@@ -63,7 +63,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity.parent == "hispanic"
+      assert alice.ethnicity.major == "hispanic"
+      assert alice.ethnicity.detailed == []
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -155,7 +156,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity.parent == "hispanic"
+      assert alice.ethnicity.major == "hispanic"
+      assert alice.ethnicity.detailed == []
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -199,7 +201,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity.parent == "hispanic"
+      assert alice.ethnicity.major == "hispanic"
+      assert alice.ethnicity.detailed == []
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -246,7 +249,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
-      assert alice.ethnicity.parent == "hispanic"
+      assert alice.ethnicity.major == "hispanic"
+      assert alice.ethnicity.detailed == []
       assert alice.occupation == "Rocket Scientist"
       assert alice.race == "Asian Indian"
 
@@ -445,7 +449,7 @@ defmodule Epicenter.Cases.ImportTest do
           race: "Asian Indian",
           occupation: "Rocket Scientist"
         }
-        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{parent: "not_hispanic"}})
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{major: "not_hispanic", detailed: []}})
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
@@ -464,7 +468,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.sex_at_birth == "female"
       assert updated_alice.race == "Asian Indian"
       assert updated_alice.occupation == "Rocket Scientist"
-      assert updated_alice.ethnicity.parent == "not_hispanic"
+      assert updated_alice.ethnicity.major == "not_hispanic"
+      assert updated_alice.ethnicity.detailed == []
     end
 
     # Ideally we would overwrite nils when importing a new record for an existing person,
@@ -486,7 +491,7 @@ defmodule Epicenter.Cases.ImportTest do
           race: "AAA",
           occupation: "AAA"
         }
-        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{parent: "AAA"}})
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{major: "AAA", detailed: []}})
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
@@ -507,7 +512,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.sex_at_birth == "AAA"
       assert updated_alice.race == "AAA"
       assert updated_alice.occupation == "AAA"
-      assert updated_alice.ethnicity.parent == "AAA"
+      assert updated_alice.ethnicity.major == "AAA"
+      assert updated_alice.ethnicity.detailed == []
       assert updated_alice.preferred_language == "AAA"
       assert updated_alice.gender_identity == "AAA"
       assert updated_alice.marital_status == "AAA"

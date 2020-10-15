@@ -82,8 +82,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # demographics
   #
 
-  def assert_ethnicity(%View{} = view, parent_expected_ethnicity) do
-    assert view |> Pages.parse() |> Test.Html.text("[data-role=parent-ethnicity]") == parent_expected_ethnicity
+  def assert_ethnicity(%View{} = view, expected_major_ethnicity) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=major-ethnicity]") == expected_major_ethnicity
     view
   end
 

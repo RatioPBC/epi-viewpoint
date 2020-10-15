@@ -4,32 +4,32 @@ defmodule Epicenter.Cases.Import.EthnicityTest do
   alias Epicenter.Cases.Import.Ethnicity
 
   describe "build_attrs" do
-    test "creates map of parent and children ethnicity values from row values" do
+    test "creates map of major and detailed ethnicity values from row values" do
       %{"foo" => "bar", "ethnicity" => ""}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "unknown", "children" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "unknown", "detailed" => []}}, :simple)
 
       %{"foo" => "bar", "ethnicity" => "Unknown"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "unknown", "children" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "unknown", "detailed" => []}}, :simple)
 
       %{"foo" => "bar", "ethnicity" => "RefusedToAnswer"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "declined_to_answer", "children" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "declined_to_answer", "detailed" => []}}, :simple)
 
       %{"foo" => "bar", "ethnicity" => "NonHispanicOrNonLatino"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "not_hispanic", "children" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "not_hispanic", "detailed" => []}}, :simple)
 
       %{"foo" => "bar", "ethnicity" => "HispanicOrLatino"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"parent" => "hispanic", "children" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "ethnicity" => %{"major" => "hispanic", "detailed" => []}}, :simple)
     end
 
     test "defaults to unknown if there is no ethnicity value" do
       %{"foo" => "bar", "baz" => "bat"}
       |> Ethnicity.build_attrs()
-      |> assert_eq(%{"foo" => "bar", "baz" => "bat", "ethnicity" => %{"parent" => "unknown", "children" => []}}, :simple)
+      |> assert_eq(%{"foo" => "bar", "baz" => "bat", "ethnicity" => %{"major" => "unknown", "detailed" => []}}, :simple)
     end
   end
 end

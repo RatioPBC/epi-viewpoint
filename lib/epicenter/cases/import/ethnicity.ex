@@ -1,11 +1,11 @@
 defmodule Epicenter.Cases.Import.Ethnicity do
   @ethnicity_mapping %{
-    "RefusedToAnswer" => %{"parent" => "declined_to_answer", "children" => []},
-    "NonHispanicOrNonLatino" => %{"parent" => "not_hispanic", "children" => []},
-    "HispanicOrLatino" => %{"parent" => "hispanic", "children" => []}
+    "RefusedToAnswer" => %{"major" => "declined_to_answer", "detailed" => []},
+    "NonHispanicOrNonLatino" => %{"major" => "not_hispanic", "detailed" => []},
+    "HispanicOrLatino" => %{"major" => "hispanic", "detailed" => []}
   }
 
-  @unknown_ethnicity %{"parent" => "unknown", "children" => []}
+  @unknown_ethnicity %{"major" => "unknown", "detailed" => []}
 
   def build_attrs(%{"ethnicity" => ethnicity} = attrs),
     do: attrs |> Map.put("ethnicity", @ethnicity_mapping[ethnicity] || @unknown_ethnicity)

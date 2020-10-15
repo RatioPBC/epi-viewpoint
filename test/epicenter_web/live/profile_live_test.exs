@@ -260,7 +260,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       assert_role_text(page_live, "gender-identity", "Female")
       assert_role_text(page_live, "sex-at-birth", "Female")
-      assert_role_text(page_live, "parent-ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
+      assert_role_text(page_live, "major-ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
       assert_role_text(page_live, "race", "Filipino")
       assert_role_text(page_live, "marital-status", "Single")
       assert_role_text(page_live, "employment", "Part time")
@@ -285,11 +285,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "ethnicity_value" do
     test "returns human readable ethnicity value for person" do
-      %{ethnicity: %{parent: "hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Hispanic, Latino/a, or Spanish origin")
-      %{ethnicity: %{parent: "not_hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Not Hispanic, Latino/a, or Spanish origin")
-      %{ethnicity: %{parent: "declined_to_answer"}} |> ProfileLive.ethnicity_value() |> assert_eq("Declined to answer")
-      %{ethnicity: %{parent: "unknown"}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
-      %{ethnicity: %{parent: nil}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
+      %{ethnicity: %{major: "hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Hispanic, Latino/a, or Spanish origin")
+      %{ethnicity: %{major: "not_hispanic"}} |> ProfileLive.ethnicity_value() |> assert_eq("Not Hispanic, Latino/a, or Spanish origin")
+      %{ethnicity: %{major: "declined_to_answer"}} |> ProfileLive.ethnicity_value() |> assert_eq("Declined to answer")
+      %{ethnicity: %{major: "unknown"}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
+      %{ethnicity: %{major: nil}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
       %{ethnicity: nil} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
     end
   end
