@@ -60,9 +60,16 @@
           .select-wrapper
             @include select
 
-        #add-phone, #add-email
-          @include button-secondary
-          @include has-icon
+        .address-wrapper:not(:first-of-type)
+          @include vertical-flow
+
+        .address-wrapper
+          .address-and-trash-can
+            @include level
+            label
+              @include centered
+          .select-wrapper
+            @include select
 
         .email-address-wrapper:not(:first-of-type)
           @include vertical-flow
@@ -79,6 +86,10 @@
 
             label
               @include centered
+
+        #add-phone, #add-email, #add-address
+          @include button-secondary
+          @include has-icon
 
       #submit-form
         @include button-primary
