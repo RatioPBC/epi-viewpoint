@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+bin/dev/postgres-stop -q && bin/dev/postgres-start
