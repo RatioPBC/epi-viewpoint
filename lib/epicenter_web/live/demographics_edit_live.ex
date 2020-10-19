@@ -19,6 +19,32 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> ok()
   end
 
+  def handle_event(
+        "form-change",
+        %{"person" => %{"ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => _detailed}} = person_params},
+        socket
+      ) do
+    changeset = socket.assigns.person |> Cases.change_person(person_params)
+    socket |> assign(changeset: changeset) |> noreply()
+  end
+
+  def handle_event("form-change", %{"person" => %{"ethnicity" => ethnicity} = _person_params}, socket) do
+    params = Euclid.Extra.Map.deep_atomize_keys(ethnicity)
+
+    changeset =
+      Ecto.Changeset.delete_change(socket.assigns.changeset, :ethnicity)
+      |> Ecto.Changeset.put_change(:ethnicity, params)
+
+    socket |> assign(changeset: changeset) |> noreply()
+  end
+
+  def handle_event("form-change", %{"person" => person_params}, socket) do
+    changeset = socket.assigns.person |> Cases.change_person(person_params)
+    socket |> assign(changeset: changeset) |> noreply()
+  end
+
+  def handle_event("form-change", _, socket), do: noreply(socket)
+
   def handle_event("submit", %{"person" => person_params} = _params, socket) do
     socket.assigns.person
     |> Cases.update_person(
@@ -74,16 +100,21 @@ defmodule EpicenterWeb.DemographicsEditLive do
     ]
   }
 
-  def detailed_ethnicity_options(major_ethnicity) do
-    @detailed_ethnicity_mapping[major_ethnicity] || []
-  end
+  def detailed_ethnicity_options(major_ethnicity),
+    do: @detailed_ethnicity_mapping[major_ethnicity] || []
 
-  def detailed_ethnicity_option_checked(person, detailed_ethnicity) do
-    if Enum.member?(person.ethnicity.detailed, detailed_ethnicity) do
-      "checked"
-    end
-  end
+  def detailed_ethnicity_checked(%Ecto.Changeset{} = changeset, detailed_ethnicity),
+    do: changeset |> Ecto.Changeset.fetch_field(:ethnicity) |> elem(1) |> detailed_ethnicity_checked(detailed_ethnicity)
 
-  def gender_identity_is_checked() do
-  end
+  def detailed_ethnicity_checked(%{detailed: nil}, _detailed_ethnicity),
+    do: false
+
+  def detailed_ethnicity_checked(%{detailed: detailed_ethnicities}, detailed_ethnicity),
+    do: detailed_ethnicity in detailed_ethnicities
+
+  def detailed_ethnicity_checked(_, _),
+    do: false
+
+  def gender_identity_is_checked(),
+    do: nil
 end

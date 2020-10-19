@@ -1,9 +1,11 @@
 defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
   import ExUnit.Assertions
+  import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.Person
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
+  alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn, %Person{id: person_id}) do
     conn |> Pages.visit("/people/#{person_id}/edit-demographics")
@@ -67,6 +69,14 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
       |> Map.new()
 
     assert actual_selections == expected_selections
+    view
+  end
+
+  def change_form(%View{} = view, person_params) do
+    view
+    |> form("#demographics-form", person: person_params)
+    |> render_change()
+
     view
   end
 end

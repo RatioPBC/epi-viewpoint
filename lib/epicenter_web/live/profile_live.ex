@@ -132,6 +132,7 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def detailed_ethnicities(%{ethnicity: nil}), do: []
+  def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
   def detailed_ethnicities(person), do: person.ethnicity.detailed
 
   def unknown_value do

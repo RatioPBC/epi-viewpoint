@@ -79,6 +79,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.last_name == "Testuser"
       assert length(billy.phones) == 0
       assert billy.tid == "billy"
+      assert billy.ethnicity.major == "unknown"
+      assert billy.ethnicity.detailed == []
       assert billy.addresses |> Euclid.Extra.Enum.pluck(:street) == ["1234 Test St"]
       assert billy.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
       assert billy.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH"]

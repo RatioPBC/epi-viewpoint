@@ -70,12 +70,47 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       assert updated_person.ethnicity.major == "hispanic_latinx_or_spanish_origin"
       assert updated_person.ethnicity.detailed == ["cuban", "puerto_rican"]
     end
+
+    test "toggling major ethnicity radio deselects detailed ethnicity checkboxes", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => true
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => true,
+        "Cuban" => true,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "not_hispanic_latinx_or_spanish_origin", "detailed" => []}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => true,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+
+      # assert major is the ONLY one selected
+      # change form to select major ethnicity with detailed options
+      # assert major and detailed is selected
+    end
   end
 
   describe "detailed_ethnicity_option_checked" do
     test "it returns true when the given detailed ethnicity option is set for the given person" do
-      assert DemographicsEditLive.detailed_ethnicity_option_checked(%{ethnicity: %{detailed: ["detailed_a", "detailed_b"]}}, "detailed_b")
-      refute DemographicsEditLive.detailed_ethnicity_option_checked(%{ethnicity: %{detailed: ["detailed_a", "detailed_b"]}}, "detailed_c")
+      assert DemographicsEditLive.detailed_ethnicity_checked(%{detailed: ["detailed_a", "detailed_b"]}, "detailed_b")
+      refute DemographicsEditLive.detailed_ethnicity_checked(%{detailed: ["detailed_a", "detailed_b"]}, "detailed_c")
+      refute DemographicsEditLive.detailed_ethnicity_checked(%{detailed: nil}, "detailed_c")
     end
   end
 end

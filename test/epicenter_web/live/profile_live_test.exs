@@ -299,4 +299,13 @@ defmodule EpicenterWeb.ProfileLiveTest do
       %{ethnicity: nil} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
     end
   end
+
+  describe "detailed_ethnicities" do
+    test "safely gets list of detailed ethnicities from person" do
+      %{ethnicity: %{detailed: ["foo", "bar"]}} |> ProfileLive.detailed_ethnicities() |> assert_eq(["foo", "bar"])
+      %{ethnicity: %{detailed: []}} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
+      %{ethnicity: %{detailed: nil}} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
+      %{ethnicity: nil} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
+    end
+  end
 end
