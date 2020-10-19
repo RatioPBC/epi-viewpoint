@@ -8,7 +8,7 @@ defmodule Epicenter.Cases.LabResult do
   alias Epicenter.Extra
 
   @required_attrs ~w{person_id}a
-  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name result sampled_on test_type tid}a
+  @optional_attrs ~w{analyzed_on reported_on request_accession_number request_facility_code request_facility_name result sampled_on source test_type tid}a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
@@ -24,6 +24,7 @@ defmodule Epicenter.Cases.LabResult do
     field :result, :string
     field :sampled_on, :date
     field :seq, :integer
+    field :source, :string
     field :test_type, :string
     field :tid, :string
 

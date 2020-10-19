@@ -7,7 +7,7 @@ defmodule Epicenter.Cases.Address do
   alias Epicenter.Cases.Address
 
   @required_attrs ~w{}a
-  @optional_attrs ~w(street city state postal_code type tid is_preferred person_id)a
+  @optional_attrs ~w(street city state postal_code type tid is_preferred person_id source)a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
@@ -20,6 +20,7 @@ defmodule Epicenter.Cases.Address do
     field :state, :string
     field :postal_code, :string
     field :seq, :integer
+    field :source, :string
     field :tid, :string
     field :type, :string
     field :person_id, :binary_id

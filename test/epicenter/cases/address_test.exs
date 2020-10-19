@@ -21,6 +21,7 @@ defmodule Epicenter.Cases.AddressTest do
           {:is_preferred, :boolean},
           {:person_id, :id},
           {:seq, :integer},
+          {:source, :string},
           {:tid, :string},
           {:type, :string},
           {:updated_at, :naive_datetime}
@@ -39,7 +40,7 @@ defmodule Epicenter.Cases.AddressTest do
     end
 
     test "attributes" do
-      changes = new_changeset(is_preferred: true).changes
+      changes = new_changeset(is_preferred: true, source: "form").changes
       assert changes.street == "1234 Test St"
       assert changes.city == "City"
       assert changes.state == "OH"
@@ -47,6 +48,7 @@ defmodule Epicenter.Cases.AddressTest do
       assert changes.tid == "alice-address"
       assert changes.type == "home"
       assert changes.is_preferred == true
+      assert changes.source == "form"
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))

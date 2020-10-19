@@ -19,6 +19,7 @@ defmodule Epicenter.Cases.PhoneTest do
           {:number, :string},
           {:person_id, :id},
           {:seq, :integer},
+          {:source, :string},
           {:tid, :string},
           {:type, :string},
           {:updated_at, :naive_datetime}
@@ -36,9 +37,10 @@ defmodule Epicenter.Cases.PhoneTest do
     end
 
     test "attributes" do
-      changes = new_changeset(is_preferred: true).changes
+      changes = new_changeset(is_preferred: true, source: "form").changes
       assert changes.is_preferred == true
       assert changes.number == "1111111000"
+      assert changes.source == "form"
       assert changes.type == "home"
       assert changes.tid == "phone"
     end

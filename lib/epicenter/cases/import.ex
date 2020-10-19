@@ -165,6 +165,7 @@ defmodule Epicenter.Cases.Import do
     row
     |> Map.take(@lab_result_db_fields_to_insert)
     |> Map.put("person_id", person.id)
+    |> Map.put("source", "import")
     |> in_audit_tuple(author, AuditLog.Revision.upsert_lab_result_action())
     |> Cases.upsert_lab_result!()
   end
@@ -172,7 +173,7 @@ defmodule Epicenter.Cases.Import do
   defp import_phone_number(row, person, author) do
     if Euclid.Exists.present?(Map.get(row, "phonenumber")) do
       Cases.upsert_phone!(
-        %{number: Map.get(row, "phonenumber"), person_id: person.id}
+        %{number: Map.get(row, "phonenumber"), person_id: person.id, source: "import"}
         |> in_audit_tuple(author, AuditLog.Revision.upsert_phone_number_action())
       )
     end
@@ -183,7 +184,7 @@ defmodule Epicenter.Cases.Import do
 
     if Euclid.Exists.any?(address_components) do
       Cases.upsert_address!(
-        %{street: street, city: city, state: state, postal_code: zip, person_id: person.id}
+        %{street: street, city: city, state: state, postal_code: zip, person_id: person.id, source: "import"}
         |> in_audit_tuple(author, AuditLog.Revision.upsert_address_action())
       )
     end

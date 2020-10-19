@@ -10,7 +10,7 @@ defmodule Epicenter.Cases.Phone do
   alias Epicenter.Extra
 
   @required_attrs ~w{number}a
-  @optional_attrs ~w{delete is_preferred person_id tid type}a
+  @optional_attrs ~w{delete is_preferred person_id source tid type}a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
@@ -21,6 +21,7 @@ defmodule Epicenter.Cases.Phone do
     field :delete, :boolean, virtual: true
     field :is_preferred, :boolean
     field :seq, :integer
+    field :source, :string
     field :tid, :string
     field :type, :string
 
