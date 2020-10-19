@@ -2,7 +2,7 @@
 
   section
     header#subnav
-      = live_redirect "Records", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
+      = live_redirect "Index cases", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
       = arrow_right_icon(6, 9)
       span data-role="name" = Format.person(@person)
 
