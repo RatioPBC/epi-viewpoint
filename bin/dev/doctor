@@ -69,9 +69,13 @@ check "gpg: installed" \
   "command -v gpg" \
   "# install gpg via package manager"
 
-check "asdf: nodejs plugin exists?" \
+check "asdf: nodejs plugin installed" \
   "asdf plugin-list | grep nodejs" \
   "asdf plugin-add nodejs && bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring"
+
+check "asdf: postgres plugin installed" \
+  "asdf plugin-list | grep postgres" \
+  "asdf plugin-add postgres"
 
 check "asdf: tools are installed" \
   "asdf which erl > /dev/null && asdf which elixir > /dev/null && asdf which node > /dev/null" \
