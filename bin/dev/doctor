@@ -78,7 +78,7 @@ check "asdf: postgres plugin installed" \
   "asdf plugin-add postgres"
 
 check "asdf: tools are installed" \
-  "asdf which erl > /dev/null && asdf which elixir > /dev/null && asdf which node > /dev/null" \
+  "asdf which erl > /dev/null && asdf which elixir > /dev/null && asdf which node > /dev/null && asdf which postgres > /dev/null" \
   "asdf install"
 
 check "elixir: hex installed" \
@@ -108,6 +108,10 @@ check "yq: correct version is installed" \
 check "postgres: running" \
   "psql -l" \
   "bin/dev/postgres-start"
+
+check "postgres: correct version is running" \
+  "test $(asdf current postgres | grep -E -o "\d+\.\d+") = $(`asdf which postgres` --version | cut -f 3 -d ' ')" \
+  "bin/dev/postgres-restart"
 
 check "postgres: role exists" \
   "psql -A -c '\du' postgres | grep 'postgres|'" \
