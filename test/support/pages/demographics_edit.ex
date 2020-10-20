@@ -44,6 +44,44 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
     view
   end
 
+  def assert_major_ethnicity_selected(%View{} = view, expected_major_ethnicity) do
+    actual_selected_major_ethnicity =
+      view
+      |> actual_selections("major-ethnicity-label", "radio")
+      |> Enum.filter(fn {_, value} -> value end)
+
+    if actual_selected_major_ethnicity != [{expected_major_ethnicity, true}] do
+      actual_selected_major_ethnicity = actual_selected_major_ethnicity |> Enum.into([], &Kernel.elem(&1, 0))
+
+      """
+      Expected to only find major ethnicity “#{expected_major_ethnicity}” selected, but found:
+        #{inspect(actual_selected_major_ethnicity)}
+      """
+      |> flunk()
+    end
+
+    view
+  end
+
+  def assert_detailed_ethnicities_selected(%View{} = view, expected_detailed_ethnicities) do
+    expected_detailed_ethnicities_tuple = expected_detailed_ethnicities |> Enum.into([], &{&1, true})
+
+    actual_selected_detailed_ethnicities =
+      view |> actual_selections("detailed-ethnicity-label", "checkbox") |> Enum.filter(fn {_, value} -> value end)
+
+    if actual_selected_detailed_ethnicities != expected_detailed_ethnicities_tuple do
+      actual_selected_detailed_ethnicities = actual_selected_detailed_ethnicities |> Enum.into([], &Kernel.elem(&1, 0))
+
+      """
+      Expected to find detailed ethnicities “#{inspect(expected_detailed_ethnicities)}” selected, but found:
+        #{inspect(actual_selected_detailed_ethnicities)}
+      """
+      |> flunk()
+    end
+
+    view
+  end
+
   def actual_selections(%View{} = view, data_role, type) do
     view
     |> Pages.parse()
