@@ -38,6 +38,7 @@ defmodule EpicenterWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     get "/", RootController, :show, as: :root
+    live "/admin/users", UsersLive, as: :users
     live "/import/start", ImportLive, as: :import_start
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
