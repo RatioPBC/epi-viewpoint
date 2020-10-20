@@ -99,10 +99,32 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Cuban" => false,
         "Another Hispanic, Latino/a or Spanish origin" => false
       })
-
-      # assert major is the ONLY one selected
-      # change form to select major ethnicity with detailed options
-      # assert major and detailed is selected
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => ["cuban"]}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => true
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => true,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "unknown", "detailed" => []}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => true,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
     end
   end
 
