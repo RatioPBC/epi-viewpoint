@@ -94,6 +94,44 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
   end
 
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_confirmation_prompt("")
+    end
+
+    test "when the user changes the name", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.change_form(%{"first_name" => "New Name"})
+      |> Pages.ProfileEdit.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+
+    test "when the user changes the dob", %{conn: conn, person: person} do
+      # this case is special because the rendered dob is different than the db formatted dob
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.change_form(%{"dob" => "07/01/2001"})
+      |> Pages.ProfileEdit.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+
+    test "when the preferred language is other", %{conn: conn, person: person} do
+      view = Pages.ProfileEdit.visit(conn, person)
+
+      view
+      |> form("#profile-form")
+      |> render_change(
+        person: %{
+          first_name: "Aaron",
+          last_name: "Testuser2",
+          dob: "01/01/2020",
+          preferred_language: "Other",
+          other_specified_language: "Welsh"
+        }
+      )
+
+      view |> Pages.ProfileEdit.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+  end
+
   describe "addresses" do
     test "adding address to a person", %{conn: conn, person: person} do
       Pages.ProfileEdit.visit(conn, person)

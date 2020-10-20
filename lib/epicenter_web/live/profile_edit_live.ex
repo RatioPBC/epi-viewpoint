@@ -10,6 +10,8 @@ defmodule EpicenterWeb.ProfileEditLive do
   alias Epicenter.Extra
   alias Epicenter.Format
 
+  @confirmation_text "Your updates have not been saved. Discard updates?"
+
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
 
@@ -26,6 +28,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     |> assign(changeset: update_dob_field_for_display(changeset))
     |> assign(person: person)
     |> assign(preferred_language_is_other: false)
+    |> assign_confirmation_prompt()
     |> ok()
   end
 
@@ -54,11 +57,11 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("form-change", %{"person" => %{"preferred_language" => "Other"} = person_params}, socket) do
-    socket |> assign(preferred_language_is_other: true) |> reassign_changeset(person_params) |> noreply()
+    socket |> assign(preferred_language_is_other: true) |> update_assigns_given_user_input(person_params) |> noreply()
   end
 
   def handle_event("form-change", %{"person" => person_params} = _params, socket) do
-    socket |> assign(preferred_language_is_other: false) |> reassign_changeset(person_params) |> noreply()
+    socket |> assign(preferred_language_is_other: false) |> update_assigns_given_user_input(person_params) |> noreply()
   end
 
   def handle_event("remove-email", %{"email-index" => email_index_param}, socket) do
@@ -207,10 +210,20 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   # # #
 
+  defp assign_confirmation_prompt(socket) do
+    prompt =
+      case socket.assigns.changeset do
+        nil -> nil
+        changeset -> if Map.drop(changeset.changes, [:dob]) == %{}, do: nil, else: @confirmation_text
+      end
+
+    socket |> assign(confirmation_prompt: prompt)
+  end
+
   defp get_field_from_changeset(changeset, field),
     do: changeset |> Ecto.Changeset.fetch_field(field) |> elem(1)
 
-  defp reassign_changeset(socket, person_params) do
+  defp update_assigns_given_user_input(socket, person_params) do
     person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
 
     changeset =
@@ -218,7 +231,9 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> Cases.change_person(person_params)
       |> Map.put(:action, :insert)
 
-    assign(socket, changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
+    socket
+    |> assign(changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
+    |> assign_confirmation_prompt()
   end
 
   defp reformat_date(changeset, field) do
