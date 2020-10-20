@@ -226,6 +226,74 @@ defmodule Epicenter.AuditLogTest do
       )
     end
 
+    test "handling nested changesets (updating an email)" do
+      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      person_params = %{
+        dob: "1970-01-01",
+        emails: %{
+          "0" => %{
+            "address" => "a@example.com",
+            "delete" => "false",
+          }
+        },
+        other_specified_language: "",
+        preferred_language: "English"
+      }
+      person = Test.Fixtures.person_attrs(user, "alice" , person_params) |> Cases.create_person!() |> Cases.preload_emails()
+
+      update_email_params = %{
+        "emails" => %{
+          "0" => %{
+            "address" => "a+test@example.com",
+            "delete" => "false",
+            "person_id" => person.id,
+            "id" => person |> Map.get(:emails) |> Euclid.Extra.List.first() |> Map.get(:id)
+          }
+        }
+      }
+      changeset = Cases.change_person(person, update_email_params)
+
+      updated_person =
+        AuditLog.update!(
+          changeset,
+          %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
+        )
+
+      assert [%{address: "a+test@example.com", id: email_id}] = updated_person.emails
+
+      assert_audit_logged(person)
+
+      assert_recent_audit_log(person, user, %{
+        "emails" => [%{"address" => "a+test@example.com"}],
+      })
+
+      assert_recent_audit_log_snapshots(
+        person,
+        user,
+        %{"emails" => [
+            %{
+              "address" => "a@example.com",
+              "delete" => false,
+              "is_preferred" => nil,
+              "person_id" => person.id,
+              "tid" => nil
+            }]},
+        %{
+          "emails" => [
+            %{
+              "address" => "a+test@example.com",
+              "delete" => false,
+              "is_preferred" => nil,
+              "person_id" => person.id,
+              "tid" => nil
+            }
+          ]
+        }
+      )
+
+      assert %{"emails" => [%{"id" => ^email_id}]} = recent_audit_log(person).change
+    end
+
     test "returns {:error, changeset} when changeset is invalid" do
       user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()

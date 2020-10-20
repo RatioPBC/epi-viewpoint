@@ -23,8 +23,8 @@ defmodule Epicenter.AuditLog do
     create_revision(changeset, %Meta{} = meta, &Repo.update!/2, ecto_options, changeset_flattening_function)
   end
 
-  defp recursively_get_changes_from_changeset(%Ecto.Changeset{changes: changes, data: %{__struct__: type}}),
-    do: changes |> recursively_get_changes_from_changeset() |> redact(type)
+  defp recursively_get_changes_from_changeset(%Ecto.Changeset{changes: changes, data: %{__struct__: type} = data}),
+    do: changes |> recursively_get_changes_from_changeset() |> redact(type) |> add_primary_keys(data)
 
   defp recursively_get_changes_from_changeset(%_struct{} = data),
     do: data
@@ -108,6 +108,16 @@ defmodule Epicenter.AuditLog do
           end
         )
         |> elem(1)
+      end
+    )
+  end
+
+  defp add_primary_keys(map, %{__struct__: type} = data) do
+    Enum.reduce(
+      type.__schema__(:primary_key),
+      map,
+      fn primary_key_component, acc ->
+        Map.put(acc, primary_key_component, Map.get(data, primary_key_component))
       end
     )
   end
