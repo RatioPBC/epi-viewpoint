@@ -97,6 +97,9 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "unknown", "detailed" => []}})
       |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Unknown")
       |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected([])
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "unknown", "detailed" => ["cuban"]}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Hispanic, Latino/a, or Spanish origin")
+      |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected(["Cuban"])
     end
   end
 

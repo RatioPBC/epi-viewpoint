@@ -20,32 +20,37 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> ok()
   end
 
-  def handle_event(
-        "form-change",
-        %{"person" => %{"ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => _detailed}} = person_params},
-        socket
-      ) do
-    changeset = socket.assigns.person |> Cases.change_person(person_params)
-    socket |> assign(changeset: changeset) |> noreply()
-  end
+  def handle_event("form-change", form_state, socket) do
+    changeset = socket.assigns.changeset
+    old_form_state = expected_person_params_from_changeset(changeset)
 
-  def handle_event("form-change", %{"person" => %{"ethnicity" => ethnicity} = _person_params}, socket) do
-    params = Euclid.Extra.Map.deep_atomize_keys(ethnicity) |> Map.take([:major])
+    old_major_ethnicity = old_form_state && old_form_state.major
+    new_major_ethnicity = form_state["person"]["ethnicity"]["major"]
 
-    changeset =
-      socket.assigns.changeset
+    old_detailed_ethnicity = old_form_state && old_form_state.detailed
+    new_detailed_ethnicity = form_state["person"]["ethnicity"]["detailed"]
+
+    new_ethnicity =
+      cond do
+        old_major_ethnicity != new_major_ethnicity and old_major_ethnicity == "hispanic_latinx_or_spanish_origin" ->
+          %{major: new_major_ethnicity, detailed: %{}}
+
+        old_detailed_ethnicity != new_detailed_ethnicity and Euclid.Exists.present?(new_detailed_ethnicity) ->
+          %{major: "hispanic_latinx_or_spanish_origin", detailed: new_detailed_ethnicity}
+
+        true ->
+          form_state["person"]["ethnicity"]
+      end
+
+    new_changeset =
+      socket.assigns.person
+      |> Cases.change_person(form_state)
       |> Ecto.Changeset.delete_change(:ethnicity)
-      |> Ecto.Changeset.put_change(:ethnicity, params)
+      |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
 
-    socket |> assign(changeset: changeset) |> noreply()
+    socket = socket |> assign(:changeset, new_changeset)
+    noreply(socket)
   end
-
-  def handle_event("form-change", %{"person" => person_params}, socket) do
-    changeset = socket.assigns.person |> Cases.change_person(person_params)
-    socket |> assign(changeset: changeset) |> noreply()
-  end
-
-  def handle_event("form-change", _, socket), do: noreply(socket)
 
   def handle_event("submit", %{"person" => person_params} = _params, socket) do
     socket.assigns.person
@@ -119,4 +124,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   def gender_identity_is_checked(),
     do: nil
+
+  defp expected_person_params_from_changeset(changeset),
+    do: changeset |> Extra.Changeset.get_field_from_changeset(:ethnicity)
 end
