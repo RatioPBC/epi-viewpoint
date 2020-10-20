@@ -92,6 +92,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_occupation(%View{} = view, expected_occupation) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=occupation]") == expected_occupation
+    view
+  end
+
   #
   # email addresses
   #

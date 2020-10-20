@@ -33,4 +33,10 @@
                   = detailed_ethnicity_label
                   = tag :input, type: "checkbox", value: detailed_ethnicity_value, checked: detailed_ethnicity_checked(@changeset, detailed_ethnicity_value), data_role: "detailed-ethnicity-checkbox", name: "person[ethnicity][detailed][]"
 
-      = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
+      div class="subheader" Occupation
+      = text_input f, :occupation, data_role: "occupation-input", id: "occupation-input"
+
+
+      #nav
+        = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
+

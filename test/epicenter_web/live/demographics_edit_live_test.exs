@@ -217,6 +217,20 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     end
   end
 
+  describe "occupation" do
+    test "it shows the existing occupation", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_occupation("architect")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => ""})
+      |> Pages.Profile.assert_occupation("")
+
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_occupation("")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "deep-sea diver"})
+      |> Pages.Profile.assert_occupation("deep-sea diver")
+    end
+  end
+
   describe "detailed_ethnicity_option_checked" do
     test "it returns true when the given detailed ethnicity option is set for the given person" do
       assert DemographicsEditLive.detailed_ethnicity_checked(%{detailed: ["detailed_a", "detailed_b"]}, "detailed_b")
