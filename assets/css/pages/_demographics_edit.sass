@@ -3,6 +3,26 @@
 #demographics-edit-page
   @include vertical-flow
 
-  #gender-identity-options
-    label
-      display: block
+  #demographics-edit
+
+    header
+      @include h2
+
+    #demographics-form
+
+      .subheader
+        @include h4
+
+    #option-set
+      label
+        display: block
+
+      .gender-identity-option
+        @include level
+
+      .ethnicity-option
+        @include level
+
+      .detailed-ethnicity-options
+        padding-left: 3rem
+
