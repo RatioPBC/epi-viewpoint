@@ -30,10 +30,11 @@ defmodule EpicenterWeb.DemographicsEditLive do
   end
 
   def handle_event("form-change", %{"person" => %{"ethnicity" => ethnicity} = _person_params}, socket) do
-    params = Euclid.Extra.Map.deep_atomize_keys(ethnicity)
+    params = Euclid.Extra.Map.deep_atomize_keys(ethnicity) |> Map.take([:major])
 
     changeset =
-      Ecto.Changeset.delete_change(socket.assigns.changeset, :ethnicity)
+      socket.assigns.changeset
+      |> Ecto.Changeset.delete_change(:ethnicity)
       |> Ecto.Changeset.put_change(:ethnicity, params)
 
     socket |> assign(changeset: changeset) |> noreply()

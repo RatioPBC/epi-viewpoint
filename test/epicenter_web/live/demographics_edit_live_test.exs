@@ -86,7 +86,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Cuban" => true,
         "Another Hispanic, Latino/a or Spanish origin" => false
       })
-      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "not_hispanic_latinx_or_spanish_origin", "detailed" => []}})
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "not_hispanic_latinx_or_spanish_origin"}})
       |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Not Hispanic, Latino/a, or Spanish origin")
       |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected([])
       |> Pages.DemographicsEdit.change_form(%{
