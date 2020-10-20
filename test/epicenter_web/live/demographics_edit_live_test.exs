@@ -101,6 +101,120 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Hispanic, Latino/a, or Spanish origin")
       |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected(["Cuban"])
     end
+
+    test "selecting major ethnicity non-hispanic(et al) first", %{conn: conn, person: person, user: user} do
+      {:ok, person_without_ethnicity} = person |> Cases.update_person({%{ethnicity: nil}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person_without_ethnicity)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "not_hispanic_latinx_or_spanish_origin"}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Not Hispanic, Latino/a, or Spanish origin")
+      |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected([])
+    end
+
+    test "selecting major ethnicity hispanic(et al) first", %{conn: conn, person: person, user: user} do
+      {:ok, person_without_ethnicity} = person |> Cases.update_person({%{ethnicity: nil}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person_without_ethnicity)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin"}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Hispanic, Latino/a, or Spanish origin")
+      |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected([])
+    end
+
+    test "selecting detailed ethnicity hispanic(et al) first", %{conn: conn, person: person, user: user} do
+      {:ok, person_without_ethnicity} =
+        person |> Cases.update_person({%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin"}}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person_without_ethnicity)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => true
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"detailed" => ["cuban"]}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Hispanic, Latino/a, or Spanish origin")
+      |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected(["Cuban"])
+    end
+
+    test "selecting detailed ethnicity first", %{conn: conn, person: person, user: user} do
+      {:ok, person_without_ethnicity} = person |> Cases.update_person({%{ethnicity: nil}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person_without_ethnicity)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"detailed" => ["cuban"]}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Hispanic, Latino/a, or Spanish origin")
+      |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected(["Cuban"])
+    end
+
+    test "selecting major ethnicity non-hispanic after selecting a detailed ethnicity", %{conn: conn, person: person, user: user} do
+      {:ok, person_without_ethnicity} = person |> Cases.update_person({%{ethnicity: nil}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person_without_ethnicity)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
+        "Unknown" => false,
+        "Declined to answer" => false,
+        "Not Hispanic, Latino/a, or Spanish origin" => false,
+        "Hispanic, Latino/a, or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
+        "Mexican, Mexican American, Chicano/a" => false,
+        "Puerto Rican" => false,
+        "Cuban" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"detailed" => ["cuban"]}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Hispanic, Latino/a, or Spanish origin")
+      |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected(["Cuban"])
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "unknown", "detailed" => ["cuban"]}})
+      |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Unknown")
+      |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected([])
+    end
   end
 
   describe "detailed_ethnicity_option_checked" do
