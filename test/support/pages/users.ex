@@ -1,9 +1,7 @@
 defmodule EpicenterWeb.Test.Pages.Users do
   import Euclid.Test.Extra.Assertions
-  import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Cases.Person
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
