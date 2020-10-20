@@ -75,13 +75,12 @@ defmodule Epicenter.CsvTest do
         "unexpected escape character \" in \"column_a   , \\\"column b\\\" , column_c\\n\"" <>
           " (make sure there are no spaces between the field separators (commas) and the quotes around field contents)"
 
-      assert_raise NimbleCSV.ParseError, expected_message, fn ->
-        """
-        column_a   , "column b" , column_c
-        "value, a" , "value b" , value c
-        """
-        |> Csv.read(&Function.identity/1, required: ["column_a", "column b", "column_c"], optional: [])
-      end
+      assert {:invalid_csv, ^expected_message} =
+               """
+               column_a   , "column b" , column_c
+               "value, a" , "value b" , value c
+               """
+               |> Csv.read(&Function.identity/1, required: ["column_a", "column b", "column_c"], optional: [])
     end
 
     test "header transformer transforms headers" do

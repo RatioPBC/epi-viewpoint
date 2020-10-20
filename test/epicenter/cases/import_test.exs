@@ -529,6 +529,54 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.notes == "AAA"
       assert updated_alice.assigned_to.tid == originator.tid
     end
+
+    test "records novel information when importing a new test result for an existing person", %{
+      originator: originator
+    } do
+      alice_attrs =
+        %{
+          first_name: "Alice",
+          last_name: "Testuser",
+          dob: ~D[1970-01-01],
+          preferred_language: "AAA",
+          gender_identity: "AAA",
+          marital_status: nil,
+          employment: "AAA",
+          notes: "AAA",
+          sex_at_birth: "AAA",
+          race: "AAA",
+          occupation: nil
+        }
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{major: "AAA", detailed: []}})
+
+      {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
+      {:ok, [alice]} = Cases.assign_user_to_people(user_id: originator.id, people_ids: [alice.id], audit_meta: Test.Fixtures.audit_meta(originator))
+
+      import_output =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , sex_11, race_12, occupation_18, ethnicity_13
+          Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , male  , White  , Brain Surgeon, Puerto Rican
+          """
+        }
+        |> Import.import_csv(originator)
+
+      assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
+      updated_alice = Cases.get_person(alice.id) |> Cases.preload_assigned_to()
+      assert updated_alice.sex_at_birth == "AAA"
+      assert updated_alice.race == "AAA"
+      assert updated_alice.occupation == "Brain Surgeon"
+      assert updated_alice.ethnicity.major == "AAA"
+      assert updated_alice.ethnicity.detailed == []
+      assert updated_alice.preferred_language == "AAA"
+      assert updated_alice.gender_identity == "AAA"
+      assert updated_alice.marital_status == nil
+      assert updated_alice.employment == "AAA"
+      assert updated_alice.notes == "AAA"
+      assert updated_alice.assigned_to.tid == originator.tid
+    end
   end
 
   describe "ImportedFile" do
@@ -585,7 +633,7 @@ defmodule Epicenter.Cases.ImportTest do
         }
         |> Import.import_csv(originator)
 
-      assert {:error, %Ecto.InvalidChangesetError{}} = result
+      assert {:error, %Ecto.Changeset{}} = result
 
       assert Cases.count_people() == 0
       assert Cases.count_lab_results() == 0
@@ -606,7 +654,7 @@ defmodule Epicenter.Cases.ImportTest do
     end
 
     test "returns an error message when the CSV is poorly formatted", %{originator: originator} do
-      {:error, message} =
+      {:error, [user_readable: message]} =
         %{
           file_name: "test.csv",
           contents: """
