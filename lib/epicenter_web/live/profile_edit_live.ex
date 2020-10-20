@@ -33,7 +33,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("add-address", _value, socket) do
-    existing_addresses = socket.assigns.changeset |> get_field_from_changeset(:addresses)
+    existing_addresses = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:addresses)
     addresses = existing_addresses |> Enum.concat([Cases.change_address(%Cases.Address{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:addresses, addresses)
@@ -41,7 +41,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("add-email", _value, socket) do
-    existing_emails = socket.assigns.changeset |> get_field_from_changeset(:emails)
+    existing_emails = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:emails)
     emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
@@ -49,7 +49,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("add-phone", _value, socket) do
-    existing_phones = socket.assigns.changeset |> get_field_from_changeset(:phones)
+    existing_phones = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:phones)
     phones = existing_phones |> Enum.concat([Cases.change_phone(%Cases.Phone{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
@@ -67,7 +67,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   def handle_event("remove-email", %{"email-index" => email_index_param}, socket) do
     email_index = email_index_param |> Euclid.Extra.String.to_integer()
 
-    existing_emails = socket.assigns.changeset |> get_field_from_changeset(:emails)
+    existing_emails = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:emails)
     emails = existing_emails |> List.delete_at(email_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
@@ -77,7 +77,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   def handle_event("remove-phone", %{"phone-index" => phone_index_param}, socket) do
     phone_index = phone_index_param |> Euclid.Extra.String.to_integer()
 
-    existing_phones = socket.assigns.changeset |> get_field_from_changeset(:phones)
+    existing_phones = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:phones)
     phones = existing_phones |> List.delete_at(phone_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
@@ -219,9 +219,6 @@ defmodule EpicenterWeb.ProfileEditLive do
 
     socket |> assign(confirmation_prompt: prompt)
   end
-
-  defp get_field_from_changeset(changeset, field),
-    do: changeset |> Ecto.Changeset.fetch_field(field) |> elem(1)
 
   defp update_assigns_given_user_input(socket, person_params) do
     person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
