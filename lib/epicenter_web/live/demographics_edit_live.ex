@@ -10,7 +10,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
-    person = %{Cases.get_person(id) | originator: socket.assigns.current_user.id}
+    person = Cases.get_person(id)
     changeset = person |> Cases.change_person(%{}) |> hard_code_gender_identity()
 
     socket

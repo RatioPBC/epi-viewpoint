@@ -34,18 +34,17 @@ defmodule Epicenter.Test.Fixtures do
   # annotated with audit_meta
   def person_attrs(originator, tid, attrs \\ %{}) do
     attrs =
-      raw_person_attrs(originator, tid, attrs)
+      raw_person_attrs(tid, attrs)
       |> merge_attrs(attrs)
 
     {attrs, audit_meta(originator)}
   end
 
-  def raw_person_attrs(originator, tid, attrs \\ %{}) do
+  def raw_person_attrs(tid, attrs \\ %{}) do
     %{
       dob: ~D[2000-01-01],
       first_name: String.capitalize(tid),
       last_name: "Testuser",
-      originator: originator,
       preferred_language: "English",
       tid: tid
     }

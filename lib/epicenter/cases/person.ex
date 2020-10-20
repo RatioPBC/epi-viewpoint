@@ -33,7 +33,6 @@ defmodule Epicenter.Cases.Person do
     field :marital_status, :string
     field :notes, :string
     field :occupation, :string
-    field :originator, :map, virtual: true
     field :preferred_language, :string
     field :race, :string
     field :seq, :integer

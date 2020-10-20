@@ -16,7 +16,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     socket = socket |> assign_defaults(session)
 
     person =
-      %{Cases.get_person(id) | originator: socket.assigns.current_user}
+      Cases.get_person(id)
       |> Cases.preload_emails()
       |> Cases.preload_phones()
       |> Cases.preload_addresses()
