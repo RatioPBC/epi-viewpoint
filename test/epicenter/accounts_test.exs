@@ -2,6 +2,7 @@ defmodule Epicenter.AccountsTest do
   use Epicenter.DataCase, async: true
 
   import Epicenter.AccountsFixtures
+  import Euclid.Test.Extra.Assertions, only: [assert_datetime_approximate: 2]
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
@@ -389,7 +390,8 @@ defmodule Epicenter.AccountsTest do
     end
 
     test "generates a reasonable expiration date", %{token: user_token} do
-      assert user_token.expires_at == user_token.inserted_at |> DateTime.add(UserToken.default_token_lifetime())
+      expected_expires_at = user_token.inserted_at |> DateTime.add(UserToken.default_token_lifetime())
+      assert_datetime_approximate(user_token.expires_at, expected_expires_at)
     end
   end
 
