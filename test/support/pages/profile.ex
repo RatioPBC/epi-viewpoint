@@ -92,6 +92,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_notes(%View{} = view, expected_notes) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=notes]") == expected_notes
+    view
+  end
+
   def assert_occupation(%View{} = view, expected_occupation) do
     assert view |> Pages.parse() |> Test.Html.text("[data-role=occupation]") == expected_occupation
     view

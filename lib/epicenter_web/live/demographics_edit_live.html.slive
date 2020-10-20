@@ -36,6 +36,9 @@
       div class="subheader" Occupation
       = text_input f, :occupation, data_role: "occupation-input", id: "occupation-input"
 
+      div class="subheader" Notes
+      = text_input f, :notes, data_role: "notes-input", id: "notes-input"
+
 
       #nav
         = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

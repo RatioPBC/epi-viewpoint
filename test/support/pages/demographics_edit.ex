@@ -82,6 +82,11 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
     view
   end
 
+  def assert_notes(%View{} = view, expected_notes) do
+    assert view |> Pages.parse() |> Test.Html.attr("[data-role=notes-input]", "value") |> Euclid.Extra.List.first("") == expected_notes
+    view
+  end
+
   def assert_occupation(%View{} = view, occupation) do
     assert view |> Pages.parse() |> Test.Html.attr("[data-role=occupation-input]", "value") |> Euclid.Extra.List.first("") == occupation
     view

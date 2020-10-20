@@ -218,7 +218,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   end
 
   describe "occupation" do
-    test "it shows the existing occupation", %{conn: conn, person: person} do
+    test "it shows the existing occupation and can be edited", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_occupation("architect")
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => ""})
@@ -228,6 +228,20 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_occupation("")
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "deep-sea diver"})
       |> Pages.Profile.assert_occupation("deep-sea diver")
+    end
+  end
+
+  describe "notes" do
+    test "it shows the existing notes and can be edited", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_notes("lorem ipsum")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"notes" => ""})
+      |> Pages.Profile.assert_notes("")
+
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_notes("")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "the sea"})
+      |> Pages.Profile.assert_occupation("the sea")
     end
   end
 
