@@ -15,7 +15,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
     view_or_conn_or_html |> Pages.assert_on_page("demographics-edit")
   end
 
-  def assert_gender_identity_selections(view, expected_selections) do
+  def assert_gender_identity_selections(%View{} = view, expected_selections) do
     actual_selections =
       view
       |> Pages.parse()
@@ -34,42 +34,29 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
     view
   end
 
-  def assert_major_ethnicity_selection(view, expected_selections) do
-    actual_selections =
-      view
-      |> Pages.parse()
-      |> Test.Html.all(
-        "[data-role=major-ethnicity-label]",
-        fn element ->
-          {
-            Test.Html.text(element),
-            Test.Html.attr(element, "input[type=radio]", "checked") == ["checked"]
-          }
-        end
-      )
-      |> Map.new()
-
-    assert actual_selections == expected_selections
+  def assert_major_ethnicity_selection(%View{} = view, expected_selections) do
+    assert actual_selections(view, "major-ethnicity-label", "radio") == expected_selections
     view
   end
 
-  def assert_detailed_ethnicity_selections(view, expected_selections) do
-    actual_selections =
-      view
-      |> Pages.parse()
-      |> Test.Html.all(
-        "[data-role=detailed-ethnicity-label]",
-        fn element ->
-          {
-            Test.Html.text(element),
-            Test.Html.attr(element, "input[type=checkbox]", "checked") == ["checked"]
-          }
-        end
-      )
-      |> Map.new()
-
-    assert actual_selections == expected_selections
+  def assert_detailed_ethnicity_selections(%View{} = view, expected_selections) do
+    assert actual_selections(view, "detailed-ethnicity-label", "checkbox") == expected_selections
     view
+  end
+
+  def actual_selections(%View{} = view, data_role, type) do
+    view
+    |> Pages.parse()
+    |> Test.Html.all(
+      "[data-role=#{data_role}]",
+      fn element ->
+        {
+          Test.Html.text(element),
+          Test.Html.attr(element, "input[type=#{type}]", "checked") == ["checked"]
+        }
+      end
+    )
+    |> Map.new()
   end
 
   def change_form(%View{} = view, person_params) do
