@@ -5,6 +5,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.Extra
   alias Epicenter.Format
 
   def mount(%{"id" => id}, session, socket) do
@@ -104,7 +105,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     do: @detailed_ethnicity_mapping[major_ethnicity] || []
 
   def detailed_ethnicity_checked(%Ecto.Changeset{} = changeset, detailed_ethnicity),
-    do: changeset |> Ecto.Changeset.fetch_field(:ethnicity) |> elem(1) |> detailed_ethnicity_checked(detailed_ethnicity)
+    do: changeset |> Extra.Changeset.get_field_from_changeset(:ethnicity) |> detailed_ethnicity_checked(detailed_ethnicity)
 
   def detailed_ethnicity_checked(%{detailed: nil}, _detailed_ethnicity),
     do: false
