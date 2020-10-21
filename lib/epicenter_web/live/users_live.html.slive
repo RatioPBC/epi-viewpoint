@@ -15,5 +15,5 @@ section#people-page data-page="users"
         tr
           td= user.name
           td= user.email
-          td --
+          td= type(user)
           td= active_status(user)

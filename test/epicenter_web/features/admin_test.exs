@@ -21,8 +21,8 @@ defmodule EpicenterWeb.Features.AdminTest do
     |> Pages.Users.assert_here()
     |> Pages.Users.assert_users([
       ["Name", "Email", "Type", "Status"],
-      ["billy", "billy@example.com", "--", "Inactive"],
-      ["user", "user@example.com", "--", "Active"]
+      ["billy", "billy@example.com", "User", "Inactive"],
+      ["user", "user@example.com", "Admin", "Active"]
     ])
   end
 
