@@ -21,7 +21,7 @@ defmodule EpicenterWeb.Features.AuthTest do
     #
     # a user is created manually, and a reset-password URL is created
     #
-    manual_creator = %User{id: Ecto.UUID.generate()}
+    manual_creator = %User{id: "00000000-0000-0000-0000-000000000000"}
     {:ok, url} = Release.create_user(manual_creator, "Test User", @good_email_address, puts: &Function.identity/1)
 
     #

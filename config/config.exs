@@ -9,7 +9,8 @@ use Mix.Config
 
 config :epicenter,
   ecto_repos: [Epicenter.Repo],
-  seeds_enabled?: false
+  seeds_enabled?: false,
+  unpersisted_admin_id: "00000000-0000-0000-0000-000000000000"
 
 # Configures the endpoint
 config :epicenter, EpicenterWeb.Endpoint,

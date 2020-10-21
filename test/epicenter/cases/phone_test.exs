@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.PhoneTest do
   alias Epicenter.Cases.Phone
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
 
   describe "schema" do

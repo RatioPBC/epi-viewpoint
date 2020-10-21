@@ -30,6 +30,7 @@ defmodule Epicenter.Cases.AddressTest do
     end
   end
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
   describe "changeset" do
     defp new_changeset(attr_updates) do

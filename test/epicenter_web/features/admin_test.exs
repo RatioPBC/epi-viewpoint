@@ -36,6 +36,7 @@ defmodule EpicenterWeb.Features.AdminTest do
     |> Pages.Users.assert_users([
       ["Name", "Email", "Type", "Status"],
       ["billy", "billy@example.com", "User", "Inactive"],
+      ["fixture admin", "admin@example.com", "Admin", "Active"],
       ["user", "user@example.com", "Admin", "Active"]
     ])
   end

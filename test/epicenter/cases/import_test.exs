@@ -11,6 +11,7 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Repo
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
   setup do
     [originator: Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()]

@@ -41,6 +41,11 @@ defmodule Epicenter.DataCase do
     :ok
   end
 
+  def persist_admin(_) do
+    {:ok, _} = Epicenter.Test.Fixtures.admin() |> Epicenter.Accounts.change_user(%{}) |> Epicenter.Repo.insert()
+    :ok
+  end
+
   @doc """
   A helper that transforms changeset errors into a map of messages.
 

@@ -8,6 +8,7 @@ defmodule Epicenter.Accounts.UserTest do
   alias Epicenter.Cases
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
 
   describe "schema" do

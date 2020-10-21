@@ -184,7 +184,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       ])
 
       # choose "assignee" via show page
-      assert_select_dropdown_options(view: show_page_live, data_role: "users", expected: ["Unassigned", "assignee", "user"])
+      assert_select_dropdown_options(view: show_page_live, data_role: "users", expected: ["Unassigned", "assignee", "fixture admin", "user"])
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
       assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"

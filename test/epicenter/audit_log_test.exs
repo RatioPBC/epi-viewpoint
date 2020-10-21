@@ -8,11 +8,14 @@ defmodule Epicenter.AuditLogTest do
   alias Epicenter.Cases.Person
   alias Epicenter.Test
 
+  setup :persist_admin
+  @admin Test.Fixtures.admin()
+
   describe "inserting" do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       {attrs_to_change_1, _audit_meta} = Test.Fixtures.person_attrs(user, "alice")
       changeset_1 = Cases.change_person(%Person{}, attrs_to_change_1)
 
@@ -85,7 +88,7 @@ defmodule Epicenter.AuditLogTest do
 
     test "omits mfa_secret from the revision" do
       mfa_secret = "123456"
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       mfa_changeset = user |> Epicenter.Accounts.User.mfa_changeset(%{"mfa_secret" => mfa_secret})
 
       {:ok, _updated_user} =
@@ -115,7 +118,7 @@ defmodule Epicenter.AuditLogTest do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       person_id = person.id
       attrs_to_change = Test.Fixtures.add_demographic_attrs(%{})
@@ -172,7 +175,7 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "handling nested changesets (adding an email)" do
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
 
       person_params = %{
@@ -227,7 +230,7 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "handling nested changesets (updating an email)" do
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person_params = %{
         dob: "1970-01-01",
         emails: %{
@@ -295,7 +298,7 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "returns {:error, changeset} when changeset is invalid" do
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
 
       person_params = %{
@@ -317,7 +320,7 @@ defmodule Epicenter.AuditLogTest do
 
   describe "audit log and change are in the same transaction" do
     test "it doesn't save the insert if the audit log entry fails" do
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       changeset = %Person{} |> Cases.change_person(elem(Test.Fixtures.person_attrs(user, "tid"), 0))
       people_count_before = Cases.count_people()
       audit_log_count_before = AuditLog.revisions(Cases.Person) |> length()
@@ -342,7 +345,7 @@ defmodule Epicenter.AuditLogTest do
     test "it doesn't save the update if the audit log entry fails" do
       [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       person_id = person.id
       attrs_to_change = Test.Fixtures.add_demographic_attrs(%{preferred_language: "preferred_language"})

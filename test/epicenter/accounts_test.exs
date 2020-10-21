@@ -11,30 +11,79 @@ defmodule Epicenter.AccountsTest do
 
   @admin Test.Fixtures.admin()
 
-  test "register_user creates a user" do
-    {:ok, user} = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user()
+  setup :persist_admin
 
-    assert user.tid == "alice"
-    assert user.name == "alice"
+  describe "user creation" do
+    test "register_user creates a user with a user admin" do
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user()
 
-    assert_recent_audit_log(user, @admin, %{
-      "tid" => "alice",
-      "name" => "alice",
-      "email" => "alice@example.com"
-    })
-  end
+      assert user.tid == "alice"
+      assert user.name == "alice"
 
-  test "register_user! creates a user" do
-    user = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user!()
+      assert_recent_audit_log(user, @admin, %{
+        "tid" => "alice",
+        "name" => "alice",
+        "email" => "alice@example.com"
+      })
+    end
 
-    assert user.tid == "alice"
-    assert user.name == "alice"
+    test "register_user! creates a user with a user admin" do
+      user = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user!()
 
-    assert_recent_audit_log(user, @admin, %{
-      "tid" => "alice",
-      "name" => "alice",
-      "email" => "alice@example.com"
-    })
+      assert user.tid == "alice"
+      assert user.name == "alice"
+
+      assert_recent_audit_log(user, @admin, %{
+        "tid" => "alice",
+        "name" => "alice",
+        "email" => "alice@example.com"
+      })
+    end
+
+    @ops_admin %Epicenter.Accounts.User{id: Application.get_env(:epicenter, :unpersisted_admin_id)}
+    test "register_user creates a user with a ops admin" do
+      {:ok, user} = Test.Fixtures.user_attrs(@ops_admin, "alice") |> Accounts.register_user()
+
+      assert user.tid == "alice"
+      assert user.name == "alice"
+
+      assert_recent_audit_log(user, @ops_admin, %{
+        "tid" => "alice",
+        "name" => "alice",
+        "email" => "alice@example.com"
+      })
+    end
+
+    test "register_user! creates a user with a ops admin" do
+      user = Test.Fixtures.user_attrs(@ops_admin, "alice") |> Accounts.register_user!()
+
+      assert user.tid == "alice"
+      assert user.name == "alice"
+
+      assert_recent_audit_log(user, @ops_admin, %{
+        "tid" => "alice",
+        "name" => "alice",
+        "email" => "alice@example.com"
+      })
+    end
+
+    test "register_user fails when originator is not admin" do
+      {:ok, phoney} = Test.Fixtures.user_attrs(@admin, "phoney") |> Accounts.register_user()
+      user_count = length(Accounts.list_users())
+      assert {:error, :admin_privileges_required} = Test.Fixtures.user_attrs(phoney, "alice") |> Accounts.register_user()
+      assert ^user_count = length(Accounts.list_users())
+    end
+
+    test "register_user! fails when originator is not admin" do
+      {:ok, phoney} = Test.Fixtures.user_attrs(@admin, "phoney") |> Accounts.register_user()
+      user_count = length(Accounts.list_users())
+
+      assert_raise Epicenter.AdminRequiredError, fn ->
+        Test.Fixtures.user_attrs(phoney, "alice") |> Accounts.register_user!()
+      end
+
+      assert ^user_count = length(Accounts.list_users())
+    end
   end
 
   describe "get_user_by_email/1" do
@@ -80,7 +129,7 @@ defmodule Epicenter.AccountsTest do
 
   describe "register_user/1" do
     setup do
-      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
+      creator = Test.Fixtures.user_attrs(@admin, "creator", %{admin: true}) |> Accounts.register_user!()
       %{creator: creator}
     end
 

@@ -9,6 +9,7 @@ defmodule Epicenter.CasesTest do
   alias Epicenter.Extra
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
   describe "importing" do
     test "import_lab_results imports lab results and creates lab_result and person records" do

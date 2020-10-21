@@ -44,6 +44,11 @@ defmodule EpicenterWeb.ConnCase do
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 
+  setup do
+    {:ok, _} = Epicenter.Test.Fixtures.admin() |> Epicenter.Accounts.change_user(%{}) |> Epicenter.Repo.insert()
+    :ok
+  end
+
   @doc """
   Setup helper that registers and logs in users.
 
