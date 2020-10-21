@@ -611,6 +611,20 @@ defmodule Epicenter.AccountsTest do
     end
   end
 
+  describe "update_user/2" do
+    setup do
+      [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]
+    end
+
+    test "updates the provided user", %{user: user} do
+      assert {:ok, _} = Accounts.update_user(user, %{admin: true, name: "Cool Admin"}, Test.Fixtures.audit_meta(@admin))
+      assert Accounts.get_user!(user.id).admin
+      assert Accounts.get_user!(user.id).name == "Cool Admin"
+      assert_revision_count(user, 2)
+      assert_recent_audit_log(user, @admin, %{"name" => "Cool Admin"})
+    end
+  end
+
   describe "update_disabled/1" do
     setup do
       [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]

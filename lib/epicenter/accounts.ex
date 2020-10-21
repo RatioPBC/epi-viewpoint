@@ -360,6 +360,10 @@ defmodule Epicenter.Accounts do
     end
   end
 
+  def update_user(%User{} = user, attrs, audit_meta) do
+    user |> change_user(attrs) |> AuditLog.update(audit_meta)
+  end
+
   @doc """
   Disables (or re-enables) a user from being able to log in
 

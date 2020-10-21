@@ -15,6 +15,7 @@ defmodule Epicenter.Accounts.UserTest do
       assert_schema(
         User,
         [
+          {:admin, :boolean},
           {:confirmed_at, :naive_datetime},
           {:email, :string},
           {:hashed_password, :string},
@@ -53,6 +54,12 @@ defmodule Epicenter.Accounts.UserTest do
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
+
+    test "admin" do
+      changes = new_changeset(%{admin: true}).changes
+      assert changes.admin
+    end
+
     test "name is required", do: assert_invalid(new_changeset(name: nil))
 
     test "email must be unique" do
