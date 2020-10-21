@@ -9,9 +9,8 @@ defmodule Epicenter.AccountsTest do
   alias Epicenter.Accounts.UserToken
   alias Epicenter.Test
 
-  @admin Test.Fixtures.admin()
-
   setup :persist_admin
+  @admin Test.Fixtures.admin()
 
   describe "user creation" do
     test "register_user creates a user with a user admin" do
@@ -84,6 +83,62 @@ defmodule Epicenter.AccountsTest do
 
       assert ^user_count = length(Accounts.list_users())
     end
+
+    test "requires email and password to be set" do
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "missing_data", %{email: nil, password: nil}) |> Accounts.register_user()
+
+      assert %{
+               password: ["can't be blank"],
+               email: ["can't be blank"]
+             } = errors_on(changeset)
+    end
+
+    test "validates email and password when given" do
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "invalid_data", %{email: "not valid", password: "not valid"}) |> Accounts.register_user()
+
+      assert %{
+               email: ["must have the @ sign and no spaces"],
+               password: ["must be between 10 and 80 characters"]
+             } = errors_on(changeset)
+    end
+
+    test "validates maximum values for email and password for security" do
+      too_long = String.duplicate("db", 100)
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "long_data", %{email: too_long, password: too_long}) |> Accounts.register_user()
+      assert "should be at most 160 character(s)" in errors_on(changeset).email
+      assert "must be between 10 and 80 characters" in errors_on(changeset).password
+    end
+
+    test "validates email uniqueness" do
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "duplicate_email") |> Accounts.register_user()
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "duplicate_email") |> Accounts.register_user()
+      assert "has already been taken" in errors_on(changeset).email
+
+      # Now try with the upper cased email too, to check that email case is ignored.
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "duplicate_email", %{email: String.upcase(user.email)}) |> Accounts.register_user()
+      assert "has already been taken" in errors_on(changeset).email
+    end
+
+    test "registers users with a hashed password" do
+      email = unique_user_email()
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
+      assert user.email == email
+      assert is_binary(user.hashed_password)
+      assert is_nil(user.confirmed_at)
+      assert is_nil(user.password)
+    end
+
+    test "has an audit log" do
+      email = unique_user_email()
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
+
+      assert_recent_audit_log(user, @admin, %{
+        "tid" => "user",
+        "name" => "user",
+        "password" => "<<REDACTED>>",
+        "email" => email
+      })
+    end
   end
 
   describe "get_user_by_email/1" do
@@ -124,69 +179,6 @@ defmodule Epicenter.AccountsTest do
     test "returns the user with the given id" do
       %{id: id} = user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       assert %User{id: ^id} = Accounts.get_user!(user.id)
-    end
-  end
-
-  describe "register_user/1" do
-    setup do
-      creator = Test.Fixtures.user_attrs(@admin, "creator", %{admin: true}) |> Accounts.register_user!()
-      %{creator: creator}
-    end
-
-    test "requires email and password to be set" do
-      {:error, changeset} = Accounts.register_user({%{}, Test.Fixtures.admin_audit_meta()})
-
-      assert %{
-               password: ["can't be blank"],
-               email: ["can't be blank"]
-             } = errors_on(changeset)
-    end
-
-    test "validates email and password when given" do
-      {:error, changeset} = Accounts.register_user({%{email: "not valid", password: "not valid"}, Test.Fixtures.admin_audit_meta()})
-
-      assert %{
-               email: ["must have the @ sign and no spaces"],
-               password: ["must be between 10 and 80 characters"]
-             } = errors_on(changeset)
-    end
-
-    test "validates maximum values for email and password for security" do
-      too_long = String.duplicate("db", 100)
-      {:error, changeset} = Accounts.register_user({%{email: too_long, password: too_long}, Test.Fixtures.admin_audit_meta()})
-      assert "should be at most 160 character(s)" in errors_on(changeset).email
-      assert "must be between 10 and 80 characters" in errors_on(changeset).password
-    end
-
-    test "validates email uniqueness", %{creator: creator} do
-      %{email: email} = Test.Fixtures.user_attrs(creator, "user") |> Accounts.register_user!()
-      {:error, changeset} = Accounts.register_user({%{email: email}, Test.Fixtures.admin_audit_meta()})
-      assert "has already been taken" in errors_on(changeset).email
-
-      # Now try with the upper cased email too, to check that email case is ignored.
-      {:error, changeset} = Accounts.register_user({%{email: String.upcase(email)}, Test.Fixtures.admin_audit_meta()})
-      assert "has already been taken" in errors_on(changeset).email
-    end
-
-    test "registers users with a hashed password", %{creator: creator} do
-      email = unique_user_email()
-      {:ok, user} = Test.Fixtures.user_attrs(creator, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
-      assert user.email == email
-      assert is_binary(user.hashed_password)
-      assert is_nil(user.confirmed_at)
-      assert is_nil(user.password)
-    end
-
-    test "has an audit log", %{creator: creator} do
-      email = unique_user_email()
-      {:ok, user} = Test.Fixtures.user_attrs(creator, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
-
-      assert_recent_audit_log(user, creator, %{
-        "tid" => "user",
-        "name" => "user",
-        "password" => "<<REDACTED>>",
-        "email" => email
-      })
     end
   end
 
