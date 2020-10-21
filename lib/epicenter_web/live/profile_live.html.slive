@@ -9,7 +9,7 @@
   section#heading
     div
       h1 data-role="full-name"= Format.person(@person)
-      h3#external-id data-role="external-id"= @person.external_id
+      h3#external-id data-role="external-id"= demographic_field(@person, :external_id)
 
     form id="assignment-form" phx-change="form-change"
       #user-list
@@ -35,8 +35,8 @@
           th Phone
           th Email
         tr
-          td data-role="date-of-birth"= Format.date(@person.dob)
-          td data-role="preferred-language"= string_or_unknown(@person.preferred_language)
+          td data-role="date-of-birth"= Format.date(demographic_field(@person, :dob))
+          td data-role="preferred-language"= string_or_unknown(demographic_field(@person, :preferred_language))
           td data-role="phone-numbers"= list_or_unknown(phone_numbers(@person))
           td data-role="email-addresses"= list_or_unknown(email_addresses(@person))
       tbody
@@ -102,25 +102,25 @@
           th Ethnicity
           th Race
         tr
-          td data-role="gender-identity"= @person.gender_identity
-          td data-role="sex-at-birth"= @person.sex_at_birth
+          td data-role="gender-identity"= demographic_field(@person, :gender_identity)
+          td data-role="sex-at-birth"= demographic_field(@person, :sex_at_birth)
           td
             div data-role="major-ethnicity"= ethnicity_value(@person)
             ul
               = for detailed_ethnicity <- detailed_ethnicities(@person) do
                 li data-role="detailed-ethnicity"= detailed_ethnicity_value(detailed_ethnicity)
-          td data-role="race"= @person.race
+          td data-role="race"= demographic_field(@person, :race)
       tbody
         tr
           th Marital status
           th Employment
           th Occupation
         tr
-          td data-role="marital-status"= string_or_unknown(Format.marital_status(@person.marital_status))
-          td data-role="employment"= string_or_unknown(Format.employment(@person.employment))
-          td data-role="occupation"= @person.occupation
+          td data-role="marital-status"= string_or_unknown(Format.marital_status(demographic_field(@person, :marital_status)))
+          td data-role="employment"= string_or_unknown(Format.employment(demographic_field(@person, :employment)))
+          td data-role="occupation"= demographic_field(@person, :occupation)
       tbody
         tr
           th Notes
         tr
-          td data-role="notes"= @person.notes
+          td data-role="notes"= demographic_field(@person, :notes)

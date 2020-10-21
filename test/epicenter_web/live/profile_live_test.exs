@@ -13,7 +13,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   setup :register_and_log_in_user
 
   setup %{user: user} do
-    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_demographics()
     [person: person, user: user]
   end
 
@@ -26,7 +26,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "when the person has no identifying information" do
     test "showing person identifying information", %{conn: conn, person: person, user: user} do
-      {:ok, _} = Cases.update_person(person, {%{preferred_language: nil}, Test.Fixtures.audit_meta(user)})
+      {:ok, _} =
+        Cases.update_person(
+          person,
+          {%{demographics: [%{id: List.first(person.demographics).id, preferred_language: nil}]}, Test.Fixtures.audit_meta(user)}
+        )
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_full_name("Alice Testuser")
@@ -307,7 +311,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "demographics" do
     setup %{person: person, user: user} do
-      person_attrs = Test.Fixtures.add_demographic_attrs(%{})
+      person_attrs = Test.Fixtures.add_demographic_attrs(%{tid: "profile-live-person"}, %{id: Euclid.Extra.List.only!(person.demographics).id})
       Cases.update_person(person, {person_attrs, Test.Fixtures.audit_meta(user)})
       :ok
     end

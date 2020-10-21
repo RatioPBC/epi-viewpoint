@@ -12,36 +12,6 @@ defmodule Epicenter.Cases.PersonTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
 
-  describe "schema" do
-    test "fields" do
-      assert_schema(
-        Person,
-        [
-          {:assigned_to_id, :binary_id},
-          {:dob, :date},
-          {:employment, :string},
-          {:ethnicity, :map},
-          {:external_id, :string},
-          {:fingerprint, :string},
-          {:first_name, :string},
-          {:gender_identity, :array},
-          {:id, :id},
-          {:inserted_at, :naive_datetime},
-          {:last_name, :string},
-          {:marital_status, :string},
-          {:notes, :text},
-          {:occupation, :string},
-          {:preferred_language, :string},
-          {:race, :string},
-          {:seq, :integer},
-          {:sex_at_birth, :string},
-          {:tid, :string},
-          {:updated_at, :naive_datetime}
-        ]
-      )
-    end
-  end
-
   describe "associations" do
     test "can have zero lab_results" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
@@ -82,9 +52,9 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "changeset" do
-    defp new_changeset(attr_updates) do
-      default_attrs = Test.Fixtures.raw_person_attrs("alice") |> Test.Fixtures.add_demographic_attrs()
-      Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
+    defp new_changeset(attr_updates, demographic_attrs \\ %{}) do
+      default_attrs = Test.Fixtures.raw_person_attrs("alice", attr_updates) |> Test.Fixtures.add_demographic_attrs(demographic_attrs)
+      Person.changeset(%Person{}, default_attrs)
     end
 
     test "assignment_changeset can assign or unassign a user to a person" do
@@ -100,23 +70,25 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "identifying attributes" do
-      changes = new_changeset(%{external_id: "10000"}).changes
-      assert changes.dob == ~D[2000-01-01]
-      assert changes.external_id == "10000"
-      assert changes.fingerprint == "2000-01-01 alice testuser"
-      assert changes.first_name == "Alice"
-      assert changes.last_name == "Testuser"
-      assert changes.preferred_language == "English"
+      changes = new_changeset(%{}).changes
       assert changes.tid == "alice"
     end
 
     test "demographic attributes" do
-      changes = new_changeset(%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}}).changes
+      changes =
+        (new_changeset(%{}, %{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}, external_id: "10000"}).changes.demographics
+         |> List.first()).changes
+
+      assert changes.dob == ~D[2000-01-01]
+      assert changes.first_name == "Alice"
       assert changes.employment == "Part time"
+      assert changes.external_id == "10000"
       assert changes.gender_identity == ["Female"]
+      assert changes.last_name == "Testuser"
       assert changes.marital_status == "Single"
       assert changes.notes == "lorem ipsum"
       assert changes.occupation == "architect"
+      assert changes.preferred_language == "English"
       assert changes.race == "Filipino"
       assert changes.sex_at_birth == "Female"
 
@@ -126,13 +98,6 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
-    test "dob is required", do: assert_invalid(new_changeset(dob: nil))
-    test "first name is required", do: assert_invalid(new_changeset(first_name: nil))
-    test "last name is required", do: assert_invalid(new_changeset(last_name: nil))
-    test "validates personal health information on dob", do: assert_invalid(new_changeset(dob: "01-10-2000"))
-    test "validates personal health information on last_name", do: assert_invalid(new_changeset(last_name: "Aliceblat"))
-
-    test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice testuser")
 
     test "associations - emails" do
       email_changeset = new_changeset(%{emails: [%{address: "othertest@example.com"}]}).changes.emails |> Euclid.Extra.List.first()
@@ -150,38 +115,6 @@ defmodule Epicenter.Cases.PersonTest do
         |> Euclid.Extra.List.first()
 
       assert %{street: "1023 Test St", city: "City7", state: "ZB", postal_code: "00002"} = address_changeset.changes
-    end
-  end
-
-  describe "constraints" do
-    defp fingerprint_contstraint_error?({attrs, audit_meta}, key, new_value) do
-      {attrs |> Map.put(key, new_value), audit_meta}
-      |> fingerprint_contstraint_error?()
-    end
-
-    defp fingerprint_contstraint_error?(attrs) do
-      case Cases.create_person(attrs) do
-        {:ok, %Person{}} ->
-          false
-
-        {:error, changeset} ->
-          if errors_on(changeset).fingerprint == ["has already been taken"],
-            do: true,
-            else: raise("Unexpected changeset errors: #{changeset |> errors_on() |> inspect()}")
-      end
-    end
-
-    test "case-insensitive unique constraint on first_name + last_name + dob" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice_attrs = Test.Fixtures.person_attrs(user, "alice")
-      assert {:ok, %Person{} = _} = alice_attrs |> Cases.create_person()
-
-      assert fingerprint_contstraint_error?(alice_attrs)
-
-      assert fingerprint_contstraint_error?(alice_attrs, :first_name, "ALICE")
-      assert fingerprint_contstraint_error?(alice_attrs, :first_name, "aLiCe")
-      refute fingerprint_contstraint_error?(alice_attrs, :first_name, "Alice2")
-      refute fingerprint_contstraint_error?(alice_attrs, :dob, ~D[1999-09-01])
     end
   end
 
@@ -283,11 +216,11 @@ defmodule Epicenter.Cases.PersonTest do
   # # # Query
 
   describe "all" do
-    test "sorts by last name (then first name, then dob descending)" do
+    test "sorts by creation order" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      Test.Fixtures.person_attrs(user, "middle", dob: ~D{2000-06-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.person_attrs(user, "last", dob: ~D{2000-06-01}, first_name: "Billy", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.person_attrs(user, "first", dob: ~D{2000-07-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
+      Test.Fixtures.person_attrs(user, "first", dob: ~D{2000-06-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
+      Test.Fixtures.person_attrs(user, "middle", dob: ~D{2000-06-01}, first_name: "Billy", last_name: "Testuser") |> Cases.create_person!()
+      Test.Fixtures.person_attrs(user, "last", dob: ~D{2000-07-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
 
       Person.Query.all() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end

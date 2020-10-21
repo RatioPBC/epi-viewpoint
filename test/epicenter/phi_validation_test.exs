@@ -3,7 +3,7 @@ defmodule Epicenter.PhiValidationTest do
 
   alias Ecto.Changeset
   alias Epicenter.Cases.Address
-  alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Phone
   alias Epicenter.Cases.Email
   alias Epicenter.PhiValidation
@@ -13,20 +13,20 @@ defmodule Epicenter.PhiValidationTest do
     @invalid_last_name "Baz"
 
     test "changeset is valid if last_name starts with 'Testuser'" do
-      Changeset.change(%Person{}, last_name: @valid_last_name)
-      |> PhiValidation.validate_phi(:person)
+      Changeset.change(%Demographic{}, last_name: @valid_last_name)
+      |> PhiValidation.validate_phi(:demographic)
       |> assert_valid()
     end
 
     test "changeset is invalid if last_name does not start with 'Testuser'" do
-      Changeset.change(%Person{}, last_name: @invalid_last_name)
-      |> PhiValidation.validate_phi(:person)
+      Changeset.change(%Demographic{}, last_name: @invalid_last_name)
+      |> PhiValidation.validate_phi(:demographic)
       |> assert_invalid(last_name: ["In non-PHI environment, must start with 'Testuser'"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
-      Changeset.change(%Person{}, last_name: @invalid_last_name)
-      |> PhiValidation.validate_phi(:person, :unrestricted)
+      Changeset.change(%Demographic{}, last_name: @invalid_last_name)
+      |> PhiValidation.validate_phi(:demographic, :unrestricted)
       |> assert_valid()
     end
   end
@@ -36,20 +36,20 @@ defmodule Epicenter.PhiValidationTest do
     @invalid_dob ~D[2020-01-02]
 
     test "changeset is valid if date of birth is first of month" do
-      Changeset.change(%Person{}, dob: @valid_dob)
-      |> PhiValidation.validate_phi(:person)
+      Changeset.change(%Demographic{}, dob: @valid_dob)
+      |> PhiValidation.validate_phi(:demographic)
       |> assert_valid()
     end
 
     test "changeset is invalid if date of birth is not first of month" do
-      Changeset.change(%Person{}, dob: @invalid_dob)
-      |> PhiValidation.validate_phi(:person)
+      Changeset.change(%Demographic{}, dob: @invalid_dob)
+      |> PhiValidation.validate_phi(:demographic)
       |> assert_invalid(dob: ["In non-PHI environment, must be the first of the month"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
-      Changeset.change(%Person{}, dob: @invalid_dob)
-      |> PhiValidation.validate_phi(:person, :unrestricted)
+      Changeset.change(%Demographic{}, dob: @invalid_dob)
+      |> PhiValidation.validate_phi(:demographic, :unrestricted)
       |> assert_valid()
     end
   end

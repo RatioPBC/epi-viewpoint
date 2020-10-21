@@ -42,19 +42,12 @@ defmodule Epicenter.Test.Fixtures do
 
   # annotated with audit_meta
   def person_attrs(originator, tid, attrs \\ %{}) do
-    attrs =
-      raw_person_attrs(tid, attrs)
-      |> merge_attrs(attrs)
-
+    attrs = raw_person_attrs(tid, attrs) |> add_demographic_attrs() |> merge_attrs(attrs)
     {attrs, audit_meta(originator)}
   end
 
   def raw_person_attrs(tid, attrs \\ %{}) do
     %{
-      dob: ~D[2000-01-01],
-      first_name: String.capitalize(tid),
-      last_name: "Testuser",
-      preferred_language: "English",
       tid: tid
     }
     |> merge_attrs(attrs)
@@ -65,23 +58,34 @@ defmodule Epicenter.Test.Fixtures do
   def add_demographic_attrs({person_attrs, audit_meta}, demographic_attrs),
     do: {add_demographic_attrs(person_attrs, demographic_attrs), audit_meta}
 
+  def add_demographic_attrs(%{demographics: [person_demographic_attrs]} = person_attrs, demographic_attrs) do
+    merged_demographic_attrs =
+      %{
+        dob: ~D[2000-01-01],
+        employment: "Part time",
+        ethnicity: %{major: "not_hispanic_latinx_or_spanish_origin", detailed: []},
+        first_name: String.capitalize(person_attrs.tid),
+        gender_identity: ["Female"],
+        last_name: "Testuser",
+        marital_status: "Single",
+        notes: "lorem ipsum",
+        occupation: "architect",
+        preferred_language: "English",
+        race: "Filipino",
+        sex_at_birth: "Female"
+      }
+      |> merge_attrs(person_demographic_attrs)
+      |> merge_attrs(demographic_attrs)
+
+    %{person_attrs | demographics: [merged_demographic_attrs]}
+  end
+
   def add_demographic_attrs(person_attrs, demographic_attrs) do
-    %{
-      employment: "Part time",
-      ethnicity: %{major: "not_hispanic_latinx_or_spanish_origin", detailed: []},
-      gender_identity: ["Female"],
-      marital_status: "Single",
-      notes: "lorem ipsum",
-      occupation: "architect",
-      race: "Filipino",
-      sex_at_birth: "Female"
-    }
-    |> merge_attrs(demographic_attrs)
-    |> merge_attrs(person_attrs)
+    add_demographic_attrs(Map.put(person_attrs, :demographics, [%{}]), demographic_attrs)
   end
 
   def add_empty_demographic_attrs(person_attrs) do
-    %{
+    add_demographic_attrs(person_attrs, %{
       "employment" => nil,
       "ethnicity" => nil,
       "gender_identity" => nil,
@@ -90,20 +94,19 @@ defmodule Epicenter.Test.Fixtures do
       "occupation" => nil,
       "race" => nil,
       "sex_at_birth" => nil
-    }
-    |> merge_attrs(person_attrs)
+    })
   end
 
   def address_attrs(originator, %Person{id: person_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
     attrs =
       %{
-        street: "#{street_number} Test St",
         city: "City",
-        state: "OH",
-        postal_code: "00000",
-        type: "home",
         person_id: person_id,
-        tid: tid
+        postal_code: "00000",
+        state: "OH",
+        street: "#{street_number} Test St",
+        tid: tid,
+        type: "home"
       }
       |> merge_attrs(attrs)
 
@@ -115,8 +118,8 @@ defmodule Epicenter.Test.Fixtures do
       %{
         number: "111-111-1000",
         person_id: person_id,
-        type: "home",
-        tid: tid
+        tid: tid,
+        type: "home"
       }
       |> merge_attrs(attrs)
 

@@ -2,17 +2,15 @@
 
   section
     header#subnav
-      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [confirm: @confirmation_prompt, role: "back-link"] do
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [confirm: confirmation_prompt(@changeset), role: "back-link"] do
         = back_icon()
         span Back
 
   section#profile-edit
     = form_for @changeset, "#", [id: "profile-form", phx_change: "form-change", phx_submit: "save"], fn f ->
-
       #identifying-information
         header
           h2 Identifying Information
-
         #name-fields
           fieldset
             = label f, :first_name do
@@ -39,7 +37,7 @@
               = error_tag f, :preferred_language
             #preferred-language
               = arrow_down_icon()
-              = select f, :preferred_language, preferred_languages(@person.preferred_language), data_role: "preferred-language"
+              = select f, :preferred_language, preferred_languages(demographic_field(@person, :preferred_language)), data_role: "preferred-language"
 
 
           fieldset#other-preferred-language data-disabled=!@preferred_language_is_other data-role="other-preferred-language"

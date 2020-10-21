@@ -11,7 +11,7 @@ defmodule Epicenter.PhiValidation do
   def validate_phi(changeset, _validation_set, :unrestricted),
     do: changeset
 
-  defp validate(changeset, :person) do
+  defp validate(changeset, :demographic) do
     changeset
     |> validate_change(:last_name, &last_name_validator/2)
     |> validate_change(:dob, &date_validator/2)

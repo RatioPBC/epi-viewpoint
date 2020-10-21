@@ -2,6 +2,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Address
+  alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.ImportedFile
@@ -36,6 +37,7 @@ defmodule Epicenter.Cases do
     all_updated =
       people_ids
       |> get_people()
+      |> preload_demographics()
       |> Enum.map(fn person ->
         {:ok, updated} =
           person
@@ -54,8 +56,11 @@ defmodule Epicenter.Cases do
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)
   def create_person({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert(audit_meta)
 
-  def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name}),
-    do: Person |> Repo.get_by(dob: dob, first_name: first_name, last_name: last_name)
+  def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name}) do
+    with %Demographic{} = demographic <- Demographic.Query.matching(dob: dob, first_name: first_name, last_name: last_name) |> Repo.one() do
+      Repo.preload(demographic, [:person]).person
+    end
+  end
 
   def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)
@@ -66,6 +71,7 @@ defmodule Epicenter.Cases do
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
+  def preload_demographics(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:demographics])
 
   #
   # address
@@ -102,4 +108,14 @@ defmodule Epicenter.Cases do
   # imported files
   #
   def create_imported_file({attrs, audit_meta}), do: %ImportedFile{} |> ImportedFile.changeset(attrs) |> AuditLog.insert!(audit_meta)
+
+  #
+  # demographics
+  #
+
+  def change_demographic(demographic, attrs), do: Demographic.changeset(demographic, attrs)
+
+  def find_or_create_demographic({attrs, _audit_meta}) do
+    %Demographic{} |> change_demographic(attrs) |> Repo.insert()
+  end
 end
