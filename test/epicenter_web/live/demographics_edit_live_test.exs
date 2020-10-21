@@ -243,6 +243,9 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_occupation("architect")
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "deep-sea diver"})
       |> Pages.Profile.assert_occupation("deep-sea diver")
+
+      updated_person = Cases.get_person(person.id)
+      assert updated_person.occupation == "deep-sea diver"
     end
   end
 
@@ -259,6 +262,9 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_notes("foo bar baz")
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"notes" => "the sea"})
       |> Pages.Profile.assert_notes("the sea")
+
+      updated_person = Cases.get_person(person.id)
+      assert updated_person.notes == "the sea"
     end
   end
 

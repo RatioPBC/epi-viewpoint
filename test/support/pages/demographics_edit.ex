@@ -83,7 +83,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
   end
 
   def assert_notes(%View{} = view, expected_notes) do
-    assert view |> Pages.parse() |> Test.Html.attr("[data-role=notes-input]", "value") |> Euclid.Extra.List.first("") == expected_notes
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=notes-input]") |> String.trim_leading() == expected_notes
     view
   end
 

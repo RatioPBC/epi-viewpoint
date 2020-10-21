@@ -37,7 +37,7 @@
       = text_input f, :occupation, data_role: "occupation-input", id: "occupation-input"
 
       div class="subheader" Notes
-      = text_input f, :notes, data_role: "notes-input", id: "notes-input"
+      = textarea f, :notes, data_role: "notes-input", id: "notes-input"
 
 
       #nav
