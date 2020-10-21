@@ -9,6 +9,11 @@ defmodule EpicenterWeb.Test.Pages do
   alias Epicenter.Test
   alias Phoenix.LiveViewTest.View
 
+  def assert_confirmation_prompt(%View{} = view, expected_prompt) do
+    view |> parse() |> Test.Html.attr("[data-role=back-link]", "data-confirm") |> assert_eq([expected_prompt])
+    view
+  end
+
   def assert_current_user(conn_or_view_or_html, user_name) do
     conn_or_view_or_html |> parse() |> Test.Html.role_text("current-user-name") |> assert_eq(user_name)
     conn_or_view_or_html

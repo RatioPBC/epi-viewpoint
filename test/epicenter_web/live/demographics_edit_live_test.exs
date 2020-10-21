@@ -302,6 +302,19 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     end
   end
 
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.assert_confirmation_prompt("")
+    end
+
+    test "when the user changes the notes", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.change_form(%{"notes" => "New notes"})
+      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+  end
+
   describe "detailed_ethnicity_option_checked" do
     test "it returns true when the given detailed ethnicity option is set for the given person" do
       assert DemographicsEditLive.detailed_ethnicity_checked(%{detailed: ["detailed_a", "detailed_b"]}, "detailed_b")

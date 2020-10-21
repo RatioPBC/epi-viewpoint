@@ -3,6 +3,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -18,6 +19,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign(changeset: changeset)
     |> assign(person: person)
+    |> assign(confirmation_prompt: nil)
     |> ok()
   end
 
@@ -30,12 +32,12 @@ defmodule EpicenterWeb.DemographicsEditLive do
       |> Ecto.Changeset.delete_change(:ethnicity)
       |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
 
-    socket |> assign(:changeset, new_changeset) |> noreply()
+    socket |> assign(:changeset, new_changeset) |> assign_confirmation_prompt |> noreply()
   end
 
   def handle_event("form-change", %{"person" => person_params}, socket) do
     changeset = socket.assigns.person |> Cases.change_person(person_params)
-    socket |> assign(changeset: changeset) |> noreply()
+    socket |> assign(changeset: changeset) |> assign_confirmation_prompt |> noreply()
   end
 
   def handle_event("submit", %{"person" => person_params} = _params, socket) do
@@ -134,4 +136,14 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   defp expected_person_params_from_changeset(changeset),
     do: changeset |> Extra.Changeset.get_field_from_changeset(:ethnicity)
+
+  defp assign_confirmation_prompt(socket) do
+    prompt =
+      case socket.assigns.changeset do
+        nil -> nil
+        _changeset -> abandon_changes_confirmation_text()
+      end
+
+    socket |> assign(confirmation_prompt: prompt)
+  end
 end

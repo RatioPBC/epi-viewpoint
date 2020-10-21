@@ -3,14 +3,13 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   import EpicenterWeb.IconView, only: [plus_icon: 0, arrow_down_icon: 0, back_icon: 0, trash_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.DateParser
   alias Epicenter.Extra
   alias Epicenter.Format
-
-  @confirmation_text "Your updates have not been saved. Discard updates?"
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
@@ -214,7 +213,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     prompt =
       case socket.assigns.changeset do
         nil -> nil
-        changeset -> if Map.drop(changeset.changes, [:dob]) == %{}, do: nil, else: @confirmation_text
+        changeset -> if Map.drop(changeset.changes, [:dob]) == %{}, do: nil, else: abandon_changes_confirmation_text()
       end
 
     socket |> assign(confirmation_prompt: prompt)

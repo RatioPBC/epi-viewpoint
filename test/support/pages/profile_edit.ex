@@ -9,11 +9,6 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  def assert_confirmation_prompt(%View{} = view, expected_prompt) do
-    view |> Pages.parse() |> Test.Html.attr("[data-role=back-link]", "data-confirm") |> assert_eq([expected_prompt])
-    view
-  end
-
   def assert_validation_messages(%View{} = view, expected_messages) do
     view |> render() |> LiveViewAssertions.assert_validation_messages(expected_messages)
     view
