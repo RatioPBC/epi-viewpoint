@@ -2,6 +2,8 @@
 FROM alpine:latest AS app_runner_base
 
 ARG ELIXIR_PROJECT=epicenter
+ARG DEFAULT_UID=1111
+ARG DEFAULT_GID=1111
 ENV LANG=C.UTF-8
 
 RUN \
@@ -27,30 +29,19 @@ RUN \
     mailcap
 
 RUN \
-  addgroup app \
-  && adduser -G app -g app -D -h /home/app -s /bin/bash app
+  addgroup --gid $DEFAULT_GID app \
+  && adduser -G app -g app -D -h /home/app -s /bin/bash --uid $DEFAULT_UID app
 
 RUN \
   mkdir -p /usr/local/etc \
   && mkdir -p /opt/bin \
-  && mkdir /opt/ssl \
   && mkdir -p /opt/${ELIXIR_PROJECT}
-
-ARG EPICENTER_SSL_CRT
-ARG EPICENTER_SSL_KEY
-ARG EPICENTER_SSL_INTERMEDIATE_PEM
-RUN echo "${EPICENTER_SSL_KEY}" > /opt/ssl/STAR_network_geometer_dev.key
-RUN echo "${EPICENTER_SSL_CRT}" > /opt/ssl/STAR_network_geometer_dev.pem
-RUN echo "${EPICENTER_SSL_INTERMEDIATE_PEM}" > /opt/ssl/STAR_network_geometer_dev_bundle.pem
 
 WORKDIR /opt/${ELIXIR_PROJECT}
 
 RUN chown -R app:app /usr/local/etc \
   && chown -R app:app /opt/${ELIXIR_PROJECT} \
-  && chown -R app:app /opt/ssl \
   && sed -i 's|root:x:0:0:root:/root:/bin/ash|root:x:0:0:root:/root:/bin/bash|' /etc/passwd
-
-RUN chmod -R 500 /opt/ssl
 
 # ---- Build Stage ----
 FROM elixir:1.10.3-alpine AS app_builder
@@ -81,10 +72,8 @@ COPY mix.lock .
 
 # Fetch the application dependencies and build the application
 ARG HEX_GEOMETER_READ_ONLY_KEY
-ARG HEX_OBAN_UI_KEY
 
 RUN mix hex.organization auth geometer --key ${HEX_GEOMETER_READ_ONLY_KEY}
-RUN mix hex.organization auth oban --key ${HEX_OBAN_UI_KEY}
 RUN mix deps.get --only=prod
 RUN mix deps.compile
 
@@ -116,5 +105,4 @@ ENV ELIXIR_PROJECT=${ELIXIR_PROJECT}
 EXPOSE 22/tcp
 EXPOSE 4000/tcp
 USER app:app
-
 CMD "/opt/${ELIXIR_PROJECT}/bin/start"

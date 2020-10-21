@@ -6,9 +6,7 @@ set +e
 check "Docker running" "docker info  > /dev/null 2>&1" "sudo dockerd"
 set -e
 
-EPICENTER_SSL_KEY=$(cat tmp/ssl/STAR_network_geometer_dev.key)
-EPICENTER_SSL_CRT=$(cat tmp/ssl/STAR_network_geometer_dev.crt)
-EPICENTER_SSL_INTERMEDIATE_PEM=$(cat tmp/ssl/STAR_network_geometer_dev_bundle.pem)
+env=${1:-dev}
 
-docker build . -t epicenter --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}" --build-arg HEX_OBAN_UI_KEY="${HEX_OBAN_UI_KEY}" --build-arg EPICENTER_SSL_KEY="${EPICENTER_SSL_KEY}" --build-arg EPICENTER_SSL_CRT="${EPICENTER_SSL_CRT}" --build-arg EPICENTER_SSL_INTERMEDIATE_PEM="${EPICENTER_SSL_INTERMEDIATE_PEM}"
-#docker tag epicenter "${DEPLOYMENT_ECR}:latest"
+docker build . -t epicenter --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}"
+#docker tag epicenter:latest "gcr.io/epikubes/viewpoint-$env:latest"

@@ -9,6 +9,7 @@ variables:
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
   POSTGRES_USER: postgres
+  CANONICAL_HOST: viewpoint-construction.network.geometer.dev
 stages:
 - test
 - deploy
@@ -21,24 +22,42 @@ cache:
   paths:
   - deps
   - assets/node_modules
-before_script:
-- npm install --prefix assets
-- mix local.rebar --force
-- mix local.hex --force
-- mix hex.organization auth geometer --key "$HEX_GEOMETER_READ_ONLY_KEY"
-- mix deps.get
-- mix deps.unlock --check-unused
-- mix deps.audit
-- npm audit --audit-level=moderate --prefix assets
 test:
+  before_script:
+    - npm install --prefix assets
+    - mix local.rebar --force
+    - mix local.hex --force
+    - mix hex.organization auth geometer --key "$HEX_GEOMETER_READ_ONLY_KEY"
+    - mix deps.get
+    - mix deps.unlock --check-unused
+    - mix deps.audit
+    - npm audit --audit-level=moderate --prefix assets
   stage: test
   script:
-  - bin/dev/test
+    - bin/dev/test
 deploy_staging:
   only:
-  - main
+    - kube-deploy
   stage: deploy
+  image: geometer/docker-gcp:latest
+  services:
+    - docker:dind
   script:
-  - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_STAGING.git
-    || true
-  - git push -f heroku HEAD:master
+    - bin/remote/deploy staging
+  environment:
+   name: staging
+   url: https://viewpoint-staging.network.geometer.dev
+
+deploy_construction:
+  only:
+    - kube-deploy
+  stage: deploy
+  image: geometer/docker-gcp:latest
+  services:
+    - docker:dind
+  script:
+    - bin/remote/deploy construction
+  environment:
+    name: construction
+    url: https://viewpoint-construction.network.geometer.dev
+  when: manual
