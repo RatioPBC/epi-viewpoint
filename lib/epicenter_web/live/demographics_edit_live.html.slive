@@ -43,6 +43,20 @@
           | Married
           = radio_button f, :marital_status, "married", data_role: "marital-status-radio-button"
 
+      span class="subheader" Employment status
+      #option-set
+        = label f, :employment, for: "person_employment_not_employed", data_role: "employment-status-label" do
+          | Not employed
+          = radio_button f, :employment, "not_employed", data_role: "employment-status-radio-button"
+
+        = label f, :employment, for: "person_employment_part_time", data_role: "employment-status-label" do
+          | Part time
+          = radio_button f, :employment, "part_time", data_role: "employment-status-radio-button"
+
+        = label f, :employment, for: "person_employment_full_time", data_role: "employment-status-label" do
+          | Full time
+          = radio_button f, :employment, "full_time", data_role: "employment-status-radio-button"
+
       div class="subheader" Occupation
       = text_input f, :occupation, data_role: "occupation-input", id: "occupation-input"
 

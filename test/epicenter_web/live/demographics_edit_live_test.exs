@@ -49,6 +49,23 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     end
   end
 
+  describe "employment" do
+    test "selecting employment status", %{conn: conn, person: person, user: user} do
+      {:ok, person_with_no_jobs} = person |> Cases.update_person({%{marital_status: nil}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person_with_no_jobs)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_employment_selections(%{"Not employed" => false, "Part time" => false, "Full time" => false})
+      |> Pages.DemographicsEdit.change_form(%{"employment" => "full_time"})
+      |> Pages.DemographicsEdit.assert_employment_selections(%{"Not employed" => false, "Part time" => false, "Full time" => true})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"employment" => "full_time"})
+      |> Pages.Profile.assert_employment("Full time")
+
+      updated_person = Cases.get_person(person_with_no_jobs.id)
+      assert updated_person.employment == "full_time"
+    end
+  end
+
   describe "ethnicity" do
     test "updating ethnicity", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)

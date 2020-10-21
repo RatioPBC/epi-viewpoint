@@ -54,6 +54,17 @@ defmodule Epicenter.FormatTest do
     end
   end
 
+  describe "employment" do
+    import Epicenter.Format, only: [employment: 1]
+
+    test "safely formats employment values" do
+      assert employment("full_time") == "Full time"
+      assert employment("part_time") == "Part time"
+      assert employment("not_employed") == "Not employed"
+      assert employment(nil) == nil
+    end
+  end
+
   describe "person" do
     import Epicenter.Format, only: [person: 1]
 

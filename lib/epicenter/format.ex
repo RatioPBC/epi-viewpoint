@@ -10,6 +10,9 @@ defmodule Epicenter.Format do
     [non_postal_code, postal_code] |> Extra.List.compact() |> Enum.join(" ")
   end
 
+  def employment(nil), do: nil
+  def employment(employment), do: employment |> String.replace("_", " ") |> String.capitalize()
+
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
 
