@@ -53,19 +53,6 @@ defmodule Epicenter.AccountsTest do
       })
     end
 
-    test "register_user! creates a user with a ops admin" do
-      user = Test.Fixtures.user_attrs(@ops_admin, "alice") |> Accounts.register_user!()
-
-      assert user.tid == "alice"
-      assert user.name == "alice"
-
-      assert_recent_audit_log(user, @ops_admin, %{
-        "tid" => "alice",
-        "name" => "alice",
-        "email" => "alice@example.com"
-      })
-    end
-
     test "register_user fails when originator is not admin" do
       {:ok, phoney} = Test.Fixtures.user_attrs(@admin, "phoney") |> Accounts.register_user()
       user_count = length(Accounts.list_users())
@@ -657,12 +644,22 @@ defmodule Epicenter.AccountsTest do
       [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]
     end
 
-    test "updates the provided user", %{user: user} do
+    test "updates the provided user with a user admin", %{user: user} do
       assert {:ok, _} = Accounts.update_user(user, %{admin: true, name: "Cool Admin"}, Test.Fixtures.audit_meta(@admin))
       assert Accounts.get_user!(user.id).admin
       assert Accounts.get_user!(user.id).name == "Cool Admin"
       assert_revision_count(user, 2)
       assert_recent_audit_log(user, @admin, %{"name" => "Cool Admin"})
+    end
+
+    test "fails when originator is not admin", %{user: user} do
+      {:ok, phoney} = Test.Fixtures.user_attrs(@admin, "phoney") |> Accounts.register_user()
+
+      assert {:error, :admin_privileges_required} = Accounts.update_user(user, %{admin: true, name: "Cool Admin"}, Test.Fixtures.audit_meta(phoney))
+
+      assert_revision_count(user, 1)
+      refute Accounts.get_user!(user.id).admin
+      assert Accounts.get_user!(user.id).name == "user"
     end
   end
 
