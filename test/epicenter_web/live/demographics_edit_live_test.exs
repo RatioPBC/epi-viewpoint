@@ -9,18 +9,21 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   setup :register_and_log_in_user
 
   setup %{user: user} do
-    person =
-      Test.Fixtures.person_attrs(user, "alice")
-      |> Test.Fixtures.add_demographic_attrs(ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]})
-      |> Cases.create_person!()
+    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
     [person: person]
   end
 
   describe "render" do
-    test "initially shows current demographics values", %{conn: conn, person: person} do
+    test "initially shows current demographics values", %{conn: conn, person: person, user: user} do
+      {:ok, person_with_ethnicities} =
+        person
+        |> Cases.update_person(
+          {%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}}, Test.Fixtures.audit_meta(user)}
+        )
+
       # TODO don't hardcode all the checkboxes to true
-      Pages.DemographicsEdit.visit(conn, person)
+      Pages.DemographicsEdit.visit(conn, person_with_ethnicities)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
         "Declined to answer" => true,
@@ -78,12 +81,12 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Unknown" => false,
         "Declined to answer" => false,
         "Not Hispanic, Latino/a, or Spanish origin" => false,
-        "Hispanic, Latino/a, or Spanish origin" => true
+        "Hispanic, Latino/a, or Spanish origin" => false
       })
       |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
         "Mexican, Mexican American, Chicano/a" => false,
-        "Puerto Rican" => true,
-        "Cuban" => true,
+        "Puerto Rican" => false,
+        "Cuban" => false,
         "Another Hispanic, Latino/a or Spanish origin" => false
       })
       |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "not_hispanic_latinx_or_spanish_origin"}})
@@ -215,17 +218,29 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_major_ethnicity_selected("Unknown")
       |> Pages.DemographicsEdit.assert_detailed_ethnicities_selected([])
     end
+
+    test "selecting ethnicities does not reset state of form", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.change_form(%{"occupation" => "architect", "notes" => "the building is great!"})
+      |> Pages.DemographicsEdit.assert_occupation("architect")
+      |> Pages.DemographicsEdit.assert_notes("the building is great!")
+      |> Pages.DemographicsEdit.change_form(%{"ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin"}})
+      |> Pages.DemographicsEdit.assert_occupation("architect")
+      |> Pages.DemographicsEdit.assert_notes("the building is great!")
+    end
   end
 
   describe "occupation" do
     test "it shows the existing occupation and can be edited", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_occupation("")
+      |> Pages.DemographicsEdit.change_form(%{"occupation" => "architect"})
       |> Pages.DemographicsEdit.assert_occupation("architect")
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => ""})
-      |> Pages.Profile.assert_occupation("")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "architect"})
+      |> Pages.Profile.assert_occupation("architect")
 
       Pages.DemographicsEdit.visit(conn, person)
-      |> Pages.DemographicsEdit.assert_occupation("")
+      |> Pages.DemographicsEdit.assert_occupation("architect")
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "deep-sea diver"})
       |> Pages.Profile.assert_occupation("deep-sea diver")
     end
@@ -234,14 +249,16 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   describe "notes" do
     test "it shows the existing notes and can be edited", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)
-      |> Pages.DemographicsEdit.assert_notes("lorem ipsum")
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"notes" => ""})
-      |> Pages.Profile.assert_notes("")
+      |> Pages.DemographicsEdit.assert_notes("")
+      |> Pages.DemographicsEdit.change_form(%{"notes" => "foo bar baz"})
+      |> Pages.DemographicsEdit.assert_notes("foo bar baz")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"notes" => "foo bar baz"})
+      |> Pages.Profile.assert_notes("foo bar baz")
 
       Pages.DemographicsEdit.visit(conn, person)
-      |> Pages.DemographicsEdit.assert_notes("")
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "the sea"})
-      |> Pages.Profile.assert_occupation("the sea")
+      |> Pages.DemographicsEdit.assert_notes("foo bar baz")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"notes" => "the sea"})
+      |> Pages.Profile.assert_notes("the sea")
     end
   end
 

@@ -21,36 +21,21 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> ok()
   end
 
-  def handle_event("form-change", form_state, socket) do
-    changeset = socket.assigns.changeset
-    old_form_state = expected_person_params_from_changeset(changeset)
-
-    old_major_ethnicity = old_form_state && old_form_state.major
-    new_major_ethnicity = form_state["person"]["ethnicity"]["major"]
-
-    old_detailed_ethnicity = old_form_state && old_form_state.detailed
-    new_detailed_ethnicity = form_state["person"]["ethnicity"]["detailed"]
-
-    new_ethnicity =
-      cond do
-        old_major_ethnicity != new_major_ethnicity and old_major_ethnicity == "hispanic_latinx_or_spanish_origin" ->
-          %{major: new_major_ethnicity, detailed: %{}}
-
-        old_detailed_ethnicity != new_detailed_ethnicity and Euclid.Exists.present?(new_detailed_ethnicity) ->
-          %{major: "hispanic_latinx_or_spanish_origin", detailed: new_detailed_ethnicity}
-
-        true ->
-          form_state["person"]["ethnicity"]
-      end
+  def handle_event("form-change", %{"person" => %{"ethnicity" => _ethnicity} = person_params} = form_state, socket) do
+    new_ethnicity = get_or_update_ethnicity_from_changeset(socket.assigns.changeset, form_state)
 
     new_changeset =
       socket.assigns.person
-      |> Cases.change_person(form_state)
+      |> Cases.change_person(person_params)
       |> Ecto.Changeset.delete_change(:ethnicity)
       |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
 
-    socket = socket |> assign(:changeset, new_changeset)
-    noreply(socket)
+    socket |> assign(:changeset, new_changeset) |> noreply()
+  end
+
+  def handle_event("form-change", %{"person" => person_params}, socket) do
+    changeset = socket.assigns.person |> Cases.change_person(person_params)
+    socket |> assign(changeset: changeset) |> noreply()
   end
 
   def handle_event("submit", %{"person" => person_params} = _params, socket) do
@@ -71,6 +56,27 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
+    end
+  end
+
+  defp get_or_update_ethnicity_from_changeset(changeset, form_params) do
+    old_form_state = expected_person_params_from_changeset(changeset)
+
+    old_major_ethnicity = old_form_state && old_form_state.major
+    new_major_ethnicity = form_params["person"]["ethnicity"]["major"]
+
+    old_detailed_ethnicity = old_form_state && old_form_state.detailed
+    new_detailed_ethnicity = form_params["person"]["ethnicity"]["detailed"]
+
+    cond do
+      old_major_ethnicity != new_major_ethnicity and old_major_ethnicity == "hispanic_latinx_or_spanish_origin" ->
+        %{major: new_major_ethnicity, detailed: %{}}
+
+      old_detailed_ethnicity != new_detailed_ethnicity and Euclid.Exists.present?(new_detailed_ethnicity) ->
+        %{major: "hispanic_latinx_or_spanish_origin", detailed: new_detailed_ethnicity}
+
+      true ->
+        form_params["person"]["ethnicity"]
     end
   end
 
