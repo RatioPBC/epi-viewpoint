@@ -301,7 +301,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
       |> Pages.ProfileEdit.click_add_phone_button()
-      |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Cell", "Home", "Work"])
+      |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Unknown", "Cell", "Home", "Work"])
       |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
       |> Pages.Profile.assert_phone_numbers(["(111) 111-1000"])
 
