@@ -274,64 +274,6 @@ defmodule Epicenter.CasesTest do
       refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testy", "dob" => dob})
       refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
     end
-
-    # test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
-    #   creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
-    #   person = Test.Fixtures.person_attrs(creator, "alice", external_id: "10000") |> Cases.upsert_person!()
-
-    #   assert person.dob == ~D[2000-01-01]
-    #   assert person.first_name == "Alice"
-    #   assert person.last_name == "Testuser"
-    #   assert person.tid == "alice"
-
-    #   assert_revision_count(person, 1)
-
-    #   assert_recent_audit_log(person, creator, %{
-    #     "dob" => "2000-01-01",
-    #     "external_id" => "10000",
-    #     "fingerprint" => "2000-01-01 alice testuser",
-    #     "first_name" => "Alice",
-    #     "last_name" => "Testuser",
-    #     "preferred_language" => "English",
-    #     "tid" => "alice"
-    #   })
-    # end
-
-    # We are temporarily disabling updating a person when we see them again in a csv
-    # https://www.pivotaltracker.com/story/show/175239678
-    # @tag :skip
-    # test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
-    #   creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
-    #   Test.Fixtures.person_attrs(creator, "alice", tid: "first-insert") |> Cases.upsert_person!()
-
-    #   updater = Test.Fixtures.user_attrs(@admin, "updater") |> Accounts.register_user!()
-    #   Test.Fixtures.person_attrs(updater, "alice", tid: "second-insert") |> Cases.upsert_person!()
-
-    #   assert [person] = Cases.list_people() |> Cases.preload_person_data()
-
-    #   [data1, data2] = person.person_data
-
-    #   assert data1.dob == ~D[2000-01-01]
-    #   assert data1.first_name == "Alice"
-    #   assert data1.last_name == "Testuser"
-    #   assert data1.tid == "first-insert"
-
-    #   assert data2.dob == ~D[2000-01-01]
-    #   assert data2.first_name == "Alice"
-    #   assert data2.last_name == "Testuser"
-    #   assert data2.tid == "second-insert"
-
-    #   assert_revision_count(person, 2)
-
-    #   assert_recent_audit_log(person, updater, %{
-    #     "tid" => "second-insert",
-    #     "dob" => "2000-01-01",
-    #     "fingerprint" => "2000-01-01 alice testuser",
-    #     "first_name" => "Alice",
-    #     "last_name" => "Testuser",
-    #     "preferred_language" => "English"
-    #   })
-    # end
   end
 
   describe "create_phone!" do
