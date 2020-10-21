@@ -66,6 +66,16 @@ defmodule Epicenter.FormatTest do
     end
   end
 
+  describe "marital_status" do
+    import Epicenter.Format, only: [marital_status: 1]
+
+    test "safely gets marital_status from person" do
+      assert marital_status("single") == "Single"
+      assert marital_status("married") == "Married"
+      assert marital_status(nil) == nil
+    end
+  end
+
   describe "phone" do
     import Epicenter.Format, only: [phone: 1]
 

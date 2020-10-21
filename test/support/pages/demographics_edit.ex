@@ -82,6 +82,11 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
     view
   end
 
+  def assert_marital_status_selection(%View{} = view, expected_marital_statuses) do
+    assert actual_selections(view, "marital-status-label", "radio") == expected_marital_statuses
+    view
+  end
+
   def assert_notes(%View{} = view, expected_notes) do
     assert view |> Pages.parse() |> Test.Html.text("[data-role=notes-input]") |> String.trim_leading() == expected_notes
     view

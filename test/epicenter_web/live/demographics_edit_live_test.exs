@@ -230,6 +230,23 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     end
   end
 
+  describe "marital status" do
+    test "selecting status", %{conn: conn, person: person, user: user} do
+      {:ok, person_without_marital_status} = person |> Cases.update_person({%{marital_status: nil}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person_without_marital_status)
+      |> Pages.DemographicsEdit.assert_here()
+      |> Pages.DemographicsEdit.assert_marital_status_selection(%{"Single" => false, "Married" => false})
+      |> Pages.DemographicsEdit.change_form(%{"marital_status" => "single"})
+      |> Pages.DemographicsEdit.assert_marital_status_selection(%{"Single" => true, "Married" => false})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"marital_status" => "single"})
+      |> Pages.Profile.assert_marital_status("Single")
+
+      updated_person = Cases.get_person(person_without_marital_status.id)
+      assert updated_person.marital_status == "single"
+    end
+  end
+
   describe "occupation" do
     test "it shows the existing occupation and can be edited", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)

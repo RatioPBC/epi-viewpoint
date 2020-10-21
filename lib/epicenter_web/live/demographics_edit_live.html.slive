@@ -33,12 +33,21 @@
                   = detailed_ethnicity_label
                   = tag :input, type: "checkbox", value: detailed_ethnicity_value, checked: detailed_ethnicity_checked(@changeset, detailed_ethnicity_value), data_role: "detailed-ethnicity-checkbox", name: "person[ethnicity][detailed][]"
 
+      span class="subheader" Marital status
+      #option-set
+        = label f, :marital_status, for: "person_marital_status_single", data_role: "marital-status-label" do
+          | Single
+          = radio_button f, :marital_status, "single", data_role: "marital-status-radio-button"
+
+        = label f, :marital_status, for: "person_marital_status_married", data_role: "marital-status-label" do
+          | Married
+          = radio_button f, :marital_status, "married", data_role: "marital-status-radio-button"
+
       div class="subheader" Occupation
       = text_input f, :occupation, data_role: "occupation-input", id: "occupation-input"
 
       div class="subheader" Notes
       = textarea f, :notes, data_role: "notes-input", id: "notes-input"
-
 
       #nav
         = submit "Save", phx_disable_with: "Saving...", id: "submit-form"

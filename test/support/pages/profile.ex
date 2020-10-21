@@ -92,6 +92,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_marital_status(%View{} = view, expected_status) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=marital-status]") == expected_status
+    view
+  end
+
   def assert_notes(%View{} = view, expected_notes) do
     assert view |> Pages.parse() |> Test.Html.text("[data-role=notes]") == expected_notes
     view

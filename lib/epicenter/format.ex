@@ -13,6 +13,9 @@ defmodule Epicenter.Format do
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
 
+  def marital_status(nil), do: nil
+  def marital_status(marital_status), do: marital_status |> String.capitalize()
+
   def person(nil), do: ""
   def person(%{first_name: first_name, last_name: last_name}), do: [first_name, last_name] |> Euclid.Exists.join(" ")
 

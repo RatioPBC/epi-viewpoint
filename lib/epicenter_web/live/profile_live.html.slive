@@ -104,7 +104,7 @@
           th Employment
           th Occupation
         tr
-          td data-role="marital-status"= @person.marital_status
+          td data-role="marital-status"= string_or_unknown(Format.marital_status(@person.marital_status))
           td data-role="employment"= @person.employment
           td data-role="occupation"= @person.occupation
       tbody
