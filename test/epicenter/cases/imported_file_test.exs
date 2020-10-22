@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.ImportedFileTest do
   alias Epicenter.Cases.ImportedFile
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
 
   describe "schema" do

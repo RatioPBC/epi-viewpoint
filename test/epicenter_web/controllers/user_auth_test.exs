@@ -124,6 +124,30 @@ defmodule EpicenterWeb.UserAuthTest do
     end
   end
 
+  describe "require_admin/2" do
+    test "shows a forbidden error if the user is NOT authenticated as an admin", %{conn: conn, user: user} do
+      conn =
+        conn
+        |> assign(:current_user, user)
+        |> UserAuth.require_admin([])
+
+      assert conn.halted
+      assert text_response(conn, 403) == "Forbidden"
+    end
+
+    test "allows the user to continue if they are an admin", %{conn: conn, user: user} do
+      {:ok, admin} = user |> Accounts.update_user(%{admin: true}, Epicenter.Test.Fixtures.admin_audit_meta())
+
+      conn =
+        conn
+        |> assign(:current_user, admin)
+        |> UserAuth.require_admin([])
+
+      refute conn.halted
+      refute conn.status
+    end
+  end
+
   describe "require_authenticated_user/2" do
     test "redirects if user is not authenticated", %{conn: conn} do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])

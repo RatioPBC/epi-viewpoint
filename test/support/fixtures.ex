@@ -12,7 +12,16 @@ defmodule Epicenter.Test.Fixtures do
   end
 
   @admin_id Ecto.UUID.generate()
-  def admin(), do: %Epicenter.Accounts.User{id: @admin_id, tid: "admin"}
+  def admin(),
+    do: %Epicenter.Accounts.User{
+      id: @admin_id,
+      tid: "admin",
+      admin: true,
+      name: "fixture admin",
+      email: "admin@example.com",
+      hashed_password: "adminpassword"
+    }
+
   def admin_audit_meta(), do: audit_meta(admin())
 
   def lab_result_attrs(%Person{id: person_id}, author, tid, sampled_on, attrs \\ %{}) do
@@ -34,32 +43,33 @@ defmodule Epicenter.Test.Fixtures do
   # annotated with audit_meta
   def person_attrs(originator, tid, attrs \\ %{}) do
     attrs =
-      raw_person_attrs(originator, tid, attrs)
+      raw_person_attrs(tid, attrs)
       |> merge_attrs(attrs)
 
     {attrs, audit_meta(originator)}
   end
 
-  def raw_person_attrs(originator, tid, attrs \\ %{}) do
+  def raw_person_attrs(tid, attrs \\ %{}) do
     %{
       dob: ~D[2000-01-01],
       first_name: String.capitalize(tid),
       last_name: "Testuser",
-      originator: originator,
       preferred_language: "English",
       tid: tid
     }
     |> merge_attrs(attrs)
   end
 
-  def add_demographic_attrs({person_attrs, audit_meta}),
-    do: {add_demographic_attrs(person_attrs), audit_meta}
+  def add_demographic_attrs(attrs_or_attrs_with_audit_tuple, demographic_attrs \\ %{})
 
-  def add_demographic_attrs(person_attrs, demographic_attrs \\ %{}) do
+  def add_demographic_attrs({person_attrs, audit_meta}, demographic_attrs),
+    do: {add_demographic_attrs(person_attrs, demographic_attrs), audit_meta}
+
+  def add_demographic_attrs(person_attrs, demographic_attrs) do
     %{
       employment: "Part time",
       ethnicity: %{major: "not_hispanic_latinx_or_spanish_origin", detailed: []},
-      gender_identity: "Female",
+      gender_identity: ["Female"],
       marital_status: "Single",
       notes: "lorem ipsum",
       occupation: "architect",
@@ -87,10 +97,9 @@ defmodule Epicenter.Test.Fixtures do
   def address_attrs(originator, %Person{id: person_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
     attrs =
       %{
-        full_address: "#{street_number} Test St, City, TS 00000",
         street: "#{street_number} Test St",
         city: "City",
-        state: "TS",
+        state: "OH",
         postal_code: "00000",
         type: "home",
         person_id: person_id,

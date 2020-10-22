@@ -34,7 +34,7 @@ defmodule Epicenter.MixProject do
   defp deps do
     [
       local_or_remote(:remote, :euclid, version: "~> 1.0", organization: "geometer", path: System.get_env("EUCLID_PATH", "../euclid")),
-      {:bcrypt_elixir, "~> 2.1.0"},
+      {:bcrypt_elixir, "~> 2.1"},
       {:ecto_sql, "~> 3.5"},
       {:eqrcode, "~> 0.1.7"},
       {:floki, ">= 0.0.0", only: :test},
@@ -44,7 +44,7 @@ defmodule Epicenter.MixProject do
       {:mix_audit, "~> 0.1", runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:mox, "~> 1.0"},
-      {:nimble_csv, "~> 0.7"},
+      {:nimble_csv, "~> 1.0"},
       {:nimble_totp, "~> 0.1.0"},
       {:number, "~> 1.0.3"},
       {:phoenix, "~> 1.5.4"},

@@ -1,7 +1,46 @@
 defmodule Epicenter.FormatTest do
   use Epicenter.SimpleCase, async: true
 
+  alias Epicenter.Cases.Address
   alias Epicenter.Cases.Phone
+
+  describe "address" do
+    import Epicenter.Format, only: [address: 1]
+
+    test "returns an empty string when the address is nil" do
+      assert address(nil) == ""
+    end
+
+    test "returns a correctly formatted address when all fields are present" do
+      full_address = %Address{street: "1001 Test St", city: "City", state: "TS", postal_code: "00000"}
+
+      assert address(full_address) == "1001 Test St, City, TS 00000"
+    end
+
+    test "returns a correctly formatted address when postal code is missing " do
+      full_address = %Address{street: "1001 Test St", city: "City", state: "TS", postal_code: nil}
+
+      assert address(full_address) == "1001 Test St, City, TS"
+    end
+
+    test "returns a correctly formatted address when all fields state is missing" do
+      full_address = %Address{street: "1001 Test St", city: "City", state: nil, postal_code: "00000"}
+
+      assert address(full_address) == "1001 Test St, City 00000"
+    end
+
+    test "returns a correctly formatted address when all fields state and city is missing" do
+      full_address = %Address{street: "1001 Test St", city: nil, state: nil, postal_code: "00000"}
+
+      assert address(full_address) == "1001 Test St 00000"
+    end
+
+    test "returns a correctly formatted address when only street is present" do
+      full_address = %Address{street: "1001 Test St", city: nil, state: nil, postal_code: nil}
+
+      assert address(full_address) == "1001 Test St"
+    end
+  end
 
   describe "date" do
     import Epicenter.Format, only: [date: 1]
@@ -15,6 +54,17 @@ defmodule Epicenter.FormatTest do
     end
   end
 
+  describe "employment" do
+    import Epicenter.Format, only: [employment: 1]
+
+    test "safely formats employment values" do
+      assert employment("full_time") == "Full time"
+      assert employment("part_time") == "Part time"
+      assert employment("not_employed") == "Not employed"
+      assert employment(nil) == nil
+    end
+  end
+
   describe "person" do
     import Epicenter.Format, only: [person: 1]
 
@@ -24,6 +74,16 @@ defmodule Epicenter.FormatTest do
       assert person(%{first_name: "Alice", last_name: nil}) == "Alice"
       assert person(%{first_name: nil, last_name: nil}) == ""
       assert person(nil) == ""
+    end
+  end
+
+  describe "marital_status" do
+    import Epicenter.Format, only: [marital_status: 1]
+
+    test "safely gets marital_status from person" do
+      assert marital_status("single") == "Single"
+      assert marital_status("married") == "Married"
+      assert marital_status(nil) == nil
     end
   end
 

@@ -2,11 +2,9 @@
 
   section
     header#subnav
-      = live_redirect "People", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
-      = arrow_right_icon(6, 9)
-      = live_redirect "#{@person.first_name} #{@person.last_name}", to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "name"]
-      = arrow_right_icon(6, 9)
-      span Update profile
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [confirm: @confirmation_prompt, role: "back-link"] do
+        = back_icon()
+        span Back
 
   section#profile-edit
     = form_for @changeset, "#", [id: "profile-form", phx_change: "form-change", phx_submit: "save"], fn f ->
@@ -72,6 +70,31 @@
         a#add-phone[phx-click="add-phone"]
           = plus_icon()
           span Add phone
+
+        fieldset
+          = if has_field?(@changeset, :addresses) do
+            header#address-form-header data-role="address-fieldset-header"
+              span Street address
+              span City
+              span State
+              span Zipcode
+          = inputs_for f, :addresses, fn address_form ->
+            = error_tag address_form, :street
+            = error_tag address_form, :city
+            = error_tag address_form, :state
+            = error_tag address_form, :postal_code
+            .address-wrapper
+              .address-and-trash-can
+                = text_input address_form, :street, data: [role: "street-input", tid: address_form.data.tid]
+                = text_input address_form, :city, data: [role: "city-input", tid: address_form.data.tid]
+                .select-wrapper
+                  = arrow_down_icon()
+                  = select address_form, :state, states(), data_role: "state-input"
+                = text_input address_form, :postal_code, data: [role: "postal-code-input", tid: address_form.data.tid]
+
+        a#add-address[phx-click="add-address"]
+          = plus_icon()
+          span Add address
 
         fieldset
           = if has_field?(@changeset, :emails) do

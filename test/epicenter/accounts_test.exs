@@ -2,38 +2,130 @@ defmodule Epicenter.AccountsTest do
   use Epicenter.DataCase, async: true
 
   import Epicenter.AccountsFixtures
+  import Euclid.Test.Extra.Assertions, only: [assert_datetime_approximate: 2]
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
   alias Epicenter.Accounts.UserToken
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
 
-  test "register_user creates a user" do
-    {:ok, user} = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user()
+  describe "user creation" do
+    test "register_user creates a user with a user admin" do
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user()
 
-    assert user.tid == "alice"
-    assert user.name == "alice"
+      assert user.tid == "alice"
+      assert user.name == "alice"
 
-    assert_recent_audit_log(user, @admin, %{
-      "tid" => "alice",
-      "name" => "alice",
-      "email" => "alice@example.com"
-    })
-  end
+      assert_recent_audit_log(user, @admin, %{
+        "tid" => "alice",
+        "name" => "alice",
+        "email" => "alice@example.com"
+      })
+    end
 
-  test "register_user! creates a user" do
-    user = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user!()
+    test "register_user! creates a user with a user admin" do
+      user = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user!()
 
-    assert user.tid == "alice"
-    assert user.name == "alice"
+      assert user.tid == "alice"
+      assert user.name == "alice"
 
-    assert_recent_audit_log(user, @admin, %{
-      "tid" => "alice",
-      "name" => "alice",
-      "email" => "alice@example.com"
-    })
+      assert_recent_audit_log(user, @admin, %{
+        "tid" => "alice",
+        "name" => "alice",
+        "email" => "alice@example.com"
+      })
+    end
+
+    @ops_admin %Epicenter.Accounts.User{id: Application.get_env(:epicenter, :unpersisted_admin_id)}
+    test "register_user creates a user with a ops admin" do
+      {:ok, user} = Test.Fixtures.user_attrs(@ops_admin, "alice") |> Accounts.register_user()
+
+      assert user.tid == "alice"
+      assert user.name == "alice"
+
+      assert_recent_audit_log(user, @ops_admin, %{
+        "tid" => "alice",
+        "name" => "alice",
+        "email" => "alice@example.com"
+      })
+    end
+
+    test "register_user fails when originator is not admin" do
+      {:ok, phoney} = Test.Fixtures.user_attrs(@admin, "phoney") |> Accounts.register_user()
+      user_count = length(Accounts.list_users())
+      assert {:error, :admin_privileges_required} = Test.Fixtures.user_attrs(phoney, "alice") |> Accounts.register_user()
+      assert ^user_count = length(Accounts.list_users())
+    end
+
+    test "register_user! fails when originator is not admin" do
+      {:ok, phoney} = Test.Fixtures.user_attrs(@admin, "phoney") |> Accounts.register_user()
+      user_count = length(Accounts.list_users())
+
+      assert_raise Epicenter.AdminRequiredError, fn ->
+        Test.Fixtures.user_attrs(phoney, "alice") |> Accounts.register_user!()
+      end
+
+      assert ^user_count = length(Accounts.list_users())
+    end
+
+    test "requires email and password to be set" do
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "missing_data", %{email: nil, password: nil}) |> Accounts.register_user()
+
+      assert %{
+               password: ["can't be blank"],
+               email: ["can't be blank"]
+             } = errors_on(changeset)
+    end
+
+    test "validates email and password when given" do
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "invalid_data", %{email: "not valid", password: "not valid"}) |> Accounts.register_user()
+
+      assert %{
+               email: ["must have the @ sign and no spaces"],
+               password: ["must be between 10 and 80 characters"]
+             } = errors_on(changeset)
+    end
+
+    test "validates maximum values for email and password for security" do
+      too_long = String.duplicate("db", 100)
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "long_data", %{email: too_long, password: too_long}) |> Accounts.register_user()
+      assert "should be at most 160 character(s)" in errors_on(changeset).email
+      assert "must be between 10 and 80 characters" in errors_on(changeset).password
+    end
+
+    test "validates email uniqueness" do
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "duplicate_email") |> Accounts.register_user()
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "duplicate_email") |> Accounts.register_user()
+      assert "has already been taken" in errors_on(changeset).email
+
+      # Now try with the upper cased email too, to check that email case is ignored.
+      {:error, changeset} = Test.Fixtures.user_attrs(@admin, "duplicate_email", %{email: String.upcase(user.email)}) |> Accounts.register_user()
+      assert "has already been taken" in errors_on(changeset).email
+    end
+
+    test "registers users with a hashed password" do
+      email = unique_user_email()
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
+      assert user.email == email
+      assert is_binary(user.hashed_password)
+      assert is_nil(user.confirmed_at)
+      assert is_nil(user.password)
+    end
+
+    test "has an audit log" do
+      email = unique_user_email()
+      {:ok, user} = Test.Fixtures.user_attrs(@admin, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
+
+      assert_recent_audit_log(user, @admin, %{
+        "tid" => "user",
+        "name" => "user",
+        "password" => "<<REDACTED>>",
+        "email" => email
+      })
+    end
   end
 
   describe "get_user_by_email/1" do
@@ -74,69 +166,6 @@ defmodule Epicenter.AccountsTest do
     test "returns the user with the given id" do
       %{id: id} = user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       assert %User{id: ^id} = Accounts.get_user!(user.id)
-    end
-  end
-
-  describe "register_user/1" do
-    setup do
-      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
-      %{creator: creator}
-    end
-
-    test "requires email and password to be set" do
-      {:error, changeset} = Accounts.register_user({%{}, Test.Fixtures.admin_audit_meta()})
-
-      assert %{
-               password: ["can't be blank"],
-               email: ["can't be blank"]
-             } = errors_on(changeset)
-    end
-
-    test "validates email and password when given" do
-      {:error, changeset} = Accounts.register_user({%{email: "not valid", password: "not valid"}, Test.Fixtures.admin_audit_meta()})
-
-      assert %{
-               email: ["must have the @ sign and no spaces"],
-               password: ["must be between 10 and 80 characters"]
-             } = errors_on(changeset)
-    end
-
-    test "validates maximum values for email and password for security" do
-      too_long = String.duplicate("db", 100)
-      {:error, changeset} = Accounts.register_user({%{email: too_long, password: too_long}, Test.Fixtures.admin_audit_meta()})
-      assert "should be at most 160 character(s)" in errors_on(changeset).email
-      assert "must be between 10 and 80 characters" in errors_on(changeset).password
-    end
-
-    test "validates email uniqueness", %{creator: creator} do
-      %{email: email} = Test.Fixtures.user_attrs(creator, "user") |> Accounts.register_user!()
-      {:error, changeset} = Accounts.register_user({%{email: email}, Test.Fixtures.admin_audit_meta()})
-      assert "has already been taken" in errors_on(changeset).email
-
-      # Now try with the upper cased email too, to check that email case is ignored.
-      {:error, changeset} = Accounts.register_user({%{email: String.upcase(email)}, Test.Fixtures.admin_audit_meta()})
-      assert "has already been taken" in errors_on(changeset).email
-    end
-
-    test "registers users with a hashed password", %{creator: creator} do
-      email = unique_user_email()
-      {:ok, user} = Test.Fixtures.user_attrs(creator, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
-      assert user.email == email
-      assert is_binary(user.hashed_password)
-      assert is_nil(user.confirmed_at)
-      assert is_nil(user.password)
-    end
-
-    test "has an audit log", %{creator: creator} do
-      email = unique_user_email()
-      {:ok, user} = Test.Fixtures.user_attrs(creator, "user", email: email, password: valid_user_password()) |> Accounts.register_user()
-
-      assert_recent_audit_log(user, creator, %{
-        "tid" => "user",
-        "name" => "user",
-        "password" => "<<REDACTED>>",
-        "email" => email
-      })
     end
   end
 
@@ -389,7 +418,8 @@ defmodule Epicenter.AccountsTest do
     end
 
     test "generates a reasonable expiration date", %{token: user_token} do
-      assert user_token.expires_at == user_token.inserted_at |> DateTime.add(UserToken.default_token_lifetime())
+      expected_expires_at = user_token.inserted_at |> DateTime.add(UserToken.default_token_lifetime())
+      assert_datetime_approximate(user_token.expires_at, expected_expires_at)
     end
   end
 
@@ -606,6 +636,30 @@ defmodule Epicenter.AccountsTest do
       assert_recent_audit_log(user, user, %{
         "password" => "<<REDACTED>>"
       })
+    end
+  end
+
+  describe "update_user/2" do
+    setup do
+      [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]
+    end
+
+    test "updates the provided user with a user admin", %{user: user} do
+      assert {:ok, _} = Accounts.update_user(user, %{admin: true, name: "Cool Admin"}, Test.Fixtures.audit_meta(@admin))
+      assert Accounts.get_user!(user.id).admin
+      assert Accounts.get_user!(user.id).name == "Cool Admin"
+      assert_revision_count(user, 2)
+      assert_recent_audit_log(user, @admin, %{"name" => "Cool Admin"})
+    end
+
+    test "fails when originator is not admin", %{user: user} do
+      {:ok, phoney} = Test.Fixtures.user_attrs(@admin, "phoney") |> Accounts.register_user()
+
+      assert {:error, :admin_privileges_required} = Accounts.update_user(user, %{admin: true, name: "Cool Admin"}, Test.Fixtures.audit_meta(phoney))
+
+      assert_revision_count(user, 1)
+      refute Accounts.get_user!(user.id).admin
+      assert Accounts.get_user!(user.id).name == "user"
     end
   end
 

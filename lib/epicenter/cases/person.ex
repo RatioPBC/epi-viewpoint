@@ -28,12 +28,11 @@ defmodule Epicenter.Cases.Person do
     field :external_id, :string
     field :fingerprint, :string
     field :first_name, :string
-    field :gender_identity, :string
+    field :gender_identity, {:array, :string}
     field :last_name, :string
     field :marital_status, :string
     field :notes, :string
     field :occupation, :string
-    field :originator, :map, virtual: true
     field :preferred_language, :string
     field :race, :string
     field :seq, :integer
@@ -78,6 +77,7 @@ defmodule Epicenter.Cases.Person do
     person
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
     |> cast_embed(:ethnicity, with: &Ethnicity.changeset/2)
+    |> cast_assoc(:addresses, with: &Address.changeset/2)
     |> cast_assoc(:emails, with: &Email.changeset/2)
     |> cast_assoc(:phones, with: &Phone.changeset/2)
     |> validate_required(@required_attrs)

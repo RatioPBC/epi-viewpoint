@@ -34,6 +34,29 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
   end
 
   #
+  # address
+  #
+
+  def assert_address_form(%View{} = view, expected_addresses) do
+    assert addresses(view) == expected_addresses
+    view
+  end
+
+  def click_add_address_button(%View{} = view) do
+    view |> render_click("add-address")
+    view
+  end
+
+  def addresses(%View{} = view) do
+    view
+    |> Pages.parse()
+    |> Test.Html.all("[data-role=street-input]", fn element ->
+      {Test.Html.attr(element, "name") |> Euclid.Extra.List.first(), Test.Html.attr(element, "value") |> Euclid.Extra.List.first("")}
+    end)
+    |> Map.new()
+  end
+
+  #
   # email address
   #
 

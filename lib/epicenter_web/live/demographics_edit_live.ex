@@ -1,22 +1,53 @@
 defmodule EpicenterWeb.DemographicsEditLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.Extra
   alias Epicenter.Format
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
-    person = %{Cases.get_person(id) | originator: socket.assigns.current_user.id}
-    changeset = person |> Cases.change_person(%{}) |> hard_code_gender_identity()
+    person = Cases.get_person(id)
+    changeset = person |> Cases.change_person(%{})
 
     socket
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign(changeset: changeset)
     |> assign(person: person)
+    |> assign(confirmation_prompt: nil)
     |> ok()
+  end
+
+  def handle_event("form-change", %{"person" => person_params} = form_state, socket) do
+    new_ethnicity = get_or_update_ethnicity_from_changeset(socket.assigns.changeset, form_state)
+
+    new_changeset =
+      socket.assigns.person
+      |> Cases.change_person(person_params)
+
+    # TODO unchecking the last gender box doesn't work unless you add this commented code back
+    #    new_changeset =
+    #      case person_params do
+    #        %{"gender_identity" => _} -> new_changeset
+    #        _ -> Map.put(new_changeset, "gender_identity", [])
+    #      end
+
+    new_changeset =
+      case person_params do
+        %{"ethnicity" => _ethnicity} ->
+          new_changeset
+          |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
+
+        _ ->
+          new_changeset
+      end
+
+    socket |> assign(:changeset, new_changeset) |> assign_confirmation_prompt |> noreply()
   end
 
   def handle_event("submit", %{"person" => person_params} = _params, socket) do
@@ -40,8 +71,25 @@ defmodule EpicenterWeb.DemographicsEditLive do
     end
   end
 
-  defp hard_code_gender_identity(%{data: data} = changeset) do
-    %{changeset | data: %{data | gender_identity: ["Female"]}}
+  defp get_or_update_ethnicity_from_changeset(changeset, form_params) do
+    old_form_state = expected_person_params_from_changeset(changeset)
+
+    old_major_ethnicity = old_form_state && old_form_state.major
+    new_major_ethnicity = form_params["person"]["ethnicity"]["major"]
+
+    old_detailed_ethnicity = old_form_state && old_form_state.detailed
+    new_detailed_ethnicity = form_params["person"]["ethnicity"]["detailed"]
+
+    cond do
+      old_major_ethnicity != new_major_ethnicity and old_major_ethnicity == "hispanic_latinx_or_spanish_origin" ->
+        %{major: new_major_ethnicity, detailed: %{}}
+
+      old_detailed_ethnicity != new_detailed_ethnicity and Euclid.Exists.present?(new_detailed_ethnicity) ->
+        %{major: "hispanic_latinx_or_spanish_origin", detailed: new_detailed_ethnicity}
+
+      true ->
+        form_params["person"]["ethnicity"]
+    end
   end
 
   def gender_identity_options() do
@@ -65,6 +113,50 @@ defmodule EpicenterWeb.DemographicsEditLive do
     ]
   end
 
-  def gender_identity_is_checked() do
+  @detailed_ethnicity_mapping %{
+    "hispanic_latinx_or_spanish_origin" => [
+      {"mexican_mexican_american_chicanx", "Mexican, Mexican American, Chicano/a"},
+      {"puerto_rican", "Puerto Rican"},
+      {"cuban", "Cuban"},
+      {"another_hispanic_latinx_or_spanish_origin", "Another Hispanic, Latino/a or Spanish origin"}
+    ]
+  }
+
+  def detailed_ethnicity_options(major_ethnicity),
+    do: @detailed_ethnicity_mapping[major_ethnicity] || []
+
+  def detailed_ethnicity_checked(%Ecto.Changeset{} = changeset, detailed_ethnicity),
+    do: changeset |> Extra.Changeset.get_field_from_changeset(:ethnicity) |> detailed_ethnicity_checked(detailed_ethnicity)
+
+  def detailed_ethnicity_checked(%{detailed: nil}, _detailed_ethnicity),
+    do: false
+
+  def detailed_ethnicity_checked(%{detailed: detailed_ethnicities}, detailed_ethnicity),
+    do: detailed_ethnicity in detailed_ethnicities
+
+  def detailed_ethnicity_checked(_, _),
+    do: false
+
+  def gender_identity_checked(changeset, gender_identity_option) do
+    case changeset |> Extra.Changeset.get_field_from_changeset(:gender_identity) do
+      nil -> false
+      gender_list -> gender_identity_option in gender_list
+    end
+  end
+
+  def gender_identity_is_checked(),
+    do: nil
+
+  defp expected_person_params_from_changeset(changeset),
+    do: changeset |> Extra.Changeset.get_field_from_changeset(:ethnicity)
+
+  defp assign_confirmation_prompt(socket) do
+    prompt =
+      case socket.assigns.changeset do
+        nil -> nil
+        _changeset -> abandon_changes_confirmation_text()
+      end
+
+    socket |> assign(confirmation_prompt: prompt)
   end
 end

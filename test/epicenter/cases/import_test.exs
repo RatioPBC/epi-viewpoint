@@ -11,6 +11,7 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Repo
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
   setup do
     [originator: Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()]
@@ -31,7 +32,7 @@ defmodule Epicenter.Cases.ImportTest do
                  contents: """
                  search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
                  Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
-                 Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
                  """
                }
                |> Import.import_csv(originator)
@@ -46,6 +47,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.test_type == "TestTest"
       assert lab_result_1.tid == "alice-result-1"
       assert lab_result_1.request_facility_name == "Lab Co South"
+      assert lab_result_1.source == "import"
 
       assert lab_result_2.result == "negative"
       assert lab_result_2.sampled_on == ~D[2020-06-06]
@@ -54,6 +56,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_2.test_type == nil
       assert lab_result_2.tid == "billy-result-1"
       assert lab_result_2.request_facility_name == nil
+      assert lab_result_2.source == "import"
 
       [alice, billy] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
       assert alice.dob == ~D[1970-01-01]
@@ -61,6 +64,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.first_name == "Alice"
       assert alice.last_name == "Testuser"
       assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.phones |> pluck(:source) == ["import"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
       assert alice.ethnicity.major == "hispanic_latinx_or_spanish_origin"
@@ -76,7 +80,13 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.last_name == "Testuser"
       assert length(billy.phones) == 0
       assert billy.tid == "billy"
-      assert billy.addresses |> pluck(:full_address) == ["1234 Test St, City, TS 00000"]
+      assert billy.ethnicity.major == "unknown"
+      assert billy.ethnicity.detailed == []
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:street) == ["1234 Test St"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
+      assert billy.addresses |> Euclid.Extra.Enum.pluck(:source) == ["import"]
       assert_revision_count(billy, 1)
     end
 
@@ -147,6 +157,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.test_type == "TestTest"
       assert lab_result_1.tid == "alice-result-1"
       assert lab_result_1.request_facility_name == "Lab Co South"
+      assert lab_result_1.source == "import"
 
       [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
       assert alice.dob == ~D[1970-01-01]
@@ -154,6 +165,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.first_name == "Alice"
       assert alice.last_name == "Testuser"
       assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.phones |> pluck(:source) == ["import"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
       assert alice.ethnicity.major == "hispanic_latinx_or_spanish_origin"
@@ -192,6 +204,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.test_type == "TestTest"
       assert lab_result_1.tid == "alice-result-1"
       assert lab_result_1.request_facility_name == "Lab Co South"
+      assert lab_result_1.source == "import"
 
       [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses()
       assert alice.dob == ~D[1970-01-01]
@@ -199,6 +212,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.first_name == "Alice"
       assert alice.last_name == "Testuser"
       assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.phones |> pluck(:source) == ["import"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
       assert alice.ethnicity.major == "hispanic_latinx_or_spanish_origin"
@@ -225,7 +239,7 @@ defmodule Epicenter.Cases.ImportTest do
                  contents: """
                  search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13,      occupation_18   , race_12
                  Alice              , Testuser          , 03/01/1990    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino , Rocket Scientist, Asian Indian
-                 Billy              , Testuser          ,               , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , positive  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000             ,                      ,             , bill      ,       ,                  ,                 ,
+                 Billy              , Testuser          ,               , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , positive  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000             ,                      ,             , bill      ,       ,                  ,                 ,
                  """
                }
                |> Import.import_csv(originator)
@@ -247,6 +261,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.first_name == "Alice"
       assert alice.last_name == "Testuser"
       assert alice.phones |> pluck(:number) == ["1111111000"]
+      assert alice.phones |> pluck(:source) == ["import"]
       assert alice.tid == "alice"
       assert alice.sex_at_birth == "female"
       assert alice.ethnicity.major == "hispanic_latinx_or_spanish_origin"
@@ -288,6 +303,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.tid == "alice"
       assert alice.lab_results |> tids() == ~w{alice-result}
       assert billy_1.lab_results |> tids() == ~w{billy-1-newer-result billy-1-older-result}
+      assert billy_1.lab_results |> pluck(:source) == ~w{import import}
       assert billy_2.lab_results |> tids() == ~w{billy-2-result}
     end
 
@@ -322,7 +338,7 @@ defmodule Epicenter.Cases.ImportTest do
       |> assert_eq(~w{person-2-result-1 person-2-result-2}, ignore_order: true)
     end
 
-    test "updates existing phone number when importing a duplicate for the same person", %{
+    test "does not introduce a duplicate phone number when importing an identical phone number for the same person", %{
       originator: originator
     } do
       alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
@@ -344,7 +360,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000"]
     end
 
-    test "creates new phone number when importing a duplicate for the same person with a different phone",
+    test "creates new phone number when importing a different phone for a matched person",
          %{originator: originator} do
       alice_attrs = %{first_name: "Alice", last_name: "Testuser", dob: ~D[1970-01-01]}
 
@@ -375,28 +391,25 @@ defmodule Epicenter.Cases.ImportTest do
       Cases.create_address!(Test.Fixtures.address_attrs(originator, alice, "0", 4250, %{}))
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000"
-             ]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
 
       %{
         file_name: "test.csv",
         contents: """
         search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
-        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4250 Test St                , City               , TS                   , 00000
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4250 Test St                , City               , OH                   , 00000
         """
       }
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000"
-             ]
-
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
     end
 
@@ -409,29 +422,25 @@ defmodule Epicenter.Cases.ImportTest do
       Cases.create_address!(Test.Fixtures.address_attrs(originator, alice, "0", 4250, %{}))
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000"
-             ]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
 
       %{
         file_name: "test.csv",
         contents: """
         search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
-        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , TS                   , 00000
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , OH                   , 00000
         """
       }
       |> Import.import_csv(originator)
 
       alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
 
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:full_address) == [
-               "4250 Test St, City, TS 00000",
-               "4251 Test St, City, TS 00000"
-             ]
-
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St", "4251 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City", "City"]
-      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["TS", "TS"]
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH", "OH"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000", "00000"]
     end
   end
@@ -483,7 +492,7 @@ defmodule Epicenter.Cases.ImportTest do
           last_name: "Testuser",
           dob: ~D[1970-01-01],
           preferred_language: "AAA",
-          gender_identity: "AAA",
+          gender_identity: ["AAA"],
           marital_status: "AAA",
           employment: "AAA",
           notes: "AAA",
@@ -515,8 +524,56 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.ethnicity.major == "AAA"
       assert updated_alice.ethnicity.detailed == []
       assert updated_alice.preferred_language == "AAA"
-      assert updated_alice.gender_identity == "AAA"
+      assert updated_alice.gender_identity == ["AAA"]
       assert updated_alice.marital_status == "AAA"
+      assert updated_alice.employment == "AAA"
+      assert updated_alice.notes == "AAA"
+      assert updated_alice.assigned_to.tid == originator.tid
+    end
+
+    test "records novel information when importing a new test result for an existing person", %{
+      originator: originator
+    } do
+      alice_attrs =
+        %{
+          first_name: "Alice",
+          last_name: "Testuser",
+          dob: ~D[1970-01-01],
+          preferred_language: "AAA",
+          gender_identity: ["AAA"],
+          marital_status: nil,
+          employment: "AAA",
+          notes: "AAA",
+          sex_at_birth: "AAA",
+          race: "AAA",
+          occupation: nil
+        }
+        |> Test.Fixtures.add_demographic_attrs(%{ethnicity: %{major: "AAA", detailed: []}})
+
+      {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
+
+      {:ok, [alice]} = Cases.assign_user_to_people(user_id: originator.id, people_ids: [alice.id], audit_meta: Test.Fixtures.audit_meta(originator))
+
+      import_output =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , sex_11, race_12, occupation_18, ethnicity_13
+          Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , male  , White  , Brain Surgeon, Puerto Rican
+          """
+        }
+        |> Import.import_csv(originator)
+
+      assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
+      updated_alice = Cases.get_person(alice.id) |> Cases.preload_assigned_to()
+      assert updated_alice.sex_at_birth == "AAA"
+      assert updated_alice.race == "AAA"
+      assert updated_alice.occupation == "Brain Surgeon"
+      assert updated_alice.ethnicity.major == "AAA"
+      assert updated_alice.ethnicity.detailed == []
+      assert updated_alice.preferred_language == "AAA"
+      assert updated_alice.gender_identity == ["AAA"]
+      assert updated_alice.marital_status == nil
       assert updated_alice.employment == "AAA"
       assert updated_alice.notes == "AAA"
       assert updated_alice.assigned_to.tid == originator.tid
@@ -530,7 +587,7 @@ defmodule Epicenter.Cases.ImportTest do
         contents: """
         search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
         Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , alice      , alice-result-1 ,                       ,                    ,                     ,
-        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000
+        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000
         """
       }
 
@@ -549,7 +606,7 @@ defmodule Epicenter.Cases.ImportTest do
         contents: """
         search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6
         Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , alice      , alice-result-1 ,                       ,                    ,                     ,
-        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , TS                  , 00000
+        Billy              , Testuser          , 03/01/1990    , 1111111001    , 10001    , 06/06/2020       , 06/07/2020    , negative  , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000
         """
       }
 
@@ -577,7 +634,7 @@ defmodule Epicenter.Cases.ImportTest do
         }
         |> Import.import_csv(originator)
 
-      assert {:error, %Ecto.InvalidChangesetError{}} = result
+      assert {:error, %Ecto.Changeset{}} = result
 
       assert Cases.count_people() == 0
       assert Cases.count_lab_results() == 0
@@ -598,7 +655,7 @@ defmodule Epicenter.Cases.ImportTest do
     end
 
     test "returns an error message when the CSV is poorly formatted", %{originator: originator} do
-      {:error, message} =
+      {:error, [user_readable: message]} =
         %{
           file_name: "test.csv",
           contents: """

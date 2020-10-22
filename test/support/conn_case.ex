@@ -22,6 +22,7 @@ defmodule EpicenterWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
+      import Epicenter.Test.ChangesetAssertions
       import EpicenterWeb.ConnCase
       import EpicenterWeb.Test.LiveViewAssertions
       import Euclid.Test.Extra.Assertions
@@ -41,6 +42,11 @@ defmodule EpicenterWeb.ConnCase do
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
+  end
+
+  setup do
+    {:ok, _} = Epicenter.Test.Fixtures.admin() |> Epicenter.Accounts.change_user(%{}) |> Epicenter.Repo.insert()
+    :ok
   end
 
   @doc """

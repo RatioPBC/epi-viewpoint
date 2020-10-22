@@ -1,7 +1,20 @@
 defmodule Epicenter.Extra.ChangesetTest do
   use Epicenter.SimpleCase, async: true
 
+  import Ecto.Changeset
   alias Epicenter.Extra.Changeset
+
+  defmodule Post do
+    use Ecto.Schema
+
+    schema "posts" do
+      field :title, :string
+      field :body, :string
+    end
+  end
+
+  defp changeset(%Post{} = schema, params),
+    do: cast(schema, params, ~w(title body)a)
 
   describe "clear_validation_errors" do
     test "drops errors from top level changes" do
@@ -40,24 +53,29 @@ defmodule Epicenter.Extra.ChangesetTest do
     end
   end
 
-  describe "rewrite_changeset_error_message" do
-    test "rewrites changeset error message for given field" do
+  test "get_field_from_changeset" do
+    changeset = changeset(%Post{body: "bar"}, %{"title" => "foo"})
+
+    assert Changeset.get_field_from_changeset(changeset, :title) == "foo"
+    assert Changeset.get_field_from_changeset(changeset, :body) == "bar"
+  end
+
+  test "rewrite_changeset_error_message" do
+    %Ecto.Changeset{
+      errors: [
+        dob: {"is invalid", [type: :date, validation: :cast]},
+        address: {"can't be blank", [validation: :required]}
+      ]
+    }
+    |> Changeset.rewrite_changeset_error_message(:dob, "please enter dates as mm/dd/yyyy")
+    |> assert_eq(
       %Ecto.Changeset{
         errors: [
-          dob: {"is invalid", [type: :date, validation: :cast]},
+          dob: {"please enter dates as mm/dd/yyyy", [type: :date, validation: :cast]},
           address: {"can't be blank", [validation: :required]}
         ]
-      }
-      |> Changeset.rewrite_changeset_error_message(:dob, "please enter dates as mm/dd/yyyy")
-      |> assert_eq(
-        %Ecto.Changeset{
-          errors: [
-            dob: {"please enter dates as mm/dd/yyyy", [type: :date, validation: :cast]},
-            address: {"can't be blank", [validation: :required]}
-          ]
-        },
-        :simple
-      )
-    end
+      },
+      :simple
+    )
   end
 end

@@ -8,12 +8,13 @@ source "bin/_support/cecho.sh"
 
 set -e
 
-if ps -x -o command | grep '[/]bin/postgres -D'; then
-  cecho --yellow "${0}:" --green "Stopping postgres..."
+if ps -x -o command | grep '[/]bin/postgres -D' >/dev/null; then
+  cecho --yellow "${0}:" --bright-bold-yellow "Stopping postgres..."
   eval "$(ps -x -o command | grep '[/]bin/postgres -D' | sed 's/bin\/postgres/bin\/pg_ctl/') stop"
+  echo ""
 else
   if [[ $1 != "-q" ]]; then
-    cecho --yellow "${0}:" --red "Postgres does not seem to be running"
+    cecho --yellow "${0}:" --bright-bold-red "Postgres does not seem to be running"
     exit 1
   fi
 fi

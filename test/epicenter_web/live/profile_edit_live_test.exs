@@ -94,6 +94,122 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
   end
 
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.assert_confirmation_prompt("")
+    end
+
+    test "when the user changes the name", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.change_form(%{"first_name" => "New Name"})
+      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+
+    test "when the user changes the dob", %{conn: conn, person: person} do
+      # this case is special because the rendered dob is different than the db formatted dob
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.change_form(%{"dob" => "07/01/2001"})
+      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+
+    test "when the preferred language is other", %{conn: conn, person: person} do
+      view = Pages.ProfileEdit.visit(conn, person)
+
+      view
+      |> form("#profile-form")
+      |> render_change(
+        person: %{
+          first_name: "Aaron",
+          last_name: "Testuser2",
+          dob: "01/01/2020",
+          preferred_language: "Other",
+          other_specified_language: "Welsh"
+        }
+      )
+
+      view |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+  end
+
+  describe "addresses" do
+    test "adding address to a person", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_address_form(%{})
+      |> Pages.ProfileEdit.click_add_address_button()
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        person: %{
+          "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "OH", "postal_code" => "00000"}}
+        }
+      )
+      |> Pages.Profile.assert_addresses(["1001 Test St, City, OH 00000"])
+
+      Cases.get_person(person.id)
+      |> Cases.preload_addresses()
+      |> Map.get(:addresses)
+      |> pluck([:street, :city, :state, :postal_code])
+      |> assert_eq([
+        %{
+          street: "1001 Test St",
+          city: "City",
+          state: "OH",
+          postal_code: "00000"
+        }
+      ])
+    end
+
+    test "updating existing addresses", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.address_attrs(user, person, "address-1", 5555) |> Cases.create_address!()
+
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_address_form(%{"person[addresses][0][street]" => "5555 Test St"})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        person: %{
+          "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "OH", "postal_code" => "00000"}}
+        }
+      )
+      |> Pages.Profile.assert_addresses(["1001 Test St, City, OH 00000"])
+
+      Cases.get_person(person.id)
+      |> Cases.preload_addresses()
+      |> Map.get(:addresses)
+      |> pluck([:street, :city, :state, :postal_code])
+      |> assert_eq([
+        %{
+          street: "1001 Test St",
+          city: "City",
+          state: "OH",
+          postal_code: "00000"
+        }
+      ])
+    end
+
+    test "clicking add address button does not reset state of form", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.click_add_address_button()
+      |> Pages.ProfileEdit.change_form(%{"addresses" => %{"0" => %{"street" => "3322 Test St"}}})
+      |> Pages.ProfileEdit.click_add_address_button()
+      |> Pages.ProfileEdit.assert_address_form(%{"person[addresses][0][street]" => "3322 Test St", "person[addresses][1][street]" => ""})
+      |> Pages.ProfileEdit.assert_validation_messages(%{})
+    end
+
+    test "it doesn't save empty addresses", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_address_form(%{})
+      |> Pages.ProfileEdit.click_add_address_button()
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        person: %{
+          "addresses" => %{"0" => %{"street" => "", "city" => "", "state" => "OH", "postal_code" => ""}}
+        }
+      )
+
+      Cases.get_person(person.id)
+      |> Cases.preload_addresses()
+      |> Map.get(:addresses)
+      |> assert_eq([])
+    end
+  end
+
   describe "email addresses" do
     test "adding email address to a person", %{conn: conn, person: person} do
       Pages.ProfileEdit.visit(conn, person)
@@ -185,7 +301,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
       |> Pages.ProfileEdit.click_add_phone_button()
-      |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Cell", "Home", "Work"])
+      |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Unknown", "Cell", "Home", "Work"])
       |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
       |> Pages.Profile.assert_phone_numbers(["(111) 111-1000"])
 

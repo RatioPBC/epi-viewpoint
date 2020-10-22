@@ -25,6 +25,9 @@ defmodule Epicenter.Extra.Changeset do
     end)
   end
 
+  def get_field_from_changeset(%Ecto.Changeset{} = changeset, field),
+    do: changeset |> Ecto.Changeset.fetch_field(field) |> elem(1)
+
   def maybe_mark_for_deletion(%{data: %{id: nil}} = changeset),
     do: changeset
 

@@ -82,8 +82,33 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # demographics
   #
 
-  def assert_ethnicity(%View{} = view, expected_major_ethnicity) do
+  def assert_employment(%View{} = view, expected_status) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=employment]") == expected_status
+    view
+  end
+
+  def assert_major_ethnicity(%View{} = view, expected_major_ethnicity) do
     assert view |> Pages.parse() |> Test.Html.text("[data-role=major-ethnicity]") == expected_major_ethnicity
+    view
+  end
+
+  def assert_detailed_ethnicities(%View{} = view, expected_detailed_ethniticies) do
+    assert view |> Pages.parse() |> Test.Html.all("[data-role=detailed-ethnicity]", as: :text) == expected_detailed_ethniticies
+    view
+  end
+
+  def assert_marital_status(%View{} = view, expected_status) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=marital-status]") == expected_status
+    view
+  end
+
+  def assert_notes(%View{} = view, expected_notes) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=notes]") == expected_notes
+    view
+  end
+
+  def assert_occupation(%View{} = view, expected_occupation) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=occupation]") == expected_occupation
     view
   end
 

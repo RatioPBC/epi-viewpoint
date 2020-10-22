@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.EmailTest do
   alias Epicenter.Cases.Email
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
 
   describe "schema" do
@@ -19,6 +20,7 @@ defmodule Epicenter.Cases.EmailTest do
           {:is_preferred, :boolean},
           {:person_id, :id},
           {:seq, :integer},
+          {:source, :string},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]

@@ -1,0 +1,19 @@
+section#people-page data-page="users"
+  h2
+    #title
+      span Users
+
+  table data-role="users-table"
+    thead
+      tr data-role="table-column-names"
+        th Name
+        th Email
+        th Type
+        th Status
+    tbody
+      = for user <- @users do
+        tr
+          td= user.name
+          td= user.email
+          td= type(user)
+          td= active_status(user)

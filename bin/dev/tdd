@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+
+source "bin/_support/cecho.sh"
+
+case $1 in
+slow)
+  cecho --yellow "Running with max-cases of 2 for slow machines..."
+  mix test.watch --max-cases 2 --seed 0 --max-failures 1
+  ;;
+*)
+  mix test.watch --seed 0 --max-failures 1
+  ;;
+esac

@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.LabResultTest do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
 
   describe "schema" do
@@ -25,6 +26,7 @@ defmodule Epicenter.Cases.LabResultTest do
           {:result, :string},
           {:sampled_on, :date},
           {:seq, :integer},
+          {:source, :string},
           {:test_type, :string},
           {:tid, :string},
           {:updated_at, :naive_datetime}
@@ -48,11 +50,19 @@ defmodule Epicenter.Cases.LabResultTest do
 
     test "attributes" do
       changes =
-        new_changeset(analyzed_on: ~D[2020-09-10], reported_on: ~D[2020-09-11], sampled_on: ~D[2020-09-12], result: "positive", test_type: "PCR").changes
+        new_changeset(
+          analyzed_on: ~D[2020-09-10],
+          reported_on: ~D[2020-09-11],
+          sampled_on: ~D[2020-09-12],
+          result: "positive",
+          test_type: "PCR",
+          source: "form"
+        ).changes
 
       assert changes.analyzed_on == ~D[2020-09-10]
       assert changes.reported_on == ~D[2020-09-11]
       assert changes.result == "positive"
+      assert changes.source == "form"
       assert changes.test_type == "PCR"
     end
   end

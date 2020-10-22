@@ -7,3 +7,11 @@ defmodule Epicenter.DateParsingError do
 
   def message(%{user_readable: user_readable}), do: user_readable
 end
+
+defmodule Epicenter.AdminRequiredError do
+  @moduledoc """
+  Raised when an unprivileged user attempts to perform an admin action.
+  """
+  defexception []
+  def message(%{}), do: "Action can only be performed by administrators"
+end

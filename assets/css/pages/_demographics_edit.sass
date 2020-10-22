@@ -3,6 +3,43 @@
 #demographics-edit-page
   @include vertical-flow
 
-  #gender-identity-options
-    label
-      display: block
+  #demographics-edit
+
+    header
+      @include h2
+
+    #demographics-form
+
+      .subheader
+        @include h4
+
+    #option-set
+
+      label
+        display: block
+
+      .gender-identity-option
+        @include level
+
+      .ethnicity-option
+        @include level
+
+      .detailed-ethnicity-options
+        padding-left: 3rem
+
+      #occupation-input, #notes-input
+        display: block
+
+    #nav
+      @include level
+      border-top: 2px solid $divider-color
+      position: fixed
+      padding: 1rem 2rem 2rem 2rem
+      bottom: 0
+      left: 0
+      right: 0
+      background-color: white
+
+      #submit-form
+        @include button-primary
+

@@ -60,7 +60,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.assert_preferred_language("English")
       |> Pages.Profile.assert_phone_numbers(["(111) 111-1001", "(111) 111-1000"])
       |> Pages.Profile.assert_email_addresses(["alice-preferred@example.com", "alice-a@example.com"])
-      |> Pages.Profile.assert_addresses(["2000 Test St, City, TS 00000", "1000 Test St, City, TS 00000home"])
+      |> Pages.Profile.assert_addresses(["2000 Test St, City, OH 00000", "1000 Test St, City, OH 00000"])
     end
 
     test "email_addresses", %{person: person} do
@@ -184,7 +184,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       ])
 
       # choose "assignee" via show page
-      assert_select_dropdown_options(view: show_page_live, data_role: "users", expected: ["Unassigned", "assignee", "user"])
+      assert_select_dropdown_options(view: show_page_live, data_role: "users", expected: ["Unassigned", "assignee", "fixture admin", "user"])
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
       assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
@@ -239,7 +239,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice, user: user} do
       socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
-      assert_role_text(show_page_live, "addresses", "1000 Test St, City, TS 00000 home")
+      assert_role_text(show_page_live, "addresses", "1000 Test St, City, OH 00000")
 
       Test.Fixtures.address_attrs(user, alice, "address2", 2000) |> Cases.create_address!()
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}]}, socket)
@@ -297,6 +297,15 @@ defmodule EpicenterWeb.ProfileLiveTest do
       %{ethnicity: %{major: "unknown"}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
       %{ethnicity: %{major: nil}} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
       %{ethnicity: nil} |> ProfileLive.ethnicity_value() |> assert_eq("Unknown")
+    end
+  end
+
+  describe "detailed_ethnicities" do
+    test "safely gets list of detailed ethnicities from person" do
+      %{ethnicity: %{detailed: ["foo", "bar"]}} |> ProfileLive.detailed_ethnicities() |> assert_eq(["foo", "bar"])
+      %{ethnicity: %{detailed: []}} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
+      %{ethnicity: %{detailed: nil}} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
+      %{ethnicity: nil} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
     end
   end
 end

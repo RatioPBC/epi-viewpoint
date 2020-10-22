@@ -9,6 +9,7 @@ defmodule Epicenter.Cases.PersonTest do
   alias Epicenter.Cases.Person
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
 
   describe "schema" do
@@ -23,7 +24,7 @@ defmodule Epicenter.Cases.PersonTest do
           {:external_id, :string},
           {:fingerprint, :string},
           {:first_name, :string},
-          {:gender_identity, :string},
+          {:gender_identity, :array},
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:last_name, :string},
@@ -82,8 +83,7 @@ defmodule Epicenter.Cases.PersonTest do
 
   describe "changeset" do
     defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      default_attrs = Test.Fixtures.raw_person_attrs(user, "alice") |> Test.Fixtures.add_demographic_attrs()
+      default_attrs = Test.Fixtures.raw_person_attrs("alice") |> Test.Fixtures.add_demographic_attrs()
       Person.changeset(%Person{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
     end
 
@@ -113,7 +113,7 @@ defmodule Epicenter.Cases.PersonTest do
     test "demographic attributes" do
       changes = new_changeset(%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}}).changes
       assert changes.employment == "Part time"
-      assert changes.gender_identity == "Female"
+      assert changes.gender_identity == ["Female"]
       assert changes.marital_status == "Single"
       assert changes.notes == "lorem ipsum"
       assert changes.occupation == "architect"
@@ -133,6 +133,24 @@ defmodule Epicenter.Cases.PersonTest do
     test "validates personal health information on last_name", do: assert_invalid(new_changeset(last_name: "Aliceblat"))
 
     test "generates a fingerprint", do: assert(new_changeset(%{}).changes.fingerprint == "2000-01-01 alice testuser")
+
+    test "associations - emails" do
+      email_changeset = new_changeset(%{emails: [%{address: "othertest@example.com"}]}).changes.emails |> Euclid.Extra.List.first()
+      assert email_changeset.changes.address == "othertest@example.com"
+    end
+
+    test "associations - phones" do
+      phone_changeset = new_changeset(%{phones: [%{number: "1111111003"}]}).changes.phones |> Euclid.Extra.List.first()
+      assert phone_changeset.changes.number == "1111111003"
+    end
+
+    test "associations - address" do
+      address_changeset =
+        new_changeset(%{addresses: [%{street: "1023 Test St", city: "City7", state: "ZB", postal_code: "00002"}]}).changes.addresses
+        |> Euclid.Extra.List.first()
+
+      assert %{street: "1023 Test St", city: "City7", state: "ZB", postal_code: "00002"} = address_changeset.changes
+    end
   end
 
   describe "constraints" do

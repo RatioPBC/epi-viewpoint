@@ -1,8 +1,23 @@
 defmodule Epicenter.Format do
+  alias Epicenter.Cases.Address
   alias Epicenter.Cases.Phone
+  alias Euclid.Extra
+
+  def address(nil), do: ""
+
+  def address(%Address{street: street, city: city, state: state, postal_code: postal_code}) do
+    non_postal_code = [street, city, state] |> Extra.List.compact() |> Enum.join(", ")
+    [non_postal_code, postal_code] |> Extra.List.compact() |> Enum.join(" ")
+  end
+
+  def employment(nil), do: nil
+  def employment(employment), do: employment |> String.replace("_", " ") |> String.capitalize()
 
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
+
+  def marital_status(nil), do: nil
+  def marital_status(marital_status), do: marital_status |> String.capitalize()
 
   def person(nil), do: ""
   def person(%{first_name: first_name, last_name: last_name}), do: [first_name, last_name] |> Euclid.Exists.join(" ")

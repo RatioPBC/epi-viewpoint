@@ -11,12 +11,25 @@ source "bin/_support/cecho.sh"
 
 set -e
 
-pgdir="$(pwd)/priv/postgres"
-datadir="${pgdir}/data"
-mkdir -p ${datadir}
+if eval "asdf plugin-list | grep postgres > /dev/null 2>&1"; then
+  pgdir="$(pwd)/priv/postgres"
+  postgres_path="$(asdf where postgres)"
+  log_path="${pgdir}/logfile"
+  datadir="${pgdir}/data"
+  mkdir -p ${datadir}
+else
+  cecho --yellow "${0}:" --bright-bold-red "asdf postgres plugin not found"
+  exit 1
+fi
 
 if [[ -f ${datadir}/PG_VERSION ]]; then
-  $(asdf where postgres)/bin/pg_ctl -D ${datadir} -l ${pgdir}/logfile start
+  cecho --yellow "${0}:" --bold-bright-yellow "Starting postgres..."
+  cecho --white "postgres:" --bold-bright-white "${postgres_path}"
+  cecho --white "data dir:" --bold-bright-white "${datadir}"
+  cecho --white "log file:" --bold-bright-white "${log_path}"
+  echo ""
+  "${postgres_path}/bin/pg_ctl" -D ${datadir} -l "${log_path}" start
+  echo ""
 else
   cecho --yellow "${0}:" --bright-bold-red "${datadir}" --red "does not seem to be a postgres data directory"
   cecho --yellow "Try running" --bright-bold-white "pg_ctl -D ${datadir} initdb"

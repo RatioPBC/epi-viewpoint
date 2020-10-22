@@ -8,11 +8,14 @@ defmodule Epicenter.AuditLogTest do
   alias Epicenter.Cases.Person
   alias Epicenter.Test
 
+  setup :persist_admin
+  @admin Test.Fixtures.admin()
+
   describe "inserting" do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       {attrs_to_change_1, _audit_meta} = Test.Fixtures.person_attrs(user, "alice")
       changeset_1 = Cases.change_person(%Person{}, attrs_to_change_1)
 
@@ -85,7 +88,7 @@ defmodule Epicenter.AuditLogTest do
 
     test "omits mfa_secret from the revision" do
       mfa_secret = "123456"
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       mfa_changeset = user |> Epicenter.Accounts.User.mfa_changeset(%{"mfa_secret" => mfa_secret})
 
       {:ok, _updated_user} =
@@ -115,7 +118,7 @@ defmodule Epicenter.AuditLogTest do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       person_id = person.id
       attrs_to_change = Test.Fixtures.add_demographic_attrs(%{})
@@ -172,7 +175,7 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "handling nested changesets (adding an email)" do
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
 
       person_params = %{
@@ -226,8 +229,76 @@ defmodule Epicenter.AuditLogTest do
       )
     end
 
+    test "handling nested changesets (updating an email)" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      person_params = %{
+        dob: "1970-01-01",
+        emails: %{
+          "0" => %{
+            "address" => "a@example.com",
+            "delete" => "false",
+          }
+        },
+        other_specified_language: "",
+        preferred_language: "English"
+      }
+      person = Test.Fixtures.person_attrs(user, "alice" , person_params) |> Cases.create_person!() |> Cases.preload_emails()
+
+      update_email_params = %{
+        "emails" => %{
+          "0" => %{
+            "address" => "a+test@example.com",
+            "delete" => "false",
+            "person_id" => person.id,
+            "id" => person |> Map.get(:emails) |> Euclid.Extra.List.first() |> Map.get(:id)
+          }
+        }
+      }
+      changeset = Cases.change_person(person, update_email_params)
+
+      updated_person =
+        AuditLog.update!(
+          changeset,
+          %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
+        )
+
+      assert [%{address: "a+test@example.com", id: email_id}] = updated_person.emails
+
+      assert_audit_logged(person)
+
+      assert_recent_audit_log(person, user, %{
+        "emails" => [%{"address" => "a+test@example.com"}],
+      })
+
+      assert_recent_audit_log_snapshots(
+        person,
+        user,
+        %{"emails" => [
+            %{
+              "address" => "a@example.com",
+              "delete" => false,
+              "is_preferred" => nil,
+              "person_id" => person.id,
+              "tid" => nil
+            }]},
+        %{
+          "emails" => [
+            %{
+              "address" => "a+test@example.com",
+              "delete" => false,
+              "is_preferred" => nil,
+              "person_id" => person.id,
+              "tid" => nil
+            }
+          ]
+        }
+      )
+
+      assert %{"emails" => [%{"id" => ^email_id}]} = recent_audit_log(person).change
+    end
+
     test "returns {:error, changeset} when changeset is invalid" do
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_emails()
 
       person_params = %{
@@ -249,7 +320,7 @@ defmodule Epicenter.AuditLogTest do
 
   describe "audit log and change are in the same transaction" do
     test "it doesn't save the insert if the audit log entry fails" do
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       changeset = %Person{} |> Cases.change_person(elem(Test.Fixtures.person_attrs(user, "tid"), 0))
       people_count_before = Cases.count_people()
       audit_log_count_before = AuditLog.revisions(Cases.Person) |> length()
@@ -274,7 +345,7 @@ defmodule Epicenter.AuditLogTest do
     test "it doesn't save the update if the audit log entry fails" do
       [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "user") |> Accounts.register_user!()
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       person_id = person.id
       attrs_to_change = Test.Fixtures.add_demographic_attrs(%{preferred_language: "preferred_language"})

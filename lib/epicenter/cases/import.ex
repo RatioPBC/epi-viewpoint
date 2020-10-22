@@ -62,13 +62,14 @@ defmodule Epicenter.Cases.Import do
       try do
         Cases.create_imported_file(in_audit_tuple(file, originator, AuditLog.Revision.import_csv_action()))
 
-        case Csv.read(file.contents, &rename_headers/1, @fields) do
-          {:ok, rows} ->
-            rows
-            |> transform_dates()
-            |> reject_rows_with_blank_key_values("dob")
-            |> import_rows(originator)
-
+        with {:ok, rows} <- Csv.read(file.contents, &rename_headers/1, @fields),
+             {:transform_dates, {:ok, rows}} <- {:transform_dates, transform_dates(rows)},
+             rows = reject_rows_with_blank_key_values(rows, "dob") do
+          case import_rows(rows, originator) do
+            {:ok, import_info} -> import_info
+            {:error, other} -> Repo.rollback(other)
+          end
+        else
           {:error, :missing_headers, headers} ->
             inverse_key_map = @key_map |> Enum.map(fn {k, v} -> {v, k} end) |> Map.new()
 
@@ -80,15 +81,15 @@ defmodule Epicenter.Cases.Import do
               |> Enum.join(", ")
 
             Repo.rollback(user_readable: "Missing required columns: #{headers_string}")
+
+          {:invalid_csv, message} ->
+            Repo.rollback(user_readable: "Invalid CSV: \n #{message}")
+
+          {:transform_dates, {:error, message}} ->
+            Repo.rollback(message)
         end
       rescue
-        error in NimbleCSV.ParseError ->
-          Repo.rollback(error.message)
-
         error in Ecto.InvalidChangesetError ->
-          Repo.rollback(error)
-
-        error in Epicenter.DateParsingError ->
           Repo.rollback(error)
       end
     end)
@@ -119,52 +120,110 @@ defmodule Epicenter.Cases.Import do
   end
 
   defp transform_dates(rows) do
-    date_parser = &DateParser.parse_mm_dd_yyyy!/1
-    Enum.map(rows, &Euclid.Extra.Map.transform(&1, @date_fields, date_parser))
+    Enum.reduce(rows, {:ok, []}, fn
+      row, {:ok, rows} ->
+        case transform_dates_row(row) do
+          {:ok, row} -> {:ok, rows ++ [row]}
+          other -> other
+        end
+
+      _, other ->
+        other
+    end)
+  end
+
+  defp transform_dates_row(row) do
+    date_parser = &DateParser.parse_mm_dd_yyyy/1
+
+    Enum.reduce(@date_fields, {:ok, row}, fn
+      date_field, {:ok, row} ->
+        case date_parser.(Map.get(row, date_field)) do
+          {:ok, date} -> {:ok, Map.put(row, date_field, date)}
+          other -> other
+        end
+
+      _, other ->
+        other
+    end)
   end
 
   defp import_rows({importable_rows, error_messages}, originator) do
     result =
       for row <- importable_rows, reduce: %{people: MapSet.new(), lab_results: MapSet.new()} do
         %{people: people, lab_results: lab_results} ->
-          %{person: person, lab_result: lab_result} = import_row(row, originator)
-          %{people: MapSet.put(people, person.id), lab_results: MapSet.put(lab_results, lab_result.id)}
+          case import_row(row, originator) do
+            %{person: person, lab_result: lab_result} ->
+              %{people: MapSet.put(people, person.id), lab_results: MapSet.put(lab_results, lab_result.id)}
+
+            other ->
+              other
+          end
+
+        other ->
+          other
       end
 
-    import_info = %ImportInfo{
-      imported_people: result.people |> MapSet.to_list() |> Cases.get_people(),
-      imported_person_count: MapSet.size(result.people),
-      imported_lab_result_count: MapSet.size(result.lab_results),
-      skipped_row_count: length(error_messages),
-      skipped_row_error_messages: error_messages,
-      total_person_count: Cases.count_people(),
-      total_lab_result_count: Cases.count_lab_results()
-    }
-
-    import_info
+    with %{people: people, lab_results: lab_results} <- result do
+      {:ok,
+       %ImportInfo{
+         imported_people: people |> MapSet.to_list() |> Cases.get_people(),
+         imported_person_count: MapSet.size(result.people),
+         imported_lab_result_count: MapSet.size(lab_results),
+         skipped_row_count: length(error_messages),
+         skipped_row_error_messages: error_messages,
+         total_person_count: Cases.count_people(),
+         total_lab_result_count: Cases.count_lab_results()
+       }}
+    end
   end
 
   defp import_row(row, originator) do
-    person = import_person(row, originator)
-    lab_result = import_lab_result(row, person, originator)
-    import_phone_number(row, person, originator)
-    import_address(row, person, originator)
-    %{person: person, lab_result: lab_result}
+    person = Cases.find_matching_person(row)
+
+    with {:ok, person} <- import_person(person, row, originator) do
+      lab_result = import_lab_result(row, person, originator)
+      import_phone_number(row, person, originator)
+      import_address(row, person, originator)
+      %{person: person, lab_result: lab_result}
+    end
   end
 
-  defp import_person(row, originator) do
-    row
-    |> Map.take(@person_db_fields_to_insert)
-    |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-    |> Ethnicity.build_attrs()
-    |> in_audit_tuple(originator, AuditLog.Revision.upsert_person_action())
-    |> Cases.upsert_person!()
+  defp import_person(person, row, originator) do
+    attrs =
+      row
+      |> Map.take(@person_db_fields_to_insert)
+      |> Euclid.Extra.Map.rename_key("person_tid", "tid")
+      |> Ethnicity.build_attrs()
+      |> strip_updates_to_existing_data(person)
+
+    changes = in_audit_tuple(attrs, originator, AuditLog.Revision.upsert_person_action())
+
+    if person do
+      Cases.update_person(person, changes)
+    else
+      Cases.create_person(changes)
+    end
+  end
+
+  defp strip_updates_to_existing_data(row, nil), do: row
+
+  defp strip_updates_to_existing_data(row, person) do
+    keys =
+      Enum.reduce(row, [], fn {key, _value}, update_keys ->
+        case Map.get(person, key |> String.to_atom()) do
+          nil -> [key | update_keys]
+          _ -> update_keys
+        end
+      end)
+
+    Map.take(row, keys)
   end
 
   defp import_lab_result(row, person, author) do
     row
     |> Map.take(@lab_result_db_fields_to_insert)
     |> Map.put("person_id", person.id)
+    |> Map.put("source", "import")
     |> in_audit_tuple(author, AuditLog.Revision.upsert_lab_result_action())
     |> Cases.upsert_lab_result!()
   end
@@ -172,7 +231,7 @@ defmodule Epicenter.Cases.Import do
   defp import_phone_number(row, person, author) do
     if Euclid.Exists.present?(Map.get(row, "phonenumber")) do
       Cases.upsert_phone!(
-        %{number: Map.get(row, "phonenumber"), person_id: person.id}
+        %{number: Map.get(row, "phonenumber"), person_id: person.id, source: "import"}
         |> in_audit_tuple(author, AuditLog.Revision.upsert_phone_number_action())
       )
     end
@@ -183,7 +242,7 @@ defmodule Epicenter.Cases.Import do
 
     if Euclid.Exists.any?(address_components) do
       Cases.upsert_address!(
-        %{full_address: "#{street}, #{city}, #{state} #{zip}", street: street, city: city, state: state, postal_code: zip, person_id: person.id}
+        %{street: street, city: city, state: state, postal_code: zip, person_id: person.id, source: "import"}
         |> in_audit_tuple(author, AuditLog.Revision.upsert_address_action())
       )
     end

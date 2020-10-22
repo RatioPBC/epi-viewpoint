@@ -98,6 +98,19 @@ defmodule EpicenterWeb.UserAuth do
     end
   end
 
+  def require_admin(conn, _opts) do
+    cond do
+      conn.assigns[:current_user].admin ->
+        conn
+
+      true ->
+        conn
+        |> put_status(:forbidden)
+        |> text("Forbidden")
+        |> halt()
+    end
+  end
+
   def require_authenticated_user_without_mfa(conn, _opts) do
     require_authenticated_user(conn, mfa_required?: false)
   end

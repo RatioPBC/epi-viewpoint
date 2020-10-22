@@ -2,7 +2,7 @@
 
   section
     header#subnav
-      = live_redirect "Records", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
+      = live_redirect "Index cases", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
       = arrow_right_icon(6, 9)
       span data-role="name" = Format.person(@person)
 
@@ -47,8 +47,7 @@
             = if Euclid.Exists.present?(@person.addresses) do
               = for address <- @person.addresses do
                 div class="address-details" data-role="address-details"
-                  div = address.full_address
-                  div = address.type
+                  div = Format.address(address)
             - else
               = unknown_value()
 
@@ -93,7 +92,11 @@
         tr
           td data-role="gender-identity"= @person.gender_identity
           td data-role="sex-at-birth"= @person.sex_at_birth
-          td data-role="major-ethnicity"= ethnicity_value(@person)
+          td
+            div data-role="major-ethnicity"= ethnicity_value(@person)
+            ul
+              = for detailed_ethnicity <- detailed_ethnicities(@person) do
+                li data-role="detailed-ethnicity"= detailed_ethnicity_value(detailed_ethnicity)
           td data-role="race"= @person.race
       tbody
         tr
@@ -101,8 +104,8 @@
           th Employment
           th Occupation
         tr
-          td data-role="marital-status"= @person.marital_status
-          td data-role="employment"= @person.employment
+          td data-role="marital-status"= string_or_unknown(Format.marital_status(@person.marital_status))
+          td data-role="employment"= string_or_unknown(Format.employment(@person.employment))
           td data-role="occupation"= @person.occupation
       tbody
         tr

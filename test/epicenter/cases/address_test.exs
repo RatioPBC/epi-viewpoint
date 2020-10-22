@@ -11,7 +11,7 @@ defmodule Epicenter.Cases.AddressTest do
       assert_schema(
         Cases.Address,
         [
-          {:full_address, :string},
+          {:address_fingerprint, :string},
           {:street, :string},
           {:city, :string},
           {:state, :string},
@@ -21,6 +21,7 @@ defmodule Epicenter.Cases.AddressTest do
           {:is_preferred, :boolean},
           {:person_id, :id},
           {:seq, :integer},
+          {:source, :string},
           {:tid, :string},
           {:type, :string},
           {:updated_at, :naive_datetime}
@@ -29,6 +30,7 @@ defmodule Epicenter.Cases.AddressTest do
     end
   end
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
   describe "changeset" do
     defp new_changeset(attr_updates) do
@@ -39,26 +41,24 @@ defmodule Epicenter.Cases.AddressTest do
     end
 
     test "attributes" do
-      changes = new_changeset(is_preferred: true).changes
-      assert changes.full_address == "1234 Test St, City, TS 00000"
+      changes = new_changeset(is_preferred: true, source: "form").changes
       assert changes.street == "1234 Test St"
       assert changes.city == "City"
-      assert changes.state == "TS"
+      assert changes.state == "OH"
       assert changes.postal_code == "00000"
       assert changes.tid == "alice-address"
       assert changes.type == "home"
       assert changes.is_preferred == true
+      assert changes.source == "form"
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
-    test "full_address is optional", do: assert_valid(new_changeset(full_address: nil))
     test "street is optional", do: assert_valid(new_changeset(street: nil))
     test "city is optional", do: assert_valid(new_changeset(city: nil))
     test "state is optional", do: assert_valid(new_changeset(state: nil))
     test "postal_code is optional", do: assert_valid(new_changeset(postal_code: nil))
-    test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
 
-    test "validates personal health information on address", do: assert_invalid(new_changeset(full_address: "123 main st, sf ca"))
+    test "validates personal health information on address", do: assert_invalid(new_changeset(street: "123 main st"))
   end
 
   describe "query" do

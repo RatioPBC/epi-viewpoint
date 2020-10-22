@@ -40,7 +40,7 @@ defmodule Epicenter.Release do
 
       Epicenter.Accounts.register_user!(
         {%{email: email, password: password, tid: tid, name: name},
-         %Epicenter.AuditLog.Meta{author_id: "00000000-0000-0000-0000-000000000000", reason_action: "seed-user", reason_event: "seeds.exs"}}
+         %Epicenter.AuditLog.Meta{author_id: Application.get_env(:epicenter, :unpersisted_admin_id), reason_action: "seed-user", reason_event: "seeds.exs"}}
       )
     end
   end

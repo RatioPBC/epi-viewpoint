@@ -11,6 +11,7 @@ defmodule Epicenter.Accounts.User do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
+    field :admin, :boolean
     field :confirmed_at, :naive_datetime
     field :email, :string
     field :hashed_password, :string, redact: true
@@ -29,7 +30,7 @@ defmodule Epicenter.Accounts.User do
   derive_jason_encoder(except: [:seq])
 
   @required_attrs ~w{name}a
-  @optional_attrs ~w{tid}a
+  @optional_attrs ~w{tid admin}a
   @registration_attrs ~w{email password}a
   @mfa_attrs ~w{mfa_secret}a
 

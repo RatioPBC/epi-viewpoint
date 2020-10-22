@@ -121,6 +121,20 @@ defmodule EpicenterWeb.ProfileLive do
   def ethnicity_value(%{ethnicity: ethnicity}),
     do: @ethnicity_values_map |> Map.get(ethnicity.major)
 
+  @detailed_ethnicity_values_map %{
+    "mexican_mexican_american_chicanx" => "Mexican, Mexican American, Chicano/a",
+    "puerto_rican" => "Puerto Rican",
+    "cuban" => "Cuban",
+    "another_hispanic_latinx_or_spanish_origin" => "Another Hispanic, Latino/a or Spanish origin"
+  }
+  def detailed_ethnicity_value(detailed_ethnicity) do
+    @detailed_ethnicity_values_map |> Map.get(detailed_ethnicity)
+  end
+
+  def detailed_ethnicities(%{ethnicity: nil}), do: []
+  def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
+  def detailed_ethnicities(person), do: person.ethnicity.detailed
+
   def unknown_value do
     Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
   end

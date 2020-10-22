@@ -6,6 +6,9 @@
   #subnav
     @include subnav
 
+    a
+      @include has-icon($link-color)
+
   #profile-edit
     header
       @include h4
@@ -60,9 +63,32 @@
           .select-wrapper
             @include select
 
-        #add-phone, #add-email
-          @include button-secondary
-          @include has-icon
+        $form-row-inner-margin: 1rem
+
+        #address-form-header
+          display: grid
+          grid-template-columns: 40% 10% 5em 8em
+
+          > * + *
+            margin-left: $form-row-inner-margin
+
+        .address-wrapper:not(:first-of-type)
+          @include vertical-flow
+
+        .address-wrapper
+          .address-and-trash-can
+            display: grid
+            grid-template-columns: 40% 10% 5em 8em
+
+            > * + *
+              margin-left: $form-row-inner-margin
+
+            .select-wrapper
+              @include select
+              margin-left: $form-row-inner-margin
+
+            label
+              @include centered
 
         .email-address-wrapper:not(:first-of-type)
           @include vertical-flow
@@ -79,6 +105,10 @@
 
             label
               @include centered
+
+        #add-phone, #add-email, #add-address
+          @include button-secondary
+          @include has-icon
 
       #submit-form
         @include button-primary

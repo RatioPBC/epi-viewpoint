@@ -33,7 +33,7 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
     #
 
     profile_page
-    |> Pages.Profile.assert_assignable_users(~w{Unassigned assignee nonassignee user})
+    |> Pages.Profile.assert_assignable_users(["Unassigned", "assignee", "fixture admin", "nonassignee", "user"])
     |> Pages.Profile.assign(assignee)
 
     #

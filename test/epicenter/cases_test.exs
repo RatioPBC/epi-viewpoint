@@ -9,6 +9,7 @@ defmodule Epicenter.CasesTest do
   alias Epicenter.Extra
   alias Epicenter.Test
 
+  setup :persist_admin
   @admin Test.Fixtures.admin()
   describe "importing" do
     test "import_lab_results imports lab results and creates lab_result and person records" do
@@ -261,55 +262,17 @@ defmodule Epicenter.CasesTest do
       })
     end
 
-    test "upsert_person! creates a person if one doesn't exist (based on first name, last name, dob)" do
-      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
-      person = Test.Fixtures.person_attrs(creator, "alice", external_id: "10000") |> Cases.upsert_person!()
+    test "find_matching_person finds a person by their dob, first_name, and last_name" do
+      dob = ~D[2000-01-01]
+      strip_seq = fn map -> Map.put(map, :seq, nil) end
+      person = Test.Fixtures.person_attrs(@admin, "alice", dob: dob) |> Cases.create_person!() |> strip_seq.()
+      match = Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => dob}) |> strip_seq.()
 
-      assert person.dob == ~D[2000-01-01]
-      assert person.first_name == "Alice"
-      assert person.last_name == "Testuser"
-      assert person.tid == "alice"
+      assert match == person
 
-      assert_revision_count(person, 1)
-
-      assert_recent_audit_log(person, creator, %{
-        "dob" => "2000-01-01",
-        "external_id" => "10000",
-        "fingerprint" => "2000-01-01 alice testuser",
-        "first_name" => "Alice",
-        "last_name" => "Testuser",
-        "preferred_language" => "English",
-        "tid" => "alice"
-      })
-    end
-
-    # We are temporarily disabling updating a person when we see them again in a csv
-    # https://www.pivotaltracker.com/story/show/175239678
-    @tag :skip
-    test "upsert_person! updates a person if one already exists (based on first name, last name, dob)" do
-      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
-      Test.Fixtures.person_attrs(creator, "alice", tid: "first-insert") |> Cases.upsert_person!()
-
-      updater = Test.Fixtures.user_attrs(@admin, "updater") |> Accounts.register_user!()
-      Test.Fixtures.person_attrs(updater, "alice", tid: "second-insert") |> Cases.upsert_person!()
-
-      assert [person] = Cases.list_people()
-
-      assert person.dob == ~D[2000-01-01]
-      assert person.first_name == "Alice"
-      assert person.last_name == "Testuser"
-      assert person.tid == "second-insert"
-
-      assert_revision_count(person, 2)
-
-      assert_recent_audit_log(person, updater, %{
-        "tid" => "second-insert",
-        "dob" => "2000-01-01",
-        "fingerprint" => "2000-01-01 alice testuser",
-        "first_name" => "Alice",
-        "last_name" => "Testuser",
-        "preferred_language" => "English"
-      })
+      refute Cases.find_matching_person(%{"first_name" => "billy", "last_name" => "Testuser", "dob" => dob})
+      refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testy", "dob" => dob})
+      refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
     end
   end
 
@@ -441,10 +404,9 @@ defmodule Epicenter.CasesTest do
     test "persists the values correctly", %{creator: creator, person: person} do
       address = Test.Fixtures.address_attrs(creator, person, "address1", 4250) |> Cases.create_address!()
 
-      assert address.full_address == "4250 Test St, City, TS 00000"
       assert address.street == "4250 Test St"
       assert address.city == "City"
-      assert address.state == "TS"
+      assert address.state == "OH"
       assert address.postal_code == "00000"
       assert address.type == "home"
       assert address.tid == "address1"
@@ -462,7 +424,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(address, creator, %{
         "tid" => "address1",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "OH",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -494,7 +459,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(original_address, creator, %{
         "tid" => "address2",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "OH",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -516,7 +484,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(new_address, creator, %{
         "tid" => "address2",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "OH",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })
@@ -533,7 +504,10 @@ defmodule Epicenter.CasesTest do
 
       assert_recent_audit_log(new_address, creator, %{
         "tid" => "address1",
-        "full_address" => "4250 Test St, City, TS 00000",
+        "street" => "4250 Test St",
+        "city" => "City",
+        "state" => "OH",
+        "postal_code" => "00000",
         "person_id" => person.id,
         "type" => "home"
       })

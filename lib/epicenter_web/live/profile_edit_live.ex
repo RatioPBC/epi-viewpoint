@@ -1,8 +1,9 @@
 defmodule EpicenterWeb.ProfileEditLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.IconView, only: [plus_icon: 0, arrow_down_icon: 0, arrow_right_icon: 2, trash_icon: 0]
+  import EpicenterWeb.IconView, only: [plus_icon: 0, arrow_down_icon: 0, back_icon: 0, trash_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -12,7 +13,13 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
-    person = %{Cases.get_person(id) | originator: socket.assigns.current_user} |> Cases.preload_emails() |> Cases.preload_phones()
+
+    person =
+      Cases.get_person(id)
+      |> Cases.preload_emails()
+      |> Cases.preload_phones()
+      |> Cases.preload_addresses()
+
     changeset = person |> Cases.change_person(%{})
 
     socket
@@ -20,11 +27,20 @@ defmodule EpicenterWeb.ProfileEditLive do
     |> assign(changeset: update_dob_field_for_display(changeset))
     |> assign(person: person)
     |> assign(preferred_language_is_other: false)
+    |> assign_confirmation_prompt()
     |> ok()
   end
 
+  def handle_event("add-address", _value, socket) do
+    existing_addresses = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:addresses)
+    addresses = existing_addresses |> Enum.concat([Cases.change_address(%Cases.Address{}, %{})])
+
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:addresses, addresses)
+    socket |> assign(changeset: changeset |> Extra.Changeset.clear_validation_errors()) |> noreply()
+  end
+
   def handle_event("add-email", _value, socket) do
-    existing_emails = socket.assigns.changeset |> get_field_from_changeset(:emails)
+    existing_emails = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:emails)
     emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
@@ -32,7 +48,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("add-phone", _value, socket) do
-    existing_phones = socket.assigns.changeset |> get_field_from_changeset(:phones)
+    existing_phones = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:phones)
     phones = existing_phones |> Enum.concat([Cases.change_phone(%Cases.Phone{}, %{})])
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
@@ -40,17 +56,17 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def handle_event("form-change", %{"person" => %{"preferred_language" => "Other"} = person_params}, socket) do
-    socket |> assign(preferred_language_is_other: true) |> reassign_changeset(person_params) |> noreply()
+    socket |> assign(preferred_language_is_other: true) |> update_assigns_given_user_input(person_params) |> noreply()
   end
 
   def handle_event("form-change", %{"person" => person_params} = _params, socket) do
-    socket |> assign(preferred_language_is_other: false) |> reassign_changeset(person_params) |> noreply()
+    socket |> assign(preferred_language_is_other: false) |> update_assigns_given_user_input(person_params) |> noreply()
   end
 
   def handle_event("remove-email", %{"email-index" => email_index_param}, socket) do
     email_index = email_index_param |> Euclid.Extra.String.to_integer()
 
-    existing_emails = socket.assigns.changeset |> get_field_from_changeset(:emails)
+    existing_emails = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:emails)
     emails = existing_emails |> List.delete_at(email_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
@@ -60,7 +76,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   def handle_event("remove-phone", %{"phone-index" => phone_index_param}, socket) do
     phone_index = phone_index_param |> Euclid.Extra.String.to_integer()
 
-    existing_phones = socket.assigns.changeset |> get_field_from_changeset(:phones)
+    existing_phones = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:phones)
     phones = existing_phones |> List.delete_at(phone_index)
 
     changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
@@ -74,6 +90,7 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> clean_up_languages()
       |> remove_blank_email_addresses()
       |> remove_blank_phone_numbers()
+      |> remove_blank_addresses()
 
     socket.assigns.person
     |> Cases.update_person(
@@ -109,7 +126,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   def phone_types(),
-    do: [{"Cell", "cell"}, {"Home", "home"}, {"Work", "work"}]
+    do: [{"Unknown", nil}, {"Cell", "cell"}, {"Home", "home"}, {"Work", "work"}]
 
   def preferred_languages(current \\ nil) do
     has_current = Euclid.Exists.present?(current)
@@ -147,6 +164,10 @@ defmodule EpicenterWeb.ProfileEditLive do
     (first ++ middle ++ last) |> Enum.uniq()
   end
 
+  def states() do
+    ~w{AL AK AS AZ AR CA CO CT DE DC FL GA GO HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MP MT NE NV NH NJ NM NY NC ND OH OK OR PA PR RI SC SD TN TX UT VT VA VI WA WV WI WY}
+  end
+
   def remove_blank_email_addresses(%{"emails" => email_params} = person_params) do
     updated_email_params =
       email_params
@@ -171,12 +192,34 @@ defmodule EpicenterWeb.ProfileEditLive do
   def remove_blank_phone_numbers(person_params),
     do: person_params
 
+  def remove_blank_addresses(%{"addresses" => address_params} = person_params) do
+    updated_address_params =
+      address_params
+      |> Enum.reject(fn {_index, address} ->
+        %{"street" => street, "city" => city, "postal_code" => postal_code} = address
+        Euclid.Exists.blank?(street) and Euclid.Exists.blank?(city) and Euclid.Exists.blank?(postal_code)
+      end)
+      |> Map.new()
+
+    person_params |> Map.put("addresses", updated_address_params)
+  end
+
+  def remove_blank_addresses(person_params),
+    do: person_params
+
   # # #
 
-  defp get_field_from_changeset(changeset, field),
-    do: changeset |> Ecto.Changeset.fetch_field(field) |> elem(1)
+  defp assign_confirmation_prompt(socket) do
+    prompt =
+      case socket.assigns.changeset do
+        nil -> nil
+        changeset -> if Map.drop(changeset.changes, [:dob]) == %{}, do: nil, else: abandon_changes_confirmation_text()
+      end
 
-  defp reassign_changeset(socket, person_params) do
+    socket |> assign(confirmation_prompt: prompt)
+  end
+
+  defp update_assigns_given_user_input(socket, person_params) do
     person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
 
     changeset =
@@ -184,7 +227,9 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> Cases.change_person(person_params)
       |> Map.put(:action, :insert)
 
-    assign(socket, changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
+    socket
+    |> assign(changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
+    |> assign_confirmation_prompt()
   end
 
   defp reformat_date(changeset, field) do

@@ -53,6 +53,10 @@ defmodule Epicenter.Cases do
   def count_people(), do: Person |> Repo.aggregate(:count)
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)
   def create_person({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert(audit_meta)
+
+  def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name}),
+    do: Person |> Repo.get_by(dob: dob, first_name: first_name, last_name: last_name)
+
   def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)
   def list_people(:all), do: Person.Query.all() |> Repo.all()
@@ -62,7 +66,6 @@ defmodule Epicenter.Cases do
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
-  def upsert_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta, Person.Query.opts_for_upsert())
 
   #
   # address
