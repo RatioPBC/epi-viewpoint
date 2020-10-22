@@ -1,6 +1,6 @@
 image: circleci/elixir:1.10.4-node-browsers
 services:
-- postgres:12.2-alpine
+  - postgres:12.2-alpine
 variables:
   GIT_DEPTH: 0
   GIT_STRATEGY: clone
@@ -11,17 +11,17 @@ variables:
   POSTGRES_USER: postgres
   CANONICAL_HOST: viewpoint-construction.network.geometer.dev
 stages:
-- test
-- deploy
+  - test
+  - deploy
 cache:
   key:
     files:
-    - mix.lock
-    - assets/package-lock.json
+      - mix.lock
+      - assets/package-lock.json
     prefix: v1
   paths:
-  - deps
-  - assets/node_modules
+    - deps
+    - assets/node_modules
 test:
   before_script:
     - npm install --prefix assets
@@ -45,8 +45,8 @@ deploy_staging:
   script:
     - bin/remote/deploy staging
   environment:
-   name: staging
-   url: https://viewpoint-staging.network.geometer.dev
+    name: staging
+    url: https://viewpoint-staging.network.geometer.dev
 
 deploy_construction:
   only:
