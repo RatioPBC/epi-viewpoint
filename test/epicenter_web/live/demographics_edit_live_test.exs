@@ -18,21 +18,25 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     test "initially shows current demographics values", %{conn: conn, person: person, user: user} do
       {:ok, person_with_ethnicities} =
         person
-        |> Cases.update_person(
-          {%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}}, Test.Fixtures.audit_meta(user)}
-        )
+        |> Cases.update_person({
+          %{
+            ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]},
+            gender_identity: ["Female", "Transgender woman/trans woman/male-to-female (MTF)"]
+          },
+          Test.Fixtures.audit_meta(user)
+        })
 
       # TODO don't hardcode all the checkboxes to true
       Pages.DemographicsEdit.visit(conn, person_with_ethnicities)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
-        "Declined to answer" => true,
+        "Declined to answer" => false,
         "Female" => true,
         "Transgender woman/trans woman/male-to-female (MTF)" => true,
-        "Male" => true,
-        "Transgender man/trans man/female-to-male (FTM)" => true,
-        "Genderqueer/gender nonconforming neither exclusively male nor female" => true,
-        "Additional gender category (or other)" => true
+        "Male" => false,
+        "Transgender man/trans man/female-to-male (FTM)" => false,
+        "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
+        "Additional gender category (or other)" => false
       })
       |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
         "Unknown" => false,
@@ -45,6 +49,39 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Puerto Rican" => true,
         "Cuban" => true,
         "Another Hispanic, Latino/a or Spanish origin" => false
+      })
+    end
+  end
+
+  describe "gender identity" do
+    test "unchecking the last gender identity", %{conn: conn, person: person, user: user} do
+      {:ok, person} =
+        person
+        |> Cases.update_person({%{gender_identity: ["Female"]}, Test.Fixtures.audit_meta(user)})
+
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
+        "Declined to answer" => false,
+        "Female" => true,
+        "Transgender woman/trans woman/male-to-female (MTF)" => false,
+        "Male" => false,
+        "Transgender man/trans man/female-to-male (FTM)" => false,
+        "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
+        "Additional gender category (or other)" => false
+      })
+      # The line below is unrealistic. the "gender_identity" field needs to be missing from
+      # the person_params passes to handle_event("form-change"...), but when we don't include
+      # it LiveViewTest *helpfully* adds back the gender_identity that is currently selected,
+      # so we can't reproduce (in a test) the bug where the last checkbox refuses to uncheck.
+      |> Pages.DemographicsEdit.change_form(%{"gender_identity" => []})
+      |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
+        "Declined to answer" => false,
+        "Female" => false,
+        "Transgender woman/trans woman/male-to-female (MTF)" => false,
+        "Male" => false,
+        "Transgender man/trans man/female-to-male (FTM)" => false,
+        "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
+        "Additional gender category (or other)" => false
       })
     end
   end

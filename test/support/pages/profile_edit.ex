@@ -1,5 +1,4 @@
 defmodule EpicenterWeb.Test.Pages.ProfileEdit do
-  import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 

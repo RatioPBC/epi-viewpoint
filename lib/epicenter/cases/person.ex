@@ -28,7 +28,7 @@ defmodule Epicenter.Cases.Person do
     field :external_id, :string
     field :fingerprint, :string
     field :first_name, :string
-    field :gender_identity, :string
+    field :gender_identity, {:array, :string}
     field :last_name, :string
     field :marital_status, :string
     field :notes, :string

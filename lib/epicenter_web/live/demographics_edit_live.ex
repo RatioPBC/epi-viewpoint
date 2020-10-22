@@ -13,7 +13,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> assign_defaults(session)
     person = Cases.get_person(id)
-    changeset = person |> Cases.change_person(%{}) |> hard_code_gender_identity()
+    changeset = person |> Cases.change_person(%{})
 
     socket
     |> assign_page_title("#{Format.person(person)} (edit)")
@@ -23,21 +23,31 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> ok()
   end
 
-  def handle_event("form-change", %{"person" => %{"ethnicity" => _ethnicity} = person_params} = form_state, socket) do
+  def handle_event("form-change", %{"person" => person_params} = form_state, socket) do
     new_ethnicity = get_or_update_ethnicity_from_changeset(socket.assigns.changeset, form_state)
 
     new_changeset =
       socket.assigns.person
       |> Cases.change_person(person_params)
-      |> Ecto.Changeset.delete_change(:ethnicity)
-      |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
+
+    # TODO unchecking the last gender box doesn't work unless you add this commented code back
+    #    new_changeset =
+    #      case person_params do
+    #        %{"gender_identity" => _} -> new_changeset
+    #        _ -> Map.put(new_changeset, "gender_identity", [])
+    #      end
+
+    new_changeset =
+      case person_params do
+        %{"ethnicity" => _ethnicity} ->
+          new_changeset
+          |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
+
+        _ ->
+          new_changeset
+      end
 
     socket |> assign(:changeset, new_changeset) |> assign_confirmation_prompt |> noreply()
-  end
-
-  def handle_event("form-change", %{"person" => person_params}, socket) do
-    changeset = socket.assigns.person |> Cases.change_person(person_params)
-    socket |> assign(changeset: changeset) |> assign_confirmation_prompt |> noreply()
   end
 
   def handle_event("submit", %{"person" => person_params} = _params, socket) do
@@ -80,10 +90,6 @@ defmodule EpicenterWeb.DemographicsEditLive do
       true ->
         form_params["person"]["ethnicity"]
     end
-  end
-
-  defp hard_code_gender_identity(%{data: data} = changeset) do
-    %{changeset | data: %{data | gender_identity: ["Female"]}}
   end
 
   def gender_identity_options() do
@@ -130,6 +136,13 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   def detailed_ethnicity_checked(_, _),
     do: false
+
+  def gender_identity_checked(changeset, gender_identity_option) do
+    case changeset |> Extra.Changeset.get_field_from_changeset(:gender_identity) do
+      nil -> false
+      gender_list -> gender_identity_option in gender_list
+    end
+  end
 
   def gender_identity_is_checked(),
     do: nil

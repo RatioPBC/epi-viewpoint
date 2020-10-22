@@ -14,9 +14,9 @@
       #option-set
         = for gender_identity_option <- gender_identity_options() do
           div
-            = label f, :gender_identity, class: "gender-identity-option", data_role: "gender-identity-checkbox-label" do
+            = label f, :gender_identity, class: "gender-identity-option", data_role: "gender-identity-checkbox-label", name: "person[gender_identity][]" do
               = gender_identity_option
-              = checkbox f, :gender_identity, value: gender_identity_option, checked: true, data_role: "gender-identity-checkbox"
+              = checkbox f, :gender_identity, checked_value: gender_identity_option, checked: gender_identity_checked(@changeset, gender_identity_option), hidden_input: false, data_role: "gender-identity-checkbox", name: "person[gender_identity][]"
 
       span class="subheader" Ethnicity
       #option-set

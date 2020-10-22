@@ -24,7 +24,7 @@ defmodule Epicenter.Cases.PersonTest do
           {:external_id, :string},
           {:fingerprint, :string},
           {:first_name, :string},
-          {:gender_identity, :string},
+          {:gender_identity, :array},
           {:id, :id},
           {:inserted_at, :naive_datetime},
           {:last_name, :string},
@@ -113,7 +113,7 @@ defmodule Epicenter.Cases.PersonTest do
     test "demographic attributes" do
       changes = new_changeset(%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}}).changes
       assert changes.employment == "Part time"
-      assert changes.gender_identity == "Female"
+      assert changes.gender_identity == ["Female"]
       assert changes.marital_status == "Single"
       assert changes.notes == "lorem ipsum"
       assert changes.occupation == "architect"

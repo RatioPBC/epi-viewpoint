@@ -492,7 +492,7 @@ defmodule Epicenter.Cases.ImportTest do
           last_name: "Testuser",
           dob: ~D[1970-01-01],
           preferred_language: "AAA",
-          gender_identity: "AAA",
+          gender_identity: ["AAA"],
           marital_status: "AAA",
           employment: "AAA",
           notes: "AAA",
@@ -524,7 +524,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.ethnicity.major == "AAA"
       assert updated_alice.ethnicity.detailed == []
       assert updated_alice.preferred_language == "AAA"
-      assert updated_alice.gender_identity == "AAA"
+      assert updated_alice.gender_identity == ["AAA"]
       assert updated_alice.marital_status == "AAA"
       assert updated_alice.employment == "AAA"
       assert updated_alice.notes == "AAA"
@@ -540,7 +540,7 @@ defmodule Epicenter.Cases.ImportTest do
           last_name: "Testuser",
           dob: ~D[1970-01-01],
           preferred_language: "AAA",
-          gender_identity: "AAA",
+          gender_identity: ["AAA"],
           marital_status: nil,
           employment: "AAA",
           notes: "AAA",
@@ -572,7 +572,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert updated_alice.ethnicity.major == "AAA"
       assert updated_alice.ethnicity.detailed == []
       assert updated_alice.preferred_language == "AAA"
-      assert updated_alice.gender_identity == "AAA"
+      assert updated_alice.gender_identity == ["AAA"]
       assert updated_alice.marital_status == nil
       assert updated_alice.employment == "AAA"
       assert updated_alice.notes == "AAA"
