@@ -1,14 +1,14 @@
 defmodule EpicenterWeb.UsersLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_admin_defaults: 2, assign_page_title: 2, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [authenticate_admin_user!: 2, assign_page_title: 2, ok: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
 
   def mount(_params, session, socket) do
     socket
-    |> assign_admin_defaults(session)
+    |> authenticate_admin_user!(session)
     |> assign_page_title("Users")
     |> assign(users: Accounts.list_users())
     |> ok()

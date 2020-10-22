@@ -2,7 +2,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
 
   alias Epicenter.AuditLog
@@ -11,7 +11,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
   alias Epicenter.Format
 
   def mount(%{"id" => id}, session, socket) do
-    socket = socket |> assign_defaults(session)
+    socket = socket |> authenticate_user(session)
     person = Cases.get_person(id)
     changeset = person |> Cases.change_person(%{})
 

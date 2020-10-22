@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.PeopleLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
@@ -14,7 +14,7 @@ defmodule EpicenterWeb.PeopleLive do
       do: Cases.subscribe_to_people()
 
     socket
-    |> assign_defaults(session)
+    |> authenticate_user(session)
     |> assign_page_title("People")
     |> set_reload_message(nil)
     |> set_filter(:with_lab_results)
