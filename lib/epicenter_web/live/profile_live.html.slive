@@ -8,8 +8,8 @@
 
   section#heading
     div
-      h2 data-role="full-name"= Format.person(@person)
-      #external-id data-role="external-id"= @person.external_id
+      h1 data-role="full-name"= Format.person(@person)
+      h3#external-id data-role="external-id"= @person.external_id
 
     form id="assignment-form" phx-change="form-change"
       #user-list
@@ -24,7 +24,7 @@
 
   section#profile
     header
-      span Profile
+      h2 Profile
       span= live_redirect "Update", to: Routes.profile_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileEditLive, @person), id: "edit-button"
 
     table#profile-data
@@ -52,7 +52,8 @@
               = unknown_value()
 
   section#lab-results data-role="lab-results"
-    header Lab Results
+    header
+      h2 Lab Results
 
     = if Euclid.Exists.blank?(@person.lab_results) do
       div#empty-lab-results No lab results
@@ -80,7 +81,7 @@
 
   section#demographics
     header
-      span Demographics
+      h2 Demographics
 
     table#demographics-data
       tbody
