@@ -28,7 +28,7 @@
       fieldset
         = label f, :passcode do
           ' Six-digit passcode
-        = number_input :user, :passcode, required: true, autocapitalize: "none", autocomplete: "off", spellcheck: "false", maxlength: 6, minlength: 6
+        = number_input :user, :passcode, required: true, autocapitalize: "none", autocomplete: "off", spellcheck: "false", maxlength: 6, minlength: 6, autofocus: true
 
       fieldset
         = submit "Continue", id: "submit"
