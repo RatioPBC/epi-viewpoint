@@ -122,6 +122,7 @@
   .styleguide-section
     .styleguide-section-title#messaging Messaging
 
+    .styleguide-example-title Tooltip
     .styleguide-example
       #tooltip-when-disabled
         #button-1-container data-disabled=false
@@ -139,6 +140,7 @@
   .styleguide-section
     .styleguide-section-title#layout Layout
 
+    .styleguide-example-title Centered
     .styleguide-example
       #centered
         #centered-contents
@@ -149,6 +151,7 @@
         ' @include centered
         small The contents are centered horizontally and vertically within the element that includes the mixin
 
+    .styleguide-example-title Level
     .styleguide-example
       #level
         button Item 1
@@ -162,6 +165,7 @@
         ' @include level
         small Like horizontal-flow, but the contents are vertically aligned
 
+    .styleguide-example-title Horizontal Flow
     .styleguide-example
       #horizontal-flow
         button Item 1
@@ -193,6 +197,7 @@
         ' @include horizontal-flow($justify: space-between)
         small The children are spaced apart evenly
 
+    .styleguide-example-title Vertical Flow
     .styleguide-example
       #vertical-flow
         button Item 1
@@ -206,6 +211,7 @@
         ' @include vertical-flow
         small The children have a vertical space between them
 
+    .styleguide-example-title Nested
     .styleguide-example
       #nested-flows
         #outer-vertical-flow
@@ -220,6 +226,7 @@
             span The end
       code @include vertical-flow, @include horizontal-flow
 
+    .styleguide-example-title Pancake Stack
     .styleguide-example
       #pancake-stack
         div Top
@@ -236,12 +243,14 @@
   .styleguide-section
     .styleguide-section-title#containers Containers
 
+    .styleguide-example-title Section
     .styleguide-example
       #section-container
         section
           ' Here is some text in a section
       code section
 
+    .styleguide-example-title Card
     .styleguide-example
       #card-container
         #card1
@@ -254,6 +263,7 @@
         ' @include card
         small use vertical-flow on a container to make vertical space between cards
 
+    .styleguide-example-title Subnav
     .styleguide-example
       #subnav-container
         #subnav
@@ -287,6 +297,7 @@
   .styleguide-section
     .styleguide-section-title#form Form
 
+    .styleguide-example-title Select
     .styleguide-example
       #select
         #select-enabled
@@ -324,6 +335,7 @@
     .styleguide-section-title#effects
       ' Effects
 
+    .styleguide-example-title Shadow
     .styleguide-example
       #shadow-overlay
         ' Shadow for overlays
