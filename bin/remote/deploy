@@ -12,6 +12,7 @@ if [[ $env_list =~ (^|[[:space:]])"$env"($|[[:space:]]) ]]; then
         echo "setting up gitlab for gcloud access..."
         echo "$GCP_ACCESS_CONSTRUCTION" > tmp/gcloud-service-key-construction.json # Google Cloud service accounts
         echo "$GCP_ACCESS_STAGING" > tmp/gcloud-service-key-staging.json # Google Cloud service accounts
+        echo "$GCP_ACCESS_DEMO" > tmp/gcloud-service-key-demo.json # Google Cloud service accounts
         gcloud auth activate-service-account --key-file tmp/gcloud-service-key-$env.json
         gcloud config set project epikubes
         gcloud auth configure-docker

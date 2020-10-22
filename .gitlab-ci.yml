@@ -35,6 +35,7 @@ test:
   stage: test
   script:
     - bin/dev/test
+
 deploy_staging:
   only:
     - kube-deploy
@@ -60,4 +61,17 @@ deploy_construction:
   environment:
     name: construction
     url: https://viewpoint-construction.network.geometer.dev
+
+deploy_demo:
+  only:
+    - kube-deploy
+  stage: deploy
+  image: geometer/docker-gcp:latest
+  services:
+    - docker:dind
+  script:
+    - bin/remote/deploy demo
+  environment:
+    name: demo
+    url: https://viewpoint-demo.network.geometer.dev
   when: manual
