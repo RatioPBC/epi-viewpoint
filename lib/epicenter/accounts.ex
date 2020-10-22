@@ -13,6 +13,7 @@ defmodule Epicenter.Accounts do
   @unpersisted_admin_id Application.get_env(:epicenter, :unpersisted_admin_id)
   def register_user({_attrs, %{author_id: @unpersisted_admin_id} = _} = args), do: _register_user(args)
   def register_user({_attrs, audit_meta} = args), do: if(admin?(audit_meta), do: _register_user(args), else: {:error, :admin_privileges_required})
+  def register_user!({_attrs, %{author_id: @unpersisted_admin_id} = _} = args), do: _register_user!(args)
   def register_user!({_attrs, audit_meta} = args), do: if(admin?(audit_meta), do: _register_user!(args), else: raise(Epicenter.AdminRequiredError))
   defp _register_user({attrs, audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> AuditLog.insert(audit_meta)
   defp _register_user!({attrs, audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> AuditLog.insert!(audit_meta)

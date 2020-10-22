@@ -5,13 +5,13 @@ defmodule EpicenterWeb.LiveHelpers do
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  def assign_defaults(socket, %{"user_token" => user_token} = _session),
+  def authenticate_user(socket, %{"user_token" => user_token} = _session),
     do: socket |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end) |> check_user()
 
-  def assign_defaults(socket, _session),
+  def authenticate_user(socket, _session),
     do: socket
 
-  def assign_admin_defaults(socket, %{"user_token" => user_token} = _session),
+  def authenticate_admin_user!(socket, %{"user_token" => user_token} = _session),
     do: socket |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end) |> check_admin()
 
   def assign_page_title(socket, page_title),

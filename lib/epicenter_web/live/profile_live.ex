@@ -2,7 +2,7 @@ defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
@@ -17,7 +17,7 @@ defmodule EpicenterWeb.ProfileLive do
     person = Cases.get_person(person_id)
 
     socket
-    |> assign_defaults(session)
+    |> authenticate_user(session)
     |> assign_page_title(Format.person(person))
     |> assign_person(person)
     |> assign_users()
