@@ -1,45 +1,32 @@
 #styleguide-form-page
   section
     = form_for @changeset, "#", [id: "form-layout"], fn f ->
-      fieldset.has-fieldsets
-        fieldset.is-size-m
-          = label f, :first_name do
-            | First name
-            = error_tag f, :first_name
-          = text_input f, :first_name
+      fieldset
+        = label f, :first_name, "First name", style: "grid-row: 1; grid-column: 1 / span 2"
+        = error_tag f, :first_name, style: "grid-row: 2; grid-column: 1 / span 2"
+        = text_input f, :first_name, style: "grid-row: 3; grid-column: 1 / span 2"
 
-        fieldset.is-size-m
-          = label f, :last_name do
-            | Last name
-            = error_tag f, :last_name
-          = text_input f, :last_name
+        = label f, :last_name, "Last name", style: "grid-row: 1; grid-column: 3 / span 2"
+        = error_tag f, :last_name, style: "grid-row: 2; grid-column: 3 / span 2"
+        = text_input f, :last_name, style: "grid-row: 3; grid-column: 3 / span 2"
 
-      fieldset.is-size-l
-        = label f, :email do
-          | Email
-          = error_tag f, :email
-        = text_input f, :email
+      fieldset
+        = label f, :email, "E-mail", style: "grid-row: 1; grid-column: 1 / span 4"
+        = error_tag f, :email, style: "grid-row: 2; grid-column: 1 / span 4"
+        = text_input f, :email, style: "grid-row: 3; grid-column: 1 / span 4"
 
-      fieldset.has-fieldsets
-        fieldset.is-size-s
-          = label f, :call_time do
-            | Call time
-            = error_tag f, :call_time
-          = text_input f, :call_time
+      fieldset
+        = label f, :type, "Type", style: "grid-row: 1; grid-column: 1 / span 2"
+        .select-wrapper style="grid-row: 2; grid-column: 1 / span 2"
+          = arrow_down_icon()
+          = select f, :type, types()
 
-        fieldset.is-size-xs
-          label AM/PM
-          .has-select
-            = select f, :call_time_daypart, ["AM": "am", "PM": "pm"]
+      fieldset
+        = label f, :status, "Status", style: "grid-row: 1; grid-column: 1 / span 2"
+        .select-wrapper style="grid-row: 2; grid-column: 1 / span 2"
+          = arrow_down_icon()
+          = select f, :status, statuses()
 
-        fieldset
-          = label f, :call_reason do
-            | Reason
-            = error_tag f, :call_reason
-          = text_input f, :call_reason
-
-      fieldset.is-size-xl
-        = label f, :full_address do
-          | Full address
-          = error_tag f, :full_address
-        = text_input f, :full_address
+      footer
+        = submit "Save"
+        = submit "Delete"

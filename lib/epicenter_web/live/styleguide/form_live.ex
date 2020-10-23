@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.Styleguide.FormLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.IconView, only: [arrow_down_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, ok: 1]
 
   defmodule StyleguideSchema do
@@ -24,6 +25,14 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     |> assign_changeset()
     |> ok()
   end
+
+  # # #
+
+  def statuses(),
+    do: [Active: "active", Inactive: "inactive"]
+
+  def types(),
+    do: [Admin: "admin", Member: "member"]
 
   # # #
 

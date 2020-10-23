@@ -226,6 +226,51 @@
   .form-error-message
     @include has-icon($error-color)
 
+// work-in-progress grid-based form to possibly replace the other form mixin
+@mixin form-grid
+  @include vertical-flow
+  margin-bottom: 10rem
+
+  fieldset
+    display: grid
+    column-gap: 1rem
+    row-gap: 0
+    grid-auto-columns: 8rem
+    grid-auto-rows: auto
+    justify-items: stretch
+    align-items: stretch
+
+    label
+      font-weight: bold
+
+    input
+      padding: $input-padding
+      border: 1px solid $input-color
+
+    .invalid-feedback
+      color: $error-color
+      font-size: $small-body-text-size
+      font-weight: normal
+
+    .select-wrapper
+      @include select
+
+  footer
+    @include level
+    background-color: white
+    border-top: 2px solid $divider-color
+    bottom: 0
+    left: 0
+    padding: 2rem 2rem 2rem
+    position: fixed
+    right: 0
+
+    button
+      @include button-secondary
+
+    button:first-of-type
+      @include button-primary
+
 @mixin -heading
   font-weight: bold
   line-height: 1.5
@@ -320,6 +365,7 @@
     outline: none
     padding: $input-padding
     padding-right: 2.5rem
+    width: 100%
 
   select:focus
     outline: 0
