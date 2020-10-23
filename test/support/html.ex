@@ -58,7 +58,7 @@ defmodule Epicenter.Test.Html do
     do: html |> Floki.text(sep: " ")
 
   def text(html, role: role) when not is_binary(html),
-    do: html |> text("[data-role=#{role}]") |> IO.inspect()
+    do: html |> text("[data-role=#{role}]")
 
   def text(html, css_query) when not is_binary(html),
     do: html |> find(css_query) |> Floki.text()
