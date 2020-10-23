@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Styleguide.MultiFieldFormLive do
+defmodule EpicenterWeb.Styleguide.FormLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, ok: 1]

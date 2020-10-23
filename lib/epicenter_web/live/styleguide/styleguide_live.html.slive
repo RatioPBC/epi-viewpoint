@@ -298,8 +298,7 @@
     .styleguide-section-title#form Form
 
     .styleguide-example-title Full form examples
-    a href="/styleguide/multi-field-form" Multi-field form
-
+    = live_redirect "Form example", to: Routes.styleguide_form_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormLive)
 
     .styleguide-example-title Select
     .styleguide-example
