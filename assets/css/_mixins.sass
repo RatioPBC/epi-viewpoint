@@ -201,6 +201,18 @@
       margin-top: 0.25rem
       padding: $input-padding
       border: 1px solid $input-color
+      @extend .is-size-m
+
+    &.has-fieldsets
+      @include level
+
+    .has-select
+      @include select
+
+    @each $name, $size in $form-field-sizes
+      &.is-size-#{$name}
+        input
+          width: $size
 
   .invalid-feedback
     color: $error-color

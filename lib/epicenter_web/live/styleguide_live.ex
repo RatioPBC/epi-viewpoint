@@ -1,11 +1,28 @@
 defmodule EpicenterWeb.StyleguideLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.IconView
 
+  defmodule StyleguideSchema do
+    use Ecto.Schema
+
+    embedded_schema do
+      field :first_name, :string
+      field :last_name, :string
+      field :email, :string
+      field :full_address, :string
+    end
+  end
+
   def mount(_params, _session, socket) do
-    socket |> assign(show_nav: false) |> assign_address() |> clear_suggestions() |> ok()
+    socket
+    |> assign_page_title("Styleguide")
+    |> assign(show_nav: false)
+    |> assign_changeset()
+    |> assign_address()
+    |> clear_suggestions()
+    |> ok()
   end
 
   def handle_event("choose-address", %{"address" => address}, socket) do
@@ -20,6 +37,11 @@ defmodule EpicenterWeb.StyleguideLive do
 
   defp assign_address(socket, address \\ "") do
     socket |> assign(address: address)
+  end
+
+  defp assign_changeset(socket) do
+    changeset = %StyleguideSchema{} |> Ecto.Changeset.change() |> Ecto.Changeset.validate_required([:email])
+    socket |> assign(changeset: %{changeset | action: :insert})
   end
 
   defp assign_suggestions(socket, address) do

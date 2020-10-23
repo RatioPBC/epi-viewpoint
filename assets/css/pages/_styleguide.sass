@@ -191,10 +191,8 @@
   //
   // Form
   //
-  #autocomplete
-    @include autocomplete
-    input
-      width: 300px
+  #form-layout
+    @include form
 
   #select
     @include horizontal-flow
@@ -213,3 +211,11 @@
 
   #shadow-overlay
     @include shadow($style: overlay)
+
+  //
+  // Icebox
+  //
+  #autocomplete
+    @include autocomplete
+    input
+      width: 300px
