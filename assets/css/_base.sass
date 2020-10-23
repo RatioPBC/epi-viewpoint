@@ -4,6 +4,8 @@
 a
   text-decoration: none
   color: $link-color
+  &:hover
+    text-decoration: underline
 
 body
   color: $primary-text-color
@@ -19,6 +21,11 @@ body
 
 body, html
   height: 100%
+
+input[type="checkbox"]
+  transform: scale(1.2)
+  &:hover
+    cursor: pointer
 
 fieldset
   border: none

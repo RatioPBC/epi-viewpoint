@@ -116,4 +116,4 @@
 
       #form-end
       #nav
-        = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
+        = submit "Save", id: "submit-form"

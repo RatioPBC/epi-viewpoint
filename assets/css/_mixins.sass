@@ -149,12 +149,13 @@
 
   thead
     tr:last-of-type
-      th, td
-        border-bottom: 1px solid $divider-color
-        padding-bottom: 1rem
+      border-bottom: 1px solid $divider-color
+      padding-bottom: 1rem
+
+  tr
+    border-bottom: 1px solid $divider-color
 
   th, td
-    border-bottom: 1px solid $divider-color
     min-width: 8rem
     padding: 0.5rem 1rem 0.5rem 0
     text-align: left
@@ -166,13 +167,10 @@
   .unknown
     color: $disabled-text-color
 
-  th
-    padding-bottom: .5rem
-
   th, td
     border: none
     padding-left: 0
-    padding-right: 3rem
+    padding-right: 6rem
     text-align: left
     vertical-align: top
 

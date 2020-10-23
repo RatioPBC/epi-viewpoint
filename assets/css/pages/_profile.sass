@@ -27,7 +27,7 @@
       .address-details
         padding-top: .5rem
         & + .address-details
-          padding-top: 1.5rem
+          padding-top: .5rem
 
   section#lab-results
     @include card
@@ -40,8 +40,11 @@
     table#lab-results-data
       @include data-table
 
+      tr:last-child
+        border-bottom: none
+
       td
-        padding: 2rem 0
+        padding: 0.5rem 0
 
   section#case-investigations
     @include card
