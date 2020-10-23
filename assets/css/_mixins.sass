@@ -232,13 +232,7 @@
   margin-bottom: 10rem
 
   fieldset
-    display: grid
-    column-gap: 1rem
-    row-gap: 0
-    grid-auto-columns: 8rem
-    grid-auto-rows: auto
-    justify-items: stretch
-    align-items: stretch
+    @include grid(8rem)
 
     label
       font-weight: bold
@@ -270,6 +264,25 @@
 
     button:first-of-type
       @include button-primary
+
+@mixin grid($column-size)
+  align-items: stretch
+  column-gap: 1rem
+  display: grid
+  grid-auto-columns: $column-size
+  grid-auto-rows: auto
+  justify-items: stretch
+  row-gap: 0
+
+  @for $i from 1 through 10
+    > [data-grid-row="#{$i}"]
+      grid-row: $i
+
+    > [data-grid-col="#{$i}"]
+      grid-column-start: $i
+
+    > [data-grid-span="#{$i}"]
+      grid-column-end: span $i
 
 @mixin -heading
   font-weight: bold

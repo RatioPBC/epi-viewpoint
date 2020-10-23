@@ -2,28 +2,28 @@
   section
     = form_for @changeset, "#", [id: "form-layout"], fn f ->
       fieldset
-        = label f, :first_name, "First name", style: "grid-row: 1; grid-column: 1 / span 2"
-        = error_tag f, :first_name, style: "grid-row: 2; grid-column: 1 / span 2"
-        = text_input f, :first_name, style: "grid-row: 3; grid-column: 1 / span 2"
+        = label f, :first_name, "First name", data: [grid: [row: 1, col: 1, span: 2]]
+        = error_tag f, :first_name, data: [grid: [row: 2, col: 1, span: 2]]
+        = text_input f, :first_name, data: [grid: [row: 3, col: 1, span: 2]]
 
-        = label f, :last_name, "Last name", style: "grid-row: 1; grid-column: 3 / span 2"
-        = error_tag f, :last_name, style: "grid-row: 2; grid-column: 3 / span 2"
-        = text_input f, :last_name, style: "grid-row: 3; grid-column: 3 / span 2"
-
-      fieldset
-        = label f, :email, "E-mail", style: "grid-row: 1; grid-column: 1 / span 4"
-        = error_tag f, :email, style: "grid-row: 2; grid-column: 1 / span 4"
-        = text_input f, :email, style: "grid-row: 3; grid-column: 1 / span 4"
+        = label f, :last_name, "Last name", data: [grid: [row: 1, col: 3, span: 2]]
+        = error_tag f, :last_name, data: [grid: [row: 2, col: 3, span: 2]]
+        = text_input f, :last_name, data: [grid: [row: 3, col: 3, span: 2]]
 
       fieldset
-        = label f, :type, "Type", style: "grid-row: 1; grid-column: 1 / span 2"
-        .select-wrapper style="grid-row: 2; grid-column: 1 / span 2"
+        = label f, :email, "E-mail", data: [grid: [row: 1, col: 1, span: 4]]
+        = error_tag f, :email,  data: [grid: [row: 2, col: 1, span: 4]]
+        = text_input f, :email, data: [grid: [row: 3, col: 1, span: 4]]
+
+      fieldset
+        = label f, :type, "Type", data: [grid: [row: 1, col: 1, span: 2]]
+        = tag :div, class: "select-wrapper", data: [grid: [row: 2, col: 1, span: 2]]
           = arrow_down_icon()
           = select f, :type, types()
 
       fieldset
-        = label f, :status, "Status", style: "grid-row: 1; grid-column: 1 / span 2"
-        .select-wrapper style="grid-row: 2; grid-column: 1 / span 2"
+        = label f, :status, "Status", data: [grid: [row: 1, col: 1, span: 2]]
+        = tag :div, class: "select-wrapper",  data: [grid: [row: 2, col: 1, span: 2]]
           = arrow_down_icon()
           = select f, :status, statuses()
 

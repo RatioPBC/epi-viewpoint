@@ -20,7 +20,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
 
   def mount(_params, _session, socket) do
     socket
-    |> assign_page_title("Styleguide: multi-field form")
+    |> assign_page_title("Styleguide: form")
     |> assign(show_nav: false)
     |> assign_changeset()
     |> ok()
