@@ -354,6 +354,14 @@
   display: grid
   grid-template-rows: auto 1fr auto
 
+@mixin radio-button-list
+  @include vertical-flow($margin: 0.25rem)
+  font-weight: bold
+
+  label
+    display: block
+    font-weight: normal
+
 @mixin select
   align-items: center
   border-color: $input-color
@@ -429,7 +437,7 @@
   path
     fill: $color
 
-@mixin vertical-flow
+@mixin vertical-flow($margin: 2rem)
   & > table
     display: table
 
@@ -437,4 +445,4 @@
     display: block
 
     &:not(:first-child)
-      margin-top: 2rem
+      margin-top: $margin
