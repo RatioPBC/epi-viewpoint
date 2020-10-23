@@ -140,6 +140,31 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   #
+  # case investigations
+  #
+
+  def assert_case_investigations(%View{} = view, %{status: status, reported_on: reported_on, number: number}) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.assert_text("status", status)
+    |> Test.Html.assert_text("reported-on", reported_on)
+    |> Test.Html.assert_text("case-investigation-title", number)
+
+    view
+  end
+
+  def assert_no_case_investigations(%View{} = view) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("[data-role=case-investigation-title]")
+    |> assert_eq([])
+
+    view
+  end
+
+  #
   # lab results
   #
 

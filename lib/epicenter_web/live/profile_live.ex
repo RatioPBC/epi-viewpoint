@@ -7,8 +7,10 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Format
+  alias Epicenter.Extra.Date.NilFirst
 
   def mount(%{"id" => person_id}, session, socket) do
     if connected?(socket),
@@ -20,6 +22,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> authenticate_user(session)
     |> assign_page_title(Format.person(person))
     |> assign_person(person)
+    |> assign_case_investigation(person)
     |> assign_users()
     |> ok()
   end
@@ -57,6 +60,30 @@ defmodule EpicenterWeb.ProfileLive do
   def assign_person(socket, person) do
     updated_person = person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
     assign(socket, person: updated_person)
+  end
+
+  defp assign_case_investigation(socket, person) do
+    person = Cases.preload_lab_results(person)
+
+    case_investigation_view =
+      with positive_lab_results when positive_lab_results != [] <- Enum.filter(person.lab_results, &LabResult.is_positive(&1)),
+           lab_result when not is_nil(lab_result) <- Enum.min_by(positive_lab_results, & &1.reported_on, NilFirst, fn -> nil end) do
+        reported_on =
+          cond do
+            !Euclid.Exists.present?(lab_result.reported_on) -> "unknown date"
+            true -> Epicenter.Format.date(lab_result.reported_on)
+          end
+
+        %{
+          number: "001",
+          status: "Pending",
+          reported_on: reported_on
+        }
+      else
+        _ -> nil
+      end
+
+    assign(socket, case_investigation_view: case_investigation_view)
   end
 
   defp assign_users(socket),

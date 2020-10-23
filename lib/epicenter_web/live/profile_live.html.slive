@@ -51,6 +51,17 @@
             - else
               = unknown_value()
 
+  = if Euclid.Exists.present?(@case_investigation_view) do
+    section#case-investigations
+      header data-role="case-investigation-title"
+       = "Case investigation #{@case_investigation_view.number}"
+
+      .reported-on data-role="reported-on"
+        span = "Initiated by positive lab result reported on #{@case_investigation_view.reported_on}"
+
+      .status data-role="status"
+        span class="status-value" = @case_investigation_view.status
+        = " interview"
   section#lab-results data-role="lab-results"
     header
       h2 Lab Results
