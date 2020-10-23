@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.StyleguideLive do
+defmodule EpicenterWeb.Styleguide.StyleguideLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
@@ -54,7 +54,7 @@ defmodule EpicenterWeb.StyleguideLive do
 
   # # #
 
-  @address_data EpicenterWeb.StyleguideData.generate_address_data()
+  @address_data EpicenterWeb.Styleguide.AutocompleteData.generate_address_data()
 
   defp suggest_address(""), do: []
 
