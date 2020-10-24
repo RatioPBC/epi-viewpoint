@@ -41,6 +41,18 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     def create_movie(attrs) do
       %Movie{} |> Movie.changeset(attrs) |> apply_action(:create)
     end
+
+    @doc "simulate getting a movie from the db"
+    def get_movie() do
+      %Movie{
+        director: "Rick Moranis",
+        in_stock: false,
+        language: "English",
+        producer: "Louis M. Silverstein",
+        release_date: ~D[1983-08-26],
+        title: "Strange Brew"
+      }
+    end
   end
 
   # a schema just for this page whose fields match the fields of the form, not of the database table(s)
@@ -51,6 +63,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     import Epicenter.Validation, only: [validate_date: 2]
 
     alias Epicenter.DateParser
+    alias Epicenter.Format
 
     @primary_key false
 
@@ -67,8 +80,12 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     @required_attrs ~w{director language release_date title}a
     @optional_attrs ~w{producer status}a
 
-    def changeset(form \\ %MovieForm{}, form_attrs) do
-      form
+    def changeset(%Movie{} = movie) do
+      movie |> movie_form_attrs() |> changeset()
+    end
+
+    def changeset(form_attrs) do
+      %MovieForm{}
       |> cast(form_attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
       |> validate_date(:release_date)
@@ -76,23 +93,45 @@ defmodule EpicenterWeb.Styleguide.FormLive do
 
     def movie_attrs(%Ecto.Changeset{} = changeset) do
       case apply_action(changeset, :create) do
-        {:ok, struct} -> {:ok, struct |> Map.from_struct() |> convert(:release_date) |> convert(:status, :in_stock)}
+        {:ok, movie_form} -> {:ok, movie_attrs(movie_form)}
         other -> other
       end
     end
 
-    defp convert(attrs, :release_date),
+    def movie_attrs(%MovieForm{} = movie_form) do
+      movie_form
+      |> Map.from_struct()
+      |> convert(:release_date, :string_to_date)
+      |> convert(:status, :in_stock)
+    end
+
+    def movie_form_attrs(%Movie{} = movie) do
+      movie
+      |> Map.from_struct()
+      |> convert(:release_date, :date_to_string)
+      |> convert(:in_stock, :status)
+    end
+
+    defp convert(attrs, :release_date, :date_to_string),
+      do: attrs |> Map.update(:release_date, nil, &Format.date/1)
+
+    defp convert(attrs, :release_date, :string_to_date),
       do: attrs |> Map.update(:release_date, nil, &DateParser.parse_mm_dd_yyyy!/1)
+
+    defp convert(%{in_stock: in_stock} = attrs, :in_stock, :status),
+      do: attrs |> Map.put(:status, if(in_stock, do: "in-stock", else: "out-of-stock")) |> Map.delete(:in_stock)
 
     defp convert(%{status: status} = attrs, :status, :in_stock),
       do: attrs |> Map.put(:in_stock, status == "in-stock") |> Map.delete(:status)
   end
 
   def mount(_params, _session, socket) do
+    movie = Movies.get_movie()
+
     socket
     |> assign_page_title("Styleguide: form")
     |> assign(show_nav: false)
-    |> assign_form_changeset(MovieForm.changeset(%{}))
+    |> assign_form_changeset(MovieForm.changeset(movie))
     |> assign_movie(nil)
     |> ok()
   end
