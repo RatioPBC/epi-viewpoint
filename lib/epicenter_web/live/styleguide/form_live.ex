@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.Styleguide.FormLive do
   use EpicenterWeb, :live_view
 
+  import Epicenter.Validation, only: [validate_date: 2]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
 
@@ -47,6 +48,9 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     use Ecto.Schema
 
     import Ecto.Changeset
+    import Epicenter.Validation, only: [validate_date: 2]
+
+    alias Epicenter.DateParser
 
     @primary_key false
 
@@ -60,25 +64,28 @@ defmodule EpicenterWeb.Styleguide.FormLive do
       field :title, :string
     end
 
-    @required_attrs ~w{director producer title}a
-    @optional_attrs ~w{language release_date status}a
+    @required_attrs ~w{director language release_date title}a
+    @optional_attrs ~w{producer status}a
 
     def changeset(form \\ %MovieForm{}, form_attrs) do
       form
       |> cast(form_attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
+      |> validate_date(:release_date)
     end
 
     def movie_attrs(%Ecto.Changeset{} = changeset) do
       case apply_action(changeset, :create) do
-        {:ok, struct} -> {:ok, struct |> Map.from_struct() |> status_to_in_stock()}
+        {:ok, struct} -> {:ok, struct |> Map.from_struct() |> convert(:release_date) |> convert(:status, :in_stock)}
         other -> other
       end
     end
 
-    defp status_to_in_stock(%{status: status} = attrs) do
-      attrs |> Map.put(:in_stock, status == "in-stock")
-    end
+    defp convert(attrs, :release_date),
+      do: attrs |> Map.update(:release_date, nil, &DateParser.parse_mm_dd_yyyy!/1)
+
+    defp convert(%{status: status} = attrs, :status, :in_stock),
+      do: attrs |> Map.put(:in_stock, status == "in-stock") |> Map.delete(:status)
   end
 
   def mount(_params, _session, socket) do
