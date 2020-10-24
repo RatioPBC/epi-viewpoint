@@ -24,7 +24,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     end
 
     @required_attrs ~w{director in_stock producer title}a
-    @optional_attrs ~w{language release_date}a
+    @optional_attrs ~w{genres language release_date}a
 
     def changeset(movie, attrs) do
       movie
@@ -46,6 +46,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     def get_movie() do
       %Movie{
         director: "Rick Moranis",
+        genres: ["Drama", "Science Fiction"],
         in_stock: false,
         language: "English",
         producer: "Louis M. Silverstein",
@@ -78,7 +79,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     end
 
     @required_attrs ~w{director language release_date title}a
-    @optional_attrs ~w{producer status}a
+    @optional_attrs ~w{genres producer status}a
 
     def changeset(%Movie{} = movie) do
       movie |> movie_form_attrs() |> changeset()
@@ -151,6 +152,12 @@ defmodule EpicenterWeb.Styleguide.FormLive do
   end
 
   # # #
+
+  def genres(),
+    do: ["Comedy", "Drama", "Musical", "Science Fiction"]
+
+  def languages(),
+    do: ["English", "German", "Italian"]
 
   def statuses(),
     do: [{"In Stock", "in-stock"}, {"Out Of Stock", "out-of-stock"}]

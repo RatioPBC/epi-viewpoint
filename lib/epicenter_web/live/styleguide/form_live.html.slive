@@ -18,30 +18,34 @@
         = text_input f, :producer, data: [grid: [row: 3, col: 3, span: 2]]
 
       fieldset
-        = label f, :status, "Status", data: [grid: [row: 1, col: 1, span: 2]]
-        = error_tag f, :status, data: [grid: [row: 2, col: 1, span: 2]]
-        = content_tag :div, class: "select-wrapper", data: [grid: [row: 3, col: 1, span: 2]] do
-          = arrow_down_icon()
-          = select f, :status, statuses()
+        = content_tag :label, "Genres", data: [grid: [row: 1, col: 1, span: 2]]
+        = error_tag f, :language, data: [grid: [row: 2, col: 1, span: 2]]
+        = content_tag :div, class: "checkbox-button-list", data: [grid: [row: 3, col: 1, span: 2]] do
+          = for genre <- genres() do
+            = label do
+              => checkbox f, :genres, name: input_name(f, :genres) <> "[]", checked: genre in input_value(f, :genres), checked_value: genre, hidden_input: false
+              = genre
 
         = content_tag :label, "Language", data: [grid: [row: 1, col: 3, span: 2]]
         = error_tag f, :language, data: [grid: [row: 2, col: 3, span: 2]]
-        = tag :div, class: "radio-button-list", data: [grid: [row: 3, col: 3, span: 2]]
-          = label do
-            => radio_button f, :language, "English"
-            ' English
-          = label do
-            => radio_button f, :language, "German"
-            ' German
-          = label do
-            => radio_button f, :language, "Italian"
-            ' Italian
+        = content_tag :div, class: "radio-button-list", data: [grid: [row: 3, col: 3, span: 2]] do
+          = for language <- languages() do
+            = label do
+              => radio_button f, :language, language
+              = language
 
       fieldset
         = label f, :release_date, "Release Date", data: [grid: [row: 1, col: 1, span: 2]]
         = content_tag :div, "MM/DD/YYYY", data: [grid: [row: 2, col: 1, span: 2]]
         = error_tag f, :release_date, data: [grid: [row: 3, col: 1, span: 2]]
         = text_input f, :release_date, data: [grid: [row: 4, col: 1, span: 2]]
+
+      fieldset
+        = label f, :status, "Status", data: [grid: [row: 1, col: 1, span: 2]]
+        = error_tag f, :status, data: [grid: [row: 2, col: 1, span: 2]]
+        = content_tag :div, class: "select-wrapper", data: [grid: [row: 3, col: 1, span: 2]] do
+          = arrow_down_icon()
+          = select f, :status, statuses()
 
       .debug
         div form changeset (changed on "Save")

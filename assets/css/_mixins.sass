@@ -142,6 +142,9 @@
   & > *
     place-self: center
 
+@mixin checkbox-button-list
+  @include radio-button-list
+
 @mixin data-table
   border-collapse: collapse
   margin-top: 3rem
@@ -245,6 +248,9 @@
       color: $error-color
       font-size: $small-body-text-size
       font-weight: normal
+
+    .checkbox-button-list
+      @include checkbox-button-list
 
     .radio-button-list
       @include radio-button-list
