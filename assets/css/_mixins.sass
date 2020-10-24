@@ -246,6 +246,9 @@
       font-size: $small-body-text-size
       font-weight: normal
 
+    .radio-button-list
+      @include radio-button-list
+
     .select-wrapper
       @include select
 
@@ -265,9 +268,12 @@
     button:first-of-type
       @include button-primary
 
+    .form-error-message
+      color: $error-color
+
 @mixin grid($column-size)
-  align-items: stretch
-  column-gap: 1rem
+  align-items: start
+  column-gap: 2rem
   display: grid
   grid-auto-columns: $column-size
   grid-auto-rows: auto
@@ -355,8 +361,9 @@
   grid-template-rows: auto 1fr auto
 
 @mixin radio-button-list
-  @include vertical-flow($margin: 0.25rem)
+  @include vertical-flow($margin: 0.5rem)
   font-weight: bold
+  margin-top: 0.5rem
 
   label
     display: block

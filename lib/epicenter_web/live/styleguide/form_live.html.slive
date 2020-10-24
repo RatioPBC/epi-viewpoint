@@ -1,32 +1,55 @@
 #styleguide-form-page
   section
-    = form_for @changeset, "#", [id: "form-layout"], fn f ->
-      fieldset
-        = label f, :first_name, "First name", data: [grid: [row: 1, col: 1, span: 2]]
-        = error_tag f, :first_name, data: [grid: [row: 2, col: 1, span: 2]]
-        = text_input f, :first_name, data: [grid: [row: 3, col: 1, span: 2]]
+    h2 Movie
 
-        = label f, :last_name, "Last name", data: [grid: [row: 1, col: 3, span: 2]]
-        = error_tag f, :last_name, data: [grid: [row: 2, col: 3, span: 2]]
-        = text_input f, :last_name, data: [grid: [row: 3, col: 3, span: 2]]
+    = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
+      fieldset
+        = label f, :title, "Title", data: [grid: [row: 1, col: 1, span: 4]]
+        = error_tag f, :title,  data: [grid: [row: 2, col: 1, span: 4]]
+        = text_input f, :title, data: [grid: [row: 3, col: 1, span: 4]]
 
       fieldset
-        = label f, :email, "E-mail", data: [grid: [row: 1, col: 1, span: 4]]
-        = error_tag f, :email,  data: [grid: [row: 2, col: 1, span: 4]]
-        = text_input f, :email, data: [grid: [row: 3, col: 1, span: 4]]
+        = label f, :director, "Director", data: [grid: [row: 1, col: 1, span: 2]]
+        = error_tag f, :director, data: [grid: [row: 2, col: 1, span: 2]]
+        = text_input f, :director, data: [grid: [row: 3, col: 1, span: 2]]
+
+        = label f, :producer, "Producer", data: [grid: [row: 1, col: 3, span: 2]]
+        = error_tag f, :producer, data: [grid: [row: 2, col: 3, span: 2]]
+        = text_input f, :producer, data: [grid: [row: 3, col: 3, span: 2]]
 
       fieldset
-        = label f, :type, "Type", data: [grid: [row: 1, col: 1, span: 2]]
-        = tag :div, class: "select-wrapper", data: [grid: [row: 2, col: 1, span: 2]]
-          = arrow_down_icon()
-          = select f, :type, types()
+        = label f, :release_date, "Release Date", data: [grid: [row: 1, col: 1, span: 2]]
+        = error_tag f, :release_date, data: [grid: [row: 2, col: 1, span: 2]]
+        = text_input f, :release_date, data: [grid: [row: 3, col: 1, span: 2]]
+
+        = content_tag :label, "Language", data: [grid: [row: 1, col: 3, span: 2]]
+        = error_tag f, :language, data: [grid: [row: 2, col: 3, span: 2]]
+        = tag :div, class: "radio-button-list", data: [grid: [row: 3, col: 3, span: 2]]
+          = label do
+            => radio_button f, :language, "English"
+            ' English
+          = label do
+            => radio_button f, :language, "German"
+            ' German
+          = label do
+            => radio_button f, :language, "Italian"
+            ' Italian
 
       fieldset
         = label f, :status, "Status", data: [grid: [row: 1, col: 1, span: 2]]
-        = tag :div, class: "select-wrapper",  data: [grid: [row: 2, col: 1, span: 2]]
+        = error_tag f, :status, data: [grid: [row: 2, col: 1, span: 2]]
+        = tag :div, class: "select-wrapper", data: [grid: [row: 3, col: 1, span: 2]]
           = arrow_down_icon()
           = select f, :status, statuses()
+
+      .debug
+        div form changeset (changed on "Save")
+        div= inspect(@form_changeset)
+      .debug
+        div movie (created on "Save" if the form changeset is valid)
+        div= inspect(@movie)
 
       footer
         = submit "Save"
         = submit "Delete"
+        .form-error-message= @form_error
