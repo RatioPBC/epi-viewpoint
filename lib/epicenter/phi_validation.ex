@@ -1,4 +1,4 @@
-defmodule Epicenter.Validation do
+defmodule Epicenter.PhiValidation do
   import Ecto.Changeset, only: [validate_change: 3]
 
   @user_input_restrictions Application.compile_env(:epicenter, :user_input_restrictions, :testdata_only)

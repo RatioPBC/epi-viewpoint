@@ -3,7 +3,7 @@ defmodule Epicenter.Cases.Phone do
 
   import Ecto.Changeset
   import Ecto.Query
-  import Epicenter.Validation, only: [validate_phi: 2]
+  import Epicenter.PhiValidation, only: [validate_phi: 2]
 
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone

@@ -1,4 +1,4 @@
-defmodule Epicenter.ValidationTest do
+defmodule Epicenter.PhiValidationTest do
   use Epicenter.DataCase, async: true
 
   alias Ecto.Changeset
@@ -6,7 +6,7 @@ defmodule Epicenter.ValidationTest do
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
   alias Epicenter.Cases.Email
-  alias Epicenter.Validation
+  alias Epicenter.PhiValidation
 
   describe "validate_phi: person last_name" do
     @valid_last_name "Testuser2"
@@ -14,19 +14,19 @@ defmodule Epicenter.ValidationTest do
 
     test "changeset is valid if last_name starts with 'Testuser'" do
       Changeset.change(%Person{}, last_name: @valid_last_name)
-      |> Validation.validate_phi(:person)
+      |> PhiValidation.validate_phi(:person)
       |> assert_valid()
     end
 
     test "changeset is invalid if last_name does not start with 'Testuser'" do
       Changeset.change(%Person{}, last_name: @invalid_last_name)
-      |> Validation.validate_phi(:person)
+      |> PhiValidation.validate_phi(:person)
       |> assert_invalid(last_name: ["In non-PHI environment, must start with 'Testuser'"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
       Changeset.change(%Person{}, last_name: @invalid_last_name)
-      |> Validation.validate_phi(:person, :unrestricted)
+      |> PhiValidation.validate_phi(:person, :unrestricted)
       |> assert_valid()
     end
   end
@@ -37,19 +37,19 @@ defmodule Epicenter.ValidationTest do
 
     test "changeset is valid if date of birth is first of month" do
       Changeset.change(%Person{}, dob: @valid_dob)
-      |> Validation.validate_phi(:person)
+      |> PhiValidation.validate_phi(:person)
       |> assert_valid()
     end
 
     test "changeset is invalid if date of birth is not first of month" do
       Changeset.change(%Person{}, dob: @invalid_dob)
-      |> Validation.validate_phi(:person)
+      |> PhiValidation.validate_phi(:person)
       |> assert_invalid(dob: ["In non-PHI environment, must be the first of the month"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
       Changeset.change(%Person{}, dob: @invalid_dob)
-      |> Validation.validate_phi(:person, :unrestricted)
+      |> PhiValidation.validate_phi(:person, :unrestricted)
       |> assert_valid()
     end
   end
@@ -60,19 +60,19 @@ defmodule Epicenter.ValidationTest do
 
     test "changest is valid if phone number matches '111-111-1xxx'" do
       Changeset.change(%Phone{}, number: @valid_phone_number)
-      |> Validation.validate_phi(:phone)
+      |> PhiValidation.validate_phi(:phone)
       |> assert_valid()
     end
 
     test "changest is invalid if phone number does not match '111-111-1xxx'" do
       Changeset.change(%Phone{}, number: @invalid_phone_number)
-      |> Validation.validate_phi(:phone)
+      |> PhiValidation.validate_phi(:phone)
       |> assert_invalid(number: ["In non-PHI environment, must match '111-111-1xxx'"])
     end
 
     test "changest is valid when there are no user input restrictions" do
       Changeset.change(%Phone{}, number: @invalid_phone_number)
-      |> Validation.validate_phi(:phone, :unrestricted)
+      |> PhiValidation.validate_phi(:phone, :unrestricted)
       |> assert_valid()
     end
   end
@@ -83,19 +83,19 @@ defmodule Epicenter.ValidationTest do
 
     test "changeset is valid if email address ends with '@example.com'" do
       Changeset.change(%Email{}, address: @valid_email_address)
-      |> Validation.validate_phi(:email)
+      |> PhiValidation.validate_phi(:email)
       |> assert_valid()
     end
 
     test "changeset is invalid if email address does not end with '@example.com'" do
       Changeset.change(%Email{}, address: @invalid_email_address)
-      |> Validation.validate_phi(:email)
+      |> PhiValidation.validate_phi(:email)
       |> assert_invalid(address: ["In non-PHI environment, must end with '@example.com'"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
       Changeset.change(%Email{}, address: @invalid_email_address)
-      |> Validation.validate_phi(:email, :unrestricted)
+      |> PhiValidation.validate_phi(:email, :unrestricted)
       |> assert_valid()
     end
   end
@@ -106,19 +106,19 @@ defmodule Epicenter.ValidationTest do
 
     test "changeset is valid if street is on Test St" do
       Changeset.change(%Address{}, street: @valid_street)
-      |> Validation.validate_phi(:address)
+      |> PhiValidation.validate_phi(:address)
       |> assert_valid()
     end
 
     test "changeset is invalid if street is not on Test St" do
       Changeset.change(%Address{}, street: @invalid_street)
-      |> Validation.validate_phi(:address)
+      |> PhiValidation.validate_phi(:address)
       |> assert_invalid(street: ["In non-PHI environment, must match '#### Test St'"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
       Changeset.change(%Address{}, street: @invalid_street)
-      |> Validation.validate_phi(:address, :unrestricted)
+      |> PhiValidation.validate_phi(:address, :unrestricted)
       |> assert_valid()
     end
   end
@@ -129,19 +129,19 @@ defmodule Epicenter.ValidationTest do
 
     test "changeset is valid if city is City followed by an optional number" do
       Changeset.change(%Address{}, city: @valid_city)
-      |> Validation.validate_phi(:address)
+      |> PhiValidation.validate_phi(:address)
       |> assert_valid()
     end
 
     test "changeset is invalid if city does not start with City and end in a number" do
       Changeset.change(%Address{}, city: @invalid_city)
-      |> Validation.validate_phi(:address)
+      |> PhiValidation.validate_phi(:address)
       |> assert_invalid(city: ["In non-PHI environment, must match 'City#'"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
       Changeset.change(%Address{}, city: @invalid_city)
-      |> Validation.validate_phi(:address, :unrestricted)
+      |> PhiValidation.validate_phi(:address, :unrestricted)
       |> assert_valid()
     end
   end
@@ -152,19 +152,19 @@ defmodule Epicenter.ValidationTest do
 
     test "changeset is valid if postal_code starts with 4 zeros" do
       Changeset.change(%Address{}, postal_code: @valid_postal_code)
-      |> Validation.validate_phi(:address)
+      |> PhiValidation.validate_phi(:address)
       |> assert_valid()
     end
 
     test "changeset is invalid if postal_code does not start with 4 zeros" do
       Changeset.change(%Address{}, postal_code: @invalid_postal_code)
-      |> Validation.validate_phi(:address)
+      |> PhiValidation.validate_phi(:address)
       |> assert_invalid(postal_code: ["In non-PHI environment, must match '0000x'"])
     end
 
     test "changeset is valid when there are no user input restrictions" do
       Changeset.change(%Address{}, postal_code: @invalid_postal_code)
-      |> Validation.validate_phi(:address, :unrestricted)
+      |> PhiValidation.validate_phi(:address, :unrestricted)
       |> assert_valid()
     end
   end
