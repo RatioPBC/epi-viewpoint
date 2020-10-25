@@ -20,19 +20,11 @@
       fieldset
         = content_tag :label, "Genres", data: [grid: [row: 1, col: 1, span: 2]]
         = error_tag f, :language, data: [grid: [row: 2, col: 1, span: 2]]
-        = content_tag :div, class: "checkbox-button-list", data: [grid: [row: 3, col: 1, span: 2]] do
-          = for genre <- genres() do
-            = label do
-              => checkbox f, :genres, name: input_name(f, :genres) <> "[]", checked: genre in input_value(f, :genres), checked_value: genre, hidden_input: false
-              = genre
+        = checkbox_list f, :genres, genres(), data: [grid: [row: 3, col: 1, span: 2]]
 
         = content_tag :label, "Language", data: [grid: [row: 1, col: 3, span: 2]]
         = error_tag f, :language, data: [grid: [row: 2, col: 3, span: 2]]
-        = content_tag :div, class: "radio-button-list", data: [grid: [row: 3, col: 3, span: 2]] do
-          = for language <- languages() do
-            = label do
-              => radio_button f, :language, language
-              = language
+        = radio_button_list f, :language, languages(), data: [grid: [row: 3, col: 3, span: 2]]
 
       fieldset
         = label f, :release_date, "Release Date", data: [grid: [row: 1, col: 1, span: 2]]
