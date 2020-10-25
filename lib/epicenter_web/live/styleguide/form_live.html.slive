@@ -19,7 +19,7 @@
 
       fieldset
         = content_tag :label, "Genres", data: [grid: [row: 1, col: 1, span: 2]]
-        = error_tag f, :language, data: [grid: [row: 2, col: 1, span: 2]]
+        = error_tag f, :genres, data: [grid: [row: 2, col: 1, span: 2]]
         = checkbox_list f, :genres, genres(), data: [grid: [row: 3, col: 1, span: 2]]
 
         = content_tag :label, "Language", data: [grid: [row: 1, col: 3, span: 2]]
