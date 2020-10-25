@@ -46,9 +46,9 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     def get_movie() do
       %Movie{
         director: "Rick Moranis",
-        genres: ["Drama", "Science Fiction"],
+        genres: ["Comedy", "Drama"],
         in_stock: false,
-        language: "English",
+        language: "Spanish",
         producer: "Louis M. Silverstein",
         release_date: ~D[1983-08-26],
         title: "Strange Brew"

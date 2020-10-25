@@ -3,6 +3,7 @@ defmodule Epicenter.SimpleCase do
 
   using do
     quote do
+      import Epicenter.Test.HtmlAssertions
       import Euclid.Test.Extra.Assertions
     end
   end

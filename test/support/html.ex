@@ -36,6 +36,9 @@ defmodule Epicenter.Test.Html do
   def meta_contents(html, name) when not is_binary(html),
     do: html |> Floki.attribute("meta[name=#{name}]", "content") |> Enum.join("")
 
+  def normalize(html_string) when is_binary(html_string),
+    do: html_string |> parse() |> Floki.raw_html()
+
   def parse(html_string),
     do: html_string |> Floki.parse_fragment!()
 

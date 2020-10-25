@@ -24,7 +24,7 @@
 
         = content_tag :label, "Language", data: [grid: [row: 1, col: 3, span: 2]]
         = error_tag f, :language, data: [grid: [row: 2, col: 3, span: 2]]
-        = radio_button_list f, :language, languages(), data: [grid: [row: 3, col: 3, span: 2]]
+        = radio_button_list f, :language, languages(), [other: "Other"], data: [grid: [row: 3, col: 3, span: 2]]
 
       fieldset
         = label f, :release_date, "Release Date", data: [grid: [row: 1, col: 1, span: 2]]
