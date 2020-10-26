@@ -298,7 +298,8 @@
     .styleguide-section-title#form Form
 
     .styleguide-example-title Full form examples
-    = live_redirect "Form example", to: Routes.styleguide_form_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormLive)
+    div= live_redirect "Form example", to: Routes.styleguide_form_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormLive)
+    div= live_redirect "Form builder example", to: Routes.styleguide_form_builder_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormBuilderLive)
 
     .styleguide-example-title Radio button list
     .styleguide-example

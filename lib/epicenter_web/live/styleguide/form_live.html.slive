@@ -1,6 +1,7 @@
 #styleguide-form-page
   section
     h2 Movie
+    i Interactive demo of using an embedded schema module (MovieForm) as the datasource for a form
 
     = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
       fieldset

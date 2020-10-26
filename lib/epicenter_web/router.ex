@@ -62,6 +62,7 @@ defmodule EpicenterWeb.Router do
     get "/fakemail", FakeMailController, :show
     live "/styleguide", Styleguide.StyleguideLive, as: :styleguide
     live "/styleguide/form", Styleguide.FormLive, as: :styleguide_form
+    live "/styleguide/form-builder", Styleguide.FormBuilderLive, as: :styleguide_form_builder
     delete "/users/log_out", UserSessionController, :delete
   end
 
