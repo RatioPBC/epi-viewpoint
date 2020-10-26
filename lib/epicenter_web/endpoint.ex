@@ -36,6 +36,7 @@ defmodule EpicenterWeb.Endpoint do
       favicon.ico
       robots.txt
       site.webmanifest
+      version.txt
     ]
 
   # Code reloading can be explicitly enabled under the
