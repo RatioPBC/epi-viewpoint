@@ -11,7 +11,8 @@
 
       #identifying-information
         header
-          span Identifying Information
+          h2 Identifying Information
+
         #name-fields
           fieldset
             = label f, :first_name do
@@ -49,7 +50,7 @@
 
       #locating-information
         header
-          span Locating Information
+          h2 Locating Information
 
         fieldset
           = if has_field?(@changeset, :phones) do
@@ -114,7 +115,6 @@
         a#add-email[phx-click="add-email"]
           = plus_icon()
           span Add email
-
 
       #form-end
       #nav
