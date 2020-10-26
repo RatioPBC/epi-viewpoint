@@ -27,10 +27,6 @@ config :epicenter, Epicenter.Repo,
         url: CFG.database_url()
 
 config :epicenter, EpicenterWeb.Endpoint,
-       # http: [
-       #   port: CFG.application_port(),
-       #   transport_options: [socket_opts: [:inet6]]
-       # ],
        live_view: [signing_salt: CFG.live_view_signing_salt()],
        secret_key_base: CFG.secret_key_base(),
        server: true,
