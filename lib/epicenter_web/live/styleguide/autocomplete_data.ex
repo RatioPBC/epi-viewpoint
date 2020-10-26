@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.StyleguideData do
+defmodule EpicenterWeb.Styleguide.AutocompleteData do
   def generate_address_data() do
     for street <- ["Park", "Main", "Oak", "Pine", "Maple"],
         street_type <- ["Ave", "Blvd", "St", "Way"],

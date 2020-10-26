@@ -27,7 +27,7 @@
       .address-details
         padding-top: .5rem
         & + .address-details
-          padding-top: 1.5rem
+          padding-top: .5rem
 
   section#lab-results
     @include card
@@ -40,9 +40,25 @@
     table#lab-results-data
       @include data-table
 
-      td
-        padding: 2rem 0
+      tr:last-child
+        border-bottom: none
 
+      td
+        padding: 0.5rem 0
+
+  section#case-investigations
+    @include card
+
+    .reported-on
+      color: $-black-60
+      margin-top: 0
+
+    .status
+      margin-top: 2rem
+      font-size: 1.8rem
+      font-weight: bold
+      .status-value
+        color: $-red
   section#demographics
     @include card
 

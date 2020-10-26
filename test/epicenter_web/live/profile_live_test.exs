@@ -80,9 +80,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       page_live
       |> assert_role_text("lab-results", "Lab Results No lab results")
     end
+
+    test "there are no case investigations" do
+    end
   end
 
-  describe "lab results table" do
+  describe "when there are lab results" do
     defp build_lab_result(person, user, tid, sampled_on, analyzed_on, reported_on) do
       Test.Fixtures.lab_result_attrs(person, user, tid, sampled_on, %{
         result: "positive",
@@ -140,6 +143,63 @@ defmodule EpicenterWeb.ProfileLiveTest do
         ["Collection", "Result", "Ordering Facility", "Analysis", "Reported", "Type"],
         ["Unknown", "Unknown", "Unknown", "Unknown", "Unknown", "Unknown"]
       ])
+    end
+  end
+
+  describe "case investigations" do
+    defp build_negative_lab_result(person, user, tid, sampled_on, analyzed_on, reported_on) do
+      Test.Fixtures.lab_result_attrs(person, user, tid, sampled_on, %{
+        result: "negative",
+        request_facility_name: "Big Big Hospital",
+        analyzed_on: analyzed_on,
+        reported_on: reported_on,
+        test_type: "PCR"
+      })
+      |> Cases.create_lab_result!()
+    end
+
+    test "it shows a pending case investigation", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab_result", ~D[2020-08-05], ~D[2020-08-06], ~D[2020-08-07])
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigations(%{status: "Pending", reported_on: "08/07/2020", number: "001"})
+    end
+
+    test "the initiated-by tag uses the oldest positive lab result", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab_result", ~D[2020-08-05], ~D[2020-08-06], ~D[2020-08-07])
+      build_lab_result(person, user, "lab_result", ~D[2020-07-05], ~D[2020-07-06], ~D[2020-07-07])
+      build_negative_lab_result(person, user, "lab_result", ~D[2020-06-05], ~D[2020-06-06], ~D[2020-06-07])
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigations(%{status: "Pending", reported_on: "07/07/2020", number: "001"})
+    end
+
+    test "if any lab results have reported_on, it uses that one", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab_result", ~D[2020-08-05], ~D[2020-08-06], ~D[2020-08-07])
+      build_lab_result(person, user, "lab_result", ~D[2020-07-05], ~D[2020-07-06], ~D[2020-07-07])
+      build_lab_result(person, user, "lab_result", nil, nil, nil)
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigations(%{status: "Pending", reported_on: "07/07/2020", number: "001"})
+    end
+
+    test "if all lab results are missing reported_on, it initiated date is unknown", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab_result", nil, nil, nil)
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigations(%{status: "Pending", reported_on: "unknown", number: "001"})
+    end
+
+    test "if they only have negative test results, don't show a case investigation", %{conn: conn, person: person, user: user} do
+      build_negative_lab_result(person, user, "lab_result", ~D[2020-07-05], ~D[2020-07-06], ~D[2020-07-07])
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_no_case_investigations()
+    end
+
+    test "if there are no lab results, don't  show a case investigation", %{conn: conn, person: person} do
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_no_case_investigations()
     end
   end
 

@@ -20,12 +20,6 @@
     & > *
       margin-top: 1rem
 
-  .styleguide-title
-    font-size: 3rem
-    font-weight: bold
-    margin-bottom: 2rem
-    padding-top: 5rem
-
   .styleguide-example
     align-items: center
     display: grid
@@ -35,6 +29,18 @@
 
     & + .styleguide-example
       margin-top: 3rem
+
+  .styleguide-section-title
+    font-size: 3rem
+    font-weight: bold
+    margin-bottom: 2rem
+    padding-top: 5rem
+
+  .styleguide-example-title
+    font-size: 2rem
+    font-weight: bold
+    margin-bottom: 1rem
+    padding-top: 1rem
 
   code
     color: purple
@@ -185,10 +191,8 @@
   //
   // Form
   //
-  #autocomplete
-    @include autocomplete
-    input
-      width: 300px
+  #radio-buttons
+    @include radio-button-list
 
   #select
     @include horizontal-flow
@@ -207,3 +211,11 @@
 
   #shadow-overlay
     @include shadow($style: overlay)
+
+  //
+  // Icebox
+  //
+  #autocomplete
+    @include autocomplete
+    input
+      width: 300px

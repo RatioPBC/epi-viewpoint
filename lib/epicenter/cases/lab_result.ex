@@ -68,6 +68,10 @@ defmodule Epicenter.Cases.LabResult do
   def fingerprint_fields,
     do: ~w{analyzed_on person_id reported_on request_accession_number request_facility_code request_facility_name result sampled_on test_type}a
 
+  def is_positive(lab_result) do
+    lab_result.result == "positive"
+  end
+
   defmodule Query do
     import Ecto.Query
 

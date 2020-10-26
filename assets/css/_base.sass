@@ -4,6 +4,8 @@
 a
   text-decoration: none
   color: $link-color
+  &:hover
+    text-decoration: underline
 
 body
   color: $primary-text-color
@@ -19,6 +21,18 @@ body
 
 body, html
   height: 100%
+
+.debug
+  color: purple
+  font-family: monospace
+  *:first-child
+    font-weight: bold
+
+input[type="checkbox"]
+  margin-right: 2px
+  transform: scale(1.2) translateX(1px)
+  &:hover
+    cursor: pointer
 
 fieldset
   border: none

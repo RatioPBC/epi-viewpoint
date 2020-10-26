@@ -65,7 +65,8 @@
                   = arrow_down_icon()
                   = select phone_form, :type, phone_types(), data: [role: "phone-types"]
                 = label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do
-                  = trash_icon()
+                  .trash-icon
+                    = trash_icon()
 
         a#add-phone[phx-click="add-phone"]
           = plus_icon()
@@ -107,7 +108,8 @@
               .email-address-and-trash-can
                 = email_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
                 = label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do
-                  = trash_icon()
+                  .trash-icon
+                    = trash_icon()
 
         a#add-email[phx-click="add-email"]
           = plus_icon()
@@ -116,4 +118,4 @@
 
       #form-end
       #nav
-        = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
+        = submit "Save", id: "submit-form"
