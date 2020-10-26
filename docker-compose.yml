@@ -9,7 +9,7 @@ services:
     ports:
       - 5432:5432
   runner:
-    image: epicenter
+    image: epicenter:latest
     ports:
       - 4000:4000
     volumes:

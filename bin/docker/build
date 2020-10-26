@@ -6,4 +6,4 @@ set +e
 check "Docker running" "docker info  > /dev/null 2>&1" "sudo dockerd"
 set -e
 
-docker build . -t epicenter --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}"
+docker build . -t epicenter:latest --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}"

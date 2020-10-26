@@ -1,7 +1,7 @@
 # ---- Application Base Stage ----
 FROM alpine:latest AS app_runner_base
 
-ARG ELIXIR_PROJECT=epicenter
+ENV ELIXIR_PROJECT=epicenter
 ARG DEFAULT_UID=1111
 ARG DEFAULT_GID=1111
 ENV LANG=C.UTF-8
@@ -34,7 +34,6 @@ RUN \
 
 RUN \
   mkdir -p /usr/local/etc \
-  && mkdir -p /opt/bin \
   && mkdir -p /opt/${ELIXIR_PROJECT}
 
 WORKDIR /opt/${ELIXIR_PROJECT}
@@ -91,7 +90,6 @@ COPY bin ./bin
 FROM app_runner_base
 
 ENV MIX_ENV=prod
-ARG PROJECT=epicenter
 
 WORKDIR /opt/${ELIXIR_PROJECT}
 
@@ -101,7 +99,6 @@ COPY --from=app_builder /app/bin/docker/start /opt/${ELIXIR_PROJECT}/bin
 RUN chown -R app:app /opt/${ELIXIR_PROJECT}
 
 ENV PORT=4000
-ENV ELIXIR_PROJECT=${ELIXIR_PROJECT}
 EXPOSE 22/tcp
 EXPOSE 4000/tcp
 USER app:app
