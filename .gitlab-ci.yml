@@ -12,6 +12,8 @@ variables:
 stages:
   - test
   - deploy
+before_script:
+  - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 cache:
   key:
     files:
@@ -36,6 +38,17 @@ test:
     - bin/dev/test
   variables:
     MIX_ENV: test
+build_image:
+  stage: test
+  only:
+    - main
+  image: geometer/docker-gcp:latest
+  services:
+    - docker:dind
+  script:
+    - bin/docker/build
+    - docker tag epicenter:latest $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 deploy_staging:
   only:
     - main
@@ -44,6 +57,8 @@ deploy_staging:
   services:
     - docker:dind
   script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
     - bin/remote/deploy staging
   environment:
     name: staging
@@ -56,6 +71,8 @@ deploy_construction:
   services:
     - docker:dind
   script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
     - bin/remote/deploy construction
   environment:
     name: construction
@@ -68,6 +85,8 @@ deploy_demo:
   services:
     - docker:dind
   script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
     - bin/remote/deploy demo
   environment:
     name: demo
