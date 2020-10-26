@@ -18,7 +18,7 @@ if [[ $env_list =~ (^|[[:space:]])"$env"($|[[:space:]]) ]]; then
         gcloud auth configure-docker
     fi
 
-    bin/docker/build $env
+    bin/docker/build
     docker tag epicenter:latest "gcr.io/epikubes/viewpoint-$env:latest"
     repo="gcr.io/epikubes/viewpoint-$env"
     echo "starting push"

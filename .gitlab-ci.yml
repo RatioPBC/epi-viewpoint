@@ -9,7 +9,6 @@ variables:
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
   POSTGRES_USER: postgres
-  CANONICAL_HOST: viewpoint-construction.network.geometer.dev
 stages:
   - test
   - deploy
@@ -35,6 +34,8 @@ test:
   stage: test
   script:
     - bin/dev/test
+  variables:
+    MIX_ENV: test
 
 deploy_staging:
   only:
