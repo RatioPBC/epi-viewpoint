@@ -8,6 +8,11 @@ defmodule Epicenter.Test.HtmlAssertions do
     left
   end
 
+  def assert_text(html, data_role, contained_text) do
+    assert Test.Html.text(html, role: data_role) =~ contained_text
+    html
+  end
+
   defp to_html_string(string) when is_binary(string),
     do: Test.Html.normalize(string)
 

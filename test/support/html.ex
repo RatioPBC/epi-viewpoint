@@ -1,6 +1,4 @@
 defmodule Epicenter.Test.Html do
-  import ExUnit.Assertions
-
   def all(html, css_query, as: :text) when not is_binary(html),
     do: html |> all(css_query, &Floki.text/1)
 
@@ -12,11 +10,6 @@ defmodule Epicenter.Test.Html do
 
   def all(html, css_query, fun) when not is_binary(html) and is_function(fun),
     do: html |> find(css_query) |> Enum.map(fun)
-
-  def assert_text(html, data_role, contained_text) do
-    assert text(html, role: data_role) =~ contained_text
-    html
-  end
 
   def attr(html, css_query \\ "*", attr_name) when not is_binary(html),
     do: html |> Floki.attribute(css_query, attr_name)

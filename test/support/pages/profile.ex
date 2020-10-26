@@ -6,6 +6,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.Person
   alias Epicenter.Test
+  alias Epicenter.Test.HtmlAssertions
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
@@ -147,9 +148,9 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.assert_text("status", status)
-    |> Test.Html.assert_text("reported-on", reported_on)
-    |> Test.Html.assert_text("case-investigation-title", number)
+    |> HtmlAssertions.assert_text("status", status)
+    |> HtmlAssertions.assert_text("reported-on", reported_on)
+    |> HtmlAssertions.assert_text("case-investigation-title", number)
 
     view
   end
