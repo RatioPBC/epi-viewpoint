@@ -39,7 +39,7 @@ test:
 
 deploy_staging:
   only:
-    - kube-deploy
+    - main
   stage: deploy
   image: geometer/docker-gcp:latest
   services:
@@ -52,7 +52,7 @@ deploy_staging:
 
 deploy_construction:
   only:
-    - kube-deploy
+    - main
   stage: deploy
   image: geometer/docker-gcp:latest
   services:
@@ -65,7 +65,7 @@ deploy_construction:
 
 deploy_demo:
   only:
-    - kube-deploy
+    - main
   stage: deploy
   image: geometer/docker-gcp:latest
   services:
