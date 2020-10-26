@@ -36,7 +36,6 @@ test:
     - bin/dev/test
   variables:
     MIX_ENV: test
-
 deploy_staging:
   only:
     - main
@@ -49,7 +48,6 @@ deploy_staging:
   environment:
     name: staging
     url: https://viewpoint-staging.network.geometer.dev
-
 deploy_construction:
   only:
     - main
@@ -62,7 +60,6 @@ deploy_construction:
   environment:
     name: construction
     url: https://viewpoint-construction.network.geometer.dev
-
 deploy_demo:
   only:
     - main

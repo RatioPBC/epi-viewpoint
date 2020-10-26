@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 services:
   postgres:
     image: postgres
@@ -16,12 +16,11 @@ services:
       - ./tmp/ssl:/opt/ssl:ro
     environment:
       ALLOW_PRIVATE_WEB: "true"
-      CANONICAL_HOST: "localhost"
-      DATABASE_URL: "ecto://cc:abc123@postgres:5432/epicenter_dev"
+      CANONICAL_HOST: localhost
+      DATABASE_URL: ecto://cc:abc123@postgres:5432/epicenter_dev
       DBSSL: "false"
-      LIVE_VIEW_SIGNING_SALT: "xbK8/I1ibfroHQvkZTMKbO7NOLAHtbdP"
-      RELEASE_LEVEL: "dev"
-      SECRET_KEY_BASE: "3TjNgvbwkybwa/wmAHz6kgakyAZ5ETIBCGuKRFW1s/ebkOqElLgtQrJrPZqY51cr"
-
+      LIVE_VIEW_SIGNING_SALT: xbK8/I1ibfroHQvkZTMKbO7NOLAHtbdP
+      RELEASE_LEVEL: dev
+      SECRET_KEY_BASE: 3TjNgvbwkybwa/wmAHz6kgakyAZ5ETIBCGuKRFW1s/ebkOqElLgtQrJrPZqY51cr
     depends_on:
       - postgres
