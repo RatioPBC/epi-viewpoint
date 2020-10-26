@@ -1,12 +1,11 @@
 defmodule Epicenter.Accounts.MultifactorAuth do
   @totp Application.compile_env(:epicenter, :totp, Epicenter.Accounts.TOTP)
-  @issuer Application.compile_env(:epicenter, :mfa_issuer, "Viewpoint")
 
   alias Epicenter.Accounts.User
   alias Epicenter.Extra
 
   def auth_uri(%User{email: email}, secret),
-    do: @totp.otpauth_uri("Viewpoint:#{email}", secret, issuer: @issuer)
+    do: @totp.otpauth_uri("Viewpoint:#{email}", secret, issuer: mfa_issuer())
 
   def check(secret, passcode) when is_binary(secret) and is_binary(passcode) do
     passcode = Extra.String.remove_non_numbers(passcode)
@@ -28,4 +27,8 @@ defmodule Epicenter.Accounts.MultifactorAuth do
 
   def generate_secret(),
     do: @totp.secret()
+
+  defp mfa_issuer do
+    Application.get_env(:epicenter, :mfa_issuer, "Viewpoint")
+  end
 end

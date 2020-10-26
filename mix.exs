@@ -33,7 +33,7 @@ defmodule Epicenter.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      local_or_remote(:remote, :euclid, version: "~> 1.0", organization: "geometer", path: "../euclid"),
+      local_or_remote(:remote, :euclid, version: "~> 1.0", organization: "geometer", path: System.get_env("EUCLID_PATH", "../euclid")),
       {:bcrypt_elixir, "~> 2.1"},
       {:ecto_sql, "~> 3.5"},
       {:eqrcode, "~> 0.1.7"},

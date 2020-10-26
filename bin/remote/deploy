@@ -1,0 +1,32 @@
+#! /usr/bin/env bash
+
+set -e
+
+mkdir -p tmp
+
+env_list="dev prod staging construction demo"
+env=$1
+if [[ $env_list =~ (^|[[:space:]])"$env"($|[[:space:]]) ]]; then
+
+    if [ -n "$GITLAB_CI" ]; then # CI variable is present in gitlab only
+        echo "setting up gitlab for gcloud access..."
+        echo "$GCP_ACCESS_CONSTRUCTION" > tmp/gcloud-service-key-construction.json # Google Cloud service accounts
+        echo "$GCP_ACCESS_STAGING" > tmp/gcloud-service-key-staging.json # Google Cloud service accounts
+        echo "$GCP_ACCESS_DEMO" > tmp/gcloud-service-key-demo.json # Google Cloud service accounts
+        gcloud auth activate-service-account --key-file tmp/gcloud-service-key-$env.json
+        gcloud config set project epikubes
+        gcloud auth configure-docker
+    fi
+
+    bin/docker/build
+    docker tag epicenter:latest "gcr.io/epikubes/viewpoint-$env:latest"
+    repo="gcr.io/epikubes/viewpoint-$env"
+    echo "starting push"
+    docker push "$repo"
+
+    echo "push complete"
+    curl -f -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://viewpoint-rollout-$env.network.geometer.dev
+    echo "restart ping complete"
+else
+    echo "Environment '$env' not found in allowed set: '$env_list'"
+fi

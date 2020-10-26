@@ -45,17 +45,19 @@ check "direnv: .envrc file has all keys" \
   "sed -E 's/=.+//' .envrc.sample >/tmp/.envrc-keys.sample && sed -E 's/=.+//' .envrc >/tmp/.envrc-keys && testcomm" \
   "# copy required keys from .envrc.sample to .envrc and don't forget to run 'direnv allow'"
 
+
 check "direnv: loaded RC path" \
-  "direnv status | grep -s 'Loaded RC path $(pwd)/.envrc'" \
+  "direnv status | grep -s 'Loaded RC path'" \
   "open https://direnv.net/docs/hook.html"
 
 check "asdf: installed" \
   "command -v asdf" \
   "git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.7.8 && echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bash_profile && echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> ~/.bash_profile && asdf update"
 
+EUCLID_PATH="${EUCLID_PATH:-../euclid}"
 check "repo: euclid is installed locally" \
-  "ls ../euclid" \
-  "git clone git@gitlab.com:geometerio/resolve/euclid ../euclid"
+  "ls $EUCLID_PATH" \
+  "git clone git@gitlab.com:geometerio/resolve/euclid $EUCLID_PATH"
 
 check "asdf: erlang plugin installed" \
   "asdf plugin-list | grep erlang" \

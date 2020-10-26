@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+
+/opt/epicenter/bin/epicenter eval "Epicenter.Release.migrate()"
+/opt/epicenter/bin/epicenter start

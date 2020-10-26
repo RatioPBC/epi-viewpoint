@@ -4,20 +4,70 @@ defmodule Epicenter.Release do
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
+  @app :epicenter
+
+  #
+  # DB management
+  #
+
+  def migrate do
+    ensure_started()
+
+    for repo <- repos() do
+      {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
+    end
+  end
+
+  def rollback(repo, version) do
+    ensure_started()
+    {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
+  end
+
+  def seeds do
+    IO.puts("RUNNING SEEDS...")
+
+    existing_user_tids = Epicenter.Accounts.list_users() |> Euclid.Extra.Enum.pluck(:tid)
+
+    new_users =
+      [{"superuser", "Sal Superuser"}, {"admin", "Amy Admin"}, {"investigator", "Ida Investigator"}, {"tracer", "Tom Tracer"}]
+      |> Enum.reject(fn {tid, _name} -> tid in existing_user_tids end)
+
+    for {tid, name} <- new_users do
+      email = "#{tid}@example.com"
+      password = "password123"
+
+      IO.puts("Creating #{name} / #{email} / #{password}")
+
+      Epicenter.Accounts.register_user!(
+        {%{email: email, password: password, tid: tid, name: name},
+         %Epicenter.AuditLog.Meta{author_id: Application.get_env(:epicenter, :unpersisted_admin_id), reason_action: "seed-user", reason_event: "seeds.exs"}}
+      )
+    end
+  end
+
+  defp repos do
+    Application.load(@app)
+    Application.fetch_env!(@app, :ecto_repos)
+  end
+
+  #
+  # User management
+  #
+
   @doc """
   An administrator can use `create_user` to make a user with a name and email.
 
   To do so, find your administrator's user:
 
-    iex> administrator = Epicenter.Repo.get_by(Epicenter.Accounts.User, email: "admin@example.com")
+  iex> administrator = Epicenter.Repo.get_by(Epicenter.Accounts.User, email: "admin@example.com")
 
   NOTE: For the very _first_ user, please use a fake/robot user with UUID "00000000-0000-0000-0000-000000000000"
 
-    iex> administrator = %Epicenter.Accounts.User{id: "00000000-0000-0000-0000-000000000000"}
+  iex> administrator = %Epicenter.Accounts.User{id: "00000000-0000-0000-0000-000000000000"}
 
   Then call this function by providing a list of email addresses of users to disable:
 
-    iex> Epicenter.Release.create_user(administrator, "Fred Durst", "limpbizkit@example.com")
+  iex> Epicenter.Release.create_user(administrator, "Fred Durst", "limpbizkit@example.com")
   """
 
   def create_user(%Epicenter.Accounts.User{} = author, name, email, opts \\ []) do
@@ -108,6 +158,10 @@ defmodule Epicenter.Release do
     [_body, url] = Regex.run(~r|\n(https?://[^\n]+)\n|, body)
     url
   end
+
+  #
+  # other stuff
+  #
 
   defp ensure_started do
     Application.ensure_all_started(:ssl)

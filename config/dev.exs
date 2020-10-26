@@ -68,7 +68,7 @@ config :epicenter, EpicenterWeb.Endpoint,
     ]
   ]
 
-config :epicenter, mfa_issuer: "Viewpoint-dev"
+config :epicenter, mfa_issuer: System.fetch_env!("CANONICAL_HOST")
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n", level: :warn
