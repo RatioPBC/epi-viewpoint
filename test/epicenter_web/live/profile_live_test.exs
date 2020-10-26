@@ -80,9 +80,6 @@ defmodule EpicenterWeb.ProfileLiveTest do
       page_live
       |> assert_role_text("lab-results", "Lab Results No lab results")
     end
-
-    test "there are no case investigations" do
-    end
   end
 
   describe "when there are lab results" do

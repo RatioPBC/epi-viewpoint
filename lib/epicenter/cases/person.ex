@@ -98,27 +98,20 @@ defmodule Epicenter.Cases.Person do
   defp change_fingerprint(changeset), do: changeset
 
   def latest_lab_result(person) do
-    case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do
-      nil -> nil
-      [] -> nil
-      lab_results -> lab_results |> Enum.sort_by(& &1.seq, :desc) |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst)
-    end
+    person
+    |> Cases.preload_lab_results()
+    |> Map.get(:lab_results)
+    |> Enum.sort_by(& &1.seq, :desc)
+    |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst, fn -> nil end)
   end
 
   def oldest_positive_lab_result(person) do
-    case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do
-      nil ->
-        nil
-
-      [] ->
-        nil
-
-      lab_results ->
-        lab_results
-        |> Enum.filter(&LabResult.is_positive?(&1))
-        |> Enum.sort_by(& &1.seq, :asc)
-        |> Enum.min_by(& &1.reported_on, NilFirst, fn -> nil end)
-    end
+    person
+    |> Cases.preload_lab_results()
+    |> Map.get(:lab_results)
+    |> Enum.filter(&LabResult.is_positive?(&1))
+    |> Enum.sort_by(& &1.seq, :asc)
+    |> Enum.min_by(& &1.reported_on, NilFirst, fn -> nil end)
   end
 
   defmodule Query do
