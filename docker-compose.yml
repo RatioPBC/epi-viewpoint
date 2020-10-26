@@ -12,6 +12,8 @@ services:
     image: epicenter
     ports:
       - 4000:4000
+    volumes:
+      - ./tmp/ssl:/opt/ssl:ro
     environment:
       ALLOW_PRIVATE_WEB: "true"
       CANONICAL_HOST: "localhost"
