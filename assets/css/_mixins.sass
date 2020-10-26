@@ -98,11 +98,17 @@
   @include -button($size: $size)
   color: white
 
+  &:hover
+    background-color: $-egyptian-blue
+
 @mixin button-secondary($size: regular)
   @include -button($size: $size)
   background-color: $secondary-button-color
   border-color: $secondary-button-color
   color: $primary-text-color
+
+  &:hover
+    background-color: $-geyser
 
 @mixin button-outline($size: regular)
   @include -button($size: $size)
