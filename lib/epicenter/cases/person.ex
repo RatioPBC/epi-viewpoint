@@ -13,6 +13,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
+  alias Epicenter.Extra.Date.NilFirst
 
   @required_attrs ~w{dob first_name last_name}a
   @optional_attrs ~w{assigned_to_id external_id preferred_language tid employment gender_identity marital_status notes occupation race sex_at_birth}a
@@ -101,6 +102,22 @@ defmodule Epicenter.Cases.Person do
       nil -> nil
       [] -> nil
       lab_results -> lab_results |> Enum.sort_by(& &1.seq, :desc) |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst)
+    end
+  end
+
+  def oldest_positive_lab_result(person) do
+    case person |> Cases.preload_lab_results() |> Map.get(:lab_results) do
+      nil ->
+        nil
+
+      [] ->
+        nil
+
+      lab_results ->
+        lab_results
+        |> Enum.filter(&LabResult.is_positive(&1))
+        |> Enum.sort_by(& &1.seq, :asc)
+        |> Enum.min_by(& &1.reported_on, NilFirst, fn -> nil end)
     end
   end
 

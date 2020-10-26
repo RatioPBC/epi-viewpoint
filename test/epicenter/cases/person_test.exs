@@ -224,6 +224,62 @@ defmodule Epicenter.Cases.PersonTest do
     end
   end
 
+  describe "oldest_positive_lab_result" do
+    test "returns nil if no lab results" do
+      Test.Fixtures.user_attrs(@admin, "user")
+      |> Accounts.register_user!()
+      |> Test.Fixtures.person_attrs("alice")
+      |> Cases.create_person!()
+      |> Person.oldest_positive_lab_result()
+      |> assert_eq(nil)
+    end
+
+    test "returns a positive lab result with the oldest reported on date" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "01-01-2020", reported_on: "2020-07-01") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "01-01-2020", reported_on: "2020-06-01") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "even older", "01-01-2020", reported_on: "2020-05-01") |> Cases.create_lab_result!()
+
+      Test.Fixtures.lab_result_attrs(alice, user, "oldest but negative", "01-01-2020", result: "negative", reported_on: "2020-04-01")
+      |> Cases.create_lab_result!()
+
+      assert Person.oldest_positive_lab_result(alice).tid == "even older"
+    end
+
+    test "when there is a null reported_on for a positive test, returns that oldest known positive test reported on" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "01-01-2020", reported_on: "2020-07-01") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "01-01-2020", reported_on: "2020-06-01") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown", "01-01-2020", reported_on: nil) |> Cases.create_lab_result!()
+
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown negative", "01-01-2020", reported_on: nil, result: "negative")
+      |> Cases.create_lab_result!()
+
+      assert Person.oldest_positive_lab_result(alice).tid == "older"
+    end
+
+    test "when there are two positive results with null reported_on, returns the lab results with the smallest seq" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older unknown", "01-01-2020", reported_on: nil) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer unknown", "01-01-2020", reported_on: nil) |> Cases.create_lab_result!()
+
+      assert Person.oldest_positive_lab_result(alice).tid == "older unknown"
+    end
+
+    test "when there are no positive results, return nil" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+
+      Test.Fixtures.lab_result_attrs(alice, user, "negative", "01-01-2020", result: "negative", reported_on: "2020-04-01")
+      |> Cases.create_lab_result!()
+
+      assert is_nil(Person.oldest_positive_lab_result(alice))
+    end
+  end
+
   # # # Query
 
   describe "all" do

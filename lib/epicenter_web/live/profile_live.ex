@@ -7,10 +7,8 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Format
-  alias Epicenter.Extra.Date.NilFirst
 
   def mount(%{"id" => person_id}, session, socket) do
     if connected?(socket),
@@ -66,8 +64,7 @@ defmodule EpicenterWeb.ProfileLive do
     person = Cases.preload_lab_results(person)
 
     case_investigation_view =
-      with positive_lab_results when positive_lab_results != [] <- Enum.filter(person.lab_results, &LabResult.is_positive(&1)),
-           lab_result when not is_nil(lab_result) <- Enum.min_by(positive_lab_results, & &1.reported_on, NilFirst, fn -> nil end) do
+      with lab_result when not is_nil(lab_result) <- Person.oldest_positive_lab_result(person) do
         reported_on =
           cond do
             !Euclid.Exists.present?(lab_result.reported_on) -> "unknown date"
