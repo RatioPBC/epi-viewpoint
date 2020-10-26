@@ -106,4 +106,36 @@ defmodule Epicenter.Cases.LabResultTest do
       LabResult.Query.display_order() |> Repo.all() |> tids() |> assert_eq(~w{lab0 lab1 lab2 lab3 lab4})
     end
   end
+
+  describe "is_positive?" do
+    setup do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      [user: user, person: person]
+    end
+
+    test "when result is a case-insensitive match of positive, returns true", %{user: user, person: person} do
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result-1", "06-02-2020", result: "positive") |> Cases.create_lab_result!()
+      assert LabResult.is_positive?(lab_result)
+
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result-2", "06-02-2020", result: "pOsItIvE") |> Cases.create_lab_result!()
+      assert LabResult.is_positive?(lab_result)
+    end
+
+    test "when result is a case-insensitive match of other, returns true", %{user: user, person: person} do
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result-1", "06-02-2020", result: "other") |> Cases.create_lab_result!()
+      assert LabResult.is_positive?(lab_result)
+
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result-2", "06-02-2020", result: "oThEr") |> Cases.create_lab_result!()
+      assert LabResult.is_positive?(lab_result)
+    end
+
+    test "when result is anything else, returns false", %{user: user, person: person} do
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result-1", "06-02-2020", result: "negative") |> Cases.create_lab_result!()
+      refute LabResult.is_positive?(lab_result)
+
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "result-2", "06-02-2020", result: nil) |> Cases.create_lab_result!()
+      refute LabResult.is_positive?(lab_result)
+    end
+  end
 end
