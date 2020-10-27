@@ -60,6 +60,7 @@ deploy_staging:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
     - bin/remote/deploy staging
+  resource_group: staging
   environment:
     name: staging
     url: https://viewpoint-staging.network.geometer.dev
@@ -74,6 +75,7 @@ deploy_construction:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
     - bin/remote/deploy construction
+  resource_group: construction
   environment:
     name: construction
     url: https://viewpoint-construction.network.geometer.dev
@@ -88,6 +90,7 @@ deploy_demo:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
     - bin/remote/deploy demo
+  resource_group: demo
   environment:
     name: demo
     url: https://viewpoint-demo.network.geometer.dev
