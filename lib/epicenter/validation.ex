@@ -1,15 +1,20 @@
 defmodule Epicenter.Validation do
-  import Ecto.Changeset, only: [validate_change: 3]
-
+  alias Ecto.Changeset
   alias Epicenter.DateParser
 
   def validate_date(changeset, field) when is_atom(field) do
-    validate_change(changeset, field, fn field, date ->
+    Changeset.validate_change(changeset, field, fn field, date ->
       case DateParser.parse_mm_dd_yyyy(date) do
         {:ok, _} -> valid()
         {:error, _} -> invalid(field, "must be MM/DD/YYYY")
       end
     end)
+  end
+
+  def validate_email_format(changeset, field) do
+    changeset
+    |> Changeset.validate_format(field, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> Changeset.validate_length(field, max: 160)
   end
 
   defp valid(), do: []
