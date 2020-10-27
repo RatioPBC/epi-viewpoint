@@ -43,8 +43,7 @@ check "direnv: .envrc file exists" \
 
 check "direnv: .envrc file has all keys" \
   "sed -E 's/=.+//' .envrc.sample >/tmp/.envrc-keys.sample && sed -E 's/=.+//' .envrc >/tmp/.envrc-keys && testcomm" \
-  "# copy required keys from .envrc.sample to .envrc and don't forget to run 'direnv allow'"
-
+  "# copy required keys from .envrc.sample to .envrc and don't forget to run 'direnv allow', also make sure your keys are alphabetical"
 
 check "direnv: loaded RC path" \
   "direnv status | grep -s 'Loaded RC path'" \
@@ -112,7 +111,7 @@ check "postgres: running" \
   "bin/dev/postgres-start"
 
 check "postgres: correct version is running" \
-  "test $(asdf current postgres | grep -E -o "\d+\.\d+") = $(`asdf which postgres` --version | cut -f 3 -d ' ')" \
+  "test $(asdf current postgres | grep -E -o "\d+\.\d+") = $($(asdf which postgres) --version | cut -f 3 -d ' ')" \
   "bin/dev/postgres-restart"
 
 check "postgres: role exists" \

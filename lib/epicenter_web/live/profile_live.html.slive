@@ -62,6 +62,9 @@
       .status data-role="status"
         span class="status-value" = @case_investigation_view.status
         = " interview"
+      = live_redirect "Start Investigation", to: Routes.case_investigation_start_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartLive, @person), id: "start-case-investigation-link-001"
+
+
   section#lab-results data-role="lab-results"
     header
       h2 Lab Results

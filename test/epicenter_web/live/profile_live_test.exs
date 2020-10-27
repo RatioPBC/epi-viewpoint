@@ -198,6 +198,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_no_case_investigations()
     end
+
+    test "starting a case investigation", %{conn: conn, person: person, user: user} do
+      build_lab_result(person, user, "lab_result", ~D[2020-08-05], ~D[2020-08-06], ~D[2020-08-07])
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.click_start_case_investigation("001")
+      |> assert_redirects_to("/people/#{person.id}/case_investigations/todo/start")
+    end
   end
 
   describe "assigning and unassigning user to a person" do
@@ -333,10 +341,6 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> element("[data-role=edit-demographics-button]")
       |> render_click()
       |> assert_redirects_to("/people/#{person.id}/edit-demographics")
-    end
-
-    defp assert_redirects_to({_, {:live_redirect, %{to: destination_path}}}, expected_path) do
-      assert destination_path == expected_path
     end
   end
 

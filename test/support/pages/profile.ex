@@ -165,6 +165,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def click_start_case_investigation(%View{} = view, number) do
+    view
+    |> element("#start-case-investigation-link-#{number}")
+    |> render_click()
+  end
+
   #
   # lab results
   #

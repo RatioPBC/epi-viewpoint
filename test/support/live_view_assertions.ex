@@ -63,6 +63,10 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
     end
   end
 
+  def assert_redirects_to({_, {:live_redirect, %{to: destination_path}}}, expected_path) do
+    assert destination_path == expected_path
+  end
+
   def assert_role_text(%Phoenix.LiveViewTest.View{} = view, data_role, expected_value) do
     selector = "[data-role=#{data_role}]"
     rendered = view |> element(selector) |> render() |> Test.Html.parse() |> Test.Html.text()
