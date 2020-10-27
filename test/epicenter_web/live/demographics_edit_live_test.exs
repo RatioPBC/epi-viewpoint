@@ -9,7 +9,10 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   setup :register_and_log_in_user
 
   setup %{user: user} do
-    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    person =
+      Test.Fixtures.person_attrs(user, "alice")
+      |> Test.Fixtures.add_demographic_attrs(%{ethnicity: nil, occupation: nil, notes: nil})
+      |> Cases.create_person!()
 
     [person: person]
   end
@@ -20,8 +23,13 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         person
         |> Cases.update_person({
           %{
-            ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]},
-            gender_identity: ["Female", "Transgender woman/trans woman/male-to-female (MTF)"]
+            demographics: [
+              %{
+                id: Euclid.Extra.List.only!(person.demographics).id,
+                ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]},
+                gender_identity: ["Female", "Transgender woman/trans woman/male-to-female (MTF)"]
+              }
+            ]
           },
           Test.Fixtures.audit_meta(user)
         })
@@ -57,7 +65,9 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     test "unchecking the last gender identity", %{conn: conn, person: person, user: user} do
       {:ok, person} =
         person
-        |> Cases.update_person({%{gender_identity: ["Female"]}, Test.Fixtures.audit_meta(user)})
+        |> Cases.update_person(
+          {%{demographics: [%{id: Euclid.Extra.List.only!(person.demographics).id, gender_identity: ["Female"]}]}, Test.Fixtures.audit_meta(user)}
+        )
 
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
@@ -95,11 +105,10 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_employment_selections(%{"Not employed" => false, "Part time" => false, "Full time" => false})
       |> Pages.DemographicsEdit.change_form(%{"employment" => "full_time"})
       |> Pages.DemographicsEdit.assert_employment_selections(%{"Not employed" => false, "Part time" => false, "Full time" => true})
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"employment" => "full_time"})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"employment" => "full_time"})
       |> Pages.Profile.assert_employment("Full time")
 
-      updated_person = Cases.get_person(person_with_no_jobs.id)
-      assert updated_person.employment == "full_time"
+      assert demographics(person_with_no_jobs.id).employment == "full_time"
     end
   end
 
@@ -107,23 +116,23 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     test "updating ethnicity", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"ethnicity" => %{"major" => "declined_to_answer"}})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"ethnicity" => %{"major" => "declined_to_answer"}})
       |> Pages.Profile.assert_major_ethnicity("Declined to answer")
 
       # TODO: - should we assert on the audit log?      assert_revision_count(person, 2)
-      assert Cases.get_person(person.id).ethnicity.major == "declined_to_answer"
+      assert demographics(person.id).ethnicity.major == "declined_to_answer"
     end
 
     test "choosing a detailed ethnicity(ies)", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form",
-        person: %{"ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => ["cuban", "puerto_rican"]}}
+        demographic: %{"ethnicity" => %{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => ["cuban", "puerto_rican"]}}
       )
       |> Pages.Profile.assert_major_ethnicity("Hispanic, Latino/a, or Spanish origin")
       |> Pages.Profile.assert_detailed_ethnicities(["Cuban", "Puerto Rican"])
 
-      updated_person = Cases.get_person(person.id)
+      updated_person = demographics(person.id)
       assert updated_person.ethnicity.major == "hispanic_latinx_or_spanish_origin"
       assert updated_person.ethnicity.detailed == ["cuban", "puerto_rican"]
     end
@@ -205,7 +214,11 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
     test "selecting detailed ethnicity hispanic(et al) first", %{conn: conn, person: person, user: user} do
       {:ok, person_without_ethnicity} =
-        person |> Cases.update_person({%{ethnicity: %{major: "hispanic_latinx_or_spanish_origin"}}, Test.Fixtures.audit_meta(user)})
+        person
+        |> Cases.update_person(
+          {%{demographics: [%{id: Euclid.Extra.List.only!(person.demographics).id, ethnicity: %{major: "hispanic_latinx_or_spanish_origin"}}]},
+           Test.Fixtures.audit_meta(user)}
+        )
 
       Pages.DemographicsEdit.visit(conn, person_without_ethnicity)
       |> Pages.DemographicsEdit.assert_here()
@@ -293,11 +306,10 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_marital_status_selection(%{"Single" => false, "Married" => false})
       |> Pages.DemographicsEdit.change_form(%{"marital_status" => "single"})
       |> Pages.DemographicsEdit.assert_marital_status_selection(%{"Single" => true, "Married" => false})
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"marital_status" => "single"})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"marital_status" => "single"})
       |> Pages.Profile.assert_marital_status("Single")
 
-      updated_person = Cases.get_person(person_without_marital_status.id)
-      assert updated_person.marital_status == "single"
+      assert demographics(person_without_marital_status.id).marital_status == "single"
     end
   end
 
@@ -307,16 +319,17 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_occupation("")
       |> Pages.DemographicsEdit.change_form(%{"occupation" => "architect"})
       |> Pages.DemographicsEdit.assert_occupation("architect")
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "architect"})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"occupation" => "architect"})
       |> Pages.Profile.assert_occupation("architect")
+
+      assert demographics(person.id).occupation == "architect"
 
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_occupation("architect")
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"occupation" => "deep-sea diver"})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"occupation" => "deep-sea diver"})
       |> Pages.Profile.assert_occupation("deep-sea diver")
 
-      updated_person = Cases.get_person(person.id)
-      assert updated_person.occupation == "deep-sea diver"
+      assert demographics(person.id).occupation == "deep-sea diver"
     end
   end
 
@@ -326,16 +339,15 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.DemographicsEdit.assert_notes("")
       |> Pages.DemographicsEdit.change_form(%{"notes" => "foo bar baz"})
       |> Pages.DemographicsEdit.assert_notes("foo bar baz")
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"notes" => "foo bar baz"})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"notes" => "foo bar baz"})
       |> Pages.Profile.assert_notes("foo bar baz")
 
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_notes("foo bar baz")
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", person: %{"notes" => "the sea"})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"notes" => "the sea"})
       |> Pages.Profile.assert_notes("the sea")
 
-      updated_person = Cases.get_person(person.id)
-      assert updated_person.notes == "the sea"
+      assert demographics(person.id).notes == "the sea"
     end
   end
 
@@ -358,5 +370,47 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       refute DemographicsEditLive.detailed_ethnicity_checked(%{detailed: ["detailed_a", "detailed_b"]}, "detailed_c")
       refute DemographicsEditLive.detailed_ethnicity_checked(%{detailed: nil}, "detailed_c")
     end
+  end
+
+  test "making a 'form' demographic", %{conn: conn, person: person} do
+    {:ok, person} =
+      Cases.update_person(
+        person,
+        {%{demographics: person.demographics |> Enum.map(fn demo -> %{id: demo.id, source: "import"} end)}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.DemographicsEdit.visit(conn, person)
+    |> Pages.DemographicsEdit.assert_occupation("")
+    |> Pages.DemographicsEdit.change_form(%{"occupation" => "architect"})
+    |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"occupation" => "architect"})
+
+    assert [%{source: "import"}, %{source: "form", first_name: nil, occupation: "architect"}] = all_demographics(person.id)
+  end
+
+  test "modifying the 'form' demographic", %{conn: conn, person: person} do
+    {:ok, person} =
+      Cases.update_person(
+        person,
+        {%{demographics: person.demographics |> Enum.map(fn demo -> %{id: demo.id, source: "form"} end)}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.DemographicsEdit.visit(conn, person)
+    |> Pages.DemographicsEdit.assert_occupation("")
+    |> Pages.DemographicsEdit.change_form(%{"occupation" => "architect"})
+    |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic: %{"occupation" => "architect"})
+
+    assert [%{source: "form", occupation: "architect"}] = all_demographics(person.id)
+  end
+
+  defp all_demographics(person_id) do
+    Cases.get_person(person_id)
+    |> Cases.preload_demographics()
+    |> Map.get(:demographics)
+  end
+
+  defp demographics(person_id) do
+    Cases.get_person(person_id)
+    |> Cases.preload_demographics()
+    |> Cases.Person.coalesce_demographics()
   end
 end

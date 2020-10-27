@@ -25,10 +25,11 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_role_attribute_value(view, "dob", "01/01/2000")
     end
 
+    @tag :skip
     test "validates changes when the form is saved (not merely changed)", %{conn: conn, person: %Cases.Person{id: id}} do
       {:ok, view, _} = live(conn, "/people/#{id}/edit")
 
-      changes = %{"person" => %{"dob" => "01/01/197", "emails" => %{"0" => %{"address" => ""}}}}
+      changes = %{"form_data" => %{"dob" => "01/01/197", "emails" => %{"0" => %{"address" => ""}}}}
 
       view |> render_click("add-email")
 
@@ -38,7 +39,49 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       view
       |> form("#profile-form", changes)
       |> render_submit()
-      |> assert_validation_messages(%{"person_dob" => "please enter dates as mm/dd/yyyy"})
+      |> assert_validation_messages(%{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
+    end
+
+    test "making a 'form' demographic", %{conn: conn, person: person} do
+      {:ok, person} =
+        Cases.update_person(
+          person,
+          {%{demographics: person.demographics |> Enum.map(fn demo -> %{id: demo.id, source: "import"} end)}, Test.Fixtures.admin_audit_meta()}
+        )
+
+      {:ok, view, _} = live(conn, "/people/#{person.id}/edit")
+
+      changes = %{"form_data" => %{"dob" => "01/01/1970"}}
+
+      {:ok, redirected_live, _} =
+        view
+        |> form("#profile-form", changes)
+        |> render_submit()
+        |> follow_redirect(conn)
+
+      assert_role_text(redirected_live, "date-of-birth", "01/01/1970")
+      assert [%{source: "import"}, %{source: "form", first_name: nil, dob: ~D[1970-01-01]}] = demographics(person.id)
+    end
+
+    test "modifying the 'form' demographic", %{conn: conn, person: person} do
+      {:ok, person} =
+        Cases.update_person(
+          person,
+          {%{demographics: person.demographics |> Enum.map(fn demo -> %{id: demo.id, source: "form"} end)}, Test.Fixtures.admin_audit_meta()}
+        )
+
+      {:ok, view, _} = live(conn, "/people/#{person.id}/edit")
+
+      changes = %{"form_data" => %{"dob" => "01/01/1970"}}
+
+      {:ok, redirected_live, _} =
+        view
+        |> form("#profile-form", changes)
+        |> render_submit()
+        |> follow_redirect(conn)
+
+      assert_role_text(redirected_live, "date-of-birth", "01/01/1970")
+      assert [%{source: "form", dob: ~D[1970-01-01]}] = demographics(person.id)
     end
 
     test "dob field retains invalid date after failed validation, rather than resetting to the value from the database", %{conn: conn, person: person} do
@@ -46,10 +89,10 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
       assert_attribute(view, "input[data-role=dob]", "value", ["01/01/2000"])
 
-      rendered = view |> form("#profile-form", person: %{"dob" => "Jan 4 1928"}) |> render_submit()
+      rendered = view |> form("#profile-form", form_data: %{"dob" => "Jan 4 1928"}) |> render_submit()
 
       assert_attribute(view, "input[data-role=dob]", "value", ["Jan 4 1928"])
-      assert_validation_messages(rendered, %{"person_dob" => "please enter dates as mm/dd/yyyy"})
+      assert_validation_messages(rendered, %{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
@@ -57,7 +100,9 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
       {:ok, redirected_view, _} =
         view
-        |> form("#profile-form", person: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020", preferred_language: "French"})
+        |> form("#profile-form",
+          form_data: %{first_name: "Aaron", last_name: "Testuser2", dob: "01/01/2020", preferred_language: "French"}
+        )
         |> render_submit()
         |> follow_redirect(conn)
 
@@ -72,7 +117,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       {:ok, redirected_live, _} =
         view
         |> form("#profile-form",
-          person: %{
+          form_data: %{
             first_name: "Aaron",
             last_name: "Testuser2",
             dob: "01/01/2020",
@@ -119,7 +164,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       view
       |> form("#profile-form")
       |> render_change(
-        person: %{
+        form_data: %{
           first_name: "Aaron",
           last_name: "Testuser2",
           dob: "01/01/2020",
@@ -138,7 +183,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_address_form(%{})
       |> Pages.ProfileEdit.click_add_address_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
-        person: %{
+        form_data: %{
           "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "OH", "postal_code" => "00000"}}
         }
       )
@@ -162,9 +207,9 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.address_attrs(user, person, "address-1", 5555) |> Cases.create_address!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_address_form(%{"person[addresses][0][street]" => "5555 Test St"})
+      |> Pages.ProfileEdit.assert_address_form(%{"form_data[addresses][0][street]" => "5555 Test St"})
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
-        person: %{
+        form_data: %{
           "addresses" => %{"0" => %{"street" => "1001 Test St", "city" => "City", "state" => "OH", "postal_code" => "00000"}}
         }
       )
@@ -184,12 +229,38 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       ])
     end
 
+    test "updating existing addresses state only", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.address_attrs(user, person, "address-1", 5555) |> Cases.create_address!()
+
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_address_form(%{"form_data[addresses][0][street]" => "5555 Test St"})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        form_data: %{
+          "addresses" => %{"0" => %{"state" => "AK"}}
+        }
+      )
+      |> Pages.Profile.assert_addresses(["5555 Test St, City, AK 00000"])
+
+      Cases.get_person(person.id)
+      |> Cases.preload_addresses()
+      |> Map.get(:addresses)
+      |> pluck([:street, :city, :state, :postal_code])
+      |> assert_eq([
+        %{
+          street: "5555 Test St",
+          city: "City",
+          state: "AK",
+          postal_code: "00000"
+        }
+      ])
+    end
+
     test "clicking add address button does not reset state of form", %{conn: conn, person: person} do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.click_add_address_button()
       |> Pages.ProfileEdit.change_form(%{"addresses" => %{"0" => %{"street" => "3322 Test St"}}})
       |> Pages.ProfileEdit.click_add_address_button()
-      |> Pages.ProfileEdit.assert_address_form(%{"person[addresses][0][street]" => "3322 Test St", "person[addresses][1][street]" => ""})
+      |> Pages.ProfileEdit.assert_address_form(%{"form_data[addresses][0][street]" => "3322 Test St", "form_data[addresses][1][street]" => ""})
       |> Pages.ProfileEdit.assert_validation_messages(%{})
     end
 
@@ -198,7 +269,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_address_form(%{})
       |> Pages.ProfileEdit.click_add_address_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
-        person: %{
+        form_data: %{
           "addresses" => %{"0" => %{"street" => "", "city" => "", "state" => "OH", "postal_code" => ""}}
         }
       )
@@ -215,7 +286,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{})
       |> Pages.ProfileEdit.click_add_email_button()
-      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
       |> Pages.Profile.assert_email_addresses(["alice@example.com"])
 
       Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> pluck(:address) |> assert_eq(["alice@example.com"])
@@ -226,10 +297,10 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
+      |> Pages.ProfileEdit.assert_email_form(%{"form_data[emails][0][address]" => "alice-a@example.com"})
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
-        person: %{
+        form_data: %{
           "emails" => %{
             "0" => %{"address" => "alice-a@example.com", "is_preferred" => "false"},
             "1" => %{"address" => "alice-preferred@example.com", "is_preferred" => "true"}
@@ -243,8 +314,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
-      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
+      |> Pages.ProfileEdit.assert_email_form(%{"form_data[emails][0][address]" => "alice-a@example.com"})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"emails" => %{"0" => %{"address" => "alice-b@example.com"}}})
       |> Pages.Profile.assert_email_addresses(["alice-b@example.com"])
     end
 
@@ -252,10 +323,10 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.email_attrs(user, person, "alice-a") |> Cases.create_email!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-a@example.com"})
+      |> Pages.ProfileEdit.assert_email_form(%{"form_data[emails][0][address]" => "alice-a@example.com"})
       |> Pages.ProfileEdit.click_remove_email_button(index: "0")
       |> Pages.ProfileEdit.assert_email_form(%{})
-      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"emails" => %{}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"emails" => %{}})
       |> Pages.Profile.assert_email_addresses(["Unknown"])
 
       Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> assert_eq([])
@@ -266,7 +337,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
-        person: %{
+        form_data: %{
           "emails" => %{"0" => %{"address" => "alice-0@example.com"}, "1" => %{"address" => ""}}
         }
       )
@@ -278,7 +349,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.ProfileEdit.change_form(%{"emails" => %{"0" => %{"address" => "alice-0@example.com"}}})
       |> Pages.ProfileEdit.click_add_email_button()
-      |> Pages.ProfileEdit.assert_email_form(%{"person[emails][0][address]" => "alice-0@example.com", "person[emails][1][address]" => ""})
+      |> Pages.ProfileEdit.assert_email_form(%{"form_data[emails][0][address]" => "alice-0@example.com", "form_data[emails][1][address]" => ""})
       |> Pages.ProfileEdit.assert_validation_messages(%{})
     end
 
@@ -302,7 +373,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.assert_phone_number_types("phone-types", ["Unknown", "Cell", "Home", "Work"])
-      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
       |> Pages.Profile.assert_phone_numbers(["(111) 111-1000"])
 
       phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
@@ -314,8 +385,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.phone_attrs(user, person, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
-      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{"0" => %{"number" => "11111111009"}}})
+      |> Pages.ProfileEdit.assert_phone_number_form(%{"form_data[phones][0][number]" => "1111111000"})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"phones" => %{"0" => %{"number" => "11111111009"}}})
       |> Pages.Profile.assert_phone_numbers(["+1 (111) 111-1009"])
 
       phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
@@ -326,10 +397,10 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Test.Fixtures.phone_attrs(user, person, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
 
       Pages.ProfileEdit.visit(conn, person)
-      |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111000"})
+      |> Pages.ProfileEdit.assert_phone_number_form(%{"form_data[phones][0][number]" => "1111111000"})
       |> Pages.ProfileEdit.click_remove_phone_button(index: "0")
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
-      |> Pages.submit_and_follow_redirect(conn, "#profile-form", person: %{"phones" => %{}})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"phones" => %{}})
       |> Pages.Profile.assert_phone_numbers(["Unknown"])
 
       Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones) |> assert_eq([])
@@ -340,7 +411,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form",
-        person: %{
+        form_data: %{
           "phones" => %{"0" => %{"number" => "1111111001"}, "1" => %{"number" => ""}}
         }
       )
@@ -352,7 +423,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.change_form(%{"phones" => %{"0" => %{"number" => "1111111001"}}})
       |> Pages.ProfileEdit.click_add_phone_button()
-      |> Pages.ProfileEdit.assert_phone_number_form(%{"person[phones][0][number]" => "1111111001", "person[phones][1][number]" => ""})
+      |> Pages.ProfileEdit.assert_phone_number_form(%{"form_data[phones][0][number]" => "1111111001", "form_data[phones][1][number]" => ""})
       |> Pages.ProfileEdit.assert_validation_messages(%{})
     end
   end
@@ -382,37 +453,37 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
   end
 
-  describe "clean_up_language" do
-    test "updates parameters with other specified language if present" do
-      %{"first_name" => "Aaron", "preferred_language" => "Other", "other_specified_language" => "Piglatin"}
-      |> ProfileEditLive.clean_up_languages()
-      |> assert_eq(%{"first_name" => "Aaron", "preferred_language" => "Piglatin", "other_specified_language" => "Piglatin"})
+  describe "states" do
+    test "returns a list of states tuples" do
+      "TS"
+      |> ProfileEditLive.states()
+      |> Enum.each(fn
+        {"", nil} ->
+          # pass
+          nil
+
+        state_tuple ->
+          assert {state, state} = state_tuple
+      end)
     end
 
-    test "noop when preferred_language is not `Other`" do
-      %{"first_name" => "Aaron", "preferred_language" => "English"}
-      |> ProfileEditLive.clean_up_languages()
-      |> assert_eq(%{"first_name" => "Aaron", "preferred_language" => "English"})
+    test "includes the passed-in current state" do
+      assert {"TS", "TS"} in ProfileEditLive.states("TS")
+    end
+
+    test "includes blank state" do
+      assert {"", nil} in ProfileEditLive.states(nil)
+      assert {"", nil} in ProfileEditLive.states("TS")
+    end
+
+    test "does not duplicate existing states" do
+      ProfileEditLive.states("OH")
+      |> Enum.count(fn state_tuple -> {"OH", "OH"} == state_tuple end)
+      |> assert_eq(1)
     end
   end
 
-  describe "remove_blank_email_addresses" do
-    test "removes empty email addresses from the params" do
-      %{"first_name" => "Alice", "emails" => %{"0" => %{"address" => "alice-0@example.com"}, "1" => %{"address" => ""}}}
-      |> ProfileEditLive.remove_blank_email_addresses()
-      |> assert_eq(%{"first_name" => "Alice", "emails" => %{"0" => %{"address" => "alice-0@example.com"}}}, :simple)
-    end
-
-    test "removes blank email addresses from the params" do
-      %{"first_name" => "Alice", "emails" => %{"0" => %{"address" => "  "}, "1" => %{"address" => nil}}}
-      |> ProfileEditLive.remove_blank_email_addresses()
-      |> assert_eq(%{"first_name" => "Alice", "emails" => %{}}, :simple)
-    end
-
-    test "does nothing when there are no email addresses" do
-      %{"first_name" => "Alice"}
-      |> ProfileEditLive.remove_blank_email_addresses()
-      |> assert_eq(%{"first_name" => "Alice"})
-    end
+  defp demographics(person_id) do
+    Cases.get_person(person_id) |> Cases.preload_demographics() |> Map.get(:demographics)
   end
 end

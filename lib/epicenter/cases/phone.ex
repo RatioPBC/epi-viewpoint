@@ -36,7 +36,7 @@ defmodule Epicenter.Cases.Phone do
     |> strip_non_digits_from_number()
     |> validate_required(@required_attrs)
     |> validate_phi(:phone)
-    |> unique_constraint([:person_id, :number], name: :phone_number_person_id_index)
+    |> unique_constraint([:person_id, :number], name: :phones_number_person_id_index)
     |> Extra.Changeset.maybe_mark_for_deletion()
   end
 

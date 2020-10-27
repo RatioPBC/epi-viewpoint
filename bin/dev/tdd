@@ -9,6 +9,6 @@ slow)
   mix test.watch --max-cases 2 --seed 0 --max-failures 1
   ;;
 *)
-  mix test.watch --seed 0 --max-failures 1
+  mix test.watch --seed 0 --max-failures 1 $*
   ;;
 esac

@@ -14,9 +14,9 @@
       #option-set
         = for gender_identity_option <- gender_identity_options() do
           div
-            = label f, :gender_identity, class: "gender-identity-option", data_role: "gender-identity-checkbox-label", name: "person[gender_identity][]" do
+            = label f, :gender_identity, class: "gender-identity-option", data_role: "gender-identity-checkbox-label", name: "demographic[gender_identity][]" do
               = gender_identity_option
-              = checkbox f, :gender_identity, checked_value: gender_identity_option, checked: gender_identity_checked(@changeset, gender_identity_option), hidden_input: false, data_role: "gender-identity-checkbox", name: "person[gender_identity][]"
+              = checkbox f, :gender_identity, checked_value: gender_identity_option, checked: gender_identity_checked(@changeset, gender_identity_option), hidden_input: false, data_role: "gender-identity-checkbox", name: "demographic[gender_identity][]"
 
       span class="subheader" Ethnicity
       #option-set
@@ -29,9 +29,9 @@
 
             .detailed-ethnicity-options
               = for {detailed_ethnicity_value, detailed_ethnicity_label} <- detailed_ethnicity_options(major_ethnicity_value) do
-                = label ethnicity_form, :detailed, data_role: "detailed-ethnicity-label", name: "person[ethnicity][detailed][]" do
+                = label ethnicity_form, :detailed, data_role: "detailed-ethnicity-label", name: "demographic[ethnicity][detailed][]" do
                   = detailed_ethnicity_label
-                  = tag :input, type: "checkbox", value: detailed_ethnicity_value, checked: detailed_ethnicity_checked(@changeset, detailed_ethnicity_value), data_role: "detailed-ethnicity-checkbox", name: "person[ethnicity][detailed][]"
+                  = tag :input, type: "checkbox", value: detailed_ethnicity_value, checked: detailed_ethnicity_checked(@changeset, detailed_ethnicity_value), data_role: "detailed-ethnicity-checkbox", name: "demographic[ethnicity][detailed][]"
 
       span class="subheader" Marital status
       #option-set

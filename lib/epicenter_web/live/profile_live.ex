@@ -3,6 +3,8 @@ defmodule EpicenterWeb.ProfileLive do
 
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
+  import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
@@ -14,7 +16,7 @@ defmodule EpicenterWeb.ProfileLive do
     if connected?(socket),
       do: Cases.subscribe_to_people()
 
-    person = Cases.get_person(person_id)
+    person = Cases.get_person(person_id) |> Cases.preload_demographics()
 
     socket
     |> authenticate_user(session)
@@ -56,7 +58,7 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def assign_person(socket, person) do
-    updated_person = person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to()
+    updated_person = person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to() |> Cases.preload_demographics()
     assign(socket, person: updated_person)
   end
 
@@ -88,8 +90,8 @@ defmodule EpicenterWeb.ProfileLive do
 
   # # #
 
-  def age(%Person{dob: dob}) do
-    Date.diff(Date.utc_today(), dob) |> Integer.floor_div(365)
+  def age(dob) do
+    Date.utc_today() |> Date.diff(dob) |> Integer.floor_div(365)
   end
 
   def is_unassigned?(person) do
@@ -136,6 +138,8 @@ defmodule EpicenterWeb.ProfileLive do
     "not_hispanic_latinx_or_spanish_origin" => "Not Hispanic, Latino/a, or Spanish origin",
     "hispanic_latinx_or_spanish_origin" => "Hispanic, Latino/a, or Spanish origin"
   }
+  def ethnicity_value(%Epicenter.Cases.Person{} = person), do: person |> coalesce_demographics() |> ethnicity_value()
+
   def ethnicity_value(%{ethnicity: nil}),
     do: @ethnicity_values_map |> Map.get("unknown")
 
@@ -151,10 +155,13 @@ defmodule EpicenterWeb.ProfileLive do
     "cuban" => "Cuban",
     "another_hispanic_latinx_or_spanish_origin" => "Another Hispanic, Latino/a or Spanish origin"
   }
+  def detailed_ethnicity_value(%Epicenter.Cases.Person{} = person), do: person |> coalesce_demographics() |> detailed_ethnicity_value()
+
   def detailed_ethnicity_value(detailed_ethnicity) do
     @detailed_ethnicity_values_map |> Map.get(detailed_ethnicity)
   end
 
+  def detailed_ethnicities(%Epicenter.Cases.Person{} = person), do: person |> coalesce_demographics() |> detailed_ethnicities()
   def detailed_ethnicities(%{ethnicity: nil}), do: []
   def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
   def detailed_ethnicities(person), do: person.ethnicity.detailed

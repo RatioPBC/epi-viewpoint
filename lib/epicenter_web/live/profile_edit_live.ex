@@ -3,6 +3,7 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   import EpicenterWeb.IconView, only: [plus_icon: 0, arrow_down_icon: 0, back_icon: 0, trash_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
 
   alias Epicenter.AuditLog
@@ -10,6 +11,21 @@ defmodule EpicenterWeb.ProfileEditLive do
   alias Epicenter.DateParser
   alias Epicenter.Extra
   alias Epicenter.Format
+
+  defmodule FormData do
+    use Ecto.Schema
+
+    embedded_schema do
+      field :first_name, :string
+      field :last_name, :string
+      field :dob, :string
+      field :preferred_language, :string
+      field :other_specified_language, :string
+      embeds_many :phones, Epicenter.Cases.Phone, on_replace: :delete
+      embeds_many :emails, Epicenter.Cases.Email, on_replace: :delete
+      embeds_many :addresses, Epicenter.Cases.Address, on_replace: :delete
+    end
+  end
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
@@ -19,15 +35,28 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> Cases.preload_emails()
       |> Cases.preload_phones()
       |> Cases.preload_addresses()
+      |> Cases.preload_demographics()
 
-    changeset = person |> Cases.change_person(%{})
+    demographic = Cases.Person.coalesce_demographics(person)
+
+    changeset =
+      %FormData{
+        first_name: demographic.first_name,
+        last_name: demographic.last_name,
+        dob: with(%Date{} = date <- demographic.dob, do: Format.date(date)),
+        preferred_language: demographic.preferred_language,
+        other_specified_language: "",
+        phones: person.phones,
+        emails: person.emails,
+        addresses: person.addresses
+      }
+      |> update(%{})
 
     socket
     |> assign_page_title("#{Format.person(person)} (edit)")
-    |> assign(changeset: update_dob_field_for_display(changeset))
+    |> assign(changeset: changeset)
     |> assign(person: person)
     |> assign(preferred_language_is_other: false)
-    |> assign_confirmation_prompt()
     |> ok()
   end
 
@@ -35,7 +64,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     existing_addresses = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:addresses)
     addresses = existing_addresses |> Enum.concat([Cases.change_address(%Cases.Address{}, %{})])
 
-    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:addresses, addresses)
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_embed(:addresses, addresses)
     socket |> assign(changeset: changeset |> Extra.Changeset.clear_validation_errors()) |> noreply()
   end
 
@@ -43,7 +72,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     existing_emails = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:emails)
     emails = existing_emails |> Enum.concat([Cases.change_email(%Cases.Email{}, %{})])
 
-    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_embed(:emails, emails)
     socket |> assign(changeset: changeset |> Extra.Changeset.clear_validation_errors()) |> noreply()
   end
 
@@ -51,16 +80,30 @@ defmodule EpicenterWeb.ProfileEditLive do
     existing_phones = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:phones)
     phones = existing_phones |> Enum.concat([Cases.change_phone(%Cases.Phone{}, %{})])
 
-    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_embed(:phones, phones)
     socket |> assign(changeset: changeset |> Extra.Changeset.clear_validation_errors()) |> noreply()
   end
 
-  def handle_event("form-change", %{"person" => %{"preferred_language" => "Other"} = person_params}, socket) do
-    socket |> assign(preferred_language_is_other: true) |> update_assigns_given_user_input(person_params) |> noreply()
+  def handle_event("form-change", %{"form_data" => %{"preferred_language" => "Other"} = form_params}, socket) do
+    socket
+    |> assign(preferred_language_is_other: true)
+    |> assign(
+      changeset:
+        socket.assigns.changeset
+        |> update(form_params)
+    )
+    |> noreply()
   end
 
-  def handle_event("form-change", %{"person" => person_params} = _params, socket) do
-    socket |> assign(preferred_language_is_other: false) |> update_assigns_given_user_input(person_params) |> noreply()
+  def handle_event("form-change", %{"form_data" => form_params}, socket) do
+    socket
+    |> assign(preferred_language_is_other: false)
+    |> assign(
+      changeset:
+        socket.assigns.changeset
+        |> update(form_params)
+    )
+    |> noreply()
   end
 
   def handle_event("remove-email", %{"email-index" => email_index_param}, socket) do
@@ -69,7 +112,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     existing_emails = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:emails)
     emails = existing_emails |> List.delete_at(email_index)
 
-    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:emails, emails)
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_embed(:emails, emails)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
@@ -79,41 +122,124 @@ defmodule EpicenterWeb.ProfileEditLive do
     existing_phones = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:phones)
     phones = existing_phones |> List.delete_at(phone_index)
 
-    changeset = socket.assigns.changeset |> Ecto.Changeset.put_assoc(:phones, phones)
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_embed(:phones, phones)
     {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
   end
 
-  def handle_event("save", %{"person" => person_params}, socket) do
-    person_params =
-      person_params
-      |> update_dob_field_for_changeset()
-      |> clean_up_languages()
-      |> remove_blank_email_addresses()
-      |> remove_blank_phone_numbers()
-      |> remove_blank_addresses()
+  def handle_event("save", %{"form_data" => form_params}, socket) do
+    changeset =
+      socket.assigns.changeset
+      |> update(form_params)
+      |> validate()
 
-    socket.assigns.person
-    |> Cases.update_person(
-      {person_params,
-       %AuditLog.Meta{
-         author_id: socket.assigns.current_user.id,
-         reason_action: AuditLog.Revision.update_profile_action(),
-         reason_event: AuditLog.Revision.edit_profile_saved_event()
-       }}
-    )
-    |> case do
-      {:ok, person} ->
-        {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, update_dob_field_for_display(changeset))}
+    update_dob = fn
+      nil -> nil
+      "" -> nil
+      dob -> DateParser.parse_mm_dd_yyyy!(dob)
     end
+
+    rewrite_preferred_language = fn map, changeset ->
+      with {_, "Other"} <- Ecto.Changeset.fetch_field(changeset, :preferred_language),
+           {_, value} <- Ecto.Changeset.fetch_field(changeset, :other_specified_language) do
+        Map.put(map, :preferred_language, value)
+      else
+        _ -> map
+      end
+    end
+
+    non_form_demographics = socket.assigns.person.demographics |> Enum.reject(&(&1.source == "form")) |> Euclid.Extra.Enum.pluck([:id])
+    form_demographic = socket.assigns.person.demographics |> Enum.find(&(&1.source == "form"))
+
+    with {:valid, []} <- {:valid, changeset.errors},
+         person_params =
+           changeset.changes
+           |> Map.merge(%{
+             demographics:
+               non_form_demographics ++
+                 [
+                   changeset.changes
+                   |> update_if_present(:dob, update_dob)
+                   |> rewrite_preferred_language.(changeset)
+                   |> Map.merge(%{id: if(form_demographic, do: form_demographic.id, else: nil), source: "form"})
+                 ]
+           })
+           |> update_if_present(:emails, fn emails ->
+             Enum.map(emails, fn
+               %{data: data, action: :delete} -> %{id: data.id, delete: true}
+               %{data: data, action: :replace} -> %{id: data.id, delete: true}
+               %{data: data, changes: changes} -> %{id: data.id} |> Map.merge(changes)
+             end)
+           end)
+           |> update_if_present(:addresses, fn addresses ->
+             Enum.map(addresses, fn
+               %{data: data, action: :delete} -> %{id: data.id, delete: true}
+               %{data: data, action: :replace} -> %{id: data.id, delete: true}
+               %{data: data, changes: changes} -> %{id: data.id} |> Map.merge(changes)
+             end)
+           end)
+           |> update_if_present(:phones, fn phones ->
+             Enum.map(phones, fn
+               %{data: data, action: :delete} -> %{id: data.id, delete: true}
+               %{data: data, action: :replace} -> %{id: data.id, delete: true}
+               %{data: data, changes: changes} -> %{id: data.id} |> Map.merge(changes)
+             end)
+           end)
+           |> remove_blank_addresses()
+           |> remove_blank_email_addresses()
+           |> remove_blank_phone_numbers(),
+         {:ok, person} <-
+           Cases.update_person(
+             socket.assigns.person,
+             {person_params,
+              %AuditLog.Meta{
+                author_id: socket.assigns.current_user.id,
+                reason_action: AuditLog.Revision.update_profile_action(),
+                reason_event: AuditLog.Revision.edit_profile_saved_event()
+              }}
+           ) do
+      {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
+    else
+      {:valid, _} ->
+        {:noreply, assign(socket, :changeset, changeset)}
+
+      {:error, %Ecto.Changeset{}} ->
+        {:noreply, assign(socket, :changeset, changeset)}
+    end
+  end
+
+  defp update(changeset, form_params) do
+    changeset
+    |> Ecto.Changeset.cast(form_params, [:first_name, :last_name, :dob, :preferred_language, :other_specified_language])
+    |> Ecto.Changeset.cast_embed(:addresses, with: &Cases.Address.changeset/2)
+    |> Ecto.Changeset.cast_embed(:emails, with: &Cases.Email.changeset/2)
+    |> Ecto.Changeset.cast_embed(:phones, with: &Cases.Phone.changeset/2)
+  end
+
+  defp validate(changeset) do
+    changeset
+    |> Map.put(:action, :insert)
+    |> Ecto.Changeset.validate_change(:dob, :date_format, fn
+      :dob, nil ->
+        []
+
+      :dob, "" ->
+        []
+
+      :dob, value ->
+        case DateParser.parse_mm_dd_yyyy(value) do
+          {:ok, _date} -> []
+          _ -> [dob: "please enter dates as mm/dd/yyyy"]
+        end
+    end)
   end
 
   # # #
 
-  def clean_up_languages(%{"preferred_language" => "Other"} = person_params),
-    do: person_params |> Map.put("preferred_language", person_params |> Map.get("other_specified_language"))
+  def clean_up_languages(%{"demographics" => %{"0" => demographics}} = person_params),
+    do: put_in(person_params, ["demographics", "0"], clean_up_languages(demographics))
+
+  def clean_up_languages(%{"preferred_language" => "Other"} = demographic_params),
+    do: demographic_params |> Map.put("preferred_language", demographic_params |> Map.get("other_specified_language"))
 
   def clean_up_languages(person_params), do: person_params
 
@@ -164,44 +290,66 @@ defmodule EpicenterWeb.ProfileEditLive do
     (first ++ middle ++ last) |> Enum.uniq()
   end
 
-  def states() do
+  def states(nil) do
     ~w{AL AK AS AZ AR CA CO CT DE DC FL GA GO HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MP MT NE NV NH NJ NM NY NC ND OH OK OR PA PR RI SC SD TN TX UT VT VA VI WA WV WI WY}
+    |> Enum.map(&{&1, &1})
+    |> (&[{"", nil} | &1]).()
   end
 
-  def remove_blank_email_addresses(%{"emails" => email_params} = person_params) do
+  def states(current) do
+    [{current, current} | states(nil)]
+    |> Enum.uniq()
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
+  def remove_blank_email_addresses(%{emails: email_params} = person_params) do
     updated_email_params =
       email_params
-      |> Enum.reject(fn {_index, %{"address" => address}} -> Euclid.Exists.blank?(address) end)
-      |> Map.new()
+      |> Enum.reject(fn
+        %{id: nil, address: address} -> Euclid.Exists.blank?(address)
+        %{id: nil} -> true
+        _ -> false
+      end)
+      |> Enum.map(fn
+        %{id: id, address: address} = attrs -> if(Euclid.Exists.blank?(address), do: %{id: id, delete: true}, else: attrs)
+        other -> other
+      end)
 
-    person_params |> Map.put("emails", updated_email_params)
+    person_params |> Map.put(:emails, updated_email_params)
   end
 
   def remove_blank_email_addresses(person_params),
     do: person_params
 
-  def remove_blank_phone_numbers(%{"phones" => phone_params} = person_params) do
+  def remove_blank_phone_numbers(%{phones: phone_params} = person_params) do
     updated_phone_params =
       phone_params
-      |> Enum.reject(fn {_index, %{"number" => number}} -> Euclid.Exists.blank?(number) end)
-      |> Map.new()
+      |> Enum.reject(fn
+        %{id: nil, number: number} -> Euclid.Exists.blank?(number)
+        %{id: nil} -> true
+        _ -> false
+      end)
+      |> Enum.map(fn
+        %{id: id, number: nil} -> %{id: id, delete: true}
+        %{id: id, number: ""} -> %{id: id, delete: true}
+        other -> other
+      end)
 
-    person_params |> Map.put("phones", updated_phone_params)
+    person_params |> Map.put(:phones, updated_phone_params)
   end
 
   def remove_blank_phone_numbers(person_params),
     do: person_params
 
-  def remove_blank_addresses(%{"addresses" => address_params} = person_params) do
+  def remove_blank_addresses(%{addresses: address_params} = person_params) do
     updated_address_params =
       address_params
-      |> Enum.reject(fn {_index, address} ->
-        %{"street" => street, "city" => city, "postal_code" => postal_code} = address
-        Euclid.Exists.blank?(street) and Euclid.Exists.blank?(city) and Euclid.Exists.blank?(postal_code)
+      |> Enum.reject(fn address ->
+        Euclid.Exists.blank?(Map.get(address, :street)) and Euclid.Exists.blank?(Map.get(address, :city)) and
+          Euclid.Exists.blank?(Map.get(address, :postal_code)) and Euclid.Exists.blank?(Map.get(address, :id))
       end)
-      |> Map.new()
 
-    person_params |> Map.put("addresses", updated_address_params)
+    person_params |> Map.put(:addresses, updated_address_params)
   end
 
   def remove_blank_addresses(person_params),
@@ -209,48 +357,17 @@ defmodule EpicenterWeb.ProfileEditLive do
 
   # # #
 
-  defp assign_confirmation_prompt(socket) do
-    prompt =
-      case socket.assigns.changeset do
-        nil -> nil
-        changeset -> if Map.drop(changeset.changes, [:dob]) == %{}, do: nil, else: abandon_changes_confirmation_text()
-      end
+  def confirmation_prompt(nil), do: nil
 
-    socket |> assign(confirmation_prompt: prompt)
+  def confirmation_prompt(changeset) do
+    if changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text()
   end
 
-  defp update_assigns_given_user_input(socket, person_params) do
-    person_params = person_params |> update_dob_field_for_changeset() |> clean_up_languages()
-
-    changeset =
-      socket.assigns.person
-      |> Cases.change_person(person_params)
-      |> Map.put(:action, :insert)
-
-    socket
-    |> assign(changeset: changeset |> update_dob_field_for_display() |> Extra.Changeset.clear_validation_errors())
-    |> assign_confirmation_prompt()
-  end
-
-  defp reformat_date(changeset, field) do
-    case Ecto.Changeset.fetch_field(changeset, field) do
-      {:error} -> changeset
-      {_, date} -> Ecto.Changeset.put_change(changeset, field, Format.date(date))
-    end
-  end
-
-  defp update_dob_field_for_changeset(person_params) do
-    case DateParser.parse_mm_dd_yyyy(person_params["dob"]) do
-      {:ok, date} -> %{person_params | "dob" => date}
-      {:error, _} -> person_params
-    end
-  end
-
-  defp update_dob_field_for_display(changeset) do
-    if changeset.errors |> Keyword.has_key?(:dob) do
-      Extra.Changeset.rewrite_changeset_error_message(changeset, :dob, "please enter dates as mm/dd/yyyy")
+  defp update_if_present(map, field, func) do
+    if Map.has_key?(map, field) do
+      Map.update!(map, field, func)
     else
-      reformat_date(changeset, :dob)
+      map
     end
   end
 end
