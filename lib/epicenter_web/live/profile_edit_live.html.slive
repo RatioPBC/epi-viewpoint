@@ -52,69 +52,72 @@
         header
           h2 Locating Information
 
-        fieldset
-          = if has_field?(@changeset, :phones) do
-            header data-role="phone-fieldset-header"
-              span Phone
-          = inputs_for f, :phones, fn phone_form ->
-            = error_tag phone_form, :number
-            .phone-wrapper
-              = checkbox phone_form, :delete
-              .phone-and-trash-can
-                = telephone_input phone_form, :number, data: [role: "phone-input", tid: phone_form.data.tid]
-                .select-wrapper
-                  = arrow_down_icon()
-                  = select phone_form, :type, phone_types(), data: [role: "phone-types"]
-                = label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do
-                  .trash-icon
-                    = trash_icon()
+        .locating-information-section
+          fieldset
+            = if has_field?(@changeset, :phones) do
+              header data-role="phone-fieldset-header"
+                span Phone
+            = inputs_for f, :phones, fn phone_form ->
+              = error_tag phone_form, :number
+              .phone-wrapper
+                = checkbox phone_form, :delete
+                .phone-and-trash-can
+                  = telephone_input phone_form, :number, data: [role: "phone-input", tid: phone_form.data.tid]
+                  .select-wrapper
+                    = arrow_down_icon()
+                    = select phone_form, :type, phone_types(), data: [role: "phone-types"]
+                  = label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do
+                    .trash-icon
+                      = trash_icon()
 
-        a#add-phone[phx-click="add-phone"]
-          = plus_icon()
-          span Add phone
+          a#add-phone[phx-click="add-phone"]
+            = plus_icon()
+            span Add phone
 
-        fieldset
-          = if has_field?(@changeset, :addresses) do
-            header#address-form-header data-role="address-fieldset-header"
-              span Street address
-              span City
-              span State
-              span Zipcode
-          = inputs_for f, :addresses, fn address_form ->
-            = error_tag address_form, :street
-            = error_tag address_form, :city
-            = error_tag address_form, :state
-            = error_tag address_form, :postal_code
-            .address-wrapper
-              .address-and-trash-can
-                = text_input address_form, :street, data: [role: "street-input", tid: address_form.data.tid]
-                = text_input address_form, :city, data: [role: "city-input", tid: address_form.data.tid]
-                .select-wrapper
-                  = arrow_down_icon()
-                  = select address_form, :state, states(), data_role: "state-input"
-                = text_input address_form, :postal_code, data: [role: "postal-code-input", tid: address_form.data.tid]
+        .locating-information-section
+          fieldset
+            = if has_field?(@changeset, :addresses) do
+              header#address-form-header data-role="address-fieldset-header"
+                span Street address
+                span City
+                span State
+                span Zipcode
+            = inputs_for f, :addresses, fn address_form ->
+              = error_tag address_form, :street
+              = error_tag address_form, :city
+              = error_tag address_form, :state
+              = error_tag address_form, :postal_code
+              .address-wrapper
+                .address-and-trash-can
+                  = text_input address_form, :street, data: [role: "street-input", tid: address_form.data.tid]
+                  = text_input address_form, :city, data: [role: "city-input", tid: address_form.data.tid]
+                  .select-wrapper
+                    = arrow_down_icon()
+                    = select address_form, :state, states(), data_role: "state-input"
+                  = text_input address_form, :postal_code, data: [role: "postal-code-input", tid: address_form.data.tid]
 
-        a#add-address[phx-click="add-address"]
-          = plus_icon()
-          span Add address
+          a#add-address[phx-click="add-address"]
+            = plus_icon()
+            span Add address
 
-        fieldset
-          = if has_field?(@changeset, :emails) do
-            header data-role="email-fieldset-header"
-              span Email
-          = inputs_for f, :emails, fn email_form ->
-            = error_tag email_form, :address
-            .email-address-wrapper
-              = checkbox email_form, :delete
-              .email-address-and-trash-can
-                = email_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
-                = label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do
-                  .trash-icon
-                    = trash_icon()
+        .locating-information-section
+          fieldset
+            = if has_field?(@changeset, :emails) do
+              header data-role="email-fieldset-header"
+                span Email
+            = inputs_for f, :emails, fn email_form ->
+              = error_tag email_form, :address
+              .email-address-wrapper
+                = checkbox email_form, :delete
+                .email-address-and-trash-can
+                  = email_input email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]
+                  = label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do
+                    .trash-icon
+                      = trash_icon()
 
-        a#add-email[phx-click="add-email"]
-          = plus_icon()
-          span Add email
+          a#add-email[phx-click="add-email"]
+            = plus_icon()
+            span Add email
 
       #form-end
       #nav
