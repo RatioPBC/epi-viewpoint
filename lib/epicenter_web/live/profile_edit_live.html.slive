@@ -118,4 +118,5 @@
 
       #form-end
       #nav
-        = submit "Save", id: "submit-form"
+        #button-wrapper
+          = submit "Save", id: "submit-button"
