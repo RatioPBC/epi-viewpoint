@@ -157,7 +157,7 @@ defmodule Epicenter.Accounts.User do
     import Ecto.Query
 
     def all() do
-      from user in User, order_by: [asc: user.name, asc: user.seq]
+      from user in User, order_by: [asc: fragment("lower(?)", user.name), asc: user.seq]
     end
   end
 end

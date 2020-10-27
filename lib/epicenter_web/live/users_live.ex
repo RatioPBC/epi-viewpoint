@@ -18,5 +18,5 @@ defmodule EpicenterWeb.UsersLive do
   def active_status(%User{}), do: "Active"
 
   def type(%User{admin: true}), do: "Admin"
-  def type(%User{}), do: "User"
+  def type(%User{}), do: "Member"
 end

@@ -35,8 +35,24 @@ defmodule EpicenterWeb.Features.AdminTest do
     |> Pages.Users.assert_here()
     |> Pages.Users.assert_users([
       ["Name", "Email", "Type", "Status"],
-      ["billy", "billy@example.com", "User", "Inactive"],
+      ["billy", "billy@example.com", "Member", "Inactive"],
       ["fixture admin", "admin@example.com", "Admin", "Active"],
+      ["user", "user@example.com", "Admin", "Active"]
+    ])
+
+    # todo: click "new user"
+
+    conn
+    |> Pages.User.visit()
+    |> Pages.submit_and_follow_redirect(conn, "#user-form",
+      user_form: %{"name" => "New User", "email" => "new@example.com", "type" => "member", "status" => "active"}
+    )
+    |> Pages.Users.assert_here()
+    |> Pages.Users.assert_users([
+      ["Name", "Email", "Type", "Status"],
+      ["billy", "billy@example.com", "Member", "Inactive"],
+      ["fixture admin", "admin@example.com", "Admin", "Active"],
+      ["New User", "new@example.com", "Member", "Active"],
       ["user", "user@example.com", "Admin", "Active"]
     ])
   end

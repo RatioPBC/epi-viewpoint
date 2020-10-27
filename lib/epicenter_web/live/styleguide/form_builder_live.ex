@@ -3,6 +3,8 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
 
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
 
+  alias EpicenterWeb.Form
+
   defmodule MovieForm do
     use Ecto.Schema
 
@@ -28,60 +30,6 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
       |> cast(form_attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
     end
-  end
-
-  # form builder
-  defmodule Form do
-    use Phoenix.HTML
-
-    defstruct ~w{f safe}a
-
-    defmodule Line do
-      defstruct ~w{column f safe}a
-    end
-
-    def new(f),
-      do: %Form{f: f, safe: []}
-
-    def safe(%Form{safe: safe}),
-      do: {:safe, safe}
-
-    def line(%Form{} = form, fun) do
-      line = %Line{column: 1, f: form.f, safe: []} |> fun.()
-      %{form | safe: merge_safe(form.safe, content_tag(:fieldset, line.safe))}
-    end
-
-    # # #
-
-    def checkbox_list_field(%Form.Line{f: f} = line, field, name, values, span \\ 2) do
-      [
-        label(f, field, name, data: grid_data(1, line, span)),
-        error_tag(f, field, data: grid_data(2, line, span)),
-        checkbox_list(f, field, values, data: grid_data(3, line, span))
-      ]
-      |> add_to_line(line, span)
-    end
-
-    def text_field(%Form.Line{f: f} = line, field, name, span \\ 2) do
-      [
-        label(f, field, name, data: grid_data(1, line, span)),
-        error_tag(f, field, data: grid_data(2, line, span)),
-        text_input(f, field, data: grid_data(3, line, span))
-      ]
-      |> add_to_line(line, span)
-    end
-
-    # # #
-
-    defp grid_data(row, %Form.Line{column: column}, span),
-      do: [grid: [row: row, col: column, span: span]]
-
-    defp add_to_line(contents, %Form.Line{column: column, safe: safe} = line, span),
-      do: %{line | column: column + span, safe: safe ++ contents}
-
-    defp merge_safe({:safe, left}, {:safe, right}), do: left ++ right
-    defp merge_safe(left, {:safe, right}), do: left ++ right
-    defp merge_safe({:safe, left}, right), do: left ++ right
   end
 
   def mount(_params, _session, socket) do

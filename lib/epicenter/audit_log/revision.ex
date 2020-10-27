@@ -31,6 +31,7 @@ defmodule Epicenter.AuditLog.Revision do
     |> validate_required(@required_attrs)
   end
 
+  # action = what was the code that made this change trying to accomplish?
   def update_demographics_action(), do: "update-demographics"
   def update_assignment_bulk_action(), do: "update-assignment-bulk"
   def update_assignment_action(), do: "update-assignment"
@@ -52,6 +53,8 @@ defmodule Epicenter.AuditLog.Revision do
   def update_user_mfa_action(), do: "update-user-mfa"
   def login_user_action(), do: "login-user"
 
+  # event = what occurred that caused the code to make an action? (usually something the user did)
+  def admin_create_user_event, do: "admin-create-user"
   def edit_profile_demographics_event(), do: "edit-profile-demographics"
   def people_selected_assignee_event(), do: "people-selected-assignee"
   def profile_selected_assignee_event(), do: "profile-selected-assignee"

@@ -7,6 +7,7 @@ defmodule Epicenter.Accounts.UserTest do
   alias Epicenter.Accounts.User
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias Euclid.Extra
 
   setup :persist_admin
   @admin Test.Fixtures.admin()
@@ -87,6 +88,16 @@ defmodule Epicenter.Accounts.UserTest do
       alice = Test.Fixtures.user_attrs(@admin, "alice") |> Accounts.register_user!()
       json = Jason.encode!(alice)
       refute json =~ ~r/"seq"/
+    end
+  end
+
+  describe "query" do
+    test "all/0 sorts by name, ignoring case" do
+      Test.Fixtures.user_attrs(@admin, "middle", name: "Middle") |> Accounts.register_user!()
+      Test.Fixtures.user_attrs(@admin, "first", name: "a-first") |> Accounts.register_user!()
+      Test.Fixtures.user_attrs(@admin, "last", name: "z-last") |> Accounts.register_user!()
+
+      User.Query.all() |> Repo.all() |> Extra.Enum.pluck(:name) |> assert_eq(["a-first", "fixture admin", "Middle", "z-last"])
     end
   end
 end

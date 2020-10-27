@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.FormHelpers do
   use Phoenix.HTML
 
+  alias EpicenterWeb.IconView
+
   @doc """
   Returns an HTML element that contains a list of checkboxes to be used as a multi-select for a single form field.
   Automatically marks the appropriate checkboxes as checked based on the values in the form data.
@@ -80,6 +82,15 @@ defmodule EpicenterWeb.FormHelpers do
         " ",
         label_text,
         text_input(form, field, value: other_value, data: [reveal: "when-parent-checked"])
+      ]
+    end
+  end
+
+  def select_with_wrapper(form, field, options, html_opts \\ []) do
+    content_tag :div, class: "select-wrapper", data: [grid: [row: 3, col: 1, span: 2]] do
+      [
+        IconView.arrow_down_icon(),
+        select(form, field, options, html_opts)
       ]
     end
   end
