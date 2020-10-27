@@ -32,6 +32,7 @@ defmodule Epicenter.AuditLog.Revision do
   end
 
   # action = what was the code that made this change trying to accomplish?
+  def insert_demographics_action(), do: "insert-demographics"
   def update_demographics_action(), do: "update-demographics"
   def update_assignment_bulk_action(), do: "update-assignment-bulk"
   def update_assignment_action(), do: "update-assignment"

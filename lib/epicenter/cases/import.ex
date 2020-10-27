@@ -196,7 +196,7 @@ defmodule Epicenter.Cases.Import do
     |> Ethnicity.build_attrs()
     |> Map.put("person_id", person.id)
     |> Map.put("source", "import")
-    |> in_audit_tuple(originator, "fixme")
+    |> in_audit_tuple(originator, AuditLog.Revision.insert_demographics_action())
     |> Cases.find_or_create_demographic()
   end
 
