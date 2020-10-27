@@ -16,7 +16,7 @@ services:
       - ./tmp/ssl:/opt/ssl:ro
     environment:
       ALLOW_PRIVATE_WEB: "true"
-      CANONICAL_HOST: localhost
+      CANONICAL_HOST: viewpoint-dev.network.geometer.dev
       DATABASE_URL: ecto://cc:abc123@postgres:5432/epicenter_dev
       DBSSL: "false"
       LIVE_VIEW_SIGNING_SALT: xbK8/I1ibfroHQvkZTMKbO7NOLAHtbdP
