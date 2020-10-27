@@ -6,6 +6,7 @@ defmodule EpicenterWeb.AdminAuthorizationTest do
   alias Epicenter.Accounts
   alias Epicenter.AccountsFixtures
   alias Epicenter.Test
+  alias EpicenterWeb.UserLive
   alias EpicenterWeb.UsersLive
 
   defp visit_isolated(user_fixture, live_view, conn),
@@ -25,8 +26,11 @@ defmodule EpicenterWeb.AdminAuthorizationTest do
     unconfirmed_admin = AccountsFixtures.unconfirmed_user_fixture(%{tid: "unconfirmed", admin: true})
     confirmed_admin = AccountsFixtures.user_fixture(%{tid: "confirmed", admin: true})
 
+    unprivileged_user |> visit_isolated(UserLive, conn) |> assert_redirected_to_root()
     unprivileged_user |> visit_isolated(UsersLive, conn) |> assert_redirected_to_root()
+    unconfirmed_admin |> visit_isolated(UserLive, conn) |> assert_redirected_to_root()
     unconfirmed_admin |> visit_isolated(UsersLive, conn) |> assert_redirected_to_root()
+    confirmed_admin |> visit_isolated(UserLive, conn) |> assert_on_page("user")
     confirmed_admin |> visit_isolated(UsersLive, conn) |> assert_on_page("users")
   end
 end

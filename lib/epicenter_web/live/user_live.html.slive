@@ -1,0 +1,4 @@
+section#user-page data-page="user"
+  h2
+    #title
+      span New user
