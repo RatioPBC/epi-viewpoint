@@ -65,6 +65,7 @@ defmodule Epicenter.AuditLog.Revision do
   def update_user_password_event(), do: "update-user-password"
   def update_user_mfa_event(), do: "update-user-mfa"
   def login_user_event(), do: "login-user"
+  def seed_event(), do: "seeds"
 
   defmodule Query do
     import Ecto.Query

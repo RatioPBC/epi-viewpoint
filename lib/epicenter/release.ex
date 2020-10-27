@@ -29,19 +29,28 @@ defmodule Epicenter.Release do
     existing_user_tids = Epicenter.Accounts.list_users() |> Euclid.Extra.Enum.pluck(:tid)
 
     new_users =
-      [{"superuser", "Sal Superuser"}, {"admin", "Amy Admin"}, {"investigator", "Ida Investigator"}, {"tracer", "Tom Tracer"}]
-      |> Enum.reject(fn {tid, _name} -> tid in existing_user_tids end)
+      [
+        {"superuser", "Sal Superuser", true},
+        {"admin", "Amy Admin", true},
+        {"investigator", "Ida Investigator", false},
+        {"tracer", "Tom Tracer", false}
+      ]
+      |> Enum.reject(fn {tid, _name, _admin?} -> tid in existing_user_tids end)
 
-    for {tid, name} <- new_users do
+    for {tid, name, admin?} <- new_users do
       email = "#{tid}@example.com"
       password = "password123"
 
       IO.puts("Creating #{name} / #{email} / #{password}")
 
-      Epicenter.Accounts.register_user!(
-        {%{email: email, password: password, tid: tid, name: name},
-         %Epicenter.AuditLog.Meta{author_id: Application.get_env(:epicenter, :unpersisted_admin_id), reason_action: "seed-user", reason_event: "seeds.exs"}}
-      )
+      Epicenter.Accounts.register_user!({
+        %{email: email, password: password, tid: tid, name: name, admin: admin?},
+        %Epicenter.AuditLog.Meta{
+          author_id: Application.get_env(:epicenter, :unpersisted_admin_id),
+          reason_action: AuditLog.Revision.register_user_action(),
+          reason_event: AuditLog.Revision.seed_event()
+        }
+      })
     end
   end
 
