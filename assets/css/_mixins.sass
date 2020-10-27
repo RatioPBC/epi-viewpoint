@@ -68,7 +68,7 @@
       border-radius: 0 2px 2px 0
       border-right-width: 1px
 
-@mixin -button($size: regular)
+@mixin -button($size: regular, $hover-bg-color: $button-hover-color, $disabled-bg-color: $disabled-button-color)
   background-color: $button-color
   border: 1px solid $button-color
   border-radius: 2px
@@ -82,10 +82,13 @@
   white-space: nowrap
 
   &[data-disabled]
-    background-color: $disabled-button-color
+    background-color: $disabled-bg-color
     border-color: $disabled-text-color
     color: $disabled-text-color
     cursor: default
+
+    &:hover
+      background-color: $disabled-bg-color
 
   @if $size == small
     font-size: $small-body-text-size
@@ -93,32 +96,21 @@
 
   &:hover
     text-decoration: none
+    background-color: $hover-bg-color
 
 @mixin button-primary($size: regular)
   @include -button($size: $size)
   color: white
 
-  &:hover
-    background-color: $button-hover-color
-
 @mixin button-secondary($size: regular)
-  @include -button($size: $size)
+  @include -button($size: $size, $hover-bg-color: $secondary-button-hover-color)
   background-color: $secondary-button-color
   border-color: $secondary-button-color
   color: $primary-text-color
 
-  &:hover
-    background-color: $secondary-button-hover-color
-
 @mixin button-outline($size: regular)
-  @include -button($size: $size)
+  @include -button($size: $size, $hover-bg-color: white, $disabled-bg-color: white)
   background-color: inherit
-
-  &:hover
-    background-color: $-gray
-
-  &[data-disabled]
-    background-color: white
 
 @mixin button-link($size: regular)
   @include -button($size: $size)
