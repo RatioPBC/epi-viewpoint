@@ -105,6 +105,14 @@ defmodule EpicenterWeb.Test.Pages do
     view
   end
 
+  def submit_live(%View{} = view, form_selector, params_keyword_list) do
+    view
+    |> form(form_selector, params_keyword_list)
+    |> render_submit()
+
+    view
+  end
+
   def visit(conn, path, option \\ nil)
 
   def visit(%Plug.Conn{} = conn, path, :follow_redirect) do

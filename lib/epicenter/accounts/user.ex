@@ -32,7 +32,7 @@ defmodule Epicenter.Accounts.User do
 
   @required_attrs ~w{name}a
   @optional_attrs ~w{tid admin}a
-  @registration_attrs ~w{email password}a
+  @registration_attrs ~w{email password disabled}a
   @mfa_attrs ~w{mfa_secret}a
 
   def changeset(user, attrs) do

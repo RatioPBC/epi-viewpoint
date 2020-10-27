@@ -6,6 +6,7 @@ defmodule EpicenterWeb.UserLive do
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
   alias Epicenter.AuditLog
+  alias Epicenter.Validation
   alias EpicenterWeb.Form
 
   defmodule UserForm do
@@ -29,6 +30,7 @@ defmodule EpicenterWeb.UserLive do
       %UserForm{}
       |> cast(form_attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
+      |> Validation.validate_email_format(:email)
     end
 
     def user_attrs(%Ecto.Changeset{} = form_changeset) do
@@ -41,6 +43,8 @@ defmodule EpicenterWeb.UserLive do
     def user_attrs(%UserForm{} = user_form) do
       user_form
       |> Map.from_struct()
+      |> Map.put(:admin, user_form.type == "admin")
+      |> Map.put(:disabled, user_form.status == "inactive")
     end
 
     def user_form_attrs(%User{} = user) do
@@ -69,9 +73,29 @@ defmodule EpicenterWeb.UserLive do
       {:form, {:error, %Ecto.Changeset{valid?: false} = invalid_form_changeset}} ->
         socket |> assign_form_changeset(invalid_form_changeset, "Check the errors above") |> noreply()
 
-      {:user, {:error, _error}} ->
-        socket |> assign_form_changeset(form_changeset, "An unexpected error occurred") |> noreply()
+      {:user, {:error, %{errors: [email: {email_error_message, _}]}}} ->
+        socket
+        |> assign_form_changeset(
+          form_changeset
+          |> Ecto.Changeset.add_error(:email, email_error_message)
+          |> Map.put(:action, :insert),
+          "Check the errors above"
+        )
+        |> noreply()
+
+      {:user, {:error, changeset}} ->
+        socket |> assign_form_changeset(form_changeset, changeset_with_errors_to_error_string(changeset)) |> noreply()
     end
+  end
+
+  defp changeset_with_errors_to_error_string(changeset) do
+    Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
+      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
+        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
+      end)
+    end)
+    |> Enum.map(fn {key, value} -> "#{key |> to_string() |> String.capitalize()} #{value}" end)
+    |> Enum.join(", ")
   end
 
   defp register_user(socket, attrs) do

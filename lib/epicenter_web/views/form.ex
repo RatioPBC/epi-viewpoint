@@ -38,7 +38,7 @@ defmodule EpicenterWeb.Form do
     content_tag :footer do
       [
         submit("Save"),
-        content_tag(:div, error_message, class: "form-error-message")
+        content_tag(:div, error_message, class: "form-error-message", "data-form-error-message": error_message)
       ]
     end
     |> add_to_line(line, span)
