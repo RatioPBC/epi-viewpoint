@@ -16,52 +16,130 @@ defmodule EpicenterWeb.UserLiveTest do
     :ok
   end
 
-  test "admins can add admins", %{conn: conn} do
-    Pages.User.visit(conn)
-    |> Pages.submit_live("#user-form",
-      user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "admin", "status" => "active"}
-    )
-
-    assert %{name: "New User", email: "newadmin@example.com", admin: true} = Accounts.get_user(email: "newadmin@example.com")
-  end
-
-  test "admins can add disabled users", %{conn: conn} do
-    Pages.User.visit(conn)
-    |> Pages.submit_live("#user-form",
-      user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "member", "status" => "inactive"}
-    )
-
-    assert %{name: "New User", email: "newadmin@example.com", disabled: true} = Accounts.get_user(email: "newadmin@example.com")
-  end
-
-  test "users cannot be created with invalid email addresses", %{conn: conn} do
-    view =
+  describe "user creation form" do
+    test "allows admins to add admins", %{conn: conn} do
       Pages.User.visit(conn)
       |> Pages.submit_live("#user-form",
-        user_form: %{"name" => "New User", "email" => "an invalid email address", "type" => "member", "status" => "active"}
+        user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "admin", "status" => "active"}
       )
 
-    assert_validation_messages(render(view), %{"user_form_email" => "must have the @ sign and no spaces"})
-  end
+      assert %{name: "New User", email: "newadmin@example.com", admin: true} = Accounts.get_user(email: "newadmin@example.com")
+    end
 
-  test "all fields are required", %{conn: conn} do
-    view =
+    test "allows admins to add disabled users", %{conn: conn} do
       Pages.User.visit(conn)
       |> Pages.submit_live("#user-form",
-        user_form: %{"name" => "", "email" => "", "type" => "member", "status" => "active"}
+        user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "member", "status" => "inactive"}
       )
 
-    assert_validation_messages(render(view), %{"user_form_email" => "can't be blank", "user_form_name" => "can't be blank"})
+      assert %{name: "New User", email: "newadmin@example.com", disabled: true} = Accounts.get_user(email: "newadmin@example.com")
+    end
+
+    test "disallows users to create users with invalid email addresses", %{conn: conn} do
+      view =
+        Pages.User.visit(conn)
+        |> Pages.submit_live("#user-form",
+          user_form: %{"name" => "New User", "email" => "an invalid email address", "type" => "member", "status" => "active"}
+        )
+
+      assert_validation_messages(render(view), %{"user_form_email" => "must have the @ sign and no spaces"})
+    end
+
+    test "all fields are required", %{conn: conn} do
+      view =
+        Pages.User.visit(conn)
+        |> Pages.submit_live("#user-form",
+          user_form: %{"name" => "", "email" => "", "type" => "member", "status" => "active"}
+        )
+
+      assert_validation_messages(render(view), %{"user_form_email" => "can't be blank", "user_form_name" => "can't be blank"})
+    end
+
+    test "must have unique emails", %{conn: conn} do
+      view =
+        Pages.User.visit(conn)
+        |> Pages.submit_live("#user-form",
+          user_form: %{"name" => "real name", "email" => @admin.email, "type" => "member", "status" => "active"}
+        )
+        |> Pages.User.assert_here()
+
+      assert_validation_messages(render(view), %{"user_form_email" => "has already been taken"})
+    end
   end
 
-  test "must have unique emails", %{conn: conn} do
-    view =
-      Pages.User.visit(conn)
-      |> Pages.submit_live("#user-form",
-        user_form: %{"name" => "real name", "email" => @admin.email, "type" => "member", "status" => "active"}
-      )
-      |> Pages.User.assert_here()
+  describe "user update form" do
+    test "is prefilled properly", %{conn: conn} do
+      subject_user = Epicenter.AccountsFixtures.user_fixture(%{tid: "existinguser", name: "existing user", email: "existinguser@example.com"})
 
-    assert_validation_messages(render(view), %{"user_form_email" => "has already been taken"})
+      view = Pages.User.visit(conn, subject_user)
+
+      assert %{
+               "user_form[name]" => "existing user",
+               "user_form[email]" => "existinguser@example.com",
+               "user_form[type]" => "member",
+               "user_form[status]" => "active"
+             } = form_state(view)
+
+      subject_user =
+        Epicenter.AccountsFixtures.user_fixture(%{
+          tid: "existinguser",
+          admin: true,
+          name: "existing user",
+          disabled: true,
+          email: "existinguser2@example.com"
+        })
+
+      view = Pages.User.visit(conn, subject_user)
+
+      assert %{
+               "user_form[name]" => "existing user",
+               "user_form[email]" => "existinguser2@example.com",
+               "user_form[type]" => "admin",
+               "user_form[status]" => "inactive"
+             } = form_state(view)
+    end
+
+    test "works", %{conn: conn} do
+      %{id: id, hashed_password: hashed_password, mfa_secret: mfa_secret} =
+        subject_user = Epicenter.AccountsFixtures.user_fixture(%{tid: "existing", admin: true, email: "existinguser@example.com"})
+
+      Pages.User.visit(conn, subject_user)
+      |> Pages.submit_and_follow_redirect(conn, "#user-form",
+        user_form: %{"name" => "new name", "email" => "newemail@example.com", "type" => "member", "status" => "inactive"}
+      )
+      |> Pages.Users.assert_here()
+
+      assert %{
+               id: ^id,
+               hashed_password: ^hashed_password,
+               mfa_secret: ^mfa_secret,
+               name: "new name",
+               email: "newemail@example.com",
+               admin: false,
+               disabled: true
+             } = Accounts.get_user(email: "newemail@example.com")
+
+      assert Accounts.get_user(email: "existinguser@example.com") == nil
+    end
+  end
+
+  def form_state(view) do
+    parsed = Pages.parse(view)
+
+    inputs =
+      parsed
+      |> Epicenter.Test.Html.all("input", fn input ->
+        {Test.Html.attr(input, "name") |> List.first(), Test.Html.attr(input, "value") |> List.first()}
+      end)
+      |> Map.new()
+
+    selects =
+      parsed
+      |> Epicenter.Test.Html.all("select", fn input ->
+        {Test.Html.attr(input, "name") |> List.first(), Test.Html.find(input, "option[selected]") |> Test.Html.attr("value") |> List.first()}
+      end)
+      |> Map.new()
+
+    Map.merge(inputs, selects)
   end
 end

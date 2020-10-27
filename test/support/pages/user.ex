@@ -5,6 +5,10 @@ defmodule EpicenterWeb.Test.Pages.User do
     conn |> Pages.visit("/admin/user")
   end
 
+  def visit(%Plug.Conn{} = conn, %Epicenter.Accounts.User{} = user) do
+    conn |> Pages.visit("/admin/user/#{user.id}")
+  end
+
   def assert_here(view_or_conn_or_html) do
     view_or_conn_or_html |> Pages.assert_on_page("user")
   end

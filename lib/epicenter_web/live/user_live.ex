@@ -53,19 +53,44 @@ defmodule EpicenterWeb.UserLive do
     end
   end
 
-  def mount(_params, session, socket) do
+  def mount(params, session, socket) do
+    user =
+      case params do
+        %{"id" => id} ->
+          Accounts.get_user!(id)
+
+        _ ->
+          nil
+      end
+
+    form_seed_data =
+      case user do
+        nil ->
+          %{type: "member", status: "active"}
+
+        user ->
+          %{
+            type: if(user.admin, do: "admin", else: "member"),
+            status: if(user.disabled, do: "inactive", else: "active"),
+            email: user.email,
+            name: user.name
+          }
+      end
+
     socket
     |> authenticate_admin_user!(session)
     |> assign_page_title("User")
-    |> assign_form_changeset(UserForm.changeset(%{type: "member", status: "active"}))
+    |> assign(user: user)
+    |> assign_form_changeset(UserForm.changeset(form_seed_data))
     |> ok()
   end
 
   def handle_event("save", %{"user_form" => params}, socket) do
     form_changeset = UserForm.changeset(params)
+    user = socket.assigns.user
 
     with {:form, {:ok, user_attrs}} <- {:form, UserForm.user_attrs(form_changeset)},
-         {:user, {:ok, _user}} <- {:user, register_user(socket, user_attrs)} do
+         {:user, {:ok, _user}} <- {:user, if(user, do: update_user(socket, user, user_attrs), else: register_user(socket, user_attrs))} do
       socket
       |> push_redirect(to: Routes.users_path(socket, EpicenterWeb.UsersLive))
       |> noreply()
@@ -107,6 +132,18 @@ defmodule EpicenterWeb.UserLive do
         reason_event: AuditLog.Revision.admin_create_user_event()
       }
     })
+  end
+
+  defp update_user(socket, user, attrs) do
+    Accounts.update_user(
+      user,
+      attrs,
+      %Epicenter.AuditLog.Meta{
+        author_id: socket.assigns.current_user.id,
+        reason_action: AuditLog.Revision.update_user_registration_action(),
+        reason_event: AuditLog.Revision.admin_update_user_event()
+      }
+    )
   end
 
   def user_form_builder(changeset, form_error) do

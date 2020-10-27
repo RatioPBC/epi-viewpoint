@@ -55,11 +55,35 @@ defmodule Epicenter.Accounts.User do
   also be very expensive to hash for certain algorithms.
   """
   def registration_changeset(user, attrs) do
+    validate_password_if_necessary = fn changeset ->
+      cond do
+        Map.has_key?(changeset.changes, :password) -> validate_password(changeset)
+        !changeset.data.hashed_password -> validate_password(changeset)
+        true -> changeset
+      end
+    end
+
+    # TODO: once email confirmation is real, we need to _unconfirm_ a user when their email address changes
+    # perhaps_unconfirm_email = fn changeset ->
+    #   cond do
+    #     Map.has_key?(changeset.changes, :email) ->
+    #       if changeset.changes.email != changeset.data.email do
+    #         changeset |> put_change(:confirmed_at, nil)
+    #       else
+    #         changeset
+    #       end
+
+    #     true ->
+    #       changeset
+    #   end
+    # end
+
     user
     |> cast(attrs, @required_attrs ++ @optional_attrs ++ @registration_attrs)
     |> validate_required(@required_attrs)
     |> validate_email()
-    |> validate_password()
+    # |> perhaps_unconfirm_email.()
+    |> validate_password_if_necessary.()
   end
 
   defp validate_email(changeset) do

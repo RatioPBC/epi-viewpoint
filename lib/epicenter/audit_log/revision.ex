@@ -47,6 +47,7 @@ defmodule Epicenter.AuditLog.Revision do
   def update_user_email_action(), do: "update-user-email"
   def update_user_email_request_action(), do: "update-user-email-request"
   def create_user_action(), do: "create-user"
+  def update_user_registration_action(), do: "update-user-registration"
   def update_disabled_action(), do: "disable-user"
   def enable_user_action(), do: "enable-user"
   def update_user_password_action(), do: "update-user-password"
@@ -56,6 +57,7 @@ defmodule Epicenter.AuditLog.Revision do
 
   # event = what occurred that caused the code to make an action? (usually something the user did)
   def admin_create_user_event, do: "admin-create-user"
+  def admin_update_user_event, do: "admin-update-user"
   def edit_profile_demographics_event(), do: "edit-profile-demographics"
   def people_selected_assignee_event(), do: "people-selected-assignee"
   def profile_selected_assignee_event(), do: "profile-selected-assignee"
