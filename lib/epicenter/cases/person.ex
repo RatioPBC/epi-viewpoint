@@ -109,7 +109,7 @@ defmodule Epicenter.Cases.Person do
     person
     |> Cases.preload_lab_results()
     |> Map.get(:lab_results)
-    |> Enum.filter(&LabResult.is_positive?(&1))
+    |> Enum.filter(&LabResult.positive?(&1))
     |> Enum.sort_by(& &1.seq, :asc)
     |> Enum.min_by(& &1.reported_on, NilFirst, fn -> nil end)
   end
