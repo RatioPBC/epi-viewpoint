@@ -83,14 +83,8 @@ defmodule EpicenterWeb.PeopleLive do
   def assigned_to_name(%Person{assigned_to: assignee}),
     do: assignee.name
 
-  def full_name(person) do
-    demographic = Person.coalesce_demographics(person)
-    [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
-  end
-
-  def external_id(person) do
-    Person.coalesce_demographics(person).external_id
-  end
+  def full_name(person),
+    do: [person.first_name, person.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
 
   def is_disabled?(selected_people),
     do: selected_people == %{}
@@ -134,7 +128,7 @@ defmodule EpicenterWeb.PeopleLive do
     do: assign(socket, selected_people: Map.delete(selected_people, person_id))
 
   defp load_people(socket) do
-    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results() |> Cases.preload_assigned_to() |> Cases.preload_demographics()
+    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results() |> Cases.preload_assigned_to()
     assign_people(socket, people)
   end
 

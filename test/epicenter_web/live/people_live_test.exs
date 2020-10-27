@@ -12,7 +12,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
   setup :register_and_log_in_user
 
-  @admin Test.Fixtures.admin()
   describe "rendering" do
     defp table_contents(index_live, opts \\ []),
       do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
@@ -24,7 +23,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       Test.Fixtures.lab_result_attrs(alice, user, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "alice-result-2", Extra.Date.days_ago(2), result: "negative") |> Cases.create_lab_result!()
 
-      billy = Test.Fixtures.person_attrs(user, "billy") |> Test.Fixtures.add_demographic_attrs(%{external_id: "billy-id"}) |> Cases.create_person!()
+      billy = Test.Fixtures.person_attrs(user, "billy", external_id: "billy-id") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(billy, user, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
       [users: [user, assignee], people: [alice, billy] |> Cases.preload_assigned_to() |> Cases.preload_lab_results()]
     end
@@ -241,22 +240,17 @@ defmodule EpicenterWeb.PeopleLiveTest do
   end
 
   describe "full_name" do
-    defp wrap(demo_attrs) do
-      {:ok, person} = Test.Fixtures.person_attrs(@admin, "test") |> Test.Fixtures.add_demographic_attrs(demo_attrs) |> Cases.create_person()
-      person
-    end
-
     test "renders first and last name",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: "First", last_name: "TestuserLast"})) == "First TestuserLast")
+      do: assert(PeopleLive.full_name(%{first_name: "First", last_name: "Last"}) == "First Last")
 
     test "when there's just a first name",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: "First", last_name: nil})) == "First")
+      do: assert(PeopleLive.full_name(%{first_name: "First", last_name: nil}) == "First")
 
     test "when there's just a last name",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: nil, last_name: "TestuserLast"})) == "TestuserLast")
+      do: assert(PeopleLive.full_name(%{first_name: nil, last_name: "Last"}) == "Last")
 
     test "when first name is blank",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: "", last_name: "TestuserLast"})) == "TestuserLast")
+      do: assert(PeopleLive.full_name(%{first_name: "", last_name: "Last"}) == "Last")
   end
 
   describe "latest_result" do

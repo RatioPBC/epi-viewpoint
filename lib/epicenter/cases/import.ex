@@ -178,25 +178,14 @@ defmodule Epicenter.Cases.Import do
   end
 
   defp import_row(row, originator) do
-    person = Cases.find_matching_person(row) |> Cases.preload_demographics()
+    person = Cases.find_matching_person(row)
 
-    with {:ok, person} <- import_person(person, row, originator),
-         {:ok, _} <- import_demographic(person, row, originator) do
+    with {:ok, person} <- import_person(person, row, originator) do
       lab_result = import_lab_result(row, person, originator)
       import_phone_number(row, person, originator)
       import_address(row, person, originator)
       %{person: person, lab_result: lab_result}
     end
-  end
-
-  defp import_demographic(person, row, originator) do
-    row
-    |> Map.take(@person_db_fields_to_insert)
-    |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-    |> Ethnicity.build_attrs()
-    |> Map.put("person_id", person.id)
-    |> in_audit_tuple(originator, "fixme")
-    |> Cases.find_or_create_demographic()
   end
 
   defp import_person(person, row, originator) do
@@ -206,16 +195,13 @@ defmodule Epicenter.Cases.Import do
       |> Euclid.Extra.Map.rename_key("person_tid", "tid")
       |> Ethnicity.build_attrs()
       |> strip_updates_to_existing_data(person)
-      |> in_audit_tuple(originator, AuditLog.Revision.upsert_person_action())
 
-    # %{
-    #   "demographics" => person.demographics ++ [new_demographic]
-    # }
+    changes = in_audit_tuple(attrs, originator, AuditLog.Revision.upsert_person_action())
 
     if person do
-      Cases.update_person(person, attrs)
+      Cases.update_person(person, changes)
     else
-      Cases.create_person(attrs)
+      Cases.create_person(changes)
     end
   end
 
@@ -263,11 +249,10 @@ defmodule Epicenter.Cases.Import do
   end
 
   defp in_audit_tuple(data, author, reason_action) do
-    {data,
-     %AuditLog.Meta{
-       author_id: author.id,
-       reason_action: reason_action,
-       reason_event: AuditLog.Revision.import_csv_event()
-     }}
+    Extra.Tuple.append(data, %AuditLog.Meta{
+      author_id: author.id,
+      reason_action: reason_action,
+      reason_event: AuditLog.Revision.import_csv_event()
+    })
   end
 end

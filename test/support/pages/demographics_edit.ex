@@ -119,7 +119,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
 
   def change_form(%View{} = view, person_params) do
     view
-    |> form("#demographics-form", demographic: person_params)
+    |> form("#demographics-form", person: person_params)
     |> render_change()
 
     view

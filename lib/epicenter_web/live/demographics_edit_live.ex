@@ -12,25 +12,23 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    person = Cases.get_person(id) |> Cases.preload_demographics()
-    demographic = Cases.Person.coalesce_demographics(person) |> Map.put(:__struct__, Cases.Demographic)
-    changeset = demographic |> Ecto.Changeset.cast(%{}, [])
+    person = Cases.get_person(id)
+    changeset = person |> Cases.change_person(%{})
 
     socket
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign(changeset: changeset)
-    |> assign(demographic: demographic)
     |> assign(person: person)
     |> assign(confirmation_prompt: nil)
     |> ok()
   end
 
-  def handle_event("form-change", %{"demographic" => form_params} = form_state, socket) do
+  def handle_event("form-change", %{"person" => person_params} = form_state, socket) do
     new_ethnicity = get_or_update_ethnicity_from_changeset(socket.assigns.changeset, form_state)
 
     new_changeset =
-      socket.assigns.demographic
-      |> Cases.Demographic.changeset(form_params)
+      socket.assigns.person
+      |> Cases.change_person(person_params)
 
     # TODO unchecking the last gender box doesn't work unless you add this commented code back
     #    new_changeset =
@@ -40,7 +38,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     #      end
 
     new_changeset =
-      case form_params do
+      case person_params do
         %{"ethnicity" => _ethnicity} ->
           new_changeset
           |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
@@ -52,17 +50,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     socket |> assign(:changeset, new_changeset) |> assign_confirmation_prompt |> noreply()
   end
 
-  def handle_event("submit", %{"demographic" => demographic_params} = _params, socket) do
-    person_params = %{
-      "id" => socket.assigns.person.id,
-      "demographics" => [
-        %{
-          "id" => socket.assigns.person.demographics |> List.first() |> Map.get(:id)
-        }
-        |> Map.merge(demographic_params)
-      ]
-    }
-
+  def handle_event("submit", %{"person" => person_params} = _params, socket) do
     socket.assigns.person
     |> Cases.update_person(
       {person_params,
@@ -87,10 +75,10 @@ defmodule EpicenterWeb.DemographicsEditLive do
     old_form_state = expected_person_params_from_changeset(changeset)
 
     old_major_ethnicity = old_form_state && old_form_state.major
-    new_major_ethnicity = form_params["demographic"]["ethnicity"]["major"]
+    new_major_ethnicity = form_params["person"]["ethnicity"]["major"]
 
     old_detailed_ethnicity = old_form_state && old_form_state.detailed
-    new_detailed_ethnicity = form_params["demographic"]["ethnicity"]["detailed"]
+    new_detailed_ethnicity = form_params["person"]["ethnicity"]["detailed"]
 
     cond do
       old_major_ethnicity != new_major_ethnicity and old_major_ethnicity == "hispanic_latinx_or_spanish_origin" ->
@@ -100,7 +88,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
         %{major: "hispanic_latinx_or_spanish_origin", detailed: new_detailed_ethnicity}
 
       true ->
-        form_params["demographic"]["ethnicity"]
+        form_params["person"]["ethnicity"]
     end
   end
 

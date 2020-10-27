@@ -15,7 +15,7 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
 
   def change_form(%View{} = view, person_params) do
     view
-    |> form("#profile-form", form_data: person_params)
+    |> form("#profile-form", person: person_params)
     |> render_change()
 
     view
@@ -23,7 +23,7 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
 
   def submit(%View{} = view, person_params) do
     view
-    |> form("#profile-form", form_data: person_params)
+    |> form("#profile-form", person: person_params)
     |> render_submit()
 
     view |> Pages.ProfileEdit.assert_validation_messages(%{})
