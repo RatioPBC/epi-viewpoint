@@ -72,6 +72,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice_demographic_1.ethnicity.detailed == []
       assert alice_demographic_1.occupation == "Rocket Scientist"
       assert alice_demographic_1.race == "Asian Indian"
+      assert alice_demographic_1.source == "import"
 
       assert_revision_count(alice, 1)
 
@@ -89,6 +90,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH"]
       assert billy.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000"]
       assert billy.addresses |> Euclid.Extra.Enum.pluck(:source) == ["import"]
+      assert billy_demographic_1.source == "import"
       assert_revision_count(billy, 1)
     end
 
@@ -462,7 +464,8 @@ defmodule Epicenter.Cases.ImportTest do
           dob: ~D[1970-01-01],
           sex_at_birth: "female",
           race: "Asian Indian",
-          occupation: "Rocket Scientist"
+          occupation: "Rocket Scientist",
+          source: "form"
         })
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
@@ -479,12 +482,10 @@ defmodule Epicenter.Cases.ImportTest do
 
       assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
       updated_alice = Cases.get_person(alice.id) |> Cases.preload_demographics()
-      alice_demographic = Epicenter.Cases.Person.coalesce_demographics(updated_alice)
-      assert alice_demographic.sex_at_birth == "female"
-      assert alice_demographic.race == "Asian Indian"
-      assert alice_demographic.occupation == "Rocket Scientist"
-      assert alice_demographic.ethnicity.major == "not_hispanic_latinx_or_spanish_origin"
-      assert alice_demographic.ethnicity.detailed == []
+      [form_demographics, imported_demographics] = updated_alice.demographics |> Enum.sort_by(& &1.seq)
+
+      assert form_demographics.occupation == "Rocket Scientist"
+      assert imported_demographics.occupation == "Brain Surgeon"
     end
 
     test "does not delete existing information when importing a new test result for an existing person", %{
@@ -522,18 +523,13 @@ defmodule Epicenter.Cases.ImportTest do
 
       assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
       updated_alice = Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
-      alice_demographic = Epicenter.Cases.Person.coalesce_demographics(updated_alice)
-      assert alice_demographic.sex_at_birth == "AAA"
-      assert alice_demographic.race == "AAA"
-      assert alice_demographic.occupation == "AAA"
-      assert alice_demographic.ethnicity.major == "AAA"
-      assert alice_demographic.ethnicity.detailed == []
-      assert alice_demographic.preferred_language == "AAA"
-      assert alice_demographic.gender_identity == ["AAA"]
-      assert alice_demographic.marital_status == "AAA"
-      assert alice_demographic.employment == "AAA"
-      assert alice_demographic.notes == "AAA"
-      assert updated_alice.assigned_to.tid == originator.tid
+      [old_demographics, new_demographics] = updated_alice.demographics |> Enum.sort_by(& &1.seq)
+
+      assert old_demographics.sex_at_birth == "AAA"
+      assert old_demographics.occupation == "AAA"
+
+      assert new_demographics.sex_at_birth == "male"
+      assert new_demographics.occupation == "Brain Surgeon"
     end
 
     test "records novel information when importing a new test result for an existing person", %{
@@ -571,18 +567,13 @@ defmodule Epicenter.Cases.ImportTest do
 
       assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
       updated_alice = Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
-      alice_demographic = Epicenter.Cases.Person.coalesce_demographics(updated_alice)
-      assert alice_demographic.sex_at_birth == "AAA"
-      assert alice_demographic.race == "AAA"
-      assert alice_demographic.occupation == "Brain Surgeon"
-      assert alice_demographic.ethnicity.major == "AAA"
-      assert alice_demographic.ethnicity.detailed == []
-      assert alice_demographic.preferred_language == "AAA"
-      assert alice_demographic.gender_identity == ["AAA"]
-      assert alice_demographic.marital_status == nil
-      assert alice_demographic.employment == "AAA"
-      assert alice_demographic.notes == "AAA"
-      assert updated_alice.assigned_to.tid == originator.tid
+      [old_demographics, new_demographics] = updated_alice.demographics
+
+      assert old_demographics.occupation == nil
+      assert old_demographics.marital_status == nil
+
+      assert new_demographics.occupation == "Brain Surgeon"
+      assert new_demographics.marital_status == nil
     end
   end
 

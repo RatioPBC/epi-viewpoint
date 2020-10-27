@@ -195,6 +195,7 @@ defmodule Epicenter.Cases.Import do
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
     |> Ethnicity.build_attrs()
     |> Map.put("person_id", person.id)
+    |> Map.put("source", "import")
     |> in_audit_tuple(originator, "fixme")
     |> Cases.find_or_create_demographic()
   end
