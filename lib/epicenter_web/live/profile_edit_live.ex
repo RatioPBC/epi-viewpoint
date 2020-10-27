@@ -132,61 +132,8 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> update(form_params)
       |> validate()
 
-    update_dob = fn
-      nil -> nil
-      "" -> nil
-      dob -> DateParser.parse_mm_dd_yyyy!(dob)
-    end
-
-    rewrite_preferred_language = fn map, changeset ->
-      with {_, "Other"} <- Ecto.Changeset.fetch_field(changeset, :preferred_language),
-           {_, value} <- Ecto.Changeset.fetch_field(changeset, :other_specified_language) do
-        Map.put(map, :preferred_language, value)
-      else
-        _ -> map
-      end
-    end
-
-    non_form_demographics = socket.assigns.person.demographics |> Enum.reject(&(&1.source == "form")) |> Euclid.Extra.Enum.pluck([:id])
-    form_demographic = socket.assigns.person.demographics |> Enum.find(&(&1.source == "form"))
-
     with {:valid, []} <- {:valid, changeset.errors},
-         person_params =
-           changeset.changes
-           |> Map.merge(%{
-             demographics:
-               non_form_demographics ++
-                 [
-                   changeset.changes
-                   |> update_if_present(:dob, update_dob)
-                   |> rewrite_preferred_language.(changeset)
-                   |> Map.merge(%{id: if(form_demographic, do: form_demographic.id, else: nil), source: "form"})
-                 ]
-           })
-           |> update_if_present(:emails, fn emails ->
-             Enum.map(emails, fn
-               %{data: data, action: :delete} -> %{id: data.id, delete: true}
-               %{data: data, action: :replace} -> %{id: data.id, delete: true}
-               %{data: data, changes: changes} -> %{id: data.id} |> Map.merge(changes)
-             end)
-           end)
-           |> update_if_present(:addresses, fn addresses ->
-             Enum.map(addresses, fn
-               %{data: data, action: :delete} -> %{id: data.id, delete: true}
-               %{data: data, action: :replace} -> %{id: data.id, delete: true}
-               %{data: data, changes: changes} -> %{id: data.id} |> Map.merge(changes)
-             end)
-           end)
-           |> update_if_present(:phones, fn phones ->
-             Enum.map(phones, fn
-               %{data: data, action: :delete} -> %{id: data.id, delete: true}
-               %{data: data, action: :replace} -> %{id: data.id, delete: true}
-               %{data: data, changes: changes} -> %{id: data.id} |> Map.merge(changes)
-             end)
-           end)
-           |> remove_blank_addresses()
-           |> remove_blank_email_addresses()
-           |> remove_blank_phone_numbers(),
+         person_params = translate_form_data_to_person_params(changeset, socket.assigns.person.demographics),
          {:ok, person} <-
            Cases.update_person(
              socket.assigns.person,
@@ -206,6 +153,47 @@ defmodule EpicenterWeb.ProfileEditLive do
         {:noreply, assign(socket, :changeset, changeset)}
     end
   end
+
+  defp upsert_only_form_demographics(demographics, changeset) do
+    non_form_demographics = demographics |> Enum.reject(&(&1.source == "form")) |> Euclid.Extra.Enum.pluck([:id])
+    form_demographic = demographics |> Enum.find(&(&1.source == "form"))
+
+    non_form_demographics ++
+      [
+        changeset.changes
+        |> update_if_present(:dob, &update_dob/1)
+        |> rewrite_preferred_language(changeset)
+        |> Map.merge(%{id: if(form_demographic, do: form_demographic.id, else: nil), source: "form"})
+      ]
+  end
+
+  defp update_dob(nil), do: nil
+  defp update_dob(""), do: nil
+  defp update_dob(dob), do: DateParser.parse_mm_dd_yyyy!(dob)
+
+  defp rewrite_preferred_language(map, changeset) do
+    with {_, "Other"} <- Ecto.Changeset.fetch_field(changeset, :preferred_language),
+         {_, value} <- Ecto.Changeset.fetch_field(changeset, :other_specified_language) do
+      Map.put(map, :preferred_language, value)
+    else
+      _ -> map
+    end
+  end
+
+  defp translate_form_data_to_person_params(changeset, demographics) do
+    changeset.changes
+    |> Map.merge(%{demographics: upsert_only_form_demographics(demographics, changeset)})
+    |> update_if_present(:emails, fn emails -> Enum.map(emails, &translate_form_embed_to_person_params/1) end)
+    |> update_if_present(:addresses, fn addresses -> Enum.map(addresses, &translate_form_embed_to_person_params/1) end)
+    |> update_if_present(:phones, fn phones -> Enum.map(phones, &translate_form_embed_to_person_params/1) end)
+    |> remove_blank_addresses()
+    |> remove_blank_email_addresses()
+    |> remove_blank_phone_numbers()
+  end
+
+  defp translate_form_embed_to_person_params(%{data: data, action: :delete}), do: %{id: data.id, delete: true}
+  defp translate_form_embed_to_person_params(%{data: data, action: :replace}), do: %{id: data.id, delete: true}
+  defp translate_form_embed_to_person_params(%{data: data, changes: changes}), do: %{id: data.id} |> Map.merge(changes)
 
   defp update(changeset, form_params) do
     changeset
