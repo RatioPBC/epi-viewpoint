@@ -32,6 +32,20 @@ defmodule Epicenter.Cases.PersonTest do
       |> assert_eq(~w{result1 result2}, ignore_order: true)
     end
 
+    test "has many case_investigations" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
+      Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation1") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation2") |> Cases.create_case_investigation!()
+
+      alice
+      |> Cases.preload_case_investigations()
+      |> Map.get(:case_investigations)
+      |> tids()
+      |> assert_eq(~w{investigation1 investigation2}, ignore_order: true)
+    end
+
     test "has many phone numbers" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()

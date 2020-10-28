@@ -1,5 +1,6 @@
 defmodule Epicenter.Test.Fixtures do
   alias Epicenter.AuditLog
+  alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
 
@@ -33,6 +34,18 @@ defmodule Epicenter.Test.Fixtures do
         request_facility_name: tid <> " Lab, Inc.",
         result: "positive",
         sampled_on: sampled_on |> DateParser.parse_mm_dd_yyyy!(),
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
+  end
+
+  def case_investigation_attrs(%Person{id: person_id}, %LabResult{id: initiated_by_id}, author, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        person_id: person_id,
+        initiated_by_id: initiated_by_id,
         tid: tid
       }
       |> merge_attrs(attrs)

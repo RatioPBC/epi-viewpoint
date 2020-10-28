@@ -5,6 +5,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Accounts.User
   alias Epicenter.Cases
   alias Epicenter.Cases.Address
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
@@ -25,6 +26,7 @@ defmodule Epicenter.Cases.Person do
     belongs_to :assigned_to, User
     has_many :demographics, Demographic
     has_many :addresses, Address
+    has_many :case_investigations, CaseInvestigation
     has_many :emails, Email, on_replace: :delete
     has_many :lab_results, LabResult
     has_many :phones, Phone, on_replace: :delete

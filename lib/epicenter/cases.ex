@@ -2,6 +2,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Address
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
@@ -23,6 +24,15 @@ defmodule Epicenter.Cases do
 
   def upsert_lab_result!({attrs, audit_meta}),
     do: %LabResult{} |> change_lab_result(attrs) |> AuditLog.insert!(audit_meta, LabResult.Query.opts_for_upsert())
+
+  #
+  # case investigations
+  #
+  def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
+  def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
+
+  def preload_case_investigations(person_people_or_nil),
+    do: person_people_or_nil |> Repo.preload(case_investigations: CaseInvestigation.Query.display_order())
 
   #
   # people
