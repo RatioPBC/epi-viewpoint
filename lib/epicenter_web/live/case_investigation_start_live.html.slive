@@ -1,4 +1,4 @@
-#case-investigation-start-page data-role="case-investigation-start-page"
+#case-investigation-start-page data-role="case-investigation-start-page" data-page="case-investigation-start"
 
   section
     header#subnav
@@ -7,3 +7,7 @@
         span Back
 
   section#case-investigation-start
+    h2 Start interview
+
+    = form_for @changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
+      = start_form_builder(f)

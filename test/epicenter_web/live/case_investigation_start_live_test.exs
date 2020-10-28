@@ -1,22 +1,25 @@
 defmodule EpicenterWeb.CaseInvestigationStartLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import Phoenix.LiveViewTest
-
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
 
   setup %{user: user} do
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-    [person: person, user: user]
+    lab_result = Test.Fixtures.lab_result_attrs(person, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+    case_investigation = Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation") |> Cases.create_case_investigation!()
+    [case_investigation: case_investigation, person: person, user: user]
   end
 
-  test "disconnected and connected render", %{conn: conn, person: person} do
-    {:ok, page_live, disconnected_html} = live(conn, "/people/#{person.id}/case_investigations/todo/start")
-
-    assert_has_role(disconnected_html, "case-investigation-start-page")
-    assert_has_role(page_live, "case-investigation-start-page")
+  test "shows start case investigation form", %{conn: conn, person: person} do
+    Pages.CaseInvestigationStart.visit(conn, person)
+    |> Pages.CaseInvestigationStart.assert_here()
+    |> Pages.CaseInvestigationStart.assert_person_interviewed_selections(%{
+      "Jacob Wunderbar" => false,
+      "Proxy" => false
+    })
   end
 end

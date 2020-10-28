@@ -138,14 +138,14 @@ defmodule EpicenterWeb.Test.Pages do
     view
     |> parse()
     |> Test.Html.all(
-         "[data-role=#{data_role}]",
-         fn element ->
-           {
-             Test.Html.text(element),
-             Test.Html.attr(element, "input[type=#{type}]", "checked") == ["checked"]
-           }
-         end
-       )
+      "[data-role=#{data_role}]",
+      fn element ->
+        {
+          Test.Html.text(element),
+          Test.Html.attr(element, "input[type=#{type}]", "checked") == ["checked"]
+        }
+      end
+    )
     |> Map.new()
   end
 end
