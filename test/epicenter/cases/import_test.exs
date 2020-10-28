@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.ImportTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.ImportedFile
   alias Epicenter.Repo
@@ -92,6 +93,32 @@ defmodule Epicenter.Cases.ImportTest do
       assert billy.addresses |> Euclid.Extra.Enum.pluck(:source) == ["import"]
       assert billy_demographic_1.source == "import"
       assert_revision_count(billy, 1)
+    end
+
+    test "creates case investigations for new lab results", %{originator: originator} do
+      assert {:ok,
+              %Epicenter.Cases.Import.ImportInfo{
+                imported_people: imported_people,
+                imported_lab_result_count: 2,
+                imported_person_count: 2,
+                total_lab_result_count: 2,
+                total_person_count: 2
+              }} =
+               %{
+                 file_name: "test.csv",
+                 contents: """
+                 search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
+                 Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
+                 Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+                 """
+               }
+               |> Import.import_csv(originator)
+
+      [alice, _billy] = Cases.list_people() |> Cases.preload_case_investigations()
+      case_investigations = alice.case_investigations
+      assert [%CaseInvestigation{} = case_investigation] = case_investigations
+      case_investigation = case_investigation |> Cases.preload_initiated_by()
+      assert case_investigation.initiated_by.reported_on == ~D[2020-06-05]
     end
 
     test "can successfully import sample_data/lab_results.csv", %{originator: originator} do
@@ -718,6 +745,31 @@ defmodule Epicenter.Cases.ImportTest do
         ],
         []
       })
+    end
+  end
+
+  describe "maybe_create_case_investigation" do
+    setup %{originator: originator} do
+      alice = Test.Fixtures.person_attrs(originator, "alice") |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(alice, originator, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
+      [alice: alice, lab_result: lab_result]
+    end
+
+    test "creates case investigation for a lab result when there are no other case investigations", %{
+      originator: originator,
+      alice: alice,
+      lab_result: lab_result
+    } do
+      Import.maybe_create_case_investigation(lab_result, alice, originator)
+
+      case_investigation =
+        Cases.get_person(alice.id)
+        |> Cases.preload_case_investigations()
+        |> Map.get(:case_investigations)
+        |> Euclid.Extra.List.only!()
+
+      assert case_investigation.person_id == alice.id
+      assert case_investigation.initiated_by_id == lab_result.id
     end
   end
 end

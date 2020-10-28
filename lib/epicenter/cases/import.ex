@@ -3,6 +3,8 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Import.Ethnicity
+  alias Epicenter.Cases.LabResult
+  alias Epicenter.Cases.Person
   alias Epicenter.Csv
   alias Epicenter.DateParser
   alias Epicenter.Extra
@@ -182,11 +184,18 @@ defmodule Epicenter.Cases.Import do
 
     with {:ok, person} <- import_person(person, row, originator),
          {:ok, _} <- import_demographic(person, row, originator) do
-      lab_result = import_lab_result(row, person, originator)
+      %LabResult{} = lab_result = import_lab_result(row, person, originator)
+      maybe_create_case_investigation(lab_result, person, originator)
       import_phone_number(row, person, originator)
       import_address(row, person, originator)
       %{person: person, lab_result: lab_result}
     end
+  end
+
+  def maybe_create_case_investigation(%LabResult{id: lab_result_id}, %Person{id: person_id}, originator) do
+    %{person_id: person_id, initiated_by_id: lab_result_id}
+    |> in_audit_tuple(originator, AuditLog.Revision.upsert_lab_result_action())
+    |> Cases.create_case_investigation!()
   end
 
   defp import_demographic(person, row, originator) do
