@@ -45,16 +45,22 @@
   section#case-investigations
     @include card
 
-    .reported-on
+    #reported-on
       color: $secondary-text-color
       margin-top: 0
 
-    .status
-      margin-top: 2rem
-      font-size: 1.8rem
-      font-weight: bold
-      .status-value
-        color: $pending-color
+    #case-investigation-status
+      @include level($justify: space-between)
+      margin-top: 0
+
+      #status
+        margin-top: 2rem
+
+        #status-value
+          color: $pending-color
+
+      #start-case-investigation-link
+        @include button-primary
 
   section#demographics
     @include card

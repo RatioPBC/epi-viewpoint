@@ -207,7 +207,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_lab_result(person, user, "lab_result", ~D[2020-08-05], ~D[2020-08-06], ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.click_start_case_investigation("001")
+      |> Pages.Profile.click_start_case_investigation()
       |> assert_redirects_to("/people/#{person.id}/case_investigations/todo/start")
     end
   end
