@@ -91,6 +91,18 @@ defmodule Epicenter.Accounts.UserTest do
     end
   end
 
+  describe "filter_by_valid_password" do
+    test "returns the user if the password matches or nil if it doesn't" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      assert User.filter_by_valid_password(user, "password123") == user
+      assert User.filter_by_valid_password(user, "bad password") == nil
+    end
+
+    test "returns nil if no user is passed in" do
+      assert User.filter_by_valid_password(nil, "bad password") == nil
+    end
+  end
+
   describe "query" do
     test "all/0 sorts by name, ignoring case" do
       Test.Fixtures.user_attrs(@admin, "middle", name: "Middle") |> Accounts.register_user!()

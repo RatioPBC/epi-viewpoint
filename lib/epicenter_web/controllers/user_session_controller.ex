@@ -10,7 +10,7 @@ defmodule EpicenterWeb.UserSessionController do
     do: render_with_common_assigns(conn, "new.html", error_message: nil)
 
   def create(conn, %{"user" => %{"email" => email, "password" => password} = user_params}) do
-    if user = Accounts.get_user_by_email_and_password(email, password),
+    if user = Accounts.get_user(email: email, password: password),
       do: UserAuth.log_in_user(conn, user, user_params),
       else: render_with_common_assigns(conn, "new.html", error_message: "Invalid email or password")
   end

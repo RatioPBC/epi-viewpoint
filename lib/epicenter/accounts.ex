@@ -6,7 +6,10 @@ defmodule Epicenter.Accounts do
   alias Epicenter.Repo
 
   def change_user(%User{} = user, attrs), do: User.changeset(user, Enum.into(attrs, %{}))
-  def get_user(id), do: User |> Repo.get(id)
+  def get_user!(id) when is_binary(id), do: Repo.get!(User, id)
+  def get_user(id) when is_binary(id), do: User |> Repo.get(id)
+  def get_user(email: email) when is_binary(email), do: User |> Repo.get_by(email: email)
+  def get_user(email: email, password: password), do: get_user(email: email) |> User.filter_by_valid_password(password)
   def list_users(), do: User.Query.all() |> Repo.all()
   def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
 
@@ -22,59 +25,6 @@ defmodule Epicenter.Accounts do
 
   def update_user_mfa!(%User{} = user, {mfa_secret, audit_meta}),
     do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> AuditLog.update!(audit_meta)
-
-  ## Database getters
-
-  @spec get_user_by_email(binary) :: any
-  @doc """
-  Gets a user by email.
-
-  ## Examples
-
-      iex> get_user_by_email("foo@example.com")
-      %User{}
-
-      iex> get_user_by_email("unknown@example.com")
-      nil
-
-  """
-  def get_user_by_email(email) when is_binary(email) do
-    Repo.get_by(User, email: email)
-  end
-
-  @doc """
-  Gets a user by email and password.
-
-  ## Examples
-
-      iex> get_user_by_email_and_password("foo@example.com", "correct_password")
-      %User{}
-
-      iex> get_user_by_email_and_password("foo@example.com", "invalid_password")
-      nil
-
-  """
-  def get_user_by_email_and_password(email, password)
-      when is_binary(email) and is_binary(password) do
-    user = Repo.get_by(User, email: email)
-    if User.valid_password?(user, password), do: user
-  end
-
-  @doc """
-  Gets a single user.
-
-  Raises `Ecto.NoResultsError` if the User does not exist.
-
-  ## Examples
-
-      iex> get_user!(123)
-      %User{}
-
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_user!(id), do: Repo.get!(User, id)
 
   ## User registration
 

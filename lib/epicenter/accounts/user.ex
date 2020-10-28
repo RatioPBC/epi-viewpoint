@@ -153,6 +153,12 @@ defmodule Epicenter.Accounts.User do
     end
   end
 
+  def filter_by_valid_password(nil, _password),
+    do: nil
+
+  def filter_by_valid_password(%User{} = user, password) when is_binary(password),
+    do: if(valid_password?(user, password), do: user, else: nil)
+
   defmodule Query do
     import Ecto.Query
 

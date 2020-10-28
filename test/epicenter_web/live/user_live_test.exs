@@ -22,7 +22,7 @@ defmodule EpicenterWeb.UserLiveTest do
       user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "admin", "status" => "active"}
     )
 
-    assert %{name: "New User", email: "newadmin@example.com", admin: true} = Accounts.get_user_by_email("newadmin@example.com")
+    assert %{name: "New User", email: "newadmin@example.com", admin: true} = Accounts.get_user(email: "newadmin@example.com")
   end
 
   test "admins can add disabled users", %{conn: conn} do
@@ -31,7 +31,7 @@ defmodule EpicenterWeb.UserLiveTest do
       user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "member", "status" => "inactive"}
     )
 
-    assert %{name: "New User", email: "newadmin@example.com", disabled: true} = Accounts.get_user_by_email("newadmin@example.com")
+    assert %{name: "New User", email: "newadmin@example.com", disabled: true} = Accounts.get_user(email: "newadmin@example.com")
   end
 
   test "users cannot be created with invalid email addresses", %{conn: conn} do

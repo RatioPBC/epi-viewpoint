@@ -17,7 +17,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
     # Regardless of the outcome, show an impartial success/error message.
     message = "An email with instructions was sent"
 
-    if user = Accounts.get_user_by_email(email) do
+    if user = Accounts.get_user(email: email) do
       {:ok, %{to: to, body: body}} =
         Accounts.deliver_user_reset_password_instructions(
           user,
