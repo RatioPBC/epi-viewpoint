@@ -10,11 +10,11 @@ section#people-page data-page="people"
 
   #toolbar
     #toolbar-left
-      form id="assignment-form" phx-change="form-change" data-disabled=is_disabled?(@selected_people)
+      form id="assignment-form" phx-change="form-change" data-disabled=disabled?(@selected_people)
         #user-list
           span#assign-to-label Assign to
           #select-wrapper
-            select name="user" data-role="users" disabled=is_disabled?(@selected_people)
+            select name="user" data-role="users" disabled=disabled?(@selected_people)
               option value=""
               option value="-unassigned-" Unassigned
               = for user <- @users do
@@ -44,7 +44,7 @@ section#people-page data-page="people"
       = for person <- visible_people(@people, @only_assigned_to_me, @current_user) do
         tr data-role="person"
           td
-            input type="checkbox" checked=is_selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
+            input type="checkbox" checked=selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
           td= live_redirect full_name(person), to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)
           td= external_id(person)
           td= latest_result(person)

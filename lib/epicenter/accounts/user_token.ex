@@ -59,8 +59,8 @@ defmodule Epicenter.Accounts.UserToken do
 
     cond do
       is_nil(user_token.expires_at) -> :expired
-      Extra.is_before?(user_token.inserted_at, db_now |> DateTime.add(-max_token_lifetime())) -> :expired
-      Extra.is_before?(user_token.expires_at, db_now) -> :expired
+      Extra.before?(user_token.inserted_at, db_now |> DateTime.add(-max_token_lifetime())) -> :expired
+      Extra.before?(user_token.expires_at, db_now) -> :expired
       true -> :valid
     end
   end

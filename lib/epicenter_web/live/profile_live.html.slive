@@ -14,12 +14,12 @@
     form id="assignment-form" phx-change="form-change"
       #user-list
         #assignee-label Assignee
-        #select-wrapper data-unset=is_unassigned?(@person)
+        #select-wrapper data-unset=unassigned?(@person)
           = arrow_down_icon()
           select name="user" data-role="users"
-            option selected=is_selected?(nil, @person) value="-unassigned-" Unassigned
+            option selected=selected?(nil, @person) value="-unassigned-" Unassigned
             = for user <- @users do
-              option selected=is_selected?(user, @person) value="#{user.id}" #{user.name}
+              option selected=selected?(user, @person) value="#{user.id}" #{user.name}
 
 
   section#profile

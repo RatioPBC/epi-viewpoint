@@ -94,7 +94,7 @@ defmodule EpicenterWeb.ProfileLive do
     Date.utc_today() |> Date.diff(dob) |> Integer.floor_div(365)
   end
 
-  def is_unassigned?(person) do
+  def unassigned?(person) do
     person.assigned_to == nil
   end
 
@@ -105,7 +105,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> Enum.map(& &1.address)
   end
 
-  def is_selected?(user, person) do
+  def selected?(user, person) do
     user == person.assigned_to
   end
 

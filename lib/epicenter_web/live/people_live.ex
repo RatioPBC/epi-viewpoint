@@ -92,10 +92,10 @@ defmodule EpicenterWeb.PeopleLive do
     Person.coalesce_demographics(person).external_id
   end
 
-  def is_disabled?(selected_people),
+  def disabled?(selected_people),
     do: selected_people == %{}
 
-  def is_selected?(selected_people, %Person{id: person_id}),
+  def selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)
 
   def latest_result(person) do
