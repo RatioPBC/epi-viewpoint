@@ -15,6 +15,7 @@ defmodule Epicenter.Test.RevisionAssertions do
     entry = recent_audit_log(model)
     if entry == nil, do: flunk("Expected schema to have an audit log entry, but found none.")
     if entry.author_id != author.id, do: flunk("Expected revision to have author #{author.tid} but it did not")
+    change = Euclid.Extra.Map.stringify_keys(change)
     assert ^change = Map.take(entry.change |> remove_ids(), Map.keys(change))
   end
 

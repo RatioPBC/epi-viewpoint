@@ -645,11 +645,13 @@ defmodule Epicenter.AccountsTest do
     end
 
     test "updates the provided user with a user admin", %{user: user} do
-      assert {:ok, _} = Accounts.update_user(user, %{admin: true, name: "Cool Admin"}, Test.Fixtures.audit_meta(@admin))
-      assert Accounts.get_user!(user.id).admin
-      assert Accounts.get_user!(user.id).name == "Cool Admin"
-      assert_revision_count(user, 2)
-      assert_recent_audit_log(user, @admin, %{"name" => "Cool Admin"})
+      attrs = %{admin: true, name: "New Name", email: "new@example.com", disabled: true}
+      assert {:ok, _} = Accounts.update_user(user, attrs, Test.Fixtures.audit_meta(@admin))
+
+      reloaded_user = Accounts.get_user!(user.id)
+      assert %{admin: true, name: "New Name", email: "new@example.com", disabled: true} = reloaded_user
+      assert_revision_count(reloaded_user, 2)
+      assert_recent_audit_log(reloaded_user, @admin, %{name: "New Name", admin: true, email: "new@example.com", disabled: true})
     end
 
     test "fails when originator is not admin", %{user: user} do

@@ -31,7 +31,7 @@ defmodule Epicenter.Accounts.User do
   derive_jason_encoder(except: [:seq])
 
   @required_attrs ~w{name}a
-  @optional_attrs ~w{tid admin}a
+  @optional_attrs ~w{admin disabled email tid}a
   @registration_attrs ~w{email password disabled}a
   @mfa_attrs ~w{mfa_secret}a
 

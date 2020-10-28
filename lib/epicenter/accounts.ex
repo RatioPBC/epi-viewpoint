@@ -26,6 +26,14 @@ defmodule Epicenter.Accounts do
 
   defp admin?(%AuditLog.Meta{author_id: id}), do: get_user(id).admin
 
+  def update_user(%User{} = user, attrs, audit_meta) do
+    if admin?(audit_meta) do
+      user |> change_user(attrs) |> AuditLog.update(audit_meta)
+    else
+      {:error, :admin_privileges_required}
+    end
+  end
+
   def update_user_mfa!(%User{} = user, {mfa_secret, audit_meta}),
     do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> AuditLog.update!(audit_meta)
 
@@ -275,14 +283,6 @@ defmodule Epicenter.Accounts do
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, _, changeset, _} -> {:error, changeset}
-    end
-  end
-
-  def update_user(%User{} = user, attrs, audit_meta) do
-    if admin?(audit_meta) do
-      user |> change_user(attrs) |> AuditLog.update(audit_meta)
-    else
-      {:error, :admin_privileges_required}
     end
   end
 
