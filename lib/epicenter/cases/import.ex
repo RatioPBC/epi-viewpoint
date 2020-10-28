@@ -200,7 +200,7 @@ defmodule Epicenter.Cases.Import do
       [case_investigation] ->
         case_investigation
 
-      nil ->
+      [] ->
         %{person_id: person_id, initiated_by_id: lab_result_id}
         |> in_audit_tuple(originator, AuditLog.Revision.upsert_lab_result_action())
         |> Cases.create_case_investigation!()
