@@ -40,6 +40,12 @@ defmodule EpicenterWeb.Test.Pages do
     conn_or_view_or_html
   end
 
+  def flash_content(conn_or_view_or_html) do
+    conn_or_view_or_html
+    |> parse()
+    |> Test.Html.text(role: "flash")
+  end
+
   def follow_conn_redirect(conn, max_directs \\ 10)
 
   def follow_conn_redirect(%Plug.Conn{} = _conn, 0 = _max_redirects),

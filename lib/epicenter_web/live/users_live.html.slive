@@ -2,6 +2,8 @@ section#people-page data-page="users"
   h2
     #title
       span Users
+  div data-role="flash"
+    = live_flash(@flash, :info)
 
   table data-role="users-table"
     thead

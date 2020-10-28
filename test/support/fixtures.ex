@@ -20,7 +20,9 @@ defmodule Epicenter.Test.Fixtures do
       admin: true,
       name: "fixture admin",
       email: "admin@example.com",
-      hashed_password: "adminpassword"
+      hashed_password: "adminpassword",
+      mfa_secret: "123456",
+      confirmed_at: NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
     }
 
   def admin_audit_meta(), do: audit_meta(admin())

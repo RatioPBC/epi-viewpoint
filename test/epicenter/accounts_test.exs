@@ -553,6 +553,22 @@ defmodule Epicenter.AccountsTest do
     end
   end
 
+  describe "generate_user_reset_password_token/2" do
+    setup do
+      [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]
+    end
+
+    test "persists a reset password token's hash and returns the base64 encoded token", %{user: user} do
+      {:ok, token} = Accounts.generate_user_reset_password_token(user)
+
+      {:ok, token} = Base.url_decode64(token, padding: false)
+      assert user_token = Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
+      assert user_token.user_id == user.id
+      assert user_token.sent_to == user.email
+      assert user_token.context == "reset_password"
+    end
+  end
+
   describe "get_user_by_reset_password_token/1" do
     setup do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()

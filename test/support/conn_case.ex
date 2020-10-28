@@ -62,6 +62,12 @@ defmodule EpicenterWeb.ConnCase do
     %{conn: log_in_user(conn, user), user: user}
   end
 
+  def log_in_admin(%{conn: conn}) do
+    admin_id = Epicenter.Test.Fixtures.admin().id
+    admin = Epicenter.Accounts.get_user(admin_id)
+    %{conn: log_in_user(conn, admin), user: admin}
+  end
+
   @doc """
   Logs the given `user` into the `conn`.
 
