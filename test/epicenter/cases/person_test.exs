@@ -12,6 +12,22 @@ defmodule Epicenter.Cases.PersonTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
 
+  describe "schema" do
+    test "fields" do
+      assert_schema(
+        Person,
+        [
+          {:assigned_to_id, :binary_id},
+          {:id, :id},
+          {:inserted_at, :naive_datetime},
+          {:seq, :integer},
+          {:tid, :string},
+          {:updated_at, :naive_datetime}
+        ]
+      )
+    end
+  end
+
   describe "associations" do
     test "can have zero lab_results" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
