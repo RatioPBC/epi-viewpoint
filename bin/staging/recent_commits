@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+LATEST_SHA=$(curl -s https://viewpoint-staging.network.geometer.dev/version.txt)
+
+if git rev-list --quiet "${LATEST_SHA}" -- 2>/dev/null; then
+  git log -10 --pretty=format:"%h: %s (%an/%cn)" "${LATEST_SHA}"
+else
+  echo "Could not find deployed sha '${LATEST_SHA}' in local git history - do you need to pull?"
+  exit 1
+fi
