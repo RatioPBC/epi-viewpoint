@@ -48,6 +48,10 @@ defmodule Epicenter.Cases.Demographic do
     import Ecto.Query
     alias Epicenter.Cases.Demographic
 
+    def display_order() do
+      from demographics in Demographic, order_by: [asc: demographics.seq]
+    end
+
     def matching(dob: dob, first_name: first_name, last_name: last_name) do
       from(d in Demographic, where: [dob: ^dob, first_name: ^first_name, last_name: ^last_name])
       |> first()

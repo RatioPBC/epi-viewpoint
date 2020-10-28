@@ -126,6 +126,20 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(originator)}
   end
 
+  def demographic_attrs(author, person, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        dob: ~D[2000-01-01],
+        first_name: tid,
+        last_name: "Testuser",
+        person_id: person.id,
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
+  end
+
   def phone_attrs(author, %Person{id: person_id}, tid, attrs \\ %{}) do
     attrs =
       %{
