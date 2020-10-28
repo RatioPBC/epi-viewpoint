@@ -4,6 +4,8 @@ defmodule EpicenterWeb.Form do
   import EpicenterWeb.ErrorHelpers
   import EpicenterWeb.FormHelpers
 
+  alias EpicenterWeb.FormHelpers
+
   alias EpicenterWeb.Form
 
   defstruct ~w{f safe}a
@@ -44,6 +46,15 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, span)
   end
 
+  def radio_button_list(%Form.Line{f: f} = line, field, name, values, options, span \\ 2) do
+    [
+      label(f, field, name, data: grid_data(1, line, span)),
+      error_tag(f, field, data: grid_data(2, line, span)),
+      FormHelpers.radio_button_list(f, field, values, options, data: grid_data(3, line, span))
+    ]
+    |> add_to_line(line, span)
+  end
+
   def save_button(%Form.Line{} = line, span \\ 2) do
     submit("Save", data: grid_data(1, line, span))
     |> add_to_line(line, span)
@@ -53,7 +64,7 @@ defmodule EpicenterWeb.Form do
     [
       label(f, field, name, data: grid_data(1, line, span)),
       error_tag(f, field, data: grid_data(2, line, span)),
-      select_with_wrapper(f, field, options, data: grid_data(3, line, span))
+      FormHelpers.select_with_wrapper(f, field, options, data: grid_data(3, line, span))
     ]
     |> add_to_line(line, span)
   end

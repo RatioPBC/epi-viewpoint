@@ -84,6 +84,7 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
     |> Form.line(fn line ->
       line
       |> Form.checkbox_list_field(:genres, "Genres", genres())
+      |> Form.radio_button_list(:language, "Language", languages(), other: "Other")
     end)
     |> Form.safe()
   end
