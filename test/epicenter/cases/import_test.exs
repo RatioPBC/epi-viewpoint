@@ -9,6 +9,7 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.ImportedFile
+  alias Epicenter.Cases.Person
   alias Epicenter.Repo
   alias Epicenter.Test
 
@@ -760,16 +761,26 @@ defmodule Epicenter.Cases.ImportTest do
       alice: alice,
       lab_result: lab_result
     } do
-      Import.create_case_investigation_if_no_other(lab_result, alice, originator)
+      %CaseInvestigation{} = Import.create_case_investigation_if_no_other(lab_result, alice, originator)
 
-      case_investigation =
-        Cases.get_person(alice.id)
-        |> Cases.preload_case_investigations()
-        |> Map.get(:case_investigations)
-        |> Euclid.Extra.List.only!()
+      case_investigation = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Euclid.Extra.List.only!()
 
       assert case_investigation.person_id == alice.id
       assert case_investigation.initiated_by_id == lab_result.id
+    end
+
+    test "does not create case investigation for a lab result when there is an existing case investigation", %{
+      originator: originator,
+      alice: alice,
+      lab_result: lab_result
+    } do
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(alice, lab_result, originator, "investigation")
+        |> Cases.create_case_investigation!()
+
+      Import.create_case_investigation_if_no_other(lab_result, alice, originator)
+      existing_case_investigation = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Euclid.Extra.List.only!()
+      assert case_investigation.id == existing_case_investigation.id
     end
   end
 end

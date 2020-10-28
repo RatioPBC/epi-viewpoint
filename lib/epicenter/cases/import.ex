@@ -192,10 +192,19 @@ defmodule Epicenter.Cases.Import do
     end
   end
 
-  def create_case_investigation_if_no_other(%LabResult{id: lab_result_id}, %Person{id: person_id}, originator) do
-    %{person_id: person_id, initiated_by_id: lab_result_id}
-    |> in_audit_tuple(originator, AuditLog.Revision.upsert_lab_result_action())
-    |> Cases.create_case_investigation!()
+  def create_case_investigation_if_no_other(%LabResult{id: lab_result_id}, %Person{id: person_id} = person, originator) do
+    person
+    |> Cases.preload_case_investigations()
+    |> Map.get(:case_investigations)
+    |> case do
+      [case_investigation] ->
+        case_investigation
+
+      nil ->
+        %{person_id: person_id, initiated_by_id: lab_result_id}
+        |> in_audit_tuple(originator, AuditLog.Revision.upsert_lab_result_action())
+        |> Cases.create_case_investigation!()
+    end
   end
 
   defp import_demographic(person, row, originator) do
