@@ -1,9 +1,9 @@
-section#people-page data-page="users"
+section#users-page data-page="users"
   h2
     #title
       span Users
-  div data-role="flash"
-    = live_flash(@flash, :info)
+  #password-reset data-role="password-reset"
+    = live_flash(@flash, :password_reset)
 
   table data-role="users-table"
     thead

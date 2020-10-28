@@ -89,7 +89,7 @@ defmodule EpicenterWeb.UserLive do
       {:ok, encoded_token} = Accounts.generate_user_reset_password_token(user)
 
       socket
-      |> put_flash(:info, "Reset link for #{user.email}: #{Routes.user_reset_password_url(Endpoint, :edit, encoded_token)}")
+      |> put_flash(:password_reset, "Reset link for #{user.email}: #{Routes.user_reset_password_url(Endpoint, :edit, encoded_token)}")
       |> push_redirect(to: Routes.users_path(socket, EpicenterWeb.UsersLive))
       |> noreply()
     else

@@ -38,7 +38,7 @@ defmodule EpicenterWeb.UserLiveTest do
           user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "admin", "status" => "active"}
         )
         |> Pages.Users.assert_here()
-        |> Pages.flash_content()
+        |> Pages.Users.password_reset_text()
 
       captures =
         Regex.named_captures(~r[Reset link for newadmin@example.com: http://\w+:\d+/users/reset-password/(?<encoded_token>.+)], flash_content)

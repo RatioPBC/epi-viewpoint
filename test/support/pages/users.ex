@@ -23,4 +23,10 @@ defmodule EpicenterWeb.Test.Pages.Users do
 
     view
   end
+
+  def password_reset_text(conn_or_view_or_html) do
+    conn_or_view_or_html
+    |> Pages.parse()
+    |> Test.Html.text(role: "password-reset")
+  end
 end
