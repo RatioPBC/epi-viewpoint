@@ -117,8 +117,8 @@ defmodule Epicenter.Cases.ImportTest do
       [alice, _billy] = Cases.list_people() |> Cases.preload_case_investigations()
       case_investigations = alice.case_investigations
       assert [%CaseInvestigation{} = case_investigation] = case_investigations
-      case_investigation = case_investigation |> Cases.preload_initiated_by()
-      assert case_investigation.initiated_by.reported_on == ~D[2020-06-05]
+      #      case_investigation = case_investigation |> Cases.preload_initiated_by()
+      #      assert case_investigation.initiated_by.reported_on == ~D[2020-06-05]
     end
 
     test "can successfully import sample_data/lab_results.csv", %{originator: originator} do

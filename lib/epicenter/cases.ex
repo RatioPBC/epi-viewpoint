@@ -31,8 +31,11 @@ defmodule Epicenter.Cases do
   def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
 
-  def preload_case_investigations(person_people_or_nil),
-    do: person_people_or_nil |> Repo.preload(case_investigations: CaseInvestigation.Query.display_order())
+  def preload_case_investigations(person_or_people_or_nil),
+    do: person_or_people_or_nil |> Repo.preload(case_investigations: CaseInvestigation.Query.display_order())
+
+  def preload_initiated_by(person_or_people_or_nil),
+    do: person_or_people_or_nil |> Repo.preload(initiated_by: CaseInvestigation.Query.display_order())
 
   #
   # people
