@@ -6,6 +6,9 @@ defmodule Epicenter.Accounts do
   alias Epicenter.Repo
 
   def change_user(%User{} = user, attrs), do: User.changeset(user, Enum.into(attrs, %{}))
+  def change_user_email(user, attrs \\ %{}), do: User.email_changeset(user, attrs)
+  def change_user_password(user, attrs \\ %{}), do: User.password_changeset(user, attrs)
+  def change_user_registration(%User{} = user, attrs \\ %{}), do: User.registration_changeset(user, attrs)
   def get_user!(id) when is_binary(id), do: Repo.get!(User, id)
   def get_user(id) when is_binary(id), do: User |> Repo.get(id)
   def get_user(email: email) when is_binary(email), do: User |> Repo.get_by(email: email)
@@ -18,43 +21,13 @@ defmodule Epicenter.Accounts do
   def register_user({_attrs, audit_meta} = args), do: if(admin?(audit_meta), do: _register_user(args), else: {:error, :admin_privileges_required})
   def register_user!({_attrs, %{author_id: @unpersisted_admin_id} = _} = args), do: _register_user!(args)
   def register_user!({_attrs, audit_meta} = args), do: if(admin?(audit_meta), do: _register_user!(args), else: raise(Epicenter.AdminRequiredError))
-  defp _register_user({attrs, audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> AuditLog.insert(audit_meta)
-  defp _register_user!({attrs, audit_meta}), do: %User{} |> User.registration_changeset(attrs) |> AuditLog.insert!(audit_meta)
+  defp _register_user({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> AuditLog.insert(audit_meta)
+  defp _register_user!({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> AuditLog.insert!(audit_meta)
 
   defp admin?(%AuditLog.Meta{author_id: id}), do: get_user(id).admin
 
   def update_user_mfa!(%User{} = user, {mfa_secret, audit_meta}),
     do: user |> User.mfa_changeset(%{mfa_secret: mfa_secret}) |> AuditLog.update!(audit_meta)
-
-  ## User registration
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking user changes.
-
-  ## Examples
-
-      iex> change_user_registration(user)
-      %Ecto.Changeset{data: %User{}}
-
-  """
-  def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs)
-  end
-
-  ## Settings
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for changing the user email.
-
-  ## Examples
-
-      iex> change_user_email(user)
-      %Ecto.Changeset{data: %User{}}
-
-  """
-  def change_user_email(user, attrs \\ %{}) do
-    User.email_changeset(user, attrs)
-  end
 
   @doc """
   Emulates that the email will change without actually changing
@@ -122,19 +95,6 @@ defmodule Epicenter.Accounts do
 
     Repo.insert!(user_token)
     UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for changing the user password.
-
-  ## Examples
-
-      iex> change_user_password(user)
-      %Ecto.Changeset{data: %User{}}
-
-  """
-  def change_user_password(user, attrs \\ %{}) do
-    User.password_changeset(user, attrs)
   end
 
   @doc """
