@@ -50,6 +50,7 @@ defmodule EpicenterWeb.Router do
     live "/people", PeopleLive, as: :people
     live "/people/:id", ProfileLive, as: :profile
     live "/people/:id/case_investigations/todo/start", CaseInvestigationStartLive, as: :case_investigation_start
+    live "/people/:id/case_investigations/todo/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
     get "/users/settings", UserSettingsController, :edit

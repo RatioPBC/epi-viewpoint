@@ -61,7 +61,7 @@ defmodule EpicenterWeb.FormHelpers do
   # A list of radio buttons, each wrapped in a label
   defp radio_buttons(form, field, values) do
     for value <- values do
-      label do
+      label(data: [role: radio_button_list_label_role(form, field)]) do
         [radio_button(form, field, value), " ", value]
       end
     end
@@ -73,10 +73,10 @@ defmodule EpicenterWeb.FormHelpers do
   # A radio button, plus an associated text field that is visible only when the radio button is checked
   defp radio_button_and_text_field(form, field, label_text, predefined_values) do
     input_value = input_value(form, field)
-    other_selected? = input_value not in predefined_values
+    other_selected? = input_value not in predefined_values and input_value != nil
     other_value = if other_selected?, do: input_value, else: ""
 
-    label do
+    label(data: [role: radio_button_list_label_role(form, field)]) do
       [
         radio_button(form, field, nil, checked: other_selected?),
         " ",
@@ -84,6 +84,10 @@ defmodule EpicenterWeb.FormHelpers do
         text_input(form, field, value: other_value, data: [reveal: "when-parent-checked"])
       ]
     end
+  end
+
+  defp radio_button_list_label_role(form, field) do
+    [form.name, Atom.to_string(field)] |> Enum.join("_")
   end
 
   def select_with_wrapper(form, field, options, html_opts \\ []) do
