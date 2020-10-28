@@ -748,7 +748,7 @@ defmodule Epicenter.Cases.ImportTest do
     end
   end
 
-  describe "maybe_create_case_investigation" do
+  describe "create_case_investigation_if_no_other" do
     setup %{originator: originator} do
       alice = Test.Fixtures.person_attrs(originator, "alice") |> Cases.create_person!()
       lab_result = Test.Fixtures.lab_result_attrs(alice, originator, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
@@ -760,7 +760,7 @@ defmodule Epicenter.Cases.ImportTest do
       alice: alice,
       lab_result: lab_result
     } do
-      Import.maybe_create_case_investigation(lab_result, alice, originator)
+      Import.create_case_investigation_if_no_other(lab_result, alice, originator)
 
       case_investigation =
         Cases.get_person(alice.id)
