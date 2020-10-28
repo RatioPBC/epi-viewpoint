@@ -128,7 +128,7 @@ defmodule Epicenter.Cases do
 
   def change_demographic(demographic, attrs), do: Demographic.changeset(demographic, attrs)
 
-  def find_or_create_demographic({attrs, _audit_meta}) do
-    %Demographic{} |> change_demographic(attrs) |> Repo.insert()
+  def create_demographic({attrs, audit_meta}) do
+    %Demographic{} |> change_demographic(attrs) |> AuditLog.insert(audit_meta)
   end
 end

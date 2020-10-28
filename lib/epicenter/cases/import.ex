@@ -215,7 +215,7 @@ defmodule Epicenter.Cases.Import do
     |> Map.put("person_id", person.id)
     |> Map.put("source", "import")
     |> in_audit_tuple(originator, AuditLog.Revision.insert_demographics_action())
-    |> Cases.find_or_create_demographic()
+    |> Cases.create_demographic()
   end
 
   defp import_person(person, row, originator) do

@@ -297,18 +297,19 @@ defmodule Epicenter.CasesTest do
       refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
     end
 
-    test "find_or_create_demographic/2" do
+    test "create_demographic/2" do
       person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
 
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      Cases.find_or_create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "alice", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
-      assert person |> Cases.preload_demographics() |> Map.get(:demographics) |> length() == 1
+      {:ok, demo1} =
+        Cases.create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "second", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
+
+      {:ok, demo2} =
+        Cases.create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "third", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
+
+      assert demographics(person.id) |> length() == 3
+
+      assert %{change: %{"tid" => "second"}} = recent_audit_log(demo1)
+      assert %{change: %{"tid" => "third"}} = recent_audit_log(demo2)
     end
   end
 
@@ -548,5 +549,9 @@ defmodule Epicenter.CasesTest do
         "type" => "home"
       })
     end
+  end
+
+  defp demographics(person_id) do
+    Cases.get_person(person_id) |> Cases.preload_demographics() |> Map.get(:demographics)
   end
 end

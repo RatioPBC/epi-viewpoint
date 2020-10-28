@@ -8,6 +8,7 @@ defmodule Epicenter.Cases.Demographic do
 
   @required_attrs ~w{dob first_name last_name}a
   @optional_attrs ~w{external_id preferred_language tid employment gender_identity marital_status notes occupation person_id race sex_at_birth source}a
+  @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

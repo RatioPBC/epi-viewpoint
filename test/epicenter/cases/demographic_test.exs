@@ -18,9 +18,9 @@ defmodule Epicenter.Cases.DemographicTest do
     test "sorts by insertion order" do
       author = Test.Fixtures.admin()
       {:ok, person} = Test.Fixtures.person_attrs(author, "person") |> Cases.create_person()
-      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "first") |> Cases.find_or_create_demographic()
-      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "second") |> Cases.find_or_create_demographic()
-      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "third") |> Cases.find_or_create_demographic()
+      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "first") |> Cases.create_demographic()
+      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "second") |> Cases.create_demographic()
+      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "third") |> Cases.create_demographic()
 
       Demographic.Query.display_order() |> Repo.all() |> tids() |> assert_eq([nil, "first", "second", "third"])
     end
