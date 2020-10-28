@@ -28,7 +28,7 @@ defmodule EpicenterWeb.Features.AdminTest do
 
     Test.Fixtures.user_attrs(@admin, "billy")
     |> Accounts.register_user!()
-    |> Accounts.update_disabled(:disabled, Test.Fixtures.audit_meta(@admin))
+    |> Accounts.update_user(%{disabled: true}, Test.Fixtures.audit_meta(@admin))
 
     conn
     |> Pages.Users.visit()

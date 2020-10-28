@@ -665,33 +665,6 @@ defmodule Epicenter.AccountsTest do
     end
   end
 
-  describe "update_disabled/1" do
-    setup do
-      [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]
-    end
-
-    test "disables the provided user", %{user: user} do
-      assert {:ok, _} = Accounts.update_disabled(user, :disabled, Test.Fixtures.audit_meta(@admin))
-      assert Accounts.get_user!(user.id).disabled == true
-      assert_revision_count(user, 2)
-      assert_recent_audit_log(user, @admin, %{"disabled" => true})
-    end
-
-    test "enables the provided user", %{user: user} do
-      assert {:ok, _} = Accounts.update_disabled(user, :enabled, Test.Fixtures.audit_meta(@admin))
-      assert Accounts.get_user!(user.id).disabled == false
-      assert_revision_count(user, 2)
-      assert_recent_audit_log(user, @admin, %{"disabled" => false})
-    end
-
-    test "gives an error message if user is already in the requested state", %{user: user} do
-      {:ok, user} = Accounts.update_disabled(user, :disabled, Test.Fixtures.audit_meta(@admin))
-      assert {:error, _} = Accounts.update_disabled(user, :disabled, Test.Fixtures.audit_meta(@admin))
-      {:ok, user} = Accounts.update_disabled(user, :enabled, Test.Fixtures.audit_meta(@admin))
-      assert {:error, _} = Accounts.update_disabled(user, :enabled, Test.Fixtures.audit_meta(@admin))
-    end
-  end
-
   describe "inspect/2" do
     test "does not include password" do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""

@@ -108,11 +108,11 @@ defmodule Epicenter.Release do
     }
 
     for email <- emails do
-      with {:ok, user} <- Accounts.get_user(email: email),
-           {:ok, _user} <- Epicenter.Accounts.update_disabled(user, action, audit_meta) do
+      with user when not is_nil(user) <- Accounts.get_user(email: email),
+           {:ok, _user} <- Epicenter.Accounts.update_user(user, %{disabled: action == :disabled}, audit_meta) do
         puts.("OK: #{action} #{email}")
       else
-        {:error, error} -> puts.("ERROR: #{action} #{email} (#{error})")
+        {:error, error} -> puts.("ERROR when trying to set #{email} to #{action} (#{error})")
       end
     end
 

@@ -172,7 +172,7 @@ defmodule EpicenterWeb.UserAuthTest do
     end
 
     test "redirects if user is authenticated but disabled", %{conn: conn, user: user} do
-      {:ok, user} = Accounts.update_disabled(user, :disabled, Epicenter.Test.Fixtures.admin_audit_meta())
+      {:ok, user} = Accounts.update_user(user, %{disabled: true}, Epicenter.Test.Fixtures.admin_audit_meta())
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
