@@ -79,6 +79,7 @@ deploy_construction:
   environment:
     name: construction
     url: https://viewpoint-construction.network.geometer.dev
+  when: manual
 deploy_demo:
   only:
     - main
