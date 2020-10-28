@@ -79,10 +79,9 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
         "Additional gender category (or other)" => false
       })
-      # The line below is unrealistic. the "gender_identity" field needs to be missing from
-      # the person_params passes to handle_event("form-change"...), but when we don't include
-      # it LiveViewTest *helpfully* adds back the gender_identity that is currently selected,
-      # so we can't reproduce (in a test) the bug where the last checkbox refuses to uncheck.
+      # The line below causes LiveViewTest to omit gender_identity from the list of
+      # params sent to handle_event("form-change", ...), thus emulating the
+      # deselection of all genders.
       |> Pages.DemographicsEdit.change_form(%{"gender_identity" => []})
       |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
         "Declined to answer" => false,

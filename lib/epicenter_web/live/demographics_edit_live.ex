@@ -32,12 +32,11 @@ defmodule EpicenterWeb.DemographicsEditLive do
       socket.assigns.demographic
       |> Cases.Demographic.changeset(form_params)
 
-    # TODO unchecking the last gender box doesn't work unless you add this commented code back
-    #    new_changeset =
-    #      case person_params do
-    #        %{"gender_identity" => _} -> new_changeset
-    #        _ -> Map.put(new_changeset, "gender_identity", [])
-    #      end
+    new_changeset =
+      case form_params do
+        %{"gender_identity" => _} -> new_changeset
+        _ -> Ecto.Changeset.put_change(new_changeset, :gender_identity, [])
+      end
 
     new_changeset =
       case form_params do
