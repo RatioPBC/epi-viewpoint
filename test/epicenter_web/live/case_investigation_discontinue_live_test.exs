@@ -25,10 +25,10 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     Pages.CaseInvestigationDiscontinue.visit(conn, person)
     |> Pages.CaseInvestigationDiscontinue.assert_here()
     |> Pages.CaseInvestigationDiscontinue.assert_reason_selections(%{
-      " Unable to reach" => false,
-      " Transferred to another jurisdiction" => false,
-      " Deceased" => false,
-      " Other" => false
+      "Unable to reach" => false,
+      "Transferred to another jurisdiction" => false,
+      "Deceased" => false,
+      "Other" => false
     })
   end
 end

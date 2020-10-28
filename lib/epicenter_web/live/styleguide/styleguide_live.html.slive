@@ -301,25 +301,6 @@
     div= live_redirect "Form example", to: Routes.styleguide_form_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormLive)
     div= live_redirect "Form builder example", to: Routes.styleguide_form_builder_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormBuilderLive)
 
-    .styleguide-example-title Radio button list
-    .styleguide-example
-      fieldset#radio-buttons
-        ' Favorite color
-
-        label
-          input> type="radio" name="favorite_color" value="blue"
-          ' Blue
-
-        label
-          input> type="radio" name="favorite_color" value="green"
-          ' Green
-
-        label
-          input> type="radio" name="favorite_color" value="red"
-          ' Red
-      code
-        ' @include radio-button-list
-
     .styleguide-example-title Select
     .styleguide-example
       #select

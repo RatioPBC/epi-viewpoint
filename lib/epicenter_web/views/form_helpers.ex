@@ -62,7 +62,7 @@ defmodule EpicenterWeb.FormHelpers do
   defp radio_buttons(form, field, values) do
     for value <- values do
       label(data: [role: radio_button_list_label_role(form, field)]) do
-        [radio_button(form, field, value), " ", value]
+        [radio_button(form, field, value), value]
       end
     end
   end
@@ -79,7 +79,6 @@ defmodule EpicenterWeb.FormHelpers do
     label(data: [role: radio_button_list_label_role(form, field)]) do
       [
         radio_button(form, field, nil, checked: other_selected?),
-        " ",
         label_text,
         text_input(form, field, value: other_value, data: [reveal: "when-parent-checked"])
       ]

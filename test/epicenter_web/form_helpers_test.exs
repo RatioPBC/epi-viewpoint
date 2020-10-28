@@ -56,9 +56,9 @@ defmodule EpicenterWeb.FormHelpersTest do
       FormHelpers.radio_button_list(form, :language, ["English", "German", "Italian"], id: "language-list")
       |> assert_html_eq("""
       <div class="radio-button-list" id="language-list">
-        <label data-role="movie_language"><input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/> Italian</label>
-        <label data-role="movie_language"><input id="movie_language_German" name="movie[language]" type="radio" value="German" checked="checked"/> German</label>
-        <label data-role="movie_language"><input id="movie_language_English" name="movie[language]" type="radio" value="English"/> English</label>
+        <label data-role="movie_language"><input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/>Italian</label>
+        <label data-role="movie_language"><input id="movie_language_German" name="movie[language]" type="radio" value="German" checked="checked"/>German</label>
+        <label data-role="movie_language"><input id="movie_language_English" name="movie[language]" type="radio" value="English"/>English</label>
       </div>
       """)
     end
@@ -67,9 +67,9 @@ defmodule EpicenterWeb.FormHelpersTest do
       FormHelpers.radio_button_list(form, :language, ["English", "Italian"], [other: "Other"], id: "language-list")
       |> assert_html_eq("""
       <div class="radio-button-list" id="language-list">
-        <label data-role="movie_language"><input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/> Other<input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="German"></label>
-        <label data-role="movie_language"><input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/> Italian</label>
-        <label data-role="movie_language"><input id="movie_language_English" name="movie[language]" type="radio" value="English"/> English</label>
+        <label data-role="movie_language"><input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>Other<input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="German"></label>
+        <label data-role="movie_language"><input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/>Italian</label>
+        <label data-role="movie_language"><input id="movie_language_English" name="movie[language]" type="radio" value="English"/>English</label>
       </div>
       """)
     end
