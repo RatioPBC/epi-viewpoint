@@ -9,7 +9,6 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.Person
   alias Epicenter.Format
 
   def mount(%{"id" => person_id}, session, socket) do
@@ -22,7 +21,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> authenticate_user(session)
     |> assign_page_title(Format.person(person))
     |> assign_person(person)
-    |> assign_case_investigation(person)
+    |> assign_case_investigations(person)
     |> assign_users()
     |> ok()
   end
@@ -62,27 +61,14 @@ defmodule EpicenterWeb.ProfileLive do
     assign(socket, person: updated_person)
   end
 
-  defp assign_case_investigation(socket, person) do
-    person = Cases.preload_lab_results(person)
+  defp assign_case_investigations(socket, person) do
+    person = Cases.preload_case_investigations(person)
 
-    case_investigation_view =
-      with lab_result when not is_nil(lab_result) <- Person.oldest_positive_lab_result(person) do
-        reported_on =
-          cond do
-            !Euclid.Exists.present?(lab_result.reported_on) -> "unknown date"
-            true -> Epicenter.Format.date(lab_result.reported_on)
-          end
+    case_investigations =
+      person.case_investigations
+      |> Cases.preload_initiated_by()
 
-        %{
-          number: "001",
-          status: "Pending",
-          reported_on: reported_on
-        }
-      else
-        _ -> nil
-      end
-
-    assign(socket, case_investigation_view: case_investigation_view)
+    assign(socket, case_investigations: case_investigations)
   end
 
   defp assign_users(socket),

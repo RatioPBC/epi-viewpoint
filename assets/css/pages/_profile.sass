@@ -42,25 +42,29 @@
     table#lab-results-data
       @include data-table
 
-  section#case-investigations
+  section.case-investigation
     @include card
 
-    #reported-on
+    .reported-on
       color: $secondary-text-color
       margin-top: 0
 
-    #case-investigation-status
+    .case-investigation-status
       @include level($justify: space-between)
       margin-top: 0
 
-      #status
+      .status
         margin-top: 2rem
 
-        #status-value
+        .status-value
           color: $pending-color
 
-      #start-case-investigation-link
+      .start-case-investigation-link
         @include button-primary
+        margin-right: 1.4rem
+
+      .discontinue-case-investigation-link
+        @include button-secondary
 
   section#demographics
     @include card

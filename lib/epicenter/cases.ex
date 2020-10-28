@@ -34,8 +34,8 @@ defmodule Epicenter.Cases do
   def preload_case_investigations(person_or_people_or_nil),
     do: person_or_people_or_nil |> Repo.preload(case_investigations: CaseInvestigation.Query.display_order())
 
-  def preload_initiated_by(case_investigation_or_nil),
-    do: case_investigation_or_nil |> Repo.preload(:initiated_by)
+  def preload_initiated_by(case_investigations_or_nil),
+    do: case_investigations_or_nil |> Repo.preload(:initiated_by)
 
   #
   # people
