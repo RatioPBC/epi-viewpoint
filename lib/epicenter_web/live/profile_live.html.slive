@@ -25,7 +25,7 @@
   section#profile
     header
       h2 Profile
-      span= live_redirect "Update", to: Routes.profile_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileEditLive, @person), id: "edit-button"
+      span= live_redirect "Update", to: Routes.profile_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileEditLive, @person)
 
     table#profile-data
       tbody
@@ -54,7 +54,8 @@
   = if Euclid.Exists.present?(@case_investigation_view) do
     section#case-investigations
       header data-role="case-investigation-title"
-       = "Case investigation #{@case_investigation_view.number}"
+        h2= "Case investigation #{@case_investigation_view.number}"
+        span= live_redirect "Start Investigation", to: Routes.case_investigation_start_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartLive, @person), id: "start-case-investigation-link-001"
 
       .reported-on data-role="reported-on"
         span = "Initiated by positive lab result reported on #{@case_investigation_view.reported_on}"
@@ -62,8 +63,6 @@
       .status data-role="status"
         span class="status-value" = @case_investigation_view.status
         = " interview"
-      = live_redirect "Start Investigation", to: Routes.case_investigation_start_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartLive, @person), id: "start-case-investigation-link-001"
-
 
   section#lab-results data-role="lab-results"
     header
