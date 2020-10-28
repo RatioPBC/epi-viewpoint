@@ -9,7 +9,6 @@ defmodule Epicenter.Cases.ImportTest do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.ImportedFile
-  alias Epicenter.Cases.Person
   alias Epicenter.Repo
   alias Epicenter.Test
 
