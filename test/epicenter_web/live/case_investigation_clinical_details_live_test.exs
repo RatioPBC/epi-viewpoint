@@ -20,5 +20,10 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
   test "has a case investigation view", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.CaseInvestigationClinicalDetails.assert_here()
+    |> Pages.CaseInvestigationClinicalDetails.assert_clinical_status_selection(%{
+      "Unknown" => false,
+      "Symptomatic" => false,
+      "Asymptomatic" => false
+    })
   end
 end
