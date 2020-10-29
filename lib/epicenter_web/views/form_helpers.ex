@@ -85,9 +85,8 @@ defmodule EpicenterWeb.FormHelpers do
     end
   end
 
-  defp radio_button_list_label_role(form, field) do
-    [form.name, Atom.to_string(field)] |> Enum.join("_")
-  end
+  defp radio_button_list_label_role(form, field),
+    do: [form.name, Atom.to_string(field)] |> Enum.map(&String.replace(&1, "_", "-")) |> Enum.join("-")
 
   def select_with_wrapper(form, field, options, html_opts \\ []) do
     content_tag :div, class: "select-wrapper", data: [grid: [row: 3, col: 1, span: 2]] do

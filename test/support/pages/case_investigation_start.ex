@@ -15,7 +15,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStart do
   end
 
   def assert_person_interviewed_selections(%View{} = view, expected_selections) do
-    assert Pages.actual_selections(view, "case_investigation_person_interview", "checkbox") == expected_selections
+    assert Pages.actual_selections(view, "case-investigation-person-interview", "checkbox") == expected_selections
     view
   end
 end
