@@ -148,7 +148,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "case investigations" do
-    defp build_case_investigation(person, user, tid, reported_on) do
+    defp build_case_investigation(person, user, tid, reported_on, attrs \\ %{}) do
       lab_result =
         Test.Fixtures.lab_result_attrs(person, user, "lab_result_#{tid}", reported_on, %{
           result: "positive",
@@ -160,7 +160,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Test.Fixtures.case_investigation_attrs(person, lab_result, user, tid, %{
         name: "001"
-      })
+      } |> Map.merge(attrs))
       |> Cases.create_case_investigation!()
     end
 
@@ -191,7 +191,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> assert_redirects_to("/people/#{person.id}/case_investigations/todo/start_interview")
     end
 
-    test "discontinuing a case investigation", %{conn: conn, person: person, user: user} do
+    test "navigating to discontinue a case investigation", %{conn: conn, person: person, user: user} do
       lab_result = build_lab_result(person, user, "lab_result", ~D[2020-08-05], ~D[2020-08-06], ~D[2020-08-07])
 
       case_investigation =
@@ -202,6 +202,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_discontinue_case_investigation("001")
       |> assert_redirects_to("/people/#{person.id}/case_investigations/#{case_investigation.id}/discontinue")
+    end
+
+    test "discontinued case investigations say so", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{discontinued_at: NaiveDateTime.utc_now()})
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigations(%{status: "Discontinued", reported_on: "Unknown", number: "001"})
     end
   end
 

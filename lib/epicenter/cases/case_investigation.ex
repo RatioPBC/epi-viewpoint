@@ -37,6 +37,14 @@ defmodule Epicenter.Cases.CaseInvestigation do
 
   def pending_interview_status(), do: "pending_interview"
 
+  def readable_status(canonical_status) do
+    pending = pending_interview_status()
+    case canonical_status do
+      ^pending -> "Pending interview"
+      _ -> "Unknown"
+    end
+  end
+
   defmodule Query do
     import Ecto.Query
 

@@ -9,6 +9,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
 
   def mount(%{"id" => person_id}, session, socket) do
@@ -117,6 +118,13 @@ defmodule EpicenterWeb.ProfileLive do
       unknown_value()
     end
   end
+
+  def displayable_case_investigation_status(case_investigation)
+
+  def displayable_case_investigation_status(%{discontinued_at: nil} = case_investigation) do
+    CaseInvestigation.readable_status(case_investigation.status)
+  end
+  def displayable_case_investigation_status(_), do: "Discontinued"
 
   @ethnicity_values_map %{
     "unknown" => "Unknown",
