@@ -9,6 +9,21 @@ defmodule EpicenterWeb.Test.Pages do
   alias Epicenter.Test
   alias Phoenix.LiveViewTest.View
 
+  def actual_selections(%View{} = view, data_role, type) do
+    view
+    |> parse()
+    |> Test.Html.all(
+         "[data-role=#{data_role}]",
+         fn element ->
+           {
+             Test.Html.text(element),
+             Test.Html.attr(element, "input[type=#{type}]", "checked") == ["checked"]
+           }
+         end
+       )
+    |> Map.new()
+  end
+
   def assert_confirmation_prompt(%View{} = view, expected_prompt) do
     view |> parse() |> Test.Html.attr("[data-role=back-link]", "data-confirm") |> assert_eq([expected_prompt])
     view
@@ -132,20 +147,5 @@ defmodule EpicenterWeb.Test.Pages do
   def visit(%Plug.Conn{} = conn, path, nil) do
     {:ok, view, _html} = live(conn, path)
     view
-  end
-
-  def actual_selections(%View{} = view, data_role, type) do
-    view
-    |> parse()
-    |> Test.Html.all(
-      "[data-role=#{data_role}]",
-      fn element ->
-        {
-          Test.Html.text(element),
-          Test.Html.attr(element, "input[type=#{type}]", "checked") == ["checked"]
-        }
-      end
-    )
-    |> Map.new()
   end
 end

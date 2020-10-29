@@ -17,6 +17,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
     @primary_key false
     embedded_schema do
       field :person_interviewed, :string
+      field :date_started, :date
     end
 
     @required_attrs ~w{person_interviewed}a
@@ -28,7 +29,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs)
 
     def case_investigation_start_interview_form_attrs(%Person{} = person),
-      do: %{person_interviewed: Format.person(person)}
+      do: %{person_interviewed: Format.person(person), date_started: Format.date(Date.utc_today())}
   end
 
   def mount(%{"id" => person_id}, session, socket) do
@@ -48,9 +49,10 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   def people_interviewed(person),
     do: [Format.person(person)]
 
-  def start_interivew_form_builder(form, person) do
+  def start_interview_form_builder(form, person) do
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
+    |> Form.line(&Form.date_field(&1, :date_started, "Date started"))
     |> Form.safe()
   end
 

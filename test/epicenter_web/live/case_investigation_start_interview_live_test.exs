@@ -18,5 +18,6 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     Pages.CaseInvestigationStartInterview.visit(conn, person)
     |> Pages.CaseInvestigationStartInterview.assert_here()
     |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_selections(%{"Alice Testuser" => false, "Proxy" => false})
+    |> Pages.CaseInvestigationStartInterview.assert_date_started(:today)
   end
 end

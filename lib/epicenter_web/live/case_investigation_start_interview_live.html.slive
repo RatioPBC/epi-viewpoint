@@ -10,4 +10,4 @@
     h2 Start interview
 
     = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
-      = start_interivew_form_builder(f, @person)
+      = start_interview_form_builder(f, @person)
