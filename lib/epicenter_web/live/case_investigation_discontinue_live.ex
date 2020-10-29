@@ -34,7 +34,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
               }}
            ) do
       socket
-      |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person))
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
       |> noreply()
     end
   end

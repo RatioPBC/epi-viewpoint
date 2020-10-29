@@ -50,6 +50,8 @@
             - else
               = unknown_value()
 
+  a#case-investigations
+    | Case investigations
   = for case_investigation <- @case_investigations do
     section.case-investigation
       header data-role="case-investigation-title"

@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
 import "phoenix_html";
 import { Socket } from "phoenix";
 import NProgress from "nprogress";
-import { LiveSocket } from "phoenix_live_view";
+import { LiveSocket, Browser } from "phoenix_live_view";
 
 let Hooks = {};
 
@@ -139,9 +139,12 @@ let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken }
 });
 
-// Show progress bar on live navigation and form submits
-window.addEventListener("phx:page-loading-start", (info) => NProgress.start());
-window.addEventListener("phx:page-loading-stop", (info) => NProgress.done());
+window.addEventListener("phx:page-loading-stop", (info) => {
+  let hashEl = Browser.getHashTargetEl(window.location.hash);
+  if (hashEl) {
+    hashEl.scrollIntoView();
+  }
+});
 
 // connect if there are any LiveViews on the page
 liveSocket.connect();
