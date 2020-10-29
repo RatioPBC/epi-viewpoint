@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+source "bin/_support/cecho.sh"
+source "bin/_support/git.sh"
+
+SHA=$1
+
+if [[ -z ${SHA} ]]; then
+  cecho --bright-bold-red "Usage: ${0} <sha>"
+  exit 1
+fi
+
+if ! sha_exists_locally ${SHA}; then
+  cecho --bright-bold-red "Given sha '${SHA}' does not exist in local git history"
+  exit 1
+fi
+
+DEPLOYED_SHA=$(curl -s https://viewpoint-staging.network.geometer.dev/version.txt)
+
+if ! sha_exists_locally ${DEPLOYED_SHA}; then
+  cecho --bright-bold-red "Could not find deployed sha '${DEPLOYED_SHA}' in local git history - do you need to pull?"
+  exit 1
+fi
+
+if [[ "${DEPLOYED_SHA}" = "${SHA}" ]]; then
+  cecho --green "${SHA} is deployed and the most recent commit on staging"
+  exit 0
+fi
+
+COUNT=$(git rev-list --count ${SHA}..${DEPLOYED_SHA})
+
+if [[ "${COUNT}" = "0" ]]; then
+  cecho --yellow "${SHA} has not been deployed to staging"
+  exit 1
+fi
+
+cecho --green "${SHA} is deployed to staging and is ${COUNT} commits behind staging's HEAD"
