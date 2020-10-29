@@ -18,7 +18,7 @@ section#users-page data-page="users"
     tbody
       = for user <- @users do
         tr
-          td= user.name
+          td= live_redirect user.name, to: Routes.user_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLive, user)
           td= user.email
           td= type(user)
           td= active_status(user)
