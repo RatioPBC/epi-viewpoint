@@ -18,6 +18,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     field :discontinued_at, :utc_datetime
     field :name, :string
     field :seq, :integer
+    field :status, :string, read_after_writes: true
     field :tid, :string
 
     timestamps(type: :utc_datetime)
@@ -33,6 +34,8 @@ defmodule Epicenter.Cases.CaseInvestigation do
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
   end
+
+  def pending_interview_status(), do: "pending_interview"
 
   defmodule Query do
     import Ecto.Query

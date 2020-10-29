@@ -24,6 +24,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:name, :string},
           {:person_id, :id},
           {:seq, :integer},
+          {:status, :string},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]
