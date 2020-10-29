@@ -27,6 +27,9 @@ defmodule Epicenter.Format do
   def phone(%Phone{number: number}), do: phone(number)
   def phone(string) when is_binary(string), do: reformat_phone(string)
 
+  def time(nil), do: ""
+  def time(%Time{} = time), do: "#{zero_pad(to_twelve_hour(time.hour), 2)}:#{zero_pad(time.minute, 2)}"
+
   # # #
 
   defp reformat_phone(string) when byte_size(string) == 10,
@@ -37,6 +40,15 @@ defmodule Epicenter.Format do
 
   defp reformat_phone(string),
     do: string
+
+  defp to_twelve_hour(0),
+    do: 12
+
+  defp to_twelve_hour(hour) when hour > 12,
+    do: to_twelve_hour(rem(hour, 12))
+
+  defp to_twelve_hour(hour),
+    do: hour
 
   defp zero_pad(value, zeros),
     do: String.pad_leading(to_string(value), zeros, "0")

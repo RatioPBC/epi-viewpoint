@@ -93,13 +93,13 @@ defmodule EpicenterWeb.FormHelpersTest do
     test "renders a select inside a div with 'select-wrapper' class and an icon", %{form: form} do
       options = [{"English", "English"}, {"Deutsche", "German"}, {"Español", "Spanish"}]
 
-      FormHelpers.select_with_wrapper(form, :language, options)
+      FormHelpers.select_with_wrapper(form, :language, options, data: [grid: [row: 3, col: 1, span: 2]])
       |> assert_html_eq("""
       <div class="select-wrapper" data-grid-col="1" data-grid-row="3" data-grid-span="2">
         <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M7.41 8.59003L12 13.17L16.59 8.59003L18 10L12 16L6 10L7.41 8.59003Z" fill="black" fill-opacity="0.87"></path>
         </svg>
-        <select id="movie_language" name="movie[language]">
+        <select data-grid-col="1" data-grid-row="3" data-grid-span="2" id="movie_language" name="movie[language]">
           <option value="English">English</option>
           <option value="German" selected>Deutsche</option>
           <option value="Spanish">Español</option>

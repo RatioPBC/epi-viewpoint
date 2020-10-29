@@ -39,9 +39,9 @@ defmodule EpicenterWeb.Form do
   def date_field(%Form.Line{f: f} = line, field, name, span \\ 2) do
     [
       label(f, field, name, data: grid_data(1, line, span)),
-      "MM/DD/YYYY",
-      error_tag(f, field, data: grid_data(2, line, span)),
-      text_input(f, field, data: grid_data(3, line, span))
+      content_tag(:div, "MM/DD/YYYY", data: grid_data(2, line, span)),
+      error_tag(f, field, data: grid_data(3, line, span)),
+      text_input(f, field, data: grid_data(4, line, span))
     ]
     |> add_to_line(line, span)
   end

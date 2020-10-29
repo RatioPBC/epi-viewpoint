@@ -11,10 +11,12 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
   end
 
   def assert_date_started(%View{} = view, :today) do
-    [actual_date] = view
-                    |> Pages.parse()
-                    |> Test.Html.find("input#start_interview_form_date_started")
-                    |> Test.Html.attr("value")
+    [actual_date] =
+      view
+      |> Pages.parse()
+      |> Test.Html.find("input#start_interview_form_date_started")
+      |> Test.Html.attr("value")
+
     assert actual_date =~ ~r"\d\d\/\d\d\/\d\d\d\d"
     view
   end
@@ -26,6 +28,24 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
 
   def assert_person_interviewed_selections(%View{} = view, expected_selections) do
     assert Pages.actual_selections(view, "start-interview-form-person-interviewed", "checkbox") == expected_selections
+    view
+  end
+
+  def assert_time_started(%View{} = view, :now) do
+    parsed = view |> Pages.parse()
+
+    [actual_time] =
+      parsed
+      |> Test.Html.find("input#start_interview_form_time_started")
+      |> Test.Html.attr("value")
+
+    [actual_am_pm] =
+      parsed
+      |> Test.Html.find("select#start_interview_form_time_started_am_pm option[selected]")
+      |> Enum.map(&Test.Html.text(&1))
+
+    assert actual_time =~ ~r"\d\d:\d\d"
+    assert actual_am_pm in ~w{AM PM}
     view
   end
 end

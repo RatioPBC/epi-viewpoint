@@ -17,7 +17,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
     @primary_key false
     embedded_schema do
       field :person_interviewed, :string
-      field :date_started, :date
+      field :date_started, :string
+      field :time_started, :string
+      field :time_started_am_pm, :string
     end
 
     @required_attrs ~w{person_interviewed}a
@@ -28,8 +30,14 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
     def changeset(attrs),
       do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs)
 
-    def case_investigation_start_interview_form_attrs(%Person{} = person),
-      do: %{person_interviewed: Format.person(person), date_started: Format.date(Date.utc_today())}
+    def case_investigation_start_interview_form_attrs(%Person{} = person) do
+      %{
+        person_interviewed: Format.person(person),
+        date_started: Format.date(Date.utc_today()),
+        time_started: Format.time(Time.utc_now()),
+        time_started_am_pm: if(Time.utc_now().hour >= 12, do: "PM", else: "AM")
+      }
+    end
   end
 
   def mount(%{"id" => person_id}, session, socket) do
@@ -49,10 +57,18 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   def people_interviewed(person),
     do: [Format.person(person)]
 
+  def time_started_am_pm_options(),
+    do: ["AM", "PM"]
+
   def start_interview_form_builder(form, person) do
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
     |> Form.line(&Form.date_field(&1, :date_started, "Date started"))
+    |> Form.line(fn line ->
+      line
+      |> Form.text_field(:time_started, "Time interviewed")
+      |> Form.select(:time_started_am_pm, "", time_started_am_pm_options(), 1)
+    end)
     |> Form.safe()
   end
 

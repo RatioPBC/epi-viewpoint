@@ -95,7 +95,9 @@ defmodule EpicenterWeb.FormHelpers do
     do: [form.name, Atom.to_string(field)] |> Enum.map(&String.replace(&1, "_", "-")) |> Enum.join("-")
 
   def select_with_wrapper(form, field, options, html_opts \\ []) do
-    content_tag :div, class: "select-wrapper", data: [grid: [row: 3, col: 1, span: 2]] do
+    data = html_opts |> Keyword.get(:data)
+
+    content_tag :div, class: "select-wrapper", data: data do
       [
         IconView.arrow_down_icon(),
         select(form, field, options, html_opts)

@@ -111,4 +111,19 @@ defmodule Epicenter.FormatTest do
       assert phone(%Phone{number: nil}) == ""
     end
   end
+
+  describe "time" do
+    import Epicenter.Format, only: [time: 1]
+
+    test "when given a time, formats it as hh:mm in 12 hour time" do
+      assert time(~T[00:03:05]) == "12:03"
+      assert time(~T[08:03:05]) == "08:03"
+      assert time(~T[12:03:05]) == "12:03"
+      assert time(~T[20:03:05]) == "08:03"
+    end
+
+    test "when given a nil, quietly renders an empty string" do
+      assert time(nil) == ""
+    end
+  end
 end
