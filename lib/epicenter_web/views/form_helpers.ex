@@ -12,8 +12,14 @@ defmodule EpicenterWeb.FormHelpers do
 
     content_tag :div, opts do
       for value <- values do
+        {label, value} =
+          case value do
+            {label, value} -> {label, value}
+            value -> {value, value}
+          end
+
         label do
-          [checkbox_list_checkbox(form, field, value), " ", value]
+          [checkbox_list_checkbox(form, field, value), " ", label]
         end
       end
     end

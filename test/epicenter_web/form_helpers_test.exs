@@ -49,6 +49,23 @@ defmodule EpicenterWeb.FormHelpersTest do
       </div>
       """)
     end
+
+    test "renders a checkbox list with differing label text and input values" do
+      changeset = Changeset.change(%Movie{genres: ["drama"]})
+      form = Phoenix.HTML.FormData.to_form(changeset, [])
+
+      FormHelpers.checkbox_list(form, :genres, [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}, {"Science Fiction", "sci_fi"}],
+        id: "genre-list"
+      )
+      |> assert_html_eq("""
+      <div class="checkbox-list" id="genre-list">
+        <label><input id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/> Comedy</label>
+        <label><input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/> Drama</label>
+        <label><input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/> Musical</label>
+        <label><input id="movie_genres" name="movie[genres][]" type="checkbox" value="sci_fi"/> Science Fiction</label>
+      </div>
+      """)
+    end
   end
 
   describe "radio_button_list" do
@@ -75,7 +92,7 @@ defmodule EpicenterWeb.FormHelpersTest do
     end
 
     test "renders radio buttons with differing label text and input values" do
-      changeset = Changeset.change(%Movie{genres: ["Drama"], language: "deutsch"})
+      changeset = Changeset.change(%Movie{language: "deutsch"})
       form = Phoenix.HTML.FormData.to_form(changeset, [])
 
       FormHelpers.radio_button_list(form, :language, [{"English", "english"}, {"German", "deutsch"}, {"Italian", "italiano"}], id: "language-list")
