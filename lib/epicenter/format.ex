@@ -20,7 +20,7 @@ defmodule Epicenter.Format do
   def marital_status(marital_status), do: marital_status |> String.capitalize()
 
   def person(nil), do: ""
-  def person(%Epicenter.Cases.Person{} = person_), do: person(Epicenter.Cases.Person.coalesce_demographics(person_))
+  def person(%Epicenter.Cases.Person{} = person), do: person(Epicenter.Cases.Person.coalesce_demographics(person))
   def person(%{first_name: first_name, last_name: last_name}), do: [first_name, last_name] |> Euclid.Exists.join(" ")
 
   def phone(nil), do: ""

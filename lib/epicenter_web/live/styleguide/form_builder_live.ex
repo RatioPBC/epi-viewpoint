@@ -70,8 +70,8 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
 
   # # #
 
-  def movie_form_builder(changeset) do
-    Form.new(changeset)
+  def movie_form_builder(form) do
+    Form.new(form)
     |> Form.line(fn line ->
       line
       |> Form.text_field(:title, "Title", 4)

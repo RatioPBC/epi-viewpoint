@@ -21,7 +21,6 @@
             = for user <- @users do
               option selected=selected?(user, @person) value="#{user.id}" #{user.name}
 
-
   section#profile
     header
       h2 Profile

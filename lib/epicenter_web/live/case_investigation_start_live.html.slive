@@ -9,5 +9,5 @@
   section#case-investigation-start
     h2 Start interview
 
-    = form_for @changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
-      = start_form_builder(f)
+    = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
+      = start_form_builder(f, @person)

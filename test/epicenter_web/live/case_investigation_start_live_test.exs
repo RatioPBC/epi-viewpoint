@@ -17,9 +17,6 @@ defmodule EpicenterWeb.CaseInvestigationStartLiveTest do
   test "shows start case investigation form", %{conn: conn, person: person} do
     Pages.CaseInvestigationStart.visit(conn, person)
     |> Pages.CaseInvestigationStart.assert_here()
-    |> Pages.CaseInvestigationStart.assert_person_interviewed_selections(%{
-      "Jacob Wunderbar" => false,
-      "Proxy" => false
-    })
+    |> Pages.CaseInvestigationStart.assert_person_interviewed_selections(%{"Alice Testuser" => false, "Proxy" => false})
   end
 end
