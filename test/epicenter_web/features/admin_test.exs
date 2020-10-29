@@ -39,11 +39,8 @@ defmodule EpicenterWeb.Features.AdminTest do
       ["fixture admin", "admin@example.com", "Admin", "Active"],
       ["user", "user@example.com", "Admin", "Active"]
     ])
-
-    # todo: click "new user"
-
-    conn
-    |> Pages.User.visit()
+    |> Pages.Users.click_add_user(conn)
+    |> Pages.User.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#user-form",
       user_form: %{"name" => "New User", "email" => "new@example.com", "type" => "member", "status" => "active"}
     )

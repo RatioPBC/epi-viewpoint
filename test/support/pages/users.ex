@@ -29,4 +29,14 @@ defmodule EpicenterWeb.Test.Pages.Users do
     |> Pages.parse()
     |> Test.Html.text(role: "password-reset")
   end
+
+  def click_add_user(%View{} = view, conn) do
+    {:ok, view, _} =
+      view
+      |> element("[data-role=add-user]")
+      |> render_click()
+      |> Pages.follow_live_view_redirect(conn)
+
+    view
+  end
 end

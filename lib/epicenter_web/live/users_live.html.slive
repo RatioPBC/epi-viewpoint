@@ -2,8 +2,11 @@ section#users-page data-page="users"
   h2
     #title
       span Users
-  #password-reset data-role="password-reset"
-    = live_flash(@flash, :password_reset)
+
+  = if live_flash(@flash, :password_reset) do
+    #password-reset data-role="password-reset" = live_flash(@flash, :password_reset)
+
+  = live_redirect "Add user", to: Routes.new_user_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLive), data: [role: :"add-user"], id: "add-user"
 
   table data-role="users-table"
     thead
