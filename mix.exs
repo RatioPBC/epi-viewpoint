@@ -20,7 +20,7 @@ defmodule Epicenter.MixProject do
   def application do
     [
       mod: {Epicenter.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:jason, :logger_json, :runtime_tools]
     ]
   end
 
@@ -41,6 +41,7 @@ defmodule Epicenter.MixProject do
       {:gettext, "~> 0.11"},
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.0"},
+      {:logger_json, "~> 4.0"},
       {:mix_audit, "~> 0.1", runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:mox, "~> 1.0"},

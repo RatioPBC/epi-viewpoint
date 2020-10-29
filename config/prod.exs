@@ -18,8 +18,18 @@ config :epicenter, EpicenterWeb.Endpoint,
 config :epicenter,
   user_input_restrictions: :unrestricted
 
-# Do not print debug messages in production
-config :logger, level: :info
+config :logger,
+  level: :info,
+  backends: [LoggerJSON]
+
+config :logger_json, :backend,
+  metadata: :all,
+  formatter: LoggerJSON.Formatters.GoogleCloudLogger
+
+# prevents duplicate ecto logs (LoggerJSON configured in application.ex start/2)
+config :epicenter, Epicenter.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  log: false
 
 # ## SSL Support
 #
