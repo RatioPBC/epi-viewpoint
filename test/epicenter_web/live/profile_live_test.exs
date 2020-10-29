@@ -187,8 +187,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.click_start_case_investigation("001")
-      |> assert_redirects_to("/people/#{person.id}/case_investigations/todo/start")
+      |> Pages.Profile.click_start_interview_case_investigation("001")
+      |> assert_redirects_to("/people/#{person.id}/case_investigations/todo/start_interview")
     end
 
     test "discontinuing a case investigation", %{conn: conn, person: person, user: user} do

@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.CaseInvestigationStartLiveTest do
+defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
@@ -15,8 +15,8 @@ defmodule EpicenterWeb.CaseInvestigationStartLiveTest do
   end
 
   test "shows start case investigation form", %{conn: conn, person: person} do
-    Pages.CaseInvestigationStart.visit(conn, person)
-    |> Pages.CaseInvestigationStart.assert_here()
-    |> Pages.CaseInvestigationStart.assert_person_interviewed_selections(%{"Alice Testuser" => false, "Proxy" => false})
+    Pages.CaseInvestigationStartInterview.visit(conn, person)
+    |> Pages.CaseInvestigationStartInterview.assert_here()
+    |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_selections(%{"Alice Testuser" => false, "Proxy" => false})
   end
 end

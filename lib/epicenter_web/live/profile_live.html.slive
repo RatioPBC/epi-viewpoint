@@ -68,7 +68,7 @@
             = "Pending"
           = " interview"
         .links
-          span= live_redirect "Start interview", to: Routes.case_investigation_start_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartLive, @person), id: "start-case-investigation-link-001", class: "start-case-investigation-link"
+          span= live_redirect "Start interview", to: Routes.case_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartInterviewLive, @person), id: "start-interview-case-investigation-link-001", class: "start-interview-case-investigation-link"
           span= live_redirect "Discontinue", to: Routes.case_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationDiscontinueLive, @person, case_investigation), id: "discontinue-case-investigation-link-001", class: "discontinue-case-investigation-link"
 
   section#lab-results data-role="lab-results"

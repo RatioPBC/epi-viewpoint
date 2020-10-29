@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.CaseInvestigationStartLive do
+defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
@@ -9,7 +9,7 @@ defmodule EpicenterWeb.CaseInvestigationStartLive do
   alias Epicenter.Format
   alias EpicenterWeb.Form
 
-  defmodule StartForm do
+  defmodule StartInterviewForm do
     use Ecto.Schema
 
     import Ecto.Changeset
@@ -22,12 +22,12 @@ defmodule EpicenterWeb.CaseInvestigationStartLive do
     @required_attrs ~w{person_interviewed}a
 
     def changeset(%Person{} = person),
-      do: person |> case_investigation_start_form_attrs() |> changeset()
+      do: person |> case_investigation_start_interview_form_attrs() |> changeset()
 
     def changeset(attrs),
-      do: %StartForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs)
+      do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs)
 
-    def case_investigation_start_form_attrs(%Person{} = person),
+    def case_investigation_start_interview_form_attrs(%Person{} = person),
       do: %{person_interviewed: Format.person(person)}
   end
 
@@ -37,7 +37,7 @@ defmodule EpicenterWeb.CaseInvestigationStartLive do
 
     socket
     |> assign_page_title("Start Case Investigation")
-    |> assign_form_changeset(StartForm.changeset(person))
+    |> assign_form_changeset(StartInterviewForm.changeset(person))
     |> assign(person: person)
     |> ok()
   end
@@ -48,7 +48,7 @@ defmodule EpicenterWeb.CaseInvestigationStartLive do
   def people_interviewed(person),
     do: [Format.person(person)]
 
-  def start_form_builder(form, person) do
+  def start_interivew_form_builder(form, person) do
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
     |> Form.safe()
