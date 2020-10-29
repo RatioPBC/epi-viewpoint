@@ -4,6 +4,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
+  alias Ecto.Changeset
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias EpicenterWeb.Form
@@ -23,7 +24,13 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
 
   def handle_event("save", %{"case_investigation" => params}, socket) do
     params = Map.put(params, "discontinued_at", DateTime.utc_now())
+
     with {:ok, _} <-
+           socket.assigns.changeset
+           |> Changeset.cast(params, [:discontinue_reason])
+           |> Changeset.validate_required([:discontinue_reason])
+           |> Changeset.apply_action(:update),
+         {:ok, _} <-
            Cases.update_case_investigation(
              socket.assigns.case_investigation,
              {params,
@@ -36,6 +43,9 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
       |> noreply()
+    else
+      {:error, changeset} ->
+        socket |> assign(changeset: changeset) |> noreply()
     end
   end
 

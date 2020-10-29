@@ -44,13 +44,24 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     case_investigation: case_investigation
   } do
     Pages.CaseInvestigationDiscontinue.visit(conn, person, case_investigation)
-    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-discontinue-form",
-      case_investigation: %{"discontinue_reason" => "Unable to reach"}
-    )
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-discontinue-form", case_investigation: %{"discontinue_reason" => "Unable to reach"})
     |> Pages.Profile.assert_here(person)
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert "Unable to reach" = case_investigation.discontinue_reason
     assert_datetime_approximate(case_investigation.discontinued_at, DateTime.utc_now(), 2)
+  end
+
+  test "discontinuing requires a reason", %{
+    conn: conn,
+    person: person,
+    case_investigation: case_investigation
+  } do
+    view =
+      Pages.CaseInvestigationDiscontinue.visit(conn, person, case_investigation)
+      |> Pages.submit_live("#case-investigation-discontinue-form", case_investigation: %{"discontinue_reason" => ""})
+      |> Pages.CaseInvestigationDiscontinue.assert_here()
+
+    assert_validation_messages(render(view), %{"case_investigation_discontinue_reason" => "can't be blank"})
   end
 end
