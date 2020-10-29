@@ -118,16 +118,17 @@ defmodule EpicenterWeb.UserLiveTest do
       %{id: id, hashed_password: hashed_password, mfa_secret: mfa_secret} =
         subject_user = Epicenter.AccountsFixtures.user_fixture(%{tid: "existing", admin: true, email: "existinguser@example.com"})
 
-      Pages.User.visit(conn, subject_user)
-      |> Pages.submit_and_follow_redirect(conn, "#user-form",
-        user_form: %{"name" => "new name", "email" => "newemail@example.com", "type" => "member", "status" => "inactive"}
-      )
-      |> Pages.Users.assert_here()
-      |> Pages.Users.assert_users([
-        ["Name", "Email", "Type", "Status"],
-        ["fixture admin", "admin@example.com", "Admin", "Active"],
-        ["new name", "newemail@example.com", "Member", "Inactive"]
-      ])
+      view =
+        Pages.User.visit(conn, subject_user)
+        |> Pages.submit_and_follow_redirect(conn, "#user-form",
+          user_form: %{"name" => "new name", "email" => "newemail@example.com", "type" => "member", "status" => "inactive"}
+        )
+        |> Pages.Users.assert_here()
+        |> Pages.Users.assert_users([
+          ["Name", "Email", "Type", "Status"],
+          ["fixture admin", "admin@example.com", "Admin", "Active"],
+          ["new name", "newemail@example.com", "Member", "Inactive"]
+        ])
 
       assert %{
                id: ^id,
@@ -138,6 +139,10 @@ defmodule EpicenterWeb.UserLiveTest do
                admin: false,
                disabled: true
              } = Accounts.get_user(email: "newemail@example.com")
+
+      text = Pages.Users.password_reset_text(view)
+
+      assert text == ""
 
       assert Accounts.get_user(email: "existinguser@example.com") == nil
     end

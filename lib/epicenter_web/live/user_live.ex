@@ -86,10 +86,17 @@ defmodule EpicenterWeb.UserLive do
 
     with {:form, {:ok, user_attrs}} <- {:form, UserForm.user_attrs(form_changeset)},
          {:user, {:ok, user}} <- {:user, if(user, do: update_user(socket, user, user_attrs), else: register_user(socket, user_attrs))} do
-      {:ok, encoded_token} = Accounts.generate_user_reset_password_token(user)
+      socket =
+        if socket.assigns.user do
+          socket
+        else
+          {:ok, encoded_token} = Accounts.generate_user_reset_password_token(user)
+
+          socket
+          |> put_flash(:password_reset, "Reset link for #{user.email}: #{Routes.user_reset_password_url(Endpoint, :edit, encoded_token)}")
+        end
 
       socket
-      |> put_flash(:password_reset, "Reset link for #{user.email}: #{Routes.user_reset_password_url(Endpoint, :edit, encoded_token)}")
       |> push_redirect(to: Routes.users_path(socket, EpicenterWeb.UsersLive))
       |> noreply()
     else
