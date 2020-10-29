@@ -1,11 +1,10 @@
 defmodule Epicenter.Accounts do
+  alias Epicenter.Accounts.Admin
   alias Epicenter.Accounts.User
   alias Epicenter.Accounts.UserToken
   alias Epicenter.Accounts.UserNotifier
   alias Epicenter.AuditLog
   alias Epicenter.Repo
-
-  @unpersisted_admin_id Application.get_env(:epicenter, :unpersisted_admin_id)
 
   def change_user(%User{} = user, attrs), do: User.changeset(user, Enum.into(attrs, %{}))
   def change_user_email(user, attrs \\ %{}), do: User.email_changeset(user, attrs)
@@ -18,17 +17,10 @@ defmodule Epicenter.Accounts do
   def get_user(email: email, password: password), do: get_user(email: email) |> User.filter_by_valid_password(password)
   def list_users(), do: User.Query.all() |> Repo.all()
   def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
-  def register_user({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> ensure_admin(audit_meta, &AuditLog.insert/2)
-  def register_user!({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> ensure_admin!(audit_meta, &AuditLog.insert!/2)
-  def update_user(%User{} = user, attrs, audit_meta), do: user |> change_user(attrs) |> ensure_admin(audit_meta, &AuditLog.update/2)
+  def register_user({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> Admin.insert_by_admin(audit_meta)
+  def register_user!({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> Admin.insert_by_admin!(audit_meta)
+  def update_user(%User{} = user, attrs, audit_meta), do: user |> change_user(attrs) |> Admin.update_by_admin(audit_meta)
   def update_user_mfa!(%User{} = user, {mfa_secret, audit_meta}), do: user |> change_user_mfa(mfa_secret) |> AuditLog.update!(audit_meta)
-
-  defp ensure_admin(changeset, audit_meta, db_fn), do: ensure_admin(admin?(audit_meta), fn -> db_fn.(changeset, audit_meta) end)
-  defp ensure_admin!(changeset, audit_meta, db_fn), do: ensure_admin!(admin?(audit_meta), fn -> db_fn.(changeset, audit_meta) end)
-  defp ensure_admin(admin?, db_fn), do: if(admin?, do: db_fn.(), else: {:error, :admin_privileges_required})
-  defp ensure_admin!(admin?, db_fn), do: if(admin?, do: db_fn.(), else: raise(Epicenter.AdminRequiredError))
-  defp admin?(%AuditLog.Meta{author_id: @unpersisted_admin_id}), do: true
-  defp admin?(%AuditLog.Meta{author_id: id}), do: get_user(id).admin
 
   @doc """
   Emulates that the email will change without actually changing

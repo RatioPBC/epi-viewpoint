@@ -2,7 +2,6 @@ defmodule Epicenter.AccountsTest do
   use Epicenter.DataCase, async: true
 
   import Epicenter.AccountsFixtures
-  import Euclid.Test.Extra.Assertions, only: [assert_datetime_approximate: 2]
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
@@ -683,6 +682,14 @@ defmodule Epicenter.AccountsTest do
       assert_revision_count(user, 1)
       refute Accounts.get_user!(user.id).admin
       assert Accounts.get_user!(user.id).name == "user"
+    end
+
+    test "fails when originator is the unpersisted admin (that's only supposed to be used for creating users)", %{user: user} do
+      audit_meta = Test.Fixtures.audit_meta(%{id: Application.get_env(:epicenter, :unpersisted_admin_id)})
+
+      user
+      |> Accounts.update_user(%{admin: true, name: "Cool Admin"}, audit_meta)
+      |> assert_eq({:error, :admin_privileges_required})
     end
   end
 
