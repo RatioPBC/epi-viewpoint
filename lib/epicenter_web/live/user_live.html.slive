@@ -1,5 +1,5 @@
 section#user-page data-page="user"
-  h2 New user
+  h2= if(@user, do: "Edit user", else: "New user")
 
   = form_for @form_changeset, "#", [id: "user-form", phx_submit: "save"], fn f ->
     = user_form_builder(f, @form_error)
