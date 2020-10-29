@@ -61,8 +61,14 @@ defmodule EpicenterWeb.FormHelpers do
   # A list of radio buttons, each wrapped in a label
   defp radio_buttons(form, field, values) do
     for value <- values do
+      {label, value} =
+        case value do
+          {label, value} -> {label, value}
+          value -> {value, value}
+        end
+
       label(data: [role: radio_button_list_label_role(form, field)]) do
-        [radio_button(form, field, value), value]
+        [radio_button(form, field, value), label]
       end
     end
   end

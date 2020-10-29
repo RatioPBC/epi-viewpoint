@@ -73,6 +73,20 @@ defmodule EpicenterWeb.FormHelpersTest do
       </div>
       """)
     end
+
+    test "renders radio buttons with differing label text and input values" do
+      changeset = Changeset.change(%Movie{genres: ["Drama"], language: "deutsch"})
+      form = Phoenix.HTML.FormData.to_form(changeset, [])
+
+      FormHelpers.radio_button_list(form, :language, [{"English", "english"}, {"German", "deutsch"}, {"Italian", "italiano"}], id: "language-list")
+      |> assert_html_eq("""
+      <div class="radio-button-list" id="language-list">
+        <label data-role="movie-language"><input id="movie_language_italiano" name="movie[language]" type="radio" value="italiano"/>Italian</label>
+        <label data-role="movie-language"><input id="movie_language_deutsch" name="movie[language]" type="radio" value="deutsch" checked="checked"/>German</label>
+        <label data-role="movie-language"><input id="movie_language_english" name="movie[language]" type="radio" value="english"/>English</label>
+      </div>
+      """)
+    end
   end
 
   describe "select_with_wrapper" do
