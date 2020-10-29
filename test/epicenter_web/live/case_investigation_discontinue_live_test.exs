@@ -2,7 +2,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
-  import Euclid.Test.Extra.Assertions, only: [assert_datetime_approximate: 2]
+  import Euclid.Test.Extra.Assertions, only: [assert_datetime_approximate: 3]
 
   alias Epicenter.Cases
   alias Epicenter.Test
@@ -51,6 +51,6 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert "Unable to reach" = case_investigation.discontinue_reason
-    assert_datetime_approximate(case_investigation.discontinued_at, DateTime.utc_now())
+    assert_datetime_approximate(case_investigation.discontinued_at, DateTime.utc_now(), 2)
   end
 end
