@@ -28,8 +28,12 @@ defmodule Epicenter.Cases do
   #
   # case investigations
   #
+  def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
   def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
+
+  def update_case_investigation(%CaseInvestigation{} = case_investigation, {attrs, audit_meta}),
+    do: case_investigation |> change_case_investigation(attrs) |> AuditLog.update(audit_meta)
 
   def preload_case_investigations(person_or_people_or_nil),
     do: person_or_people_or_nil |> Repo.preload(case_investigations: CaseInvestigation.Query.display_order())

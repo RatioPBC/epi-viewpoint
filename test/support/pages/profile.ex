@@ -17,7 +17,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   def assert_here(view_or_conn_or_html, person) do
     view_or_conn_or_html |> Pages.assert_on_page("profile")
     if !person.tid, do: raise("Person must have a tid for this assertion: #{inspect(person)}")
-    view_or_conn_or_html |> Pages.parse() |> Test.Html.attr("[data-page=profile]", "data-tid") |> assert_eq(person.tid)
+    view_or_conn_or_html |> Pages.parse() |> Test.Html.attr("[data-page=profile]", "data-tid") |> assert_eq([person.tid])
   end
 
   #

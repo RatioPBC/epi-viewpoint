@@ -10,5 +10,5 @@
     h2 Discontinue interview
     h3 before interview start
 
-    = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "case-investigation-discontinue-form", phx_submit: "save"], fn f ->
       = discontinue_form_builder(f)

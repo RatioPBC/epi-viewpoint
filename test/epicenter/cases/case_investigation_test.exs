@@ -16,6 +16,8 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       assert_schema(
         CaseInvestigation,
         [
+          {:discontinue_reason, :string},
+          {:discontinued_at, :utc_datetime},
           {:id, :id},
           {:initiated_by_id, :id},
           {:inserted_at, :naive_datetime},
