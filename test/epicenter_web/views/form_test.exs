@@ -20,7 +20,10 @@ defmodule EpicenterWeb.FormTest do
     end
   end
 
-  defp phx_form(data) do
+  @languages [{"Italian", "italian"}, {"English", "english"}]
+  @genres ~w{Comedy Drama Musical}
+
+  defp phx_form(data \\ %{}) do
     %Movie{}
     |> Ecto.Changeset.change(Enum.into(data, %{}))
     |> Phoenix.HTML.Form.form_for("/url")
@@ -81,11 +84,124 @@ defmodule EpicenterWeb.FormTest do
     assert Test.Html.attr(language_input, "data-grid-col") == ["3"]
   end
 
+  test "checkbox_list_field" do
+    phx_form(genres: ~w{Comedy Musical})
+    |> Form.new()
+    |> Form.line(&Form.checkbox_list_field(&1, :genres, "Genres", @genres, 3))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>
+      <label data-grid-col="1" data-grid-row="1" data-grid-span="3" for="movie_genres">Genres</label>
+      <div class="checkbox-list" data-grid-col="1" data-grid-row="3" data-grid-span="3">
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy" checked="checked"/>Comedy\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama"/>Drama\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical" checked="checked"/>Musical\v
+        </label>
+      </div>
+    </fieldset>
+    """)
+  end
+
+  test "content_div" do
+    phx_form()
+    |> Form.new()
+    |> Form.line(&Form.content_div(&1, "some content"))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>
+      <div data-grid-col="1" data-grid-row="1" data-grid-span="2">some content</div>
+    </fieldset>
+    """)
+  end
+
+  test "date_field" do
+    phx_form(release_date: ~D[2000-01-02])
+    |> Form.new()
+    |> Form.line(&Form.date_field(&1, :release_date, "Release date", 4))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>
+      <label data-grid-col="1" data-grid-row="1" data-grid-span="4" for="movie_release_date">Release date</label>
+      <div data-grid-col="1" data-grid-row="2" data-grid-span="4">MM/DD/YYYY</div>
+      <input
+        data-grid-col="1"
+        data-grid-row="4"
+        data-grid-span="4"
+        id="movie_release_date"
+        name="movie[release_date]"
+        type="text"
+        value="2000-01-02"/>
+    </fieldset>
+    """)
+  end
+
+  test "footer" do
+    phx_form(language: "English")
+    |> Form.new()
+    |> Form.line(&Form.footer(&1, "some error message"))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>
+      <footer>
+        <button type="submit">Save</button>
+        <div class="form-error-message" data-form-error-message="some error message">some error message</div>
+      </footer>
+    </fieldset>
+    """)
+  end
+
+  test "radio_button_list" do
+    phx_form(language: "English")
+    |> Form.new()
+    |> Form.line(&Form.radio_button_list(&1, :language, "Language", @languages, other: "Other"))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>
+      <label data-grid-col="1" data-grid-row="1" data-grid-span="2" for="movie_language">\v
+        Language\v
+      </label>
+      <div class="radio-button-list" data-grid-col="1" data-grid-row="3" data-grid-span="2">
+        <label data-role="movie-language">
+          <input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>\v
+          Other\v
+
+          <input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="English"/>
+        </label>
+        <label data-role="movie-language">
+          <input id="movie_language_english" name="movie[language]" type="radio" value="english"/>\v
+          English\v
+        </label>
+        <label data-role="movie-language">
+          <input id="movie_language_italian" name="movie[language]" type="radio" value="italian"/>\v
+          Italian\v
+        </label>
+      </div>
+    </fieldset>
+    """)
+  end
+
+  test "save_button" do
+    phx_form()
+    |> Form.new()
+    |> Form.line(&Form.save_button(&1))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>\v
+      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" type="submit">Save</button>\v
+    </fieldset>
+    """)
+  end
+
   test "select" do
     parsed =
       phx_form(language: "English")
       |> Form.new()
-      |> Form.line(&Form.select(&1, :language, "Language", [{"Italian", "italian"}, {"English", "english"}], 4))
+      |> Form.line(&Form.select(&1, :language, "Language", @languages, 4))
       |> parse()
 
     assert [{"fieldset", [], [label, select_wrapper]}] = parsed
@@ -94,22 +210,15 @@ defmodule EpicenterWeb.FormTest do
     label
     |> render()
     |> assert_html_eq("""
-    <label
-      data-grid-col="1"
-      data-grid-row="1"
-      data-grid-span="4"
-      for="movie_language">Language</label>
+    <label data-grid-col="1" data-grid-row="1" data-grid-span="4" for="movie_language">\v
+      Language\v
+    </label>
     """)
 
     select
     |> render()
     |> assert_html_eq("""
-    <select
-      data-grid-col="1"
-      data-grid-row="3"
-      data-grid-span="4"
-      id="movie_language"
-      name="movie[language]">\v
+    <select data-grid-col="1" data-grid-row="3" data-grid-span="4" id="movie_language" name="movie[language]">\v
       <option value="italian">Italian</option>\v
       <option value="english">English</option>\v
     </select>
@@ -123,19 +232,13 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <label
-        data-grid-col="1"
-        data-grid-row="1"
-        data-grid-span="3"
-        for="movie_title">Title</label>
+      <label data-grid-col="1" data-grid-row="1" data-grid-span="3" for="movie_title">\v
+        Title\v
+      </label>
       <input
-        data-grid-col="1"
-        data-grid-row="3"
-        data-grid-span="3"
-        id="movie_title"
-        name="movie[title]"
-        type="text"
-        value="Strange Brew"/>
+        data-grid-col="1" data-grid-row="3" data-grid-span="3"
+        id="movie_title" name="movie[title]" type="text" value="Strange Brew"
+      />
     </fieldset>
     """)
   end
