@@ -59,7 +59,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     Form.new(changeset)
     |> Form.line(fn line ->
       line
-      |> Form.radio_button_list(:discontinue_reason, "Reason", reasons(), [other: "Other"], 8)
+      |> Form.radio_button_list(:discontinue_reason, "Reason", reasons(), other: "Other", span: 8)
     end)
     |> Form.line(fn line ->
       line

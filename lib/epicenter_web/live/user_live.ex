@@ -153,11 +153,11 @@ defmodule EpicenterWeb.UserLive do
 
   def user_form_builder(changeset, form_error) do
     Form.new(changeset)
-    |> Form.line(&Form.text_field(&1, :name, "Name", 4))
-    |> Form.line(&Form.text_field(&1, :email, "Email", 4))
+    |> Form.line(&Form.text_field(&1, :name, "Name", span: 4))
+    |> Form.line(&Form.text_field(&1, :email, "Email", span: 4))
     |> Form.line(&Form.select(&1, :type, "Type", [{"Admin", "admin"}, {"Member", "member"}]))
     |> Form.line(&Form.select(&1, :status, "Status", [{"Active", "active"}, {"Inactive", "inactive"}]))
-    |> Form.line(&Form.footer(&1, form_error, 4))
+    |> Form.line(&Form.footer(&1, form_error, span: 4))
     |> Form.safe()
   end
 

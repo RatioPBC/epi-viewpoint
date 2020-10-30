@@ -43,8 +43,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
   def clinical_details_form_builder(form) do
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), [], 4))
-    |> Form.line(&Form.checkbox_list_field(&1, :symptoms, "Symptoms", symptoms(), 4))
+    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), span: 4))
+    |> Form.line(&Form.checkbox_list_field(&1, :symptoms, "Symptoms", symptoms(), span: 4))
     |> Form.safe()
   end
 

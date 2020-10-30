@@ -74,7 +74,7 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
     Form.new(form)
     |> Form.line(fn line ->
       line
-      |> Form.text_field(:title, "Title", 4)
+      |> Form.text_field(:title, "Title", span: 4)
     end)
     |> Form.line(fn line ->
       line

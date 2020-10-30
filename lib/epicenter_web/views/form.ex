@@ -27,81 +27,89 @@ defmodule EpicenterWeb.Form do
 
   # # #
 
-  def checkbox_list_field(%Form.Line{f: f} = line, field, name, values, span \\ 2) do
+  @doc "opts: span"
+  def checkbox_list_field(%Form.Line{f: f} = line, field, name, values, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, span)),
-      error_tag(f, field, data: grid_data(2, line, span)),
-      checkbox_list(f, field, values, data: grid_data(3, line, span))
+      label(f, field, name, data: grid_data(1, line, opts)),
+      error_tag(f, field, data: grid_data(2, line, opts)),
+      checkbox_list(f, field, values, data: grid_data(3, line, opts))
     ]
-    |> add_to_line(line, span)
+    |> add_to_line(line, opts)
   end
 
-  def content_div(%Form.Line{} = line, content, span \\ 2) do
+  @doc "opts: span"
+  def content_div(%Form.Line{} = line, content, opts \\ []) do
     [
-      content_tag(:div, content, data: grid_data(1, line, span))
+      content_tag(:div, content, data: grid_data(1, line, opts))
     ]
-    |> add_to_line(line, span)
+    |> add_to_line(line, opts)
   end
 
-  def date_field(%Form.Line{f: f} = line, field, name, span \\ 2) do
+  @doc "opts: span"
+  def date_field(%Form.Line{f: f} = line, field, name, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, span)),
-      content_tag(:div, "MM/DD/YYYY", data: grid_data(2, line, span)),
-      error_tag(f, field, data: grid_data(3, line, span)),
-      text_input(f, field, data: grid_data(4, line, span))
+      label(f, field, name, data: grid_data(1, line, opts)),
+      content_tag(:div, "MM/DD/YYYY", data: grid_data(2, line, opts)),
+      error_tag(f, field, data: grid_data(3, line, opts)),
+      text_input(f, field, data: grid_data(4, line, opts))
     ]
-    |> add_to_line(line, span)
+    |> add_to_line(line, opts)
   end
 
-  def footer(%Form.Line{} = line, error_message, span \\ 2) do
+  @doc "opts: span"
+  def footer(%Form.Line{} = line, error_message, opts \\ []) do
     content_tag :footer do
       [
         submit("Save"),
         content_tag(:div, error_message, class: "form-error-message", "data-form-error-message": error_message)
       ]
     end
-    |> add_to_line(line, span)
+    |> add_to_line(line, opts)
   end
 
-  def radio_button_list(%Form.Line{f: f} = line, field, name, values, opts \\ [], span \\ 2) do
+  @doc "opts: other, span"
+  def radio_button_list(%Form.Line{f: f} = line, field, name, values, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, span)),
-      error_tag(f, field, data: grid_data(2, line, span)),
-      FormHelpers.radio_button_list(f, field, values, opts, data: grid_data(3, line, span))
+      label(f, field, name, data: grid_data(1, line, opts)),
+      error_tag(f, field, data: grid_data(2, line, opts)),
+      FormHelpers.radio_button_list(f, field, values, opts, data: grid_data(3, line, opts))
     ]
-    |> add_to_line(line, span)
+    |> add_to_line(line, opts)
   end
 
-  def save_button(%Form.Line{} = line, span \\ 2) do
-    submit("Save", data: grid_data(1, line, span))
-    |> add_to_line(line, span)
+  @doc "opts: span"
+  def save_button(%Form.Line{} = line, opts \\ []) do
+    submit("Save", data: grid_data(1, line, opts))
+    |> add_to_line(line, opts)
   end
 
-  def select(%Form.Line{f: f} = line, field, name, options, span \\ 2) do
+  @doc "opts: span"
+  def select(%Form.Line{f: f} = line, field, name, options, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, span)),
-      error_tag(f, field, data: grid_data(2, line, span)),
-      FormHelpers.select_with_wrapper(f, field, options, data: grid_data(3, line, span))
+      label(f, field, name, data: grid_data(1, line, opts)),
+      error_tag(f, field, data: grid_data(2, line, opts)),
+      FormHelpers.select_with_wrapper(f, field, options, data: grid_data(3, line, opts))
     ]
-    |> add_to_line(line, span)
+    |> add_to_line(line, opts)
   end
 
-  def text_field(%Form.Line{f: f} = line, field, name, span \\ 2) do
+  @doc "opts: span"
+  def text_field(%Form.Line{f: f} = line, field, name, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, span)),
-      error_tag(f, field, data: grid_data(2, line, span)),
-      text_input(f, field, data: grid_data(3, line, span))
+      label(f, field, name, data: grid_data(1, line, opts)),
+      error_tag(f, field, data: grid_data(2, line, opts)),
+      text_input(f, field, data: grid_data(3, line, opts))
     ]
-    |> add_to_line(line, span)
+    |> add_to_line(line, opts)
   end
 
   # # #
 
-  defp grid_data(row, %Form.Line{column: column}, span),
-    do: [grid: [row: row, col: column, span: span]]
+  defp grid_data(row, %Form.Line{column: column}, opts),
+    do: [grid: [row: row, col: column, span: Keyword.get(opts, :span, 2)]]
 
-  defp add_to_line(contents, %Form.Line{column: column, safe: safe} = line, span),
-    do: %{line | column: column + span, safe: safe ++ contents}
+  defp add_to_line(contents, %Form.Line{column: column, safe: safe} = line, opts),
+    do: %{line | column: column + Keyword.get(opts, :span, 2), safe: safe ++ contents}
 
   defp merge_safe({:safe, left}, {:safe, right}), do: left ++ right
   defp merge_safe(left, {:safe, right}), do: left ++ right

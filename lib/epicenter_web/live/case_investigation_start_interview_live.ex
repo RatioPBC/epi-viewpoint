@@ -76,7 +76,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
     |> Form.line(fn line ->
       line
       |> Form.text_field(:time_started, "Time interviewed")
-      |> Form.select(:time_started_am_pm, "", time_started_am_pm_options(), 1)
+      |> Form.select(:time_started_am_pm, "", time_started_am_pm_options(), span: 1)
       |> Form.content_div(timezone.abbreviation)
     end)
     |> Form.line(&Form.save_button(&1))

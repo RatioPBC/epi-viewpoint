@@ -51,8 +51,8 @@ defmodule EpicenterWeb.FormTest do
     parsed =
       phx_form(title: "Strange Brew", language: "English")
       |> Form.new()
-      |> Form.line(&Form.text_field(&1, :title, "Title", 4))
-      |> Form.line(&Form.text_field(&1, :language, "Language", 4))
+      |> Form.line(&Form.text_field(&1, :title, "Title", span: 4))
+      |> Form.line(&Form.text_field(&1, :language, "Language", span: 4))
       |> parse()
 
     assert [title_fieldset, language_fieldset] = parsed
@@ -66,8 +66,8 @@ defmodule EpicenterWeb.FormTest do
       |> Form.new()
       |> Form.line(fn line ->
         line
-        |> Form.text_field(:title, "Title", 2)
-        |> Form.text_field(:language, "Language", 2)
+        |> Form.text_field(:title, "Title", span: 2)
+        |> Form.text_field(:language, "Language", span: 2)
       end)
       |> parse()
 
@@ -87,7 +87,7 @@ defmodule EpicenterWeb.FormTest do
   test "checkbox_list_field" do
     phx_form(genres: ~w{Comedy Musical})
     |> Form.new()
-    |> Form.line(&Form.checkbox_list_field(&1, :genres, "Genres", @genres, 3))
+    |> Form.line(&Form.checkbox_list_field(&1, :genres, "Genres", @genres, span: 3))
     |> render()
     |> assert_html_eq("""
     <fieldset>
@@ -122,7 +122,7 @@ defmodule EpicenterWeb.FormTest do
   test "date_field" do
     phx_form(release_date: ~D[2000-01-02])
     |> Form.new()
-    |> Form.line(&Form.date_field(&1, :release_date, "Release date", 4))
+    |> Form.line(&Form.date_field(&1, :release_date, "Release date", span: 4))
     |> render()
     |> assert_html_eq("""
     <fieldset>
@@ -158,14 +158,14 @@ defmodule EpicenterWeb.FormTest do
   test "radio_button_list" do
     phx_form(language: "English")
     |> Form.new()
-    |> Form.line(&Form.radio_button_list(&1, :language, "Language", @languages, other: "Other"))
+    |> Form.line(&Form.radio_button_list(&1, :language, "Language", @languages, other: "Other", span: 5))
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <label data-grid-col="1" data-grid-row="1" data-grid-span="2" for="movie_language">\v
+      <label data-grid-col="1" data-grid-row="1" data-grid-span="5" for="movie_language">\v
         Language\v
       </label>
-      <div class="radio-button-list" data-grid-col="1" data-grid-row="3" data-grid-span="2">
+      <div class="radio-button-list" data-grid-col="1" data-grid-row="3" data-grid-span="5">
         <label data-role="movie-language">
           <input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>\v
           Other\v
@@ -201,7 +201,7 @@ defmodule EpicenterWeb.FormTest do
     parsed =
       phx_form(language: "English")
       |> Form.new()
-      |> Form.line(&Form.select(&1, :language, "Language", @languages, 4))
+      |> Form.line(&Form.select(&1, :language, "Language", @languages, span: 4))
       |> parse()
 
     assert [{"fieldset", [], [label, select_wrapper]}] = parsed
@@ -228,7 +228,7 @@ defmodule EpicenterWeb.FormTest do
   test "text_field" do
     phx_form(title: "Strange Brew")
     |> Form.new()
-    |> Form.line(&Form.text_field(&1, :title, "Title", 3))
+    |> Form.line(&Form.text_field(&1, :title, "Title", span: 3))
     |> render()
     |> assert_html_eq("""
     <fieldset>
