@@ -28,9 +28,9 @@ defmodule EpicenterWeb.Form do
   # # #
 
   @doc "opts: span"
-  def checkbox_list_field(%Form.Line{f: f} = line, field, name, values, opts \\ []) do
+  def checkbox_list_field(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, opts)),
+      label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
       checkbox_list(f, field, values, data: grid_data(3, line, opts))
     ]
@@ -46,9 +46,9 @@ defmodule EpicenterWeb.Form do
   end
 
   @doc "opts: span"
-  def date_field(%Form.Line{f: f} = line, field, name, opts \\ []) do
+  def date_field(%Form.Line{f: f} = line, field, label_text, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, opts)),
+      label(f, field, label_text, data: grid_data(1, line, opts)),
       content_tag(:div, "MM/DD/YYYY", data: grid_data(2, line, opts)),
       error_tag(f, field, data: grid_data(3, line, opts)),
       text_input(f, field, data: grid_data(4, line, opts))
@@ -68,9 +68,9 @@ defmodule EpicenterWeb.Form do
   end
 
   @doc "opts: other, span"
-  def radio_button_list(%Form.Line{f: f} = line, field, name, values, opts \\ []) do
+  def radio_button_list(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, opts)),
+      label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
       FormHelpers.radio_button_list(f, field, values, opts, data: grid_data(3, line, opts))
     ]
@@ -84,9 +84,9 @@ defmodule EpicenterWeb.Form do
   end
 
   @doc "opts: span"
-  def select(%Form.Line{f: f} = line, field, name, options, opts \\ []) do
+  def select(%Form.Line{f: f} = line, field, label_text, options, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, opts)),
+      label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
       FormHelpers.select_with_wrapper(f, field, options, data: grid_data(3, line, opts))
     ]
@@ -94,9 +94,9 @@ defmodule EpicenterWeb.Form do
   end
 
   @doc "opts: span"
-  def text_field(%Form.Line{f: f} = line, field, name, opts \\ []) do
+  def text_field(%Form.Line{f: f} = line, field, label_text, opts \\ []) do
     [
-      label(f, field, name, data: grid_data(1, line, opts)),
+      label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
       text_input(f, field, data: grid_data(3, line, opts))
     ]
