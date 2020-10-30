@@ -6,6 +6,9 @@ defmodule Epicenter.Extra.String do
   def pluralize(1, singular, _plural), do: "1 #{singular}"
   def pluralize(n, _singular, plural) when is_integer(n), do: "#{n} #{plural}"
 
+  @doc "remove all whitespace following a backspace+v escape code"
+  def remove_marked_whitespace(s), do: s |> String.replace(~r|\v\s*|, "")
+
   def remove_non_numbers(nil), do: nil
   def remove_non_numbers(s), do: s |> Elixir.String.replace(~r|[^\d]|, "")
 

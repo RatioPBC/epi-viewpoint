@@ -9,6 +9,19 @@ defmodule Epicenter.Extra.StringTest do
     test "many", do: assert(Extra.String.pluralize(2, "nerd", "nerds") == "2 nerds")
   end
 
+  describe "remove_marked_whitespace" do
+    test "removes whitespace following backslash-v" do
+      """
+      ant bat\v cat dog\v
+          eel fox\v  \t \r
+
+        gnu
+      """
+      |> Extra.String.remove_marked_whitespace()
+      |> assert_eq("ant batcat dogeel foxgnu\n")
+    end
+  end
+
   describe "remove_non_numbers" do
     test "doesn't blow up on nil" do
       assert Extra.String.remove_non_numbers(nil) == nil
