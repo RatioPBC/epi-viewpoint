@@ -4,6 +4,33 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   import Phoenix.LiveView.Helpers
 
+  def interview_buttons(case_investigation, person) do
+    case case_investigation.discontinue_reason do
+      nil ->
+        [
+          live_redirect("Start interview",
+            to: Routes.case_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartInterviewLive, person),
+            id: "start-interview-case-investigation-link-001",
+            class: "start-interview-case-investigation-link"
+          ),
+          live_redirect("Discontinue",
+            to:
+              Routes.case_investigation_discontinue_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.CaseInvestigationDiscontinueLive,
+                person,
+                case_investigation
+              ),
+            id: "discontinue-case-investigation-link-001",
+            class: "discontinue-case-investigation-link"
+          )
+        ]
+
+      _ ->
+        []
+    end
+  end
+
   def history_items(case_investigation, person) do
     items = []
 

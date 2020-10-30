@@ -219,6 +219,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Discontinued", reported_on: "Unknown", number: "001"})
+      # in discontinued case investigations, start and discontinue buttons move down to history section
+      |> Pages.Profile.assert_start_interview_button_title("001", "")
+      |> Pages.Profile.assert_discontinue_interview_button_title("001", "")
       # TODO Render datetime in Ohio timezone
       |> Pages.Profile.assert_case_investigation_has_history("Discontinued interview on 01/01/2020: Unable to reach")
     end

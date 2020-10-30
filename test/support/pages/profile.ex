@@ -165,6 +165,28 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_start_interview_button_title(%View{} = view, number, title) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#start-interview-case-investigation-link-#{number}")
+    |> Test.Html.text()
+    |> assert_eq(title)
+
+    view
+  end
+
+  def assert_discontinue_interview_button_title(%View{} = view, number, title) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#discontinue-case-investigation-link-#{number}")
+    |> Test.Html.text()
+    |> assert_eq(title)
+
+    view
+  end
+
   def assert_case_investigation_has_history(%View{} = view, history_texts) do
     view
     |> render()
