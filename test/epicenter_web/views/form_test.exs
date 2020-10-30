@@ -36,6 +36,14 @@ defmodule EpicenterWeb.FormTest do
     |> Test.Html.parse()
   end
 
+  defp render(%Form{} = form) do
+    form |> parse() |> render()
+  end
+
+  defp render(parsed_html) do
+    parsed_html |> Test.Html.html()
+  end
+
   test "creates a form with multiple fields" do
     parsed =
       phx_form(title: "Strange Brew", language: "English")
@@ -71,5 +79,64 @@ defmodule EpicenterWeb.FormTest do
     assert Test.Html.attr(title_input, "data-grid-col") == ["1"]
     assert Test.Html.attr(language_label, "data-grid-col") == ["3"]
     assert Test.Html.attr(language_input, "data-grid-col") == ["3"]
+  end
+
+  test "select" do
+    parsed =
+      phx_form(language: "English")
+      |> Form.new()
+      |> Form.line(&Form.select(&1, :language, "Language", [{"Italian", "italian"}, {"English", "english"}], 4))
+      |> parse()
+
+    assert [{"fieldset", [], [label, select_wrapper]}] = parsed
+    assert {"div", _, [{"svg", _, _}, select]} = select_wrapper
+
+    label
+    |> render()
+    |> assert_html_eq("""
+    <label
+      data-grid-col="1"
+      data-grid-row="1"
+      data-grid-span="4"
+      for="movie_language">Language</label>
+    """)
+
+    select
+    |> render()
+    |> assert_html_eq("""
+    <select
+      data-grid-col="1"
+      data-grid-row="3"
+      data-grid-span="4"
+      id="movie_language"
+      name="movie[language]">\v
+      <option value="italian">Italian</option>\v
+      <option value="english">English</option>\v
+    </select>
+    """)
+  end
+
+  test "text_field" do
+    phx_form(title: "Strange Brew")
+    |> Form.new()
+    |> Form.line(&Form.text_field(&1, :title, "Title", 3))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>
+      <label
+        data-grid-col="1"
+        data-grid-row="1"
+        data-grid-span="3"
+        for="movie_title">Title</label>
+      <input
+        data-grid-col="1"
+        data-grid-row="3"
+        data-grid-span="3"
+        id="movie_title"
+        name="movie[title]"
+        type="text"
+        value="Strange Brew"/>
+    </fieldset>
+    """)
   end
 end
