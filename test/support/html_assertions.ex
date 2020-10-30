@@ -1,6 +1,7 @@
 defmodule Epicenter.Test.HtmlAssertions do
   import ExUnit.Assertions
 
+  alias Epicenter.Extra
   alias Epicenter.Test
 
   def assert_html_eq(left, right) do
@@ -14,7 +15,7 @@ defmodule Epicenter.Test.HtmlAssertions do
   end
 
   defp to_html_string(string) when is_binary(string),
-    do: Test.Html.normalize(string)
+    do: string |> Extra.String.remove_marked_whitespace() |> Test.Html.normalize()
 
   defp to_html_string({:safe, _iodata} = safe_html),
     do: Phoenix.HTML.safe_to_string(safe_html) |> to_html_string()

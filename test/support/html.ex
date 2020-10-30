@@ -23,6 +23,9 @@ defmodule Epicenter.Test.Html do
   def has_role?(html, role),
     do: html |> find("[data-role=#{role}]") |> Euclid.Exists.present?()
 
+  def html(html) when not is_binary(html),
+    do: html |> Floki.raw_html()
+
   def html(html, css_query) when not is_binary(html),
     do: html |> find(css_query) |> Enum.map(&Floki.raw_html/1)
 
