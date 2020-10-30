@@ -84,10 +84,10 @@ defmodule EpicenterWeb.FormTest do
     assert Test.Html.attr(language_input, "data-grid-col") == ["3"]
   end
 
-  test "checkbox_list_field" do
+  test "checkbox_list" do
     phx_form(genres: ~w{Comedy Musical})
     |> Form.new()
-    |> Form.line(&Form.checkbox_list_field(&1, :genres, "Genres", @genres, span: 3))
+    |> Form.line(&Form.checkbox_list(&1, :genres, "Genres", @genres, span: 3))
     |> render()
     |> assert_html_eq("""
     <fieldset>

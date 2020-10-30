@@ -2,11 +2,9 @@ defmodule EpicenterWeb.Form do
   use Phoenix.HTML
 
   import EpicenterWeb.ErrorHelpers
-  import EpicenterWeb.FormHelpers
-
-  alias EpicenterWeb.FormHelpers
 
   alias EpicenterWeb.Form
+  alias EpicenterWeb.FormHelpers
 
   defstruct ~w{f safe}a
 
@@ -28,11 +26,11 @@ defmodule EpicenterWeb.Form do
   # # #
 
   @doc "opts: span"
-  def checkbox_list_field(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
+  def checkbox_list(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
     [
       label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
-      checkbox_list(f, field, values, data: grid_data(3, line, opts))
+      FormHelpers.checkbox_list(f, field, values, data: grid_data(3, line, opts))
     ]
     |> add_to_line(line, opts)
   end
