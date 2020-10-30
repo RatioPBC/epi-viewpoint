@@ -12,16 +12,20 @@ defmodule EpicenterWeb.FormHelpers do
 
     content_tag :div, opts do
       for value <- values do
-        {label, value} =
-          case value do
-            {label, value} -> {label, value}
-            value -> {value, value}
-          end
-
-        label(data: [role: input_list_label_role(form, field)]) do
-          [checkbox_list_checkbox(form, field, value), label]
-        end
+        checkbox_with_label(form, field, value)
       end
+    end
+  end
+
+  def checkbox_with_label(form, field, {label_text, value}),
+    do: checkbox_with_label(form, field, value, label_text)
+
+  def checkbox_with_label(form, field, value),
+    do: checkbox_with_label(form, field, value, value)
+
+  def checkbox_with_label(form, field, value, label_text) do
+    label(data: [role: input_list_label_role(form, field)]) do
+      [checkbox_list_checkbox(form, field, value), label_text]
     end
   end
 
@@ -69,15 +73,19 @@ defmodule EpicenterWeb.FormHelpers do
   # A list of radio buttons, each wrapped in a label
   defp radio_buttons(form, field, values) do
     for value <- values do
-      {label, value} =
-        case value do
-          {label, value} -> {label, value}
-          value -> {value, value}
-        end
+      radio_button_with_label(form, field, value)
+    end
+  end
 
-      label(data: [role: input_list_label_role(form, field)]) do
-        [radio_button(form, field, value), label]
-      end
+  def radio_button_with_label(form, field, {label_text, value}),
+    do: radio_button_with_label(form, field, value, label_text)
+
+  def radio_button_with_label(form, field, value),
+    do: radio_button_with_label(form, field, value, value)
+
+  def radio_button_with_label(form, field, value, label_text) do
+    label(data: [role: input_list_label_role(form, field)]) do
+      [radio_button(form, field, value), label_text]
     end
   end
 
