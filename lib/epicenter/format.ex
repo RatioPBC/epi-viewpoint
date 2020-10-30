@@ -16,6 +16,12 @@ defmodule Epicenter.Format do
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
 
+  def date_time(nil), do: ""
+
+  def date_time(%DateTime{} = date_time) do
+    "#{zero_pad(date_time.month, 2)}/#{zero_pad(date_time.day, 2)}/#{date_time.year}"
+  end
+
   def marital_status(nil), do: nil
   def marital_status(marital_status), do: marital_status |> String.capitalize()
 

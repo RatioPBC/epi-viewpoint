@@ -158,9 +158,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
         })
         |> Cases.create_lab_result!()
 
-      Test.Fixtures.case_investigation_attrs(person, lab_result, user, tid, %{
-        name: "001"
-      } |> Map.merge(attrs))
+      Test.Fixtures.case_investigation_attrs(
+        person,
+        lab_result,
+        user,
+        tid,
+        %{name: "001"}
+        |> Map.merge(attrs)
+      )
       |> Cases.create_case_investigation!()
     end
 
@@ -205,9 +210,29 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "discontinued case investigations say so", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{discontinued_at: NaiveDateTime.utc_now()})
+      date = ~N[2020-01-01 23:00:07]
+
+      build_case_investigation(person, user, "case_investigation", nil, %{
+        discontinued_at: date,
+        discontinue_reason: "Unable to reach"
+      })
+
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Discontinued", reported_on: "Unknown", number: "001"})
+      # TODO Render datetime in Ohio timezone
+      |> Pages.Profile.assert_case_investigation_has_history("Discontinued interview on 01/01/2020: Unable to reach")
+    end
+
+    test "discontinuation reason can be edited", %{conn: conn, person: person, user: user} do
+      case_investigation =
+        build_case_investigation(person, user, "case_investigation", nil, %{
+          discontinued_at: NaiveDateTime.utc_now(),
+          discontinue_reason: "Unable to reach"
+        })
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.click_edit_discontinuation_link("001")
+      |> assert_redirects_to("/people/#{person.id}/case_investigations/#{case_investigation.id}/discontinue")
     end
   end
 

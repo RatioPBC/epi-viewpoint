@@ -4,6 +4,7 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
+  import EpicenterWeb.Profile.CaseInvestigationPresenter, only: [history_items: 2]
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
 
   alias Epicenter.Accounts
@@ -124,6 +125,7 @@ defmodule EpicenterWeb.ProfileLive do
   def displayable_case_investigation_status(%{discontinued_at: nil} = case_investigation) do
     CaseInvestigation.readable_status(case_investigation.status)
   end
+
   def displayable_case_investigation_status(_), do: "Discontinued"
 
   @ethnicity_values_map %{

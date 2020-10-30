@@ -51,6 +51,7 @@
 
     .case-investigation-status
       @include level($justify: space-between)
+      border-bottom: 2px solid $divider-color
       margin-top: 0
 
       .status
@@ -65,6 +66,12 @@
 
       .discontinue-case-investigation-link
         @include button-secondary
+
+    .case-investigation-history
+      color: $secondary-text-color
+
+      .history-item-link
+        padding-left: 2rem
 
   section#demographics
     @include card

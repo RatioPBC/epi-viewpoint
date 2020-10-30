@@ -69,6 +69,11 @@
           span= live_redirect "Start interview", to: Routes.case_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartInterviewLive, @person), id: "start-interview-case-investigation-link-001", class: "start-interview-case-investigation-link"
           span= live_redirect "Discontinue", to: Routes.case_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationDiscontinueLive, @person, case_investigation), id: "discontinue-case-investigation-link-001", class: "discontinue-case-investigation-link"
 
+      .case-investigation-history
+        = for history_item <- history_items(case_investigation, @person) do
+          span data-role="case-investigation-history-item-text" = history_item.text
+          span class="history-item-link" = history_item.link
+
   section#lab-results data-role="lab-results"
     header
       h2 Lab Results
