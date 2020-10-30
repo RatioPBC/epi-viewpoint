@@ -4,7 +4,7 @@ set -e
 source "bin/_support/step.sh"
 
 step "compiling" "MIX_ENV=test mix compile --force --warnings-as-errors || (MIX_ENV=test mix clean && false)"
-if [ -z "${MIX_TEST_MAX_CASES}"]; then
+if [ -z "${MIX_TEST_MAX_CASES}" ]; then
   step "running tests" "mix test --color"
 else
   step "running tests with max cases of ${MIX_TEST_MAX_CASES}" "mix test --max-cases ${MIX_TEST_MAX_CASES} --color"
