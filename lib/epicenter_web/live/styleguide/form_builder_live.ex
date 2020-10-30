@@ -16,6 +16,7 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
       field :director, :string
       field :genres, {:array, :string}
       field :language, :string
+      field :notes, :string
       field :producer, :string
       field :release_date, :string
       field :status, :string
@@ -72,10 +73,7 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
 
   def movie_form_builder(form) do
     Form.new(form)
-    |> Form.line(fn line ->
-      line
-      |> Form.text_field(:title, "Title", span: 4)
-    end)
+    |> Form.line(&Form.text_field(&1, :title, "Title", span: 4))
     |> Form.line(fn line ->
       line
       |> Form.text_field(:director, "Director")
@@ -86,6 +84,7 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
       |> Form.checkbox_list(:genres, "Genres", genres())
       |> Form.radio_button_list(:language, "Language", languages(), other: "Other")
     end)
+    |> Form.line(&Form.textarea_field(&1, :notes, "Notes", span: 4))
     |> Form.safe()
   end
 end

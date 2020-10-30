@@ -92,6 +92,16 @@ defmodule EpicenterWeb.Form do
   end
 
   @doc "opts: span"
+  def textarea_field(%Form.Line{f: f} = line, field, label_text, opts \\ []) do
+    [
+      label(f, field, label_text, data: grid_data(1, line, opts)),
+      error_tag(f, field, data: grid_data(2, line, opts)),
+      textarea(f, field, rows: 4, data: grid_data(3, line, opts))
+    ]
+    |> add_to_line(line, opts)
+  end
+
+  @doc "opts: span"
   def text_field(%Form.Line{f: f} = line, field, label_text, opts \\ []) do
     [
       label(f, field, label_text, data: grid_data(1, line, opts)),

@@ -225,6 +225,25 @@ defmodule EpicenterWeb.FormTest do
     """)
   end
 
+  test "textarea_field" do
+    phx_form(title: "Strange Brew")
+    |> Form.new()
+    |> Form.line(&Form.textarea_field(&1, :title, "Title", span: 3))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>
+      <label data-grid-col="1" data-grid-row="1" data-grid-span="3" for="movie_title">\v
+        Title\v
+      </label>
+      <textarea
+        data-grid-col="1" data-grid-row="3" data-grid-span="3"
+        id="movie_title" name="movie[title]" rows="4">
+    \v  Strange Brew\v
+      </textarea>
+    </fieldset>
+    """)
+  end
+
   test "text_field" do
     phx_form(title: "Strange Brew")
     |> Form.new()
