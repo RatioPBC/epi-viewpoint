@@ -14,11 +14,29 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     [case_investigation: case_investigation, person: person, user: user]
   end
 
-  test "shows start case investigation form", %{conn: conn, person: person} do
-    Pages.CaseInvestigationStartInterview.visit(conn, person)
+  test "shows start case investigation form", %{conn: conn, person: person, case_investigation: case_investigation} do
+    Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
     |> Pages.CaseInvestigationStartInterview.assert_here()
     |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_selections(%{"Alice Testuser" => false, "Proxy" => false})
     |> Pages.CaseInvestigationStartInterview.assert_date_started(:today)
     |> Pages.CaseInvestigationStartInterview.assert_time_started(:now)
+  end
+
+  test "saving start case investigation form", %{conn: conn, person: person, case_investigation: case_investigation} do
+    Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
+      start_interview_form: %{
+        "person_interviewed" => "Alice's guardian",
+        "date_started" => "09/06/2020",
+        "time_started" => "03:45",
+        "time_started_am_pm" => "PM"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    # TODO: next up!
+    #    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    #    assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.started_at
+    #    assert "Alice's guardian" = case_investigation.person_interviewed
   end
 end

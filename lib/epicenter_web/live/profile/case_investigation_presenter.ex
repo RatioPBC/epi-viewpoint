@@ -9,7 +9,13 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       nil ->
         [
           live_redirect("Start interview",
-            to: Routes.case_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartInterviewLive, person),
+            to:
+              Routes.case_investigation_start_interview_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.CaseInvestigationStartInterviewLive,
+                person,
+                case_investigation
+              ),
             id: "start-interview-case-investigation-link-001",
             class: "start-interview-case-investigation-link"
           ),

@@ -1,13 +1,14 @@
 defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
   import ExUnit.Assertions
 
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  def visit(%Plug.Conn{} = conn, %Person{id: person_id}) do
-    conn |> Pages.visit("/people/#{person_id}/case_investigations/todo/start_interview")
+  def visit(%Plug.Conn{} = conn, %Person{id: person_id}, %CaseInvestigation{id: case_investigation_id}) do
+    conn |> Pages.visit("/people/#{person_id}/case_investigations/#{case_investigation_id}/start_interview")
   end
 
   def assert_date_started(%View{} = view, :today) do

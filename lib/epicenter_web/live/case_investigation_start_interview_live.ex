@@ -32,6 +32,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
     def case_investigation_start_interview_form_attrs(%Person{} = person) do
       local_now = Timex.now(EpicenterWeb.CaseInvestigationStartInterviewLive.time_zone_name())
+
       %{
         person_interviewed: Format.person(person),
         date_started: Format.date(local_now |> DateTime.to_date()),
@@ -52,8 +53,11 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
     |> ok()
   end
 
-  def handle_event("save", %{}, socket),
-    do: noreply(socket)
+  def handle_event("save", %{}, socket) do
+    socket
+    |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
+    |> noreply()
+  end
 
   def people_interviewed(person),
     do: [Format.person(person)]
@@ -65,6 +69,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
   def start_interview_form_builder(form, person) do
     timezone = Timex.timezone(time_zone_name(), Timex.now())
+
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
     |> Form.line(&Form.date_field(&1, :date_started, "Date started"))
@@ -74,6 +79,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       |> Form.select(:time_started_am_pm, "", time_started_am_pm_options(), 1)
       |> Form.content_div(timezone.abbreviation)
     end)
+    |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end
 

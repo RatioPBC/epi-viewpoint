@@ -50,7 +50,9 @@ defmodule EpicenterWeb.Router do
     post "/import/upload", ImportController, :create
     live "/people", PeopleLive, as: :people
     live "/people/:id", ProfileLive, as: :profile
-    live "/people/:id/case_investigations/todo/start_interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
+
+    live "/people/:id/case_investigations/:case_investigation_id/start_interview", CaseInvestigationStartInterviewLive,
+      as: :case_investigation_start_interview
 
     live "/case_investigations/:id/clinical_details", CaseInvestigationClinicalDetailsLive, as: :case_investigation_clinical_details
 

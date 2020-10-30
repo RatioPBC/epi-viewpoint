@@ -563,8 +563,9 @@ defmodule Epicenter.CasesTest do
     end
 
     test "gets default status from db default", %{person: person, lab_result: lab_result, creator: creator} do
-      case_investigation = Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{status: nil})
-                           |> Cases.create_case_investigation!()
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{status: nil})
+        |> Cases.create_case_investigation!()
 
       assert case_investigation.status == CaseInvestigation.pending_interview_status()
     end

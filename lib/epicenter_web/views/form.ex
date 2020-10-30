@@ -38,7 +38,7 @@ defmodule EpicenterWeb.Form do
 
   def content_div(%Form.Line{} = line, content, span \\ 2) do
     [
-      content_tag(:div, content, data: grid_data(1, line, span)),
+      content_tag(:div, content, data: grid_data(1, line, span))
     ]
     |> add_to_line(line, span)
   end
