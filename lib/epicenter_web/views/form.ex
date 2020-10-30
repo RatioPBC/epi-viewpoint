@@ -36,6 +36,13 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, span)
   end
 
+  def content_div(%Form.Line{} = line, content, span \\ 2) do
+    [
+      content_tag(:div, content, data: grid_data(1, line, span)),
+    ]
+    |> add_to_line(line, span)
+  end
+
   def date_field(%Form.Line{f: f} = line, field, name, span \\ 2) do
     [
       label(f, field, name, data: grid_data(1, line, span)),

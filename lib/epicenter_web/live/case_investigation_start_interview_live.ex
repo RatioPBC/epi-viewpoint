@@ -31,11 +31,12 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs)
 
     def case_investigation_start_interview_form_attrs(%Person{} = person) do
+      local_now = Timex.now(EpicenterWeb.CaseInvestigationStartInterviewLive.time_zone_name())
       %{
         person_interviewed: Format.person(person),
-        date_started: Format.date(Date.utc_today()),
-        time_started: Format.time(Time.utc_now()),
-        time_started_am_pm: if(Time.utc_now().hour >= 12, do: "PM", else: "AM")
+        date_started: Format.date(local_now |> DateTime.to_date()),
+        time_started: Format.time(local_now |> DateTime.to_time()),
+        time_started_am_pm: if(local_now.hour >= 12, do: "PM", else: "AM")
       }
     end
   end
@@ -60,7 +61,10 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   def time_started_am_pm_options(),
     do: ["AM", "PM"]
 
+  def time_zone_name(), do: "America/New_York"
+
   def start_interview_form_builder(form, person) do
+    timezone = Timex.timezone(time_zone_name(), Timex.now())
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
     |> Form.line(&Form.date_field(&1, :date_started, "Date started"))
@@ -68,6 +72,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       line
       |> Form.text_field(:time_started, "Time interviewed")
       |> Form.select(:time_started_am_pm, "", time_started_am_pm_options(), 1)
+      |> Form.content_div(timezone.abbreviation)
     end)
     |> Form.safe()
   end
