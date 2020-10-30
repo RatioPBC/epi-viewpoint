@@ -148,7 +148,7 @@
   margin: 0 auto
 
 @mixin checkbox-list
-  @include radio-button-list
+  @include -input-vertical-list
 
 @mixin data-table
   border-collapse: collapse
@@ -380,14 +380,23 @@
 
 @mixin radio-button-list
   // Radio button list items are in reverse order in the markup so that the "other" text field is overridden by
-  // any radio button, so the CSS here reverses the reverse order.
+  // any radio button, so the CSS here reverses the reverse order. HOWEVER, this breaks keyboard tab order, so
+  // we should implement this a different way sometime.
+  @include -input-vertical-list
   display: flex
   flex-direction: column-reverse
 
+  > *:not(:last-child)
+    margin-top: 0.5rem
+
+  > *:last-child
+    margin-top: 0
+
+@mixin -input-vertical-list
   font-weight: bold
   margin-top: 0.5rem
 
-  > *:not(:last-child)
+  > *:not(:first-child)
     margin-top: 0.5rem
 
   label
