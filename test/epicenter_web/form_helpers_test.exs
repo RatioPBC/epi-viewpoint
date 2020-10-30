@@ -42,10 +42,22 @@ defmodule EpicenterWeb.FormHelpersTest do
       FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], id: "genre-list")
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy"/>Comedy</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama" checked/>Drama</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical"/>Musical</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Science Fiction"/>Science Fiction</label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy"/>\v
+          Comedy\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama" checked/>\v
+          Drama\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical"/>\v
+          Musical\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Science Fiction"/>\v
+          Science Fiction\v
+        </label>
       </div>
       """)
     end
@@ -53,16 +65,27 @@ defmodule EpicenterWeb.FormHelpersTest do
     test "renders a checkbox list with differing label text and input values" do
       changeset = Changeset.change(%Movie{genres: ["drama"]})
       form = Phoenix.HTML.FormData.to_form(changeset, [])
+      genres = [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}, {"Science Fiction", "sci_fi"}]
 
-      FormHelpers.checkbox_list(form, :genres, [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}, {"Science Fiction", "sci_fi"}],
-        id: "genre-list"
-      )
+      FormHelpers.checkbox_list(form, :genres, genres, id: "genre-list")
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/>Comedy</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/>Drama</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/>Musical</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="sci_fi"/>Science Fiction</label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/>\v
+          Comedy\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/>\v
+          Drama\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/>\v
+          Musical\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="sci_fi"/>\v
+          Science Fiction\v
+        </label>
       </div>
       """)
     end
@@ -74,10 +97,22 @@ defmodule EpicenterWeb.FormHelpersTest do
       FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], id: "genre-list")
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy"/>Comedy</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama"/>Drama</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical"/>Musical</label>
-        <label data-role="movie-genres"><input id="movie_genres" name="movie[genres][]" type="checkbox" value="Science Fiction"/>Science Fiction</label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy"/>\v
+          Comedy\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama"/>\v
+          Drama\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical"/>\v
+          Musical\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Science Fiction"/>\v
+          Science Fiction\v
+        </label>
       </div>
       """)
     end
@@ -88,9 +123,18 @@ defmodule EpicenterWeb.FormHelpersTest do
       FormHelpers.radio_button_list(form, :language, ["English", "German", "Italian"], id: "language-list")
       |> assert_html_eq("""
       <div class="radio-button-list" id="language-list">
-        <label data-role="movie-language"><input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/>Italian</label>
-        <label data-role="movie-language"><input id="movie_language_German" name="movie[language]" type="radio" value="German" checked="checked"/>German</label>
-        <label data-role="movie-language"><input id="movie_language_English" name="movie[language]" type="radio" value="English"/>English</label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/>\v
+          Italian\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_German" name="movie[language]" type="radio" value="German" checked="checked"/>\v
+          German\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_English" name="movie[language]" type="radio" value="English"/>\v
+          English\v
+        </label>
       </div>
       """)
     end
@@ -99,9 +143,19 @@ defmodule EpicenterWeb.FormHelpersTest do
       FormHelpers.radio_button_list(form, :language, ["English", "Italian"], [other: "Other"], id: "language-list")
       |> assert_html_eq("""
       <div class="radio-button-list" id="language-list">
-        <label data-role="movie-language"><input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>Other<input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="German"></label>
-        <label data-role="movie-language"><input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/>Italian</label>
-        <label data-role="movie-language"><input id="movie_language_English" name="movie[language]" type="radio" value="English"/>English</label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>\v
+          Other\v
+          <input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="German">\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_Italian" name="movie[language]" type="radio" value="Italian"/>\v
+          Italian\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_English" name="movie[language]" type="radio" value="English"/>\v
+          English\v
+          </label>
       </div>
       """)
     end
@@ -113,9 +167,18 @@ defmodule EpicenterWeb.FormHelpersTest do
       FormHelpers.radio_button_list(form, :language, [{"English", "english"}, {"German", "deutsch"}, {"Italian", "italiano"}], id: "language-list")
       |> assert_html_eq("""
       <div class="radio-button-list" id="language-list">
-        <label data-role="movie-language"><input id="movie_language_italiano" name="movie[language]" type="radio" value="italiano"/>Italian</label>
-        <label data-role="movie-language"><input id="movie_language_deutsch" name="movie[language]" type="radio" value="deutsch" checked="checked"/>German</label>
-        <label data-role="movie-language"><input id="movie_language_english" name="movie[language]" type="radio" value="english"/>English</label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_italiano" name="movie[language]" type="radio" value="italiano"/>\v
+          Italian\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_deutsch" name="movie[language]" type="radio" value="deutsch" checked="checked"/>\v
+          German\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_english" name="movie[language]" type="radio" value="english"/>\v
+          English\v
+        </label>
       </div>
       """)
     end
