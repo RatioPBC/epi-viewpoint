@@ -25,5 +25,22 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       "Symptomatic" => false,
       "Asymptomatic" => false
     })
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
+      "Fever > 100.4F" => false,
+      "Subjective fever (felt feverish)" => false,
+      "Cough" => false,
+      "Shortness of breath" => false,
+      "Diarrhea/GI" => false,
+      "Headache" => false,
+      "Muscle ache" => false,
+      "Chills" => false,
+      "Sore throat" => false,
+      "Vomiting" => false,
+      "Abdominal pain" => false,
+      "Nasal congestion" => false,
+      "Loss of sense of smell" => false,
+      "Loss of sense of taste" => false,
+      "Fatigue" => false
+    })
   end
 end

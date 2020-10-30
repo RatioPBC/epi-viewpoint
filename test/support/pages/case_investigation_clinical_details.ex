@@ -21,4 +21,13 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
     assert selections == actual_selections
     view
   end
+
+  def assert_symptoms_selection(%View{} = view, selections) do
+    actual_selections =
+      view
+      |> Pages.actual_selections("clinical-details-form-symptoms", "checkbox")
+
+    assert selections == actual_selections
+    view
+  end
 end

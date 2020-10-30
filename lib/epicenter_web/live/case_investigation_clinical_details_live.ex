@@ -43,7 +43,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
   def clinical_details_form_builder(form) do
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses()))
+    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), [], 4))
+    |> Form.line(&Form.checkbox_list_field(&1, :symptoms, "Symptoms", symptoms(), 4))
     |> Form.safe()
   end
 
@@ -52,6 +53,26 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
       {"Unknown", "unknown"},
       {"Symptomatic", "symptomatic"},
       {"Asymptomatic", "asymptomatic"}
+    ]
+  end
+
+  defp symptoms() do
+    [
+      {"Fever > 100.4F", "fever"},
+      {"Subjective fever (felt feverish)", "subjective_fever"},
+      {"Cough", "cough"},
+      {"Shortness of breath", "shortness_of_breath"},
+      {"Diarrhea/GI", "diarrhea_gi"},
+      {"Headache", "headache"},
+      {"Muscle ache", "muscle_ache"},
+      {"Chills", "chills"},
+      {"Sore throat", "sore_throat"},
+      {"Vomiting", "vomiting"},
+      {"Abdominal pain", "abdominal_pain"},
+      {"Nasal congestion", "nasal_congestion"},
+      {"Loss of sense of smell", "loss_of_sense_of_smell"},
+      {"Loss of sense of taste", "loss_of_sense_of_taste"},
+      {"Fatigue", "fatigue"}
     ]
   end
 end

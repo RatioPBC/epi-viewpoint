@@ -18,8 +18,8 @@ defmodule EpicenterWeb.FormHelpers do
             value -> {value, value}
           end
 
-        label do
-          [checkbox_list_checkbox(form, field, value), " ", label]
+        label(data: [role: input_list_label_role(form, field)]) do
+          [checkbox_list_checkbox(form, field, value), label]
         end
       end
     end
@@ -30,11 +30,13 @@ defmodule EpicenterWeb.FormHelpers do
   Automatically marks the checkbox as checked if its value is in the form data's list of values.
   """
   def checkbox_list_checkbox(form, field, value) do
+    form_field_value = input_value(form, field)
+
     checkbox(
       form,
       field,
       name: checkbox_list_input_name(form, field),
-      checked: value in input_value(form, field),
+      checked: !is_nil(form_field_value) && value in form_field_value,
       checked_value: value,
       hidden_input: false
     )
@@ -73,7 +75,7 @@ defmodule EpicenterWeb.FormHelpers do
           value -> {value, value}
         end
 
-      label(data: [role: radio_button_list_label_role(form, field)]) do
+      label(data: [role: input_list_label_role(form, field)]) do
         [radio_button(form, field, value), label]
       end
     end
@@ -88,7 +90,7 @@ defmodule EpicenterWeb.FormHelpers do
     other_selected? = input_value not in predefined_values and input_value != nil
     other_value = if other_selected?, do: input_value, else: ""
 
-    label(data: [role: radio_button_list_label_role(form, field)]) do
+    label(data: [role: input_list_label_role(form, field)]) do
       [
         radio_button(form, field, nil, checked: other_selected?),
         label_text,
@@ -97,7 +99,7 @@ defmodule EpicenterWeb.FormHelpers do
     end
   end
 
-  defp radio_button_list_label_role(form, field),
+  defp input_list_label_role(form, field),
     do: [form.name, Atom.to_string(field)] |> Enum.map(&String.replace(&1, "_", "-")) |> Enum.join("-")
 
   def select_with_wrapper(form, field, options, html_opts \\ []) do
