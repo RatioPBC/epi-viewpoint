@@ -33,10 +33,12 @@ defmodule Epicenter.AuditLog.Revision do
 
   # action = what was the code that made this change trying to accomplish?
   def create_user_action(), do: "create-user"
+  def demote_user_action(), do: "demote-user"
   def enable_user_action(), do: "enable-user"
   def import_csv_action(), do: "import-csv"
   def insert_demographics_action(), do: "insert-demographics"
   def login_user_action(), do: "login-user"
+  def promote_user_action(), do: "promote-user"
   def register_user_action(), do: "register-user"
   def releases_action(), do: "releases"
   def reset_password_action(), do: "reset-password"

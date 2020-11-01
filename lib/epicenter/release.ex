@@ -45,16 +45,16 @@ defmodule Epicenter.Release do
 
   Then call this function by providing a list of email addresses of users to disable:
 
-  iex> Epicenter.Release.create_user(administrator, "Fred Durst", "limpbizkit@example.com")
+  iex> Epicenter.Release.create_user(administrator, "Fred Durst", "limpbizkit@example.com", :member)
   """
 
-  def create_user(%Epicenter.Accounts.User{} = author, name, email, opts \\ []) do
+  def create_user(%Epicenter.Accounts.User{} = author, name, email, level, opts \\ []) when level in [:member, :admin] do
     ensure_started()
 
     puts = Keyword.get(opts, :puts, &IO.puts/1)
     puts.("Creating user #{name} / #{email}; they must set their password via this URL:")
 
-    attrs = %{email: email, password: Euclid.Extra.Random.string(), name: name}
+    attrs = %{email: email, password: Euclid.Extra.Random.string(), name: name, admin: level == :admin}
 
     audit_meta = %AuditLog.Meta{
       author_id: author.id,
@@ -77,20 +77,30 @@ defmodule Epicenter.Release do
   end
 
   @doc """
-  An administrator can use `update_users` to disable users from being able to accomplish actions,
+  An administrator can use `update_user` to manipulate a user's permissions,
   or to re-enable them. To do so, find your administrator's user:
+
+  NOTE: The robot user cannot accomplish this task
 
   administrator = Epicenter.Repo.get_by(Epicenter.Accounts.User, email: "admin@example.com")
 
-  Then call this function by providing a list of email addresses of users to disable or enable:
+  Then call this function by providing a user's email to disable or enable the user with that email:
 
-  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :disabled)
-  Epicenter.Release.update_users(administrator, ["some-other-user@example.com"], :enabled)
+  Epicenter.Release.update_user(administrator, "some-other-user@example.com", :disabled)
+  Epicenter.Release.update_user(administrator, "some-other-user@example.com", :enabled)
 
-  Progress will be logged to stdout.
+  Or call it with :admin to promote them to administrator:
+
+  Epicenter.Release.update_user(administrator, "some-other-user@example.com", :admin)
+
+  Or call it with :member to demote them to non-administrator:
+
+  Epicenter.Release.update_user(administrator, "some-other-user@example.com", :member)
+
+  stdout will tell you if your update worked
   """
-  @spec update_users(%Epicenter.Accounts.User{}, list(String.t()), atom()) :: :ok
-  def update_users(author, emails, action, opts \\ []) when action in [:disabled, :enabled] do
+  @spec update_user(%Epicenter.Accounts.User{}, String.t(), :disabled | :enabled | :admin | :member) :: :ok
+  def update_user(author, email, action, opts \\ []) when action in [:disabled, :enabled, :admin, :member] do
     ensure_started()
 
     puts = Keyword.get(opts, :puts, &IO.puts/1)
@@ -99,6 +109,8 @@ defmodule Epicenter.Release do
       case action do
         :disabled -> AuditLog.Revision.update_disabled_action()
         :enabled -> AuditLog.Revision.enable_user_action()
+        :admin -> AuditLog.Revision.promote_user_action()
+        :member -> AuditLog.Revision.demote_user_action()
       end
 
     audit_meta = %AuditLog.Meta{
@@ -107,13 +119,20 @@ defmodule Epicenter.Release do
       reason_event: AuditLog.Revision.releases_event()
     }
 
-    for email <- emails do
-      with user when not is_nil(user) <- Accounts.get_user(email: email),
-           {:ok, _user} <- Epicenter.Accounts.update_user(user, %{disabled: action == :disabled}, audit_meta) do
-        puts.("OK: #{action} #{email}")
-      else
-        {:error, error} -> puts.("ERROR when trying to set #{email} to #{action} (#{error})")
+    attrs =
+      case action do
+        :disabled -> %{disabled: true}
+        :enabled -> %{disabled: false}
+        :admin -> %{admin: true}
+        :member -> %{admin: false}
       end
+
+    with user when not is_nil(user) <- Accounts.get_user(email: email),
+         {:ok, _user} <- Epicenter.Accounts.update_user(user, attrs, audit_meta) do
+      puts.("OK: #{action} #{email}")
+    else
+      nil -> puts.("Could not find a user with email #{email}")
+      {:error, error} -> puts.("ERROR when trying to set #{email} to #{action} (#{inspect(error)})")
     end
 
     :ok
