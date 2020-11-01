@@ -9,15 +9,17 @@ defmodule Epicenter.Cases.CaseInvestigation do
   alias Epicenter.Cases.Person
 
   @required_attrs ~w{initiated_by_id person_id}a
-  @optional_attrs ~w{discontinue_reason discontinued_at name tid}a
+  @optional_attrs ~w{discontinue_reason discontinued_at person_interviewed name started_at tid}a
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "case_investigations" do
     field :discontinue_reason, :string
     field :discontinued_at, :utc_datetime
+    field :person_interviewed, :string
     field :name, :string
     field :seq, :integer
+    field :started_at, :utc_datetime
     field :status, :string, read_after_writes: true
     field :tid, :string
 

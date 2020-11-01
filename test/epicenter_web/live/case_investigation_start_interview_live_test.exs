@@ -34,9 +34,8 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     )
     |> Pages.Profile.assert_here(person)
 
-    # TODO: next up!
-    #    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    assert "Alice's guardian" = case_investigation.person_interviewed
     #    assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.started_at
-    #    assert "Alice's guardian" = case_investigation.person_interviewed
   end
 end

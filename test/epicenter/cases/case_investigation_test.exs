@@ -23,6 +23,8 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:inserted_at, :naive_datetime},
           {:name, :string},
           {:person_id, :id},
+          {:person_interviewed, :string},
+          {:started_at, :utc_datetime},
           {:seq, :integer},
           {:status, :string},
           {:tid, :string},
