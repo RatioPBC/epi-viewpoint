@@ -9,13 +9,12 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   alias Epicenter.Cases.Person
   alias Epicenter.Format
   alias EpicenterWeb.Form
+  alias EpicenterWeb.PresentationConstants
 
   defmodule StartInterviewForm do
     use Ecto.Schema
 
     import Ecto.Changeset
-
-    alias EpicenterWeb.CaseInvestigationStartInterviewLive
 
     @primary_key false
     embedded_schema do
@@ -34,7 +33,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs) |> validate_interviewed_at()
 
     def case_investigation_start_interview_form_attrs(%Person{} = person) do
-      local_now = Timex.now(EpicenterWeb.CaseInvestigationStartInterviewLive.time_zone_name())
+      local_now = Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
 
       %{
         person_interviewed: Format.person(person),
@@ -70,7 +69,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
     defp convert_time(datestring, timestring, ampmstring) do
       with {:ok, datetime} <- Timex.parse("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"),
-           %Timex.TimezoneInfo{} = timezone <- Timex.timezone(CaseInvestigationStartInterviewLive.time_zone_name(), datetime),
+           %Timex.TimezoneInfo{} = timezone <- Timex.timezone(PresentationConstants.presented_time_zone(), datetime),
            %DateTime{} = time <- Timex.to_datetime(datetime, timezone) do
         {:ok, time}
       end
@@ -137,11 +136,8 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   def time_started_am_pm_options(),
     do: ["AM", "PM"]
 
-  def time_zone_name(),
-    do: "America/New_York"
-
   def start_interview_form_builder(form, person) do
-    timezone = Timex.timezone(time_zone_name(), Timex.now())
+    timezone = Timex.timezone(PresentationConstants.presented_time_zone(), Timex.now())
 
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
