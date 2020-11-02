@@ -151,7 +151,7 @@ defmodule Epicenter.AuditLogTest do
           }
         )
 
-      assert [revision_0, revision_1, revision_2] =
+      assert [_revision_0, revision_1, revision_2] =
                [%{changed_id: ^person_id}, %{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
 
       assert revision_1.author_id == user.id

@@ -98,7 +98,7 @@ defmodule Epicenter.Cases.ImportTest do
     test "creates case investigations for new lab results", %{originator: originator} do
       assert {:ok,
               %Epicenter.Cases.Import.ImportInfo{
-                imported_people: imported_people,
+                imported_people: _imported_people,
                 imported_lab_result_count: 2,
                 imported_person_count: 2,
                 total_lab_result_count: 2,
