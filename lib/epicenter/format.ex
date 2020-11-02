@@ -16,10 +16,10 @@ defmodule Epicenter.Format do
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
 
-  def date_time(nil), do: ""
+  def date_time_with_zone(nil), do: ""
 
-  def date_time(%DateTime{} = date_time) do
-    "#{zero_pad(date_time.month, 2)}/#{zero_pad(date_time.day, 2)}/#{date_time.year}"
+  def date_time_with_zone(%DateTime{} = date_time) do
+    Calendar.strftime(date_time, "%m/%d/%Y at %I:%M%P %Z")
   end
 
   def marital_status(nil), do: nil

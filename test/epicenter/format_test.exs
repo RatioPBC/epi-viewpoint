@@ -54,6 +54,20 @@ defmodule Epicenter.FormatTest do
     end
   end
 
+  describe "date_time_with_zone" do
+    import Epicenter.Format, only: [date_time_with_zone: 1]
+
+    test "when given a datetime, formats it as a date with the time and zone information" do
+      utc_datetime = ~U[2020-01-02 01:00:07Z]
+      {:ok, localized_datetime} = DateTime.shift_zone(utc_datetime, "America/New_York")
+      assert date_time_with_zone(localized_datetime) == "01/01/2020 at 08:00pm EST"
+    end
+
+    test "when given a nil, quietly renders an empty string" do
+      assert date_time_with_zone(nil) == ""
+    end
+  end
+
   describe "employment" do
     import Epicenter.Format, only: [employment: 1]
 

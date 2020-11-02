@@ -210,7 +210,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "discontinued case investigations say so", %{conn: conn, person: person, user: user} do
-      date = ~N[2020-01-01 23:00:07]
+      date = ~N[2020-01-02 01:00:07]
 
       build_case_investigation(person, user, "case_investigation", nil, %{
         discontinued_at: date,
@@ -222,8 +222,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       # in discontinued case investigations, start and discontinue buttons move down to history section
       |> Pages.Profile.assert_start_interview_button_title("001", "")
       |> Pages.Profile.assert_discontinue_interview_button_title("001", "")
-      # TODO Render datetime in Ohio timezone
-      |> Pages.Profile.assert_case_investigation_has_history("Discontinued interview on 01/01/2020: Unable to reach")
+      |> Pages.Profile.assert_case_investigation_has_history("Discontinued interview on 01/01/2020 at 08:00pm EST: Unable to reach")
     end
 
     test "discontinuation reason can be edited", %{conn: conn, person: person, user: user} do

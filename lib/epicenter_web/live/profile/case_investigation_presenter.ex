@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   alias Epicenter.Format
+  alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 
   import Phoenix.LiveView.Helpers
@@ -44,7 +45,10 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       if case_investigation.discontinue_reason != nil do
         [
           %{
-            text: "Discontinued interview on #{Format.date_time(case_investigation.discontinued_at)}: #{case_investigation.discontinue_reason}",
+            text:
+              "Discontinued interview on #{case_investigation.discontinued_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()}: #{
+                case_investigation.discontinue_reason
+              }",
             link:
               live_redirect(
                 "Edit",
@@ -66,5 +70,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       end
 
     items
+  end
+
+  defp convert_to_presented_time_zone(datetime) do
+    DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
   end
 end
