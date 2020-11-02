@@ -102,7 +102,8 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   def time_started_am_pm_options(),
     do: ["AM", "PM"]
 
-  def time_zone_name(), do: "America/New_York"
+  def time_zone_name(),
+    do: "America/New_York"
 
   def start_interview_form_builder(form, person) do
     timezone = Timex.timezone(time_zone_name(), Timex.now())
@@ -114,7 +115,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       line
       |> Form.text_field(:time_started, "Time interviewed")
       |> Form.select(:time_started_am_pm, "", time_started_am_pm_options(), span: 1)
-      |> Form.content_div(timezone.abbreviation)
+      |> Form.content_div(timezone.abbreviation, row: 3)
     end)
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()

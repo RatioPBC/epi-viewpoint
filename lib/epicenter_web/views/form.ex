@@ -37,9 +37,7 @@ defmodule EpicenterWeb.Form do
 
   @doc "opts: span"
   def content_div(%Form.Line{} = line, content, opts \\ []) do
-    [
-      content_tag(:div, content, data: grid_data(1, line, opts))
-    ]
+    [content_tag(:div, content, data: grid_data(line, opts))]
     |> add_to_line(line, opts)
   end
 
@@ -115,6 +113,9 @@ defmodule EpicenterWeb.Form do
 
   defp grid_data(row, %Form.Line{column: column}, opts),
     do: [grid: [row: row, col: column, span: Keyword.get(opts, :span, 2)]]
+
+  defp grid_data(%Form.Line{column: column}, opts),
+    do: [grid: [row: Keyword.get(opts, :row, 1), col: column, span: Keyword.get(opts, :span, 2)]]
 
   defp add_to_line(contents, %Form.Line{column: column, safe: safe} = line, opts),
     do: %{line | column: column + Keyword.get(opts, :span, 2), safe: safe ++ contents}
