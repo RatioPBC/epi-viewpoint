@@ -119,25 +119,48 @@ defmodule EpicenterWeb.FormTest do
     """)
   end
 
-  test "date_field" do
-    phx_form(release_date: ~D[2000-01-02])
-    |> Form.new()
-    |> Form.line(&Form.date_field(&1, :release_date, "Release date", span: 4))
-    |> render()
-    |> assert_html_eq("""
-    <fieldset>
-      <label data-grid-col="1" data-grid-row="1" data-grid-span="4" for="movie_release_date">Release date</label>
-      <div data-grid-col="1" data-grid-row="2" data-grid-span="4">MM/DD/YYYY</div>
-      <input
-        data-grid-col="1"
-        data-grid-row="4"
-        data-grid-span="4"
-        id="movie_release_date"
-        name="movie[release_date]"
-        type="text"
-        value="2000-01-02"/>
-    </fieldset>
-    """)
+  describe "date_field" do
+    test "default appearance" do
+      phx_form(release_date: ~D[2000-01-02])
+      |> Form.new()
+      |> Form.line(&Form.date_field(&1, :release_date, "Release date", span: 4))
+      |> render()
+      |> assert_html_eq("""
+      <fieldset>
+        <label data-grid-col="1" data-grid-row="1" data-grid-span="4" for="movie_release_date">Release date</label>
+        <div data-grid-col="1" data-grid-row="2" data-grid-span="4">MM/DD/YYYY</div>
+        <input
+          data-grid-col="1"
+          data-grid-row="4"
+          data-grid-span="4"
+          id="movie_release_date"
+          name="movie[release_date]"
+          type="text"
+          value="2000-01-02"/>
+      </fieldset>
+      """)
+    end
+
+    test "with custom explanation text" do
+      phx_form(release_date: ~D[2000-01-02])
+      |> Form.new()
+      |> Form.line(&Form.date_field(&1, :release_date, "Release date", explanation_text: "This is a cool release date!"))
+      |> render()
+      |> assert_html_eq("""
+      <fieldset>
+        <label data-grid-col="1" data-grid-row="1" data-grid-span="2" for="movie_release_date">Release date</label>
+        <div data-grid-col="1" data-grid-row="2" data-grid-span="2">This is a cool release date!</div>
+        <input
+          data-grid-col="1"
+          data-grid-row="4"
+          data-grid-span="2"
+          id="movie_release_date"
+          name="movie[release_date]"
+          type="text"
+          value="2000-01-02"/>
+      </fieldset>
+      """)
+    end
   end
 
   test "footer" do

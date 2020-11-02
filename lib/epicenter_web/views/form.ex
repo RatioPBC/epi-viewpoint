@@ -45,12 +45,14 @@ defmodule EpicenterWeb.Form do
   def date_field(%Form.Line{f: f} = line, field, label_text, opts \\ []) do
     [
       label(f, field, label_text, data: grid_data(1, line, opts)),
-      content_tag(:div, "MM/DD/YYYY", data: grid_data(2, line, opts)),
+      content_tag(:div, date_explanation_text(opts), data: grid_data(2, line, opts)),
       error_tag(f, field, data: grid_data(3, line, opts)),
       text_input(f, field, data: grid_data(4, line, opts))
     ]
     |> add_to_line(line, opts)
   end
+
+  defp date_explanation_text(opts), do: Keyword.get(opts, :explanation_text, "MM/DD/YYYY")
 
   @doc "opts: span"
   def footer(%Form.Line{} = line, error_message, opts \\ []) do
