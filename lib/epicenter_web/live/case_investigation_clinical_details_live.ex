@@ -3,7 +3,9 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, ok: 1]
 
+  alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Format
   alias EpicenterWeb.Form
 
   defmodule ClinicalDetailsForm do
@@ -14,6 +16,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     @primary_key false
     embedded_schema do
       field :clinical_status, :string
+      field :symptom_onset_date, :string
     end
 
     @required_attrs ~w{}a
@@ -31,19 +34,29 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     def case_investigation_attrs(%CaseInvestigation{} = case_investigation) do
       case_investigation
       |> Map.from_struct()
+      |> assign_default_values(case_investigation)
+    end
+
+    defp assign_default_values(attrs_map, case_investigation) do
+      attrs_map
+      |> Map.put(:symptom_onset_date, Format.date(case_investigation.initiated_by.sampled_on))
     end
   end
 
-  def mount(%{"id" => _id}, _session, socket) do
+  def mount(%{"id" => id}, _session, socket) do
+    case_investigation = id |> Cases.get_case_investigation() |> Cases.preload_initiated_by()
+
+    # TODO user auth
     socket
     |> assign_page_title(" Case Investigation Clinical Details")
-    |> assign(:form_changeset, ClinicalDetailsForm.changeset(%CaseInvestigation{}))
+    |> assign(:form_changeset, ClinicalDetailsForm.changeset(case_investigation))
     |> ok()
   end
 
   def clinical_details_form_builder(form) do
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), span: 4))
+    |> Form.line(&Form.date_field(&1, :symptom_onset_date, "Symptom onset date*"))
     |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms(), span: 4))
     |> Form.safe()
   end

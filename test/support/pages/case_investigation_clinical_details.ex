@@ -1,7 +1,10 @@
 defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
   import ExUnit.Assertions
+  import Euclid.Test.Extra.Assertions, only: [assert_eq: 2]
+  import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
@@ -11,6 +14,16 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
 
   def assert_here(view_or_conn_or_html) do
     view_or_conn_or_html |> Pages.assert_on_page("case-investigation-clinical-details")
+  end
+
+  def assert_symptom_onset_date_value(%View{} = view, value) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.attr("#clinical_details_form_symptom_onset_date", "value")
+    |> assert_eq([value])
+
+    view
   end
 
   def assert_clinical_status_selection(%View{} = view, selections) do
