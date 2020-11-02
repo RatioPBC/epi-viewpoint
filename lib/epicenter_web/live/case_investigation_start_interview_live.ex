@@ -15,6 +15,8 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
     import Ecto.Changeset
 
+    alias EpicenterWeb.CaseInvestigationStartInterviewLive
+
     @primary_key false
     embedded_schema do
       field :person_interviewed, :string
@@ -49,11 +51,23 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       end
     end
 
-    def case_investigation_attrs(%StartInterviewForm{} = start_interview_form),
-      do: start_interview_form |> Map.from_struct() |> convert_name()
+    def case_investigation_attrs(%StartInterviewForm{} = start_interview_form) do
+      person_interviewed = convert_name(start_interview_form)
+      started_at = convert_time_started_and_date_started(start_interview_form)
+      %{person_interviewed: person_interviewed, started_at: started_at}
+    end
 
-    def convert_name(attrs) do
-      attrs |> Map.put(:person_interviewed, Map.get(attrs, :person_interviewed))
+    defp convert_name(attrs) do
+      Map.get(attrs, :person_interviewed)
+    end
+
+    defp convert_time_started_and_date_started(attrs) do
+      date = attrs |> Map.get(:date_started)
+      time = attrs |> Map.get(:time_started)
+      am_pm = attrs |> Map.get(:time_started_am_pm)
+      datetime = Timex.parse!("#{date} #{time} #{am_pm}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}")
+      timezone = Timex.timezone(CaseInvestigationStartInterviewLive.time_zone_name(), datetime)
+      Timex.to_datetime(datetime, timezone)
     end
   end
 
