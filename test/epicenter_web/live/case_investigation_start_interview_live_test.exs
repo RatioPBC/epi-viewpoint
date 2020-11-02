@@ -4,6 +4,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
+  import Phoenix.LiveViewTest
 
   setup :register_and_log_in_user
 
@@ -37,5 +38,69 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert "Alice's guardian" = case_investigation.person_interviewed
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.started_at
+  end
+
+  test "invalid times become errors", %{conn: conn, person: person, case_investigation: case_investigation} do
+    view =
+      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      |> Pages.submit_live("#case-investigation-interview-start-form",
+        start_interview_form: %{
+          "person_interviewed" => "Alice's guardian",
+          "date_started" => "09/06/2020",
+          "time_started" => "13:45",
+          "time_started_am_pm" => "PM"
+        }
+      )
+
+    assert_validation_messages(render(view), %{"start_interview_form_time_started" => "is invalid"})
+  end
+
+  test "invalid dates become errors", %{conn: conn, person: person, case_investigation: case_investigation} do
+    view =
+      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      |> Pages.submit_live("#case-investigation-interview-start-form",
+        start_interview_form: %{
+          "person_interviewed" => "Alice's guardian",
+          "date_started" => "09/32/2020",
+          "time_started" => "12:45",
+          "time_started_am_pm" => "PM"
+        }
+      )
+
+    assert_validation_messages(render(view), %{"start_interview_form_date_started" => "is invalid"})
+  end
+
+  test "daylight savings hour that doesn't exist becomes an error", %{conn: conn, person: person, case_investigation: case_investigation} do
+    view =
+      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      |> Pages.submit_live("#case-investigation-interview-start-form",
+        start_interview_form: %{
+          "person_interviewed" => "Alice's guardian",
+          "date_started" => "03/08/2020",
+          "time_started" => "02:10",
+          "time_started_am_pm" => "AM"
+        }
+      )
+
+    assert_validation_messages(render(view), %{"start_interview_form_time_started" => "is invalid"})
+  end
+
+  test "validates presence of all fields", %{conn: conn, person: person, case_investigation: case_investigation} do
+    view =
+      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      |> Pages.submit_live("#case-investigation-interview-start-form",
+        start_interview_form: %{
+          "person_interviewed" => "",
+          "date_started" => "",
+          "time_started" => "",
+          "time_started_am_pm" => "AM"
+        }
+      )
+
+    assert_validation_messages(render(view), %{
+      "start_interview_form_person_interviewed" => "can't be blank",
+      "start_interview_form_date_started" => "can't be blank",
+      "start_interview_form_time_started" => "can't be blank"
+    })
   end
 end

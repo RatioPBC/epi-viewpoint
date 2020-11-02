@@ -31,7 +31,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       do: person |> case_investigation_start_interview_form_attrs() |> changeset()
 
     def changeset(attrs),
-      do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs)
+      do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs) |> validate_interviewed_at()
 
     def case_investigation_start_interview_form_attrs(%Person{} = person) do
       local_now = Timex.now(EpicenterWeb.CaseInvestigationStartInterviewLive.time_zone_name())
@@ -53,7 +53,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
     def case_investigation_attrs(%StartInterviewForm{} = start_interview_form) do
       person_interviewed = convert_name(start_interview_form)
-      started_at = convert_time_started_and_date_started(start_interview_form)
+      {:ok, started_at} = convert_time_started_and_date_started(start_interview_form)
       %{person_interviewed: person_interviewed, started_at: started_at}
     end
 
@@ -65,9 +65,30 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
       date = attrs |> Map.get(:date_started)
       time = attrs |> Map.get(:time_started)
       am_pm = attrs |> Map.get(:time_started_am_pm)
-      datetime = Timex.parse!("#{date} #{time} #{am_pm}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}")
-      timezone = Timex.timezone(CaseInvestigationStartInterviewLive.time_zone_name(), datetime)
-      Timex.to_datetime(datetime, timezone)
+      convert_time(date, time, am_pm)
+    end
+
+    defp convert_time(datestring, timestring, ampmstring) do
+      with {:ok, datetime} <- Timex.parse("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"),
+           %Timex.TimezoneInfo{} = timezone <- Timex.timezone(CaseInvestigationStartInterviewLive.time_zone_name(), datetime),
+           %DateTime{} = time <- Timex.to_datetime(datetime, timezone) do
+        {:ok, time}
+      end
+    end
+
+    defp validate_interviewed_at(changeset) do
+      with {_, date} <- fetch_field(changeset, :date_started),
+           {_, time} <- fetch_field(changeset, :time_started),
+           {_, am_pm} <- fetch_field(changeset, :time_started_am_pm),
+           {:date_started, {:ok, _}} <- {:date_started, convert_time(date, "12:00", "PM")},
+           {:time_started, {:ok, _}} <- {:time_started, convert_time("01/01/2000", time, "PM")},
+           {:together, {:ok, _}} <- {:together, convert_time(date, time, am_pm)} do
+        changeset
+      else
+        {:together, _} -> changeset |> add_error(:time_started, "is invalid")
+        {field, _} -> changeset |> add_error(field, "is invalid")
+        _ -> changeset
+      end
     end
   end
 
