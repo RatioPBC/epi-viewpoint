@@ -51,7 +51,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   end
 
   def people_interviewed(person),
-    do: [Format.person(person)]
+    do: [{Format.person(person), StartInterviewForm.interview_non_proxy_sentinel_value()}]
 
   def time_started_am_pm_options(),
     do: ["AM", "PM"]

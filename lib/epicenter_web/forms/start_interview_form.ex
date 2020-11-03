@@ -3,7 +3,6 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
 
   import Ecto.Changeset
 
-  alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
   alias EpicenterWeb.Forms.StartInterviewForm
@@ -18,6 +17,7 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   end
 
   @required_attrs ~w{date_started person_interviewed time_started time_started_am_pm}a
+  @interview_non_proxy_sentinel_value "~~self~~"
 
   def changeset(%CaseInvestigation{} = case_investigation),
     do: case_investigation |> case_investigation_start_interview_form_attrs() |> changeset()
@@ -50,13 +50,13 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   end
 
   def case_investigation_attrs(%StartInterviewForm{} = start_interview_form) do
-    # is the name "~~~self~~~" ?
-    # if so, clear interview proxy name
-    # if not, set interview proxy name
     interview_proxy_name = convert_name(start_interview_form)
     {:ok, started_at} = convert_time_started_and_date_started(start_interview_form)
     %{interview_proxy_name: interview_proxy_name, started_at: started_at}
   end
+
+  defp convert_name(%{person_interviewed: @interview_non_proxy_sentinel_value} = _attrs),
+    do: nil
 
   defp convert_name(attrs),
     do: Map.get(attrs, :person_interviewed)
@@ -76,8 +76,11 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
     convert_time(date, time, am_pm)
   end
 
-  defp person_interviewed(%CaseInvestigation{interview_proxy_name: nil} = case_investigation),
-    do: case_investigation.person |> Cases.preload_demographics() |> Format.person()
+  def interview_non_proxy_sentinel_value(),
+    do: @interview_non_proxy_sentinel_value
+
+  defp person_interviewed(%CaseInvestigation{interview_proxy_name: nil}),
+    do: interview_non_proxy_sentinel_value()
 
   defp person_interviewed(%CaseInvestigation{interview_proxy_name: interview_proxy_name}),
     do: interview_proxy_name

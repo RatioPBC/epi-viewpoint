@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   import Phoenix.LiveView.Helpers
 
+  alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
   alias EpicenterWeb.PresentationConstants
@@ -31,10 +32,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       if case_investigation.started_at do
         [
           %{
-            text:
-              "Started interview #{if(case_investigation.interview_proxy_name, do: "with #{case_investigation.interview_proxy_name} ")} on #{
-                case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
-              }",
+            text: "Started interview with #{with_interviewee_name(case_investigation)} on #{interview_start_date(case_investigation)}",
             link:
               live_redirect(
                 "Edit",
@@ -83,9 +81,11 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     items |> Enum.reverse()
   end
 
-  defp convert_to_presented_time_zone(datetime) do
-    DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
-  end
+  defp convert_to_presented_time_zone(datetime),
+    do: DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
+
+  defp interview_start_date(case_investigation),
+    do: case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
 
   defp redirect_to(case_investigation, :start_interview) do
     live_redirect("Start interview",
@@ -102,4 +102,10 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       class: "discontinue-case-investigation-link"
     )
   end
+
+  defp with_interviewee_name(%CaseInvestigation{interview_proxy_name: nil} = case_investigation),
+    do: case_investigation |> Cases.preload_person() |> Map.get(:person) |> Cases.preload_demographics() |> Format.person()
+
+  defp with_interviewee_name(%CaseInvestigation{interview_proxy_name: interview_proxy_name}),
+    do: "proxy #{interview_proxy_name}"
 end

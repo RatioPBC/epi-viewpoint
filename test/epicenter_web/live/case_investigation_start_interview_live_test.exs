@@ -19,6 +19,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.CaseInvestigationStartInterview.assert_here()
     |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_selections(%{"Alice Testuser" => true, "Proxy" => false})
+    |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_sentinel_value("~~self~~")
     |> Pages.CaseInvestigationStartInterview.assert_date_started(:today)
     |> Pages.CaseInvestigationStartInterview.assert_time_started(:now)
   end
@@ -37,7 +38,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     |> Pages.CaseInvestigationStartInterview.assert_date_started("01/01/2020")
   end
 
-  test "saving start case investigation form", %{conn: conn, person: person, case_investigation: case_investigation} do
+  test "saving start case investigation form with proxy interviewee", %{conn: conn, person: person, case_investigation: case_investigation} do
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
       start_interview_form: %{
@@ -48,10 +49,48 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
       }
     )
     |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.assert_case_investigation_has_history("Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT")
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert "Alice's guardian" = case_investigation.interview_proxy_name
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.started_at
+  end
+
+  test "saving start case investigation form with case interviewee", %{conn: conn, person: person, case_investigation: case_investigation} do
+    Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
+      start_interview_form: %{
+        "person_interviewed" => "~~self~~",
+        "date_started" => "09/06/2020",
+        "time_started" => "03:45",
+        "time_started_am_pm" => "PM"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.assert_case_investigation_has_history("Started interview with Alice Testuser on 09/06/2020 at 03:45pm EDT")
+
+    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    assert case_investigation.interview_proxy_name == nil
+  end
+
+  test "saving start case investigation form with proxy interviewee having the same name as case interviewee", %{
+    conn: conn,
+    person: person,
+    case_investigation: case_investigation
+  } do
+    Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
+      start_interview_form: %{
+        "person_interviewed" => "Alice Testuser",
+        "date_started" => "09/06/2020",
+        "time_started" => "03:45",
+        "time_started_am_pm" => "PM"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    assert case_investigation.interview_proxy_name == "Alice Testuser"
   end
 
   test "invalid times become errors", %{conn: conn, case_investigation: case_investigation} do

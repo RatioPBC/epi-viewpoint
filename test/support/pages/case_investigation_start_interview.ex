@@ -42,6 +42,18 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
     view
   end
 
+  def assert_person_interviewed_sentinel_value(%View{} = view, expected_value) do
+    [actual] =
+      view
+      |> Pages.parse()
+      |> Test.Html.find("input#start_interview_form_person_interviewed___self__[type=radio]")
+      |> Test.Html.attr("value")
+
+    assert actual == expected_value
+
+    view
+  end
+
   def assert_proxy_selected(%View{} = view, expected_proxy_name) do
     assert %{"Proxy" => true} = Pages.actual_selections(view, "start-interview-form-person-interviewed", "radio")
 
