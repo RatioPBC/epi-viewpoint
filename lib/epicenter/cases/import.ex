@@ -228,10 +228,6 @@ defmodule Epicenter.Cases.Import do
       |> strip_updates_to_existing_data(person)
       |> in_audit_tuple(originator, AuditLog.Revision.upsert_person_action())
 
-    # %{
-    #   "demographics" => person.demographics ++ [new_demographic]
-    # }
-
     if person do
       Cases.update_person(person, attrs)
     else
