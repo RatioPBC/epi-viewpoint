@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source "bin/_support/cecho.sh"
+source "bin/_support/check.sh"
 source "bin/_support/step.sh"
 
 start() {
@@ -10,6 +11,15 @@ start() {
 case $1 in
 fast | no-doctor)
   start
+  ;;
+docker)
+  for file in STAR_network_geometer_dev.key STAR_network_geometer_dev.pem STAR_network_geometer_dev_bundle.pem; do
+    check "${file} exists in ./tmp/ssl" \
+      "test -f ./tmp/ssl/${file}" \
+      "# copy ${file} into ./tmp/ssl/ from 'Certificates' vault in 1Password"
+  done
+
+  docker-compose up
   ;;
 *)
   step_header "Running doctor" "./bin/dev/doctor" "(you can skip by running “${0} fast“)"
