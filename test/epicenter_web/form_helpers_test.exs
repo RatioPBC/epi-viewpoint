@@ -39,7 +39,7 @@ defmodule EpicenterWeb.FormHelpersTest do
 
   describe "checkbox_list" do
     test "returns a rendered checkbox list", %{form: form} do
-      FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], id: "genre-list")
+      FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], [], id: "genre-list")
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
         <label data-role="movie-genres">\v
@@ -67,7 +67,7 @@ defmodule EpicenterWeb.FormHelpersTest do
       form = Phoenix.HTML.FormData.to_form(changeset, [])
       genres = [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}, {"Science Fiction", "sci_fi"}]
 
-      FormHelpers.checkbox_list(form, :genres, genres, id: "genre-list")
+      FormHelpers.checkbox_list(form, :genres, genres, [], id: "genre-list")
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
         <label data-role="movie-genres">\v
@@ -94,7 +94,7 @@ defmodule EpicenterWeb.FormHelpersTest do
       changeset = Changeset.change(%Movie{genres: nil})
       form = Phoenix.HTML.FormData.to_form(changeset, [])
 
-      FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], id: "genre-list")
+      FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], [], id: "genre-list")
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
         <label data-role="movie-genres">\v

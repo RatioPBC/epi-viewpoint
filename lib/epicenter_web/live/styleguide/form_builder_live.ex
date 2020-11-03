@@ -81,7 +81,7 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
     end)
     |> Form.line(fn line ->
       line
-      |> Form.checkbox_list(:genres, "Genres", genres())
+      |> Form.checkbox_list(:genres, "Genres", genres(), other: "Other genres")
       |> Form.radio_button_list(:language, "Language", languages(), other: "Other")
     end)
     |> Form.line(&Form.textarea_field(&1, :notes, "Notes", span: 4))

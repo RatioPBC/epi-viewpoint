@@ -7,14 +7,12 @@ defmodule EpicenterWeb.FormHelpers do
   Returns an HTML element that contains a list of checkboxes to be used as a multi-select for a single form field.
   Automatically marks the appropriate checkboxes as checked based on the values in the form data.
   """
-  def checkbox_list(form, field, values, html_opts \\ []) when is_list(values) do
-    opts = [class: "checkbox-list"] |> Keyword.merge(html_opts)
+  def checkbox_list(form, field, values, opts \\ [], html_opts \\ []) when is_list(values) do
+    html_opts = [class: "checkbox-list"] |> Keyword.merge(html_opts)
     other = opts |> Keyword.get(:other)
     other_checkbox_and_text_field = checkbox_and_text_field(form, field, other, values)
-    opts = Keyword.delete(opts, :other)
-    opts = Keyword.delete(opts, :span)
 
-    content_tag :div, opts do
+    content_tag :div, html_opts do
       checkboxes(form, field, values) ++ List.wrap(other_checkbox_and_text_field)
     end
   end
