@@ -52,6 +52,29 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     assert_datetime_approximate(case_investigation.discontinued_at, DateTime.utc_now(), 2)
   end
 
+  test "reasons for discontinuing are different between case investigation that have started and those that have not", %{
+    conn: conn,
+    case_investigation: case_investigation
+  } do
+    view = Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
+    assert preset_reasons(view) == ["Deceased", "Transferred to another jurisdiction", "Unable to reach"]
+
+    {:ok, case_investigation} =
+      Cases.update_case_investigation(case_investigation, {%{started_at: NaiveDateTime.utc_now()}, Test.Fixtures.admin_audit_meta()})
+
+    view = Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
+
+    assert preset_reasons(view) == ["Refused to cooperate", "Lost to follow up", "Transferred to another jurisdiction", "Deceased"]
+  end
+
+  defp preset_reasons(view) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.all("[name='case_investigation[discontinue_reason]']", fn element -> Test.Html.attr(element, "value") |> List.first() end)
+    |> Enum.reject(&Euclid.Exists.blank?/1)
+  end
+
   test "discontinuing requires a reason", %{conn: conn, case_investigation: case_investigation} do
     view =
       Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
