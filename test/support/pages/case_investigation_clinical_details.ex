@@ -17,11 +17,17 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
   end
 
   def assert_symptom_onset_date_value(%View{} = view, value) do
-    view
-    |> render()
-    |> Test.Html.parse()
+    html =
+      view
+      |> render()
+      |> Test.Html.parse()
+
+    html
     |> Test.Html.attr("#clinical_details_form_symptom_onset_date", "value")
     |> assert_eq([value])
+
+    assert html |> Test.Html.text("#case-investigation-clinical-details") =~
+             "If asymptomatic, date of first positive test (#{value})"
 
     view
   end

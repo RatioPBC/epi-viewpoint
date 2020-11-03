@@ -50,14 +50,17 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     socket
     |> assign_page_title(" Case Investigation Clinical Details")
     |> assign(:form_changeset, ClinicalDetailsForm.changeset(case_investigation))
+    |> assign(:case_investigation, case_investigation)
     |> ok()
   end
 
-  def clinical_details_form_builder(form) do
+  def clinical_details_form_builder(form, case_investigation) do
+    symptom_onset_date_explanation_text = "If asymptomatic, date of first positive test (#{Format.date(case_investigation.initiated_by.sampled_on)})"
+
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), span: 4))
-    |> Form.line(&Form.date_field(&1, :symptom_onset_date, "Symptom onset date*"))
-    |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms(), span: 4))
+    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), span: 5))
+    |> Form.line(&Form.date_field(&1, :symptom_onset_date, "Symptom onset date*", explanation_text: symptom_onset_date_explanation_text, span: 5))
+    |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms(), span: 5))
     |> Form.safe()
   end
 

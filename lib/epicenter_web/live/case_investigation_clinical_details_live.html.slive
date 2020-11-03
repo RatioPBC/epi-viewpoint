@@ -2,4 +2,4 @@
 
   section#case-investigation-clinical-details
     = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
-      = clinical_details_form_builder(f)
+      = clinical_details_form_builder(f, @case_investigation)
