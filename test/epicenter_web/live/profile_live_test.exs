@@ -193,7 +193,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_start_interview_case_investigation("001")
-      |> assert_redirects_to("/people/#{person.id}/case_investigations/#{case_investigation.id}/start_interview")
+      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/start_interview")
     end
 
     test "navigating to discontinue a case investigation", %{conn: conn, person: person, user: user} do

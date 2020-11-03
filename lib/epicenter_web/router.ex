@@ -51,9 +51,7 @@ defmodule EpicenterWeb.Router do
     live "/people", PeopleLive, as: :people
     live "/people/:id", ProfileLive, as: :profile
 
-    live "/people/:id/case_investigations/:case_investigation_id/start_interview", CaseInvestigationStartInterviewLive,
-      as: :case_investigation_start_interview
-
+    live "/case_investigations/:id/start_interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
     live "/case_investigations/:id/clinical_details", CaseInvestigationClinicalDetailsLive, as: :case_investigation_clinical_details
 
     live "/people/:id/case_investigations/:case_investigation_id/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue

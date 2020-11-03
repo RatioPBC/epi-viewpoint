@@ -15,8 +15,8 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     [case_investigation: case_investigation, person: person, user: user]
   end
 
-  test "shows start case investigation form", %{conn: conn, person: person, case_investigation: case_investigation} do
-    Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+  test "shows start case investigation form", %{conn: conn, case_investigation: case_investigation} do
+    Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.CaseInvestigationStartInterview.assert_here()
     |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_selections(%{"Alice Testuser" => false, "Proxy" => false})
     |> Pages.CaseInvestigationStartInterview.assert_date_started(:today)
@@ -24,7 +24,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
   end
 
   test "saving start case investigation form", %{conn: conn, person: person, case_investigation: case_investigation} do
-    Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+    Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
       start_interview_form: %{
         "person_interviewed" => "Alice's guardian",
@@ -40,9 +40,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.started_at
   end
 
-  test "invalid times become errors", %{conn: conn, person: person, case_investigation: case_investigation} do
+  test "invalid times become errors", %{conn: conn, case_investigation: case_investigation} do
     view =
-      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-interview-start-form",
         start_interview_form: %{
           "person_interviewed" => "Alice's guardian",
@@ -52,12 +52,12 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
         }
       )
 
-    assert_validation_messages(render(view), %{"start_interview_form_time_started" => "is invalid"})
+    view |> render() |> assert_validation_messages(%{"start_interview_form_time_started" => "is invalid"})
   end
 
-  test "invalid dates become errors", %{conn: conn, person: person, case_investigation: case_investigation} do
+  test "invalid dates become errors", %{conn: conn, case_investigation: case_investigation} do
     view =
-      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-interview-start-form",
         start_interview_form: %{
           "person_interviewed" => "Alice's guardian",
@@ -67,12 +67,12 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
         }
       )
 
-    assert_validation_messages(render(view), %{"start_interview_form_date_started" => "is invalid"})
+    view |> render() |> assert_validation_messages(%{"start_interview_form_date_started" => "is invalid"})
   end
 
-  test "daylight savings hour that doesn't exist becomes an error", %{conn: conn, person: person, case_investigation: case_investigation} do
+  test "daylight savings hour that doesn't exist becomes an error", %{conn: conn, case_investigation: case_investigation} do
     view =
-      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-interview-start-form",
         start_interview_form: %{
           "person_interviewed" => "Alice's guardian",
@@ -82,12 +82,12 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
         }
       )
 
-    assert_validation_messages(render(view), %{"start_interview_form_time_started" => "is invalid"})
+    view |> render() |> assert_validation_messages(%{"start_interview_form_time_started" => "is invalid"})
   end
 
-  test "validates presence of all fields", %{conn: conn, person: person, case_investigation: case_investigation} do
+  test "validates presence of all fields", %{conn: conn, case_investigation: case_investigation} do
     view =
-      Pages.CaseInvestigationStartInterview.visit(conn, person, case_investigation)
+      Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-interview-start-form",
         start_interview_form: %{
           "person_interviewed" => "",
@@ -97,7 +97,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
         }
       )
 
-    assert_validation_messages(render(view), %{
+    view
+    |> render()
+    |> assert_validation_messages(%{
       "start_interview_form_person_interviewed" => "can't be blank",
       "start_interview_form_date_started" => "can't be blank",
       "start_interview_form_time_started" => "can't be blank"
