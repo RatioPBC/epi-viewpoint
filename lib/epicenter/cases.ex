@@ -34,6 +34,9 @@ defmodule Epicenter.Cases do
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
   def preload_person(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:person)
 
+  def preload_case_investigations(person_or_people_or_nil),
+    do: person_or_people_or_nil |> Repo.preload(case_investigations: CaseInvestigation.Query.display_order())
+
   def update_case_investigation(%CaseInvestigation{} = case_investigation, {attrs, audit_meta}),
     do: case_investigation |> change_case_investigation(attrs) |> AuditLog.update(audit_meta)
 
@@ -82,10 +85,6 @@ defmodule Epicenter.Cases do
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
   def list_people(:with_lab_results), do: Person.Query.with_lab_results() |> Repo.all()
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
-
-  def preload_case_investigations(person_or_people_or_nil),
-    do: person_or_people_or_nil |> Repo.preload(case_investigations: CaseInvestigation.Query.display_order())
-
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
 
