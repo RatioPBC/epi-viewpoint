@@ -5,6 +5,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
+  import Epicenter.Test.RevisionAssertions
+
   setup :register_and_log_in_user
 
   setup %{user: user} do
@@ -26,7 +28,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       "Asymptomatic" => false
     })
     |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_explanation_text("08/06/2020")
-    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_has_no_value()
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_value("")
     |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
       "Fever > 100.4F" => false,
       "Subjective fever (felt feverish)" => false,
@@ -43,6 +45,26 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       "Loss of sense of smell" => false,
       "Loss of sense of taste" => false,
       "Fatigue" => false
+    })
+  end
+
+  test "saving clinical details", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
+      clinical_details_form: %{
+        "clinical_status" => "symptomatic",
+        "symptom_onset_date" => "09/06/2020",
+        "symptoms" => ["fever", "chills"]
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    assert_revision_count(case_investigation, 2)
+
+    assert_recent_audit_log(case_investigation, user, %{
+      clinical_status: "symptomatic",
+      symptom_onset_date: "2020-09-06",
+      symptoms: ["fever", "chills"]
     })
   end
 end

@@ -41,6 +41,9 @@ defmodule Epicenter.Cases do
   def preload_initiated_by(case_investigations_or_nil),
     do: case_investigations_or_nil |> Repo.preload(:initiated_by)
 
+  def preload_person(case_investigations_or_nil),
+    do: case_investigations_or_nil |> Repo.preload(:person)
+
   #
   # people
   #

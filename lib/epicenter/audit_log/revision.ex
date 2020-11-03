@@ -62,6 +62,7 @@ defmodule Epicenter.AuditLog.Revision do
   def admin_create_user_event, do: "admin-create-user"
   def admin_update_user_event, do: "admin-update-user"
   def discontinue_pending_case_interview_event(), do: "update-user-email"
+  def edit_case_interview_clinical_details_event(), do: "edit-case-investigation-clinical-details"
   def edit_profile_demographics_event(), do: "edit-profile-demographics"
   def people_selected_assignee_event(), do: "people-selected-assignee"
   def profile_selected_assignee_event(), do: "profile-selected-assignee"

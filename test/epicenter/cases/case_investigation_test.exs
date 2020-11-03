@@ -16,6 +16,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       assert_schema(
         CaseInvestigation,
         [
+          {:clinical_status, :string},
           {:discontinue_reason, :string},
           {:discontinued_at, :utc_datetime},
           {:id, :id},
@@ -26,6 +27,8 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:person_interviewed, :string},
           {:started_at, :utc_datetime},
           {:seq, :integer},
+          {:symptom_onset_date, :date},
+          {:symptoms, :array},
           {:tid, :string},
           {:updated_at, :naive_datetime}
         ]
