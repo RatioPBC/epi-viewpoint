@@ -71,8 +71,9 @@
 
       .case-investigation-history
         = for history_item <- history_items(case_investigation) do
-          span data-role="case-investigation-history-item-text" = history_item.text
-          span class="history-item-link" = history_item.link
+          div
+            span data-role="case-investigation-history-item-text" = history_item.text
+            span class="history-item-link" = history_item.link
 
   section#lab-results data-role="lab-results"
     header
