@@ -123,7 +123,8 @@ defmodule EpicenterWeb.FormHelpers do
     do: nil
 
   # A radio button, plus an associated text field that is visible only when the radio button is checked
-  defp radio_button_and_text_field(form, field, label_text, predefined_values) do
+  defp radio_button_and_text_field(form, field, label_text, predefined_values_or_tuples) do
+    predefined_values = predefined_values(predefined_values_or_tuples)
     input_value = input_value(form, field)
     other_selected? = input_value not in predefined_values and input_value != nil
     other_value = if other_selected?, do: input_value, else: ""
@@ -136,6 +137,9 @@ defmodule EpicenterWeb.FormHelpers do
       ]
     end
   end
+
+  defp predefined_values([{_, _} | _] = values), do: values |> Enum.map(&Kernel.elem(&1, 1))
+  defp predefined_values(values), do: values
 
   defp input_list_label_role(form, field),
     do: [form.name, Atom.to_string(field)] |> Enum.map(&String.replace(&1, "_", "-")) |> Enum.join("-")

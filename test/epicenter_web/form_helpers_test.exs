@@ -182,6 +182,30 @@ defmodule EpicenterWeb.FormHelpersTest do
       """)
     end
 
+    test "optionally includes an 'other' option with an associated text input, with a list predefined values and differing labels" do
+      changeset = Changeset.change(%Movie{language: "english"})
+      form = Phoenix.HTML.FormData.to_form(changeset, [])
+
+      FormHelpers.radio_button_list(form, :language, [{"English", "english"}, {"Italian", "italiano"}], [other: "Other"], id: "language-list")
+      |> assert_html_eq("""
+      <div class="radio-button-list" id="language-list">
+        <label data-role="movie-language">\v
+          <input id="movie_language_" name="movie[language]" type="radio" value=""/>\v
+          Other\v
+          <input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="">\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_italiano" name="movie[language]" type="radio" value="italiano"/>\v
+          Italian\v
+        </label>
+        <label data-role="movie-language">\v
+          <input id="movie_language_english" name="movie[language]" type="radio" value="english" checked="checked"/>\v
+          English\v
+          </label>
+      </div>
+      """)
+    end
+
     test "renders radio buttons with differing label text and input values" do
       changeset = Changeset.change(%Movie{language: "deutsch"})
       form = Phoenix.HTML.FormData.to_form(changeset, [])
