@@ -29,9 +29,10 @@ defmodule EpicenterWeb.FormHelpers do
     label(data: [role: input_list_label_role(form, field)]) do
       [
         checkbox(form, field,
-          name: checkbox_list_input_name(form, field),
+          name: "ignore-me",
           checked: other_selected?,
           checked_value: nil,
+          value: nil,
           hidden_input: false
         ),
         label_text,

@@ -65,4 +65,10 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
 
     view
   end
+
+  def change_form(view, attrs) do
+    view |> element("#case-investigation-clinical-details-form") |> render_change(attrs)
+
+    view
+  end
 end

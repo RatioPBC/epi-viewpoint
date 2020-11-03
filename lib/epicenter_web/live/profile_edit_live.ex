@@ -348,7 +348,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   def confirmation_prompt(nil), do: nil
 
   def confirmation_prompt(changeset) do
-    if changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text()
+    if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
   end
 
   defp update_if_present(map, field, func) do

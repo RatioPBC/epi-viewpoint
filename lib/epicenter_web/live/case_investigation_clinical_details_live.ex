@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
@@ -26,22 +28,14 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     @required_attrs ~w{}a
     @optional_attrs ~w{clinical_status symptom_onset_date symptoms}a
 
-    def changeset(%CaseInvestigation{} = case_investigation) do
-      case_investigation |> case_investigation_form_attrs() |> changeset()
-    end
-
-    def changeset(attrs) do
-      %ClinicalDetailsForm{}
-      |> cast(attrs, @required_attrs ++ @optional_attrs)
-      |> Validation.validate_date(:symptom_onset_date)
-    end
-
-    def case_investigation_form_attrs(%CaseInvestigation{} = case_investigation) do
-      %{
+    def changeset(%CaseInvestigation{} = case_investigation, attrs \\ %{}) do
+      %ClinicalDetailsForm{
         clinical_status: case_investigation.clinical_status,
         symptoms: case_investigation.symptoms,
         symptom_onset_date: Format.date(case_investigation.symptom_onset_date)
       }
+      |> cast(attrs, @required_attrs ++ @optional_attrs)
+      |> Validation.validate_date(:symptom_onset_date)
     end
 
     def case_investigation_attrs(%Ecto.Changeset{} = changeset) do
@@ -75,6 +69,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     |> assign_page_title(" Case Investigation Clinical Details")
     |> assign(:form_changeset, ClinicalDetailsForm.changeset(case_investigation))
     |> assign(:case_investigation, case_investigation)
+    |> assign(:confirmation_prompt, nil)
     |> ok()
   end
 
@@ -118,18 +113,19 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     ]
   end
 
+  def handle_event("change", %{"clinical_details_form" => params}, socket) do
+    socket |> assign(:form_changeset, ClinicalDetailsForm.changeset(socket.assigns.case_investigation, params)) |> noreply()
+  end
+
   def handle_event("save", %{"clinical_details_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- ClinicalDetailsForm.changeset(params),
+    with %Ecto.Changeset{} = form_changeset <-
+           ClinicalDetailsForm.changeset(socket.assigns.case_investigation, Map.put_new(params, "symptoms", [])),
          {:form, {:ok, cast_investigation_attrs}} <- {:form, ClinicalDetailsForm.case_investigation_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, cast_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
-      # TODO: Error handling
     else
       {:form, {:error, form_changeset}} ->
         socket |> assign(:form_changeset, form_changeset) |> noreply()
-        #
-        #      {:case_investigation, {:error, _}} ->
-        #        socket |> assign_form_changeset(ClinicalDetailsForm.changeset(params), "An unexpected error occurred") |> noreply()
     end
   end
 
@@ -148,5 +144,11 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   defp redirect_to_profile_page(socket) do
     person = socket.assigns.case_investigation.person
     socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, person)}#case-investigations")
+  end
+
+  # # #
+
+  def confirmation_prompt(changeset) do
+    if changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text()
   end
 end
