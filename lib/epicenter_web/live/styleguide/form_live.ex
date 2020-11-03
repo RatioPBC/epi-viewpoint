@@ -2,6 +2,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
   use EpicenterWeb, :live_view
 
   import Epicenter.Validation, only: [validate_date: 2]
+  import EpicenterWeb.FormHelpers, only: [checkbox_list: 4, radio_button_list: 5]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
 

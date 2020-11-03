@@ -89,7 +89,6 @@ defmodule EpicenterWeb do
       import Phoenix.View
 
       import EpicenterWeb.ErrorHelpers
-      import EpicenterWeb.FormHelpers
       import EpicenterWeb.Gettext
       alias EpicenterWeb.Router.Helpers, as: Routes
     end
