@@ -66,7 +66,7 @@ defmodule Epicenter.Cases.Import do
 
         with {:ok, rows} <- Csv.read(file.contents, &rename_headers/1, @fields),
              {:transform_dates, {:ok, rows}} <- {:transform_dates, transform_dates(rows)},
-             rows = reject_rows_with_blank_key_values(rows, "dob") do
+             rows = {rows, []} do
           case import_rows(rows, originator) do
             {:ok, import_info} -> import_info
             {:error, other} -> Repo.rollback(other)

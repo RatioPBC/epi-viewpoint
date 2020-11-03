@@ -12,6 +12,8 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.Phone
   alias Epicenter.Repo
 
+  import Ecto.Query, only: [distinct: 3, first: 1]
+
   #
   # lab results
   #
@@ -72,11 +74,18 @@ defmodule Epicenter.Cases do
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)
   def create_person({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert(audit_meta)
 
-  def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name}) do
-    with %Demographic{} = demographic <- Demographic.Query.matching(dob: dob, first_name: first_name, last_name: last_name) |> Repo.one() do
-      Repo.preload(demographic, [:person]).person
-    end
+  def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name})
+      when not is_nil(dob) and not is_nil(first_name) and not is_nil(last_name) do
+    Person
+    |> Person.Query.with_demographic_field(:dob, dob)
+    |> Person.Query.with_demographic_field(:first_name, first_name)
+    |> Person.Query.with_demographic_field(:last_name, last_name)
+    |> distinct([p], p.id)
+    |> first()
+    |> Repo.one()
   end
+
+  def find_matching_person(_), do: nil
 
   def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)

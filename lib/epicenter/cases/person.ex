@@ -144,6 +144,10 @@ defmodule Epicenter.Cases.Person do
         where: lab_result.sampled_on > ^fifteen_days_ago
     end
 
+    def with_demographic_field(query, field, value) do
+      query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
+    end
+
     @fields_to_replace_from_csv ~w{updated_at}a
     def opts_for_upsert() do
       [returning: true, on_conflict: {:replace, @fields_to_replace_from_csv}, conflict_target: :fingerprint]

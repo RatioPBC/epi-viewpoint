@@ -376,6 +376,40 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_role_text(page_live, "employment", "Part time")
       assert_role_text(page_live, "occupation", "architect")
       assert_role_text(page_live, "notes", "lorem ipsum")
+      assert_role_text(page_live, "date-of-birth", "01/01/2000")
+    end
+
+    test "showing person demographics when information is missing", %{conn: conn, person: person, user: user} do
+      person_attrs =
+        Test.Fixtures.add_demographic_attrs(%{tid: "profile-live-person"}, %{
+          id: Euclid.Extra.List.only!(person.demographics).id,
+          dob: nil,
+          notes: nil,
+          occupation: nil,
+          employment: nil,
+          marital_status: nil,
+          ethnicity: nil,
+          race: nil,
+          sex_at_birth: nil,
+          gender_identity: [],
+          first_name: nil,
+          last_name: nil,
+          preferred_language: nil
+        })
+
+      {:ok, _} = Cases.update_person(person, {person_attrs, Test.Fixtures.audit_meta(user)})
+
+      {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
+
+      assert_role_text(page_live, "gender-identity", "")
+      assert_role_text(page_live, "sex-at-birth", "")
+      assert_role_text(page_live, "major-ethnicity", "Unknown")
+      assert_role_text(page_live, "race", "")
+      assert_role_text(page_live, "marital-status", "Unknown")
+      assert_role_text(page_live, "employment", "Unknown")
+      assert_role_text(page_live, "occupation", "")
+      assert_role_text(page_live, "notes", "")
+      assert_role_text(page_live, "date-of-birth", "Unknown")
     end
 
     @tag :skip

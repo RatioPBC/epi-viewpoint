@@ -34,7 +34,7 @@
           th Phone
           th Email
         tr
-          td data-role="date-of-birth"= Format.date(demographic_field(@person, :dob))
+          td data-role="date-of-birth"= string_or_unknown(with(dob when not is_nil(dob) <- demographic_field(@person, :dob), do: Format.date(dob)))
           td data-role="preferred-language"= string_or_unknown(demographic_field(@person, :preferred_language))
           td data-role="phone-numbers"= list_or_unknown(phone_numbers(@person))
           td data-role="email-addresses"= list_or_unknown(email_addresses(@person))

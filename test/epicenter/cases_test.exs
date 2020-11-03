@@ -298,6 +298,23 @@ defmodule Epicenter.CasesTest do
       refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
     end
 
+    test "find_matching_person finds a person with their dob, first_name, and last_name spread accross three records" do
+      dob = ~D[2000-01-01]
+
+      person =
+        Test.Fixtures.person_attrs(@admin, "alice")
+        |> (fn {attrs, meta} -> {Map.put(attrs, :demographics, [%{first_name: "Firsty"}, %{last_name: "Testuser"}, %{dob: dob}]), meta} end).()
+        |> Cases.create_person!()
+
+      match = Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testuser", "dob" => dob})
+
+      assert match.id == person.id
+
+      refute Cases.find_matching_person(%{"first_name" => "billy", "last_name" => "Testuser", "dob" => dob})
+      refute Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testy", "dob" => dob})
+      refute Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
+    end
+
     test "create_demographic/2" do
       person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
 
