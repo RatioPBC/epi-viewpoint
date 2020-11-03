@@ -23,6 +23,21 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     |> Pages.CaseInvestigationStartInterview.assert_time_started(:now)
   end
 
+  test "prefills with existing data when existing data is available", %{conn: conn, case_investigation: case_investigation} do
+    {:ok, _} =
+      Cases.update_case_investigation(
+        case_investigation,
+        {%{started_at: ~N[2020-01-01 23:03:07], person_interviewed: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    view =
+      Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationStartInterview.assert_here()
+
+    assert %{"start_interview_form[person_interviewed]" => "Jackson Publick"} = Pages.form_state(view)
+    assert ~N[2020-01-01 18:03:00] = Pages.CaseInvestigationStartInterview.datetime_started(view)
+  end
+
   test "saving start case investigation form", %{conn: conn, person: person, case_investigation: case_investigation} do
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",

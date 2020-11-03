@@ -48,4 +48,14 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
     assert actual_am_pm in ~w{AM PM}
     view
   end
+
+  def datetime_started(%View{} = view) do
+    state = view |> Pages.form_state()
+
+    datestring = state["start_interview_form[date_started]"]
+    timestring = state["start_interview_form[time_started]"]
+    ampmstring = state["start_interview_form[time_started_am_pm]"]
+
+    Timex.parse!("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}")
+  end
 end

@@ -1,25 +1,57 @@
 defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   import Phoenix.LiveView.Helpers
 
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
   alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 
   def interview_buttons(case_investigation) do
-    case case_investigation.discontinue_reason do
-      nil ->
+    case CaseInvestigation.status(case_investigation) do
+      :pending ->
         [
           redirect_to(case_investigation, :start_interview),
           redirect_to(case_investigation, :discontinue_interview)
         ]
 
-      _ ->
+      :started ->
+        [
+          redirect_to(case_investigation, :discontinue_interview)
+        ]
+
+      :discontinued ->
         []
     end
   end
 
   def history_items(case_investigation) do
     items = []
+
+    items =
+      if case_investigation.started_at do
+        [
+          %{
+            text:
+              "Started interview #{if(case_investigation.person_interviewed, do: "with #{case_investigation.person_interviewed} ")} on #{
+                case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+              }",
+            link:
+              live_redirect(
+                "Edit",
+                to:
+                  Routes.case_investigation_start_interview_path(
+                    EpicenterWeb.Endpoint,
+                    EpicenterWeb.CaseInvestigationStartInterviewLive,
+                    case_investigation
+                  ),
+                class: "case-investigation-link"
+              )
+          }
+          | items
+        ]
+      else
+        items
+      end
 
     items =
       if case_investigation.discontinue_reason != nil do
@@ -48,7 +80,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
         items
       end
 
-    items
+    items |> Enum.reverse()
   end
 
   defp convert_to_presented_time_zone(datetime) do

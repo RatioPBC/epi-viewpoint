@@ -93,7 +93,7 @@ defmodule EpicenterWeb.UserLiveTest do
                "user_form[email]" => "existinguser@example.com",
                "user_form[type]" => "member",
                "user_form[status]" => "active"
-             } = form_state(view)
+             } = Pages.form_state(view)
 
       subject_user =
         Epicenter.AccountsFixtures.user_fixture(%{
@@ -111,7 +111,7 @@ defmodule EpicenterWeb.UserLiveTest do
                "user_form[email]" => "existinguser2@example.com",
                "user_form[type]" => "admin",
                "user_form[status]" => "inactive"
-             } = form_state(view)
+             } = Pages.form_state(view)
     end
 
     test "works", %{conn: conn} do
@@ -146,25 +146,5 @@ defmodule EpicenterWeb.UserLiveTest do
 
       assert Accounts.get_user(email: "existinguser@example.com") == nil
     end
-  end
-
-  def form_state(view) do
-    parsed = Pages.parse(view)
-
-    inputs =
-      parsed
-      |> Epicenter.Test.Html.all("input", fn input ->
-        {Test.Html.attr(input, "name") |> List.first(), Test.Html.attr(input, "value") |> List.first()}
-      end)
-      |> Map.new()
-
-    selects =
-      parsed
-      |> Epicenter.Test.Html.all("select", fn input ->
-        {Test.Html.attr(input, "name") |> List.first(), Test.Html.find(input, "option[selected]") |> Test.Html.attr("value") |> List.first()}
-      end)
-      |> Map.new()
-
-    Map.merge(inputs, selects)
   end
 end

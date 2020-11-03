@@ -74,6 +74,36 @@ defmodule EpicenterWeb.Test.Pages do
   def form_errors(conn),
     do: conn |> parse() |> Test.Html.all("[data-form-error-message]", attr: "data-form-error-message")
 
+  def form_state(%View{} = view) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.all("[name]", fn thing -> thing end)
+    |> Enum.filter(fn
+      {tag, _attrs, _children} when tag in ["select", "textarea"] ->
+        true
+
+      {"input", _attrs, _children} = element ->
+        type = element |> Test.Html.attr("type") |> List.first()
+        checked = element |> Test.Html.attr("checked") |> List.first()
+        type != "radio" || checked == "checked"
+
+      _ ->
+        false
+    end)
+    |> Enum.reduce(%{}, fn
+      {"select", _attrs, _children} = element, acc ->
+        acc
+        |> Map.put(
+          Test.Html.attr(element, "name") |> List.first(),
+          Test.Html.find(element, "option[selected]") |> Test.Html.attr("value") |> List.first()
+        )
+
+      element, acc ->
+        acc |> Map.put(Test.Html.attr(element, "name") |> List.first(), Test.Html.attr(element, "value") |> List.first())
+    end)
+  end
+
   def parse(%Plug.Conn{} = conn),
     do: conn |> html_response(200) |> Test.Html.parse_doc()
 
