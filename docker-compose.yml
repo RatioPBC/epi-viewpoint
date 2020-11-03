@@ -19,6 +19,7 @@ services:
       CANONICAL_HOST: viewpoint-dev.network.geometer.dev
       DATABASE_URL: ecto://cc:abc123@postgres:5432/epicenter_dev
       DBSSL: "false"
+      ERROR_REPORTER_SERVICE_NAME: viewpoint-dev
       LIVE_VIEW_SIGNING_SALT: xbK8/I1ibfroHQvkZTMKbO7NOLAHtbdP
       RELEASE_LEVEL: dev
       SECRET_KEY_BASE: 3TjNgvbwkybwa/wmAHz6kgakyAZ5ETIBCGuKRFW1s/ebkOqElLgtQrJrPZqY51cr

@@ -7,6 +7,6 @@ defmodule Epicenter.ErrorReporter do
   end
 
   defp service_context do
-    [service: "viewpoint-construction"]
+    Application.fetch_env!(:epicenter, Epicenter.ErrorReporter)[:service_context]
   end
 end
