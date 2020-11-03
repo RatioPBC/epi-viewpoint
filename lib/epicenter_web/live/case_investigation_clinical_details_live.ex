@@ -67,7 +67,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   end
 
   def mount(%{"id" => id}, session, socket) do
-    case_investigation = id |> Cases.get_case_investigation() |> Cases.preload_initiated_by() |> Cases.preload_person()
+    case_investigation = id |> Cases.get_case_investigation() |> Cases.preload_initiating_lab_result() |> Cases.preload_person()
 
     socket
     |> authenticate_user(session)
@@ -78,7 +78,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   end
 
   def clinical_details_form_builder(form, case_investigation) do
-    symptom_onset_date_explanation_text = "If asymptomatic, date of first positive test (#{Format.date(case_investigation.initiated_by.sampled_on)})"
+    symptom_onset_date_explanation_text =
+      "If asymptomatic, date of first positive test (#{Format.date(case_investigation.initiating_lab_result.sampled_on)})"
 
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), span: 5))

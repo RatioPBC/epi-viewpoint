@@ -43,10 +43,10 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(author)}
   end
 
-  def case_investigation_attrs(%Person{id: person_id}, %LabResult{id: initiated_by_id}, author, tid, attrs \\ %{}) do
+  def case_investigation_attrs(%Person{id: person_id}, %LabResult{id: initiating_lab_result_id}, author, tid, attrs \\ %{}) do
     attrs =
       %{
-        initiated_by_id: initiated_by_id,
+        initiating_lab_result_id: initiating_lab_result_id,
         person_id: person_id,
         started_at: nil,
         tid: tid

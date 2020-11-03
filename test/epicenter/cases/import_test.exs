@@ -117,8 +117,8 @@ defmodule Epicenter.Cases.ImportTest do
       [alice, _billy] = Cases.list_people() |> Cases.preload_case_investigations()
       case_investigations = alice.case_investigations
       assert [%CaseInvestigation{} = case_investigation] = case_investigations
-      case_investigation = case_investigation |> Cases.preload_initiated_by()
-      assert case_investigation.initiated_by.reported_on == ~D[2020-06-05]
+      case_investigation = case_investigation |> Cases.preload_initiating_lab_result()
+      assert case_investigation.initiating_lab_result.reported_on == ~D[2020-06-05]
       assert CaseInvestigation.status(case_investigation) == :pending
     end
 
@@ -766,7 +766,7 @@ defmodule Epicenter.Cases.ImportTest do
       case_investigation = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Euclid.Extra.List.only!()
 
       assert case_investigation.person_id == alice.id
-      assert case_investigation.initiated_by_id == lab_result.id
+      assert case_investigation.initiating_lab_result_id == lab_result.id
     end
 
     test "does not create case investigation for a lab result when there is an existing case investigation", %{

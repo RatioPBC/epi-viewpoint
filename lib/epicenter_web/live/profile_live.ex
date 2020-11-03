@@ -68,7 +68,7 @@ defmodule EpicenterWeb.ProfileLive do
 
     case_investigations =
       person.case_investigations
-      |> Cases.preload_initiated_by()
+      |> Cases.preload_initiating_lab_result()
 
     assign(socket, case_investigations: case_investigations)
   end

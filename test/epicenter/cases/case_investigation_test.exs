@@ -20,7 +20,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:discontinue_reason, :string},
           {:discontinued_at, :utc_datetime},
           {:id, :id},
-          {:initiated_by_id, :id},
+          {:initiating_lab_result_id, :id},
           {:inserted_at, :naive_datetime},
           {:name, :string},
           {:person_id, :id},
@@ -56,8 +56,8 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         |> Cases.preload_case_investigations()
         |> Map.get(:case_investigations)
 
-      assert_eq(case_investigation1.initiated_by_id, lab_result1.id)
-      assert_eq(case_investigation2.initiated_by_id, lab_result2.id)
+      assert_eq(case_investigation1.initiating_lab_result_id, lab_result1.id)
+      assert_eq(case_investigation2.initiating_lab_result_id, lab_result2.id)
     end
   end
 
@@ -72,6 +72,6 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
-    test "initiated_by_id is required", do: assert_invalid(new_changeset(initiated_by_id: nil))
+    test "initiating_lab_result_id is required", do: assert_invalid(new_changeset(initiating_lab_result_id: nil))
   end
 end

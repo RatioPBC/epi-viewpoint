@@ -59,7 +59,7 @@
       .reported-on data-role="reported-on"
         span
           = "Initiated by positive lab result reported on "
-          = string_or_unknown(Format.date(case_investigation.initiated_by.reported_on))
+          = string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))
 
       .case-investigation-status
         h3.status data-role="status"

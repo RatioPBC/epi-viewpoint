@@ -8,7 +8,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
 
-  @required_attrs ~w{initiated_by_id person_id}a
+  @required_attrs ~w{initiating_lab_result_id person_id}a
   @optional_attrs ~w{clinical_status discontinue_reason discontinued_at person_interviewed name started_at symptom_onset_date symptoms tid}a
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -27,7 +27,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
 
     timestamps(type: :utc_datetime)
 
-    belongs_to :initiated_by, LabResult
+    belongs_to :initiating_lab_result, LabResult
     belongs_to :person, Person
   end
 

@@ -577,7 +577,9 @@ defmodule Epicenter.CasesTest do
 
       author_id = creator.id
       lab_result_id = lab_result.id
-      assert %{author_id: ^author_id, change: %{"initiated_by_id" => ^lab_result_id, "name" => "the name"}} = recent_audit_log(case_investigation)
+
+      assert %{author_id: ^author_id, change: %{"initiating_lab_result_id" => ^lab_result_id, "name" => "the name"}} =
+               recent_audit_log(case_investigation)
     end
   end
 
