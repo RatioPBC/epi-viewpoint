@@ -34,12 +34,6 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     def case_investigation_attrs(%CaseInvestigation{} = case_investigation) do
       case_investigation
       |> Map.from_struct()
-      |> assign_default_values(case_investigation)
-    end
-
-    defp assign_default_values(attrs_map, case_investigation) do
-      attrs_map
-      |> Map.put(:symptom_onset_date, Format.date(case_investigation.initiated_by.sampled_on))
     end
   end
 

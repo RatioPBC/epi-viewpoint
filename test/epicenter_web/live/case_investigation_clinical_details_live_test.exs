@@ -25,7 +25,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       "Symptomatic" => false,
       "Asymptomatic" => false
     })
-    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_value("08/06/2020")
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_explanation_text("08/06/2020")
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_has_no_value()
     |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
       "Fever > 100.4F" => false,
       "Subjective fever (felt feverish)" => false,
