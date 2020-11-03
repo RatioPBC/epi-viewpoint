@@ -3,8 +3,8 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
 
   import Ecto.Changeset
 
+  alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.Person
   alias Epicenter.Format
   alias EpicenterWeb.Forms.StartInterviewForm
   alias EpicenterWeb.PresentationConstants
@@ -19,13 +19,13 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
 
   @required_attrs ~w{date_started person_interviewed time_started time_started_am_pm}a
 
-  def changeset(%Person{} = person, %CaseInvestigation{} = case_investigation),
-    do: case_investigation_start_interview_form_attrs(person, case_investigation) |> changeset()
+  def changeset(%CaseInvestigation{} = case_investigation),
+    do: case_investigation |> case_investigation_start_interview_form_attrs() |> changeset()
 
   def changeset(attrs),
     do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs) |> validate_interviewed_at()
 
-  def case_investigation_start_interview_form_attrs(%Person{} = person, %CaseInvestigation{} = case_investigation) do
+  def case_investigation_start_interview_form_attrs(%CaseInvestigation{} = case_investigation) do
     local_now = Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
 
     time =
@@ -35,7 +35,7 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
       ) || local_now
 
     %{
-      person_interviewed: case_investigation.person_interviewed || Format.person(person),
+      person_interviewed: person_interviewed(case_investigation),
       date_started: Format.date(time |> DateTime.to_date()),
       time_started: Format.time(time |> DateTime.to_time()),
       time_started_am_pm: if(time.hour >= 12, do: "PM", else: "AM")
@@ -55,8 +55,15 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
     %{person_interviewed: person_interviewed, started_at: started_at}
   end
 
-  defp convert_name(attrs) do
-    Map.get(attrs, :person_interviewed)
+  defp convert_name(attrs),
+    do: Map.get(attrs, :person_interviewed)
+
+  defp convert_time(datestring, timestring, ampmstring) do
+    with {:ok, datetime} <- Timex.parse("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"),
+         %Timex.TimezoneInfo{} = timezone <- Timex.timezone(PresentationConstants.presented_time_zone(), datetime),
+         %DateTime{} = time <- Timex.to_datetime(datetime, timezone) do
+      {:ok, time}
+    end
   end
 
   defp convert_time_started_and_date_started(attrs) do
@@ -66,13 +73,11 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
     convert_time(date, time, am_pm)
   end
 
-  defp convert_time(datestring, timestring, ampmstring) do
-    with {:ok, datetime} <- Timex.parse("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"),
-         %Timex.TimezoneInfo{} = timezone <- Timex.timezone(PresentationConstants.presented_time_zone(), datetime),
-         %DateTime{} = time <- Timex.to_datetime(datetime, timezone) do
-      {:ok, time}
-    end
-  end
+  defp person_interviewed(%CaseInvestigation{person_interviewed: nil} = case_investigation),
+    do: case_investigation.person |> Cases.preload_demographics() |> Format.person()
+
+  defp person_interviewed(%CaseInvestigation{person_interviewed: person_interviewed}),
+    do: person_interviewed
 
   defp validate_interviewed_at(changeset) do
     with {_, date} <- fetch_field(changeset, :date_started),

@@ -46,8 +46,9 @@ defmodule Epicenter.Test.Fixtures do
   def case_investigation_attrs(%Person{id: person_id}, %LabResult{id: initiated_by_id}, author, tid, attrs \\ %{}) do
     attrs =
       %{
-        person_id: person_id,
         initiated_by_id: initiated_by_id,
+        person_id: person_id,
+        started_at: nil,
         tid: tid
       }
       |> merge_attrs(attrs)

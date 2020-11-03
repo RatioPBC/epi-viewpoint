@@ -18,7 +18,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
     socket
     |> assign_page_title("Start Case Investigation")
-    |> assign_form_changeset(StartInterviewForm.changeset(person, case_investigation))
+    |> assign_form_changeset(StartInterviewForm.changeset(case_investigation))
     |> assign(case_investigation: case_investigation)
     |> assign(person: person)
     |> ok()

@@ -18,7 +18,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
   test "shows start case investigation form", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.CaseInvestigationStartInterview.assert_here()
-    |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_selections(%{"Alice Testuser" => false, "Proxy" => false})
+    |> Pages.CaseInvestigationStartInterview.assert_person_interviewed_selections(%{"Alice Testuser" => true, "Proxy" => false})
     |> Pages.CaseInvestigationStartInterview.assert_date_started(:today)
     |> Pages.CaseInvestigationStartInterview.assert_time_started(:now)
   end
@@ -30,12 +30,11 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
         {%{started_at: ~N[2020-01-01 23:03:07], person_interviewed: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
       )
 
-    view =
-      Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
-      |> Pages.CaseInvestigationStartInterview.assert_here()
-
-    assert %{"start_interview_form[person_interviewed]" => "Jackson Publick"} = Pages.form_state(view)
-    assert ~N[2020-01-01 18:03:00] = Pages.CaseInvestigationStartInterview.datetime_started(view)
+    Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationStartInterview.assert_here()
+    |> Pages.CaseInvestigationStartInterview.assert_proxy_selected("Jackson Publick")
+    |> Pages.CaseInvestigationStartInterview.assert_time_started("06:03", "PM")
+    |> Pages.CaseInvestigationStartInterview.assert_date_started("01/01/2020")
   end
 
   test "saving start case investigation form", %{conn: conn, person: person, case_investigation: case_investigation} do
