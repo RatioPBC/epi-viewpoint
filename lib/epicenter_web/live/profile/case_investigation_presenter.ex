@@ -1,21 +1,24 @@
 defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
+  import Phoenix.LiveView.Helpers
+
   alias Epicenter.Format
   alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  import Phoenix.LiveView.Helpers
-
-  def interview_buttons(case_investigation, person) do
+  def interview_buttons(case_investigation) do
     case case_investigation.discontinue_reason do
       nil ->
-        [redirect_to(case_investigation, :start_interview), redirect_to(case_investigation, person, :discontinue_interview)]
+        [
+          redirect_to(case_investigation, :start_interview),
+          redirect_to(case_investigation, :discontinue_interview)
+        ]
 
       _ ->
         []
     end
   end
 
-  def history_items(case_investigation, person) do
+  def history_items(case_investigation) do
     items = []
 
     items =
@@ -33,7 +36,6 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
                   Routes.case_investigation_discontinue_path(
                     EpicenterWeb.Endpoint,
                     EpicenterWeb.CaseInvestigationDiscontinueLive,
-                    person,
                     case_investigation
                   ),
                 id: "edit-discontinue-case-investigation-link-001",
@@ -61,10 +63,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     )
   end
 
-  defp redirect_to(case_investigation, person, :discontinue_interview) do
+  defp redirect_to(case_investigation, :discontinue_interview) do
     live_redirect("Discontinue",
-      to:
-        Routes.case_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationDiscontinueLive, person, case_investigation),
+      to: Routes.case_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationDiscontinueLive, case_investigation),
       id: "discontinue-case-investigation-link-001",
       class: "discontinue-case-investigation-link"
     )

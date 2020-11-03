@@ -66,11 +66,11 @@
           span class="status-value"
             = displayable_case_investigation_status(case_investigation)
         .links
-          = for link <- interview_buttons(case_investigation, @person) do
+          = for link <- interview_buttons(case_investigation) do
             span= link
 
       .case-investigation-history
-        = for history_item <- history_items(case_investigation, @person) do
+        = for history_item <- history_items(case_investigation) do
           span data-role="case-investigation-history-item-text" = history_item.text
           span class="history-item-link" = history_item.link
 

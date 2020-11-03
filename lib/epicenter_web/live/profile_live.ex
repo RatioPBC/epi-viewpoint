@@ -1,17 +1,11 @@
 defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
+  import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
-
-  import EpicenterWeb.Profile.CaseInvestigationPresenter,
-    only: [
-      interview_buttons: 2,
-      history_items: 2
-    ]
-
-  import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
+  import EpicenterWeb.Profile.CaseInvestigationPresenter, only: [interview_buttons: 1, history_items: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog

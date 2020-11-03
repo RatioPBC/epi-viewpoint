@@ -9,10 +9,10 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   alias Epicenter.Cases
   alias EpicenterWeb.Form
 
-  def mount(%{"id" => person_id, "case_investigation_id" => case_investigation_id}, session, socket) do
+  def mount(%{"id" => case_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    person = Cases.get_person(person_id)
-    case_investigation = Cases.get_case_investigation(case_investigation_id)
+    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person()
+    person = case_investigation.person
 
     socket
     |> assign_page_title("Discontinue Case Investigation")

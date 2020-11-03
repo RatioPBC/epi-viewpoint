@@ -206,7 +206,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_discontinue_case_investigation("001")
-      |> assert_redirects_to("/people/#{person.id}/case_investigations/#{case_investigation.id}/discontinue")
+      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/discontinue")
     end
 
     test "discontinued case investigations say so", %{conn: conn, person: person, user: user} do
@@ -234,7 +234,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_edit_discontinuation_link("001")
-      |> assert_redirects_to("/people/#{person.id}/case_investigations/#{case_investigation.id}/discontinue")
+      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/discontinue")
     end
 
     test "started case investigations say so", %{conn: conn, person: person, user: user} do

@@ -2,12 +2,11 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationDiscontinue do
   import ExUnit.Assertions
 
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.Person
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  def visit(%Plug.Conn{} = conn, %Person{id: person_id}, %CaseInvestigation{id: case_investigation_id}) do
-    conn |> Pages.visit("/people/#{person_id}/case_investigations/#{case_investigation_id}/discontinue")
+  def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
+    conn |> Pages.visit("/case_investigations/#{case_investigation_id}/discontinue")
   end
 
   def assert_reason_selections(%View{} = view, expected_reasons) do

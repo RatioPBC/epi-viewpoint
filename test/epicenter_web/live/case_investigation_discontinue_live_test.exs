@@ -20,15 +20,15 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     [person: person, user: user, case_investigation: case_investigation]
   end
 
-  test "disconnected and connected render", %{conn: conn, person: person, case_investigation: case_investigation} do
-    {:ok, page_live, disconnected_html} = live(conn, "/people/#{person.id}/case_investigations/#{case_investigation.id}/discontinue")
+  test "disconnected and connected render", %{conn: conn, case_investigation: case_investigation} do
+    {:ok, page_live, disconnected_html} = live(conn, "/case_investigations/#{case_investigation.id}/discontinue")
 
     assert_has_role(disconnected_html, "case-investigation-discontinue-page")
     assert_has_role(page_live, "case-investigation-discontinue-page")
   end
 
-  test "has a reason select radio", %{conn: conn, person: person, case_investigation: case_investigation} do
-    Pages.CaseInvestigationDiscontinue.visit(conn, person, case_investigation)
+  test "has a reason select radio", %{conn: conn, case_investigation: case_investigation} do
+    Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
     |> Pages.CaseInvestigationDiscontinue.assert_here()
     |> Pages.CaseInvestigationDiscontinue.assert_reason_selections(%{
       "Unable to reach" => false,
@@ -43,7 +43,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     person: person,
     case_investigation: case_investigation
   } do
-    Pages.CaseInvestigationDiscontinue.visit(conn, person, case_investigation)
+    Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-discontinue-form", case_investigation: %{"discontinue_reason" => "Unable to reach"})
     |> Pages.Profile.assert_here(person)
 
@@ -52,16 +52,12 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     assert_datetime_approximate(case_investigation.discontinued_at, DateTime.utc_now(), 2)
   end
 
-  test "discontinuing requires a reason", %{
-    conn: conn,
-    person: person,
-    case_investigation: case_investigation
-  } do
+  test "discontinuing requires a reason", %{conn: conn, case_investigation: case_investigation} do
     view =
-      Pages.CaseInvestigationDiscontinue.visit(conn, person, case_investigation)
+      Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-discontinue-form", case_investigation: %{"discontinue_reason" => ""})
       |> Pages.CaseInvestigationDiscontinue.assert_here()
 
-    assert_validation_messages(render(view), %{"case_investigation_discontinue_reason" => "can't be blank"})
+    view |> render() |> assert_validation_messages(%{"case_investigation_discontinue_reason" => "can't be blank"})
   end
 end

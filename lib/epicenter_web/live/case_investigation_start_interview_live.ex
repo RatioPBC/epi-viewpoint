@@ -8,14 +8,13 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   alias Epicenter.Cases
   alias Epicenter.Cases.StartInterviewForm
   alias Epicenter.Format
-  alias Epicenter.Repo
   alias EpicenterWeb.Form
   alias EpicenterWeb.PresentationConstants
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
-    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Repo.preload(:person)
-    person = case_investigation.person |> Cases.preload_demographics()
     socket = socket |> authenticate_user(session)
+    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person()
+    person = case_investigation.person |> Cases.preload_demographics()
 
     socket
     |> assign_page_title("Start Case Investigation")
