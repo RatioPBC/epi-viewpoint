@@ -1,3 +1,0 @@
-#!/bin/bash
-
-mix hex.organization auth geometer --key "${HEX_GEOMETER_READ_ONLY_KEY}"
