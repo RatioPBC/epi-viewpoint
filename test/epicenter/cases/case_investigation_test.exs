@@ -24,7 +24,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:inserted_at, :naive_datetime},
           {:name, :string},
           {:person_id, :id},
-          {:person_interviewed, :string},
+          {:interview_proxy_name, :string},
           {:started_at, :utc_datetime},
           {:seq, :integer},
           {:symptom_onset_date, :date},

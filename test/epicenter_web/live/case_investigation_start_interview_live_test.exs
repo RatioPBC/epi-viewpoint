@@ -27,7 +27,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     {:ok, _} =
       Cases.update_case_investigation(
         case_investigation,
-        {%{started_at: ~N[2020-01-01 23:03:07], person_interviewed: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
+        {%{started_at: ~N[2020-01-01 23:03:07], interview_proxy_name: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
       )
 
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
@@ -50,7 +50,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     |> Pages.Profile.assert_here(person)
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
-    assert "Alice's guardian" = case_investigation.person_interviewed
+    assert "Alice's guardian" = case_investigation.interview_proxy_name
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.started_at
   end
 

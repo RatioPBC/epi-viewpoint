@@ -32,7 +32,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Started interview #{if(case_investigation.person_interviewed, do: "with #{case_investigation.person_interviewed} ")} on #{
+              "Started interview #{if(case_investigation.interview_proxy_name, do: "with #{case_investigation.interview_proxy_name} ")} on #{
                 case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
               }",
             link:

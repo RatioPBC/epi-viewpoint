@@ -50,9 +50,12 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   end
 
   def case_investigation_attrs(%StartInterviewForm{} = start_interview_form) do
-    person_interviewed = convert_name(start_interview_form)
+    # is the name "~~~self~~~" ?
+    # if so, clear interview proxy name
+    # if not, set interview proxy name
+    interview_proxy_name = convert_name(start_interview_form)
     {:ok, started_at} = convert_time_started_and_date_started(start_interview_form)
-    %{person_interviewed: person_interviewed, started_at: started_at}
+    %{interview_proxy_name: interview_proxy_name, started_at: started_at}
   end
 
   defp convert_name(attrs),
@@ -73,11 +76,11 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
     convert_time(date, time, am_pm)
   end
 
-  defp person_interviewed(%CaseInvestigation{person_interviewed: nil} = case_investigation),
+  defp person_interviewed(%CaseInvestigation{interview_proxy_name: nil} = case_investigation),
     do: case_investigation.person |> Cases.preload_demographics() |> Format.person()
 
-  defp person_interviewed(%CaseInvestigation{person_interviewed: person_interviewed}),
-    do: person_interviewed
+  defp person_interviewed(%CaseInvestigation{interview_proxy_name: interview_proxy_name}),
+    do: interview_proxy_name
 
   defp validate_interviewed_at(changeset) do
     with {_, date} <- fetch_field(changeset, :date_started),
