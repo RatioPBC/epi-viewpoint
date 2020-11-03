@@ -85,14 +85,15 @@ defmodule EpicenterWeb.FormTest do
   end
 
   test "checkbox_list" do
-    phx_form(genres: ~w{Comedy Musical})
+    phx_form(genres: ~w{Comedy Musical Indie})
     |> Form.new()
-    |> Form.line(&Form.checkbox_list(&1, :genres, "Genres", @genres, span: 3))
+    |> Form.line(&Form.checkbox_list(&1, :genres, "Genres", @genres, other: "Other", span: 3))
     |> render()
     |> assert_html_eq("""
     <fieldset>
       <label data-grid-col="1" data-grid-row="1" data-grid-span="3" for="movie_genres">Genres</label>
       <div class="checkbox-list" data-grid-col="1" data-grid-row="3" data-grid-span="3">
+
         <label data-role="movie-genres">\v
           <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy" checked="checked"/>Comedy\v
         </label>
@@ -101,6 +102,10 @@ defmodule EpicenterWeb.FormTest do
         </label>
         <label data-role="movie-genres">\v
           <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical" checked="checked"/>Musical\v
+        </label>
+        <label data-role="movie-genres">\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="" checked="checked"/>Other\v
+          <input data-reveal="when-parent-checked" id="movie_genres" name="movie[genres][]" type="text" value="Indie"/>\v
         </label>
       </div>
     </fieldset>
@@ -179,7 +184,7 @@ defmodule EpicenterWeb.FormTest do
   end
 
   test "radio_button_list" do
-    phx_form(language: "English")
+    phx_form(language: "Weird English")
     |> Form.new()
     |> Form.line(&Form.radio_button_list(&1, :language, "Language", @languages, other: "Other", span: 5))
     |> render()
@@ -193,7 +198,7 @@ defmodule EpicenterWeb.FormTest do
           <input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>\v
           Other\v
 
-          <input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="English"/>
+          <input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="Weird English"/>
         </label>
         <label data-role="movie-language">
           <input id="movie_language_english" name="movie[language]" type="radio" value="english"/>\v

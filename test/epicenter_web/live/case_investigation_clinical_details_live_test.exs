@@ -44,7 +44,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       "Nasal congestion" => false,
       "Loss of sense of smell" => false,
       "Loss of sense of taste" => false,
-      "Fatigue" => false
+      "Fatigue" => false,
+      "Other" => false
     })
   end
 

@@ -9,11 +9,45 @@ defmodule EpicenterWeb.FormHelpers do
   """
   def checkbox_list(form, field, values, html_opts \\ []) when is_list(values) do
     opts = [class: "checkbox-list"] |> Keyword.merge(html_opts)
+    other = opts |> Keyword.get(:other)
+    other_checkbox_and_text_field = checkbox_and_text_field(form, field, other, values)
+    opts = Keyword.delete(opts, :other)
+    opts = Keyword.delete(opts, :span)
 
     content_tag :div, opts do
-      for value <- values do
-        checkbox_with_label(form, field, value)
-      end
+      checkboxes(form, field, values) ++ List.wrap(other_checkbox_and_text_field)
+    end
+  end
+
+  defp checkbox_and_text_field(_form, _field, nil = _label_text, _values), do: nil
+
+  defp checkbox_and_text_field(form, field, label_text, predefined_values) do
+    selected_values = input_value(form, field)
+    others = Enum.filter(selected_values, fn val -> val not in predefined_values end)
+    other_selected? = length(others) > 0
+    other_value = if other_selected?, do: Enum.join(others, " "), else: ""
+
+    label(data: [role: input_list_label_role(form, field)]) do
+      [
+        checkbox(form, field,
+          name: checkbox_list_input_name(form, field),
+          checked: other_selected?,
+          checked_value: nil,
+          hidden_input: false
+        ),
+        label_text,
+        text_input(form, field,
+          value: other_value,
+          name: checkbox_list_input_name(form, field),
+          data: [reveal: "when-parent-checked"]
+        )
+      ]
+    end
+  end
+
+  defp checkboxes(form, field, values) do
+    for value <- values do
+      checkbox_with_label(form, field, value)
     end
   end
 

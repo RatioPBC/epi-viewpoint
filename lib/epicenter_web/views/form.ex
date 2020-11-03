@@ -26,16 +26,6 @@ defmodule EpicenterWeb.Form do
   # # #
 
   @doc "opts: span"
-  def checkbox_list(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
-    [
-      label(f, field, label_text, data: grid_data(1, line, opts)),
-      error_tag(f, field, data: grid_data(2, line, opts)),
-      FormHelpers.checkbox_list(f, field, values, data: grid_data(3, line, opts))
-    ]
-    |> add_to_line(line, opts)
-  end
-
-  @doc "opts: span"
   def content_div(%Form.Line{} = line, content, opts \\ []) do
     [content_tag(:div, content, data: grid_data(line, opts))]
     |> add_to_line(line, opts)
@@ -71,6 +61,16 @@ defmodule EpicenterWeb.Form do
       label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
       FormHelpers.radio_button_list(f, field, values, opts, data: grid_data(3, line, opts))
+    ]
+    |> add_to_line(line, opts)
+  end
+
+  @doc "opts: other, span"
+  def checkbox_list(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
+    [
+      label(f, field, label_text, data: grid_data(1, line, opts)),
+      error_tag(f, field, data: grid_data(2, line, opts)),
+      FormHelpers.checkbox_list(f, field, values, Keyword.merge(opts, data: grid_data(3, line, opts)))
     ]
     |> add_to_line(line, opts)
   end
