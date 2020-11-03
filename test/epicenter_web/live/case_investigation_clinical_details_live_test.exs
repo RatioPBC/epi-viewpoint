@@ -6,6 +6,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
   alias EpicenterWeb.Test.Pages
 
   import Epicenter.Test.RevisionAssertions
+  import Phoenix.LiveViewTest
 
   setup :register_and_log_in_user
 
@@ -73,5 +74,19 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       symptom_onset_date: "2020-09-06",
       symptoms: ["fever", "chills"]
     })
+  end
+
+  test "validating date format", %{conn: conn, case_investigation: case_investigation} do
+    view =
+      Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+      |> Pages.submit_live("#case-investigation-clinical-details-form",
+        clinical_details_form: %{
+          "clinical_status" => "symptomatic",
+          "symptom_onset_date" => "09/32/2020",
+          "symptoms" => ["fever", "chills"]
+        }
+      )
+
+    view |> render() |> assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be MM/DD/YYYY"})
   end
 end

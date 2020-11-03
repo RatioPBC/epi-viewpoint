@@ -8,6 +8,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.DateParser
   alias Epicenter.Format
+  alias Epicenter.Validation
   alias EpicenterWeb.Form
 
   defmodule ClinicalDetailsForm do
@@ -32,6 +33,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     def changeset(attrs) do
       %ClinicalDetailsForm{}
       |> cast(attrs, @required_attrs ++ @optional_attrs)
+      |> Validation.validate_date(:symptom_onset_date)
     end
 
     def case_investigation_form_attrs(%CaseInvestigation{} = case_investigation) do
@@ -122,12 +124,12 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, cast_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
       # TODO: Error handling
-      #        else
-      #      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
-      #        socket |> assign_form_changeset(form_changeset) |> noreply()
-      #
-      #      {:case_investigation, {:error, _}} ->
-      #        socket |> assign_form_changeset(ClinicalDetailsForm.changeset(params), "An unexpected error occurred") |> noreply()
+    else
+      {:form, {:error, form_changeset}} ->
+        socket |> assign(:form_changeset, form_changeset) |> noreply()
+        #
+        #      {:case_investigation, {:error, _}} ->
+        #        socket |> assign_form_changeset(ClinicalDetailsForm.changeset(params), "An unexpected error occurred") |> noreply()
     end
   end
 
