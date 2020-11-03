@@ -23,6 +23,9 @@ html lang="en"
             #nav-left
               = link to: "/", id: "logo" do
                 = logo_icon()
+
+              = link "Index cases", to: "/people"
+
             #nav-right
               #user-menu
                 #user-menu-title
