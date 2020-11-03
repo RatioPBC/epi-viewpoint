@@ -34,12 +34,11 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
       |> cast(attrs, @required_attrs ++ @optional_attrs)
     end
 
-    def case_investigation_form_attrs(%CaseInvestigation{} = _case_investigation) do
-      # TODO: populate for edit
+    def case_investigation_form_attrs(%CaseInvestigation{} = case_investigation) do
       %{
-        clinical_status: [],
-        symptoms: [],
-        symptom_onset_date: ""
+        clinical_status: case_investigation.clinical_status,
+        symptoms: case_investigation.symptoms,
+        symptom_onset_date: Format.date(case_investigation.symptom_onset_date)
       }
     end
 

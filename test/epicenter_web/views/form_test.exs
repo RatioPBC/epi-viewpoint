@@ -21,7 +21,7 @@ defmodule EpicenterWeb.FormTest do
   end
 
   @languages [{"Italian", "italian"}, {"English", "english"}]
-  @genres ~w{Comedy Drama Musical}
+  @genres [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}]
 
   defp phx_form(data \\ %{}) do
     %Movie{}
@@ -85,7 +85,7 @@ defmodule EpicenterWeb.FormTest do
   end
 
   test "checkbox_list" do
-    phx_form(genres: ~w{Comedy Musical Indie})
+    phx_form(genres: ~w{comedy musical Indie})
     |> Form.new()
     |> Form.line(&Form.checkbox_list(&1, :genres, "Genres", @genres, other: "Other", span: 3))
     |> render()
@@ -95,13 +95,13 @@ defmodule EpicenterWeb.FormTest do
       <div class="checkbox-list" data-grid-col="1" data-grid-row="3" data-grid-span="3">
 
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy" checked="checked"/>Comedy\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy" checked="checked"/>Comedy\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama"/>Drama\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>Drama\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical" checked="checked"/>Musical\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical" checked="checked"/>Musical\v
         </label>
         <label data-role="movie-genres">\v
           <input id="movie_genres" name="movie[genres][]" type="checkbox" value="" checked="checked"/>Other\v

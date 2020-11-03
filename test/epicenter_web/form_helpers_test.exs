@@ -14,7 +14,7 @@ defmodule EpicenterWeb.FormHelpersTest do
   end
 
   setup do
-    changeset = Changeset.change(%Movie{genres: ["Drama"], language: "German"})
+    changeset = Changeset.change(%Movie{genres: ["drama"], language: "German"})
     form = Phoenix.HTML.FormData.to_form(changeset, [])
     [form: form]
   end
@@ -32,30 +32,41 @@ defmodule EpicenterWeb.FormHelpersTest do
     end
 
     test "marks the checkbox as checked if it's in the form data", %{form: form} do
-      FormHelpers.checkbox_list_checkbox(form, :genres, "Drama")
-      |> assert_html_eq(~s|<input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama" checked/>|)
+      FormHelpers.checkbox_list_checkbox(form, :genres, "drama")
+      |> assert_html_eq(~s|<input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/>|)
     end
   end
 
   describe "checkbox_list" do
     test "returns a rendered checkbox list", %{form: form} do
-      FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], [], id: "genre-list")
+      FormHelpers.checkbox_list(
+        form,
+        :genres,
+        [
+          {"Comedy", "comedy"},
+          {"Drama", "drama"},
+          {"Musical", "musical"},
+          {"Science Fiction", "science_fiction"}
+        ],
+        [],
+        id: "genre-list"
+      )
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy"/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/>\v
           Comedy\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama" checked/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/>\v
           Drama\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical"/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/>\v
           Musical\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Science Fiction"/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="science_fiction"/>\v
           Science Fiction\v
         </label>
       </div>
@@ -94,23 +105,34 @@ defmodule EpicenterWeb.FormHelpersTest do
       changeset = Changeset.change(%Movie{genres: nil})
       form = Phoenix.HTML.FormData.to_form(changeset, [])
 
-      FormHelpers.checkbox_list(form, :genres, ["Comedy", "Drama", "Musical", "Science Fiction"], [], id: "genre-list")
+      FormHelpers.checkbox_list(
+        form,
+        :genres,
+        [
+          {"Comedy", "comedy"},
+          {"Drama", "drama"},
+          {"Musical", "musical"},
+          {"Science Fiction", "science_fiction"}
+        ],
+        [],
+        id: "genre-list"
+      )
       |> assert_html_eq("""
       <div class="checkbox-list" id="genre-list">
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Comedy"/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/>\v
           Comedy\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Drama"/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>\v
           Drama\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Musical"/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/>\v
           Musical\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="Science Fiction"/>\v
+          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="science_fiction"/>\v
           Science Fiction\v
         </label>
       </div>

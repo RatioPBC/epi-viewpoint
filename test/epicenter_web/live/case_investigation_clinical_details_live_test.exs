@@ -14,7 +14,12 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     lab_result = Test.Fixtures.lab_result_attrs(person, user, "alice-test-result", ~D[2020-08-06]) |> Cases.create_lab_result!()
 
     case_investigation =
-      Test.Fixtures.case_investigation_attrs(person, lab_result, user, "alice-case-investigation") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(person, lab_result, user, "alice-case-investigation", %{
+        clinical_status: "asymptomatic",
+        symptom_onset_date: ~D[2020-11-03],
+        symptoms: ["cough", "headache"]
+      })
+      |> Cases.create_case_investigation!()
 
     [person: person, user: user, case_investigation: case_investigation]
   end
@@ -25,17 +30,17 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.CaseInvestigationClinicalDetails.assert_clinical_status_selection(%{
       "Unknown" => false,
       "Symptomatic" => false,
-      "Asymptomatic" => false
+      "Asymptomatic" => true
     })
     |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_explanation_text("08/06/2020")
-    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_value("")
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_value("11/03/2020")
     |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
       "Fever > 100.4F" => false,
       "Subjective fever (felt feverish)" => false,
-      "Cough" => false,
+      "Cough" => true,
       "Shortness of breath" => false,
       "Diarrhea/GI" => false,
-      "Headache" => false,
+      "Headache" => true,
       "Muscle ache" => false,
       "Chills" => false,
       "Sore throat" => false,
