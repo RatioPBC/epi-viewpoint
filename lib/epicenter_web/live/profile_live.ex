@@ -129,7 +129,10 @@ defmodule EpicenterWeb.ProfileLive do
   def displayable_case_investigation_status(case_investigation)
 
   def displayable_case_investigation_status(%{discontinued_at: nil} = case_investigation) do
-    CaseInvestigation.readable_status(case_investigation.status)
+    case CaseInvestigation.status(case_investigation) do
+      :pending -> "Pending interview"
+      :started -> "Ongoing interview"
+    end
   end
 
   def displayable_case_investigation_status(_), do: "Discontinued"

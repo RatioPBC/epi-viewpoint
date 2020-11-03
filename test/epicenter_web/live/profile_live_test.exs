@@ -236,6 +236,13 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.click_edit_discontinuation_link("001")
       |> assert_redirects_to("/people/#{person.id}/case_investigations/#{case_investigation.id}/discontinue")
     end
+
+    test "started case investigations say so", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now()})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", reported_on: "Unknown", number: "001"})
+    end
   end
 
   describe "assigning and unassigning user to a person" do

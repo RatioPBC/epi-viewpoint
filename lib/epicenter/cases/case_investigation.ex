@@ -20,7 +20,6 @@ defmodule Epicenter.Cases.CaseInvestigation do
     field :name, :string
     field :seq, :integer
     field :started_at, :utc_datetime
-    field :status, :string, read_after_writes: true
     field :tid, :string
 
     timestamps(type: :utc_datetime)
@@ -37,16 +36,10 @@ defmodule Epicenter.Cases.CaseInvestigation do
     |> validate_required(@required_attrs)
   end
 
-  def pending_interview_status(), do: "pending_interview"
-
-  def readable_status(canonical_status) do
-    pending = pending_interview_status()
-
-    case canonical_status do
-      ^pending -> "Pending interview"
-      _ -> "Unknown"
-    end
-  end
+  @spec status(%CaseInvestigation{}) :: :pending | :discontinued
+  def status(%{discontinued_at: timestamp}) when not is_nil(timestamp), do: :discontinued
+  def status(%{started_at: timestamp}) when not is_nil(timestamp), do: :started
+  def status(_), do: :pending
 
   defmodule Query do
     import Ecto.Query

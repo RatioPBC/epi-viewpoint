@@ -567,7 +567,7 @@ defmodule Epicenter.CasesTest do
         Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{status: nil})
         |> Cases.create_case_investigation!()
 
-      assert case_investigation.status == CaseInvestigation.pending_interview_status()
+      assert CaseInvestigation.status(case_investigation) == :pending
     end
   end
 

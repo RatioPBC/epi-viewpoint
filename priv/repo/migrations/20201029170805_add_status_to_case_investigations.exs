@@ -5,7 +5,7 @@ defmodule Epicenter.Repo.Migrations.AddStatusToCaseInvestigations do
 
   def change do
     alter table(:case_investigations) do
-      add :status, :string, null: false, default: CaseInvestigation.pending_interview_status()
+      add :status, :string, null: false, default: "pending_interview"
     end
   end
 end
