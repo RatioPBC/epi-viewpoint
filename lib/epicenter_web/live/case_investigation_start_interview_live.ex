@@ -6,9 +6,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.StartInterviewForm
   alias Epicenter.Format
   alias EpicenterWeb.Form
+  alias EpicenterWeb.Forms.StartInterviewForm
   alias EpicenterWeb.PresentationConstants
 
   def mount(%{"id" => case_investigation_id}, session, socket) do

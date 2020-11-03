@@ -1,11 +1,11 @@
-defmodule Epicenter.Cases.StartInterviewForm do
+defmodule EpicenterWeb.Forms.StartInterviewForm do
   use Ecto.Schema
 
   import Ecto.Changeset
 
   alias Epicenter.Cases.Person
-  alias Epicenter.Cases.StartInterviewForm
   alias Epicenter.Format
+  alias EpicenterWeb.Forms.StartInterviewForm
   alias EpicenterWeb.PresentationConstants
 
   @primary_key false
