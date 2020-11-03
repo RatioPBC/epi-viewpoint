@@ -55,4 +55,14 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
     assert selections == actual_selections
     view
   end
+
+  def assert_save_button_visible(%View{} = view) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.text("button[type=submit]")
+    |> assert_eq("Save")
+
+    view
+  end
 end

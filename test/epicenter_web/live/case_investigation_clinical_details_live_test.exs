@@ -47,6 +47,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       "Fatigue" => false,
       "Other" => false
     })
+    |> Pages.CaseInvestigationClinicalDetails.assert_save_button_visible()
   end
 
   test "saving clinical details", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
