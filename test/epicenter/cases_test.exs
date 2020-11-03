@@ -564,10 +564,20 @@ defmodule Epicenter.CasesTest do
 
     test "gets default status from db default", %{person: person, lab_result: lab_result, creator: creator} do
       case_investigation =
-        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{status: nil})
+        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
         |> Cases.create_case_investigation!()
 
       assert CaseInvestigation.status(case_investigation) == :pending
+    end
+
+    test "makes a revision", %{person: person, lab_result: lab_result, creator: creator} do
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{name: "the name"})
+        |> Cases.create_case_investigation!()
+
+      author_id = creator.id
+      lab_result_id = lab_result.id
+      assert %{author_id: ^author_id, change: %{"initiated_by_id" => ^lab_result_id, "name" => "the name"}} = recent_audit_log(case_investigation)
     end
   end
 

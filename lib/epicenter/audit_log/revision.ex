@@ -36,6 +36,7 @@ defmodule Epicenter.AuditLog.Revision do
   def demote_user_action(), do: "demote-user"
   def enable_user_action(), do: "enable-user"
   def import_csv_action(), do: "import-csv"
+  def insert_case_investigation_action(), do: "insert-case-investigation"
   def insert_demographics_action(), do: "insert-demographics"
   def login_user_action(), do: "login-user"
   def promote_user_action(), do: "promote-user"

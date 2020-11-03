@@ -203,7 +203,7 @@ defmodule Epicenter.Cases.Import do
       [] ->
         # TODO currently assuming max of 1 case investigation and so, hardcoding name to "001"
         %{person_id: person_id, initiated_by_id: lab_result_id, name: "001"}
-        |> in_audit_tuple(originator, AuditLog.Revision.upsert_lab_result_action())
+        |> in_audit_tuple(originator, AuditLog.Revision.insert_case_investigation_action())
         |> Cases.create_case_investigation!()
     end
   end
