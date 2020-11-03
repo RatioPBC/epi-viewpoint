@@ -76,6 +76,22 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     })
   end
 
+  test "saving empty clinical details", %{conn: conn, case_investigation: case_investigation, person: person} do
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
+      clinical_details_form: %{
+        "symptom_onset_date" => "",
+        "symptoms" => []
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    assert Euclid.Exists.blank?(case_investigation.symptoms)
+    assert case_investigation.symptom_onset_date == nil
+    assert case_investigation.clinical_status == "asymptomatic"
+  end
+
   test "validating date format", %{conn: conn, case_investigation: case_investigation} do
     view =
       Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
