@@ -63,8 +63,7 @@
 
       .case-investigation-status
         h3.status data-role="status"
-          span class="status-value" data-status-value=CaseInvestigation.status(case_investigation)
-            = displayable_case_investigation_status(case_investigation)
+          = displayable_case_investigation_status(case_investigation)
         .links
           = for link <- interview_buttons(case_investigation) do
             span= link
@@ -96,6 +95,11 @@
                 td= string_or_unknown(nil)
                 td= string_or_unknown(nil)
                 td= string_or_unknown(nil)
+        .case-investigation-contacts
+          .contacts-header-row
+            h4
+              span id="contacts-#{case_investigation.name}"
+                | Contacts
 
   section#lab-results data-role="lab-results"
     header

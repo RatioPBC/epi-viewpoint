@@ -248,9 +248,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", status_value: "started", reported_on: "Unknown", number: "001"})
       |> Pages.Profile.assert_clinical_details_showing("001")
-
-      # TODO
-      #      |> Pages.Profile.assert_contacts_showing("001")
+      |> Pages.Profile.assert_contacts_showing("001")
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do

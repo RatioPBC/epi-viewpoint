@@ -122,14 +122,30 @@ defmodule EpicenterWeb.ProfileLive do
 
   def displayable_case_investigation_status(case_investigation)
 
+  # content_tag :footer, data: grid_data(1, line, opts) do
+  #      [
+  #        submit("Save"),
+  #        content_tag(:div, error_message,
+  #          class: "form-error-message",
+  #          data: [form_error_message: error_message, sticky: Keyword.get(opts, :sticky, false)]
+  #        )
+  #      ]
+  #    end
+
   def displayable_case_investigation_status(%{discontinued_at: nil} = case_investigation) do
     case CaseInvestigation.status(case_investigation) do
-      :pending -> "Pending interview"
-      :started -> "Ongoing interview"
+      :pending -> styled_status("Pending", :pending)
+      :started -> styled_status("Ongoing", :started)
     end
   end
 
-  def displayable_case_investigation_status(_), do: "Discontinued"
+  def displayable_case_investigation_status(_), do: [content_tag(:span, "Discontinued", class: :discontinued)]
+
+  defp styled_status(displayable_status, status) do
+    content_tag :span do
+      [content_tag(:span, displayable_status, class: status), " interview"]
+    end
+  end
 
   @ethnicity_values_map %{
     "unknown" => "Unknown",

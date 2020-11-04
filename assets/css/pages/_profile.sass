@@ -57,10 +57,9 @@
       .status
         margin-top: 2rem
 
-        .status-value
-          &[data-status-value=pending]
+        .pending
             color: $pending-color
-          &[data-status-value=started]
+        .started
             color: $started-color
 
       .start-interview-case-investigation-link
@@ -90,6 +89,11 @@
         @include level($justify: space-between)
         a
           @include button-outline(wide)
+
+    .contacts-header-row
+      border-top: 2px solid $divider-color
+      padding: 2rem 0
+
 
   section#demographics
     @include card

@@ -157,7 +157,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> HtmlAssertions.assert_text("case-investigation-title", number)
 
     assert parsed_html
-           |> Test.Html.present?(selector: ".status-value[data-status-value=#{status_value}]")
+           |> Test.Html.present?(selector: ".#{status_value}")
 
     view
   end
