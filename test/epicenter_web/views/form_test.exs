@@ -104,7 +104,7 @@ defmodule EpicenterWeb.FormTest do
           <input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical" checked="checked"/>Musical\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="" checked="checked"/>Other\v
+          <input id="movie_genres" name="ignore-me" type="checkbox" value="" checked="checked"/>Other\v
           <input data-reveal="when-parent-checked" id="movie_genres" name="movie[genres][]" type="text" value="Indie"/>\v
         </label>
       </div>
