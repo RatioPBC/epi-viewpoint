@@ -133,6 +133,10 @@ Hooks.AutocompleteList = {
   }
 };
 
+Hooks.Multiselect = {
+  mounted() {}
+};
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
   hooks: Hooks,

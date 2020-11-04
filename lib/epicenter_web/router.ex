@@ -68,6 +68,7 @@ defmodule EpicenterWeb.Router do
     live "/styleguide", Styleguide.StyleguideLive, as: :styleguide
     live "/styleguide/form", Styleguide.FormLive, as: :styleguide_form
     live "/styleguide/form-builder", Styleguide.FormBuilderLive, as: :styleguide_form_builder
+    live "/styleguide/form-multiselect", Styleguide.FormMultiselectLive, as: :styleguide_form_multiselect
     delete "/users/log_out", UserSessionController, :delete
   end
 

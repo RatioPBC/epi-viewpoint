@@ -3,6 +3,20 @@ defmodule Epicenter.Extra.StringTest do
 
   alias Epicenter.Extra
 
+  describe "dasherize" do
+    test "stringifies and converts underscores to dashes" do
+      assert Extra.String.dasherize("foo") == "foo"
+      assert Extra.String.dasherize(:foo) == "foo"
+      assert Extra.String.dasherize("foo bar") == "foo bar"
+      assert Extra.String.dasherize("foo_bar_baz") == "foo-bar-baz"
+      assert Extra.String.dasherize(:foo_bar_baz) == "foo-bar-baz"
+    end
+
+    test "with a list, dasherizes each item and joins with a dash" do
+      assert Extra.String.dasherize(["foo", :bar, :baz_fez]) == "foo-bar-baz-fez"
+    end
+  end
+
   describe "pluralize" do
     test "zero", do: assert(Extra.String.pluralize(0, "nerd", "nerds") == "0 nerds")
     test "one", do: assert(Extra.String.pluralize(1, "nerd", "nerds") == "1 nerd")

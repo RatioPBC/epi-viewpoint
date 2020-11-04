@@ -5,6 +5,7 @@ defmodule EpicenterWeb.Form do
 
   alias EpicenterWeb.Form
   alias EpicenterWeb.FormHelpers
+  alias EpicenterWeb.Multiselect
 
   defstruct ~w{f safe}a
 
@@ -46,12 +47,31 @@ defmodule EpicenterWeb.Form do
 
   @doc "opts: span"
   def footer(%Form.Line{} = line, error_message, opts \\ []) do
-    content_tag :footer do
+    opts = opts |> Keyword.put_new(:span, 8)
+
+    content_tag :footer, data: grid_data(1, line, opts) do
       [
         submit("Save"),
-        content_tag(:div, error_message, class: "form-error-message", "data-form-error-message": error_message)
+        content_tag(:div, error_message,
+          class: "form-error-message",
+          data: [form_error_message: error_message, sticky: Keyword.get(opts, :sticky, false)]
+        )
       ]
     end
+    |> add_to_line(line, Keyword.put_new(opts, :span, 8))
+  end
+
+  @doc "opts: span"
+  def wip_multiselect(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
+    [
+      label(f, field, label_text, data: grid_data(1, line, opts)),
+      error_tag(f, field, data: grid_data(2, line, opts)),
+      content_tag(
+        :div,
+        Multiselect.multiselect_inputs(f, field, values, nil),
+        data: grid_data(3, line, opts) ++ [multiselect: "container"]
+      )
+    ]
     |> add_to_line(line, opts)
   end
 
@@ -75,7 +95,7 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, opts)
   end
 
-  @doc "opts: span"
+  @doc "opts: span, sticky"
   def save_button(%Form.Line{} = line, opts \\ []) do
     submit("Save", data: grid_data(1, line, opts))
     |> add_to_line(line, opts)

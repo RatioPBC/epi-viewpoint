@@ -266,6 +266,12 @@
     .radio-button-list
       @include radio-button-list
 
+    [data-multiselect=container]
+      @include -input-vertical-list
+
+    label[data-multiselect=child]
+      margin-left: 2.5rem
+
     .select-wrapper
       @include select
       margin: 0
@@ -273,12 +279,14 @@
   footer
     @include level
     background-color: white
-    border-top: 2px solid $divider-color
-    bottom: 0
-    left: 0
-    padding: 2rem 2rem 2rem
-    position: fixed
-    right: 0
+
+    &[data-sticky=true]
+      border-top: 2px solid $divider-color
+      bottom: 0
+      left: 0
+      padding: 2rem 2rem 2rem
+      position: fixed
+      right: 0
 
     button
       @include button-secondary

@@ -1,0 +1,14 @@
+#styleguide-form-multiselect-page
+  section
+    h2 Multiselect
+    i Demo of multiselects
+
+    = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
+      = example_form_builder(f, @form_error)
+
+    .debug
+      div form changeset (changed on "Save")
+      div= inspect(@form_changeset)
+    .debug
+      div example (created on "Save" if the form changeset is valid)
+      div= inspect(@example)
