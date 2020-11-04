@@ -118,8 +118,27 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   end
 
   def handle_event("save", %{"clinical_details_form" => params}, socket) do
+    any_other_symptoms = params["symptoms_other"] != nil
+
+    params =
+      params
+      |> Map.put_new("symptoms", [])
+      |> Map.update!("symptoms", fn symptoms -> Enum.reject(symptoms, &Euclid.Exists.blank?/1) end)
+
+    prefilled_values = symptoms() |> Enum.map(fn {_label, value} -> value end)
+
+    params =
+      if any_other_symptoms do
+        params
+      else
+        %{params | "symptoms" => params["symptoms"] |> Enum.filter(&(&1 in prefilled_values))}
+      end
+
     with %Ecto.Changeset{} = form_changeset <-
-           ClinicalDetailsForm.changeset(socket.assigns.case_investigation, Map.put_new(params, "symptoms", [])),
+           ClinicalDetailsForm.changeset(
+             socket.assigns.case_investigation,
+             params
+           ),
          {:form, {:ok, cast_investigation_attrs}} <- {:form, ClinicalDetailsForm.case_investigation_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, cast_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()

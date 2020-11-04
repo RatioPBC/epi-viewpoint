@@ -62,7 +62,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
         "symptom_onset_date" => "09/06/2020",
-        "symptoms" => ["fever", "chills"]
+        "symptoms" => ["fever", "chills", "groggy"],
+        "symptoms_other" => true
       }
     )
     |> Pages.Profile.assert_here(person)
@@ -72,7 +73,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     assert_recent_audit_log(case_investigation, user, %{
       clinical_status: "symptomatic",
       symptom_onset_date: "2020-09-06",
-      symptoms: ["fever", "chills"]
+      symptoms: ["fever", "chills", "groggy"]
     })
   end
 
@@ -81,7 +82,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "symptom_onset_date" => "",
-        "symptoms" => []
+        "symptoms" => [""]
       }
     )
     |> Pages.Profile.assert_here(person)
@@ -104,6 +105,19 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       )
 
     view |> render() |> assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be MM/DD/YYYY"})
+  end
+
+  test "stripping out 'other' when submitting without other checked", %{conn: conn, case_investigation: case_investigation} do
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
+      clinical_details_form: %{
+        "clinical_status" => "symptomatic",
+        "symptom_onset_date" => "09/02/2020",
+        "symptoms" => ["fever", "groggy"]
+      }
+    )
+
+    assert %{symptoms: ["fever"]} = Cases.get_case_investigation(case_investigation.id)
   end
 
   describe "warning the user when navigation will erase their changes" do

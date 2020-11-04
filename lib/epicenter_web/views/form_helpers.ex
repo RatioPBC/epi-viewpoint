@@ -20,7 +20,7 @@ defmodule EpicenterWeb.FormHelpers do
   defp checkbox_and_text_field(_form, _field, nil = _label_text, _values), do: nil
 
   defp checkbox_and_text_field(form, field, label_text, predefined_labels_and_values) do
-    selected_values = input_value(form, field)
+    selected_values = input_value(form, field) || []
     predefined_values = predefined_labels_and_values |> Enum.map(fn {_label, key} -> key end)
     others = Enum.filter(selected_values, fn val -> val not in predefined_values end)
     other_selected? = length(others) > 0
@@ -29,10 +29,10 @@ defmodule EpicenterWeb.FormHelpers do
     label(data: [role: input_list_label_role(form, field)]) do
       [
         checkbox(form, field,
-          name: "ignore-me",
+          name: input_name(form, "#{field}_other"),
           checked: other_selected?,
-          checked_value: nil,
-          value: nil,
+          checked_value: true,
+          value: "true",
           hidden_input: false
         ),
         label_text,
