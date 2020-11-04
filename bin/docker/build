@@ -3,7 +3,7 @@
 source "bin/_support/check.sh"
 
 set +e
-check "Docker running" "docker info  > /dev/null 2>&1" "sudo dockerd # or maybe: docker-machine start default && eval \$(docker-machine env)"
+check "Docker running" "docker info  > /dev/null 2>&1" "sudo dockerd"
 set -e
 
 if [ -n "$GITLAB_CI" ]; then # CI variable is present in gitlab only

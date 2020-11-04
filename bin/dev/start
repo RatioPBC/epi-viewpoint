@@ -19,6 +19,12 @@ docker)
       "# copy ${file} into ./tmp/ssl/ from 'Certificates' vault in 1Password"
   done
 
+  check "hostname in /etc/hosts" \
+    "grep -q viewpoint-dev.network.geometer.dev /etc/hosts" \
+    "hostess add viewpoint-dev.network.geometer.dev 127.0.0.1 # or manually edit /etc/hosts"
+
+  cecho --white "after docker starts, go to" --bold-bright-yellow "https://viewpoint-dev.network.geometer.dev:4000"
+
   docker-compose up
   ;;
 *)
