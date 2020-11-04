@@ -141,6 +141,17 @@ defmodule EpicenterWeb.ProfileLive do
 
   def displayable_case_investigation_status(_), do: [content_tag(:span, "Discontinued", class: :discontinued)]
 
+  @clinical_status_map %{
+    nil => "None",
+    "unknown" => "Unknown",
+    "symptomatic" => "Symptomatic",
+    "asymptomatic" => "Asymptomatic"
+  }
+
+  def displayable_clinical_status(%{clinical_status: clinical_status}) do
+    Map.get(@clinical_status_map, clinical_status)
+  end
+
   defp styled_status(displayable_status, status) do
     content_tag :span do
       [content_tag(:span, displayable_status, class: status), " interview"]

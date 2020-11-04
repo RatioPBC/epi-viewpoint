@@ -92,7 +92,8 @@
 
             tbody
               tr data-tid=case_investigation.tid
-                td= string_or_unknown(nil)
+                td data-role="case-investigation-clinical-status-text"
+                  = displayable_clinical_status(case_investigation)
                 td= string_or_unknown(nil)
                 td= string_or_unknown(nil)
         .case-investigation-contacts

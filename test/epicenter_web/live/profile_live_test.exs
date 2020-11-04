@@ -243,12 +243,33 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations say so", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now()})
+      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: "symptomatic"})
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", status_value: "started", reported_on: "Unknown", number: "001"})
-      |> Pages.Profile.assert_clinical_details_showing("001")
+      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "Symptomatic"})
       |> Pages.Profile.assert_contacts_showing("001")
+    end
+
+    test "started case investigations that lack a clinical status show the value as 'None'", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: nil})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "None"})
+    end
+
+    test "started case investigations with a clinical status of asymptomatic render correctly", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: "asymptomatic"})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "Asymptomatic"})
+    end
+
+    test "started case investigations with a clinical status of unknown render correctly", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: "unknown"})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "Unknown"})
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do

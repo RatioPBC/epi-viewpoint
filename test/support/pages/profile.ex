@@ -270,11 +270,18 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
-  def assert_clinical_details_showing(%View{} = view, number) do
-    view
-    |> render()
-    |> Test.Html.parse()
-    |> Test.Html.find!("#clinical-details-#{number}")
+  def assert_clinical_details_showing(%View{} = view, %{number: number, clinical_status: clinical_status}) do
+    parsed_html =
+      view
+      |> render()
+      |> Test.Html.parse()
+
+    parsed_html |> Test.Html.find!("#clinical-details-#{number}")
+
+    parsed_html
+    |> Test.Html.find("[data-role=case-investigation-clinical-status-text]")
+    |> Test.Html.text()
+    |> assert_eq(clinical_status)
 
     view
   end
