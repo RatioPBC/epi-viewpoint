@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+source "bin/_support/cecho.sh"
+source "bin/_support/git.sh"
+
+LATEST_STAGING_SHA=$(curl -s https://viewpoint-staging.network.geometer.dev/version.txt)
+LATEST_DEMO_SHA=$(curl -s https://viewpoint-demo.network.geometer.dev/version.txt)
+
+if ! sha_exists_locally ${LATEST_STAGING_SHA}; then
+  cecho --bright-bold-red "Could not find deployed sha '${LATEST_STAGING_SHA}' from staging in local git history - do you need to pull?"
+  exit 1
+fi
+
+if ! sha_exists_locally ${LATEST_DEMO_SHA}; then
+  cecho --bright-bold-red "Could not find deployed sha '${LATEST_DEMO_SHA}' from demo in local git history - do you need to pull?"
+  exit 1
+fi
+
+if [[ "${LATEST_DEMO_SHA}" = "${LATEST_STAGING_SHA}" ]]; then
+  cecho --green "Demo is up-to-date with staging (sha: ${LATEST_STAGING_SHA})"
+  exit 0
+fi
+
+cecho --yellow "Demo is missing these commits from staging:"
+git log --pretty=format:"%h: %s (%an/%cn)" "${LATEST_DEMO_SHA}".."${LATEST_STAGING_SHA}"
