@@ -81,7 +81,7 @@
               span id="clinical-details-#{case_investigation.name}"
                 | Clinical
             .links
-              span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation)
+              span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation) , id: "case-investigation-clinical-details-link-001", class: "case-investigation-clinical-details-link"
 
           table.clinical-data data-role="clinical-data-table"
             thead
