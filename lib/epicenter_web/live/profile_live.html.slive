@@ -75,26 +75,27 @@
             span data-role="case-investigation-history-item-text" = history_item.text
             span class="history-item-link" = history_item.link
 
-      .case-investigation-clinical
-        .clinical-details-header-row
-          h4
-            span id="clinical-details-#{case_investigation.name}"
-              | Clinical
-          .links
-            span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation)
+      = if case_investigation.started_at != nil do
+        .case-investigation-clinical
+          .clinical-details-header-row
+            h4
+              span id="clinical-details-#{case_investigation.name}"
+                | Clinical
+            .links
+              span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation)
 
-        table.clinical-data data-role="clinical-data-table"
-          thead
-            tr data-role="table-column-names"
-              th Clinical status
-              th Onset date
-              th Symptoms
+          table.clinical-data data-role="clinical-data-table"
+            thead
+              tr data-role="table-column-names"
+                th Clinical status
+                th Onset date
+                th Symptoms
 
-          tbody
-            tr data-tid=case_investigation.tid
-              td= string_or_unknown(nil)
-              td= string_or_unknown(nil)
-              td= string_or_unknown(nil)
+            tbody
+              tr data-tid=case_investigation.tid
+                td= string_or_unknown(nil)
+                td= string_or_unknown(nil)
+                td= string_or_unknown(nil)
 
   section#lab-results data-role="lab-results"
     header
