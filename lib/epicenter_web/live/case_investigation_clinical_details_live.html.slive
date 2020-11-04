@@ -7,5 +7,6 @@
         span Back
 
   section#case-investigation-clinical-details
+    h2 Edit clinical details
     = form_for @form_changeset, "#", [id: "case-investigation-clinical-details-form", phx_change: "change", phx_submit: "save"], fn f ->
       = clinical_details_form_builder(f, @case_investigation)
