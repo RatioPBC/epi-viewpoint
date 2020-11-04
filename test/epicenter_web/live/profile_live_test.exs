@@ -247,29 +247,40 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", status_value: "started", reported_on: "Unknown", number: "001"})
-      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "Symptomatic"})
+      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "Symptomatic"})
       |> Pages.Profile.assert_contacts_showing("001")
     end
 
-    test "started case investigations that lack a clinical status show the value as 'None'", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: nil})
+    test "started case investigations that lack a clinical details show the values as 'None'", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{
+        started_at: NaiveDateTime.utc_now(),
+        clinical_status: nil,
+        symptom_onset_date: nil
+      })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "None"})
+      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "None", symptom_onset_date: "None"})
     end
 
-    test "started case investigations with a clinical status of asymptomatic render correctly", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: "asymptomatic"})
+    test "started case investigations with a clinical details asymptomatic render correctly", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{
+        started_at: NaiveDateTime.utc_now(),
+        clinical_status: "asymptomatic",
+        symptom_onset_date: ~D[2020-09-12]
+      })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "Asymptomatic"})
+      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "Asymptomatic", symptom_onset_date: "09/12/2020"})
     end
 
-    test "started case investigations with a clinical status of unknown render correctly", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: "unknown"})
+    test "started case investigations with a unknown clinical details render correctly", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{
+        started_at: NaiveDateTime.utc_now(),
+        clinical_status: "unknown"
+      })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_clinical_details_showing(%{number: "001", clinical_status: "Unknown"})
+      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "Unknown"})
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do

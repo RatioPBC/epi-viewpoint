@@ -152,6 +152,9 @@ defmodule EpicenterWeb.ProfileLive do
     Map.get(@clinical_status_map, clinical_status)
   end
 
+  def displayable_symptom_onset_date(%{symptom_onset_date: nil}), do: "None"
+  def displayable_symptom_onset_date(%{symptom_onset_date: symptom_onset_date}), do: Format.date(symptom_onset_date)
+
   defp styled_status(displayable_status, status) do
     content_tag :span do
       [content_tag(:span, displayable_status, class: status), " interview"]
