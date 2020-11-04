@@ -41,7 +41,7 @@ defmodule Epicenter.MixProject do
       {:gettext, "~> 0.11"},
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.0"},
-      {:logger_json, git: "https://github.com/patmaddox/logger_json.git", branch: "google-error-reporter"},
+      {:logger_json, git: "https://github.com/patmaddox/logger_json.git", ref: "472e16ca0f755e7fa3cc75b8617e0b74289e285b"},
       {:mix_audit, "~> 0.1", runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:mox, "~> 1.0"},

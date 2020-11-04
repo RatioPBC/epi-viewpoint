@@ -44,8 +44,10 @@ config :epicenter, EpicenterWeb.Endpoint,
     cacertfile: "/opt/ssl/STAR_network_geometer_dev_bundle.pem"
   ]
 
-config :epicenter, Epicenter.ErrorReporter,
-  service_context: [
-    service: System.fetch_env!("ERROR_REPORTER_SERVICE_NAME"),
-    version: :code.priv_dir(:epicenter) |> Path.join("static/version.txt") |> File.read!() |> String.trim()
-  ]
+config :logger_json, :google_error_reporter,
+  %{
+    serviceContext: %{
+      service: System.fetch_env!("ERROR_REPORTER_SERVICE_NAME"),
+      version: :code.priv_dir(:epicenter) |> Path.join("static/version.txt") |> File.read!() |> String.trim()
+    }
+  }
