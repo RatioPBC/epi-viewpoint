@@ -76,10 +76,12 @@
             span class="history-item-link" = history_item.link
 
       .case-investigation-clinical
-        h4
-          span id="clinical-details-#{case_investigation.name}"
-            | Clinical
-        .links = live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation)
+        .clinical-details-header-row
+          h4
+            span id="clinical-details-#{case_investigation.name}"
+              | Clinical
+          .links
+            span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation)
 
         table.clinical-data data-role="clinical-data-table"
           thead
