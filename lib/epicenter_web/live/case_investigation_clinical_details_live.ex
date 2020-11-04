@@ -4,6 +4,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.Profile.CaseInvestigationPresenter, only: [clinical_statuses_options: 0, symptoms_options: 0]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -78,39 +79,11 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
       "If asymptomatic, date of first positive test (#{Format.date(case_investigation.initiating_lab_result.sampled_on)})"
 
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses(), span: 5))
+    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses_options(), span: 5))
     |> Form.line(&Form.date_field(&1, :symptom_onset_date, "Symptom onset date*", explanation_text: symptom_onset_date_explanation_text, span: 5))
-    |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms(), other: "Other", span: 5))
+    |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), other: "Other", span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
-  end
-
-  defp clinical_statuses() do
-    [
-      {"Unknown", "unknown"},
-      {"Symptomatic", "symptomatic"},
-      {"Asymptomatic", "asymptomatic"}
-    ]
-  end
-
-  defp symptoms() do
-    [
-      {"Fever > 100.4F", "fever"},
-      {"Subjective fever (felt feverish)", "subjective_fever"},
-      {"Cough", "cough"},
-      {"Shortness of breath", "shortness_of_breath"},
-      {"Diarrhea/GI", "diarrhea_gi"},
-      {"Headache", "headache"},
-      {"Muscle ache", "muscle_ache"},
-      {"Chills", "chills"},
-      {"Sore throat", "sore_throat"},
-      {"Vomiting", "vomiting"},
-      {"Abdominal pain", "abdominal_pain"},
-      {"Nasal congestion", "nasal_congestion"},
-      {"Loss of sense of smell", "loss_of_sense_of_smell"},
-      {"Loss of sense of taste", "loss_of_sense_of_taste"},
-      {"Fatigue", "fatigue"}
-    ]
   end
 
   def handle_event("change", %{"clinical_details_form" => params}, socket) do
@@ -125,7 +98,9 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
       |> Map.put_new("symptoms", [])
       |> Map.update!("symptoms", fn symptoms -> Enum.reject(symptoms, &Euclid.Exists.blank?/1) end)
 
-    prefilled_values = symptoms() |> Enum.map(fn {_label, value} -> value end)
+    prefilled_values =
+      symptoms_options()
+      |> Enum.map(fn {_label, value} -> value end)
 
     params =
       if any_other_symptoms do

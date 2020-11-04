@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   import Phoenix.LiveView.Helpers
+  import Phoenix.HTML.Tag
 
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
@@ -117,4 +118,95 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   defp with_interviewee_name(%CaseInvestigation{interview_proxy_name: interview_proxy_name}),
     do: "proxy #{interview_proxy_name}"
+
+  def symptoms_options() do
+    [
+      {"Fever > 100.4F", "fever"},
+      {"Subjective fever (felt feverish)", "subjective_fever"},
+      {"Cough", "cough"},
+      {"Shortness of breath", "shortness_of_breath"},
+      {"Diarrhea/GI", "diarrhea_gi"},
+      {"Headache", "headache"},
+      {"Muscle ache", "muscle_ache"},
+      {"Chills", "chills"},
+      {"Sore throat", "sore_throat"},
+      {"Vomiting", "vomiting"},
+      {"Abdominal pain", "abdominal_pain"},
+      {"Nasal congestion", "nasal_congestion"},
+      {"Loss of sense of smell", "loss_of_sense_of_smell"},
+      {"Loss of sense of taste", "loss_of_sense_of_taste"},
+      {"Fatigue", "fatigue"}
+    ]
+  end
+
+  @symptom_map %{
+    "fever" => "Fever > 100.4F",
+    "subjective_fever" => "Subjective fever (felt feverish)",
+    "cough" => "Cough",
+    "shortness_of_breath" => "Shortness of breath",
+    "diarrhea_gi" => "Diarrhea/GI",
+    "headache" => "Headache",
+    "muscle_ache" => "Muscle ache",
+    "chills" => "Chills",
+    "sore_throat" => "Sore throat",
+    "vomiting" => "Vomiting",
+    "abdominal_pain" => "Abdominal pain",
+    "nasal_congestion" => "Nasal congestion",
+    "loss_of_sense_of_smell" => "Loss of sense of smell",
+    "loss_of_sense_of_taste" => "Loss of sense of taste",
+    "fatigue" => "Fatigue"
+  }
+
+  def symptom_map() do
+    @symptom_map
+  end
+
+  def displayable_case_investigation_status(case_investigation)
+
+  def displayable_case_investigation_status(%{discontinued_at: nil} = case_investigation) do
+    case CaseInvestigation.status(case_investigation) do
+      :pending -> styled_status("Pending", :pending)
+      :started -> styled_status("Ongoing", :started)
+    end
+  end
+
+  def displayable_case_investigation_status(_), do: [content_tag(:span, "Discontinued", class: :discontinued)]
+
+  def clinical_statuses_options() do
+    [
+      {"Unknown", "unknown"},
+      {"Symptomatic", "symptomatic"},
+      {"Asymptomatic", "asymptomatic"}
+    ]
+  end
+
+  @clinical_status_map %{
+    nil => "None",
+    "unknown" => "Unknown",
+    "symptomatic" => "Symptomatic",
+    "asymptomatic" => "Asymptomatic"
+  }
+
+  def displayable_clinical_status(%{clinical_status: clinical_status}) do
+    Map.get(@clinical_status_map, clinical_status)
+  end
+
+  def displayable_symptom_onset_date(%{symptom_onset_date: nil}), do: "None"
+  def displayable_symptom_onset_date(%{symptom_onset_date: symptom_onset_date}), do: Format.date(symptom_onset_date)
+
+  def displayable_symptoms(%{symptoms: nil}), do: "None"
+  def displayable_symptoms(%{symptoms: []}), do: "None"
+
+  def displayable_symptoms(%{symptoms: symptoms}) do
+    Enum.map(symptoms, fn symptom_code ->
+      Map.get(symptom_map(), symptom_code, symptom_code)
+    end)
+    |> Enum.join(", ")
+  end
+
+  defp styled_status(displayable_status, status) do
+    content_tag :span do
+      [content_tag(:span, displayable_status, class: status), " interview"]
+    end
+  end
 end

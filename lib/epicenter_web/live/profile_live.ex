@@ -5,12 +5,20 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
-  import EpicenterWeb.Profile.CaseInvestigationPresenter, only: [interview_buttons: 1, history_items: 1]
+
+  import EpicenterWeb.Profile.CaseInvestigationPresenter,
+    only: [
+      interview_buttons: 1,
+      history_items: 1,
+      displayable_case_investigation_status: 1,
+      displayable_clinical_status: 1,
+      displayable_symptom_onset_date: 1,
+      displayable_symptoms: 1
+    ]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
 
   def mount(%{"id" => person_id}, session, socket) do
@@ -117,75 +125,6 @@ defmodule EpicenterWeb.ProfileLive do
       end
     else
       unknown_value()
-    end
-  end
-
-  def displayable_case_investigation_status(case_investigation)
-
-  # content_tag :footer, data: grid_data(1, line, opts) do
-  #      [
-  #        submit("Save"),
-  #        content_tag(:div, error_message,
-  #          class: "form-error-message",
-  #          data: [form_error_message: error_message, sticky: Keyword.get(opts, :sticky, false)]
-  #        )
-  #      ]
-  #    end
-
-  def displayable_case_investigation_status(%{discontinued_at: nil} = case_investigation) do
-    case CaseInvestigation.status(case_investigation) do
-      :pending -> styled_status("Pending", :pending)
-      :started -> styled_status("Ongoing", :started)
-    end
-  end
-
-  def displayable_case_investigation_status(_), do: [content_tag(:span, "Discontinued", class: :discontinued)]
-
-  @clinical_status_map %{
-    nil => "None",
-    "unknown" => "Unknown",
-    "symptomatic" => "Symptomatic",
-    "asymptomatic" => "Asymptomatic"
-  }
-
-  def displayable_clinical_status(%{clinical_status: clinical_status}) do
-    Map.get(@clinical_status_map, clinical_status)
-  end
-
-  def displayable_symptom_onset_date(%{symptom_onset_date: nil}), do: "None"
-  def displayable_symptom_onset_date(%{symptom_onset_date: symptom_onset_date}), do: Format.date(symptom_onset_date)
-
-  @symptom_map %{
-    "fever" => "Fever > 100.4F",
-    "subjective_fever" => "Subjective fever (felt feverish)",
-    "cough" => "Cough",
-    "shortness_of_breath" => "Shortness of breath",
-    "diarrhea_gi" => "Diarrhea/GI",
-    "headache" => "Headache",
-    "muscle_ache" => "Muscle ache",
-    "chills" => "Chills",
-    "sore_throat" => "Sore throat",
-    "vomiting" => "Vomiting",
-    "abdominal_pain" => "Abdominal pain",
-    "nasal_congestion" => "Nasal congestion",
-    "loss_of_sense_of_smell" => "Loss of sense of smell",
-    "loss_of_sense_of_taste" => "Loss of sense of taste",
-    "fatigue" => "Fatigue"
-  }
-
-  def displayable_symptoms(%{symptoms: nil}), do: "None"
-  def displayable_symptoms(%{symptoms: []}), do: "None"
-
-  def displayable_symptoms(%{symptoms: symptoms}) do
-    Enum.map(symptoms, fn symptom_code ->
-      Map.get(@symptom_map, symptom_code, symptom_code)
-    end)
-    |> Enum.join(", ")
-  end
-
-  defp styled_status(displayable_status, status) do
-    content_tag :span do
-      [content_tag(:span, displayable_status, class: status), " interview"]
     end
   end
 
