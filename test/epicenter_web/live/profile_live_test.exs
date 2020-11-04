@@ -220,8 +220,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Discontinued", reported_on: "Unknown", number: "001"})
       # in discontinued case investigations, start and discontinue buttons move down to history section
-      |> Pages.Profile.assert_start_interview_button_title("001", "")
-      |> Pages.Profile.assert_discontinue_interview_button_title("001", "")
+      |> Pages.Profile.refute_start_interview_button("001")
+      |> Pages.Profile.refute_discontinue_interview_button("001")
+      |> Pages.Profile.refute_complete_interview_button("001")
       |> Pages.Profile.assert_case_investigation_has_history("Discontinued interview on 01/01/2020 at 08:00pm EST: Unable to reach")
     end
 
@@ -242,6 +243,13 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", reported_on: "Unknown", number: "001"})
+    end
+
+    test "started case investigations can be completed", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now()})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigation_complete_button_title("001", "Complete interview")
     end
   end
 

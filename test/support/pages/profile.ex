@@ -177,6 +177,16 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def refute_start_interview_button(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#start-interview-case-investigation-link-#{number}")
+    |> assert_eq([])
+
+    view
+  end
+
   def assert_discontinue_interview_button_title(%View{} = view, number, title) do
     view
     |> render()
@@ -184,6 +194,37 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> Test.Html.find("#discontinue-case-investigation-link-#{number}")
     |> Test.Html.text()
     |> assert_eq(title)
+
+    view
+  end
+
+  def refute_discontinue_interview_button(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#discontinue-case-investigation-link-#{number}")
+    |> assert_eq([])
+
+    view
+  end
+
+  def assert_case_investigation_complete_button_title(%View{} = view, number, title) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#complete-interview-case-investigation-link-#{number}")
+    |> Test.Html.text()
+    |> assert_eq(title)
+
+    view
+  end
+
+  def refute_complete_interview_button(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#complete-interview-case-investigation-link-#{number}")
+    |> assert_eq([])
 
     view
   end

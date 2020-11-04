@@ -17,6 +17,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
       :started ->
         [
+          redirect_to(case_investigation, :complete_interview),
           redirect_to(case_investigation, :discontinue_interview)
         ]
 
@@ -86,6 +87,14 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   defp interview_start_date(case_investigation),
     do: case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+
+  defp redirect_to(_case_investigation, :complete_interview) do
+    live_redirect("Complete interview",
+      to: "#",
+      id: "complete-interview-case-investigation-link-001",
+      class: "complete-interview-case-investigation-link"
+    )
+  end
 
   defp redirect_to(case_investigation, :start_interview) do
     live_redirect("Start interview",
