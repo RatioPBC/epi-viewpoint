@@ -173,14 +173,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Pending", reported_on: "08/07/2020", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "08/07/2020", number: "001"})
     end
 
     test "if lab result is missing reported_on, initiated date is unknown", %{conn: conn, person: person, user: user} do
       build_case_investigation(person, user, "case_investigation", nil)
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Pending", reported_on: "Unknown", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "Unknown", number: "001"})
     end
 
     test "if there are no case investigations, don't  show a case investigation", %{conn: conn, person: person} do
@@ -218,7 +218,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Discontinued", reported_on: "Unknown", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{status: "Discontinued", status_value: "discontinued", reported_on: "Unknown", number: "001"})
       # in discontinued case investigations, start and discontinue buttons move down to history section
       |> Pages.Profile.refute_start_interview_button("001")
       |> Pages.Profile.refute_discontinue_interview_button("001")
@@ -242,7 +242,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now()})
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", reported_on: "Unknown", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", status_value: "started", reported_on: "Unknown", number: "001"})
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do

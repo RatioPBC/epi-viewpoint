@@ -63,7 +63,7 @@
 
       .case-investigation-status
         h3.status data-role="status"
-          span class="status-value"
+          span class="status-value" data-status-value=CaseInvestigation.status(case_investigation)
             = displayable_case_investigation_status(case_investigation)
         .links
           = for link <- interview_buttons(case_investigation) do

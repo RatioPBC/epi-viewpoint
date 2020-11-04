@@ -45,7 +45,10 @@ defmodule Epicenter.Test.Html do
     do: html |> html("title") |> Euclid.Extra.Enum.first!() |> parse() |> Floki.text()
 
   def present?(html, role: role) when not is_binary(html),
-    do: html |> find("[data-role=#{role}]") |> Euclid.Exists.present?()
+    do: html |> present?(selector: "[data-role=#{role}]")
+
+  def present?(html, selector: selector) when not is_binary(html),
+    do: html |> find(selector) |> Euclid.Exists.present?()
 
   def role_text(html, role),
     do: html |> text("[data-role=#{role}]")

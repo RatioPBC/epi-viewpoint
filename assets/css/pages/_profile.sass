@@ -58,7 +58,10 @@
         margin-top: 2rem
 
         .status-value
-          color: $pending-color
+          &[data-status-value=pending]
+            color: $pending-color
+          &[data-status-value=started]
+            color: $started-color
 
       .start-interview-case-investigation-link
         @include button-primary
