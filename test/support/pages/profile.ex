@@ -293,6 +293,13 @@ defmodule EpicenterWeb.Test.Pages.Profile do
       |> assert_eq(symptom_onset_date)
     end
 
+    with symptoms when not is_nil(symptoms) <- Map.get(expected_values, :symptoms) do
+      parsed_html
+      |> Test.Html.find("[data-role=case-investigation-symptoms-text]")
+      |> Test.Html.text()
+      |> assert_eq(symptoms)
+    end
+
     view
   end
 

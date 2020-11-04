@@ -96,7 +96,8 @@
                   = displayable_clinical_status(case_investigation)
                 td data-role="case-investigation-symptom-onset-date-text"
                   = displayable_symptom_onset_date(case_investigation)
-                td= string_or_unknown(nil)
+                td data-role="case-investigation-symptoms-text"
+                  = displayable_symptoms(case_investigation)
         .case-investigation-contacts
           .contacts-header-row
             h4

@@ -155,6 +155,34 @@ defmodule EpicenterWeb.ProfileLive do
   def displayable_symptom_onset_date(%{symptom_onset_date: nil}), do: "None"
   def displayable_symptom_onset_date(%{symptom_onset_date: symptom_onset_date}), do: Format.date(symptom_onset_date)
 
+  @symptom_map %{
+    "fever" => "Fever > 100.4F",
+    "subjective_fever" => "Subjective fever (felt feverish)",
+    "cough" => "Cough",
+    "shortness_of_breath" => "Shortness of breath",
+    "diarrhea_gi" => "Diarrhea/GI",
+    "headache" => "Headache",
+    "muscle_ache" => "Muscle ache",
+    "chills" => "Chills",
+    "sore_throat" => "Sore throat",
+    "vomiting" => "Vomiting",
+    "abdominal_pain" => "Abdominal pain",
+    "nasal_congestion" => "Nasal congestion",
+    "loss_of_sense_of_smell" => "Loss of sense of smell",
+    "loss_of_sense_of_taste" => "Loss of sense of taste",
+    "fatigue" => "Fatigue"
+  }
+
+  def displayable_symptoms(%{symptoms: nil}), do: "None"
+  def displayable_symptoms(%{symptoms: []}), do: "None"
+
+  def displayable_symptoms(%{symptoms: symptoms}) do
+    Enum.map(symptoms, fn symptom_code ->
+      Map.get(@symptom_map, symptom_code, symptom_code)
+    end)
+    |> Enum.join(", ")
+  end
+
   defp styled_status(displayable_status, status) do
     content_tag :span do
       [content_tag(:span, displayable_status, class: status), " interview"]

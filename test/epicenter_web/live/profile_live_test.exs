@@ -259,18 +259,23 @@ defmodule EpicenterWeb.ProfileLiveTest do
       })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "None", symptom_onset_date: "None"})
+      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "None", symptom_onset_date: "None", symptoms: "None"})
     end
 
     test "started case investigations with a clinical details asymptomatic render correctly", %{conn: conn, person: person, user: user} do
       build_case_investigation(person, user, "case_investigation", nil, %{
         started_at: NaiveDateTime.utc_now(),
         clinical_status: "asymptomatic",
-        symptom_onset_date: ~D[2020-09-12]
+        symptom_onset_date: ~D[2020-09-12],
+        symptoms: ["nasal_congestion", "Custom Symptom"]
       })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "Asymptomatic", symptom_onset_date: "09/12/2020"})
+      |> Pages.Profile.assert_clinical_details_showing("001", %{
+        clinical_status: "Asymptomatic",
+        symptom_onset_date: "09/12/2020",
+        symptoms: "Nasal congestion, Custom Symptom"
+      })
     end
 
     test "started case investigations with a unknown clinical details render correctly", %{conn: conn, person: person, user: user} do
@@ -281,6 +286,16 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "Unknown"})
+    end
+
+    test "started case investigations with empty lists of symptoms show None for symptoms", %{conn: conn, person: person, user: user} do
+      build_case_investigation(person, user, "case_investigation", nil, %{
+        started_at: NaiveDateTime.utc_now(),
+        symptoms: []
+      })
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_clinical_details_showing("001", %{symptoms: "None"})
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do
