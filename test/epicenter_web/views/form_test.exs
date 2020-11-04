@@ -133,7 +133,7 @@ defmodule EpicenterWeb.FormTest do
       |> assert_html_eq("""
       <fieldset>
         <label data-grid-col="1" data-grid-row="1" data-grid-span="4" for="movie_release_date">Release date</label>
-        <div data-grid-col="1" data-grid-row="2" data-grid-span="4">MM/DD/YYYY</div>
+        <div data-grid-col="1" data-grid-row="2" data-grid-span="4"><div>MM/DD/YYYY</div></div>
         <input
           data-grid-col="1"
           data-grid-row="4"
@@ -154,7 +154,7 @@ defmodule EpicenterWeb.FormTest do
       |> assert_html_eq("""
       <fieldset>
         <label data-grid-col="1" data-grid-row="1" data-grid-span="2" for="movie_release_date">Release date</label>
-        <div data-grid-col="1" data-grid-row="2" data-grid-span="2">This is a cool release date!</div>
+        <div data-grid-col="1" data-grid-row="2" data-grid-span="2"><div>This is a cool release date!</div></div>
         <input
           data-grid-col="1"
           data-grid-row="4"

@@ -43,7 +43,7 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, opts)
   end
 
-  defp date_explanation_text(opts), do: Keyword.get(opts, :explanation_text, "MM/DD/YYYY")
+  defp date_explanation_text(opts), do: Keyword.get(opts, :explanation_text, "MM/DD/YYYY") |> text_to_html(wrapper_tag: :div)
 
   @doc "opts: span"
   def footer(%Form.Line{} = line, error_message, opts \\ []) do
@@ -82,6 +82,23 @@ defmodule EpicenterWeb.Form do
       error_tag(f, field, data: grid_data(2, line, opts)),
       FormHelpers.radio_button_list(f, field, values, opts, data: grid_data(3, line, opts))
     ]
+    |> add_to_line(line, opts)
+  end
+
+  @doc "opts: span"
+  def checkbox_field(%Form.Line{f: f} = line, field, label_text, checkbox_text, opts \\ []) do
+    label = if label_text, do: [label([data: grid_data(1, line, opts)], do: [label_text])], else: []
+
+    (label ++
+       [
+         error_tag(f, field, data: grid_data(2, line, opts)),
+         label(f, field, data: grid_data(3, line, opts), class: "checkbox-label") do
+           [
+             checkbox(f, field),
+             checkbox_text
+           ]
+         end
+       ])
     |> add_to_line(line, opts)
   end
 

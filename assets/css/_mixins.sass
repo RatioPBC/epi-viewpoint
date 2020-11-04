@@ -251,6 +251,12 @@
     label
       font-weight: bold
 
+      &[data-multiselect=child]
+        margin-left: 2.5rem
+
+      &.checkbox-label
+        font-weight: normal
+
     input, textarea
       padding: $input-padding
       border: 1px solid $input-color
@@ -271,9 +277,6 @@
 
     [data-multiselect=container]
       @include -input-vertical-list
-
-    label[data-multiselect=child]
-      margin-left: 2.5rem
 
     .select-wrapper
       @include select
