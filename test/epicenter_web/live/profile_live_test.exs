@@ -174,6 +174,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "08/07/2020", number: "001"})
+
+      # TODO
+      #      |> Pages.Profile.refute_clinical_details_showing("001")
+      #      |> Pages.Profile.refute_contacts_showing("001")
     end
 
     test "if lab result is missing reported_on, initiated date is unknown", %{conn: conn, person: person, user: user} do
@@ -224,6 +228,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.refute_discontinue_interview_button("001")
       |> Pages.Profile.refute_complete_interview_button("001")
       |> Pages.Profile.assert_case_investigation_has_history("Discontinued interview on 01/01/2020 at 08:00pm EST: Unable to reach")
+
+      # TODO 
+      #      |> Pages.Profile.refute_clinical_details_showing("001")
+      #      |> Pages.Profile.refute_contacts_showing("001")
     end
 
     test "discontinuation reason can be edited", %{conn: conn, person: person, user: user} do
@@ -243,6 +251,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", status_value: "started", reported_on: "Unknown", number: "001"})
+      |> Pages.Profile.assert_clinical_details_showing("001")
+
+      # TODO
+      #      |> Pages.Profile.assert_contacts_showing("001")
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do

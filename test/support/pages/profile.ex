@@ -264,6 +264,44 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def assert_clinical_details_showing(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find!("#clinical-details-#{number}")
+
+    view
+  end
+
+  def assert_contacts_showing(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find!("#contacts-#{number}")
+
+    view
+  end
+
+  def refute_clinical_details_showing(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#clinical-details-#{number}")
+    |> assert_eq([])
+
+    view
+  end
+
+  def refute_contacts_showing(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#contacts-#{number}")
+    |> assert_eq([])
+
+    view
+  end
+
   #
   # lab results
   #
