@@ -180,6 +180,13 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       )
 
     Form.new(form)
+    |> Form.line(
+      &Form.content_div(
+        &1,
+        "Include people who live in the same house, or are from workspaces, shared meals, volunteer activities, playing sports, parties, places of worship, gym or exercise class, gatherings or social events, sporting events, and concerts.",
+        span: 8
+      )
+    )
     |> Form.line(fn line ->
       line
       |> Form.text_field(:first_name, "First name")
