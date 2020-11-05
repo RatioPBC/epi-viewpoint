@@ -1,5 +1,4 @@
-defmodule EpicenterWeb.Test.Pages.CaseInvestigationComplete do
-
+defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   alias EpicenterWeb.Test.Pages
 
   def assert_here(view_or_conn_or_html) do

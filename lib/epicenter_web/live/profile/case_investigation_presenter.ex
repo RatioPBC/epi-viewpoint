@@ -91,7 +91,12 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   defp redirect_to(case_investigation, :complete_interview) do
     live_redirect("Complete interview",
-      to: Routes.case_investigation_complete_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationCompleteLive, case_investigation),
+      to:
+        Routes.case_investigation_complete_interview_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.CaseInvestigationCompleteInterviewLive,
+          case_investigation
+        ),
       id: "complete-interview-case-investigation-link-001",
       class: "complete-interview-case-investigation-link"
     )

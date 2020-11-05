@@ -106,7 +106,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.click_complete_case_investigation("001")
     |> Pages.follow_live_view_redirect(conn)
     |> elem(1)
-    |> Pages.CaseInvestigationComplete.assert_here()
+    |> Pages.CaseInvestigationCompleteInterview.assert_here()
 
     assert %{
              case_investigations: [
