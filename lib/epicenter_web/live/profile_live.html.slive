@@ -103,6 +103,8 @@
             h4
               span id="contacts-#{case_investigation.name}"
                 | Contacts
+          div
+            = live_redirect "Edit", to: Routes.create_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation) , id: "add-contact-case-investigation-link-001", class: "add-contact-case-investigation-link"
 
   section#lab-results data-role="lab-results"
     header

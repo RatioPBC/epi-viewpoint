@@ -3,6 +3,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
@@ -143,4 +144,14 @@ defmodule Epicenter.Cases do
   end
 
   def preload_demographics(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(demographics: Demographic.Query.display_order())
+
+  #
+  # exposures
+  #
+  def change_exposure(%Exposure{} = exposure, attrs), do: Exposure.changeset(exposure, attrs)
+  def preload_exposures(%CaseInvestigation{} = case_investigation), do: case_investigation |> Repo.preload([:exposures])
+
+  def create_exposure({attrs, audit_meta}) do
+    %Exposure{} |> change_exposure(attrs) |> AuditLog.insert(audit_meta)
+  end
 end

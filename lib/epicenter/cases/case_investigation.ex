@@ -5,6 +5,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
   import Epicenter.EctoRedactionJasonEncoder
 
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
 
@@ -30,6 +31,8 @@ defmodule Epicenter.Cases.CaseInvestigation do
 
     belongs_to :initiating_lab_result, LabResult
     belongs_to :person, Person
+
+    has_many :exposures, Exposure, foreign_key: :exposing_case_id
   end
 
   derive_jason_encoder(except: [:seq])
