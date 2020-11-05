@@ -169,10 +169,15 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   end
 
   def contact_form_builder(form, case_investigation) do
-    onset_date = case_investigation.symptom_onset_date || case_investigation.initiating_lab_result.sampled_on
+    onset_date = case_investigation.symptom_onset_date
+    sampled_date = case_investigation.initiating_lab_result.sampled_on
+    infectious_seed_date = onset_date || sampled_date
 
     infectious_period =
-      if(onset_date, do: "#{onset_date |> Date.add(-2) |> Format.date()} - #{onset_date |> Date.add(10) |> Format.date()}", else: "Unknown")
+      if(infectious_seed_date,
+        do: "#{infectious_seed_date |> Date.add(-2) |> Format.date()} - #{infectious_seed_date |> Date.add(10) |> Format.date()}",
+        else: "Unavailable"
+      )
 
     Form.new(form)
     |> Form.line(fn line ->
@@ -189,7 +194,15 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         &1,
         :most_recent_date_together,
         "Most recent day together",
-        explanation_text: "Onset date: #{if(onset_date, do: Format.date(onset_date), else: "Unknown")}\nInfectious period: #{infectious_period}",
+        explanation_text:
+          Enum.join(
+            [
+              "Onset date: #{if(onset_date, do: Format.date(onset_date), else: "Unavailable")}",
+              "Positive lab sample: #{if(sampled_date, do: Format.date(sampled_date), else: "Unavailable")}",
+              "Infectious period: #{infectious_period}"
+            ],
+            "\n"
+          ),
         span: 4
       )
     )

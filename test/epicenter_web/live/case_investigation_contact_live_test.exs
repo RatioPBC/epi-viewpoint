@@ -77,6 +77,63 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
     end
 
+    test "when the symptom onset date is available, contains value and uses it for the infectious period", %{
+      conn: conn,
+      case_investigation: case_investigation
+    } do
+      text =
+        Pages.CaseInvestigationContact.visit(conn, case_investigation)
+        |> render()
+        |> Pages.parse()
+        |> Test.Html.text()
+
+      assert text =~ "Onset date: 11/03/2020"
+      assert text =~ "Positive lab sample: 08/06/2020"
+      assert text =~ "Infectious period: 11/01/2020 - 11/13/2020"
+    end
+
+    test "when the symptom onset is not available, contains the lab result's sampled on instead", %{
+      conn: conn,
+      case_investigation: case_investigation
+    } do
+      {:ok, case_investigation} = Cases.update_case_investigation(case_investigation, {%{symptom_onset_date: nil}, Test.Fixtures.admin_audit_meta()})
+
+      text =
+        Pages.CaseInvestigationContact.visit(conn, case_investigation)
+        |> render()
+        |> Pages.parse()
+        |> Test.Html.text()
+
+      assert text =~ "Onset date: Unavailable"
+      assert text =~ "Positive lab sample: 08/06/2020"
+      assert text =~ "Infectious period: 08/04/2020 - 08/16/2020"
+    end
+
+    test "when the symptom onset is not available, and the initiating lab result lacks a sampled on, shows unavailable for everything", %{
+      conn: conn,
+      case_investigation: case_investigation,
+      person: person,
+      user: user
+    } do
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "alice-test-result", nil) |> Cases.create_lab_result!()
+
+      {:ok, case_investigation} =
+        Cases.update_case_investigation(
+          case_investigation,
+          {%{symptom_onset_date: nil, initiating_lab_result_id: lab_result.id}, Test.Fixtures.admin_audit_meta()}
+        )
+
+      text =
+        Pages.CaseInvestigationContact.visit(conn, case_investigation)
+        |> render()
+        |> Pages.parse()
+        |> Test.Html.text()
+
+      assert text =~ "Onset date: Unavailable"
+      assert text =~ "Positive lab sample: Unavailable"
+      assert text =~ "Infectious period: Unavailable"
+    end
+
     test "validates the fields", %{conn: conn, case_investigation: case_investigation} do
       view =
         Pages.CaseInvestigationContact.visit(conn, case_investigation)
