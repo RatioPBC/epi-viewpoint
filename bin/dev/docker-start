@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+source "bin/_support/cecho.sh"
+source "bin/_support/check.sh"
+source "bin/_support/step.sh"
+
+set -e
+
+for file in STAR_network_geometer_dev.key STAR_network_geometer_dev.pem STAR_network_geometer_dev_bundle.pem; do
+  check "${file} exists in ./tmp/ssl" \
+    "test -f ./tmp/ssl/${file}" \
+    "# copy ${file} into ./tmp/ssl/ from 'Certificates' vault in 1Password"
+done
+
+check "hostname in /etc/hosts" \
+  "grep -q viewpoint-dev.network.geometer.dev /etc/hosts" \
+  "hostess add viewpoint-dev.network.geometer.dev 127.0.0.1 # or manually edit /etc/hosts"
+
+step "Stopping local postgres" "bin/dev/postgres-stop -q"
+step "Building docker image" "bin/docker/build"
+
+cecho --white "after docker starts, go to" --bold-bright-yellow "https://viewpoint-dev.network.geometer.dev:4000"
+
+step_header "Starting docker" "docker-compose up"
+docker-compose up
