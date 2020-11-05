@@ -33,4 +33,21 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     |> Pages.CaseInvestigationCompleteInterview.assert_time_completed("06:03", "PM")
     |> Pages.CaseInvestigationCompleteInterview.assert_date_completed("01/01/2020")
   end
+
+  test "saving complete case investigation", %{conn: conn, case_investigation: case_investigation, person: person} do
+    Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
+      complete_interview_form: %{
+        "date_completed" => "09/06/2020",
+        "time_completed" => "03:45",
+        "time_completed_am_pm" => "PM"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    #    |> Pages.Profile.assert_case_investigation_has_history("Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT")
+
+    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
+  end
 end

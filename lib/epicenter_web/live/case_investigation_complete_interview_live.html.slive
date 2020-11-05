@@ -1,4 +1,4 @@
 #case-investigation-complete-page data-page="case-investigation-complete"
 
-  = form_for @form_changeset, "#", fn f ->
+  = form_for @form_changeset, "#", [id: "case-investigation-interview-complete-form", phx_submit: "save"], fn f ->
     = complete_interview_form_builder(f)
