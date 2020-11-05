@@ -81,13 +81,22 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses_options(), span: 5))
     |> Form.line(&Form.date_field(&1, :symptom_onset_date, "Symptom onset date*", explanation_text: symptom_onset_date_explanation_text, span: 5))
-    |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), other: "Other", span: 5))
+    |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end
 
   def handle_event("change", %{"clinical_details_form" => params}, socket) do
-    socket |> assign(:form_changeset, ClinicalDetailsForm.changeset(socket.assigns.case_investigation, params)) |> noreply()
+    params =
+      if Map.has_key?(params, :symptoms) do
+        params
+      else
+        Map.put(params, "symptoms", [])
+      end
+
+    new_changeset = ClinicalDetailsForm.changeset(socket.assigns.case_investigation, params)
+
+    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
   end
 
   def handle_event("save", %{"clinical_details_form" => params}, socket) do

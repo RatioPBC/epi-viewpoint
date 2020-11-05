@@ -56,7 +56,13 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.CaseInvestigationClinicalDetails.assert_save_button_visible()
   end
 
-  test "saving clinical details", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
+  @tag :skip
+  test "saving clinical details with progressive disclosure of 'Other' text box", %{
+    conn: conn,
+    case_investigation: case_investigation,
+    person: person,
+    user: user
+  } do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
@@ -77,12 +83,54 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     })
   end
 
+  test "saving clinical details", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
+      clinical_details_form: %{
+        "clinical_status" => "symptomatic",
+        "symptom_onset_date" => "09/06/2020",
+        "symptoms" => ["fever", "chills"]
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    assert_revision_count(case_investigation, 2)
+
+    assert_recent_audit_log(case_investigation, user, %{
+      clinical_status: "symptomatic",
+      symptom_onset_date: "2020-09-06",
+      symptoms: ["fever", "chills"]
+    })
+  end
+
+  @tag :skip
+  test "saving clinical details with an 'Other' symptom", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
+      clinical_details_form: %{
+        "clinical_status" => "symptomatic",
+        "symptom_onset_date" => "09/06/2020",
+        "symptoms" => ["fever", "chills"],
+        "symptoms_other" => true
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    assert_revision_count(case_investigation, 2)
+
+    assert_recent_audit_log(case_investigation, user, %{
+      clinical_status: "symptomatic",
+      symptom_onset_date: "2020-09-06",
+      symptoms: ["fever", "chills"]
+    })
+  end
+
   test "saving empty clinical details", %{conn: conn, case_investigation: case_investigation, person: person} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "symptom_onset_date" => "",
-        "symptoms" => [""]
+        "symptoms" => []
       }
     )
     |> Pages.Profile.assert_here(person)
@@ -107,6 +155,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     view |> render() |> assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be MM/DD/YYYY"})
   end
 
+  @tag :skip
   test "stripping out 'other' when submitting without other checked", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",

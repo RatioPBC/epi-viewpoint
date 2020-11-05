@@ -2,7 +2,7 @@
 
   section
     header#subnav
-      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [confirm: confirmation_prompt(@form_changeset), role: "back-link"] do
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [confirm: @confirmation_prompt, role: "back-link"] do
         = back_icon()
         span Back
 

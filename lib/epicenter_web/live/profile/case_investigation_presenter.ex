@@ -135,7 +135,8 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       {"Nasal congestion", "nasal_congestion"},
       {"Loss of sense of smell", "loss_of_sense_of_smell"},
       {"Loss of sense of taste", "loss_of_sense_of_taste"},
-      {"Fatigue", "fatigue"}
+      {"Fatigue", "fatigue"},
+      {"Other", "Other"}
     ]
   end
 
