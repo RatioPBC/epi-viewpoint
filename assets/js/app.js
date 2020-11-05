@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
 //
 import "phoenix_html";
 import { Socket } from "phoenix";
-import NProgress from "nprogress";
 import { LiveSocket, Browser } from "phoenix_live_view";
 
 let Hooks = {};
