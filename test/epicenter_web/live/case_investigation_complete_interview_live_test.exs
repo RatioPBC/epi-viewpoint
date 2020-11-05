@@ -21,7 +21,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     |> Pages.CaseInvestigationCompleteInterview.assert_time_completed(:now)
   end
 
-  test "prefills with existing data when existing data is available", %{conn: conn, case_investigation: case_investigation} do
+  test "prefills with existing data when existing data is available and can be edited", %{conn: conn, case_investigation: case_investigation} do
     {:ok, _} =
       Cases.update_case_investigation(
         case_investigation,
@@ -32,6 +32,16 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     |> Pages.CaseInvestigationCompleteInterview.assert_here()
     |> Pages.CaseInvestigationCompleteInterview.assert_time_completed("06:03", "PM")
     |> Pages.CaseInvestigationCompleteInterview.assert_date_completed("01/01/2020")
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
+      complete_interview_form: %{
+        "date_completed" => "09/06/2020",
+        "time_completed" => "03:45",
+        "time_completed_am_pm" => "PM"
+      }
+    )
+
+    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
   end
 
   test "saving complete case investigation", %{conn: conn, case_investigation: case_investigation, person: person} do
