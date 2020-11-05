@@ -86,7 +86,7 @@ defmodule EpicenterWeb.Test.Pages do
       {"input", _attrs, _children} = element ->
         type = element |> Test.Html.attr("type") |> List.first()
         checked = element |> Test.Html.attr("checked") |> List.first()
-        type != "radio" || checked == "checked"
+        type not in ["radio", "checkbox"] || checked == "checked"
 
       _ ->
         false

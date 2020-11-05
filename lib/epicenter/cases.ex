@@ -154,4 +154,14 @@ defmodule Epicenter.Cases do
   def create_exposure({attrs, audit_meta}) do
     %Exposure{} |> change_exposure(attrs) |> AuditLog.insert(audit_meta)
   end
+
+  def update_exposure(exposure, {attrs, audit_meta}) do
+    exposure |> change_exposure(attrs) |> AuditLog.update(audit_meta)
+  end
+
+  def get_exposure(id) do
+    Exposure |> Repo.get(id)
+  end
+
+  def preload_exposed_person(exposures), do: exposures |> Repo.preload([exposed_person: [:demographics, :phones]])
 end

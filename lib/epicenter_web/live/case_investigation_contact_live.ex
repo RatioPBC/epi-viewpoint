@@ -7,6 +7,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.Person
+  alias Epicenter.Format
   alias EpicenterWeb.Form
 
   defmodule ContactForm do
@@ -15,10 +17,15 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     import Ecto.Changeset
 
     alias Epicenter.Cases.Exposure
+    alias Epicenter.Cases.Person
     alias Epicenter.DateParser
     alias Epicenter.Validation
 
     embedded_schema do
+      field :exposure_id, :string
+      field :person_id, :string
+      field :phone_id, :string
+      field :demographic_id, :string
       field :first_name, :string
       field :last_name, :string
       field :relationship_to_case, :string
@@ -30,10 +37,23 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     end
 
     def changeset(%Exposure{} = exposure, attrs) do
+      person = exposure.exposed_person || %Person{demographics: [], phones: []}
+      demographic = Person.coalesce_demographics(person)
+      phone = List.first(person.phones) || %{id: nil, number: ""}
+
       %__MODULE__{
-        first_name: "",
-        last_name: "",
-        phone: ""
+        exposure_id: exposure.id,
+        person_id: person.id,
+        demographic_id: demographic.id,
+        phone_id: phone.id,
+        first_name: demographic.first_name,
+        last_name: demographic.last_name,
+        phone: phone.number,
+        under_18: exposure.under_18,
+        same_household: exposure.household_member,
+        relationship_to_case: exposure.relationship_to_case,
+        preferred_language: demographic.preferred_language,
+        most_recent_date_together: Format.date(exposure.most_recent_date_together)
       }
       |> cast(attrs, [
         :first_name,
@@ -56,74 +76,127 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       |> Validation.validate_date(:most_recent_date_together)
     end
 
+    def tap(data, func) do
+      func.(data)
+      data
+    end
+
     def contact_params(%Ecto.Changeset{} = formdata) do
       with {:ok, data} <- apply_action(formdata, :insert) do
+        phones =
+          if Euclid.Exists.present?(data.phone) do
+            [%{id: data.phone_id, source: "form", number: data.phone}]
+          else
+            []
+          end
+
         {:ok,
          %{
+           id: data.exposure_id,
            most_recent_date_together: DateParser.parse_mm_dd_yyyy!(data.most_recent_date_together),
            relationship_to_case: data.relationship_to_case,
            under_18: data.under_18,
            household_member: data.same_household,
            exposed_person: %{
+             id: data.person_id,
              demographics: [
-               %{source: "form", first_name: data.first_name, last_name: data.last_name}
-             ]
+               %{id: data.demographic_id, source: "form", first_name: data.first_name, last_name: data.last_name}
+             ],
+             phones: phones
            }
          }}
       end
     end
   end
 
-  def mount(%{"id" => case_investigation_id}, session, socket) do
-    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person()
+  def mount(%{"case_investigation_id" => case_investigation_id} = params, session, socket) do
+    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person() |> Cases.preload_initiating_lab_result()
+
+    exposure =
+      if id = params["id"] do
+        Cases.get_exposure(id) |> Cases.preload_exposed_person()
+      else
+        %Exposure{exposed_person: %Person{demographics: [], phones: []}}
+      end
 
     socket
     |> authenticate_user(session)
     |> assign_page_title("Case Investigation Contact")
-    |> assign(:changeset, ContactForm.changeset(%Exposure{}, %{}))
+    |> assign(:changeset, ContactForm.changeset(exposure, %{}))
+    |> assign(:exposure, exposure)
     |> assign(:case_investigation, case_investigation)
     |> ok()
   end
 
+  def handle_event("change", %{"contact_form" => params}, socket) do
+    socket |> assign(changeset: ContactForm.changeset(socket.assigns.exposure, params)) |> noreply()
+  end
+
   def handle_event("save", %{"contact_form" => params}, socket) do
-    with {:form, {:ok, data}} <- {:form, ContactForm.changeset(%Exposure{}, params) |> ContactForm.contact_params()},
+    exposure = socket.assigns.exposure
+
+    with {:form, {:ok, data}} <- {:form, ContactForm.changeset(exposure, params) |> ContactForm.contact_params()},
          data = data |> Map.put(:exposing_case_id, socket.assigns.case_investigation.id),
-         {:ok, _} <- create_exposure(data, socket.assigns.current_user) do
+         {:ok, _} <- create_or_update_exposure(exposure, data, socket.assigns.current_user) do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
-
-      # else
-      #   {:form, {:error, changeset}} ->
-      #     socket
-      #     |> assign(changeset: changeset)
-      #     |> noreply()
+    else
+      {:form, {:error, changeset}} ->
+        socket
+        |> assign(changeset: changeset)
+        |> noreply()
     end
   end
 
-  defp create_exposure(data, author) do
-    Cases.create_exposure(
-      {data,
-       %Epicenter.AuditLog.Meta{
-         author_id: author.id,
-         reason_action: AuditLog.Revision.create_contact_action(),
-         reason_event: AuditLog.Revision.create_contact_event()
-       }}
-    )
+  defp create_or_update_exposure(exposure, data, author) do
+    if data.id do
+      Cases.update_exposure(
+        exposure,
+        {data,
+         %Epicenter.AuditLog.Meta{
+           author_id: author.id,
+           reason_action: AuditLog.Revision.create_contact_action(),
+           reason_event: AuditLog.Revision.create_contact_event()
+         }}
+      )
+    else
+      Cases.create_exposure(
+        {data,
+         %Epicenter.AuditLog.Meta{
+           author_id: author.id,
+           reason_action: AuditLog.Revision.create_contact_action(),
+           reason_event: AuditLog.Revision.create_contact_event()
+         }}
+      )
+    end
   end
 
-  def contact_form_builder(form) do
+  def contact_form_builder(form, case_investigation) do
+    onset_date = case_investigation.symptom_onset_date || case_investigation.initiating_lab_result.sampled_on
+
+    infectious_period =
+      if(onset_date, do: "#{onset_date |> Date.add(-2) |> Format.date()} - #{onset_date |> Date.add(10) |> Format.date()}", else: "Unknown")
+
     Form.new(form)
     |> Form.line(fn line ->
       line
       |> Form.text_field(:first_name, "First name")
       |> Form.text_field(:last_name, "Last name")
     end)
-    |> Form.line(&Form.text_field(&1, :relationship_to_case, "Relationship to case"))
+    |> Form.line(&Form.text_field(&1, :relationship_to_case, "Relationship to case", span: 4))
     |> Form.line(&Form.checkbox_field(&1, :same_household, nil, "This person lives in the same household", span: 8))
     |> Form.line(&Form.checkbox_field(&1, :under_18, "Age", "This person is under 18 years old", span: 8))
-    |> Form.line(&Form.text_field(&1, :phone, "Phone"))
-    |> Form.line(&Form.date_field(&1, :most_recent_date_together, "Most recent day together"))
+    |> Form.line(&Form.text_field(&1, :phone, "Phone", span: 4))
+    |> Form.line(
+      &Form.date_field(
+        &1,
+        :most_recent_date_together,
+        "Most recent day together",
+        explanation_text: "Onset date: #{if(onset_date, do: Format.date(onset_date), else: "Unknown")}\nInfectious period: #{infectious_period}",
+        span: 4
+      )
+    )
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end
