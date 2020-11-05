@@ -165,8 +165,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         {data,
          %Epicenter.AuditLog.Meta{
            author_id: author.id,
-           reason_action: AuditLog.Revision.create_contact_action(),
-           reason_event: AuditLog.Revision.create_contact_event()
+           reason_action: AuditLog.Revision.update_exposure_action(),
+           reason_event: AuditLog.Revision.update_contact_event()
          }}
       )
     end
