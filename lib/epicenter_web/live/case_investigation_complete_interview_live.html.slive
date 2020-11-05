@@ -1,1 +1,4 @@
 #case-investigation-complete-page data-page="case-investigation-complete"
+
+  = form_for @form_changeset, "#", fn f ->
+    = complete_interview_form_builder(f)
