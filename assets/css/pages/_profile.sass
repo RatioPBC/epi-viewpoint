@@ -90,9 +90,15 @@
         a
           @include button-outline(wide)
 
-    .contacts-header-row
-      border-top: 2px solid $divider-color
-      padding: 2rem 0
+    .case-investigation-contacts
+      .contacts-header-row
+        border-top: 2px solid $divider-color
+        padding: 2rem 0
+        @include level($justify: space-between)
+        .add-contact-case-investigation-link
+          @include button-outline(wide)
+
+
 
 
   section#demographics
