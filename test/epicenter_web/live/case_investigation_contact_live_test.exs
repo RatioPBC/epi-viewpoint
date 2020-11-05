@@ -74,7 +74,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Epicenter.Repo.preload(exposures: [exposed_person: [:demographics, :phones]])
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
     end
 
     test "validates the fields", %{conn: conn, case_investigation: case_investigation} do
@@ -216,7 +216,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Epicenter.Repo.preload(exposures: [exposed_person: [:demographics, :phones]])
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
     end
   end
 end

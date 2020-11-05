@@ -149,7 +149,11 @@ defmodule Epicenter.Cases do
   # exposures
   #
   def change_exposure(%Exposure{} = exposure, attrs), do: Exposure.changeset(exposure, attrs)
-  def preload_exposures(%CaseInvestigation{} = case_investigation), do: case_investigation |> Repo.preload([:exposures])
+
+  def preload_exposures(%CaseInvestigation{} = case_investigation),
+    do: case_investigation |> Repo.preload(exposures: [exposed_person: [:demographics, :phones]])
+
+  def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
 
   def create_exposure({attrs, audit_meta}) do
     %Exposure{} |> change_exposure(attrs) |> AuditLog.insert(audit_meta)
@@ -162,6 +166,4 @@ defmodule Epicenter.Cases do
   def get_exposure(id) do
     Exposure |> Repo.get(id)
   end
-
-  def preload_exposed_person(exposures), do: exposures |> Repo.preload([exposed_person: [:demographics, :phones]])
 end

@@ -600,6 +600,123 @@ defmodule Epicenter.CasesTest do
     end
   end
 
+  describe "create_exposure" do
+    test "makes an exposure and a revision" do
+      case_investigation = setup_case_investigation!()
+
+      {:ok, exposure} =
+        Cases.create_exposure({
+          Test.Fixtures.exposure_attrs(case_investigation, "exposure", %{under_18: true})
+          |> Map.put(:exposed_person, %{}),
+          Test.Fixtures.admin_audit_meta()
+        })
+
+      case_investigation_id = case_investigation.id
+      author_id = @admin.id
+
+      assert %{exposing_case_id: ^case_investigation_id, under_18: true} = Cases.get_exposure(exposure.id)
+      assert %{author_id: ^author_id, change: %{"exposing_case_id" => ^case_investigation_id, "under_18" => true}} = recent_audit_log(exposure)
+    end
+  end
+
+  describe "update_exposure" do
+    test "updates an exposure end creates a revision" do
+      case_investigation = setup_case_investigation!()
+
+      {:ok, exposure} =
+        Cases.create_exposure({
+          Test.Fixtures.exposure_attrs(case_investigation, "exposure")
+          |> Map.put(:exposed_person, %{}),
+          Test.Fixtures.admin_audit_meta()
+        })
+
+      {:ok, exposure} =
+        Cases.update_exposure(exposure, {
+          %{household_member: true},
+          Test.Fixtures.admin_audit_meta()
+        })
+
+      author_id = @admin.id
+      assert %{household_member: true} = Cases.get_exposure(exposure.id)
+      assert %{author_id: ^author_id, change: %{"household_member" => true}} = recent_audit_log(exposure)
+    end
+  end
+
+  describe "preload_exposures" do
+    test "hydrates exactly into an exposure's exposed_person's demographics and phones" do
+      case_investigation = setup_case_investigation!()
+
+      {:ok, _exposure} =
+        Cases.create_exposure({
+          Test.Fixtures.exposure_attrs(case_investigation, "exposure")
+          |> Map.put(:exposed_person, %{
+            demographics: [
+              %{first_name: "Cindy"}
+            ],
+            phones: [
+              %{number: "1111111987"}
+            ]
+          }),
+          Test.Fixtures.admin_audit_meta()
+        })
+
+      assert %{
+               exposures: [
+                 %{
+                   exposed_person: %{
+                     demographics: [
+                       %{first_name: "Cindy"}
+                     ],
+                     phones: [
+                       %{number: "1111111987"}
+                     ]
+                   }
+                 }
+               ]
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+    end
+  end
+
+  describe "preload_exposed_person" do
+    test "hydrates exactly into the exposed_person's demographics and phones" do
+      case_investigation = setup_case_investigation!()
+
+      {:ok, exposure} =
+        Cases.create_exposure({
+          Test.Fixtures.exposure_attrs(case_investigation, "exposure")
+          |> Map.put(:exposed_person, %{
+            demographics: [
+              %{first_name: "Cindy"}
+            ],
+            phones: [
+              %{number: "1111111987"}
+            ]
+          }),
+          Test.Fixtures.admin_audit_meta()
+        })
+
+      assert %{
+               exposed_person: %{
+                 demographics: [
+                   %{first_name: "Cindy"}
+                 ],
+                 phones: [
+                   %{number: "1111111987"}
+                 ]
+               }
+             } = Cases.get_exposure(exposure.id) |> Cases.preload_exposed_person()
+    end
+  end
+
+  defp setup_case_investigation!() do
+    creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
+    {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+    lab_result = Test.Fixtures.lab_result_attrs(person, creator, "person1_test_result", ~D[2020-10-04]) |> Cases.create_lab_result!()
+
+    Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
+    |> Cases.create_case_investigation!()
+  end
+
   defp demographics(person_id) do
     Cases.get_person(person_id) |> Cases.preload_demographics() |> Map.get(:demographics)
   end

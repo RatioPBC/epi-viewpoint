@@ -1,5 +1,6 @@
 defmodule Epicenter.Test.Fixtures do
   alias Epicenter.AuditLog
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
@@ -54,6 +55,18 @@ defmodule Epicenter.Test.Fixtures do
       |> merge_attrs(attrs)
 
     {attrs, audit_meta(author)}
+  end
+
+  def exposure_attrs(%CaseInvestigation{id: case_investigation_id}, tid, attrs \\ %{}) do
+    %{
+      tid: tid,
+      exposing_case_id: case_investigation_id,
+      relationship_to_case: "Family",
+      most_recent_date_together: ~D[2020-10-31],
+      household_member: false,
+      under_18: false
+    }
+    |> merge_attrs(attrs)
   end
 
   # annotated with audit_meta
