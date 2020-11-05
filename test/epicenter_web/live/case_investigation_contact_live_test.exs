@@ -34,6 +34,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                "contact_form[first_name]" => nil,
                "contact_form[last_name]" => nil,
                "contact_form[relationship_to_case]" => "",
+               "contact_form[preferred_language]" => "",
                "contact_form[phone]" => ""
              } = Pages.form_state(view)
 
@@ -46,7 +47,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "most_recent_date_together" => "10/31/2020",
           "under_18" => "true",
           "same_household" => "true",
-          "phone" => "1111111234"
+          "phone" => "1111111234",
+          "preferred_language" => "Haitian Creole"
         }
       )
       |> Pages.Profile.assert_here(person)
@@ -63,7 +65,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                        %{
                          source: "form",
                          first_name: "Alice",
-                         last_name: "Testuser"
+                         last_name: "Testuser",
+                         preferred_language: "Haitian Creole"
                        }
                      ],
                      phones: [
@@ -204,7 +207,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                  %{
                    source: "form",
                    first_name: "Billy",
-                   last_name: "Testuser"
+                   last_name: "Testuser",
+                   preferred_language: "Haitian Creole"
                  }
                ],
                phones: [
@@ -231,6 +235,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                "contact_form[under_18]" => "false",
                "contact_form[same_household]" => "true",
                "contact_form[most_recent_date_together]" => "10/31/2020",
+               "contact_form[preferred_language]" => "Haitian Creole",
                "contact_form[relationship_to_case]" => "spouse"
              } = Pages.form_state(view)
     end
@@ -246,7 +251,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "most_recent_date_together" => "11/02/2020",
           "under_18" => "true",
           "same_household" => "false",
-          "phone" => "1111111321"
+          "phone" => "1111111321",
+          "preferred_language" => "English"
         }
       )
 
@@ -262,7 +268,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                        %{
                          source: "form",
                          first_name: "Cindy",
-                         last_name: "Testuser"
+                         last_name: "Testuser",
+                         preferred_language: "English"
                        }
                      ],
                      phones: [

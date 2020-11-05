@@ -96,7 +96,13 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
            exposed_person: %{
              id: data.person_id,
              demographics: [
-               %{id: data.demographic_id, source: "form", first_name: data.first_name, last_name: data.last_name}
+               %{
+                 id: data.demographic_id,
+                 source: "form",
+                 first_name: data.first_name,
+                 last_name: data.last_name,
+                 preferred_language: data.preferred_language
+               }
              ],
              phones: phones
            }
@@ -168,6 +174,25 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     end
   end
 
+  @preferred_language_options [
+    {"English", "English"},
+    {"Spanish", "Spanish"},
+    {"Arabic", "Arabic"},
+    {"Bengali", "Bengali"},
+    {"Chinese (Cantonese)", "Chinese (Cantonese)"},
+    {"Chinese (Mandarin)", "Chinese (Mandarin)"},
+    {"French", "French"},
+    {"Haitian Creole", "Haitian Creole"},
+    {"Hebrew", "Hebrew"},
+    {"Hindi", "Hindi"},
+    {"Italian", "Italian"},
+    {"Korean", "Korean"},
+    {"Polish", "Polish"},
+    {"Russian", "Russian"},
+    {"Swahili", "Swahili"},
+    {"Yiddish", "Yiddish"}
+  ]
+
   @relationship_options [
     "Family",
     "Partner or roommate",
@@ -206,6 +231,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> Form.line(&Form.checkbox_field(&1, :same_household, nil, "This person lives in the same household", span: 8))
     |> Form.line(&Form.checkbox_field(&1, :under_18, "Age", "This person is under 18 years old", span: 8))
     |> Form.line(&Form.text_field(&1, :phone, "Phone", span: 4))
+    |> Form.line(&Form.radio_button_list(&1, :preferred_language, "Preferred Language", @preferred_language_options, other: "Other", span: 4))
     |> Form.line(
       &Form.date_field(
         &1,
