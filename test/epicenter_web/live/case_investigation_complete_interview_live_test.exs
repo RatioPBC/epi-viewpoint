@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import Phoenix.LiveViewTest
+
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
@@ -72,5 +74,24 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
       |> Pages.CaseInvestigationCompleteInterview.change_form(%{"date_completed" => "09/06/2020"})
       |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
     end
+  end
+
+  test "validates presence of all fields", %{conn: conn, case_investigation: case_investigation} do
+    view =
+      Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+      |> Pages.submit_live("#case-investigation-interview-complete-form",
+        complete_interview_form: %{
+          "date_completed" => "",
+          "time_completed" => "",
+          "time_completed_am_pm" => "AM"
+        }
+      )
+
+    view
+    |> render()
+    |> assert_validation_messages(%{
+      "complete_interview_form_date_completed" => "can't be blank",
+      "complete_interview_form_time_completed" => "can't be blank"
+    })
   end
 end

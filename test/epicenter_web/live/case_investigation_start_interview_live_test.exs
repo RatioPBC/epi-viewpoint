@@ -1,10 +1,11 @@
 defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import Phoenix.LiveViewTest
+
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
-  import Phoenix.LiveViewTest
 
   setup :register_and_log_in_user
 
