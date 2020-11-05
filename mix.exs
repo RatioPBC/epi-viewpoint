@@ -31,8 +31,12 @@ defmodule Epicenter.MixProject do
 
   defp update_tzdata(release) do
     {:ok, _started} = Application.ensure_all_started(:tzdata)
-    Tzdata.ReleaseUpdater.poll_for_update()
-    release
+
+    case Tzdata.ReleaseUpdater.poll_for_update() do
+      :do_nothing -> release
+      :ok -> release
+      {:error, error} -> {:error, error}
+    end
   end
 
   # Specifies your project dependencies.
