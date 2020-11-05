@@ -17,6 +17,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         CaseInvestigation,
         [
           {:clinical_status, :string},
+          {:completed_interview_at, :utc_datetime},
           {:discontinue_reason, :string},
           {:discontinued_at, :utc_datetime},
           {:id, :id},

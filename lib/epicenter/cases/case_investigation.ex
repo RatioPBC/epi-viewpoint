@@ -9,12 +9,13 @@ defmodule Epicenter.Cases.CaseInvestigation do
   alias Epicenter.Cases.Person
 
   @required_attrs ~w{initiating_lab_result_id person_id}a
-  @optional_attrs ~w{clinical_status discontinue_reason discontinued_at interview_proxy_name name started_at symptom_onset_date symptoms tid}a
+  @optional_attrs ~w{clinical_status completed_interview_at discontinue_reason discontinued_at interview_proxy_name name started_at symptom_onset_date symptoms tid}a
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "case_investigations" do
     field :clinical_status, :string
+    field :completed_interview_at, :utc_datetime
     field :discontinue_reason, :string
     field :discontinued_at, :utc_datetime
     field :interview_proxy_name, :string
