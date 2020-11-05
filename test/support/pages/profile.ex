@@ -270,6 +270,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_complete_case_investigation(%View{} = view, number) do
+    view
+    |> element("#complete-interview-case-investigation-link-#{number}")
+    |> render_click()
+  end
+
   # expected_values %{clinical_status: clinical_status, symptom_onset_date: symptom_onset_date}}
   def assert_clinical_details_showing(%View{} = view, number, expected_values) do
     parsed_html =

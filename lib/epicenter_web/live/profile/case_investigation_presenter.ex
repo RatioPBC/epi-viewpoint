@@ -89,9 +89,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   defp interview_start_date(case_investigation),
     do: case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
 
-  defp redirect_to(_case_investigation, :complete_interview) do
+  defp redirect_to(case_investigation, :complete_interview) do
     live_redirect("Complete interview",
-      to: "#",
+      to: Routes.case_investigation_complete_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationCompleteLive, case_investigation),
       id: "complete-interview-case-investigation-link-001",
       class: "complete-interview-case-investigation-link"
     )
