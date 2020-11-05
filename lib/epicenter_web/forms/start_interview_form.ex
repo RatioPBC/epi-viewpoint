@@ -42,17 +42,14 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
     }
   end
 
-  def case_investigation_attrs(%Ecto.Changeset{} = changeset) do
-    case apply_action(changeset, :create) do
-      {:ok, case_investigation_start_form} -> {:ok, case_investigation_attrs(case_investigation_start_form)}
+  def case_investigation_attrs(%Ecto.Changeset{} = form_changeset) do
+    with {:ok, case_investigation_start_form} <- apply_action(form_changeset, :create) do
+      interview_proxy_name = convert_name(case_investigation_start_form)
+      {:ok, started_at} = convert_time_started_and_date_started(case_investigation_start_form)
+      {:ok, %{interview_proxy_name: interview_proxy_name, started_at: started_at}}
+    else
       other -> other
     end
-  end
-
-  def case_investigation_attrs(%StartInterviewForm{} = start_interview_form) do
-    interview_proxy_name = convert_name(start_interview_form)
-    {:ok, started_at} = convert_time_started_and_date_started(start_interview_form)
-    %{interview_proxy_name: interview_proxy_name, started_at: started_at}
   end
 
   defp convert_name(%{person_interviewed: @interview_non_proxy_sentinel_value} = _attrs),
