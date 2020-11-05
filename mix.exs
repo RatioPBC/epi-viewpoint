@@ -10,7 +10,8 @@ defmodule Epicenter.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: [epicenter: [steps: [:assemble, &update_tzdata/1]]]
     ]
   end
 
@@ -27,6 +28,12 @@ defmodule Epicenter.MixProject do
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp update_tzdata(release) do
+    {:ok, _started} = Application.ensure_all_started(:tzdata)
+    Tzdata.ReleaseUpdater.poll_for_update()
+    release
+  end
 
   # Specifies your project dependencies.
   #
