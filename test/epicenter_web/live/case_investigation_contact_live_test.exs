@@ -33,6 +33,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       assert %{
                "contact_form[first_name]" => nil,
                "contact_form[last_name]" => nil,
+               "contact_form[relationship_to_case]" => "",
                "contact_form[phone]" => ""
              } = Pages.form_state(view)
 

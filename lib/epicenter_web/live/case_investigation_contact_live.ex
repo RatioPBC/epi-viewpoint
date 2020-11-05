@@ -168,6 +168,16 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     end
   end
 
+  @relationship_options [
+    "Family",
+    "Partner or roommate",
+    "Healthcare worker",
+    "Neighbor",
+    "Co-worker",
+    "Friend",
+    "Teacher or childcare",
+    "Service provider"
+  ]
   def contact_form_builder(form, case_investigation) do
     onset_date = case_investigation.symptom_onset_date
     sampled_date = case_investigation.initiating_lab_result.sampled_on
@@ -192,7 +202,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       |> Form.text_field(:first_name, "First name")
       |> Form.text_field(:last_name, "Last name")
     end)
-    |> Form.line(&Form.text_field(&1, :relationship_to_case, "Relationship to case", span: 4))
+    |> Form.line(&Form.radio_button_list(&1, :relationship_to_case, "Relationship to case", @relationship_options, other: "Other", span: 4))
     |> Form.line(&Form.checkbox_field(&1, :same_household, nil, "This person lives in the same household", span: 8))
     |> Form.line(&Form.checkbox_field(&1, :under_18, "Age", "This person is under 18 years old", span: 8))
     |> Form.line(&Form.text_field(&1, :phone, "Phone", span: 4))
