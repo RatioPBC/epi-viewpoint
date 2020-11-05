@@ -24,16 +24,13 @@ document.addEventListener("DOMContentLoaded", UserMenu.setup);
 import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket, Browser } from "phoenix_live_view";
-
-let Hooks = {};
-
-Hooks.Multiselect = {
-  mounted() {}
-};
+import { MultiselectHook } from "./multiselect";
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: Hooks,
+  hooks: {
+    Multiselect: MultiselectHook
+  },
   params: { _csrf_token: csrfToken }
 });
 
