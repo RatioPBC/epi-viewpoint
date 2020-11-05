@@ -20,7 +20,9 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
   def changeset(%CaseInvestigation{} = case_investigation),
     do: case_investigation |> case_investigation_complete_investigation_form_attrs() |> changeset()
 
-  def changeset(attrs), do: %CompleteInterviewForm{} |> cast(attrs, @required_attrs)
+  def changeset(attrs), do: %CompleteInterviewForm{} |> CompleteInterviewForm.cast(attrs)
+
+  def cast(data, attrs), do: cast(data, attrs, @required_attrs)
 
   def case_investigation_complete_investigation_form_attrs(%CaseInvestigation{} = case_investigation) do
     %{completed_interview_at: completed_interview_at} = case_investigation

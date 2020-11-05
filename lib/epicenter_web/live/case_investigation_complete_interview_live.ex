@@ -1,12 +1,15 @@
 defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
+  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.CompleteInterviewForm
   alias EpicenterWeb.PresentationConstants
-  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
     case_investigation = case_investigation_id |> Cases.get_case_investigation()
@@ -16,6 +19,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     |> authenticate_user(session)
     |> assign_page_title("Complete interview")
     |> assign(:case_investigation, case_investigation)
+    |> assign(:confirmation_prompt, nil)
     |> assign(:form_changeset, CompleteInterviewForm.changeset(case_investigation))
     |> assign(:person, person)
     |> ok()
@@ -34,6 +38,12 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     end)
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
+  end
+
+  def handle_event("change", %{"complete_interview_form" => params}, socket) do
+    new_changeset = CompleteInterviewForm.changeset(socket.assigns.case_investigation) |> CompleteInterviewForm.cast(params)
+
+    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
   end
 
   def handle_event("save", %{"complete_interview_form" => params}, socket) do
@@ -70,4 +80,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
 
   defp time_completed_am_pm_options(),
     do: ["AM", "PM"]
+
+  defp confirmation_prompt(changeset),
+    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 end

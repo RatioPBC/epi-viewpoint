@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   import ExUnit.Assertions
+  import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Test
@@ -65,5 +66,11 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
       |> Enum.map(&Test.Html.text(&1))
 
     {actual_time, actual_am_pm}
+  end
+
+  def change_form(view, attrs, target \\ ["complete_interview_form[date_completed]"]) do
+    view |> element("#case-investigation-interview-complete-form") |> render_change(attrs |> Map.put(:_target, target))
+
+    view
   end
 end

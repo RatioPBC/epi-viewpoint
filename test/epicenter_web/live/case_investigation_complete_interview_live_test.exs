@@ -60,4 +60,17 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
   end
+
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+      |> Pages.assert_confirmation_prompt("")
+    end
+
+    test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationCompleteInterview.change_form(%{"date_completed" => "09/06/2020"})
+      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+  end
 end
