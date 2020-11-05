@@ -37,7 +37,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              } = Pages.form_state(view)
 
       view
-      |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
+      |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
         contact_form: %{
           "first_name" => "Alice",
           "last_name" => "Testuser",
@@ -89,7 +89,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              } = Pages.form_state(view)
 
       view
-      |> Pages.submit_live("#case-investigation-clinical-details-form",
+      |> Pages.submit_live("#case-investigation-contact-form",
         contact_form: %{
           "first_name" => "",
           "last_name" => "",
@@ -111,7 +111,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       })
 
       view
-      |> Pages.submit_live("#case-investigation-clinical-details-form",
+      |> Pages.submit_live("#case-investigation-contact-form",
         contact_form: %{
           "first_name" => "Alice",
           "last_name" => "Testuser",
@@ -180,7 +180,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
     test "works", %{conn: conn, case_investigation: case_investigation, exposure: exposure} do
       Pages.CaseInvestigationContact.visit(conn, case_investigation, exposure)
       |> Pages.CaseInvestigationContact.assert_here()
-      |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
+      |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
         contact_form: %{
           "first_name" => "Cindy",
           "last_name" => "Testuser",
@@ -217,6 +217,19 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                  }
                ]
              } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+    end
+  end
+
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.assert_confirmation_prompt("")
+    end
+
+    test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationContact.change_form(%{"first_name" => "Alice"})
+      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
     end
   end
 end

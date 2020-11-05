@@ -8,5 +8,5 @@
 
   section#case-investigation-contact
     h2 Add contact
-    = form_for @changeset, "#", [id: "case-investigation-clinical-details-form", phx_change: "change", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "case-investigation-contact-form", phx_change: "change", phx_submit: "save"], fn f ->
       = contact_form_builder(f, @case_investigation)

@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.CaseInvestigationContactLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
@@ -74,11 +75,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         :most_recent_date_together
       ])
       |> Validation.validate_date(:most_recent_date_together)
-    end
-
-    def tap(data, func) do
-      func.(data)
-      data
     end
 
     def contact_params(%Ecto.Changeset{} = formdata) do
@@ -201,5 +197,5 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> Form.safe()
   end
 
-  def confirmation_prompt(changeset), do: nil
+  def confirmation_prompt(changeset), do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 end
