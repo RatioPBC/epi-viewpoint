@@ -7,3 +7,5 @@
 # install prettier (for bin/dev/format)
 npm install prettier --save-dev --prefix assets
 
+# install jest
+npm install --save-dev jest --prefix assets

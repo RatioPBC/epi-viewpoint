@@ -77,7 +77,7 @@ export let MultiselectHook = {
   // // //
 
   forEachChild(container, parent, attributeSelector, callback) {
-    if (parent) {
+    if (parent && parent.id) {
       container
         .querySelectorAll(`input${attributeSelector}[data-multiselect-parent-id=${parent.id}]`)
         .forEach(callback);
