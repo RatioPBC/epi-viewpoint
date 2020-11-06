@@ -29,10 +29,10 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     timezone = Timex.timezone(PresentationConstants.presented_time_zone(), Timex.now())
 
     Form.new(form)
-    |> Form.line(&Form.date_field(&1, :date_completed, "Date interview completed"))
+    |> Form.line(&Form.date_field(&1, :date_completed, "Date interview completed", span: 3))
     |> Form.line(fn line ->
       line
-      |> Form.text_field(:time_completed, "Time interview completed")
+      |> Form.text_field(:time_completed, "Time interview completed", span: 3)
       |> Form.select(:time_completed_am_pm, "", time_completed_am_pm_options(), span: 1)
       |> Form.content_div(timezone.abbreviation, row: 3)
     end)

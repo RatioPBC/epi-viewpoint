@@ -51,7 +51,6 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
     end
   end
 
-  # TODO extract me
   defp convert_time_completed_and_date_completed(attrs) do
     date = attrs |> Map.get(:date_completed)
     time = attrs |> Map.get(:time_completed)

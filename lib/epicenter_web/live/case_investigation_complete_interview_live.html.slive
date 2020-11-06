@@ -1,4 +1,4 @@
-#case-investigation-complete-page data-page="case-investigation-complete"
+#case-investigation-complete-interview-page data-page="case-investigation-complete"
 
   section
     header#subnav
@@ -6,5 +6,8 @@
         = back_icon()
         span Back
 
-  = form_for @form_changeset, "#", [id: "case-investigation-interview-complete-form", phx_change: "change", phx_submit: "save"], fn f ->
-    = complete_interview_form_builder(f)
+  section#case-investigation-complete-interview
+    h2 Complete interview
+
+    = form_for @form_changeset, "#", [id: "case-investigation-interview-complete-form", phx_change: "change", phx_submit: "save"], fn f ->
+      = complete_interview_form_builder(f)
