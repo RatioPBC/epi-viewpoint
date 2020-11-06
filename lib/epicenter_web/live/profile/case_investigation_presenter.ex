@@ -4,6 +4,8 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.Person
   alias Epicenter.Format
   alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
@@ -214,5 +216,29 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     content_tag :span do
       [content_tag(:span, displayable_status, class: status), " interview"]
     end
+  end
+
+  def contact_details_as_list(%Exposure{} = exposure) do
+    content_tag :ul do
+      build_details_list(exposure) |> Enum.map(&content_tag(:li, &1))
+    end
+  end
+
+  defp build_details_list(%{
+         relationship_to_case: relationship_to_case,
+         most_recent_date_together: most_recent_date_together,
+         household_member: household_member,
+         under_18: under_18,
+         exposed_person: exposed_person
+       }) do
+    demographic = Person.coalesce_demographics(exposed_person)
+    phone = List.first(exposed_person.phones)
+
+    details = [relationship_to_case]
+    details = if household_member, do: details ++ ["Household"], else: details
+    details = if under_18, do: details ++ ["Minor"], else: details
+    details = if Euclid.Exists.present?(phone), do: details ++ [Format.phone(phone)], else: details
+    details = if Euclid.Exists.present?(demographic.preferred_language), do: details ++ [demographic.preferred_language], else: details
+    details ++ ["Last together #{Format.date(most_recent_date_together)}"]
   end
 end

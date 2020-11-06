@@ -304,6 +304,65 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigation_complete_button_title("001", "Complete interview")
     end
+
+    test "started case investigations show contacts", %{conn: conn, person: person, user: user} do
+      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{started_at: NaiveDateTime.utc_now()})
+
+      {:ok, _} =
+        Cases.create_exposure(
+          {%{
+             exposing_case_id: case_investigation.id,
+             relationship_to_case: "Family",
+             most_recent_date_together: ~D[2020-10-31],
+             household_member: true,
+             under_18: true,
+             exposed_person: %{
+               demographics: [
+                 %{
+                   source: "form",
+                   first_name: "Complete",
+                   last_name: "Testuser",
+                   preferred_language: "Haitian Creole"
+                 }
+               ],
+               phones: [
+                 %{
+                   number: "1111111542"
+                 }
+               ]
+             }
+           }, Test.Fixtures.admin_audit_meta()}
+        )
+
+      {:ok, _} =
+        Cases.create_exposure(
+          {%{
+             exposing_case_id: case_investigation.id,
+             relationship_to_case: "Friend",
+             most_recent_date_together: ~D[2020-11-30],
+             household_member: false,
+             under_18: false,
+             exposed_person: %{
+               demographics: [
+                 %{
+                   source: "form",
+                   first_name: "Partial",
+                   last_name: "Testuser"
+                 }
+               ],
+               phones: []
+             }
+           }, Test.Fixtures.admin_audit_meta()}
+        )
+
+      assert [
+               "Complete Testuser Family Household Minor (111) 111-1542 Haitian Creole Last together 10/31/2020",
+               "Partial Testuser Friend Last together 11/30/2020"
+             ] =
+               Pages.Profile.visit(conn, person)
+               |> Pages.Profile.assert_contacts_showing("001")
+               |> Pages.Profile.case_investigation_contact_details("001")
+    end
   end
 
   describe "assigning and unassigning user to a person" do

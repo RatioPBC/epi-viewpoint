@@ -338,6 +338,14 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def case_investigation_contact_details(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#contacts-#{number} .contact-details")
+    |> Enum.map(&Test.Html.text/1)
+  end
+
   #
   # lab results
   #

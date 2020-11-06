@@ -150,8 +150,8 @@ defmodule Epicenter.Cases do
   #
   def change_exposure(%Exposure{} = exposure, attrs), do: Exposure.changeset(exposure, attrs)
 
-  def preload_exposures(%CaseInvestigation{} = case_investigation),
-    do: case_investigation |> Repo.preload(exposures: [exposed_person: [:demographics, :phones]])
+  def preload_exposures(case_investigations_or_nil),
+    do: case_investigations_or_nil |> Repo.preload(exposures: [exposed_person: [:demographics, :phones]])
 
   def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
 
