@@ -15,6 +15,8 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
 
     embedded_schema do
       field :radios, :string
+      field :radios_with_other, :string
+      field :radios_with_other_preselected, :string
       field :checkboxes, {:array, :string}
       field :radios_and_checkboxes, {:array, :string}
       field :radios_with_nested_checkboxes, {:array, :string}
@@ -23,6 +25,8 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
 
     @required_attrs ~w{
       radios
+      radios_with_other
+      radios_with_other_preselected
       checkboxes
       radios_and_checkboxes
       radios_with_nested_checkboxes
@@ -50,6 +54,8 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     def get_example() do
       %Example{
         radios: "r2",
+        radios_with_other: "r2",
+        radios_with_other_preselected: "r4",
         checkboxes: ["c1", "c3"],
         radios_and_checkboxes: ["c1", "c3"],
         radios_with_nested_checkboxes: ["r2", "c1", "c2"],
@@ -67,6 +73,8 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
 
     embedded_schema do
       field :radios, {:array, :string}
+      field :radios_with_other, {:array, :string}
+      field :radios_with_other_preselected, {:array, :string}
       field :checkboxes, {:array, :string}
       field :radios_and_checkboxes, {:array, :string}
       field :radios_with_nested_checkboxes, {:array, :string}
@@ -75,6 +83,8 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
 
     @required_attrs ~w{
       radios
+      radios_with_other
+      radios_with_other_preselected
       checkboxes
       radios_and_checkboxes
       radios_with_nested_checkboxes
@@ -105,7 +115,9 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     def example_attrs(%ExampleForm{} = example_form) do
       example_form
       |> Map.from_struct()
-      |> convert(:radios, :list_to_string)
+      |> Map.update!(:radios, &List.first/1)
+      |> Map.update!(:radios_with_other, &List.first/1)
+      |> Map.update!(:radios_with_other_preselected, &List.first/1)
     end
 
     def example_form_attrs(%Example{} = example) do
@@ -157,6 +169,21 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
         [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:radio, "R4", "r4"}],
         span: 2
       )
+      |> Form.wip_multiselect(
+        :radios_with_other,
+        "With other",
+        [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:other_radio, "Other", "r4"}],
+        span: 2
+      )
+      |> Form.wip_multiselect(
+        :radios_with_other_preselected,
+        "With other preselected",
+        [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:other_radio, "Other", "r4"}],
+        span: 2
+      )
+    end)
+    |> Form.line(fn line ->
+      line
       |> Form.wip_multiselect(
         :checkboxes,
         "Checkboxes",

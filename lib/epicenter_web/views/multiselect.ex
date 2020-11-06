@@ -26,19 +26,18 @@ defmodule EpicenterWeb.Multiselect do
       case type do
         :checkbox -> [multiselect_checkbox(f, field, value, parent_id), label_text]
         :radio -> [multiselect_radio(f, field, value, parent_id), label_text]
+        :other_radio -> [multiselect_radio(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
       end
     end
   end
 
   def multiselect_checkbox(f, field, value, parent_id) do
-    form_field_value = input_value(f, field)
-
     checkbox(
       f,
       field,
       id: input_id(f, field, value),
-      name: multiselect_input_name(f, field),
-      checked: !is_nil(form_field_value) && value in form_field_value,
+      name: multiselect_input_name(f, field, false),
+      checked: current_value?(f, field, value),
       checked_value: value,
       hidden_input: false,
       phx_hook: "Multiselect",
@@ -46,26 +45,41 @@ defmodule EpicenterWeb.Multiselect do
     )
   end
 
-  def multiselect_radio(f, field, value, parent_id) do
-    checked =
-      case input_value(f, field) do
-        nil -> false
-        list when is_list(list) -> value in list
-        other -> value == other
-      end
-
+  def multiselect_radio(f, field, value, parent_id, other? \\ false) do
     radio_button(
       f,
       field,
       value,
-      checked: checked,
-      name: multiselect_input_name(f, field),
+      checked: current_value?(f, field, value),
+      name: multiselect_input_name(f, field, other?),
       phx_hook: "Multiselect",
       data: [multiselect: [parent_id: parent_id]]
     )
   end
 
-  def multiselect_input_name(f, field) do
-    input_name(f, field) <> "[]"
+  def multiselect_text(f, field, value) do
+    content_tag :div, data: [multiselect: "text-wrapper"] do
+      text_input(
+        f,
+        field,
+        disabled: !current_value?(f, field, value),
+        name: multiselect_input_name(f, field, false),
+        value: value,
+        data: [multiselect: [parent_id: input_id(f, field, value)]]
+      )
+    end
+  end
+
+  # # #
+
+  def multiselect_input_name(f, field, false = _other?), do: input_name(f, field) <> "[]"
+  def multiselect_input_name(f, field, true = _other?), do: input_name(f, field) <> "_other"
+
+  def current_value?(f, field, value) do
+    case input_value(f, field) do
+      nil -> false
+      list when is_list(list) -> value in list
+      other -> value == other
+    end
   end
 end

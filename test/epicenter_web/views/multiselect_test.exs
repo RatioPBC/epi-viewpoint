@@ -63,7 +63,7 @@ defmodule EpicenterWeb.MultiselectTest do
   end
 
   describe "multiselect_input" do
-    test "returns a label and input when there are no children" do
+    test "when there are no children, returns a label and input" do
       assert [{"label", label_attrs, [{"input", checkbox_attrs, []}, "Comedy"]}] =
                phx_form(genres: ["comedy", "musical"])
                |> Multiselect.multiselect_input(:genres, {:checkbox, "Comedy", "comedy"}, nil)
@@ -85,7 +85,7 @@ defmodule EpicenterWeb.MultiselectTest do
              }
     end
 
-    test "returns a label, input, and children" do
+    test "when there are children, returns a label, input, and children" do
       comedy_sub_values = [{:checkbox, "Dark Comedy", "dark-comedy"}, {:checkbox, "Musical Comedy", "musical-comedy"}]
       value = {:checkbox, "Comedy", "comedy", comedy_sub_values}
 
@@ -126,6 +126,37 @@ defmodule EpicenterWeb.MultiselectTest do
                "value" => "musical-comedy"
              }
     end
+
+    test "when there is an 'other' field" do
+      assert [
+               {
+                 "label",
+                 [{"data-multiselect", "parent"}, {"data-role", "movie-genres"}],
+                 [{"input", radio_attrs, []}, "Comedy", {"div", [{"data-multiselect", "text-wrapper"}], [{"input", text_field_attrs, []}]}]
+               }
+             ] =
+               phx_form(genres: ["comedy", "musical"])
+               |> Multiselect.multiselect_input(:genres, {:other_radio, "Comedy", "comedy"}, nil)
+               |> parse()
+
+      assert Enum.into(radio_attrs, %{}) == %{
+               "checked" => "checked",
+               "data-multiselect-parent-id" => "",
+               "id" => "movie_genres_comedy",
+               "name" => "movie[genres]_other",
+               "phx-hook" => "Multiselect",
+               "type" => "radio",
+               "value" => "comedy"
+             }
+
+      assert Enum.into(text_field_attrs, %{}) == %{
+               "data-multiselect-parent-id" => "movie_genres_comedy",
+               "id" => "movie_genres",
+               "name" => "movie[genres][]",
+               "type" => "text",
+               "value" => "comedy"
+             }
+    end
   end
 
   describe "multiselect_checkbox" do
@@ -161,6 +192,23 @@ defmodule EpicenterWeb.MultiselectTest do
                "name" => "movie[genres][]",
                "phx-hook" => "Multiselect",
                "type" => "radio",
+               "value" => "comedy"
+             }
+    end
+  end
+
+  describe "multiselect_text" do
+    test "renders a text field to be used for 'other'" do
+      assert [{"div", [{"data-multiselect", "text-wrapper"}], [{"input", attrs, []}]}] =
+               phx_form(genres: ["comedy", "musical"])
+               |> Multiselect.multiselect_text(:genres, "comedy")
+               |> parse()
+
+      assert attrs |> Enum.into(%{}) == %{
+               "data-multiselect-parent-id" => "movie_genres_comedy",
+               "id" => "movie_genres",
+               "name" => "movie[genres][]",
+               "type" => "text",
                "value" => "comedy"
              }
     end

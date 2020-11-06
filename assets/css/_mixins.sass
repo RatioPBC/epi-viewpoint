@@ -278,6 +278,17 @@
     [data-multiselect=container]
       @include -input-vertical-list
 
+    input:checked ~ [data-multiselect=text-wrapper]
+      display: flex
+
+    [data-multiselect=text-wrapper]
+      display: none
+      padding: 0.5rem 0 0 2.5rem
+
+      input[type=text]
+        display: inline-block
+        min-width: 1rem
+
     .select-wrapper
       @include select
       margin: 0
@@ -419,7 +430,6 @@
 
   [data-reveal="when-parent-checked"]
     display: none
-    disabled: true
 
   input:checked ~ [data-reveal="when-parent-checked"]
     display: initial

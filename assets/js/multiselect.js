@@ -26,8 +26,11 @@ export let MultiselectHook = {
 
   radioWasClicked(container, _parent, radio) {
     this.topLevelInputs(container).forEach((input) => {
-      if (input !== radio) {
+      if (input === radio) {
+        this.enableTextFieldChildren(container, input);
+      } else {
         input.checked = false;
+        this.disableTextFieldChildren(container, input);
         this.uncheckAllChildren(container, input);
       }
     });
@@ -55,6 +58,22 @@ export let MultiselectHook = {
   },
 
   // // //
+
+  disableTextFieldChildren(container, parent) {
+    if (parent) {
+      container
+        .querySelectorAll(`input[type=text][data-multiselect-parent-id=${parent.id}]`)
+        .forEach((child) => (child.disabled = true));
+    }
+  },
+
+  enableTextFieldChildren(container, parent) {
+    if (parent) {
+      container
+        .querySelectorAll(`input[type=text][data-multiselect-parent-id=${parent.id}]`)
+        .forEach((child) => (child.disabled = false));
+    }
+  },
 
   topLevelInputs(container) {
     return container.querySelectorAll(
