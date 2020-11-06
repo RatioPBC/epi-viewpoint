@@ -57,7 +57,8 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     )
     |> Pages.Profile.assert_here(person)
 
-    #    |> Pages.Profile.assert_case_investigation_has_history("Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT")
+    # TODO show history text on profile
+    #    |> Pages.Profile.assert_case_investigation_has_history("Completed interview on 09/06/2020 at 03:45pm EDT")
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
@@ -76,22 +77,66 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     end
   end
 
-  test "validates presence of all fields", %{conn: conn, case_investigation: case_investigation} do
-    view =
-      Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-      |> Pages.submit_live("#case-investigation-interview-complete-form",
-        complete_interview_form: %{
-          "date_completed" => "",
-          "time_completed" => "",
-          "time_completed_am_pm" => "AM"
-        }
-      )
+  describe "validation" do
+    test "invalid times become errors", %{conn: conn, case_investigation: case_investigation} do
+      view =
+        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#case-investigation-interview-complete-form",
+          complete_interview_form: %{
+            "date_completed" => "09/06/2020",
+            "time_completed" => "13:45",
+            "time_completed_am_pm" => "PM"
+          }
+        )
 
-    view
-    |> render()
-    |> assert_validation_messages(%{
-      "complete_interview_form_date_completed" => "can't be blank",
-      "complete_interview_form_time_completed" => "can't be blank"
-    })
+      view |> render() |> assert_validation_messages(%{"complete_interview_form_time_completed" => "is invalid"})
+    end
+
+    test "invalid dates become errors", %{conn: conn, case_investigation: case_investigation} do
+      view =
+        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#case-investigation-interview-complete-form",
+          complete_interview_form: %{
+            "date_completed" => "09/32/2020",
+            "time_completed" => "12:45",
+            "time_completed_am_pm" => "PM"
+          }
+        )
+
+      view |> render() |> assert_validation_messages(%{"complete_interview_form_date_completed" => "is invalid"})
+    end
+
+    test "daylight savings hour that doesn't exist becomes an error", %{conn: conn, case_investigation: case_investigation} do
+      view =
+        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#case-investigation-interview-complete-form",
+          complete_interview_form: %{
+            "date_completed" => "03/08/2020",
+            "time_completed" => "02:10",
+            "time_completed_am_pm" => "AM"
+          }
+        )
+
+      view |> render() |> assert_validation_messages(%{"complete_interview_form_time_completed" => "is invalid"})
+    end
+
+    test "validates presence of all fields", %{conn: conn, case_investigation: case_investigation} do
+      view =
+        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#case-investigation-interview-complete-form",
+          complete_interview_form: %{
+            "date_completed" => "",
+            "time_completed" => "",
+            "time_completed_am_pm" => "AM"
+          }
+        )
+
+      view
+      |> render()
+      |> assert_validation_messages(%{
+        "complete_interview_form_date_completed" => "can't be blank",
+        "complete_interview_form_time_completed" => "can't be blank"
+      })
+    end
   end
 end

@@ -2,11 +2,11 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
   use Ecto.Schema
 
   import Ecto.Changeset
+  import EpicenterWeb.Views.DateExtraction, only: [convert_time: 3, extract_and_validate_date: 4]
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
   alias EpicenterWeb.Forms.CompleteInterviewForm
-  alias EpicenterWeb.PresentationConstants
 
   @primary_key false
   embedded_schema do
@@ -20,7 +20,12 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
   def changeset(%CaseInvestigation{} = case_investigation),
     do: case_investigation |> case_investigation_complete_investigation_form_attrs() |> changeset()
 
-  def changeset(attrs), do: %CompleteInterviewForm{} |> CompleteInterviewForm.cast(attrs) |> validate_required(@required_attrs)
+  def changeset(attrs) do
+    %CompleteInterviewForm{}
+    |> CompleteInterviewForm.cast(attrs)
+    |> validate_required(@required_attrs)
+    |> extract_and_validate_date(:date_completed, :time_completed, :time_completed_am_pm)
+  end
 
   def cast(data, attrs), do: cast(data, attrs, @required_attrs)
 
@@ -46,14 +51,7 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
     end
   end
 
-  defp convert_time(datestring, timestring, ampmstring) do
-    with {:ok, datetime} <- Timex.parse("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"),
-         %Timex.TimezoneInfo{} = timezone <- Timex.timezone(PresentationConstants.presented_time_zone(), datetime),
-         %DateTime{} = time <- Timex.to_datetime(datetime, timezone) do
-      {:ok, time}
-    end
-  end
-
+  # TODO extract me
   defp convert_time_completed_and_date_completed(attrs) do
     date = attrs |> Map.get(:date_completed)
     time = attrs |> Map.get(:time_completed)

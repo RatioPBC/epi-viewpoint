@@ -2,11 +2,11 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   use Ecto.Schema
 
   import Ecto.Changeset
+  import EpicenterWeb.Views.DateExtraction, only: [convert_time: 3, extract_and_validate_date: 4]
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
   alias EpicenterWeb.Forms.StartInterviewForm
-  alias EpicenterWeb.PresentationConstants
 
   @primary_key false
   embedded_schema do
@@ -22,8 +22,12 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   def changeset(%CaseInvestigation{} = case_investigation),
     do: case_investigation |> case_investigation_start_interview_form_attrs() |> changeset()
 
-  def changeset(attrs),
-    do: %StartInterviewForm{} |> cast(attrs, @required_attrs) |> validate_required(@required_attrs) |> validate_interviewed_at()
+  def changeset(attrs) do
+    %StartInterviewForm{}
+    |> cast(attrs, @required_attrs)
+    |> validate_required(@required_attrs)
+    |> extract_and_validate_date(:date_started, :time_started, :time_started_am_pm)
+  end
 
   def case_investigation_start_interview_form_attrs(%CaseInvestigation{} = case_investigation) do
     local_now = Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
@@ -58,14 +62,6 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   defp convert_name(attrs),
     do: Map.get(attrs, :person_interviewed)
 
-  defp convert_time(datestring, timestring, ampmstring) do
-    with {:ok, datetime} <- Timex.parse("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"),
-         %Timex.TimezoneInfo{} = timezone <- Timex.timezone(PresentationConstants.presented_time_zone(), datetime),
-         %DateTime{} = time <- Timex.to_datetime(datetime, timezone) do
-      {:ok, time}
-    end
-  end
-
   defp convert_time_started_and_date_started(attrs) do
     date = attrs |> Map.get(:date_started)
     time = attrs |> Map.get(:time_started)
@@ -81,19 +77,4 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
 
   defp person_interviewed(%CaseInvestigation{interview_proxy_name: interview_proxy_name}),
     do: interview_proxy_name
-
-  defp validate_interviewed_at(changeset) do
-    with {_, date} <- fetch_field(changeset, :date_started),
-         {_, time} <- fetch_field(changeset, :time_started),
-         {_, am_pm} <- fetch_field(changeset, :time_started_am_pm),
-         {:date_started, {:ok, _}} <- {:date_started, convert_time(date, "12:00", "PM")},
-         {:time_started, {:ok, _}} <- {:time_started, convert_time("01/01/2000", time, "PM")},
-         {:together, {:ok, _}} <- {:together, convert_time(date, time, am_pm)} do
-      changeset
-    else
-      {:together, _} -> changeset |> add_error(:time_started, "is invalid")
-      {field, _} -> changeset |> add_error(field, "is invalid")
-      _ -> changeset
-    end
-  end
 end
