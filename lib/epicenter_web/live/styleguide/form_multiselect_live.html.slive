@@ -7,8 +7,16 @@
       = example_form_builder(f, @form_error)
 
     .debug
-      div form changeset (changed on "Save")
+      b form changeset (changed on "Save")
       div= inspect(@form_changeset)
     .debug
-      div example (created on "Save" if the form changeset is valid)
-      div= inspect(@example)
+      b example (created on "Save" if the form changeset is valid)
+
+      div
+        = if @example do
+          table
+            = for key <- @example |> Map.from_struct() |> Map.keys() |> Enum.sort() do
+              tr
+                td= key
+                td= @example |> Map.get(key) |> inspect()
+
