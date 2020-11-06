@@ -63,6 +63,15 @@
       code @include button-primary
 
     .styleguide-example
+      a#primary-button-with-icon href="#"
+        = checkmark_icon()
+        span Primary button with icon
+      code
+        ' @include button-primary
+        ' @include has-icon($color: white)
+        small Text should be wrapped in a span in order to be spaced properly
+
+    .styleguide-example
       a#primary-button-small href="#" Primary button (small)
       code @include button-primary($size: small)
 

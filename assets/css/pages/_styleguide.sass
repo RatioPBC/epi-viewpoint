@@ -78,6 +78,10 @@
   #primary-button, #primary-button-disabled
     @include button-primary
 
+  #primary-button-with-icon
+    @include button-primary
+    @include has-icon($color: white)
+
   #primary-button-small
     @include button-primary($size: small)
 

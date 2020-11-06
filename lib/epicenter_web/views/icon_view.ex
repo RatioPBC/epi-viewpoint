@@ -28,6 +28,15 @@ defmodule EpicenterWeb.IconView do
     |> raw()
   end
 
+  def checkmark_icon(width \\ 16, height \\ 14) do
+    """
+    <svg width="#{width}" height="#{height}" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5.7963 11.17L1.6263 7L0.206299 8.41L5.7963 14L17.7963 2L16.3863 0.589996L5.7963 11.17Z" fill="white" fill-opacity="0.87"/>
+    </svg>
+    """
+    |> raw()
+  end
+
   def error_icon(width \\ 16, height \\ 16) do
     """
     <svg width="#{width}" height="#{height}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
