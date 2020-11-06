@@ -45,9 +45,7 @@ config :epicenter, EpicenterWeb.Endpoint,
   ]
 
 config :logger_json, :google_error_reporter,
-  %{
-    serviceContext: %{
-      service: System.fetch_env!("ERROR_REPORTER_SERVICE_NAME"),
-      version: :code.priv_dir(:epicenter) |> Path.join("static/version.txt") |> File.read!() |> String.trim()
-    }
-  }
+  service_context: [
+    service: System.fetch_env!("ERROR_REPORTER_SERVICE_NAME"),
+    version: :code.priv_dir(:epicenter) |> Path.join("static/version.txt") |> File.read!() |> String.trim()
+  ]

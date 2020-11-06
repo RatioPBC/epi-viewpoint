@@ -63,6 +63,8 @@ defmodule EpicenterWeb do
   def router do
     quote do
       use Phoenix.Router
+      use Plug.ErrorHandler
+      use EpicenterWeb.ErrorHandler
 
       import Plug.Conn
       import Phoenix.Controller
