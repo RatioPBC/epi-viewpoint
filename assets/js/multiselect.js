@@ -27,10 +27,10 @@ export let MultiselectHook = {
   radioWasClicked(container, _parent, radio) {
     this.topLevelInputs(container).forEach((input) => {
       if (input === radio) {
-        this.enableTextFieldChildren(container, input);
+        this.enableChildTextField(container, input);
       } else {
         input.checked = false;
-        this.disableTextFieldChildren(container, input);
+        this.disableChildTextField(container, input);
         this.uncheckAllChildren(container, input);
       }
     });
@@ -43,7 +43,7 @@ export let MultiselectHook = {
       parent.checked = true;
     }
 
-    this.enableTextFieldChildren(container, checkbox);
+    this.enableChildTextField(container, checkbox);
 
     container.querySelectorAll("input[type=radio]").forEach((radio) => {
       if (radio === parent) {
@@ -56,25 +56,31 @@ export let MultiselectHook = {
   },
 
   checkboxWasUnchecked(container, _parent, checkbox) {
-    this.disableTextFieldChildren(container, checkbox);
+    this.disableChildTextField(container, checkbox);
     this.uncheckAllChildren(container, checkbox);
   },
 
   // // //
 
-  disableTextFieldChildren(container, parent) {
-    if (parent) {
-      container
-        .querySelectorAll(`input[type=text][data-multiselect-parent-id=${parent.id}]`)
-        .forEach((child) => (child.disabled = true));
-    }
+  disableChildTextField(container, parent) {
+    this.forEachChild(container, parent, "[type=text]", (child) => (child.disabled = true));
   },
 
-  enableTextFieldChildren(container, parent) {
+  enableChildTextField(container, parent) {
+    this.forEachChild(container, parent, "[type=text]", (child) => (child.disabled = false));
+  },
+
+  uncheckAllChildren(container, parent) {
+    this.forEachChild(container, parent, "", (child) => (child.checked = false));
+  },
+
+  // // //
+
+  forEachChild(container, parent, attributeSelector, callback) {
     if (parent) {
       container
-        .querySelectorAll(`input[type=text][data-multiselect-parent-id=${parent.id}]`)
-        .forEach((child) => (child.disabled = false));
+        .querySelectorAll(`input${attributeSelector}[data-multiselect-parent-id=${parent.id}]`)
+        .forEach(callback);
     }
   },
 
@@ -82,13 +88,5 @@ export let MultiselectHook = {
     return container.querySelectorAll(
       "input[type=checkbox][data-multiselect-parent-id=''], input[type=radio][data-multiselect-parent-id='']"
     );
-  },
-
-  uncheckAllChildren(container, parent) {
-    if (parent) {
-      container
-        .querySelectorAll(`input[data-multiselect-parent-id=${parent.id}]`)
-        .forEach((child) => (child.checked = false));
-    }
   }
 };
