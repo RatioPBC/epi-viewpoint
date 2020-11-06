@@ -397,6 +397,23 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.click_edit_contact_link(exposure)
       |> assert_redirects_to("/case_investigations/#{case_investigation.id}/contact/#{exposure.id}")
     end
+
+    test "case investigations with completed interviews render correctly", %{conn: conn, person: person, user: user} do
+      completed_at = ~U[2020-11-05 19:57:00Z]
+      case_investigation = build_case_investigation(person, user, "case_investigation", nil, %{completed_interview_at: completed_at})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_case_investigations(%{
+        status: "Completed interview",
+        status_value: "completed-interview",
+        reported_on: "Unknown",
+        number: "001"
+      })
+      |> Pages.Profile.assert_case_investigation_has_history("Completed interview on 11/05/2020 at 02:57pm EST")
+      |> Pages.Profile.refute_complete_interview_button("001")
+      |> Pages.Profile.click_edit_complete_interview_link("001")
+      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/complete_interview")
+    end
   end
 
   describe "assigning and unassigning user to a person" do

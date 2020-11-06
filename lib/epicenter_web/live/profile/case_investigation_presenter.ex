@@ -24,6 +24,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
           redirect_to(case_investigation, :discontinue_interview)
         ]
 
+      :completed_interview ->
+        []
+
       :discontinued ->
         []
     end
@@ -82,6 +85,30 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
         items
       end
 
+    items =
+      if case_investigation.completed_interview_at != nil do
+        [
+          %{
+            text: "Completed interview on #{completed_interview_date(case_investigation)}",
+            link:
+              live_redirect(
+                "Edit",
+                to:
+                  Routes.case_investigation_complete_interview_path(
+                    EpicenterWeb.Endpoint,
+                    EpicenterWeb.CaseInvestigationCompleteInterviewLive,
+                    case_investigation
+                  ),
+                id: "edit-complete-interview-link-001",
+                class: "edit-complete-interview-link"
+              )
+          }
+          | items
+        ]
+      else
+        items
+      end
+
     items |> Enum.reverse()
   end
 
@@ -90,6 +117,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   defp interview_start_date(case_investigation),
     do: case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+
+  defp completed_interview_date(case_investigation),
+    do: case_investigation.completed_interview_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
 
   defp redirect_to(case_investigation, :complete_interview) do
     live_redirect("Complete interview",
@@ -175,6 +205,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     case CaseInvestigation.status(case_investigation) do
       :pending -> styled_status("Pending", :pending)
       :started -> styled_status("Ongoing", :started)
+      :completed_interview -> styled_status("Completed", "completed-interview")
     end
   end
 

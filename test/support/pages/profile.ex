@@ -264,6 +264,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_edit_complete_interview_link(%View{} = view, number) do
+    view
+    |> element("#edit-complete-interview-link-#{number}")
+    |> render_click()
+  end
+
   def click_edit_clinical_details_link(%View{} = view, number) do
     view
     |> element("#case-investigation-clinical-details-link-#{number}")
