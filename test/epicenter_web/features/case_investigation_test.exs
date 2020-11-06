@@ -103,6 +103,23 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
       }
     )
     |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.click_add_contact_link("001")
+    |> Pages.follow_live_view_redirect(conn)
+    |> elem(1)
+    |> Pages.CaseInvestigationContact.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
+      contact_form: %{
+        "first_name" => "Connie",
+        "last_name" => "Testuser",
+        "relationship_to_case" => "Friend",
+        "most_recent_date_together" => "10/31/2020",
+        "under_18" => "true",
+        "same_household" => "true",
+        "phone" => "1111111111",
+        preferred_language: "Haitian Creole"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
     |> Pages.Profile.click_complete_case_investigation("001")
     |> Pages.follow_live_view_redirect(conn)
     |> elem(1)
@@ -111,11 +128,35 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     assert %{
              case_investigations: [
                %{
+                 id: case_investigation_id,
                  clinical_status: "symptomatic",
                  symptom_onset_date: ~D[2020-09-06],
                  symptoms: ["fever", "chills"]
                }
              ]
            } = Cases.get_person(person.id) |> Cases.preload_demographics() |> Cases.preload_case_investigations()
+
+    assert %{
+             exposures: [
+               %{
+                 exposed_person: %{
+                   demographics: [
+                     %{
+                       first_name: "Connie",
+                       last_name: "Testuser",
+                       preferred_language: "Haitian Creole"
+                     }
+                   ],
+                   phones: [%{number: "1111111111"}]
+                 },
+                 household_member: true,
+                 most_recent_date_together: ~D[2020-10-31],
+                 relationship_to_case: "Friend",
+                 under_18: true
+               }
+             ]
+           } =
+             Cases.get_case_investigation(case_investigation_id)
+             |> Cases.preload_exposures()
   end
 end
