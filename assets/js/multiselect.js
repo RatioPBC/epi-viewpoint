@@ -5,12 +5,12 @@ export let MultiselectHook = {
       const parent = document.getElementById(e.target.getAttribute("data-multiselect-parent-id"));
 
       switch (e.target.getAttribute("type")) {
-        case "radio":
-          this.radioWasClicked(container, parent, e.target);
-          break;
-
         case "checkbox":
           this.checkboxWasClicked(container, parent, e.target);
+          break;
+
+        case "radio":
+          this.radioWasClicked(container, parent, e.target);
           break;
       }
     });
@@ -38,10 +38,12 @@ export let MultiselectHook = {
 
   // // //
 
-  checkboxWasChecked(container, parent, _checkbox) {
+  checkboxWasChecked(container, parent, checkbox) {
     if (parent) {
       parent.checked = true;
     }
+
+    this.enableTextFieldChildren(container, checkbox);
 
     container.querySelectorAll("input[type=radio]").forEach((radio) => {
       if (radio === parent) {
@@ -54,6 +56,7 @@ export let MultiselectHook = {
   },
 
   checkboxWasUnchecked(container, _parent, checkbox) {
+    this.disableTextFieldChildren(container, checkbox);
     this.uncheckAllChildren(container, checkbox);
   },
 

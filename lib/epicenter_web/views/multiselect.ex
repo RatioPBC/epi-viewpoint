@@ -26,22 +26,23 @@ defmodule EpicenterWeb.Multiselect do
       case type do
         :checkbox -> [multiselect_checkbox(f, field, value, parent_id), label_text]
         :radio -> [multiselect_radio(f, field, value, parent_id), label_text]
+        :other_checkbox -> [multiselect_checkbox(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
         :other_radio -> [multiselect_radio(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
       end
     end
   end
 
-  def multiselect_checkbox(f, field, value, parent_id) do
+  def multiselect_checkbox(f, field, value, parent_id, other? \\ false) do
     checkbox(
       f,
       field,
-      id: input_id(f, field, value),
-      name: multiselect_input_name(f, field, false),
       checked: current_value?(f, field, value),
       checked_value: value,
+      data: [multiselect: [parent_id: parent_id]],
       hidden_input: false,
-      phx_hook: "Multiselect",
-      data: [multiselect: [parent_id: parent_id]]
+      id: input_id(f, field, value),
+      name: multiselect_input_name(f, field, other?),
+      phx_hook: "Multiselect"
     )
   end
 
@@ -51,9 +52,9 @@ defmodule EpicenterWeb.Multiselect do
       field,
       value,
       checked: current_value?(f, field, value),
+      data: [multiselect: [parent_id: parent_id]],
       name: multiselect_input_name(f, field, other?),
-      phx_hook: "Multiselect",
-      data: [multiselect: [parent_id: parent_id]]
+      phx_hook: "Multiselect"
     )
   end
 
@@ -62,10 +63,10 @@ defmodule EpicenterWeb.Multiselect do
       text_input(
         f,
         field,
+        data: [multiselect: [parent_id: input_id(f, field, value)]],
         disabled: !current_value?(f, field, value),
         name: multiselect_input_name(f, field, false),
-        value: value,
-        data: [multiselect: [parent_id: input_id(f, field, value)]]
+        value: value
       )
     end
   end
