@@ -97,20 +97,24 @@
         @include level($justify: space-between)
         .add-contact-case-investigation-link
           @include button-outline(wide)
-      .contact-details
-        .contact-name
-          font-weight: bold
-        ul
-          @include horizontal-flow(left, 0)
-        li + li::before
-          content: ''
-          display: inline-block
-          vertical-align: middle
-          margin: 0 0.75rem
-          width: 0.5rem
-          height: 0.5rem
-          border-radius: 50%
-          background-color: currentColor
+      .contact
+        &:not(:first-child)
+          margin-top: 2rem
+        .contact-details
+          .contact-name
+            font-weight: bold
+          ul
+            @include horizontal-flow(left, 0)
+
+            li + li::before
+              content: ''
+              display: inline-block
+              vertical-align: middle
+              margin: 0 0.75rem
+              width: 0.5rem
+              height: 0.5rem
+              border-radius: 50%
+              background-color: currentColor
 
   section#demographics
     @include card

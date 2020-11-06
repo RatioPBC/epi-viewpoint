@@ -363,6 +363,40 @@ defmodule EpicenterWeb.ProfileLiveTest do
                |> Pages.Profile.assert_contacts_showing("001")
                |> Pages.Profile.case_investigation_contact_details("001")
     end
+
+    test "a contact can be edited", %{conn: conn, person: person, user: user} do
+      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{started_at: NaiveDateTime.utc_now()})
+
+      {:ok, exposure} =
+        Cases.create_exposure(
+          {%{
+             exposing_case_id: case_investigation.id,
+             relationship_to_case: "Family",
+             most_recent_date_together: ~D[2020-10-31],
+             household_member: true,
+             under_18: true,
+             exposed_person: %{
+               demographics: [
+                 %{
+                   source: "form",
+                   first_name: "Complete",
+                   last_name: "Testuser",
+                   preferred_language: "Haitian Creole"
+                 }
+               ],
+               phones: [
+                 %{
+                   number: "1111111542"
+                 }
+               ]
+             }
+           }, Test.Fixtures.admin_audit_meta()}
+        )
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.click_edit_contact_link(exposure)
+      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/contact/#{exposure.id}")
+    end
   end
 
   describe "assigning and unassigning user to a person" do

@@ -346,6 +346,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> Enum.map(&Test.Html.text/1)
   end
 
+  def click_edit_contact_link(%View{} = view, exposure) do
+    view
+    |> element("[data-role=edit-contact][data-exposure=#{exposure.id}]")
+    |> render_click()
+  end
+
   #
   # lab results
   #
