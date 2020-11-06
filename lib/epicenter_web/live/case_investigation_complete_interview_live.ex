@@ -3,7 +3,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
 
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -33,7 +33,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     |> Form.line(fn line ->
       line
       |> Form.text_field(:time_completed, "Time interview completed", span: 3)
-      |> Form.select(:time_completed_am_pm, "", time_completed_am_pm_options(), span: 1)
+      |> Form.select(:time_completed_am_pm, "", PresentationConstants.am_pm_options(), span: 1)
       |> Form.content_div(timezone.abbreviation, row: 3)
     end)
     |> Form.line(&Form.save_button(&1))
@@ -60,6 +60,11 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     end
   end
 
+  # # #
+
+  def assign_form_changeset(socket, form_changeset, form_error \\ nil),
+    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
+
   defp update_case_investigation(socket, params) do
     Cases.update_case_investigation(
       socket.assigns.case_investigation,
@@ -72,14 +77,8 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     )
   end
 
-  defp assign_form_changeset(socket, form_changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
-
   defp redirect_to_profile_page(socket),
     do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
-
-  defp time_completed_am_pm_options(),
-    do: ["AM", "PM"]
 
   defp confirmation_prompt(changeset),
     do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
