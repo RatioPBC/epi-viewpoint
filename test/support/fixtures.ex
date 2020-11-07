@@ -70,9 +70,12 @@ defmodule Epicenter.Test.Fixtures do
   end
 
   # annotated with audit_meta
-  def person_attrs(originator, tid, attrs \\ %{}) do
-    attrs = raw_person_attrs(tid, attrs) |> add_demographic_attrs() |> merge_attrs(attrs)
-    {attrs, audit_meta(originator)}
+  @doc "opts - :demographics (boolean)"
+  def person_attrs(originator, tid, attrs \\ %{}, opts \\ []) do
+    new_attrs = raw_person_attrs(tid, attrs)
+    new_attrs = if Keyword.get(opts, :demographics, true), do: add_demographic_attrs(new_attrs), else: new_attrs
+    new_attrs = new_attrs |> merge_attrs(attrs)
+    {new_attrs, audit_meta(originator)}
   end
 
   def raw_person_attrs(tid, attrs \\ %{}) do

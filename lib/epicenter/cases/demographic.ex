@@ -1,10 +1,11 @@
 defmodule Epicenter.Cases.Demographic do
   use Ecto.Schema
 
-  alias Epicenter.Cases.Person
-  alias Epicenter.Cases.Ethnicity
   import Ecto.Changeset
   import Epicenter.PhiValidation, only: [validate_phi: 2]
+
+  alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Ethnicity
 
   @required_attrs ~w{dob first_name last_name}a
   @optional_attrs ~w{external_id preferred_language tid employment gender_identity marital_status notes occupation person_id race sex_at_birth source}a
@@ -51,6 +52,14 @@ defmodule Epicenter.Cases.Demographic do
 
     def display_order() do
       from demographics in Demographic, order_by: [asc: demographics.seq]
+    end
+
+    def latest_form_demographic(%Person{id: person_id}) do
+      from demographics in Demographic,
+        where: demographics.person_id == ^person_id,
+        where: demographics.source == "form",
+        order_by: [desc: demographics.updated_at, desc: demographics.seq],
+        limit: 1
     end
 
     def matching(dob: dob, first_name: first_name, last_name: last_name) do
