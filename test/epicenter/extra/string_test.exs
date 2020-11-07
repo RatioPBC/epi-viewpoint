@@ -65,4 +65,16 @@ defmodule Epicenter.Extra.StringTest do
       assert Extra.String.trim("  foo  ") == "foo"
     end
   end
+
+  describe "underscore" do
+    test "stringifies and converts dashes to underscores" do
+      assert Extra.String.underscore("foo") == "foo"
+      assert Extra.String.underscore("foo bar") == "foo bar"
+      assert Extra.String.underscore("foo-bar-baz") == "foo_bar_baz"
+    end
+
+    test "with a list, underscores each item and joins with an underscore" do
+      assert Extra.String.underscore(["foo", :bar, "baz-fez"]) == "foo_bar_baz_fez"
+    end
+  end
 end

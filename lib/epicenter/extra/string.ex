@@ -22,4 +22,7 @@ defmodule Epicenter.Extra.String do
 
   def trim(nil), do: nil
   def trim(s) when is_binary(s), do: Elixir.String.trim(s)
+
+  def underscore(list) when is_list(list), do: list |> Enum.map(&underscore/1) |> Enum.join("_")
+  def underscore(item), do: item |> to_string() |> String.replace("-", "_")
 end
