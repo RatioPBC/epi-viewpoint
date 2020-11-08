@@ -14,8 +14,9 @@ defmodule EpicenterWeb.Multiselect do
   end
 
   def multiselect_input(f, field, {type, label_text, value, children}, parent_id) do
+    child_field = Extra.String.underscore([field, value]) |> Euclid.Extra.Atom.from_string()
     {:safe, parent_input} = multiselect_input(f, field, {type, label_text, value}, parent_id)
-    {:safe, child_inputs} = multiselect_inputs(f, field, children, input_id(f, field, value))
+    {:safe, child_inputs} = multiselect_inputs(f, child_field, children, input_id(f, field, value))
     {:safe, [parent_input] ++ child_inputs}
   end
 

@@ -61,8 +61,21 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, Keyword.put_new(opts, :span, 8))
   end
 
-  @doc "opts: span"
-  def wip_multiselect(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
+  @doc """
+  Creates a multiselect that can contain inputs that are checkboxes and/or radio buttons.
+  Any of the inputs can have an associated free text field for "other value" functionality.
+  Any of the top-level inputs can also have a list of children.
+
+  The `values` parameter is a list of tuples in the form {type, label, value} or {type, label, value, [children]},
+  where `children` is another list of tuples.
+
+  `type` can be: `:checkbox`, `:radio`, `:other_checkbox`, or `:other_radio`
+
+  ## Options
+
+    * `:span` - the number of grid columns the field should span
+  """
+  def multiselect(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
     [
       label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),

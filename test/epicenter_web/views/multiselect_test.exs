@@ -110,8 +110,8 @@ defmodule EpicenterWeb.MultiselectTest do
 
       assert Enum.into(dark_comedy_attrs, %{}) == %{
                "data-multiselect-parent-id" => "movie_genres_comedy",
-               "id" => "movie_genres_dark_comedy",
-               "name" => "movie[genres][]",
+               "id" => "movie_genres_comedy_dark_comedy",
+               "name" => "movie[genres_comedy][]",
                "phx-hook" => "Multiselect",
                "type" => "checkbox",
                "value" => "dark-comedy"
@@ -119,8 +119,8 @@ defmodule EpicenterWeb.MultiselectTest do
 
       assert Enum.into(musical_comedy_attrs, %{}) == %{
                "data-multiselect-parent-id" => "movie_genres_comedy",
-               "id" => "movie_genres_musical_comedy",
-               "name" => "movie[genres][]",
+               "id" => "movie_genres_comedy_musical_comedy",
+               "name" => "movie[genres_comedy][]",
                "phx-hook" => "Multiselect",
                "type" => "checkbox",
                "value" => "musical-comedy"

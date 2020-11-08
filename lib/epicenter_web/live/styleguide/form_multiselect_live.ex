@@ -163,19 +163,19 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     Form.new(form)
     |> Form.line(fn line ->
       line
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :radios,
         "Radios",
         [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:radio, "R4", "r4"}],
         span: 2
       )
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :radios_with_other,
         "With other",
         [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:other_radio, "Other", "r4"}],
         span: 2
       )
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :radios_with_other_preselected,
         "With other preselected",
         [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:other_radio, "Other", "r4"}],
@@ -184,19 +184,19 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     end)
     |> Form.line(fn line ->
       line
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :checkboxes,
         "Checkboxes",
         [{:checkbox, "C1", "c1"}, {:checkbox, "C2", "c2"}, {:checkbox, "C3", "c3"}, {:checkbox, "C4", "c4"}],
         span: 2
       )
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :radios_and_checkboxes,
         "Mixed",
         [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:checkbox, "C1", "c1"}, {:checkbox, "C2", "c2"}],
         span: 2
       )
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :radios_and_checkboxes_with_other,
         "With other",
         [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:checkbox, "C1", "c1"}, {:other_checkbox, "Other", "c2"}],
@@ -205,7 +205,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     end)
     |> Form.line(fn line ->
       line
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :radios_with_nested_checkboxes,
         "Radios + nested checkboxes",
         [
@@ -215,7 +215,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
         ],
         span: 3
       )
-      |> Form.wip_multiselect(
+      |> Form.multiselect(
         :radios_and_checkboxes_with_nested_checkboxes,
         "Mixed + nested checkboxes",
         [

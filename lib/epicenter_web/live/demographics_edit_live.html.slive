@@ -2,67 +2,13 @@
 
   section
     header#subnav
-      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [confirm: @confirmation_prompt, role: "back-link"] do
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [confirm: nil, role: "back-link"] do
         = back_icon()
         span Back
 
   section#demographics-edit
     header
       span Edit demographics
-    = form_for @changeset, "#", [id: "demographics-form", phx_submit: "submit", phx_change: "form-change"], fn f ->
-      span class="subheader" Gender identity
-      #option-set
-        = for gender_identity_option <- gender_identity_options() do
-          div
-            = label f, :gender_identity, class: "gender-identity-option", data_role: "gender-identity-checkbox-label", name: "demographic[gender_identity][]" do
-              = gender_identity_option
-              = checkbox f, :gender_identity, checked_value: gender_identity_option, checked: gender_identity_checked(@changeset, gender_identity_option), hidden_input: false, data_role: "gender-identity-checkbox", name: "demographic[gender_identity][]"
 
-      span class="subheader" Ethnicity
-      #option-set
-        = inputs_for f, :ethnicity, fn ethnicity_form ->
-          = for {major_ethnicity_value, major_ethnicity_label} <- major_ethnicity_options() do
-
-            = label ethnicity_form, :major, data_role: "major-ethnicity-label" do
-              = major_ethnicity_label
-              = radio_button ethnicity_form, :major, major_ethnicity_value, data_role: "major-ethnicity-radio-button"
-
-            .detailed-ethnicity-options
-              = for {detailed_ethnicity_value, detailed_ethnicity_label} <- detailed_ethnicity_options(major_ethnicity_value) do
-                = label ethnicity_form, :detailed, data_role: "detailed-ethnicity-label", name: "demographic[ethnicity][detailed][]" do
-                  = detailed_ethnicity_label
-                  = tag :input, type: "checkbox", value: detailed_ethnicity_value, checked: detailed_ethnicity_checked(@changeset, detailed_ethnicity_value), data_role: "detailed-ethnicity-checkbox", name: "demographic[ethnicity][detailed][]"
-
-      span class="subheader" Marital status
-      #option-set
-        = label f, :marital_status, for: "person_marital_status_single", data_role: "marital-status-label" do
-          | Single
-          = radio_button f, :marital_status, "single", data_role: "marital-status-radio-button"
-
-        = label f, :marital_status, for: "person_marital_status_married", data_role: "marital-status-label" do
-          | Married
-          = radio_button f, :marital_status, "married", data_role: "marital-status-radio-button"
-
-      span class="subheader" Employment status
-      #option-set
-        = label f, :employment, for: "person_employment_not_employed", data_role: "employment-status-label" do
-          | Not employed
-          = radio_button f, :employment, "not_employed", data_role: "employment-status-radio-button"
-
-        = label f, :employment, for: "person_employment_part_time", data_role: "employment-status-label" do
-          | Part time
-          = radio_button f, :employment, "part_time", data_role: "employment-status-radio-button"
-
-        = label f, :employment, for: "person_employment_full_time", data_role: "employment-status-label" do
-          | Full time
-          = radio_button f, :employment, "full_time", data_role: "employment-status-radio-button"
-
-      div class="subheader" Occupation
-      = text_input f, :occupation, data_role: "occupation-input", id: "occupation-input"
-
-      div class="subheader" Notes
-      = textarea f, :notes, data_role: "notes-input", id: "notes-input"
-
-      #nav
-        = submit "Save", phx_disable_with: "Saving...", id: "submit-form"
-
+    = form_for @form_changeset, "#", [id: "demographics-form", phx_submit: "save", phx_change: "form-change"], fn f ->
+      = form_builder(f)

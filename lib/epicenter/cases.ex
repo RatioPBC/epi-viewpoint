@@ -138,12 +138,10 @@ defmodule Epicenter.Cases do
   # demographics
   #
   def change_demographic(demographic, attrs), do: Demographic.changeset(demographic, attrs)
-
-  def create_demographic({attrs, audit_meta}) do
-    %Demographic{} |> change_demographic(attrs) |> AuditLog.insert(audit_meta)
-  end
-
+  def create_demographic({attrs, audit_meta}), do: %Demographic{} |> change_demographic(attrs) |> AuditLog.insert(audit_meta)
+  def get_demographic(%Person{} = person, source: :form), do: Demographic.Query.latest_form_demographic(person) |> Repo.one()
   def preload_demographics(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(demographics: Demographic.Query.display_order())
+  def update_demographic(%Demographic{} = demo, {attrs, audit_meta}), do: demo |> change_demographic(attrs) |> AuditLog.update(audit_meta)
 
   #
   # exposures

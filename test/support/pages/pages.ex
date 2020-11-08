@@ -10,6 +10,8 @@ defmodule EpicenterWeb.Test.Pages do
   alias Phoenix.LiveViewTest.View
 
   def actual_selections(%View{} = view, data_role, type) do
+    input_selector = type |> List.wrap() |> Enum.map(&"input[type=#{&1}]") |> Enum.join(", ")
+
     view
     |> parse()
     |> Test.Html.all(
@@ -17,7 +19,7 @@ defmodule EpicenterWeb.Test.Pages do
       fn element ->
         {
           Test.Html.text(element),
-          Test.Html.attr(element, "input[type=#{type}]", "checked") == ["checked"]
+          Test.Html.attr(element, input_selector, "checked") == ["checked"]
         }
       end
     )

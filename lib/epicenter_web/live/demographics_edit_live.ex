@@ -3,177 +3,164 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
-  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Extra
+  alias Epicenter.Cases.Demographic
   alias Epicenter.Format
+  alias EpicenterWeb.Form
+  alias EpicenterWeb.Forms.DemographicForm
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
     person = Cases.get_person(id) |> Cases.preload_demographics()
     demographic = Cases.Person.coalesce_demographics(person) |> Map.put(:__struct__, Cases.Demographic)
-    changeset = demographic |> Ecto.Changeset.cast(%{}, [])
 
     socket
     |> assign_page_title("#{Format.person(person)} (edit)")
-    |> assign(changeset: changeset)
-    |> assign(demographic: demographic)
+    |> assign_form_changeset(DemographicForm.model_to_form_changeset(demographic))
     |> assign(person: person)
-    |> assign(confirmation_prompt: nil)
     |> ok()
   end
 
-  def handle_event("form-change", %{"demographic" => form_params} = form_state, socket) do
-    new_ethnicity = get_or_update_ethnicity_from_changeset(socket.assigns.changeset, form_state)
-
-    new_changeset =
-      socket.assigns.demographic
-      |> Cases.Demographic.changeset(form_params)
-
-    new_changeset =
-      case form_params do
-        %{"gender_identity" => _} -> new_changeset
-        _ -> Ecto.Changeset.put_change(new_changeset, :gender_identity, [])
-      end
-
-    new_changeset =
-      case form_params do
-        %{"ethnicity" => _ethnicity} ->
-          new_changeset
-          |> Ecto.Changeset.put_change(:ethnicity, Euclid.Extra.Map.deep_atomize_keys(new_ethnicity))
-
-        _ ->
-          new_changeset
-      end
-
-    socket |> assign(:changeset, new_changeset) |> assign_confirmation_prompt |> noreply()
+  # temporarily does nothing until another issue is worked out
+  def handle_event("form-change", _params, socket) do
+    socket |> noreply()
   end
 
-  def handle_event("submit", %{"demographic" => demographic_params} = _params, socket) do
-    non_form_demographics = socket.assigns.person.demographics |> Enum.reject(&(&1.source == "form")) |> Euclid.Extra.Enum.pluck([:id])
-    form_demographic = socket.assigns.person.demographics |> Enum.find(&(&1.source == "form"))
+  def handle_event("save", params, socket) do
+    demographic_params = Map.get(params, "demographic_form", %{})
+    person = socket.assigns.person
+    current_user = socket.assigns.current_user
 
-    person_params = %{
-      "id" => socket.assigns.person.id,
-      "demographics" =>
-        non_form_demographics ++
-          [
-            %{
-              "id" => if(form_demographic, do: form_demographic.id, else: nil),
-              "source" => "form"
-            }
-            |> Map.merge(demographic_params)
-          ]
+    with %Ecto.Changeset{} = form_changeset <- DemographicForm.attrs_to_form_changeset(demographic_params),
+         {:form, {:ok, model_attrs}} <- {:form, DemographicForm.form_changeset_to_model_attrs(form_changeset)},
+         {:model, {:ok, _model}} <- {:model, create_or_update_model(model_attrs, person, current_user)} do
+      socket |> redirect_to_profile_page() |> noreply()
+    else
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        socket |> assign_form_changeset(form_changeset) |> noreply()
+
+      {:model, {:error, _}} ->
+        socket |> assign_form_changeset(DemographicForm.attrs_to_form_changeset(params), "An unexpected error occurred") |> noreply()
+    end
+  end
+
+  def create_or_update_model(attrs, person, author) do
+    audit_meta = %Epicenter.AuditLog.Meta{
+      author_id: author.id,
+      reason_event: AuditLog.Revision.edit_profile_demographics_event()
     }
 
-    socket.assigns.person
-    |> Cases.update_person(
-      {person_params,
-       %AuditLog.Meta{
-         author_id: socket.assigns.current_user.id,
-         reason_action: AuditLog.Revision.update_profile_action(),
-         reason_event: AuditLog.Revision.edit_profile_saved_event()
-       }}
-    )
-    |> case do
-      {:ok, person} ->
-        socket
-        |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))
-        |> noreply()
+    attrs = attrs |> Map.put(:person_id, person.id)
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
+    case Cases.get_demographic(person, source: :form) do
+      nil ->
+        audit_meta = %{audit_meta | reason_action: AuditLog.Revision.insert_demographics_action()}
+        {:ok, _demographic} = Cases.create_demographic({attrs, audit_meta})
+
+      %Demographic{} = demographic ->
+        audit_meta = %{audit_meta | reason_action: AuditLog.Revision.update_demographics_action()}
+        {:ok, _demographic} = Cases.update_demographic(demographic, {attrs, audit_meta})
     end
   end
 
-  defp get_or_update_ethnicity_from_changeset(changeset, form_params) do
-    old_form_state = expected_person_params_from_changeset(changeset)
+  defp assign_form_changeset(socket, %Ecto.Changeset{valid?: false} = changeset),
+    do: socket |> assign_form_changeset(changeset, "Check the errors above")
 
-    old_major_ethnicity = old_form_state && old_form_state.major
-    new_major_ethnicity = form_params["demographic"]["ethnicity"]["major"]
-
-    old_detailed_ethnicity = old_form_state && old_form_state.detailed
-    new_detailed_ethnicity = form_params["demographic"]["ethnicity"]["detailed"]
-
-    cond do
-      old_major_ethnicity != new_major_ethnicity and old_major_ethnicity == "hispanic_latinx_or_spanish_origin" ->
-        %{major: new_major_ethnicity, detailed: %{}}
-
-      old_detailed_ethnicity != new_detailed_ethnicity and Euclid.Exists.present?(new_detailed_ethnicity) ->
-        %{major: "hispanic_latinx_or_spanish_origin", detailed: new_detailed_ethnicity}
-
-      true ->
-        form_params["demographic"]["ethnicity"]
-    end
+  defp assign_form_changeset(socket, %Ecto.Changeset{} = changeset, form_error \\ nil) do
+    socket |> assign(form_changeset: changeset, form_error: form_error)
   end
 
-  def gender_identity_options() do
-    [
-      "Declined to answer",
-      "Female",
-      "Transgender woman/trans woman/male-to-female (MTF)",
-      "Male",
-      "Transgender man/trans man/female-to-male (FTM)",
-      "Genderqueer/gender nonconforming neither exclusively male nor female",
-      "Additional gender category (or other)"
-    ]
+  defp redirect_to_profile_page(socket) do
+    person = socket.assigns.person
+    socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, person)}#demographics-data")
   end
 
-  def major_ethnicity_options() do
-    [
-      {"unknown", "Unknown"},
-      {"declined_to_answer", "Declined to answer"},
-      {"not_hispanic_latinx_or_spanish_origin", "Not Hispanic, Latino/a, or Spanish origin"},
-      {"hispanic_latinx_or_spanish_origin", "Hispanic, Latino/a, or Spanish origin"}
-    ]
-  end
+  # # #
 
-  @detailed_ethnicity_mapping %{
-    "hispanic_latinx_or_spanish_origin" => [
-      {"mexican_mexican_american_chicanx", "Mexican, Mexican American, Chicano/a"},
-      {"puerto_rican", "Puerto Rican"},
-      {"cuban", "Cuban"},
-      {"another_hispanic_latinx_or_spanish_origin", "Another Hispanic, Latino/a or Spanish origin"}
-    ]
-  }
+  @gender_identity_options [
+    {:radio, "Unknown", "unknown"},
+    {:radio, "Declined to answer", "declined_to_answer"},
+    {:checkbox, "Female", "female"},
+    {:checkbox, "Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
+    {:checkbox, "Male", "male"},
+    {:checkbox, "Transgender man/trans man/female-to-male (FTM)", "transgender_man"},
+    {:checkbox, "Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"},
+    {:other_checkbox, "Additional gender category (or other), please specify", ""}
+  ]
 
-  def detailed_ethnicity_options(major_ethnicity),
-    do: @detailed_ethnicity_mapping[major_ethnicity] || []
+  @sex_at_birth_options [
+    {:radio, "Unknown", "unknown"},
+    {:radio, "Declined to answer", "declined_to_answer"},
+    {:radio, "Female", "female"},
+    {:radio, "Male", "male"},
+    {:radio, "Intersex", "intersex"}
+  ]
 
-  def detailed_ethnicity_checked(%Ecto.Changeset{} = changeset, detailed_ethnicity),
-    do: changeset |> Extra.Changeset.get_field_from_changeset(:ethnicity) |> detailed_ethnicity_checked(detailed_ethnicity)
+  @ethnicity_options [
+    {:radio, "Unknown", "unknown"},
+    {:radio, "Declined to answer", "declined_to_answer"},
+    {:radio, "Not Hispanic, Latino/a, or Spanish origin", "not_hispanic_latinx_or_spanish_origin"},
+    {:radio, "Hispanic, Latino/a, or Spanish origin", "hispanic_latinx_or_spanish_origin",
+     [
+       {:checkbox, "Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx"},
+       {:checkbox, "Puerto Rican", "puerto_rican"},
+       {:checkbox, "Cuban", "cuban"},
+       {:other_checkbox, "Another Hispanic, Latino/a or Spanish origin, please specify", ""}
+     ]}
+  ]
 
-  def detailed_ethnicity_checked(%{detailed: nil}, _detailed_ethnicity),
-    do: false
+  @race_options [
+    {:radio, "Unknown", "unknown"},
+    {:radio, "Declined to answer", "declined_to_answer"},
+    {:checkbox, "White", "white"},
+    {:checkbox, "Black or African American", "black_or_african_american"},
+    {:checkbox, "American Indian or Alaska Native", "american_indian_or_alaska_native"},
+    {:checkbox, "Asian", "asian",
+     [
+       {:checkbox, "Asian Indian", "asian_indian"},
+       {:checkbox, "Chinese", "chinese"},
+       {:checkbox, "Filipino", "filipino"},
+       {:checkbox, "Japanese", "japanese"},
+       {:checkbox, "Korean", "korean"},
+       {:checkbox, "Vietnamese", "vietnamese"},
+       {:other_checkbox, "Other Asian, please specify", ""}
+     ]},
+    {:checkbox, "Native Hawaiian or Other Pacific Islander", "native_hawaiian_or_other_pacific_islander",
+     [
+       {:checkbox, "Native Hawaiian", "native_hawaiian"},
+       {:checkbox, "Guamanian or Chamorro", "guamanian_or_chamorro"},
+       {:checkbox, "Samoan", "samoan"},
+       {:other_checkbox, "Other Pacific Islander, please specify", ""}
+     ]},
+    {:other_checkbox, "Other", ""}
+  ]
 
-  def detailed_ethnicity_checked(%{detailed: detailed_ethnicities}, detailed_ethnicity),
-    do: detailed_ethnicity in detailed_ethnicities
+  @marital_status_options [
+    {:radio, "Unknown", "unknown"},
+    {:radio, "Single", "single"},
+    {:radio, "Married", "married"}
+  ]
 
-  def detailed_ethnicity_checked(_, _),
-    do: false
+  @employment_options [
+    {:radio, "Unknown", "unknown"},
+    {:radio, "Not employed", "not_employed"},
+    {:radio, "Part time", "part_time"},
+    {:radio, "Full time", "full_time"}
+  ]
 
-  def gender_identity_checked(changeset, gender_identity_option) do
-    case changeset |> Extra.Changeset.get_field_from_changeset(:gender_identity) do
-      nil -> false
-      gender_list -> gender_identity_option in gender_list
-    end
-  end
-
-  def gender_identity_is_checked(),
-    do: nil
-
-  defp expected_person_params_from_changeset(changeset),
-    do: changeset |> Extra.Changeset.get_field_from_changeset(:ethnicity)
-
-  defp assign_confirmation_prompt(socket) do
-    prompt =
-      case socket.assigns.changeset do
-        nil -> nil
-        _changeset -> abandon_changes_confirmation_text()
-      end
-
-    socket |> assign(confirmation_prompt: prompt)
+  def form_builder(form) do
+    Form.new(form)
+    |> Form.line(&Form.multiselect(&1, :gender_identity, "Gender identity", @gender_identity_options, span: 8))
+    |> Form.line(&Form.multiselect(&1, :sex_at_birth, "Sex at birth", @sex_at_birth_options, span: 8))
+    |> Form.line(&Form.multiselect(&1, :ethnicity, "Ethnicity", @ethnicity_options, span: 8))
+    |> Form.line(&Form.multiselect(&1, :race, "Race", @race_options, span: 8))
+    |> Form.line(&Form.multiselect(&1, :marital_status, "Marital status", @marital_status_options, span: 8))
+    |> Form.line(&Form.multiselect(&1, :employment, "Employment status", @employment_options, span: 8))
+    |> Form.line(&Form.text_field(&1, :occupation, "Occupation", span: 6))
+    |> Form.line(&Form.textarea_field(&1, :notes, "Notes", span: 6))
+    |> Form.line(&Form.footer(&1, nil, span: 8))
+    |> Form.safe()
   end
 end
