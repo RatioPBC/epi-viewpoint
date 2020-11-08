@@ -564,14 +564,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       {:ok, page_live, _html} = live(conn, "/people/#{person.id}")
 
-      assert_role_text(page_live, "gender-identity", "")
-      assert_role_text(page_live, "sex-at-birth", "")
+      assert_role_text(page_live, "gender-identity", "Unknown")
+      assert_role_text(page_live, "sex-at-birth", "Unknown")
       assert_role_text(page_live, "major-ethnicity", "Unknown")
-      assert_role_text(page_live, "race", "")
+      assert_role_text(page_live, "race", "Unknown")
       assert_role_text(page_live, "marital-status", "Unknown")
       assert_role_text(page_live, "employment", "Unknown")
-      assert_role_text(page_live, "occupation", "")
-      assert_role_text(page_live, "notes", "")
+      assert_role_text(page_live, "occupation", "Unknown")
+      assert_role_text(page_live, "notes", "--")
       assert_role_text(page_live, "date-of-birth", "Unknown")
     end
 

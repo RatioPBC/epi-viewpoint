@@ -88,6 +88,8 @@ defmodule EpicenterWeb.ProfileLive do
 
   # # #
 
+  @unknown_text "Unknown"
+
   def age(dob) do
     Date.utc_today() |> Date.diff(dob) |> Integer.floor_div(365)
   end
@@ -114,10 +116,10 @@ defmodule EpicenterWeb.ProfileLive do
     |> Enum.map(&Format.phone/1)
   end
 
-  def string_or_unknown(value) do
+  def string_or_unknown(value, text \\ @unknown_text) do
     if Euclid.Exists.present?(value),
       do: value,
-      else: unknown_value()
+      else: unknown_value(text)
   end
 
   def list_or_unknown(values) do
@@ -164,7 +166,7 @@ defmodule EpicenterWeb.ProfileLive do
   def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
   def detailed_ethnicities(person), do: person.ethnicity.detailed
 
-  def unknown_value do
-    Phoenix.HTML.Tag.content_tag(:span, "Unknown", class: "unknown")
+  def unknown_value(text \\ @unknown_text) do
+    Phoenix.HTML.Tag.content_tag(:span, text, class: "unknown")
   end
 end

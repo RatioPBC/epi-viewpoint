@@ -154,25 +154,25 @@
           th Ethnicity
           th Race
         tr
-          td data-role="gender-identity"= demographic_field(@person, :gender_identity)
-          td data-role="sex-at-birth"= demographic_field(@person, :sex_at_birth)
+          td data-role="gender-identity"= @person |> demographic_field(:gender_identity) |> list_or_unknown()
+          td data-role="sex-at-birth"= @person |> demographic_field(:sex_at_birth) |> string_or_unknown()
           td
             div data-role="major-ethnicity"= ethnicity_value(@person)
             ul
               = for detailed_ethnicity <- detailed_ethnicities(@person) do
                 li data-role="detailed-ethnicity"= detailed_ethnicity_value(detailed_ethnicity)
-          td data-role="race"= demographic_field(@person, :race)
+          td data-role="race"= @person |> demographic_field(:race) |> string_or_unknown()
       tbody
         tr
           th Marital status
           th Employment
           th Occupation
         tr
-          td data-role="marital-status"= string_or_unknown(Format.marital_status(demographic_field(@person, :marital_status)))
-          td data-role="employment"= string_or_unknown(Format.employment(demographic_field(@person, :employment)))
-          td data-role="occupation"= demographic_field(@person, :occupation)
+          td data-role="marital-status"= @person |> demographic_field(:marital_status) |> Format.marital_status() |> string_or_unknown()
+          td data-role="employment"= @person |> demographic_field(:employment) |> Format.employment() |> string_or_unknown()
+          td data-role="occupation"= @person |> demographic_field(:occupation) |> string_or_unknown()
       tbody
         tr
           th Notes
         tr
-          td data-role="notes"= demographic_field(@person, :notes)
+          td data-role="notes"= @person |> demographic_field(:notes) |> string_or_unknown("--")
