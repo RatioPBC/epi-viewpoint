@@ -152,7 +152,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
         }
       )
 
-    view |> render() |> assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be MM/DD/YYYY"})
+    view |> render() |> Pages.assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be MM/DD/YYYY"})
   end
 
   @tag :skip

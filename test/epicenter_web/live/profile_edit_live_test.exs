@@ -34,12 +34,12 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       view |> render_click("add-email")
 
       render_change(view, "form-change", changes)
-      |> assert_validation_messages(%{})
+      |> Pages.assert_validation_messages(%{})
 
       view
       |> form("#profile-form", changes)
       |> render_submit()
-      |> assert_validation_messages(%{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
+      |> Pages.assert_validation_messages(%{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
     end
 
     test "making a 'form' demographic", %{conn: conn, person: person} do
@@ -92,7 +92,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       rendered = view |> form("#profile-form", form_data: %{"dob" => "Jan 4 1928"}) |> render_submit()
 
       assert_attribute(view, "input[data-role=dob]", "value", ["Jan 4 1928"])
-      assert_validation_messages(rendered, %{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
+      Pages.assert_validation_messages(rendered, %{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
@@ -261,7 +261,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.change_form(%{"addresses" => %{"0" => %{"street" => "3322 Test St"}}})
       |> Pages.ProfileEdit.click_add_address_button()
       |> Pages.ProfileEdit.assert_address_form(%{"form_data[addresses][0][street]" => "3322 Test St", "form_data[addresses][1][street]" => ""})
-      |> Pages.ProfileEdit.assert_validation_messages(%{})
+      |> Pages.assert_validation_messages(%{})
     end
 
     test "it doesn't save empty addresses", %{conn: conn, person: person} do
@@ -350,7 +350,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.change_form(%{"emails" => %{"0" => %{"address" => "alice-0@example.com"}}})
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.ProfileEdit.assert_email_form(%{"form_data[emails][0][address]" => "alice-0@example.com", "form_data[emails][1][address]" => ""})
-      |> Pages.ProfileEdit.assert_validation_messages(%{})
+      |> Pages.assert_validation_messages(%{})
     end
 
     test "email label hides when no emails are present", %{conn: conn, person: person} do
@@ -424,7 +424,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.ProfileEdit.change_form(%{"phones" => %{"0" => %{"number" => "1111111001"}}})
       |> Pages.ProfileEdit.click_add_phone_button()
       |> Pages.ProfileEdit.assert_phone_number_form(%{"form_data[phones][0][number]" => "1111111001", "form_data[phones][1][number]" => ""})
-      |> Pages.ProfileEdit.assert_validation_messages(%{})
+      |> Pages.assert_validation_messages(%{})
     end
   end
 

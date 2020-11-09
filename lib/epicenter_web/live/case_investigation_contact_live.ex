@@ -250,6 +250,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       )
     )
     |> Form.line(&Form.save_button(&1))
+#    |> Form.line(&Form.footer(&1, nil, span: 4))
     |> Form.safe()
   end
 

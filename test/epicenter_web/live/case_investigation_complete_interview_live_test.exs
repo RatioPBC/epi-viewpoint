@@ -89,7 +89,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
           }
         )
 
-      view |> render() |> assert_validation_messages(%{"complete_interview_form_time_completed" => "is invalid"})
+      view |> render() |> Pages.assert_validation_messages(%{"complete_interview_form_time_completed" => "is invalid"})
     end
 
     test "invalid dates become errors", %{conn: conn, case_investigation: case_investigation} do
@@ -103,7 +103,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
           }
         )
 
-      view |> render() |> assert_validation_messages(%{"complete_interview_form_date_completed" => "is invalid"})
+      view |> render() |> Pages.assert_validation_messages(%{"complete_interview_form_date_completed" => "is invalid"})
     end
 
     test "daylight savings hour that doesn't exist becomes an error", %{conn: conn, case_investigation: case_investigation} do
@@ -117,7 +117,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
           }
         )
 
-      view |> render() |> assert_validation_messages(%{"complete_interview_form_time_completed" => "is invalid"})
+      view |> render() |> Pages.assert_validation_messages(%{"complete_interview_form_time_completed" => "is invalid"})
     end
 
     test "validates presence of all fields", %{conn: conn, case_investigation: case_investigation} do
@@ -133,7 +133,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
 
       view
       |> render()
-      |> assert_validation_messages(%{
+      |> Pages.assert_validation_messages(%{
         "complete_interview_form_date_completed" => "can't be blank",
         "complete_interview_form_time_completed" => "can't be blank"
       })

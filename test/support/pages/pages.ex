@@ -57,6 +57,21 @@ defmodule EpicenterWeb.Test.Pages do
     conn_or_view_or_html
   end
 
+  def assert_validation_messages(%View{} = view, expected_messages) do
+    view |> render() |> assert_validation_messages(expected_messages)
+    view
+  end
+
+  def assert_validation_messages(html_string, expected_messages) when is_binary(html_string) do
+    html_string
+    |> Test.Html.parse()
+    |> Test.Html.all("[phx-feedback-for]", fn validation_message ->
+      {Test.Html.attr(validation_message, "phx-feedback-for") |> List.first(), Test.Html.text(validation_message)}
+    end)
+    |> Enum.into(%{})
+    |> assert_eq(expected_messages, :simple)
+  end
+
   def follow_conn_redirect(conn, max_directs \\ 10)
 
   def follow_conn_redirect(%Plug.Conn{} = _conn, 0 = _max_redirects),

@@ -8,11 +8,6 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  def assert_validation_messages(%View{} = view, expected_messages) do
-    view |> render() |> LiveViewAssertions.assert_validation_messages(expected_messages)
-    view
-  end
-
   def change_form(%View{} = view, person_params) do
     view
     |> form("#profile-form", form_data: person_params)
@@ -26,7 +21,7 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     |> form("#profile-form", form_data: person_params)
     |> render_submit()
 
-    view |> Pages.ProfileEdit.assert_validation_messages(%{})
+    view |> Pages.assert_validation_messages(%{})
   end
 
   def visit(%Plug.Conn{} = conn, %Person{id: person_id}) do

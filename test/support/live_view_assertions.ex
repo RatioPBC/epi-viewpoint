@@ -1,5 +1,4 @@
 defmodule EpicenterWeb.Test.LiveViewAssertions do
-  import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
@@ -127,15 +126,5 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
       """
       |> flunk()
     end
-  end
-
-  def assert_validation_messages(html_string, expected_messages) do
-    html_string
-    |> Test.Html.parse()
-    |> Test.Html.all("[phx-feedback-for]", fn validation_message ->
-      {Test.Html.attr(validation_message, "phx-feedback-for") |> List.first(), Test.Html.text(validation_message)}
-    end)
-    |> Enum.into(%{})
-    |> assert_eq(expected_messages, :simple)
   end
 end

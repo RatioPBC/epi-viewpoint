@@ -164,7 +164,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
 
       view
       |> render()
-      |> assert_validation_messages(%{
+      |> Pages.assert_validation_messages(%{
         "contact_form_first_name" => "can't be blank",
         "contact_form_last_name" => "can't be blank",
         "contact_form_most_recent_date_together" => "can't be blank",
@@ -186,7 +186,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
 
       view
       |> render()
-      |> assert_validation_messages(%{
+      |> Pages.assert_validation_messages(%{
         "contact_form_most_recent_date_together" => "must be MM/DD/YYYY"
       })
     end
