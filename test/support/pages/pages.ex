@@ -72,6 +72,11 @@ defmodule EpicenterWeb.Test.Pages do
     |> assert_eq(expected_messages, :simple)
   end
 
+  def assert_save_error(%View{} = view, expected_message) do
+    assert actual_save_error(view) == expected_message
+    view
+  end
+
   def follow_conn_redirect(conn, max_directs \\ 10)
 
   def follow_conn_redirect(%Plug.Conn{} = _conn, 0 = _max_redirects),
@@ -129,6 +134,11 @@ defmodule EpicenterWeb.Test.Pages do
 
   def parse(html_string) when is_binary(html_string),
     do: html_string |> Test.Html.parse_doc()
+
+  def refute_save_error(%View{} = view) do
+    assert actual_save_error(view) == ""
+    view
+  end
 
   def submit_form(%Plug.Conn{} = conn, http_method, role, name, %{} = fields)
       when http_method in [:put, :post] do
@@ -194,5 +204,14 @@ defmodule EpicenterWeb.Test.Pages do
   def visit(%Plug.Conn{} = conn, path, nil) do
     {:ok, view, _html} = live(conn, path)
     view
+  end
+
+  # # #
+
+  defp actual_save_error(view) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.text(".form-error-message")
   end
 end

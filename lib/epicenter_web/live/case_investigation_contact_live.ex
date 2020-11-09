@@ -124,14 +124,14 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     socket
     |> authenticate_user(session)
     |> assign_page_title("Case Investigation Contact")
-    |> assign(:changeset, ContactForm.changeset(exposure, %{}))
+    |> assign_form_changeset(ContactForm.changeset(exposure, %{}))
     |> assign(:exposure, exposure)
     |> assign(:case_investigation, case_investigation)
     |> ok()
   end
 
   def handle_event("change", %{"contact_form" => params}, socket) do
-    socket |> assign(changeset: ContactForm.changeset(socket.assigns.exposure, params)) |> noreply()
+    socket |> assign_form_changeset(ContactForm.changeset(socket.assigns.exposure, params)) |> noreply()
   end
 
   def handle_event("save", %{"contact_form" => params}, socket) do
@@ -146,7 +146,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     else
       {:form, {:error, changeset}} ->
         socket
-        |> assign(changeset: changeset)
+        |> assign_form_changeset(changeset, "Check errors above")
         |> noreply()
     end
   end
@@ -203,7 +203,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     "Teacher or childcare",
     "Service provider"
   ]
-  def contact_form_builder(form, case_investigation) do
+  def contact_form_builder(form, case_investigation, form_error) do
     onset_date = case_investigation.symptom_onset_date
     sampled_date = case_investigation.initiating_lab_result.sampled_on
     infectious_seed_date = onset_date || sampled_date
@@ -249,10 +249,13 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         span: 4
       )
     )
-    |> Form.line(&Form.save_button(&1))
-#    |> Form.line(&Form.footer(&1, nil, span: 4))
+    |> Form.line(&Form.footer(&1, form_error, span: 4))
     |> Form.safe()
   end
 
   def confirmation_prompt(changeset), do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
+
+  defp assign_form_changeset(socket, changeset, form_error \\ nil) do
+    socket |> assign(changeset: changeset, form_error: form_error)
+  end
 end

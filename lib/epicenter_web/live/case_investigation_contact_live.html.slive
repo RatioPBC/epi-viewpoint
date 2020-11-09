@@ -9,4 +9,4 @@
   section#case-investigation-contact
     h2= if(@changeset.data.exposure_id, do: "Edit contact", else: "Add contact")
     = form_for @changeset, "#", [id: "case-investigation-contact-form", phx_change: "change", phx_submit: "save"], fn f ->
-      = contact_form_builder(f, @case_investigation)
+      = contact_form_builder(f, @case_investigation, @form_error)

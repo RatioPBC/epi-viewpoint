@@ -285,6 +285,22 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
     end
   end
 
+  describe "validations" do
+    test "shows validation errors on submit", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.assert_validation_messages(%{})
+      |> Pages.refute_save_error()
+      |> Pages.submit_live("#case-investigation-contact-form", complete_interview_contact_form: %{})
+      |> Pages.assert_validation_messages(%{
+        "contact_form_first_name" => "can't be blank",
+        "contact_form_last_name" => "can't be blank",
+        "contact_form_most_recent_date_together" => "can't be blank",
+        "contact_form_relationship_to_case" => "can't be blank"
+      })
+      |> Pages.assert_save_error("Check errors above")
+    end
+  end
+
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
       Pages.CaseInvestigationContact.visit(conn, case_investigation)
