@@ -120,10 +120,20 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
       }
     )
     |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.refute_isolation_monitoring_visible("001")
     |> Pages.Profile.click_complete_case_investigation("001")
     |> Pages.follow_live_view_redirect(conn)
     |> elem(1)
     |> Pages.CaseInvestigationCompleteInterview.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
+      complete_interview_form: %{
+        "date_completed" => "09/06/2020",
+        "time_completed" => "03:45",
+        "time_completed_am_pm" => "PM"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.assert_isolation_monitoring_visible("001")
 
     assert %{
              case_investigations: [

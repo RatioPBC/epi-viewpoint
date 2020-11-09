@@ -112,6 +112,13 @@
                 = contact_details_as_list(exposure)
               div
                 = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, exposure) , data: [role: "edit-contact", exposure: exposure.id]
+      = if CaseInvestigation.status(case_investigation) == :completed_interview do
+        .case-investigation-isolation-monitoring id="isolation-monitoring-#{case_investigation.name}"
+          .contacts-header-row
+            h4
+              span
+                | Isolation Monitoring
+
 
   section#lab-results data-role="lab-results"
     header

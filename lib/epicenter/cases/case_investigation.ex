@@ -43,7 +43,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     |> validate_required(@required_attrs)
   end
 
-  @spec status(%CaseInvestigation{}) :: :pending | :started | :discontinued
+  @spec status(%CaseInvestigation{}) :: :pending | :started | :discontinued | :completed_interview
   def status(%{discontinued_at: timestamp}) when not is_nil(timestamp), do: :discontinued
   def status(%{completed_interview_at: timestamp}) when not is_nil(timestamp), do: :completed_interview
   def status(%{started_at: timestamp}) when not is_nil(timestamp), do: :started

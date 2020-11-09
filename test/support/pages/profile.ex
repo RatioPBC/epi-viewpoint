@@ -319,6 +319,15 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_isolation_monitoring_visible(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find!("#isolation-monitoring-#{number}")
+
+    view
+  end
+
   def refute_clinical_details_showing(%View{} = view, number) do
     view
     |> render()
@@ -334,6 +343,16 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render()
     |> Test.Html.parse()
     |> Test.Html.find("#contacts-#{number}")
+    |> assert_eq([])
+
+    view
+  end
+
+  def refute_isolation_monitoring_visible(%View{} = view, number) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#isolation-monitoring-#{number}")
     |> assert_eq([])
 
     view
