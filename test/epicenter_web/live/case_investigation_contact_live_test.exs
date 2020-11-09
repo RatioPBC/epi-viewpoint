@@ -33,8 +33,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       assert %{
                "contact_form[first_name]" => nil,
                "contact_form[last_name]" => nil,
-               "contact_form[relationship_to_case]" => "",
-               "contact_form[preferred_language]" => "",
                "contact_form[phone]" => ""
              } = Pages.form_state(view)
 
@@ -154,7 +152,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         contact_form: %{
           "first_name" => "",
           "last_name" => "",
-          "relationship_to_case" => "",
           "most_recent_date_together" => "",
           "under_18" => "false",
           "same_household" => "false",
@@ -176,7 +173,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         contact_form: %{
           "first_name" => "Alice",
           "last_name" => "Testuser",
-          "relationship_to_case" => "neighbor",
+          "relationship_to_case" => "Family",
           "most_recent_date_together" => "10/32/2020",
           "under_18" => "false",
           "same_household" => "false",
@@ -198,7 +195,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         Cases.create_exposure(
           {%{
              exposing_case_id: case_investigation.id,
-             relationship_to_case: "spouse",
+             relationship_to_case: "Family",
              most_recent_date_together: ~D[2020-10-31],
              household_member: true,
              under_18: false,
@@ -236,7 +233,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                "contact_form[same_household]" => "true",
                "contact_form[most_recent_date_together]" => "10/31/2020",
                "contact_form[preferred_language]" => "Haitian Creole",
-               "contact_form[relationship_to_case]" => "spouse"
+               "contact_form[relationship_to_case]" => "Family"
              } = Pages.form_state(view)
     end
 
