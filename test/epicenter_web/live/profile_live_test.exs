@@ -533,7 +533,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       assert_role_text(page_live, "gender-identity", "Female")
       assert_role_text(page_live, "sex-at-birth", "Female")
-      assert_role_text(page_live, "major-ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
+      assert_role_text(page_live, "ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
       assert_role_text(page_live, "race", "Filipino")
       assert_role_text(page_live, "marital-status", "Single")
       assert_role_text(page_live, "employment", "Part time")
@@ -566,7 +566,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       assert_role_text(page_live, "gender-identity", "Unknown")
       assert_role_text(page_live, "sex-at-birth", "Unknown")
-      assert_role_text(page_live, "major-ethnicity", "Unknown")
+      assert_role_text(page_live, "ethnicity", "Unknown")
       assert_role_text(page_live, "race", "Unknown")
       assert_role_text(page_live, "marital-status", "Unknown")
       assert_role_text(page_live, "employment", "Unknown")

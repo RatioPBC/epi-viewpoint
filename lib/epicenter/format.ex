@@ -1,5 +1,6 @@
 defmodule Epicenter.Format do
   alias Epicenter.Cases.Address
+  alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Phone
   alias Euclid.Extra
 
@@ -10,20 +11,18 @@ defmodule Epicenter.Format do
     [non_postal_code, postal_code] |> Extra.List.compact() |> Enum.join(" ")
   end
 
-  def employment(nil), do: nil
-  def employment(employment), do: employment |> String.replace("_", " ") |> String.capitalize()
-
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
 
   def date_time_with_zone(nil), do: ""
+  def date_time_with_zone(%DateTime{} = date_time), do: Calendar.strftime(date_time, "%m/%d/%Y at %I:%M%P %Z")
 
-  def date_time_with_zone(%DateTime{} = date_time) do
-    Calendar.strftime(date_time, "%m/%d/%Y at %I:%M%P %Z")
-  end
-
-  def marital_status(nil), do: nil
-  def marital_status(marital_status), do: marital_status |> String.capitalize()
+  def demographic(%{major: major, detailed: detailed}, field), do: demographic(List.wrap(major) ++ List.wrap(detailed), field)
+  def demographic(values, field) when is_list(values), do: Enum.map(values, &demographic(&1, field))
+  def demographic(nil, _field), do: nil
+  def demographic("unknown", _field), do: "Unknown"
+  def demographic("declined_to_answer", _field), do: "Declined to answer"
+  def demographic(value, field), do: Demographic.find_humanized_value(field, value)
 
   def person(nil), do: ""
   def person(%Epicenter.Cases.Person{} = person), do: person(Epicenter.Cases.Person.coalesce_demographics(person))

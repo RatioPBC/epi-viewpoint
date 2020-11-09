@@ -46,6 +46,67 @@ defmodule Epicenter.Cases.Demographic do
     |> validate_phi(:demographic)
   end
 
+  def find_humanized_value(field, value) do
+    case Map.get(humanized_values(), field) do
+      nil ->
+        value
+
+      humanized_values_for_field ->
+        default = {value, value}
+        {humanized, _val} = Enum.find(humanized_values_for_field, default, fn {_humanized, val} -> val == value end)
+        humanized
+    end
+  end
+
+  def humanized_values do
+    %{
+      gender_identity: [
+        {"Female", "female"},
+        {"Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
+        {"Male", "male"},
+        {"Transgender man/trans man/female-to-male (FTM)", "transgender_man"},
+        {"Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"}
+      ],
+      sex_at_birth: [
+        {"Female", "female"},
+        {"Male", "male"},
+        {"Intersex", "intersex"}
+      ],
+      ethnicity: [
+        {"Not Hispanic, Latino/a, or Spanish origin", "not_hispanic_latinx_or_spanish_origin"},
+        {"Hispanic, Latino/a, or Spanish origin", "hispanic_latinx_or_spanish_origin"},
+        {"Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx"},
+        {"Puerto Rican", "puerto_rican"},
+        {"Cuban", "cuban"}
+      ],
+      race: [
+        {"White", "white"},
+        {"Black or African American", "black_or_african_american"},
+        {"American Indian or Alaska Native", "american_indian_or_alaska_native"},
+        {"Asian", "asian"},
+        {"Asian Indian", "asian_indian"},
+        {"Chinese", "chinese"},
+        {"Filipino", "filipino"},
+        {"Japanese", "japanese"},
+        {"Korean", "korean"},
+        {"Vietnamese", "vietnamese"},
+        {"Native Hawaiian or Other Pacific Islander", "native_hawaiian_or_other_pacific_islander"},
+        {"Native Hawaiian", "native_hawaiian"},
+        {"Guamanian or Chamorro", "guamanian_or_chamorro"},
+        {"Samoan", "samoan"}
+      ],
+      marital_status: [
+        {"Single", "single"},
+        {"Married", "married"}
+      ],
+      employment: [
+        {"Not employed", "not_employed"},
+        {"Part time", "part_time"},
+        {"Full time", "full_time"}
+      ]
+    }
+  end
+
   defmodule Query do
     import Ecto.Query
     alias Epicenter.Cases.Demographic

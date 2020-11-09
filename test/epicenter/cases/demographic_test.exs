@@ -14,6 +14,14 @@ defmodule Epicenter.Cases.DemographicTest do
   test "validates personal health information on dob", do: assert_invalid(new_changeset(%{dob: "01-10-2000"}))
   test "validates personal health information on last_name", do: assert_invalid(new_changeset(%{last_name: "Aliceblat"}))
 
+  describe "find_humanized_value" do
+    test "gets humanized values for fields" do
+      assert Demographic.find_humanized_value(:gender_identity, "male") == "Male"
+      assert Demographic.find_humanized_value(:gender_identity, "abcdef") == "abcdef"
+      assert Demographic.find_humanized_value(:bogus_field, "abcdef") == "abcdef"
+    end
+  end
+
   describe "Query.display_order" do
     test "sorts by insertion order" do
       author = Test.Fixtures.admin()

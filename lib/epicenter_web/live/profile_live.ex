@@ -4,7 +4,7 @@ defmodule EpicenterWeb.ProfileLive do
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
-  import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
+  import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
 
   import EpicenterWeb.Profile.CaseInvestigationPresenter,
     only: [

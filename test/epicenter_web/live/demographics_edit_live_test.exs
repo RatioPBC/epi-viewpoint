@@ -107,7 +107,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
           "ethnicity_hispanic_latinx_or_spanish_origin" => []
         }
       )
-      |> Pages.Profile.assert_major_ethnicity("Declined to answer")
+      |> Pages.Profile.assert_ethnicities(["Declined to answer"])
 
       assert demographics(person.id).ethnicity.major == "declined_to_answer"
     end
@@ -121,8 +121,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
           "ethnicity_hispanic_latinx_or_spanish_origin" => ["cuban", "puerto_rican"]
         }
       )
-      |> Pages.Profile.assert_major_ethnicity("Hispanic, Latino/a, or Spanish origin")
-      |> Pages.Profile.assert_detailed_ethnicities(["Cuban", "Puerto Rican"])
+      |> Pages.Profile.assert_ethnicities(["Hispanic, Latino/a, or Spanish origin", "Cuban", "Puerto Rican"])
 
       updated_person = demographics(person.id)
       assert updated_person.ethnicity.major == "hispanic_latinx_or_spanish_origin"

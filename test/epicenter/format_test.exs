@@ -68,14 +68,15 @@ defmodule Epicenter.FormatTest do
     end
   end
 
-  describe "employment" do
-    import Epicenter.Format, only: [employment: 1]
+  describe "demographic" do
+    import Epicenter.Format, only: [demographic: 2]
 
-    test "safely formats employment values" do
-      assert employment("full_time") == "Full time"
-      assert employment("part_time") == "Part time"
-      assert employment("not_employed") == "Not employed"
-      assert employment(nil) == nil
+    test "safely formats demographic fields" do
+      assert demographic(nil, :gender_identitiy) == nil
+      assert demographic("Some other value", :gender_identity) == "Some other value"
+      assert demographic("Yet another value", :bogus_field) == "Yet another value"
+      assert demographic("transgender_woman", :gender_identity) == "Transgender woman/trans woman/male-to-female (MTF)"
+      assert demographic(["female", "male"], :gender_identity) == ["Female", "Male"]
     end
   end
 
@@ -88,16 +89,6 @@ defmodule Epicenter.FormatTest do
       assert person(%{first_name: "Alice", last_name: nil}) == "Alice"
       assert person(%{first_name: nil, last_name: nil}) == ""
       assert person(nil) == ""
-    end
-  end
-
-  describe "marital_status" do
-    import Epicenter.Format, only: [marital_status: 1]
-
-    test "safely gets marital_status from person" do
-      assert marital_status("single") == "Single"
-      assert marital_status("married") == "Married"
-      assert marital_status(nil) == nil
     end
   end
 
