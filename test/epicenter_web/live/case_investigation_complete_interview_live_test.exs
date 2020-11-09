@@ -56,9 +56,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
       }
     )
     |> Pages.Profile.assert_here(person)
-
-    # TODO show history text on profile
-    #    |> Pages.Profile.assert_case_investigation_has_history("Completed interview on 09/06/2020 at 03:45pm EDT")
+    |> Pages.Profile.assert_case_investigation_has_history("Completed interview on 09/06/2020 at 03:45pm EDT")
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
