@@ -158,17 +158,12 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "phone" => ""
         }
       )
-
-      view
-      |> render()
       |> Pages.assert_validation_messages(%{
         "contact_form_first_name" => "can't be blank",
         "contact_form_last_name" => "can't be blank",
         "contact_form_most_recent_date_together" => "can't be blank",
         "contact_form_relationship_to_case" => "can't be blank"
       })
-
-      view
       |> Pages.submit_live("#case-investigation-contact-form",
         contact_form: %{
           "first_name" => "Alice",
@@ -180,11 +175,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "phone" => ""
         }
       )
-
-      view
-      |> render()
       |> Pages.assert_validation_messages(%{
-        "contact_form_most_recent_date_together" => "must be MM/DD/YYYY"
+        "contact_form_most_recent_date_together" => "must be a valid MM/DD/YYYY date"
       })
     end
 

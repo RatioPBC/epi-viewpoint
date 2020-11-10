@@ -142,17 +142,15 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
   end
 
   test "validating date format", %{conn: conn, case_investigation: case_investigation} do
-    view =
-      Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
-      |> Pages.submit_live("#case-investigation-clinical-details-form",
-        clinical_details_form: %{
-          "clinical_status" => "symptomatic",
-          "symptom_onset_date" => "09/32/2020",
-          "symptoms" => ["fever", "chills"]
-        }
-      )
-
-    view |> render() |> Pages.assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be MM/DD/YYYY"})
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.submit_live("#case-investigation-clinical-details-form",
+      clinical_details_form: %{
+        "clinical_status" => "symptomatic",
+        "symptom_onset_date" => "09/32/2020",
+        "symptoms" => ["fever", "chills"]
+      }
+    )
+    |> Pages.assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be a valid MM/DD/YYYY date"})
   end
 
   @tag :skip

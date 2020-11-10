@@ -6,7 +6,7 @@ defmodule Epicenter.Validation do
     Changeset.validate_change(changeset, field, fn field, date ->
       case DateParser.parse_mm_dd_yyyy(date) do
         {:ok, _} -> valid()
-        {:error, _} -> invalid(field, "must be MM/DD/YYYY")
+        {:error, _} -> invalid(field, "must be a valid MM/DD/YYYY date")
       end
     end)
   end

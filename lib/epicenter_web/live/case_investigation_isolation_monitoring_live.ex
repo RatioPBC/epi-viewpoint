@@ -23,7 +23,10 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     end
 
     def attrs_to_form_changeset(attrs) do
-      %IsolationMonitoringForm{} |> cast(attrs, @required_attrs ++ @optional_attrs) |> Validation.validate_date(:date_started)
+      %IsolationMonitoringForm{}
+      |> cast(attrs, @required_attrs ++ @optional_attrs)
+      |> Validation.validate_date(:date_started)
+      |> Validation.validate_date(:date_ended)
     end
 
     def isolation_dates(%CaseInvestigation{symptom_onset_date: nil} = case_investigation) do
@@ -52,17 +55,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     save_and_redirect(socket, params)
   end
 
-  def mount(%{"id" => case_investigation_id}, session, socket) do
-    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_initiating_lab_result()
-
-    socket
-    |> assign_page_title(" Case Investigation Isolation Monitoring")
-    |> authenticate_user(session)
-    |> assign(:case_investigation, case_investigation)
-    |> assign_form_changeset(IsolationMonitoringForm.model_to_form_changeset(case_investigation))
-    |> ok()
-  end
-
   def isolation_monitoring_form_builder(form, case_investigation) do
     onset_date = case_investigation.symptom_onset_date
     sampled_date = case_investigation.initiating_lab_result.sampled_on
@@ -87,6 +79,17 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     |> Form.line(&Form.date_field(&1, :date_ended, "Isolation end date", span: 3, explanation_text: "Recommended length: 10 days"))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
+  end
+
+  def mount(%{"id" => case_investigation_id}, session, socket) do
+    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_initiating_lab_result()
+
+    socket
+    |> assign_page_title(" Case Investigation Isolation Monitoring")
+    |> authenticate_user(session)
+    |> assign(:case_investigation, case_investigation)
+    |> assign_form_changeset(IsolationMonitoringForm.model_to_form_changeset(case_investigation))
+    |> ok()
   end
 
   # # #

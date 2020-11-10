@@ -53,11 +53,13 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
       Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-isolation-monitoring-form",
         isolation_monitoring_form: %{
-          "date_started" => "09/32/2020"
+          "date_started" => "02/31/2020",
+          "date_ended" => "09/32/2020"
         }
       )
       |> Pages.assert_validation_messages(%{
-        "isolation_monitoring_form_date_started" => "must be MM/DD/YYYY"
+        "isolation_monitoring_form_date_started" => "must be a valid MM/DD/YYYY date",
+        "isolation_monitoring_form_date_ended" => "must be a valid MM/DD/YYYY date"
       })
     end
   end
