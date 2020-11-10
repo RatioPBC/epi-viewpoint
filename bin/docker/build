@@ -8,8 +8,13 @@ set -e
 
 if [ -n "$GITLAB_CI" ]; then # CI variable is present in gitlab only
   COMMIT_SHA=$CI_COMMIT_SHA
+  docker build . -t $CI_REGISTRY_IMAGE:app_runner_base --target app_runner_base --cache-from "$CI_REGISTRY_IMAGE:app_runner_base"
+  docker build . -t $CI_REGISTRY_IMAGE:app_builder --target app_builder --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}" --build-arg COMMIT_SHA=$COMMIT_SHA --cache-from "$CI_REGISTRY_IMAGE:app_runner_base" --cache-from "$CI_REGISTRY_IMAGE:app_builder"
+  docker build . -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE:latest --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}" --build-arg COMMIT_SHA=$COMMIT_SHA --cache-from "$CI_REGISTRY_IMAGE:app_runner_base" --cache-from "$CI_REGISTRY_IMAGE:app_builder"
+  docker push $CI_REGISTRY_IMAGE:app_runner_base
+  docker push $CI_REGISTRY_IMAGE:app_builder
+  docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 else
   COMMIT_SHA=$(git rev-parse --verify HEAD)
+  docker build . -t epicenter:latest --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}" --build-arg COMMIT_SHA=$COMMIT_SHA
 fi
-
-docker build . -t epicenter:latest --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}" --build-arg COMMIT_SHA=$COMMIT_SHA

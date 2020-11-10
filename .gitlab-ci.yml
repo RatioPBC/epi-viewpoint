@@ -23,6 +23,7 @@ cache:
   paths:
     - deps
     - assets/node_modules
+    - _build
 test:
   before_script:
     - npm install --prefix assets
@@ -47,8 +48,6 @@ build_image:
     - docker:dind
   script:
     - bin/docker/build
-    - docker tag epicenter:latest $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 deploy_staging:
   only:
     - main
