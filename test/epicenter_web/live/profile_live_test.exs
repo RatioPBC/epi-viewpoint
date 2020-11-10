@@ -316,6 +316,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
              most_recent_date_together: ~D[2020-10-31],
              household_member: true,
              under_18: true,
+             guardian_name: "Jacob",
              exposed_person: %{
                demographics: [
                  %{
@@ -375,6 +376,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
              most_recent_date_together: ~D[2020-10-31],
              household_member: true,
              under_18: true,
+             guardian_name: "Jacob",
              exposed_person: %{
                demographics: [
                  %{

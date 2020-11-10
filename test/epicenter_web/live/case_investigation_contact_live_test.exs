@@ -43,7 +43,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "last_name" => "Testuser",
           "relationship_to_case" => "Family",
           "most_recent_date_together" => "10/31/2020",
-          "under_18" => "true",
+          "under_18" => "false",
           "same_household" => "true",
           "phone" => "1111111234",
           "preferred_language" => "Haitian Creole"
@@ -57,7 +57,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    relationship_to_case: "Family",
                    most_recent_date_together: ~D[2020-10-31],
                    household_member: true,
-                   under_18: true,
+                   under_18: false,
                    exposed_person: %{
                      demographics: [
                        %{
@@ -187,6 +187,92 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         "contact_form_most_recent_date_together" => "must be MM/DD/YYYY"
       })
     end
+
+    test "marking a contact as under_18 collects the phone number for the guardian", %{
+      conn: conn,
+      case_investigation: case_investigation
+    } do
+      view =
+        Pages.CaseInvestigationContact.visit(conn, case_investigation)
+        |> Pages.CaseInvestigationContact.assert_here()
+
+      assert %{
+               "contact_form[phone]" => "Phone"
+             } = Pages.form_labels(view)
+
+      refute "contact_form[guardian_name]" in (Pages.form_labels(view) |> Map.keys())
+      refute "contact_form[guardian_phone]" in (Pages.form_labels(view) |> Map.keys())
+
+      view =
+        view
+        |> Pages.CaseInvestigationContact.change_form(contact_form: %{"under_18" => "true", "same_household" => "true", "first_name" => "Jared"})
+
+      assert %{
+               "contact_form[guardian_name]" => "Guardian's name",
+               "contact_form[guardian_phone]" => "Guardian's phone"
+             } = Pages.form_labels(view)
+
+      refute "contact_form[phone]" in (Pages.form_labels(view) |> Map.keys())
+
+      view
+      |> Pages.submit_live("#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "relationship_to_case" => "Family",
+          "most_recent_date_together" => "10/15/2020",
+          "under_18" => "true",
+          "guardian_name" => "",
+          "same_household" => "false",
+          "guardian_phone" => ""
+        }
+      )
+
+      view
+      |> render()
+      |> Pages.assert_validation_messages(%{
+        "contact_form_guardian_name" => "can't be blank"
+      })
+
+      view
+      |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "David",
+          "last_name" => "Testuser",
+          "relationship_to_case" => "Friend",
+          "most_recent_date_together" => "10/30/2020",
+          "under_18" => "true",
+          "same_household" => "true",
+          "guardian_name" => "Cuthbert Testuser",
+          "guardian_phone" => "1111111234",
+          "preferred_language" => "Haitian Creole"
+        }
+      )
+
+      assert %{
+               exposures: [
+                 %{
+                   relationship_to_case: "Friend",
+                   most_recent_date_together: ~D[2020-10-30],
+                   household_member: true,
+                   under_18: true,
+                   guardian_name: "Cuthbert Testuser",
+                   guardian_phone: "1111111234",
+                   exposed_person: %{
+                     demographics: [
+                       %{
+                         source: "form",
+                         first_name: "David",
+                         last_name: "Testuser",
+                         preferred_language: "Haitian Creole"
+                       }
+                     ],
+                     phones: []
+                   }
+                 }
+               ]
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+    end
   end
 
   describe "updating" do
@@ -235,6 +321,32 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                "contact_form[preferred_language]" => "Haitian Creole",
                "contact_form[relationship_to_case]" => "Family"
              } = Pages.form_state(view)
+
+      {:ok, exposure} =
+        Cases.update_exposure(
+          exposure,
+          {%{
+             under_18: true,
+             guardian_name: "Someone",
+             guardian_phone: "1111111928"
+           }, Test.Fixtures.admin_audit_meta()}
+        )
+
+      view =
+        Pages.CaseInvestigationContact.visit(conn, case_investigation, exposure)
+        |> Pages.CaseInvestigationContact.assert_here()
+
+      assert %{
+               "contact_form[first_name]" => "Billy",
+               "contact_form[last_name]" => "Testuser",
+               "contact_form[under_18]" => "true",
+               "contact_form[guardian_name]" => "Someone",
+               "contact_form[guardian_phone]" => "1111111928",
+               "contact_form[same_household]" => "true",
+               "contact_form[most_recent_date_together]" => "10/31/2020",
+               "contact_form[preferred_language]" => "Haitian Creole",
+               "contact_form[relationship_to_case]" => "Family"
+             } = Pages.form_state(view)
     end
 
     test "works", %{conn: conn, case_investigation: case_investigation, exposure: exposure} do
@@ -246,7 +358,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "last_name" => "Testuser",
           "relationship_to_case" => "Friend",
           "most_recent_date_together" => "11/02/2020",
-          "under_18" => "true",
+          "under_18" => "false",
           "same_household" => "false",
           "phone" => "1111111321",
           "preferred_language" => "English"
@@ -259,7 +371,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    relationship_to_case: "Friend",
                    most_recent_date_together: ~D[2020-11-02],
                    household_member: false,
-                   under_18: true,
+                   under_18: false,
                    exposed_person: %{
                      demographics: [
                        %{
@@ -306,7 +418,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
       Pages.CaseInvestigationContact.visit(conn, case_investigation)
-      |> Pages.CaseInvestigationContact.change_form(%{"first_name" => "Alice"})
+      |> Pages.CaseInvestigationContact.change_form(contact_form: %{"first_name" => "Alice"})
       |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
     end
   end

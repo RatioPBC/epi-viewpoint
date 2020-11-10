@@ -113,7 +113,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
         "last_name" => "Testuser",
         "relationship_to_case" => "Friend",
         "most_recent_date_together" => "10/31/2020",
-        "under_18" => "true",
+        "under_18" => "false",
         "same_household" => "true",
         "phone" => "1111111111",
         preferred_language: "Haitian Creole"
@@ -162,7 +162,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
                  household_member: true,
                  most_recent_date_together: ~D[2020-10-31],
                  relationship_to_case: "Friend",
-                 under_18: true
+                 under_18: false
                }
              ]
            } =

@@ -96,6 +96,27 @@ defmodule EpicenterWeb.Test.Pages do
   def form_errors(conn),
     do: conn |> parse() |> Test.Html.all("[data-form-error-message]", attr: "data-form-error-message")
 
+  def form_labels(%View{} = view) do
+    parsed =
+      view
+      |> render()
+      |> Test.Html.parse()
+
+    parsed
+    |> Test.Html.all("label[for]", fn label ->
+      html_for = label |> Test.Html.attr("for") |> List.first()
+
+      with input when not is_nil(input) <- Test.Html.find(parsed, "##{html_for}") do
+        name = input |> Test.Html.attr("name") |> List.first()
+        text = label |> Test.Html.text()
+        {name, text}
+      else
+        _ -> nil
+      end
+    end)
+    |> Enum.into(%{})
+  end
+
   def form_state(%View{} = view) do
     view
     |> render()

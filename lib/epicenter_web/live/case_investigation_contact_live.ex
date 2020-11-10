@@ -27,6 +27,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       field :person_id, :string
       field :phone_id, :string
       field :demographic_id, :string
+      field :guardian_name, :string
+      field :guardian_phone, :string
       field :first_name, :string
       field :last_name, :string
       field :relationship_to_case, :string
@@ -44,6 +46,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
       %__MODULE__{
         exposure_id: exposure.id,
+        guardian_name: exposure.guardian_name,
+        guardian_phone: exposure.guardian_phone,
         person_id: person.id,
         demographic_id: demographic.id,
         phone_id: phone.id,
@@ -61,6 +65,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         :last_name,
         :relationship_to_case,
         :same_household,
+        :guardian_name,
+        :guardian_phone,
         :under_18,
         :phone,
         :preferred_language,
@@ -74,6 +80,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         :under_18,
         :most_recent_date_together
       ])
+      |> Exposure.validate_guardian_fields()
       |> Validation.validate_date(:most_recent_date_together)
     end
 
@@ -89,6 +96,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         {:ok,
          %{
            id: data.exposure_id,
+           guardian_name: data.guardian_name,
+           guardian_phone: data.guardian_phone,
            most_recent_date_together: DateParser.parse_mm_dd_yyyy!(data.most_recent_date_together),
            relationship_to_case: data.relationship_to_case,
            under_18: data.under_18,
@@ -131,7 +140,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   end
 
   def handle_event("change", %{"contact_form" => params}, socket) do
-    socket |> assign_form_changeset(ContactForm.changeset(socket.assigns.exposure, params)) |> noreply()
+    socket
+    |> assign_form_changeset(ContactForm.changeset(socket.assigns.exposure, params))
+    |> noreply()
   end
 
   def handle_event("save", %{"contact_form" => params}, socket) do
@@ -214,6 +225,19 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         else: "Unavailable"
       )
 
+    under_18 = Epicenter.Extra.Changeset.get_field_from_changeset(form.source, :under_18)
+
+    contact_information = fn
+      form, true = _under_18 ->
+        form
+        |> Form.line(&Form.text_field(&1, :guardian_name, "Guardian's name", span: 4))
+        |> Form.line(&Form.text_field(&1, :guardian_phone, "Guardian's phone", span: 4))
+
+      form, _ = _under_18 ->
+        form
+        |> Form.line(&Form.text_field(&1, :phone, "Phone", span: 4))
+    end
+
     Form.new(form)
     |> Form.line(
       &Form.content_div(
@@ -230,7 +254,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> Form.line(&Form.radio_button_list(&1, :relationship_to_case, "Relationship to case", @relationship_options, span: 4))
     |> Form.line(&Form.checkbox_field(&1, :same_household, nil, "This person lives in the same household", span: 8))
     |> Form.line(&Form.checkbox_field(&1, :under_18, "Age", "This person is under 18 years old", span: 8))
-    |> Form.line(&Form.text_field(&1, :phone, "Phone", span: 4))
+    |> contact_information.(under_18)
     |> Form.line(&Form.radio_button_list(&1, :preferred_language, "Preferred Language", @preferred_language_options, span: 4))
     |> Form.line(
       &Form.date_field(

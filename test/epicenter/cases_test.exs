@@ -606,7 +606,7 @@ defmodule Epicenter.CasesTest do
 
       {:ok, exposure} =
         Cases.create_exposure({
-          Test.Fixtures.exposure_attrs(case_investigation, "exposure", %{under_18: true})
+          Test.Fixtures.exposure_attrs(case_investigation, "exposure", %{under_18: true, guardian_name: "Jacob"})
           |> Map.put(:exposed_person, %{}),
           Test.Fixtures.admin_audit_meta()
         })
@@ -614,8 +614,10 @@ defmodule Epicenter.CasesTest do
       case_investigation_id = case_investigation.id
       author_id = @admin.id
 
-      assert %{exposing_case_id: ^case_investigation_id, under_18: true} = Cases.get_exposure(exposure.id)
-      assert %{author_id: ^author_id, change: %{"exposing_case_id" => ^case_investigation_id, "under_18" => true}} = recent_audit_log(exposure)
+      assert %{exposing_case_id: ^case_investigation_id, under_18: true, guardian_name: "Jacob"} = Cases.get_exposure(exposure.id)
+
+      assert %{author_id: ^author_id, change: %{"exposing_case_id" => ^case_investigation_id, "under_18" => true, "guardian_name" => "Jacob"}} =
+               recent_audit_log(exposure)
     end
   end
 
