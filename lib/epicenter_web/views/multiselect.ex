@@ -23,12 +23,14 @@ defmodule EpicenterWeb.Multiselect do
   def multiselect_input(f, field, {type, label_text, value}, parent_id) do
     level = if parent_id == nil, do: "parent", else: "child"
 
-    label data: [multiselect: level, role: Extra.String.dasherize([f.name, field])] do
-      case type do
-        :checkbox -> [multiselect_checkbox(f, field, value, parent_id), label_text]
-        :radio -> [multiselect_radio(f, field, value, parent_id), label_text]
-        :other_checkbox -> [multiselect_checkbox(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
-        :other_radio -> [multiselect_radio(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
+    content_tag :div, class: "label-wrapper" do
+      label data: [multiselect: level, role: Extra.String.dasherize([f.name, field])] do
+        case type do
+          :checkbox -> [multiselect_checkbox(f, field, value, parent_id), label_text]
+          :radio -> [multiselect_radio(f, field, value, parent_id), label_text]
+          :other_checkbox -> [multiselect_checkbox(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
+          :other_radio -> [multiselect_radio(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
+        end
       end
     end
   end

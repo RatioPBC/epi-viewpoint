@@ -36,35 +36,39 @@ defmodule EpicenterWeb.MultiselectTest do
       |> Multiselect.multiselect_inputs(:genres, [{:checkbox, "Comedy", "comedy"}, {:checkbox, "Musical", "musical"}])
       |> render()
       |> assert_html_eq("""
-      <label data-multiselect="parent" data-role="movie-genres">
-        <input
+      <div class="label-wrapper">
+        <label data-multiselect="parent" data-role="movie-genres">
+          <input
+            data-multiselect-parent-id=""
+            id="movie_genres_comedy"
+            name="movie[genres][]"
+            phx-hook="Multiselect"
+            type="checkbox"
+            value="comedy"
+            checked="checked"/>\v
+          Comedy\v
+        </label>
+      </div>
+      <div class="label-wrapper">
+        <label data-multiselect="parent" data-role="movie-genres">
+          <input
           data-multiselect-parent-id=""
-          id="movie_genres_comedy"
+          id="movie_genres_musical"
           name="movie[genres][]"
           phx-hook="Multiselect"
           type="checkbox"
-          value="comedy"
+          value="musical"
           checked="checked"/>\v
-        Comedy\v
-      </label>
-      <label data-multiselect="parent" data-role="movie-genres">
-        <input
-        data-multiselect-parent-id=""
-        id="movie_genres_musical"
-        name="movie[genres][]"
-        phx-hook="Multiselect"
-        type="checkbox"
-        value="musical"
-        checked="checked"/>\v
-        Musical\v
-      </label>
+          Musical\v
+        </label>
+      </div>
       """)
     end
   end
 
   describe "multiselect_input" do
     test "when there are no children, returns a label and input" do
-      assert [{"label", label_attrs, [{"input", checkbox_attrs, []}, "Comedy"]}] =
+      assert [{"div", [{"class", "label-wrapper"}], [{"label", label_attrs, [{"input", checkbox_attrs, []}, "Comedy"]}]}] =
                phx_form(genres: ["comedy", "musical"])
                |> Multiselect.multiselect_input(:genres, {:checkbox, "Comedy", "comedy"}, nil)
                |> parse()
@@ -90,9 +94,9 @@ defmodule EpicenterWeb.MultiselectTest do
       value = {:checkbox, "Comedy", "comedy", comedy_sub_values}
 
       assert [
-               {"label", _, [{"input", comedy_attrs, []}, "Comedy"]},
-               {"label", _, [{"input", dark_comedy_attrs, []}, "Dark Comedy"]},
-               {"label", _, [{"input", musical_comedy_attrs, []}, "Musical Comedy"]}
+               {"div", [{"class", "label-wrapper"}], [{"label", _, [{"input", comedy_attrs, []}, "Comedy"]}]},
+               {"div", [{"class", "label-wrapper"}], [{"label", _, [{"input", dark_comedy_attrs, []}, "Dark Comedy"]}]},
+               {"div", [{"class", "label-wrapper"}], [{"label", _, [{"input", musical_comedy_attrs, []}, "Musical Comedy"]}]}
              ] =
                phx_form(genres: ["comedy", "musical"])
                |> Multiselect.multiselect_input(:genres, value, nil)
@@ -129,11 +133,14 @@ defmodule EpicenterWeb.MultiselectTest do
 
     test "when there is an 'other' field" do
       assert [
-               {
-                 "label",
-                 [{"data-multiselect", "parent"}, {"data-role", "movie-genres"}],
-                 [{"input", radio_attrs, []}, "Comedy", {"div", [{"data-multiselect", "text-wrapper"}], [{"input", text_field_attrs, []}]}]
-               }
+               {"div", [{"class", "label-wrapper"}],
+                [
+                  {
+                    "label",
+                    [{"data-multiselect", "parent"}, {"data-role", "movie-genres"}],
+                    [{"input", radio_attrs, []}, "Comedy", {"div", [{"data-multiselect", "text-wrapper"}], [{"input", text_field_attrs, []}]}]
+                  }
+                ]}
              ] =
                phx_form(genres: ["comedy", "musical"])
                |> Multiselect.multiselect_input(:genres, {:other_radio, "Comedy", "comedy"}, nil)
