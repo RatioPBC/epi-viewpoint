@@ -19,15 +19,19 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       field :date_started, :string
     end
 
-    def changeset(%CaseInvestigation{} = case_investigation),
-      do: cast(%IsolationMonitoringForm{date_started: isolation_date_started(case_investigation), date_ended: "01/11/2020"}, %{}, [], [])
-
-    def isolation_date_started(%CaseInvestigation{symptom_onset_date: nil} = case_investigation) do
-      case_investigation |> Cases.preload_initiating_lab_result() |> Map.get(:initiating_lab_result) |> Map.get(:sampled_on) |> Format.date()
+    def changeset(%CaseInvestigation{} = case_investigation) do
+      {date_started, date_ended} = isolation_dates(case_investigation)
+      cast(%IsolationMonitoringForm{date_started: date_started, date_ended: date_ended}, %{}, [], [])
     end
 
-    def isolation_date_started(%CaseInvestigation{symptom_onset_date: symptom_onset_date}) do
-      symptom_onset_date |> Format.date()
+    def isolation_dates(%CaseInvestigation{symptom_onset_date: nil} = case_investigation) do
+      start = case_investigation |> Cases.preload_initiating_lab_result() |> Map.get(:initiating_lab_result) |> Map.get(:sampled_on)
+
+      {start |> Format.date(), start |> Date.add(10) |> Format.date()}
+    end
+
+    def isolation_dates(%CaseInvestigation{symptom_onset_date: symptom_onset_date}) do
+      {symptom_onset_date |> Format.date(), symptom_onset_date |> Date.add(10) |> Format.date()}
     end
   end
 
