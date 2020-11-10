@@ -206,6 +206,8 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   # # #
 
   defp build_details_list(%{
+         guardian_name: guardian_name,
+         guardian_phone: guardian_phone,
          relationship_to_case: relationship_to_case,
          most_recent_date_together: most_recent_date_together,
          household_member: household_member,
@@ -217,8 +219,17 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
     details = [relationship_to_case]
     details = if household_member, do: details ++ ["Household"], else: details
-    details = if under_18, do: details ++ ["Minor"], else: details
-    details = if Euclid.Exists.present?(phone), do: details ++ [Format.phone(phone)], else: details
+
+    details =
+      if under_18 do
+        details = details ++ ["Minor"]
+        details = details ++ ["Guardian: #{guardian_name}"]
+        details = if Euclid.Exists.present?(guardian_phone), do: details ++ [Format.phone(guardian_phone)], else: details
+        details
+      else
+        if Euclid.Exists.present?(phone), do: details ++ [Format.phone(phone)], else: details
+      end
+
     details = if Euclid.Exists.present?(demographic.preferred_language), do: details ++ [demographic.preferred_language], else: details
     details ++ ["Last together #{Format.date(most_recent_date_together)}"]
   end

@@ -317,6 +317,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
              household_member: true,
              under_18: true,
              guardian_name: "Jacob",
+             guardian_phone: "(111) 111-1832",
              exposed_person: %{
                demographics: [
                  %{
@@ -324,6 +325,31 @@ defmodule EpicenterWeb.ProfileLiveTest do
                    first_name: "Complete",
                    last_name: "Testuser",
                    preferred_language: "Haitian Creole"
+                 }
+               ],
+               phones: [
+                 %{
+                   number: "1111111542"
+                 }
+               ]
+             }
+           }, Test.Fixtures.admin_audit_meta()}
+        )
+
+      {:ok, _} =
+        Cases.create_exposure(
+          {%{
+             exposing_case_id: case_investigation.id,
+             relationship_to_case: "Friend",
+             most_recent_date_together: ~D[2020-11-30],
+             household_member: false,
+             under_18: false,
+             exposed_person: %{
+               demographics: [
+                 %{
+                   source: "form",
+                   first_name: "Adult",
+                   last_name: "Testuser"
                  }
                ],
                phones: [
@@ -357,7 +383,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
         )
 
       assert [
-               "Complete Testuser Family Household Minor (111) 111-1542 Haitian Creole Last together 10/31/2020",
+               "Complete Testuser Family Household Minor Guardian: Jacob (111) 111-1832 Haitian Creole Last together 10/31/2020",
+               "Adult Testuser Friend (111) 111-1542 Last together 11/30/2020",
                "Partial Testuser Friend Last together 11/30/2020"
              ] =
                Pages.Profile.visit(conn, person)
