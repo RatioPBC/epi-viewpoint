@@ -46,7 +46,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
   end
 
-  test "saving complete case investigation", %{conn: conn, case_investigation: case_investigation, person: person} do
+  test "saving complete case investigation", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
     Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
       complete_interview_form: %{
@@ -60,6 +60,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
+    assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "complete-case-investigation-interview")
   end
 
   describe "warning the user when navigation will erase their changes" do

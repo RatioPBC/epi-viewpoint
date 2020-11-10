@@ -20,12 +20,13 @@ defmodule EpicenterWeb.ConnCase do
   using do
     quote do
       # Import conveniences for testing with connections
-      import Plug.Conn
-      import Phoenix.ConnTest
       import Epicenter.Test.ChangesetAssertions
+      import Epicenter.Test.RevisionAssertions
       import EpicenterWeb.ConnCase
       import EpicenterWeb.Test.LiveViewAssertions
       import Euclid.Test.Extra.Assertions
+      import Phoenix.ConnTest
+      import Plug.Conn
 
       alias EpicenterWeb.Router.Helpers, as: Routes
 

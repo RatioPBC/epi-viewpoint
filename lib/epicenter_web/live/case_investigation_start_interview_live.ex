@@ -72,7 +72,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
        %AuditLog.Meta{
          author_id: socket.assigns.current_user.id,
          reason_action: AuditLog.Revision.update_case_investigation_action(),
-         reason_event: AuditLog.Revision.discontinue_pending_case_interview_event()
+         reason_event: AuditLog.Revision.start_interview_event()
        }}
     )
   end

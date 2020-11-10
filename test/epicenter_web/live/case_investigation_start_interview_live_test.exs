@@ -75,9 +75,10 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
   end
 
   test "saving start case investigation form with proxy interviewee having the same name as case interviewee", %{
+    case_investigation: case_investigation,
     conn: conn,
     person: person,
-    case_investigation: case_investigation
+    user: user
   } do
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
@@ -91,6 +92,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     |> Pages.Profile.assert_here(person)
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
+
+    assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "start-interview")
+
     assert case_investigation.interview_proxy_name == "Alice Testuser"
   end
 

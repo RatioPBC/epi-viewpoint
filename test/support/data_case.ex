@@ -18,8 +18,6 @@ defmodule Epicenter.DataCase do
 
   using do
     quote do
-      alias Epicenter.Repo
-
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
@@ -28,6 +26,8 @@ defmodule Epicenter.DataCase do
       import Epicenter.Test.SchemaAssertions
       import Epicenter.Test.RevisionAssertions
       import Euclid.Test.Extra.Assertions
+
+      alias Epicenter.Repo
     end
   end
 

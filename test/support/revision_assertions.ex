@@ -11,6 +11,14 @@ defmodule Epicenter.Test.RevisionAssertions do
     if length(entries) != count, do: flunk("Expected #{count} revisions but found #{length(entries)}")
   end
 
+  def assert_recent_audit_log(model, author, action: action, event: event) do
+    entry = recent_audit_log(model)
+    assert entry != nil
+    assert entry.author_id == author.id
+    assert entry.reason_action == action
+    assert entry.reason_event == event
+  end
+
   def assert_recent_audit_log(model, author, change) do
     entry = recent_audit_log(model)
     if entry == nil, do: flunk("Expected schema to have an audit log entry, but found none.")
