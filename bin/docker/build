@@ -7,6 +7,8 @@ check "Docker running" "docker info  > /dev/null 2>&1" "sudo dockerd"
 set -e
 
 if [ -n "$GITLAB_CI" ]; then # CI variable is present in gitlab only
+  docker pull $CI_REGISTRY_IMAGE:app_runner_base
+  docker pull $CI_REGISTRY_IMAGE:app_builder
   COMMIT_SHA=$CI_COMMIT_SHA
   docker build . -t $CI_REGISTRY_IMAGE:app_runner_base --target app_runner_base --cache-from "$CI_REGISTRY_IMAGE:app_runner_base"
   docker build . -t $CI_REGISTRY_IMAGE:app_builder --target app_builder --build-arg HEX_GEOMETER_READ_ONLY_KEY="${HEX_GEOMETER_READ_ONLY_KEY}" --build-arg COMMIT_SHA=$COMMIT_SHA --cache-from "$CI_REGISTRY_IMAGE:app_runner_base" --cache-from "$CI_REGISTRY_IMAGE:app_builder"
