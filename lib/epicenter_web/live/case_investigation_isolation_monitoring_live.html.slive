@@ -2,5 +2,5 @@
   section#case-investigation-isolation-monitoring
     h2 Add isolation dates
 
-    = form_for @form_changeset, "#", [id: "case-investigation-isolation-monitoring-form"], fn f ->
+    = form_for @form_changeset, "#", [id: "case-investigation-isolation-monitoring-form", phx_submit: "save"], fn f ->
       = isolation_monitoring_form_builder(f, @case_investigation)

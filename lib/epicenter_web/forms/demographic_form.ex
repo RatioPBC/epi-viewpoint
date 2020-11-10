@@ -94,7 +94,6 @@ defmodule EpicenterWeb.Forms.DemographicForm do
         {:ok, attrs}
 
       other ->
-        IO.inspect(other, label: "other")
         other
     end
   end
