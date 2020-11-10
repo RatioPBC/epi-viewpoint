@@ -3,21 +3,21 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_USER: cc
-      POSTGRES_PASSWORD: abc123
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: epicenter_dev
     ports:
-      - 5432:5432
+      - 5433:5432
   runner:
     image: epicenter:latest
     ports:
-      - 4000:4000
+      - 4001:4000
     volumes:
       - ./tmp/ssl:/opt/ssl:ro
     environment:
       ALLOW_PRIVATE_WEB: "true"
       CANONICAL_HOST: viewpoint-dev.network.geometer.dev
-      DATABASE_URL: ecto://cc:abc123@postgres:5432/epicenter_dev
+      DATABASE_URL: ecto://postgres:postgres@postgres:5432/epicenter_dev
       DBSSL: "false"
       ERROR_REPORTER_SERVICE_NAME: viewpoint-dev
       LIVE_VIEW_SIGNING_SALT: xbK8/I1ibfroHQvkZTMKbO7NOLAHtbdP
