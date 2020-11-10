@@ -54,6 +54,7 @@ defmodule EpicenterWeb.Router do
     live "/case_investigations/:id/clinical_details", CaseInvestigationClinicalDetailsLive, as: :case_investigation_clinical_details
     live "/case_investigations/:id/complete_interview", CaseInvestigationCompleteInterviewLive, as: :case_investigation_complete_interview
     live "/case_investigations/:id/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue
+    live "/case_investigations/:id/isolation_monitoring", CaseInvestigationIsolationMonitoringLive, as: :case_investigation_isolation_monitoring
     live "/case_investigations/:case_investigation_id/contact", CaseInvestigationContactLive, as: :create_case_investigation_contact
     live "/case_investigations/:case_investigation_id/contact/:id", CaseInvestigationContactLive, as: :edit_case_investigation_contact
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
