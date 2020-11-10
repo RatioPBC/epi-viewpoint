@@ -14,11 +14,11 @@ defmodule Epicenter.Cases.PhoneTest do
       assert_schema(
         Cases.Phone,
         [
-          {:id, :id},
+          {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:is_preferred, :boolean},
           {:number, :string},
-          {:person_id, :id},
+          {:person_id, :binary_id},
           {:seq, :integer},
           {:source, :string},
           {:tid, :string},

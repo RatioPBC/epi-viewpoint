@@ -134,15 +134,51 @@ defmodule Epicenter.Test.SchemaAssertions do
       """
       |> flunk()
     end
+
+    for field_name <- all_field_names |> Enum.sort() do
+      assertion_type = assertion_fields |> field_metadata(field_name)
+      database_type = database_fields |> field_metadata(field_name)
+      schema_type = schema_fields |> field_metadata(field_name)
+
+      if !types_match?(assertion_type, database_type, schema_type) do
+        flunk("""
+        Schema type mismatch for field #{field_name}:
+
+        Assertion type: #{inspect(assertion_type)}
+        Database type: #{inspect(database_type)}
+        Elixir schema type: #{inspect(schema_type)}
+        """)
+      end
+    end
   end
 
+  defp types_match?(:boolean, %{data_type: "boolean"}, :boolean), do: true
+  defp types_match?(:binary_id, %{data_type: "uuid"}, :binary_id), do: true
+  defp types_match?(:string, %{data_type: "text"}, :string), do: true
+  defp types_match?(:string, %{data_type: "USER-DEFINED", udt_name: "citext"}, :string), do: true
+  defp types_match?(:naive_datetime, %{data_type: "timestamp without time zone"}, :naive_datetime), do: true
+  defp types_match?(:naive_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: true
+  defp types_match?(:utc_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: true
+  defp types_match?(:date, %{data_type: "date"}, :date), do: true
+  defp types_match?(:string, %{data_type: "character varying"}, :string), do: true
+  defp types_match?(:integer, %{data_type: "bigint"}, :integer), do: true
+  defp types_match?(:bigserial, %{data_type: "bigint"}, :integer), do: true
+  defp types_match?({:array, :string}, %{data_type: "ARRAY", element_data_type: "character varying"}, {:array, :string}), do: true
+  defp types_match?(_assertion_type, _database_type, _schema_type), do: false
+
   defp colon_separated(tuples),
-    do: tuples |> Enum.map(fn {k, v} -> "#{k}:#{v}" end) |> Enum.join(" ")
+    do:
+      tuples
+      |> Enum.map(fn
+        {k, {v1, v2}} -> "#{k}:#{v1}:#{v2}"
+        {k, v} -> "#{k}:#{v}"
+      end)
+      |> Enum.join(" ")
 
   defp field_metadata(field_list, field_name) do
     Enum.find_value(field_list, fn field ->
       if elem(field, 0) == field_name,
-        do: Tuple.delete_at(field, 0) |> inspect(),
+        do: elem(field, 1),
         else: nil
     end)
   end
@@ -161,12 +197,24 @@ defmodule Epicenter.Test.SchemaAssertions do
     alias Epicenter.Repo
 
     def fields(table_name) do
-      for [name, type] <- field_query(table_name),
-          do: {Euclid.Extra.Atom.from_string(name), type}
+      for [name, data_type, udt_name, element_data_type] <- field_query(table_name),
+          do: {Euclid.Extra.Atom.from_string(name), %{data_type: data_type, udt_name: udt_name, element_data_type: element_data_type}}
     end
 
     defp field_query(table_name),
-      do: query("select column_name, data_type from information_schema.columns where table_name = $1", [table_name])
+      do:
+        query(
+          """
+          SELECT information_schema.columns.column_name, information_schema.columns.data_type, information_schema.columns.udt_name, information_schema.element_types.data_type
+            FROM information_schema.columns
+            LEFT JOIN information_schema.element_types
+              ON information_schema.columns.dtd_identifier=information_schema.element_types.collection_type_identifier
+                AND information_schema.element_types.object_name = $1
+                AND information_schema.element_types.object_type = 'TABLE'
+            WHERE information_schema.columns.table_name = $1
+          """,
+          [table_name]
+        )
 
     def table_names(),
       do: "select table_name from information_schema.tables where table_schema = 'public'" |> query() |> List.flatten()

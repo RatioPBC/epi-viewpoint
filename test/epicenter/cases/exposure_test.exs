@@ -10,12 +10,12 @@ defmodule Epicenter.Cases.ExposureTest do
       assert_schema(
         Exposure,
         [
-          {:exposed_person_id, :id},
-          {:exposing_case_id, :id},
+          {:exposed_person_id, :binary_id},
+          {:exposing_case_id, :binary_id},
           {:guardian_name, :string},
           {:guardian_phone, :string},
           {:household_member, :boolean},
-          {:id, :id},
+          {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:most_recent_date_together, :date},
           {:relationship_to_case, :string},

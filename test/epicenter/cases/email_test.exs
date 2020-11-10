@@ -15,10 +15,10 @@ defmodule Epicenter.Cases.EmailTest do
         Cases.Email,
         [
           {:address, :string},
-          {:id, :id},
+          {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:is_preferred, :boolean},
-          {:person_id, :id},
+          {:person_id, :binary_id},
           {:seq, :integer},
           {:source, :string},
           {:tid, :string},

@@ -16,9 +16,9 @@ defmodule Epicenter.Cases.LabResultTest do
         [
           {:analyzed_on, :date},
           {:fingerprint, :string},
-          {:id, :id},
+          {:id, :binary_id},
           {:inserted_at, :naive_datetime},
-          {:person_id, :id},
+          {:person_id, :binary_id},
           {:reported_on, :date},
           {:request_accession_number, :string},
           {:request_facility_code, :string},

@@ -18,7 +18,7 @@ defmodule Epicenter.Cases.PersonTest do
         Person,
         [
           {:assigned_to_id, :binary_id},
-          {:id, :id},
+          {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:seq, :integer},
           {:tid, :string},

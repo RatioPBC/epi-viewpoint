@@ -14,13 +14,13 @@ defmodule Epicenter.Cases.ImportedFileTest do
       assert_schema(
         ImportedFile,
         [
-          {:id, :id},
+          {:id, :binary_id},
           {:inserted_at, :naive_datetime},
           {:seq, :integer},
           {:tid, :string},
           {:updated_at, :naive_datetime},
           {:file_name, :string},
-          {:contents, :text}
+          {:contents, :string}
         ]
       )
     end
