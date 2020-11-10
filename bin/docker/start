@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
+start_time=$(date +'%s')
 pg_args=$(echo $DATABASE_URL | awk -F '[@:/]' '{print "-h " $6 " -p " $7}')
-until pg_isready -t 60 $pg_args; do
+until pg_isready $pg_args; do
   sleep 0.1
+  now=$(date +'%s')
+  if [ $(expr $now - $start_time) -gt 5 ]
+  then
+    echo "Failed to connect to postgres in 60 seconds" 1>&2
+    exit 1
+  fi
 done
 
 /opt/epicenter/bin/epicenter eval "Epicenter.Release.migrate()"
