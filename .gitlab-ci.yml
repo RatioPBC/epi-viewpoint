@@ -14,17 +14,17 @@ stages:
   - deploy
 before_script:
   - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
-cache:
-  key:
-    files:
-      - mix.lock
-      - assets/package-lock.json
-    prefix: v1
-  paths:
-    - deps
-    - assets/node_modules
-    - _build
 test:
+  cache:
+    key:
+      files:
+        - mix.lock
+        - assets/package-lock.json
+      prefix: v1
+    paths:
+      - deps
+      - assets/node_modules
+      - _build
   before_script:
     - npm install --prefix assets
     - mix local.rebar --force
