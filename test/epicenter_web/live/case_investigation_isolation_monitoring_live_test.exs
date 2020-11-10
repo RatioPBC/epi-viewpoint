@@ -10,7 +10,11 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
   setup %{user: user} do
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
     lab_result = Test.Fixtures.lab_result_attrs(person, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
-    case_investigation = Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation") |> Cases.create_case_investigation!()
+
+    case_investigation =
+      Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation", %{completed_interview_at: ~N[2020-01-01 23:03:07]})
+      |> Cases.create_case_investigation!()
+
     [case_investigation: case_investigation, person: person, user: user]
   end
 
@@ -19,28 +23,24 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
     |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
   end
 
-  #  test "prefills with existing data when existing data is available and can be edited", %{conn: conn, case_investigation: case_investigation} do
-  #    {:ok, _} =
-  #      Cases.update_case_investigation(
-  #        case_investigation,
-  #        {%{completed_interview_at: ~N[2020-01-01 23:03:07]}, Test.Fixtures.admin_audit_meta()}
-  #      )
-  #
-  #    Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-  #    |> Pages.CaseInvestigationCompleteInterview.assert_here()
-  #    |> Pages.CaseInvestigationCompleteInterview.assert_time_completed("06:03", "PM")
-  #    |> Pages.CaseInvestigationCompleteInterview.assert_date_completed("01/01/2020")
-  #    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
-  #      complete_interview_form: %{
-  #        "date_completed" => "09/06/2020",
-  #        "time_completed" => "03:45",
-  #        "time_completed_am_pm" => "PM"
-  #      }
-  #    )
-  #
-  #    case_investigation = Cases.get_case_investigation(case_investigation.id)
-  #    assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
-  #  end
+  test "prefills with existing data when existing data is available and can be edited", %{conn: conn, case_investigation: case_investigation} do
+    Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_started("01/01/2020")
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_ended("01/11/2020")
+
+    #    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
+    #      complete_interview_form: %{
+    #        "date_completed" => "09/06/2020",
+    #        "time_completed" => "03:45",
+    #        "time_completed_am_pm" => "PM"
+    #      }
+    #    )
+    #
+    #    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    #    assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.completed_interview_at
+  end
+
   #
   #  test "saving complete case investigation", %{conn: conn, case_investigation: case_investigation, person: person} do
   #    Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
