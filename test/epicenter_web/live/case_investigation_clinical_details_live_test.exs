@@ -6,7 +6,6 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
   alias EpicenterWeb.Test.Pages
 
   import Epicenter.Test.RevisionAssertions
-  import Phoenix.LiveViewTest
 
   setup :register_and_log_in_user
 

@@ -63,4 +63,17 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
       })
     end
   end
+
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
+      |> Pages.assert_confirmation_prompt("")
+    end
+
+    test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationIsolationMonitoring.change_form(%{"date_completed" => "09/06/2020"})
+      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+  end
 end

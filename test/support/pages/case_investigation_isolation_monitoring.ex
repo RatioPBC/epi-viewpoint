@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
   import ExUnit.Assertions
+  import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Test
@@ -33,6 +34,11 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
            |> Test.Html.find("input#isolation_monitoring_form_date_ended")
            |> Test.Html.attr("value") == [expected_date_string]
 
+    view
+  end
+
+  def change_form(view, attrs, target \\ ["isolation_monitoring_form[date_started]"]) do
+    view |> element("#case-investigation-isolation-monitoring-form") |> render_change(attrs |> Map.put(:_target, target))
     view
   end
 end
