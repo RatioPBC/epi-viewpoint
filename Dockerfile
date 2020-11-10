@@ -71,15 +71,16 @@ COPY mix.lock .
 
 # Fetch the application dependencies and build the application
 ARG HEX_GEOMETER_READ_ONLY_KEY
-ARG COMMIT_SHA
 
 RUN mix hex.organization auth geometer --key ${HEX_GEOMETER_READ_ONLY_KEY}
 RUN mix deps.get --only=prod
 RUN mix deps.compile
 
 COPY assets ./assets
-RUN echo $COMMIT_SHA > assets/static/version.txt
 RUN npm ci --prefix assets
+RUN npm run deploy --prefix assets
+ARG COMMIT_SHA
+RUN echo $COMMIT_SHA > assets/static/version.txt
 RUN npm run deploy --prefix assets
 
 COPY priv ./priv
