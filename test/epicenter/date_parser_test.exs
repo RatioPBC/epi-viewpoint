@@ -28,6 +28,10 @@ defmodule Epicenter.DateParserTest do
       assert DateParser.parse_mm_dd_yyyy("6/1/#{next_two_digit_year}") == Date.new(hundred_years_ago + 1, 6, 1)
     end
 
+    test "fails when the format is correct but the date is invalid" do
+      assert DateParser.parse_mm_dd_yyyy("02/31/2020") == {:error, [user_readable: "Invalid date: 02/31/2020"]}
+    end
+
     test "other formats fail" do
       assert DateParser.parse_mm_dd_yyyy("06#01#2020") == {:error, [user_readable: "Invalid mm-dd-yyyy format: 06#01#2020"]}
       assert DateParser.parse_mm_dd_yyyy("06012020") == {:error, [user_readable: "Invalid mm-dd-yyyy format: 06012020"]}

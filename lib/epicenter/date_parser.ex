@@ -13,9 +13,13 @@ defmodule Epicenter.DateParser do
 
     year = normalize_year(year)
 
-    if [{year, 1850..2050}, {month, 1..12}, {day, 1..31}] |> Enum.all?(&valid?/1),
-      do: Date.new(year, month, day),
-      else: {:error, [user_readable: "Invalid mm-dd-yyyy format: #{mm_dd_yyyy}"]}
+    with :ok <- in_range?(year, month, day),
+         {:ok, parsed} <- Date.new(year, month, day) do
+      {:ok, parsed}
+    else
+      :out_of_range -> {:error, [user_readable: "Invalid mm-dd-yyyy format: #{mm_dd_yyyy}"]}
+      {:error, :invalid_date} -> {:error, [user_readable: "Invalid date: #{mm_dd_yyyy}"]}
+    end
   end
 
   def parse_mm_dd_yyyy(%Date{} = date) do
@@ -45,6 +49,12 @@ defmodule Epicenter.DateParser do
   defp to_integer(s) when is_binary(s), do: s |> String.trim() |> String.to_integer()
   defp to_integer(i) when is_integer(i), do: i
 
-  defp valid?({integer, range}) when is_integer(integer), do: Enum.member?(range, integer)
-  defp valid?({_date, _range}), do: false
+  defp in_range?(year, month, day) do
+    if [{year, 1850..2050}, {month, 1..12}, {day, 1..31}] |> Enum.all?(&in_range?/1),
+      do: :ok,
+      else: :out_of_range
+  end
+
+  defp in_range?({integer, range}) when is_integer(integer), do: Enum.member?(range, integer)
+  defp in_range?({_date, _range}), do: false
 end
