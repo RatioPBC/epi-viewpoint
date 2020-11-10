@@ -43,7 +43,11 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, opts)
   end
 
-  defp date_explanation_text(opts), do: Keyword.get(opts, :explanation_text, "MM/DD/YYYY") |> text_to_html(wrapper_tag: :div)
+  defp date_explanation_text(opts) do
+    explanation_text = Keyword.get(opts, :explanation_text, "MM/DD/YYYY")
+    attributes = Keyword.get(opts, :attributes, [])
+    text_to_html(explanation_text, wrapper_tag: :div, attributes: attributes)
+  end
 
   @doc "opts: span"
   def footer(%Form.Line{} = line, error_message, opts \\ []) do

@@ -14,11 +14,15 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
     view_or_conn_or_html |> Pages.assert_on_page("case-investigation-isolation-monitoring")
   end
 
-  def assert_isolation_date_started(%View{} = view, expected_date_string) do
+  def assert_isolation_date_started(%View{} = view, expected_date_string, expected_explanation_text) do
     assert view
            |> Pages.parse()
            |> Test.Html.find("input#isolation_monitoring_form_date_started")
            |> Test.Html.attr("value") == [expected_date_string]
+
+    assert view
+           |> Pages.parse()
+           |> Test.Html.text(role: "onset-date") == expected_explanation_text
 
     view
   end

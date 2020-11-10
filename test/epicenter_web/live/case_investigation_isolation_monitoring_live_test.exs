@@ -29,7 +29,10 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
   test "prefills date started with symptom onset date if present", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
-    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_started("11/03/2020")
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_started(
+      "11/03/2020",
+      "Onset date: 11/03/2020\n\nPositive lab sample: 10/27/2020"
+    )
     |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_ended("11/13/2020")
   end
 
@@ -38,7 +41,10 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
 
     Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
-    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_started("10/27/2020")
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_started(
+      "10/27/2020",
+      "Onset date: Unavailable\n\nPositive lab sample: 10/27/2020"
+    )
     |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_ended("11/06/2020")
   end
 end

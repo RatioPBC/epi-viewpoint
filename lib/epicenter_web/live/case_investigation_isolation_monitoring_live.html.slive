@@ -3,4 +3,4 @@
     h2 Add isolation dates
 
     = form_for @form_changeset, "#", [id: "case-investigation-isolation-monitoring-form"], fn f ->
-      = isolation_monitoring_form_builder(f)
+      = isolation_monitoring_form_builder(f, @case_investigation)
