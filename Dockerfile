@@ -79,9 +79,6 @@ RUN mix deps.compile
 COPY assets ./assets
 RUN npm ci --prefix assets
 RUN npm run deploy --prefix assets
-ARG COMMIT_SHA
-RUN echo $COMMIT_SHA > assets/static/version.txt
-RUN npm run deploy --prefix assets
 
 COPY priv ./priv
 COPY lib ./lib
@@ -98,6 +95,12 @@ WORKDIR /opt/${ELIXIR_PROJECT}
 
 COPY --from=app_builder /app/_build/prod/rel/${ELIXIR_PROJECT} .
 COPY --from=app_builder /app/bin/docker/start /opt/${ELIXIR_PROJECT}/bin
+
+ARG COMMIT_SHA
+RUN echo $COMMIT_SHA > version.txt
+RUN VERSION_MD5=$(md5sum version.txt | awk '{print $1}')
+RUN cp version.txt version-$VERSION_MD5.txt
+RUN mv version*.txt /opt/${ELIXIR_PROJECT}/lib/${ELIXIR_PROJECT}-0.1.0/priv/static/
 
 RUN chown -R app:app /opt/${ELIXIR_PROJECT}
 
