@@ -140,9 +140,11 @@ defmodule Epicenter.Test.SchemaAssertions do
       database_type = database_fields |> field_metadata(field_name)
       schema_type = schema_fields |> field_metadata(field_name)
 
-      if !types_match?(assertion_type, database_type, schema_type) do
+      with {:error, message} <- match_types(assertion_type, database_type, schema_type) do
         flunk("""
         Schema type mismatch for field #{field_name}:
+
+        #{message}
 
         Assertion type: #{inspect(assertion_type)}
         Database type: #{inspect(database_type)}
@@ -152,19 +154,19 @@ defmodule Epicenter.Test.SchemaAssertions do
     end
   end
 
-  defp types_match?(:boolean, %{data_type: "boolean"}, :boolean), do: true
-  defp types_match?(:binary_id, %{data_type: "uuid"}, :binary_id), do: true
-  defp types_match?(:string, %{data_type: "text"}, :string), do: true
-  defp types_match?(:string, %{data_type: "USER-DEFINED", udt_name: "citext"}, :string), do: true
-  defp types_match?(:naive_datetime, %{data_type: "timestamp without time zone"}, :naive_datetime), do: true
-  defp types_match?(:naive_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: true
-  defp types_match?(:utc_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: true
-  defp types_match?(:date, %{data_type: "date"}, :date), do: true
-  defp types_match?(:string, %{data_type: "character varying"}, :string), do: true
-  defp types_match?(:integer, %{data_type: "bigint"}, :integer), do: true
-  defp types_match?(:bigserial, %{data_type: "bigint"}, :integer), do: true
-  defp types_match?({:array, :string}, %{data_type: "ARRAY", element_data_type: "character varying"}, {:array, :string}), do: true
-  defp types_match?(_assertion_type, _database_type, _schema_type), do: false
+  defp match_types(:boolean, %{data_type: "boolean"}, :boolean), do: :ok
+  defp match_types(:binary_id, %{data_type: "uuid"}, :binary_id), do: :ok
+  defp match_types(:string, %{data_type: "text"}, :string), do: :ok
+  defp match_types(:string, %{data_type: "USER-DEFINED", udt_name: "citext"}, :string), do: :ok
+  defp match_types(:naive_datetime, %{data_type: "timestamp without time zone"}, :naive_datetime), do: :ok
+  defp match_types(:naive_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: :ok
+  defp match_types(:utc_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: :ok
+  defp match_types(:date, %{data_type: "date"}, :date), do: :ok
+  defp match_types(:string, %{data_type: "character varying"}, :string), do: {:error, "You should use a text postgres type for string data"}
+  defp match_types(:integer, %{data_type: "bigint"}, :integer), do: :ok
+  defp match_types(:bigserial, %{data_type: "bigint"}, :integer), do: :ok
+  defp match_types({:array, :string}, %{data_type: "ARRAY", element_data_type: "text"}, {:array, :string}), do: :ok
+  defp match_types(_assertion_type, _database_type, _schema_type), do: {:error, "These types did not match"}
 
   defp colon_separated(tuples),
     do:
