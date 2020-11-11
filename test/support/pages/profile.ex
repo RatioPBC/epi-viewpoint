@@ -324,7 +324,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.all("#isolation-monitoring-#{number}", as: :text)
+    |> Test.Html.all("#isolation-monitoring-#{number} h3", as: :text)
     |> Enum.map(&Extra.String.squish/1)
     |> assert_eq([status])
 
@@ -372,6 +372,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   def click_add_contact_link(%View{} = view, number) do
     view
     |> element("#add-contact-case-investigation-link-#{number}")
+    |> render_click()
+  end
+
+  def click_add_isolation_dates(%View{} = view, number) do
+    view
+    |> element("#add-isolation-dates-case-investigation-link-#{number}")
     |> render_click()
   end
 

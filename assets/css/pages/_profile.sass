@@ -76,10 +76,14 @@
         @include button-secondary
 
     .case-investigation-isolation-monitoring-status
+      @include level($justify: space-between)
+
       .pending
         color: $pending-color
       .ongoing
         color: $started-color
+      .add-isolation-dates-case-investigation-link
+        @include button-primary
 
     .case-investigation-history
       color: $secondary-text-color
