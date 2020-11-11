@@ -37,8 +37,8 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
     view
   end
 
-  def change_form(view, attrs, target \\ ["isolation_monitoring_form[date_started]"]) do
-    view |> element("#case-investigation-isolation-monitoring-form") |> render_change(attrs |> Map.put(:_target, target))
+  def change_form(view, attrs) do
+    view |> element("#case-investigation-isolation-monitoring-form") |> render_change(attrs)
     view
   end
 end

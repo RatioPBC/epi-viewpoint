@@ -27,15 +27,16 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       field :date_started, :string
     end
 
-    def attrs_to_form_changeset(attrs) do
-      %IsolationMonitoringForm{}
+    def changeset(case_investigation, attrs) do
+      {suggested_start, suggested_end} = isolation_dates(case_investigation)
+
+      %IsolationMonitoringForm{
+        date_ended: suggested_end,
+        date_started: suggested_start
+      }
       |> cast(attrs, @required_attrs ++ @optional_attrs)
       |> Validation.validate_date(:date_started)
       |> Validation.validate_date(:date_ended)
-    end
-
-    def form_changeset_cast(%Ecto.Changeset{} = form_changeset, attrs) do
-      cast(form_changeset, attrs, @required_attrs ++ @optional_attrs)
     end
 
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
@@ -52,11 +53,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       end
     end
 
-    def model_to_form_changeset(%CaseInvestigation{} = case_investigation) do
-      {date_started, date_ended} = isolation_dates(case_investigation)
-      attrs_to_form_changeset(%{date_started: date_started, date_ended: date_ended})
-    end
-
     defp isolation_dates(%CaseInvestigation{symptom_onset_date: nil} = case_investigation) do
       start = case_investigation |> Map.get(:initiating_lab_result) |> Map.get(:sampled_on)
       {start |> Format.date(), start |> Date.add(10) |> Format.date()}
@@ -68,8 +64,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   end
 
   def handle_event("change", %{"isolation_monitoring_form" => params}, socket) do
-    new_changeset =
-      IsolationMonitoringForm.model_to_form_changeset(socket.assigns.case_investigation) |> IsolationMonitoringForm.form_changeset_cast(params)
+    new_changeset = IsolationMonitoringForm.changeset(socket.assigns.case_investigation, params)
 
     socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
   end
@@ -114,7 +109,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     |> assign(:case_investigation, case_investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign_person(person)
-    |> assign_form_changeset(IsolationMonitoringForm.model_to_form_changeset(case_investigation))
+    |> assign_form_changeset(IsolationMonitoringForm.changeset(case_investigation, %{}))
     |> ok()
   end
 
@@ -133,7 +128,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
 
   defp save_and_redirect(socket, params) do
-    with %Ecto.Changeset{} = form_changeset <- IsolationMonitoringForm.attrs_to_form_changeset(params),
+    with %Ecto.Changeset{} = form_changeset <- IsolationMonitoringForm.changeset(socket.assigns.case_investigation, params),
          {:form, {:ok, model_attrs}} <- {:form, IsolationMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, model_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
