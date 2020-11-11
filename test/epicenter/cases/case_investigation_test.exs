@@ -77,4 +77,12 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
     test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
     test "initiating_lab_result_id is required", do: assert_invalid(new_changeset(initiating_lab_result_id: nil))
   end
+
+  test "case investigation status" do
+    assert %{} |> CaseInvestigation.status() == :pending
+    assert %{discontinued_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :discontinued
+    assert %{completed_interview_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :completed_interview
+    assert %{started_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :started
+    assert %{discontinued_at: ~D[2020-10-01], started_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :discontinued
+  end
 end

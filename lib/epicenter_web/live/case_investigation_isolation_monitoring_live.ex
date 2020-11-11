@@ -50,9 +50,11 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
       case apply_action(form_changeset, :create) do
         {:ok, form} ->
-          isolation_monitoring_start_date = form |> Map.get(:date_started) |> DateParser.parse_mm_dd_yyyy!()
-          isolation_monitoring_end_date = form |> Map.get(:date_ended) |> DateParser.parse_mm_dd_yyyy!()
-          {:ok, %{isolation_monitoring_start_date: isolation_monitoring_start_date, isolation_monitoring_end_date: isolation_monitoring_end_date}}
+          {:ok,
+           %{
+             isolation_monitoring_start_date: form |> Map.get(:date_started) |> DateParser.parse_mm_dd_yyyy!(),
+             isolation_monitoring_end_date: form |> Map.get(:date_ended) |> DateParser.parse_mm_dd_yyyy!()
+           }}
 
         other ->
           other
