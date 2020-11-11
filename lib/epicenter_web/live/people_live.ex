@@ -25,7 +25,7 @@ defmodule EpicenterWeb.PeopleLive do
     |> ok()
   end
 
-  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_lab_results},
+  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_positive_lab_results},
     do: socket |> set_filter(filter) |> noreply()
 
   def handle_params(_, _url, socket),
