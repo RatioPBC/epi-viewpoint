@@ -78,11 +78,19 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
     test "initiating_lab_result_id is required", do: assert_invalid(new_changeset(initiating_lab_result_id: nil))
   end
 
-  test "case investigation status" do
-    assert %{} |> CaseInvestigation.status() == :pending
-    assert %{discontinued_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :discontinued
-    assert %{completed_interview_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :completed_interview
-    assert %{started_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :started
-    assert %{discontinued_at: ~D[2020-10-01], started_at: ~D[2020-08-01]} |> CaseInvestigation.status() == :discontinued
+  describe "case investigation status" do
+    test "pending by default", do: assert(CaseInvestigation.status(%{}) == :pending)
+    test "discontinued when discontinued_at", do: assert(CaseInvestigation.status(%{discontinued_at: ~D[2020-08-01]}) == :discontinued)
+    test "started when started_at", do: assert(CaseInvestigation.status(%{started_at: ~D[2020-08-01]}) == :started)
+
+    test "completed interview when completed_interview_at",
+      do: assert(CaseInvestigation.status(%{completed_interview_at: ~D[2020-08-01]}) == :completed_interview)
+  end
+
+  describe "isolation monitoring status" do
+    test "pending by default", do: assert(CaseInvestigation.isolation_monitoring_status(%{}) == :pending)
+
+    test "ongoing when isolation_monitoring_start_date",
+      do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01]}) == :ongoing)
   end
 end
