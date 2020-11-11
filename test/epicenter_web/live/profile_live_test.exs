@@ -195,7 +195,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_start_interview_case_investigation("001")
-      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/start_interview")
+      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/start-interview")
     end
 
     test "navigating to discontinue a case investigation", %{conn: conn, person: person, user: user} do
@@ -208,7 +208,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_discontinue_case_investigation("001")
-      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/discontinue")
+      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/discontinue")
     end
 
     test "discontinued case investigations say so", %{conn: conn, person: person, user: user} do
@@ -239,7 +239,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_edit_discontinuation_link("001")
-      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/discontinue")
+      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/discontinue")
     end
 
     test "started case investigations say so", %{conn: conn, person: person, user: user} do
@@ -424,7 +424,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_edit_contact_link(exposure)
-      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/contact/#{exposure.id}")
+      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/contact/#{exposure.id}")
     end
 
     test "case investigations with completed interviews render correctly", %{conn: conn, person: person, user: user} do
@@ -441,7 +441,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.assert_case_investigation_has_history("Completed interview on 11/05/2020 at 02:57pm EST")
       |> Pages.Profile.refute_complete_interview_button("001")
       |> Pages.Profile.click_edit_complete_interview_link("001")
-      |> assert_redirects_to("/case_investigations/#{case_investigation.id}/complete_interview")
+      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/complete-interview")
     end
   end
 

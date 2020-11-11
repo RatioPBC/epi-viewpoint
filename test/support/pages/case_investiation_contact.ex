@@ -6,11 +6,11 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationContact do
   alias EpicenterWeb.Test.Pages
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: id}) do
-    conn |> Pages.visit("/case_investigations/#{id}/contact")
+    conn |> Pages.visit("/case-investigations/#{id}/contact")
   end
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}, %Exposure{id: id}) do
-    conn |> Pages.visit("/case_investigations/#{case_investigation_id}/contact/#{id}")
+    conn |> Pages.visit("/case-investigations/#{case_investigation_id}/contact/#{id}")
   end
 
   def assert_here(view_or_conn_or_html) do

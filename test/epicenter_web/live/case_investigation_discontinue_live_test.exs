@@ -21,7 +21,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
   end
 
   test "disconnected and connected render", %{conn: conn, case_investigation: case_investigation} do
-    {:ok, page_live, disconnected_html} = live(conn, "/case_investigations/#{case_investigation.id}/discontinue")
+    {:ok, page_live, disconnected_html} = live(conn, "/case-investigations/#{case_investigation.id}/discontinue")
 
     assert_has_role(disconnected_html, "case-investigation-discontinue-page")
     assert_has_role(page_live, "case-investigation-discontinue-page")

@@ -6,7 +6,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationDiscontinue do
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
-    conn |> Pages.visit("/case_investigations/#{case_investigation_id}/discontinue")
+    conn |> Pages.visit("/case-investigations/#{case_investigation_id}/discontinue")
   end
 
   def assert_reason_selections(%View{} = view, expected_reasons) do

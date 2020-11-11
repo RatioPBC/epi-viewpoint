@@ -8,7 +8,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
-    conn |> Pages.visit("/case_investigations/#{case_investigation_id}/complete_interview")
+    conn |> Pages.visit("/case-investigations/#{case_investigation_id}/complete-interview")
   end
 
   def assert_here(view_or_conn_or_html) do

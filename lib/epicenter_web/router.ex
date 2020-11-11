@@ -50,19 +50,19 @@ defmodule EpicenterWeb.Router do
     post "/import/upload", ImportController, :create
     live "/people", PeopleLive, as: :people
     live "/people/:id", ProfileLive, as: :profile
-    live "/case_investigations/:id/start_interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
-    live "/case_investigations/:id/clinical_details", CaseInvestigationClinicalDetailsLive, as: :case_investigation_clinical_details
-    live "/case_investigations/:id/complete_interview", CaseInvestigationCompleteInterviewLive, as: :case_investigation_complete_interview
-    live "/case_investigations/:id/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue
-    live "/case_investigations/:id/isolation_monitoring", CaseInvestigationIsolationMonitoringLive, as: :case_investigation_isolation_monitoring
-    live "/case_investigations/:case_investigation_id/contact", CaseInvestigationContactLive, as: :create_case_investigation_contact
-    live "/case_investigations/:case_investigation_id/contact/:id", CaseInvestigationContactLive, as: :edit_case_investigation_contact
+    live "/case-investigations/:id/start-interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
+    live "/case-investigations/:id/clinical-details", CaseInvestigationClinicalDetailsLive, as: :case_investigation_clinical_details
+    live "/case-investigations/:id/complete-interview", CaseInvestigationCompleteInterviewLive, as: :case_investigation_complete_interview
+    live "/case-investigations/:id/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue
+    live "/case-investigations/:id/isolation-monitoring", CaseInvestigationIsolationMonitoringLive, as: :case_investigation_isolation_monitoring
+    live "/case-investigations/:case_investigation_id/contact", CaseInvestigationContactLive, as: :create_case_investigation_contact
+    live "/case-investigations/:case_investigation_id/contact/:id", CaseInvestigationContactLive, as: :edit_case_investigation_contact
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
     get "/users/settings", UserSettingsController, :edit
-    put "/users/settings/update_password", UserSettingsController, :update_password
-    put "/users/settings/update_email", UserSettingsController, :update_email
-    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+    put "/users/settings/update-password", UserSettingsController, :update_password
+    put "/users/settings/update-email", UserSettingsController, :update_email
+    get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
   end
 
   scope "/", EpicenterWeb do
@@ -73,7 +73,7 @@ defmodule EpicenterWeb.Router do
     live "/styleguide/form", Styleguide.FormLive, as: :styleguide_form
     live "/styleguide/form-builder", Styleguide.FormBuilderLive, as: :styleguide_form_builder
     live "/styleguide/form-multiselect", Styleguide.FormMultiselectLive, as: :styleguide_form_multiselect
-    delete "/users/log_out", UserSessionController, :delete
+    delete "/users/log-out", UserSessionController, :delete
   end
 
   if Mix.env() in [:dev, :test] do

@@ -7,7 +7,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
-    conn |> Pages.visit("/case_investigations/#{case_investigation_id}/start_interview")
+    conn |> Pages.visit("/case-investigations/#{case_investigation_id}/start-interview")
   end
 
   def assert_date_started(%View{} = view, :today) do
