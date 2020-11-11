@@ -38,15 +38,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       cast(form_changeset, attrs, @required_attrs ++ @optional_attrs)
     end
 
-    def isolation_dates(%CaseInvestigation{symptom_onset_date: nil} = case_investigation) do
-      start = case_investigation |> Cases.preload_initiating_lab_result() |> Map.get(:initiating_lab_result) |> Map.get(:sampled_on)
-      {start |> Format.date(), start |> Date.add(10) |> Format.date()}
-    end
-
-    def isolation_dates(%CaseInvestigation{symptom_onset_date: symptom_onset_date}) do
-      {symptom_onset_date |> Format.date(), symptom_onset_date |> Date.add(10) |> Format.date()}
-    end
-
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
       case apply_action(form_changeset, :create) do
         {:ok, form} ->
@@ -64,6 +55,15 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     def model_to_form_changeset(%CaseInvestigation{} = case_investigation) do
       {date_started, date_ended} = isolation_dates(case_investigation)
       attrs_to_form_changeset(%{date_started: date_started, date_ended: date_ended})
+    end
+
+    defp isolation_dates(%CaseInvestigation{symptom_onset_date: nil} = case_investigation) do
+      start = case_investigation |> Map.get(:initiating_lab_result) |> Map.get(:sampled_on)
+      {start |> Format.date(), start |> Date.add(10) |> Format.date()}
+    end
+
+    defp isolation_dates(%CaseInvestigation{symptom_onset_date: symptom_onset_date}) do
+      {symptom_onset_date |> Format.date(), symptom_onset_date |> Date.add(10) |> Format.date()}
     end
   end
 
@@ -123,9 +123,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   defp assign_form_changeset(socket, form_changeset, form_error \\ nil),
     do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
 
-  defp assign_person(socket, %Person{} = person) do
-    socket |> assign(person: person)
-  end
+  defp assign_person(socket, %Person{} = person),
+    do: socket |> assign(person: person)
 
   defp confirmation_prompt(changeset),
     do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
