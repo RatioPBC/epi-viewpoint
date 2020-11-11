@@ -32,10 +32,11 @@
 
 `docker-compose` uses the same docker image that production does.
 
-1. `echo 127.0.0.1 viewpoint-dev.network.geometer.dev > /etc/hosts`
-2. `./bin/docker/build`
-3. `docker-compose up`
-4. `open https://viewpoint-dev.network.geometer.dev:4001/`
+There are some scripts to make local docker development easier:
 
-
-001
+* `bin/dev/docker-start` will:
+  * check that your computer is set up to run the app via docker
+  * build the docker image
+  * start the docker container
+* `bin/dev/docker-bash` will open a bash shell inside the running container
+* `bin/dev/dcoker-iex` will open an iex session inside the running container
