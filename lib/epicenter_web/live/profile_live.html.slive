@@ -112,6 +112,8 @@
                 = contact_details_as_list(exposure)
               div
                 = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, exposure) , data: [role: "edit-contact", exposure: exposure.id]
+                span=" "
+                a href="#" data-confirm="Remove #{Format.person(exposure.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-exposure-id=exposure.id data-role="remove-contact" Remove
 
       = if CaseInvestigation.status(case_investigation) == :completed_interview do
         .case-investigation-isolation-monitoring-status id="isolation-monitoring-#{case_investigation.name}"

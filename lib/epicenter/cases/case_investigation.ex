@@ -47,7 +47,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     belongs_to :initiating_lab_result, LabResult
     belongs_to :person, Person
 
-    has_many :exposures, Exposure, foreign_key: :exposing_case_id
+    has_many :exposures, Exposure, foreign_key: :exposing_case_id, where: [deleted_at: nil]
   end
 
   derive_jason_encoder(except: [:seq])

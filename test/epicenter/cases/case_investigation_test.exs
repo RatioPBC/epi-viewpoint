@@ -62,6 +62,21 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       assert_eq(case_investigation1.initiating_lab_result_id, lab_result1.id)
       assert_eq(case_investigation2.initiating_lab_result_id, lab_result2.id)
     end
+
+    test "includes non-deleted exposures" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+      case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
+      {:ok, exposure} = {Test.Fixtures.exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+
+      {:ok, _} =
+        {Test.Fixtures.exposure_attrs(case_investigation, "exposure", %{deleted_at: NaiveDateTime.utc_now()}), Test.Fixtures.admin_audit_meta()}
+        |> Cases.create_exposure()
+
+      case_investigation = case_investigation.id |> Cases.get_case_investigation() |> Cases.preload_exposures()
+      assert case_investigation.exposures |> Enum.map(& &1.id) == [exposure.id]
+    end
   end
 
   describe "changeset" do

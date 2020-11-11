@@ -381,6 +381,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_remove_contact_link(%View{} = view, exposure) do
+    view
+    |> element("[data-role=remove-contact][phx-value-exposure-id=#{exposure.id}]")
+    |> render_click()
+  end
+
   #
   # lab results
   #

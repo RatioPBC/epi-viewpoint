@@ -20,6 +20,7 @@ defmodule Epicenter.Cases.ExposureTest do
           {:most_recent_date_together, :date},
           {:relationship_to_case, :string},
           {:seq, :integer},
+          {:deleted_at, :utc_datetime},
           {:tid, :string},
           {:under_18, :boolean},
           {:updated_at, :utc_datetime}

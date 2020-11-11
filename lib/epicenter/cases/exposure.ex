@@ -7,7 +7,7 @@ defmodule Epicenter.Cases.Exposure do
   alias Epicenter.Cases.Person
 
   @required_attrs ~w{relationship_to_case most_recent_date_together exposing_case_id}a
-  @optional_attrs ~w(household_member under_18 tid guardian_phone guardian_name)a
+  @optional_attrs ~w(household_member under_18 tid guardian_phone guardian_name deleted_at)a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
@@ -18,6 +18,7 @@ defmodule Epicenter.Cases.Exposure do
     field :guardian_phone, :string
     field :seq, :integer
     field :tid, :string
+    field :deleted_at, :utc_datetime
     field :relationship_to_case, :string
     field :household_member, :boolean
     field :under_18, :boolean

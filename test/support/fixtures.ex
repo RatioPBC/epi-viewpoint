@@ -64,6 +64,7 @@ defmodule Epicenter.Test.Fixtures do
       relationship_to_case: "Family",
       most_recent_date_together: ~D[2020-10-31],
       household_member: false,
+      exposed_person: %{},
       under_18: false
     }
     |> merge_attrs(attrs)

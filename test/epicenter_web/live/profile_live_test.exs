@@ -427,6 +427,47 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> assert_redirects_to("/case-investigations/#{case_investigation.id}/contact/#{exposure.id}")
     end
 
+    test "a contact can be removed", %{conn: conn, person: person, user: user} do
+      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{started_at: NaiveDateTime.utc_now()})
+
+      {:ok, exposure} =
+        Cases.create_exposure(
+          {%{
+             exposing_case_id: case_investigation.id,
+             relationship_to_case: "Family",
+             most_recent_date_together: ~D[2020-10-31],
+             household_member: true,
+             under_18: true,
+             guardian_name: "Jacob",
+             exposed_person: %{
+               demographics: [
+                 %{
+                   source: "form",
+                   first_name: "Complete",
+                   last_name: "Testuser",
+                   preferred_language: "Haitian Creole"
+                 }
+               ],
+               phones: [
+                 %{
+                   number: "1111111542"
+                 }
+               ]
+             }
+           }, Test.Fixtures.admin_audit_meta()}
+        )
+
+      view = Pages.Profile.visit(conn, person)
+      view |> Pages.Profile.click_remove_contact_link(exposure)
+
+      case_investigation = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+      assert case_investigation.exposures == []
+
+      assert [] =
+               view
+               |> Pages.Profile.case_investigation_contact_details("001")
+    end
+
     test "case investigations with completed interviews render correctly", %{conn: conn, person: person, user: user} do
       completed_at = ~U[2020-11-05 19:57:00Z]
       case_investigation = build_case_investigation(person, user, "case_investigation", nil, %{completed_interview_at: completed_at})
