@@ -16,13 +16,13 @@ defmodule Epicenter.Cases.ExposureTest do
           {:guardian_phone, :string},
           {:household_member, :boolean},
           {:id, :binary_id},
-          {:inserted_at, :naive_datetime},
+          {:inserted_at, :utc_datetime},
           {:most_recent_date_together, :date},
           {:relationship_to_case, :string},
           {:seq, :integer},
           {:tid, :string},
           {:under_18, :boolean},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :utc_datetime}
         ]
       )
     end

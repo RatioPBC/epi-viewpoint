@@ -15,10 +15,10 @@ defmodule Epicenter.Cases.ImportedFileTest do
         ImportedFile,
         [
           {:id, :binary_id},
-          {:inserted_at, :naive_datetime},
+          {:inserted_at, :utc_datetime},
           {:seq, :integer},
           {:tid, :string},
-          {:updated_at, :naive_datetime},
+          {:updated_at, :utc_datetime},
           {:file_name, :string},
           {:contents, :string}
         ]

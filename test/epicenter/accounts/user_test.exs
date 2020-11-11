@@ -18,17 +18,17 @@ defmodule Epicenter.Accounts.UserTest do
         User,
         [
           {:admin, :boolean},
-          {:confirmed_at, :naive_datetime},
+          {:confirmed_at, :utc_datetime},
           {:email, :string},
           {:hashed_password, :string},
           {:disabled, :boolean},
           {:id, :binary_id},
-          {:inserted_at, :naive_datetime},
+          {:inserted_at, :utc_datetime},
           {:mfa_secret, :string},
           {:name, :string},
           {:seq, :bigserial},
           {:tid, :string},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :utc_datetime}
         ]
       )
     end

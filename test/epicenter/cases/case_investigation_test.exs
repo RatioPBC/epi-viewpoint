@@ -22,7 +22,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:discontinued_at, :utc_datetime},
           {:id, :binary_id},
           {:initiating_lab_result_id, :binary_id},
-          {:inserted_at, :naive_datetime},
+          {:inserted_at, :utc_datetime},
           {:interview_proxy_name, :string},
           {:isolation_monitoring_end_date, :date},
           {:isolation_monitoring_start_date, :date},
@@ -33,7 +33,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:symptom_onset_date, :date},
           {:symptoms, {:array, :string}},
           {:tid, :string},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :utc_datetime}
         ]
       )
     end

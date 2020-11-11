@@ -17,14 +17,14 @@ defmodule Epicenter.Cases.AddressTest do
           {:state, :string},
           {:postal_code, :string},
           {:id, :binary_id},
-          {:inserted_at, :naive_datetime},
+          {:inserted_at, :utc_datetime},
           {:is_preferred, :boolean},
           {:person_id, :binary_id},
           {:seq, :integer},
           {:source, :string},
           {:tid, :string},
           {:type, :string},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :utc_datetime}
         ]
       )
     end

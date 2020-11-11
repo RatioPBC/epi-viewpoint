@@ -15,7 +15,7 @@ defmodule Epicenter.Cases.PhoneTest do
         Cases.Phone,
         [
           {:id, :binary_id},
-          {:inserted_at, :naive_datetime},
+          {:inserted_at, :utc_datetime},
           {:is_preferred, :boolean},
           {:number, :string},
           {:person_id, :binary_id},
@@ -23,7 +23,7 @@ defmodule Epicenter.Cases.PhoneTest do
           {:source, :string},
           {:tid, :string},
           {:type, :string},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :utc_datetime}
         ]
       )
     end

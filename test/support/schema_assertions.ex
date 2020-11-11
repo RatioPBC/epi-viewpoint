@@ -158,8 +158,8 @@ defmodule Epicenter.Test.SchemaAssertions do
   defp match_types(:binary_id, %{data_type: "uuid"}, :binary_id), do: :ok
   defp match_types(:string, %{data_type: "text"}, :string), do: :ok
   defp match_types(:string, %{data_type: "USER-DEFINED", udt_name: "citext"}, :string), do: :ok
-  defp match_types(:naive_datetime, %{data_type: "timestamp without time zone"}, :naive_datetime), do: :ok
-  defp match_types(:naive_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: :ok
+  defp match_types(:naive_datetime, _, _), do: {:error, "You should use use a schema type of :utc_datetime when persisting timestamps without a timezone"}
+  defp match_types(_, _, :naive_datetime), do: {:error, "You should use use a schema type of :utc_datetime when persisting timestamps without a timezone"}
   defp match_types(:utc_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: :ok
   defp match_types(:date, %{data_type: "date"}, :date), do: :ok
   defp match_types(:string, %{data_type: "character varying"}, :string), do: {:error, "You should use a text postgres type for string data"}

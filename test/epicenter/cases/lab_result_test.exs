@@ -17,7 +17,7 @@ defmodule Epicenter.Cases.LabResultTest do
           {:analyzed_on, :date},
           {:fingerprint, :string},
           {:id, :binary_id},
-          {:inserted_at, :naive_datetime},
+          {:inserted_at, :utc_datetime},
           {:person_id, :binary_id},
           {:reported_on, :date},
           {:request_accession_number, :string},
@@ -29,7 +29,7 @@ defmodule Epicenter.Cases.LabResultTest do
           {:source, :string},
           {:test_type, :string},
           {:tid, :string},
-          {:updated_at, :naive_datetime}
+          {:updated_at, :utc_datetime}
         ]
       )
     end
