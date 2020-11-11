@@ -8,13 +8,14 @@ defmodule EpicenterWeb.ProfileLive do
 
   import EpicenterWeb.Profile.CaseInvestigationPresenter,
     only: [
-      interview_buttons: 1,
-      history_items: 1,
-      displayable_case_investigation_status: 1,
+      contact_details_as_list: 1,
       displayable_clinical_status: 1,
+      displayable_interview_status: 1,
+      displayable_isolation_monitoring_status: 1,
       displayable_symptom_onset_date: 1,
       displayable_symptoms: 1,
-      contact_details_as_list: 1
+      history_items: 1,
+      interview_buttons: 1
     ]
 
   alias Epicenter.Accounts

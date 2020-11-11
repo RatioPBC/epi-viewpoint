@@ -61,9 +61,9 @@
           = "Initiated by positive lab result reported on "
           = string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))
 
-      .case-investigation-status
+      .case-investigation-interview-status
         h3.status data-role="status"
-          = displayable_case_investigation_status(case_investigation)
+          = displayable_interview_status(case_investigation)
         .links
           = for link <- interview_buttons(case_investigation) do
             span= link
@@ -112,12 +112,11 @@
                 = contact_details_as_list(exposure)
               div
                 = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, exposure) , data: [role: "edit-contact", exposure: exposure.id]
+
       = if CaseInvestigation.status(case_investigation) == :completed_interview do
-        .case-investigation-isolation-monitoring id="isolation-monitoring-#{case_investigation.name}"
-          .contacts-header-row
-            h4
-              span
-                | Pending isolation monitoring
+        .case-investigation-isolation-monitoring-status id="isolation-monitoring-#{case_investigation.name}"
+          h3.status data-role="status"
+            = displayable_isolation_monitoring_status(case_investigation)
 
 
   section#lab-results data-role="lab-results"

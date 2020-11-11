@@ -5,6 +5,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.Person
+  alias Epicenter.Extra
   alias Epicenter.Test
   alias Epicenter.Test.HtmlAssertions
   alias EpicenterWeb.Test.Pages
@@ -323,8 +324,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.find!("#isolation-monitoring-#{number}")
-    |> Enum.map(&Test.Html.text/1)
+    |> Test.Html.all("#isolation-monitoring-#{number}", as: :text)
+    |> Enum.map(&Extra.String.squish/1)
     |> assert_eq([status])
 
     view

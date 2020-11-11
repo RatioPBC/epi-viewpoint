@@ -49,17 +49,24 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     end
   end
 
-  def displayable_case_investigation_status(case_investigation)
-
-  def displayable_case_investigation_status(%{discontinued_at: nil} = case_investigation) do
-    case CaseInvestigation.status(case_investigation) do
-      :pending -> styled_status("Pending", :pending)
-      :started -> styled_status("Ongoing", :started)
-      :completed_interview -> styled_status("Completed", "completed-interview")
+  def displayable_isolation_monitoring_status(case_investigation) do
+    case CaseInvestigation.isolation_monitoring_status(case_investigation) do
+      :pending -> styled_status("Pending", :pending, :isolation_monitoring)
+      :ongoing -> styled_status("Ongoing", :ongoing, :isolation_monitoring)
     end
   end
 
-  def displayable_case_investigation_status(_),
+  def displayable_interview_status(case_investigation)
+
+  def displayable_interview_status(%{discontinued_at: nil} = case_investigation) do
+    case CaseInvestigation.status(case_investigation) do
+      :pending -> styled_status("Pending", :pending, :interview)
+      :started -> styled_status("Ongoing", :started, :interview)
+      :completed_interview -> styled_status("Completed", "completed-interview", :interview)
+    end
+  end
+
+  def displayable_interview_status(_),
     do: [content_tag(:span, "Discontinued", class: :discontinued)]
 
   def displayable_clinical_status(%{clinical_status: clinical_status}),
@@ -272,9 +279,11 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     )
   end
 
-  defp styled_status(displayable_status, status) do
+  defp styled_status(displayable_status, status, type) when type in [:interview, :isolation_monitoring] do
+    type_string = %{interview: "interview", isolation_monitoring: "isolation monitoring"}[type]
+
     content_tag :span do
-      [content_tag(:span, displayable_status, class: status), " interview"]
+      [content_tag(:span, displayable_status, class: status), " #{type_string}"]
     end
   end
 

@@ -49,7 +49,7 @@
       color: $secondary-text-color
       margin-top: 0
 
-    .case-investigation-status
+    .case-investigation-interview-status
       @include level($justify: space-between)
       border-bottom: 2px solid $divider-color
       margin-top: 0
@@ -75,6 +75,12 @@
       .discontinue-case-investigation-link
         @include button-secondary
 
+    .case-investigation-isolation-monitoring-status
+      .pending
+        color: $pending-color
+      .ongoing
+        color: $started-color
+
     .case-investigation-history
       color: $secondary-text-color
 
@@ -97,14 +103,18 @@
         border-top: 2px solid $divider-color
         padding: 2rem 0
         @include level($justify: space-between)
+
         .add-contact-case-investigation-link
           @include button-outline(wide)
+
       .contact
         &:not(:first-child)
           margin-top: 2rem
+
         .contact-details
           .contact-name
             font-weight: bold
+
           ul
             @include horizontal-flow(left, 0)
 
