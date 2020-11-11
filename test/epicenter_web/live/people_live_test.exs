@@ -203,7 +203,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
       # show a button to make the people visible
       # TODO: should we actually state 2 people here?
-      assert_role_text(index_live, "reload-message", "Show 3 new people")
+      assert_role_text(index_live, "reload-message", "An import was completed. Show new people.")
 
       index_live
       |> table_contents()
@@ -226,7 +226,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       # refresh the people
       Cases.broadcast_people(people)
       # TODO: we probably state 0 people here, as the test previously did...
-      assert_role_text(index_live, "reload-message", "")
+      assert_role_text(index_live, "reload-message", "An import was completed. Show new people.")
     end
   end
 

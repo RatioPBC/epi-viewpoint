@@ -32,7 +32,7 @@ defmodule EpicenterWeb.PeopleLive do
     do: socket |> noreply()
 
   def handle_info({:people, updated_people}, socket),
-    do: socket |> set_selected() |> refresh_existing_people(updated_people) |> maybe_prompt_to_reload(updated_people) |> noreply()
+    do: socket |> set_selected() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
 
   def handle_event("reload-people", _, socket),
     do: socket |> set_reload_message(nil) |> load_people() |> noreply()
@@ -141,16 +141,8 @@ defmodule EpicenterWeb.PeopleLive do
   defp load_users(socket),
     do: socket |> assign(users: Accounts.list_users())
 
-  defp maybe_prompt_to_reload(socket, people) do
-    existing_people_ids = socket.assigns.people |> Euclid.Extra.Enum.pluck(:id) |> MapSet.new()
-    new_people_ids = people |> Euclid.Extra.Enum.pluck(:id) |> MapSet.new()
-
-    if MapSet.subset?(new_people_ids, existing_people_ids) do
-      socket
-    else
-      new_people_count = MapSet.difference(new_people_ids, existing_people_ids) |> MapSet.size()
-      set_reload_message(socket, "Show #{new_people_count} new people")
-    end
+  defp prompt_to_reload(socket, _people) do
+    set_reload_message(socket, "An import was completed. Show new people.")
   end
 
   defp refresh_existing_people(socket, updated_people) do
