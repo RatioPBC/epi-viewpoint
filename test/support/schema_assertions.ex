@@ -97,9 +97,9 @@ defmodule Epicenter.Test.SchemaAssertions do
       for field_name <- all_field_names |> Enum.sort() do
         [
           field_name,
-          assertion_fields |> field_metadata(field_name),
-          database_fields |> field_metadata(field_name),
-          schema_fields |> field_metadata(field_name)
+          assertion_fields |> field_metadata(field_name) |> inspect(),
+          database_fields |> field_metadata(field_name) |> inspect(),
+          schema_fields |> field_metadata(field_name) |> inspect()
         ]
       end
 
