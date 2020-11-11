@@ -117,7 +117,7 @@
           .contacts-header-row
             h4
               span
-                | Isolation Monitoring
+                | Pending isolation monitoring
 
 
   section#lab-results data-role="lab-results"

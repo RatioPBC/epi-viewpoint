@@ -133,7 +133,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
       }
     )
     |> Pages.Profile.assert_here(person)
-    |> Pages.Profile.assert_isolation_monitoring_visible("001")
+    |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Pending isolation monitoring", number: "001"})
 
     assert %{
              case_investigations: [

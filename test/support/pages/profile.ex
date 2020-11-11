@@ -319,11 +319,13 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
-  def assert_isolation_monitoring_visible(%View{} = view, number) do
+  def assert_isolation_monitoring_visible(%View{} = view, %{status: status, number: number}) do
     view
     |> render()
     |> Test.Html.parse()
     |> Test.Html.find!("#isolation-monitoring-#{number}")
+    |> Enum.map(&Test.Html.text/1)
+    |> assert_eq([status])
 
     view
   end

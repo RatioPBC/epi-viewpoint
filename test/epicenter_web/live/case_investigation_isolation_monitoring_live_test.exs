@@ -58,8 +58,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
     )
     |> Pages.Profile.assert_here(person)
 
-    # |> Pages.Profile.assert_case_investigations(%{status: "Ongoing", status_value: "ongoing", reported_on: "08/07/2020", number: "001"})
-
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "edit-case-investigation-isolation-monitoring")
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert ~D[2020-08-01] == case_investigation.isolation_monitoring_start_date
