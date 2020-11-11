@@ -35,8 +35,6 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     "vomiting" => "Vomiting"
   }
 
-  @clock Application.get_env(:epicenter, :clock)
-
   def clinical_statuses_options() do
     [
       {"Unknown", "unknown"},
@@ -51,15 +49,12 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     end
   end
 
-  def displayable_isolation_monitoring_status(case_investigation) do
+  def displayable_isolation_monitoring_status(case_investigation, current_date) do
     case CaseInvestigation.isolation_monitoring_status(case_investigation) do
       :pending ->
         styled_status("Pending", :pending, :isolation_monitoring)
 
       :ongoing ->
-        timezone = EpicenterWeb.PresentationConstants.presented_time_zone()
-        current_date = @clock.utc_now() |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
-
         diff = Date.diff(case_investigation.isolation_monitoring_end_date, current_date)
         styled_status("Ongoing", :ongoing, :isolation_monitoring, "(#{diff} days remaining)")
     end

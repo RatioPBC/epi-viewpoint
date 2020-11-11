@@ -11,7 +11,7 @@ defmodule EpicenterWeb.ProfileLive do
       contact_details_as_list: 1,
       displayable_clinical_status: 1,
       displayable_interview_status: 1,
-      displayable_isolation_monitoring_status: 1,
+      displayable_isolation_monitoring_status: 2,
       displayable_symptom_onset_date: 1,
       displayable_symptoms: 1,
       history_items: 1,
@@ -23,6 +23,8 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
+
+  @clock Application.get_env(:epicenter, :clock)
 
   def mount(%{"id" => person_id}, session, socket) do
     if connected?(socket),
@@ -36,6 +38,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> assign_person(person)
     |> assign_case_investigations(person)
     |> assign_users()
+    |> assign_current_date()
     |> ok()
   end
 
@@ -47,6 +50,12 @@ defmodule EpicenterWeb.ProfileLive do
       updated_person -> assign_person(socket, updated_person)
     end
     |> noreply()
+  end
+
+  def assign_current_date(socket) do
+    timezone = EpicenterWeb.PresentationConstants.presented_time_zone()
+    current_date = @clock.utc_now() |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
+    socket |> assign(current_date: current_date)
   end
 
   def handle_event("remove-contact", %{"exposure-id" => exposure_id}, socket) do
