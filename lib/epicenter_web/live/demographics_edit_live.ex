@@ -25,6 +25,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   # temporarily does nothing until another issue is worked out
   def handle_event("form-change", _params, socket) do
+    #    IO.inspect(params, label: "params")
     socket |> noreply()
   end
 

@@ -150,7 +150,7 @@ defmodule EpicenterWeb.MultiselectTest do
                "checked" => "checked",
                "data-multiselect-parent-id" => "",
                "id" => "movie_genres_comedy",
-               "name" => "movie[genres]_other",
+               "name" => "movie[genres_other]",
                "phx-hook" => "Multiselect",
                "type" => "radio",
                "value" => "comedy"
@@ -159,7 +159,7 @@ defmodule EpicenterWeb.MultiselectTest do
       assert Enum.into(text_field_attrs, %{}) == %{
                "data-multiselect-parent-id" => "movie_genres_comedy",
                "id" => "movie_genres",
-               "name" => "movie[genres][]",
+               "name" => "movie[genres_other]",
                "type" => "text",
                "value" => "comedy"
              }
@@ -214,10 +214,24 @@ defmodule EpicenterWeb.MultiselectTest do
       assert attrs |> Enum.into(%{}) == %{
                "data-multiselect-parent-id" => "movie_genres_comedy",
                "id" => "movie_genres",
-               "name" => "movie[genres][]",
+               "name" => "movie[genres_other]",
                "type" => "text",
                "value" => "comedy"
              }
+    end
+  end
+
+  describe "multiselect_input_name" do
+    test "when not an 'other' field" do
+      phx_form(genres: ["comedy"]) |> Multiselect.multiselect_input_name(:genres, false) |> assert_eq("movie[genres][]")
+    end
+
+    test "when an 'other' field" do
+      %{name: nil} |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("genres_other")
+      phx_form(genres: ["comedy"]) |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("movie[genres_other]")
+      %{name: "movie"} |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("movie[genres_other]")
+      %{name: :movie} |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("movie[genres_other]")
+      :movie |> Multiselect.multiselect_input_name("genres", true) |> assert_eq("movie[genres_other]")
     end
   end
 end

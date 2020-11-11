@@ -68,7 +68,7 @@ defmodule EpicenterWeb.Multiselect do
         field,
         data: [multiselect: [parent_id: input_id(f, field, value)]],
         disabled: !current_value?(f, field, value),
-        name: multiselect_input_name(f, field, false),
+        name: multiselect_input_name(f, field, true),
         value: value
       )
     end
@@ -76,8 +76,19 @@ defmodule EpicenterWeb.Multiselect do
 
   # # #
 
-  def multiselect_input_name(f, field, false = _other?), do: input_name(f, field) <> "[]"
-  def multiselect_input_name(f, field, true = _other?), do: input_name(f, field) <> "_other"
+  def multiselect_input_name(f, field, false = _other?),
+    do: input_name(f, field) <> "[]"
+
+  def multiselect_input_name(%{name: nil}, field, true = _other?),
+    do: "#{to_string(field)}_other"
+
+  def multiselect_input_name(%{name: name}, field, true = _other?)
+      when is_atom(field) or is_binary(field),
+      do: "#{name}[#{field}_other]"
+
+  def multiselect_input_name(name, field, true = _other?)
+      when (is_atom(name) and is_atom(field)) or is_binary(field),
+      do: "#{name}[#{field}_other]"
 
   def current_value?(f, field, value) do
     case input_value(f, field) do

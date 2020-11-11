@@ -12,15 +12,24 @@ defmodule EpicenterWeb.Forms.DemographicForm do
 
   embedded_schema do
     field :employment, :string
+
     field :ethnicity, :string
     field :ethnicity_hispanic_latinx_or_spanish_origin, {:array, :string}
+    field :ethnicity_hispanic_latinx_or_spanish_origin_other, :string
+
     field :gender_identity, {:array, :string}
+    field :gender_identity_other, :string
+
     field :marital_status, :string
     field :notes, :string
     field :occupation, :string
+
     field :race, :string
     field :race_asian, {:array, :string}
+    field :race_asian_other, :string
     field :race_native_hawaiian_or_other_pacific_islander, {:array, :string}
+    field :race_native_hawaiian_or_other_pacific_islander_other, :string
+
     field :sex_at_birth, :string
   end
 
