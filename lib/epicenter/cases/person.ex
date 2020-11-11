@@ -12,7 +12,6 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
-  alias Epicenter.Extra.Date.NilFirst
 
   @optional_attrs ~w{assigned_to_id tid}a
 
@@ -72,15 +71,6 @@ defmodule Epicenter.Cases.Person do
     |> Map.get(:lab_results)
     |> Enum.sort_by(& &1.seq, :desc)
     |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst, fn -> nil end)
-  end
-
-  def oldest_positive_lab_result(person) do
-    person
-    |> Cases.preload_lab_results()
-    |> Map.get(:lab_results)
-    |> Enum.filter(&LabResult.positive?(&1))
-    |> Enum.sort_by(& &1.seq, :asc)
-    |> Enum.min_by(& &1.reported_on, NilFirst, fn -> nil end)
   end
 
   def coalesce_demographics(person) do
