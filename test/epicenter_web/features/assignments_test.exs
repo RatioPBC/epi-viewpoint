@@ -3,6 +3,7 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
+  alias Epicenter.Extra
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -15,7 +16,9 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
     Test.Fixtures.user_attrs(@admin, "nonassignee") |> Accounts.register_user!()
 
     alice = Test.Fixtures.person_attrs(assignee, "alice") |> Cases.create_person!()
+    Test.Fixtures.lab_result_attrs(alice, @admin, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
     billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
+    Test.Fixtures.lab_result_attrs(billy, @admin, "billy-result-1", Extra.Date.days_ago(2), result: "positive") |> Cases.create_lab_result!()
 
     people_page = Pages.People.visit(conn)
     profile_page = Pages.Profile.visit(conn, alice)

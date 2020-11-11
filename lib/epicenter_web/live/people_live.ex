@@ -17,7 +17,7 @@ defmodule EpicenterWeb.PeopleLive do
     |> authenticate_user(session)
     |> assign_page_title("People")
     |> set_reload_message(nil)
-    |> set_filter(:with_lab_results)
+    |> set_filter(:with_positive_lab_results)
     |> assign(:only_assigned_to_me, false)
     |> load_people()
     |> load_users()
@@ -123,7 +123,7 @@ defmodule EpicenterWeb.PeopleLive do
 
   def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"
-  def page_title(:with_lab_results), do: "People"
+  def page_title(:with_positive_lab_results), do: "Index Cases"
 
   # # # Private
 

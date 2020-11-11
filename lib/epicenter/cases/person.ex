@@ -119,19 +119,21 @@ defmodule Epicenter.Cases.Person do
         order_by: [asc: person.seq]
     end
 
-    def with_lab_results() do
+    def with_positive_lab_results() do
       from person in Person,
-        left_join: lab_result in subquery(newest_lab_result()),
+        inner_join: lab_result in subquery(newest_positive_lab_result()),
         on: lab_result.person_id == person.id,
         order_by: [asc: lab_result.max_sampled_on, asc: person.seq]
     end
 
-    defp newest_lab_result() do
+    defp newest_positive_lab_result() do
       from lab_result in LabResult,
         select: %{
           person_id: lab_result.person_id,
           max_sampled_on: max(lab_result.sampled_on)
         },
+        where: ilike(lab_result.result, "positive"),
+        or_where: ilike(lab_result.result, "detected"),
         group_by: lab_result.person_id
     end
 
@@ -140,7 +142,8 @@ defmodule Epicenter.Cases.Person do
 
       from person in all(),
         join: lab_result in assoc(person, :lab_results),
-        where: lab_result.result == "positive",
+        where: ilike(lab_result.result, "positive"),
+        or_where: ilike(lab_result.result, "detected"),
         where: lab_result.sampled_on > ^fifteen_days_ago
     end
 

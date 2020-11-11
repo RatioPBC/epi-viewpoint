@@ -226,7 +226,7 @@ defmodule Epicenter.CasesTest do
       Cases.list_people() |> tids() |> assert_eq(~w{first middle last})
       Cases.list_people(:all) |> tids() |> assert_eq(~w{first middle last})
       Cases.list_people(:call_list) |> tids() |> assert_eq(~w{last})
-      Cases.list_people(:with_lab_results) |> tids() |> assert_eq(~w{first middle last})
+      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{first middle last})
     end
 
     test "assign_user_to_people updates people's assigned user" do

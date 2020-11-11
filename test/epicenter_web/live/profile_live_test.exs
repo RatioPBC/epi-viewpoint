@@ -512,8 +512,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert updated_socket.assigns.person.tid == "alice"
     end
 
-    test "people can be assigned to users on index and show page, with cross-client updating", %{conn: conn, person: alice, assignee: assignee} do
+    test "people can be assigned to users on index and show page, with cross-client updating", %{
+      conn: conn,
+      person: alice,
+      assignee: assignee,
+      user: user
+    } do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(billy, user, "billy-lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
 
       {:ok, index_page_live, _html} = live(conn, "/people")
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")

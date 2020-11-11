@@ -296,31 +296,42 @@ defmodule Epicenter.Cases.PersonTest do
 
       Test.Fixtures.person_attrs(user, "recent-positive-result")
       |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs(user, "recent-positive-result", Extra.Date.days_ago(1), result: "positive")
+      |> Test.Fixtures.lab_result_attrs(user, "recent-positive-result", Extra.Date.days_ago(2), result: "poSiTiVe")
       |> Cases.create_lab_result!()
 
-      Person.Query.call_list() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{recent-positive-result})
+      Test.Fixtures.person_attrs(user, "recent-detected-result")
+      |> Cases.create_person!()
+      |> Test.Fixtures.lab_result_attrs(user, "recent-positive-result", Extra.Date.days_ago(1), result: "dEtEcTed")
+      |> Cases.create_lab_result!()
+
+      Person.Query.call_list() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{recent-positive-result recent-detected-result})
     end
   end
 
-  describe "with_lab_results" do
-    test "sorts by lab result sample date ascending" do
+  describe "with_positive_lab_results" do
+    test "filters for people with positive lab results, sorting by lab result sample date ascending" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
 
       middle = Test.Fixtures.person_attrs(user, "middle", dob: ~D[2000-06-01], first_name: "Middle", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(middle, user, "middle-1", ~D[2020-06-03]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(middle, user, "middle-1", ~D[2020-06-03], result: "positive") |> Cases.create_lab_result!()
 
       last = Test.Fixtures.person_attrs(user, "last", dob: ~D[2000-06-01], first_name: "Last", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-04]) |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-01]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-04], result: "negative") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(last, user, "last-1", ~D[2020-06-05], result: "pOsItIvE") |> Cases.create_lab_result!()
 
       first = Test.Fixtures.person_attrs(user, "first", dob: ~D[2000-06-01], first_name: "First", last_name: "Testuser") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(first, user, "first-1", ~D[2020-06-02]) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(first, user, "first-1", ~D[2020-06-02], result: "DeTectEd") |> Cases.create_lab_result!()
 
-      Person.Query.with_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
+      missing =
+        Test.Fixtures.person_attrs(user, "missing", dob: ~D[2000-06-01], first_name: "Missing Negative", last_name: "Testuser")
+        |> Cases.create_person!()
+
+      Test.Fixtures.lab_result_attrs(missing, user, "first-1", ~D[2020-06-02], result: "negative") |> Cases.create_lab_result!()
+
+      Person.Query.with_positive_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end
 
-    test "includes people without lab results" do
+    test "excludes people without lab results" do
       user =
         Test.Fixtures.user_attrs(@admin, "user")
         |> Accounts.register_user!()
@@ -333,10 +344,10 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.person_attrs(user, "without-lab-result")
       |> Cases.create_person!()
 
-      Person.Query.with_lab_results()
+      Person.Query.with_positive_lab_results()
       |> Epicenter.Repo.all()
       |> tids()
-      |> assert_eq(~w{with-lab-result without-lab-result})
+      |> assert_eq(~w{with-lab-result})
     end
   end
 

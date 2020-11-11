@@ -25,8 +25,12 @@ defmodule EpicenterWeb.PeopleLiveTest do
       Test.Fixtures.lab_result_attrs(alice, user, "alice-result-2", Extra.Date.days_ago(2), result: "negative") |> Cases.create_lab_result!()
 
       billy = Test.Fixtures.person_attrs(user, "billy") |> Test.Fixtures.add_demographic_attrs(%{external_id: "billy-id"}) |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(billy, user, "billy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
-      [users: [user, assignee], people: [alice, billy] |> Cases.preload_assigned_to() |> Cases.preload_lab_results()]
+      Test.Fixtures.lab_result_attrs(billy, user, "billy-result-1", Extra.Date.days_ago(3), result: "Detected") |> Cases.create_lab_result!()
+
+      nancy = Test.Fixtures.person_attrs(user, "nancy") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(nancy, user, "nancy-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
+
+      [users: [user, assignee], people: [alice, billy, nancy] |> Cases.preload_assigned_to() |> Cases.preload_lab_results()]
     end
 
     test "disconnected and connected render", %{conn: conn} do
@@ -37,7 +41,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "users can limit shown people to just those assigned to themselves", %{conn: conn, user: user} do
-      [users: [_user, _assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
+      [users: [_user, _assignee], people: [alice, _billy, _nancy]] = create_people_and_lab_results(user)
       {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
       {:ok, index_live, _} = live(conn, "/people")
 
@@ -45,7 +49,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> table_contents()
       |> assert_eq([
         ["", "Name", "ID", "Latest test result", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", user.name]
       ])
 
@@ -69,7 +73,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
     # that shouldn't change the assignment of person 1
     # but should change the assignment of person 2
     test "people who have been filtered out should not be assigned during a bulk assignment", %{conn: conn, user: user} do
-      [users: [_user, assignee], people: [alice, billy]] = create_people_and_lab_results(user)
+      [users: [_user, assignee], people: [alice, billy, _nancy]] = create_people_and_lab_results(user)
       {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
       {:ok, index_live, _} = live(conn, "/people")
 
@@ -85,14 +89,14 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "user can be assigned to people", %{conn: conn, user: user} do
-      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
+      [users: [_user, assignee], people: [alice, _billy, _nancy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
 
       index_live
       |> table_contents()
       |> assert_eq([
         ["", "Name", "ID", "Latest test result", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
 
@@ -108,7 +112,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> table_contents()
       |> assert_eq([
         ["", "Name", "ID", "Latest test result", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "assignee"]
       ])
 
@@ -116,7 +120,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "users can be unassigned from people", %{conn: conn, user: user} do
-      [users: [user, assignee], people: [alice, billy]] = create_people_and_lab_results(user)
+      [users: [user, assignee], people: [alice, billy, _nancy]] = create_people_and_lab_results(user)
       Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.audit_meta(user))
 
       {:ok, index_live, _} = live(conn, "/people")
@@ -143,14 +147,14 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "shows assignee update from different client", %{conn: conn, user: user} do
-      [users: [_user, assignee], people: [alice, _billy]] = create_people_and_lab_results(user)
+      [users: [_user, assignee], people: [alice, _billy, _nancy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
 
       index_live
       |> table_contents()
       |> assert_eq([
         ["", "Name", "ID", "Latest test result", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
 
@@ -161,12 +165,12 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> table_contents()
       |> assert_eq([
         ["", "Name", "ID", "Latest test result", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "assignee"]
       ])
     end
 
-    test "shows people and their lab tests", %{conn: conn, user: user} do
+    test "shows people with positive lab tests", %{conn: conn, user: user} do
       create_people_and_lab_results(user)
 
       {:ok, index_live, _html} = live(conn, "/people")
@@ -175,7 +179,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> table_contents()
       |> assert_eq([
         ["", "Name", "ID", "Latest test result", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
     end
@@ -192,13 +196,14 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ["", "Name", "ID", "Latest test result", "Assignee"]
       ])
 
-      # import 2 people
+      # import 3 people, only 2 of which have positive lab results
       [users: _, people: people] = create_people_and_lab_results(user)
 
       Cases.broadcast_people(people)
 
       # show a button to make the people visible
-      assert_role_text(index_live, "reload-message", "Show 2 new people")
+      # TODO: should we actually state 2 people here?
+      assert_role_text(index_live, "reload-message", "Show 3 new people")
 
       index_live
       |> table_contents()
@@ -214,12 +219,13 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> table_contents()
       |> assert_eq([
         ["", "Name", "ID", "Latest test result", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "negative, 3 days ago", ""],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", ""]
       ])
 
       # refresh the people
       Cases.broadcast_people(people)
+      # TODO: we probably state 0 people here, as the test previously did...
       assert_role_text(index_live, "reload-message", "")
     end
   end
@@ -232,7 +238,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "it is enabled after selecting a person", %{conn: conn, user: user} do
-      [users: _users, people: [alice, _billy]] = create_people_and_lab_results(user)
+      [users: _users, people: [alice, _billy, _nancy]] = create_people_and_lab_results(user)
       {:ok, index_live, _} = live(conn, "/people")
       assert_disabled(index_live, "[data-role=users]")
       index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
