@@ -24,6 +24,7 @@ config :epicenter, EpicenterWeb.Endpoint,
   server: false
 
 config :epicenter,
+  clock: FakeDateTime,
   totp: Epicenter.Test.TOTPMock
 
 # Print only warnings and errors during test

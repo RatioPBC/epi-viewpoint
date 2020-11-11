@@ -140,11 +140,12 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-monitoring-form",
       isolation_monitoring_form: %{
-        "date_started" => "09/06/2020",
-        "date_ended" => "09/16/2020"
+        "date_started" => "10/28/2020",
+        "date_ended" => "11/10/2020"
       }
     )
     |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Ongoing isolation monitoring (10 days remaining)", number: "001"})
 
     assert %{
              case_investigations: [

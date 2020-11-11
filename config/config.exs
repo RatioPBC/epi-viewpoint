@@ -11,6 +11,7 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :tzdata, :autoupdate, :disabled
 
 config :epicenter,
+  clock: DateTime,
   ecto_repos: [Epicenter.Repo],
   seeds_enabled?: false,
   unpersisted_admin_id: "00000000-0000-0000-0000-000000000000"

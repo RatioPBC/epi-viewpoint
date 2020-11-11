@@ -35,6 +35,8 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     "vomiting" => "Vomiting"
   }
 
+  @clock Application.get_env(:epicenter, :clock)
+
   def clinical_statuses_options() do
     [
       {"Unknown", "unknown"},
@@ -51,8 +53,15 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   def displayable_isolation_monitoring_status(case_investigation) do
     case CaseInvestigation.isolation_monitoring_status(case_investigation) do
-      :pending -> styled_status("Pending", :pending, :isolation_monitoring)
-      :ongoing -> styled_status("Ongoing", :ongoing, :isolation_monitoring)
+      :pending ->
+        styled_status("Pending", :pending, :isolation_monitoring)
+
+      :ongoing ->
+        timezone = EpicenterWeb.PresentationConstants.presented_time_zone()
+        current_date = @clock.utc_now() |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
+
+        diff = Date.diff(case_investigation.isolation_monitoring_end_date, current_date)
+        styled_status("Ongoing", :ongoing, :isolation_monitoring, "(#{diff} days remaining)")
     end
   end
 
@@ -279,11 +288,11 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     )
   end
 
-  defp styled_status(displayable_status, status, type) when type in [:interview, :isolation_monitoring] do
+  defp styled_status(displayable_status, status, type, postscript \\ "") when type in [:interview, :isolation_monitoring] do
     type_string = %{interview: "interview", isolation_monitoring: "isolation monitoring"}[type]
 
     content_tag :span do
-      [content_tag(:span, displayable_status, class: status), " #{type_string}"]
+      [content_tag(:span, displayable_status, class: status), " #{type_string} #{postscript}"]
     end
   end
 
