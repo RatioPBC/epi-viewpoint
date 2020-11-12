@@ -15,7 +15,8 @@ defmodule EpicenterWeb.ProfileLive do
       displayable_symptom_onset_date: 1,
       displayable_symptoms: 1,
       history_items: 1,
-      interview_buttons: 1
+      interview_buttons: 1,
+      isolation_monitoring_history_items: 1
     ]
 
   import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 2]

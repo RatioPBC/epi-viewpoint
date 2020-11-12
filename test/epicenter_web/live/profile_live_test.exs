@@ -484,6 +484,21 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.click_edit_complete_interview_link("001")
       |> assert_redirects_to("/case-investigations/#{case_investigation.id}/complete-interview")
     end
+
+    test "case investigations with isolation monitoring dates can be edited", %{conn: conn, person: person, user: user} do
+      case_investigation =
+        build_case_investigation(person, user, "case_investigation", nil, %{
+          completed_interview_at: ~U[2020-10-05 19:57:00Z],
+          isolation_monitoring_start_date: ~D[2020-11-05],
+          isolation_monitoring_end_date: ~D[2020-11-15]
+        })
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Ongoing isolation monitoring (15 days remaining)", number: "001"})
+      |> Pages.Profile.assert_isolation_monitoring_has_history("Isolation dates: 11/05/2020 - 11/15/2020")
+      |> Pages.Profile.click_edit_isolation_monitoring_link("001")
+      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/isolation-monitoring")
+    end
   end
 
   describe "assigning and unassigning user to a person" do

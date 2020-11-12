@@ -272,6 +272,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_edit_isolation_monitoring_link(%View{} = view, number) do
+    view
+    |> element("#edit-isolation-monitoring-link-#{number}")
+    |> render_click()
+  end
+
   def click_complete_case_investigation(%View{} = view, number) do
     view
     |> element("#complete-interview-case-investigation-link-#{number}")
@@ -356,6 +362,17 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> Test.Html.parse()
     |> Test.Html.find("#clinical-details-#{number}")
     |> assert_eq([])
+
+    view
+  end
+
+  def assert_isolation_monitoring_has_history(%View{} = view, history_texts) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("[data-role=isolation-monitoring-history-item-text]")
+    |> Test.Html.text()
+    |> assert_eq(history_texts)
 
     view
   end

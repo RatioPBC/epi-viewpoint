@@ -193,6 +193,39 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     end
   end
 
+  def isolation_monitoring_history_items(case_investigation) do
+    items = []
+
+    items =
+      if case_investigation.isolation_monitoring_start_date do
+        [
+          %{
+            text:
+              "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_start_date)} - #{
+                Format.date(case_investigation.isolation_monitoring_end_date)
+              }",
+            link:
+              live_redirect(
+                "Edit",
+                to:
+                  Routes.case_investigation_isolation_monitoring_path(
+                    EpicenterWeb.Endpoint,
+                    EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
+                    case_investigation
+                  ),
+                id: "edit-isolation-monitoring-link-001",
+                class: "case-investigation-link"
+              )
+          }
+          | items
+        ]
+      else
+        items
+      end
+
+    items |> Enum.reverse()
+  end
+
   def symptoms_options() do
     [
       {"Fever > 100.4F", "fever"},
