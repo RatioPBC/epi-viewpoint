@@ -74,6 +74,32 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
     assert ~U[2020-10-31 10:30:00Z] == case_investigation.isolation_concluded_at
   end
 
+  test "editing an isolation conclusion reason does not change the existing isolation_concluded_at timestamp", %{
+    conn: conn,
+    case_investigation: case_investigation,
+    person: person,
+    user: user
+  } do
+    {:ok, _} =
+      Cases.update_case_investigation(
+        case_investigation,
+        {%{isolation_conclusion_reason: "successfully_completed", isolation_concluded_at: ~U[2020-10-05 19:57:00Z]}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-conclude-isolation-monitoring-form",
+      conclude_isolation_monitoring_form: %{
+        "reason" => "deceased"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+
+    assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "conclude-case-investigation-isolation-monitoring")
+    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    assert "deceased" == case_investigation.isolation_conclusion_reason
+    assert ~U[2020-10-05 19:57:00Z] == case_investigation.isolation_concluded_at
+  end
+
   describe "validations" do
     test "saving without a selected reason shows an error", %{
       conn: conn,

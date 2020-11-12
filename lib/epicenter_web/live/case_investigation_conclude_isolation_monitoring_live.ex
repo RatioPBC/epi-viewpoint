@@ -27,9 +27,11 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
       |> validate_required(@required_attrs)
     end
 
-    def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
+    def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset, %{isolation_concluded_at: isolation_concluded_at}) do
+      isolation_concluded_at = isolation_concluded_at || @clock.utc_now()
+
       case apply_action(form_changeset, :create) do
-        {:ok, form} -> {:ok, %{isolation_conclusion_reason: form.reason, isolation_concluded_at: @clock.utc_now()}}
+        {:ok, form} -> {:ok, %{isolation_conclusion_reason: form.reason, isolation_concluded_at: isolation_concluded_at}}
         other -> other
       end
     end
@@ -51,7 +53,8 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     params = full_params |> Map.get("conclude_isolation_monitoring_form", %{})
 
     with %Ecto.Changeset{} = form_changeset <- ConcludeIsolationMonitoringForm.changeset(socket.assigns.case_investigation, params),
-         {:form, {:ok, model_attrs}} <- {:form, ConcludeIsolationMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
+         {:form, {:ok, model_attrs}} <-
+           {:form, ConcludeIsolationMonitoringForm.form_changeset_to_model_attrs(form_changeset, socket.assigns.case_investigation)},
          {:case_investigation, {:ok, _case_investigation}} <-
            {:case_investigation,
             Cases.update_case_investigation(
