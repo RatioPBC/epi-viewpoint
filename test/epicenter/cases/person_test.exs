@@ -111,16 +111,16 @@ defmodule Epicenter.Cases.PersonTest do
 
       assert changes.dob == ~D[2000-01-01]
       assert changes.first_name == "Alice"
-      assert changes.employment == "Part time"
+      assert changes.employment == "part_time"
       assert changes.external_id == "10000"
-      assert changes.gender_identity == ["Female"]
+      assert changes.gender_identity == ["female"]
       assert changes.last_name == "Testuser"
-      assert changes.marital_status == "Single"
+      assert changes.marital_status == "single"
       assert changes.notes == "lorem ipsum"
       assert changes.occupation == "architect"
       assert changes.preferred_language == "English"
-      assert changes.race == "Filipino"
-      assert changes.sex_at_birth == "Female"
+      assert changes.race == "filipino"
+      assert changes.sex_at_birth == "female"
 
       ethnicity_changes = changes.ethnicity.changes
       assert ethnicity_changes.major == "hispanic_latinx_or_spanish_origin"

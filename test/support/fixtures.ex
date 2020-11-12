@@ -108,17 +108,17 @@ defmodule Epicenter.Test.Fixtures do
     merged_demographic_attrs =
       %{
         dob: ~D[2000-01-01],
-        employment: "Part time",
+        employment: "part_time",
         ethnicity: %{major: "not_hispanic_latinx_or_spanish_origin", detailed: []},
         first_name: String.capitalize(person_attrs.tid),
-        gender_identity: ["Female"],
+        gender_identity: ["female"],
         last_name: "Testuser",
-        marital_status: "Single",
+        marital_status: "single",
         notes: "lorem ipsum",
         occupation: "architect",
         preferred_language: "English",
-        race: "Filipino",
-        sex_at_birth: "Female"
+        race: "filipino",
+        sex_at_birth: "female"
       }
       |> merge_attrs(person_demographic_attrs)
       |> merge_attrs(demographic_attrs)

@@ -63,21 +63,11 @@ defmodule Epicenter.Cases.Demographic do
 
   def humanized_values do
     %{
-      gender_identity: [
+      employment: [
         {"Unknown", "unknown"},
-        {"Declined to answer", "declined_to_answer"},
-        {"Female", "female"},
-        {"Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
-        {"Male", "male"},
-        {"Transgender man/trans man/female-to-male (FTM)", "transgender_man"},
-        {"Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"}
-      ],
-      sex_at_birth: [
-        {"Unknown", "unknown"},
-        {"Declined to answer", "declined_to_answer"},
-        {"Female", "female"},
-        {"Male", "male"},
-        {"Intersex", "intersex"}
+        {"Not employed", "not_employed"},
+        {"Part time", "part_time"},
+        {"Full time", "full_time"}
       ],
       ethnicity: [
         {"Unknown", "unknown"},
@@ -87,6 +77,20 @@ defmodule Epicenter.Cases.Demographic do
         {"Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx"},
         {"Puerto Rican", "puerto_rican"},
         {"Cuban", "cuban"}
+      ],
+      gender_identity: [
+        {"Unknown", "unknown"},
+        {"Declined to answer", "declined_to_answer"},
+        {"Female", "female"},
+        {"Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
+        {"Male", "male"},
+        {"Transgender man/trans man/female-to-male (FTM)", "transgender_man"},
+        {"Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"}
+      ],
+      marital_status: [
+        {"Unknown", "unknown"},
+        {"Single", "single"},
+        {"Married", "married"}
       ],
       race: [
         {"Unknown", "unknown"},
@@ -106,16 +110,12 @@ defmodule Epicenter.Cases.Demographic do
         {"Guamanian or Chamorro", "guamanian_or_chamorro"},
         {"Samoan", "samoan"}
       ],
-      marital_status: [
+      sex_at_birth: [
         {"Unknown", "unknown"},
-        {"Single", "single"},
-        {"Married", "married"}
-      ],
-      employment: [
-        {"Unknown", "unknown"},
-        {"Not employed", "not_employed"},
-        {"Part time", "part_time"},
-        {"Full time", "full_time"}
+        {"Declined to answer", "declined_to_answer"},
+        {"Female", "female"},
+        {"Male", "male"},
+        {"Intersex", "intersex"}
       ]
     }
   end
