@@ -66,6 +66,7 @@ defmodule Epicenter.AuditLog.Revision do
   # event = what occurred that caused the code to make an action? (usually something the user did)
   def admin_create_user_event, do: "admin-create-user"
   def admin_update_user_event, do: "admin-update-user"
+  def conclude_case_investigation_isolation_monitoring_event, do: "conclude-case-investigation-isolation-monitoring"
   def complete_case_investigation_interview_event(), do: "complete-case-investigation-interview"
   def create_contact_event(), do: "create-contact"
   def discontinue_pending_case_interview_event(), do: "discontinue-pending-case-interview"

@@ -17,6 +17,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     discontinue_reason
     discontinued_at
     interview_proxy_name
+    isolation_conclusion_reason
     isolation_monitoring_end_date
     isolation_monitoring_start_date
     name
@@ -37,6 +38,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     field :isolation_monitoring_end_date, :date
     field :isolation_monitoring_start_date, :date
     field :name, :string
+    field :isolation_conclusion_reason, :string
     field :seq, :integer
     field :started_at, :utc_datetime
     field :symptom_onset_date, :date
