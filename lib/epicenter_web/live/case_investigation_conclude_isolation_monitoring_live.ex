@@ -1,8 +1,9 @@
 defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
+  alias Epicenter.Cases
   alias EpicenterWeb.Form
 
   defmodule ConcludeIsolationMonitoringForm do
@@ -23,12 +24,19 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     end
   end
 
-  def mount(%{"id" => _case_investigation_id}, session, socket) do
+  def mount(%{"id" => case_investigation_id}, session, socket) do
+    case_investigation = Cases.get_case_investigation(case_investigation_id) |> Cases.preload_person()
+
     socket
     |> assign_page_title(" Case Investigation Conclude Isolation Monitoring")
     |> assign(:form_changeset, ConcludeIsolationMonitoringForm.changeset(:foo, %{}))
+    |> assign(:person, case_investigation.person)
     |> authenticate_user(session)
     |> ok()
+  end
+
+  def handle_event("save", %{"conclude_isolation_monitoring_form" => _params}, socket) do
+    socket |> redirect_to_profile_page() |> noreply()
   end
 
   def conclude_isolation_monitoring_form_builder(form) do
@@ -48,4 +56,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
       {"Deceased", "deceased"}
     ]
   end
+
+  defp redirect_to_profile_page(socket),
+       do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
 end
