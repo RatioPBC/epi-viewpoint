@@ -135,10 +135,23 @@
               height: 0.5rem
               border-radius: 50%
               background-color: currentColor
+
     .case-investigation-notes
       form
         @include form-grid
         margin-bottom: 0
+
+      .case-investigation-note
+        padding-top: 2rem
+
+      .case-investigation-note-header
+        @include level
+
+        .case-investigation-note-author
+          font-weight: bold
+
+      .case-investigation-note-text
+          padding-top: .5rem
 
   section#demographics
     @include card

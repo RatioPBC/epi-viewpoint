@@ -132,10 +132,13 @@
         = form_for @note_changesets[case_investigation.id], "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_submit: "save_note"], fn f ->
               = add_note_form_builder(f, case_investigation)
         = for note <- case_investigation.notes do
-          div data-role="case-investigation-note-#{case_investigation.name}"
-            div data-role="case-investigation-note-text" = note.text
-            div data-role="case-investigation-note-author" = note.author.name
-            div data-role="case-investigation-note-date" = Format.date(note.inserted_at)
+          div.case-investigation-note data-role="case-investigation-note-#{case_investigation.name}"
+            div.case-investigation-note-header
+              span.case-investigation-note-author data-role="case-investigation-note-author" = note.author.name
+              span data-role="case-investigation-note-date" = Format.date(note.inserted_at)
+            div.case-investigation-note-text data-role="case-investigation-note-text" = note.text
+
+
 
   section#lab-results data-role="lab-results"
     header
