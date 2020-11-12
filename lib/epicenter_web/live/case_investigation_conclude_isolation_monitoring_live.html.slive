@@ -1,3 +1,5 @@
 #case-investigation-conclude-isolation-monitoring-page data-page="case-investigation-conclude-isolation-monitoring"
   section#case-investigation-conclude-isolation-monitoring
     h2 Conclude isolation monitoring
+    = form_for @form_changeset, "#", [id: "case-investigation-conclude-isolation-monitoring-form"], fn f ->
+      = conclude_isolation_monitoring_form_builder(f)
