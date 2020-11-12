@@ -24,6 +24,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:initiating_lab_result_id, :binary_id},
           {:inserted_at, :utc_datetime},
           {:interview_proxy_name, :string},
+          {:isolation_concluded_at, :utc_datetime},
           {:isolation_conclusion_reason, :string},
           {:isolation_monitoring_end_date, :date},
           {:isolation_monitoring_start_date, :date},

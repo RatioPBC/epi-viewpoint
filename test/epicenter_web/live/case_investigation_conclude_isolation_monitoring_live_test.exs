@@ -52,6 +52,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "conclude-case-investigation-isolation-monitoring")
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert "successfully_completed" == case_investigation.isolation_conclusion_reason
+    assert ~U[2020-10-31 10:30:00Z] == case_investigation.isolation_concluded_at
   end
 
   describe "validations" do

@@ -12,6 +12,8 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
     import Ecto.Changeset
 
+    @clock Application.get_env(:epicenter, :clock)
+
     @required_attrs ~w{reason}a
     @optional_attrs ~w{}a
     @primary_key false
@@ -25,7 +27,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
       case apply_action(form_changeset, :create) do
-        {:ok, form} -> {:ok, %{isolation_conclusion_reason: form.reason}}
+        {:ok, form} -> {:ok, %{isolation_conclusion_reason: form.reason, isolation_concluded_at: @clock.utc_now()}}
         other -> other
       end
     end
