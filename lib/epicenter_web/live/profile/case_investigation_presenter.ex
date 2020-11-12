@@ -210,9 +210,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       :ongoing ->
         live_redirect("Conclude isolation",
           to:
-            Routes.case_investigation_isolation_monitoring_path(
+            Routes.case_investigation_conclude_isolation_monitoring_path(
               EpicenterWeb.Endpoint,
-              EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
+              EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
               case_investigation
             ),
           id: "conclude-isolation-monitoring-case-investigation-link-001",
