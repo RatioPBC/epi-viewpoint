@@ -10,7 +10,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   alias Epicenter.Cases
   alias Epicenter.DateParser
   alias Epicenter.Extra
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
 
   defmodule FormData do
     use Ecto.Schema

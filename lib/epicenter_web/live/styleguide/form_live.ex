@@ -65,7 +65,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     import Epicenter.Validation, only: [validate_date: 2]
 
     alias Epicenter.DateParser
-    alias Epicenter.Format
+    alias EpicenterWeb.Format
 
     @primary_key false
 

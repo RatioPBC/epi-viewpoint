@@ -9,7 +9,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   alias Epicenter.Cases
   alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.Person
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
   alias EpicenterWeb.Form
 
   defmodule ContactForm do

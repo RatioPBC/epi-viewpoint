@@ -1,6 +1,6 @@
 defmodule EpicenterWeb.PersonHelpers do
   alias Epicenter.Cases.Person
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
 
   def demographic_field(person, field),
     do: person |> Person.coalesce_demographics() |> Map.get(field)

@@ -6,7 +6,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.StartInterviewForm
   alias EpicenterWeb.PresentationConstants

@@ -26,7 +26,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
   alias EpicenterWeb.Forms.CaseInvestigationNoteForm.FormFieldData
 
   @clock Application.get_env(:epicenter, :clock)

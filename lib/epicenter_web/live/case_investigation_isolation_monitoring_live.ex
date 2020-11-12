@@ -10,7 +10,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
   alias Epicenter.Validation
   alias EpicenterWeb.Form
 

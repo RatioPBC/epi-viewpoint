@@ -1,4 +1,4 @@
-defmodule Epicenter.Format do
+defmodule EpicenterWeb.Format do
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Phone
@@ -13,6 +13,9 @@ defmodule Epicenter.Format do
 
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
+
+  def date(%DateTime{} = datetime),
+    do: datetime |> DateTime.shift_zone!(EpicenterWeb.PresentationConstants.presented_time_zone()) |> DateTime.to_date() |> date()
 
   def date_time_with_zone(nil), do: ""
   def date_time_with_zone(%DateTime{} = date_time), do: Calendar.strftime(date_time, "%m/%d/%Y at %I:%M%P %Z")

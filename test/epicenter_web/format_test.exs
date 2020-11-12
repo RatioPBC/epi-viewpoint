@@ -1,11 +1,11 @@
-defmodule Epicenter.FormatTest do
+defmodule EpicenterWeb.FormatTest do
   use Epicenter.SimpleCase, async: true
 
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Phone
 
   describe "address" do
-    import Epicenter.Format, only: [address: 1]
+    import EpicenterWeb.Format, only: [address: 1]
 
     test "returns an empty string when the address is nil" do
       assert address(nil) == ""
@@ -43,7 +43,7 @@ defmodule Epicenter.FormatTest do
   end
 
   describe "date" do
-    import Epicenter.Format, only: [date: 1]
+    import EpicenterWeb.Format, only: [date: 1]
 
     test "when given a date, formats it as mm/dd/yyyy" do
       assert date(~D[2020-05-19]) == "05/19/2020"
@@ -52,10 +52,14 @@ defmodule Epicenter.FormatTest do
     test "when given a nil, quietly renders an empty string" do
       assert date(nil) == ""
     end
+
+    test "when given a datetime, formats it as mm/dd/yyyy in New_York" do
+      assert date(~U[2020-01-02 01:00:07Z]) == "01/01/2020"
+    end
   end
 
   describe "date_time_with_zone" do
-    import Epicenter.Format, only: [date_time_with_zone: 1]
+    import EpicenterWeb.Format, only: [date_time_with_zone: 1]
 
     test "when given a datetime, formats it as a date with the time and zone information" do
       utc_datetime = ~U[2020-01-02 01:00:07Z]
@@ -69,7 +73,7 @@ defmodule Epicenter.FormatTest do
   end
 
   describe "demographic" do
-    import Epicenter.Format, only: [demographic: 2]
+    import EpicenterWeb.Format, only: [demographic: 2]
 
     test "safely formats demographic fields" do
       assert demographic(nil, :gender_identitiy) == nil
@@ -81,7 +85,7 @@ defmodule Epicenter.FormatTest do
   end
 
   describe "person" do
-    import Epicenter.Format, only: [person: 1]
+    import EpicenterWeb.Format, only: [person: 1]
 
     test "formats structs that have first and last name" do
       assert person(%{first_name: "Alice", last_name: "Ant"}) == "Alice Ant"
@@ -93,7 +97,7 @@ defmodule Epicenter.FormatTest do
   end
 
   describe "phone" do
-    import Epicenter.Format, only: [phone: 1]
+    import EpicenterWeb.Format, only: [phone: 1]
 
     test "formats phone number strings when they only contain numbers" do
       assert phone("911") == "911"
@@ -118,7 +122,7 @@ defmodule Epicenter.FormatTest do
   end
 
   describe "time" do
-    import Epicenter.Format, only: [time: 1]
+    import EpicenterWeb.Format, only: [time: 1]
 
     test "when given a time, formats it as hh:mm in 12 hour time" do
       assert time(~T[00:03:05]) == "12:03"

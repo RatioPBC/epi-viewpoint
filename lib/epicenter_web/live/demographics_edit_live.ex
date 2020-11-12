@@ -7,7 +7,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Demographic
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.DemographicForm
 

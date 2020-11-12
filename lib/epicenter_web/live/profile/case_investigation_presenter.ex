@@ -6,7 +6,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.Person
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
   alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 

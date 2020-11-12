@@ -5,7 +5,7 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
   import EpicenterWeb.Views.DateExtraction, only: [convert_time: 3, extract_and_validate_date: 4]
 
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Format
+  alias EpicenterWeb.Format
   alias EpicenterWeb.Forms.CompleteInterviewForm
 
   @primary_key false
