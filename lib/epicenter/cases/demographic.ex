@@ -7,8 +7,25 @@ defmodule Epicenter.Cases.Demographic do
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Ethnicity
 
-  @required_attrs ~w{dob first_name last_name}a
-  @optional_attrs ~w{external_id preferred_language tid employment gender_identity marital_status notes occupation person_id race sex_at_birth source}a
+  @required_attrs ~w{
+    dob
+    first_name
+    last_name
+  }a
+  @optional_attrs ~w{
+    external_id
+    preferred_language
+    tid
+    employment
+    gender_identity
+    marital_status
+    notes
+    occupation
+    person_id
+    race
+    sex_at_birth
+    source
+  }a
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   @primary_key {:id, :binary_id, autogenerate: true}

@@ -110,6 +110,14 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_race(%View{} = view, expected_race) do
+    view |> Pages.parse() |> Test.Html.text("[data-role=race]") |> assert_eq(expected_race, returning: view)
+  end
+
+  def assert_sex_at_birth(%View{} = view, expected_sex_at_birth) do
+    view |> Pages.parse() |> Test.Html.text("[data-role=sex-at-birth]") |> assert_eq(expected_sex_at_birth, returning: view)
+  end
+
   #
   # email addresses
   #

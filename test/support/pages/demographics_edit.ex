@@ -33,7 +33,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
     |> assert_eq([expected], returning: view)
   end
 
-  def assert_major_ethnicity_selection(%View{} = view, expected_selections) do
+  def assert_major_ethnicity_selections(%View{} = view, expected_selections) do
     assert Pages.actual_selections(view, "demographic-form-ethnicity", ["checkbox", "radio"]) == expected_selections
     view
   end
@@ -99,11 +99,13 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
   end
 
   def assert_race_selection(%View{} = view, expected_race) do
-    view |> Pages.actual_selections("demographic-form-race", ["radio", "checkbox"]) |> assert_eq(expected_race, returning: view)
+    assert view |> Pages.actual_selections("demographic-form-race", ["radio", "checkbox"]) == expected_race
+    view
   end
 
   def assert_sex_at_birth_selection(%View{} = view, expected_sex_at_birth) do
-    view |> Pages.actual_selections("demographic-form-sex-at-birth", ["radio", "checkbox"]) |> assert_eq(expected_sex_at_birth, returning: view)
+    view |> Pages.actual_selections("demographic-form-sex-at-birth", ["radio", "checkbox"]) |> assert_eq(expected_sex_at_birth, :simple)
+    view
   end
 
   def change_form(%View{} = view, person_params) do
