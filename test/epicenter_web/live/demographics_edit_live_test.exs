@@ -146,20 +146,21 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       assert demographics(person.id).ethnicity.major == "declined_to_answer"
     end
 
-    test "choosing a detailed ethnicity(ies)", %{conn: conn, person: person} do
+    test "choosing detailed ethnicities", %{conn: conn, person: person} do
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form",
         demographic_form: %{
           "ethnicity" => ["hispanic_latinx_or_spanish_origin"],
-          "ethnicity_hispanic_latinx_or_spanish_origin" => ["cuban", "puerto_rican"]
+          "ethnicity_hispanic_latinx_or_spanish_origin" => ["cuban", "puerto_rican"],
+          "ethnicity_hispanic_latinx_or_spanish_origin_other" => "Other ethnicity"
         }
       )
-      |> Pages.Profile.assert_ethnicities(["Hispanic, Latino/a, or Spanish origin", "Cuban", "Puerto Rican"])
+      |> Pages.Profile.assert_ethnicities(["Hispanic, Latino/a, or Spanish origin", "Cuban", "Puerto Rican", "Other ethnicity"])
 
       updated_person = demographics(person.id)
       assert updated_person.ethnicity.major == "hispanic_latinx_or_spanish_origin"
-      assert updated_person.ethnicity.detailed == ["cuban", "puerto_rican"]
+      assert updated_person.ethnicity.detailed == ["cuban", "puerto_rican", "Other ethnicity"]
     end
   end
 

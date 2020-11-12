@@ -38,6 +38,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
     employment
     ethnicity
     ethnicity_hispanic_latinx_or_spanish_origin
+    ethnicity_hispanic_latinx_or_spanish_origin_other
     gender_identity
     gender_identity_other
     marital_status
@@ -78,7 +79,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
       attrs
       |> Euclid.Extra.Map.stringify_keys()
       |> Euclid.Extra.Map.transform(
-        ~w{employment ethnicity gender_identity_other marital_status sex_at_birth},
+        ~w{employment ethnicity ethnicity_hispanic_latinx_or_spanish_origin_other gender_identity_other marital_status sex_at_birth},
         &Coerce.to_string_or_nil/1
       )
 
@@ -99,37 +100,43 @@ defmodule EpicenterWeb.Forms.DemographicForm do
   def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
     case apply_action(form_changeset, :create) do
       {:ok, form} ->
-        attrs =
-          form
-          |> Map.from_struct()
-          |> Map.put(:source, "form")
-          |> convert_ethnicity_fields_to_ethnicity()
-          |> convert_gender_identity_fields()
-
-        {:ok, attrs}
+        {:ok,
+         %{
+           employment: form.employment,
+           ethnicity: extract_ethnicity(form),
+           gender_identity: extract_gender_identity(form),
+           marital_status: form.marital_status,
+           notes: form.notes,
+           occupation: form.occupation,
+           race: form.race,
+           sex_at_birth: form.sex_at_birth,
+           source: "form"
+         }}
 
       other ->
         other
     end
   end
 
-  defp convert_gender_identity_fields(map) do
-    gender_identity = Map.get(map, :gender_identity)
-    gender_identity_other = Map.get(map, :gender_identity_other)
+  defp extract_ethnicity(form) do
+    major = form.ethnicity
 
-    map
-    |> Map.put(:gender_identity, List.wrap(gender_identity) ++ List.wrap(gender_identity_other))
-    |> Map.delete(:gender_identity_other)
+    detailed =
+      if major == "hispanic_latinx_or_spanish_origin" do
+        [form.ethnicity_hispanic_latinx_or_spanish_origin, form.ethnicity_hispanic_latinx_or_spanish_origin_other]
+        |> flat_compact()
+      else
+        nil
+      end
+
+    %{major: major, detailed: detailed}
   end
 
-  defp convert_ethnicity_fields_to_ethnicity(map) do
-    case {map.ethnicity, map.ethnicity_hispanic_latinx_or_spanish_origin} do
-      {"hispanic_latinx_or_spanish_origin" = major, detailed} ->
-        map |> Map.put(:ethnicity, %{major: major, detailed: detailed})
+  defp extract_gender_identity(form) do
+    [form.gender_identity, form.gender_identity_other] |> flat_compact()
+  end
 
-      {major, _detailed} ->
-        map |> Map.put(:ethnicity, %{major: major, detailed: nil})
-    end
-    |> Map.delete(:ethnicity_hispanic_latinx_or_spanish_origin)
+  defp flat_compact(list) do
+    list |> List.flatten() |> Enum.filter(&Euclid.Exists.present?/1)
   end
 end
