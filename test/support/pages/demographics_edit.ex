@@ -22,7 +22,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
   end
 
   def assert_gender_identity_selections(%View{} = view, expected_selections) do
-    assert Pages.actual_selections(view, "demographic-form-gender-identity", ["checkbox", "radio", "text"]) == expected_selections
+    assert Pages.actual_selections(view, "demographic-form-gender-identity", ["checkbox", "radio"]) == expected_selections
     view
   end
 
@@ -96,6 +96,14 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
              occupation
 
     view
+  end
+
+  def assert_race_selection(%View{} = view, expected_race) do
+    view |> Pages.actual_selections("demographic-form-race", ["radio", "checkbox"]) |> assert_eq(expected_race, returning: view)
+  end
+
+  def assert_sex_at_birth_selection(%View{} = view, expected_sex_at_birth) do
+    view |> Pages.actual_selections("demographic-form-sex-at-birth", ["radio", "checkbox"]) |> assert_eq(expected_sex_at_birth, returning: view)
   end
 
   def change_form(%View{} = view, person_params) do

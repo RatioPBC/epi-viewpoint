@@ -20,8 +20,12 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
     test "initially shows current demographics values", %{conn: conn, person: person, user: user} do
       demographics = %{
         id: Euclid.Extra.List.only!(person.demographics).id,
+        employment_status: "not-employed",
         ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]},
-        gender_identity: ["female", "transgender_woman"]
+        gender_identity: ["female", "transgender_woman"],
+        marital_status: "single",
+        race: "asian",
+        sex_at_birth: "female"
       }
 
       {:ok, person_with_demographics} =
@@ -30,16 +34,6 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
       Pages.DemographicsEdit.visit(conn, person_with_demographics)
       |> Pages.DemographicsEdit.assert_here()
-      |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
-        "Declined to answer" => false,
-        "Female" => true,
-        "Transgender woman/trans woman/male-to-female (MTF)" => true,
-        "Male" => false,
-        "Transgender man/trans man/female-to-male (FTM)" => false,
-        "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
-        "Additional gender category (or other), please specify" => false,
-        "Unknown" => false
-      })
       |> Pages.DemographicsEdit.assert_major_ethnicity_selection(%{
         "Unknown" => false,
         "Declined to answer" => false,
@@ -51,6 +45,38 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Puerto Rican" => true,
         "Cuban" => true,
         "Another Hispanic, Latino/a or Spanish origin, please specify" => false
+      })
+      |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
+        "Declined to answer" => false,
+        "Female" => true,
+        "Transgender woman/trans woman/male-to-female (MTF)" => true,
+        "Male" => false,
+        "Transgender man/trans man/female-to-male (FTM)" => false,
+        "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
+        "Additional gender category (or other), please specify" => false,
+        "Unknown" => false
+      })
+      |> Pages.DemographicsEdit.assert_marital_status_selection(%{
+        "Married" => false,
+        "Single" => true,
+        "Unknown" => false
+      })
+      |> Pages.DemographicsEdit.assert_race_selection(%{
+        "American Indian or Alaska Native" => false,
+        "Asian" => true,
+        "Black or African American" => false,
+        "Declined to answer" => false,
+        "Native Hawaiian or Other Pacific Islander" => false,
+        "Other" => false,
+        "Unknown" => false,
+        "White" => false
+      })
+      |> Pages.DemographicsEdit.assert_sex_at_birth_selection(%{
+        "Declined to answer" => false,
+        "Female" => true,
+        "Intersex" => false,
+        "Male" => false,
+        "Unknown" => false
       })
     end
   end
