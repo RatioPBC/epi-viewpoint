@@ -27,7 +27,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.click_start_interview_case_investigation("001")
     |> Pages.follow_live_view_redirect(conn)
-    |> elem(1)
     |> Pages.CaseInvestigationStartInterview.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
       start_interview_form: %{
@@ -39,7 +38,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     )
     |> Pages.Profile.click_edit_clinical_details_link("001")
     |> Pages.follow_live_view_redirect(conn)
-    |> elem(1)
     |> Pages.CaseInvestigationClinicalDetails.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
@@ -81,7 +79,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.click_start_interview_case_investigation("001")
     |> Pages.follow_live_view_redirect(conn)
-    |> elem(1)
     |> Pages.CaseInvestigationStartInterview.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
       start_interview_form: %{
@@ -93,7 +90,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     )
     |> Pages.Profile.click_edit_clinical_details_link("001")
     |> Pages.follow_live_view_redirect(conn)
-    |> elem(1)
     |> Pages.CaseInvestigationClinicalDetails.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
@@ -105,7 +101,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.click_add_contact_link("001")
     |> Pages.follow_live_view_redirect(conn)
-    |> elem(1)
     |> Pages.CaseInvestigationContact.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
       contact_form: %{
@@ -123,7 +118,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.refute_isolation_monitoring_visible("001")
     |> Pages.Profile.click_complete_case_investigation("001")
     |> Pages.follow_live_view_redirect(conn)
-    |> elem(1)
     |> Pages.CaseInvestigationCompleteInterview.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
       complete_interview_form: %{
@@ -136,7 +130,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Pending isolation monitoring", number: "001"})
     |> Pages.Profile.click_add_isolation_dates("001")
     |> Pages.follow_live_view_redirect(conn)
-    |> elem(1)
     |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-monitoring-form",
       isolation_monitoring_form: %{

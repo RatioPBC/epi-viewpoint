@@ -90,8 +90,9 @@ defmodule EpicenterWeb.Test.Pages do
   def follow_conn_redirect(%Plug.Conn{} = conn, _),
     do: conn
 
-  def follow_live_view_redirect(redirect_response, conn),
-    do: follow_redirect(redirect_response, conn)
+  def follow_live_view_redirect(redirect_response, conn) do
+    follow_redirect(redirect_response, conn) |> elem(1)
+  end
 
   def form_errors(conn),
     do: conn |> parse() |> Test.Html.all("[data-form-error-message]", attr: "data-form-error-message")
@@ -189,13 +190,10 @@ defmodule EpicenterWeb.Test.Pages do
   end
 
   def submit_and_follow_redirect(%View{} = view, conn, form_selector, params_keyword_list) do
-    {:ok, view, _} =
-      view
-      |> form(form_selector, params_keyword_list)
-      |> render_submit()
-      |> follow_live_view_redirect(conn)
-
     view
+    |> form(form_selector, params_keyword_list)
+    |> render_submit()
+    |> follow_live_view_redirect(conn)
   end
 
   def submit_live(%View{} = view, form_selector, params_keyword_list) do
@@ -212,10 +210,6 @@ defmodule EpicenterWeb.Test.Pages do
     conn
     |> live(path)
     |> follow_live_view_redirect(conn)
-    |> case do
-      {:ok, %View{} = view, _html} -> view
-      {:ok, conn} -> conn
-    end
   end
 
   def visit(%Plug.Conn{} = conn, path, :notlive) do
