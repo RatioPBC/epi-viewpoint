@@ -20,8 +20,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     end
 
     def changeset(_case_investigation, attrs) do
-      %ConcludeIsolationMonitoringForm{}
-      |> cast(attrs, @required_attrs ++ @optional_attrs)
+      %ConcludeIsolationMonitoringForm{} |> cast(attrs, @required_attrs ++ @optional_attrs) |> validate_required(@required_attrs)
     end
 
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
@@ -44,7 +43,9 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     |> ok()
   end
 
-  def handle_event("save", %{"conclude_isolation_monitoring_form" => params}, socket) do
+  def handle_event("save", full_params, socket) do
+    params = full_params |> Map.get("conclude_isolation_monitoring_form", %{})
+
     with %Ecto.Changeset{} = form_changeset <- ConcludeIsolationMonitoringForm.changeset(socket.assigns.case_investigation, params),
          {:form, {:ok, model_attrs}} <- {:form, ConcludeIsolationMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <-
@@ -60,8 +61,8 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
             )} do
       socket |> redirect_to_profile_page() |> noreply()
     else
-      # TODO: error handling
-      _ -> socket |> noreply()
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        socket |> assign(:form_changeset, form_changeset) |> noreply()
     end
   end
 

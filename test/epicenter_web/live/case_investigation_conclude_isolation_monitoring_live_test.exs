@@ -35,7 +35,12 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
     })
   end
 
-  test "saving isolation monitoring dates for a case investigation", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
+  test "saving isolation conclusion reason for a case investigation", %{
+    conn: conn,
+    case_investigation: case_investigation,
+    person: person,
+    user: user
+  } do
     Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-conclude-isolation-monitoring-form",
       conclude_isolation_monitoring_form: %{
@@ -47,6 +52,21 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "conclude-case-investigation-isolation-monitoring")
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert "successfully_completed" == case_investigation.isolation_conclusion_reason
+  end
+
+  describe "validations" do
+    test "saving without a selected reason shows an error", %{
+      conn: conn,
+      case_investigation: case_investigation
+    } do
+      Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
+      |> Pages.submit_live("#case-investigation-conclude-isolation-monitoring-form", conclude_isolation_monitoring_form: %{})
+      |> Pages.assert_validation_messages(%{
+        "conclude_isolation_monitoring_form_reason" => "can't be blank"
+      })
+
+      assert_revision_count(case_investigation, 1)
+    end
   end
 
   #  describe "warning the user when navigation will erase their changes" do
