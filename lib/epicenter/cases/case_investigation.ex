@@ -64,6 +64,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     |> validate_required(@required_attrs)
   end
 
+  def isolation_monitoring_status(%{isolation_concluded_at: timestamp}) when not is_nil(timestamp), do: :concluded
   def isolation_monitoring_status(%{isolation_monitoring_start_date: date}) when not is_nil(date), do: :ongoing
   def isolation_monitoring_status(_), do: :pending
 

@@ -142,6 +142,22 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.click_conclude_isolation_monitoring("001")
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-conclude-isolation-monitoring-form",
+      conclude_isolation_monitoring_form: %{
+        "reason" => "successfully_completed"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Concluded isolation monitoring", number: "001"})
+    |> Pages.Profile.assert_isolation_monitoring_has_history(
+      Enum.join(
+        [
+          "Isolation dates: 10/28/2020 - 11/10/2020",
+          "Concluded isolation monitoring on 10/31/2020 at 06:30am EDT. Successfully completed isolation period"
+        ],
+        " "
+      )
+    )
 
     assert %{
              case_investigations: [

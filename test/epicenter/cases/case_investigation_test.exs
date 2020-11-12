@@ -109,5 +109,8 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
 
     test "ongoing when isolation_monitoring_start_date",
       do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01]}) == :ongoing)
+
+    test "concluded when isolation_concluded_at is present",
+      do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01], isolation_concluded_at: ~D[2020-08-02]}) == :concluded)
   end
 end

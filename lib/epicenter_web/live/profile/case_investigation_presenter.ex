@@ -57,6 +57,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
       :ongoing ->
         diff = Date.diff(case_investigation.isolation_monitoring_end_date, current_date)
         styled_status("Ongoing", :ongoing, :isolation_monitoring, "(#{diff} days remaining)")
+
+      :concluded ->
+        styled_status("Concluded", :concluded, :isolation_monitoring)
     end
   end
 
@@ -218,6 +221,9 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
           id: "conclude-isolation-monitoring-case-investigation-link-001",
           class: "conclude-isolation-monitoring-case-investigation-link"
         )
+
+      :concluded ->
+        nil
     end
   end
 
@@ -242,6 +248,28 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
                     case_investigation
                   ),
                 id: "edit-isolation-monitoring-link-001",
+                class: "case-investigation-link"
+              )
+          }
+          | items
+        ]
+      else
+        items
+      end
+
+    items =
+      if case_investigation.isolation_concluded_at do
+        [
+          %{
+            text:
+              "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{
+                humanize_isolation_conclusion_reason(case_investigation)
+              }",
+            link:
+              live_redirect(
+                "Edit",
+                to: "#",
+                id: "edit-conclude-isolation-monitoring-link-001",
                 class: "case-investigation-link"
               )
           }
@@ -309,11 +337,25 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   defp completed_interview_date(case_investigation),
     do: case_investigation.completed_interview_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
 
+  defp concluded_isolation_monitoring_date(case_investigation),
+    do: case_investigation.isolation_concluded_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+
   defp convert_to_presented_time_zone(datetime),
     do: DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
 
   defp interview_start_date(case_investigation),
     do: case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+
+  defp humanize_isolation_conclusion_reason(%{isolation_conclusion_reason: reason}) do
+    %{
+      "successfully_completed" => "Successfully completed isolation period",
+      "unable_to_isolate" => "Person unable to isolate",
+      "refused_to_cooperate" => "Refused to cooperate",
+      "lost_to_follow_up" => "Lost to follow up",
+      "transferred" => "Transferred to another jurisdiction",
+      "deceased" => "Deceased"
+    }[reason]
+  end
 
   defp redirect_to(case_investigation, :complete_interview) do
     live_redirect("Complete interview",
