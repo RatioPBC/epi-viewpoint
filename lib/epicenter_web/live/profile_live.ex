@@ -115,8 +115,8 @@ defmodule EpicenterWeb.ProfileLive do
               {case_investigation_note_attrs,
                %AuditLog.Meta{
                  author_id: socket.assigns.current_user.id,
-                 reason_action: "TODO",
-                 reason_event: "TODO"
+                 reason_action: AuditLog.Revision.create_case_investigation_note_action(),
+                 reason_event: AuditLog.Revision.profile_case_investigation_note_submission_event()
                }}
             )} do
       assign_case_investigations(socket, socket.assigns.person) |> noreply()

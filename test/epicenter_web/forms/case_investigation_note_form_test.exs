@@ -44,11 +44,14 @@ defmodule EpicenterWeb.Forms.CaseInvestigationNoteFormTest do
   end
 
   test "can add a new note", %{person: person, user: user, conn: conn} do
-    build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+    case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
     Pages.Profile.visit(conn, person)
     |> Pages.Profile.add_note("001", "A new note")
     |> Pages.Profile.assert_notes_showing("001", ["A new note"])
+
+    assert [note] = case_investigation |> Cases.preload_case_investigation_notes() |> Map.get(:notes)
+    assert_recent_audit_log(note, user, action: "create-case-investigation-note", event: "profile-case-investigation-note-submission")
   end
 
   test "can't add an empty note", %{person: person, user: user, conn: conn} do
