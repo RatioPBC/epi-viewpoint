@@ -35,21 +35,21 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
     })
   end
 
-  #  test "saving isolation monitoring dates for a case investigation", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
-  #    Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
-  #    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-monitoring-form",
-  #      isolation_monitoring_form: %{
-  #        "date_started" => "08/01/2020",
-  #        "date_ended" => "08/11/2020"
-  #      }
-  #    )
-  #    |> Pages.Profile.assert_here(person)
-  #
-  #    assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "edit-case-investigation-isolation-monitoring")
-  #    case_investigation = Cases.get_case_investigation(case_investigation.id)
-  #    assert ~D[2020-08-01] == case_investigation.isolation_monitoring_start_date
-  #    assert ~D[2020-08-11] == case_investigation.isolation_monitoring_end_date
-  #  end
+#    test "saving isolation monitoring dates for a case investigation", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
+#      Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
+#      |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-monitoring-form",
+#        isolation_monitoring_form: %{
+#          "date_started" => "08/01/2020",
+#          "date_ended" => "08/11/2020"
+#        }
+#      )
+#      |> Pages.Profile.assert_here(person)
+#
+#      assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "edit-case-investigation-isolation-monitoring")
+#      case_investigation = Cases.get_case_investigation(case_investigation.id)
+#      assert ~D[2020-08-01] == case_investigation.isolation_monitoring_start_date
+#      assert ~D[2020-08-11] == case_investigation.isolation_monitoring_end_date
+#    end
   #
   #  describe "warning the user when navigation will erase their changes" do
   #    test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do

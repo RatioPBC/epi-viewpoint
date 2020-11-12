@@ -48,6 +48,18 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
     |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_ended("11/06/2020")
   end
 
+  test "prefills with saved isolation monitoring dates", %{conn: conn, case_investigation: case_investigation} do
+    {:ok, _} = Cases.update_case_investigation(case_investigation, {%{isolation_monitoring_start_date: ~D[2020-11-01], isolation_monitoring_end_date: ~D[2020-11-11]}, Test.Fixtures.admin_audit_meta()})
+
+    Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_started(
+         "11/01/2020",
+         "Onset date: 11/03/2020\n\nPositive lab sample: 10/27/2020"
+       )
+    |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_ended("11/11/2020")
+  end
+
   test "saving isolation monitoring dates for a case investigation", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
     Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-monitoring-form",
