@@ -165,6 +165,13 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, opts)
   end
 
+  def hidden_field(%Form.Line{f: f} = line, field) do
+    [
+      hidden_input(f, field)
+    ]
+    |> add_to_line(line, [])
+  end
+
   # # #
 
   defp grid_data(row, %Form.Line{column: column}, opts),

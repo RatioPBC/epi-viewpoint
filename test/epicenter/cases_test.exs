@@ -600,6 +600,33 @@ defmodule Epicenter.CasesTest do
     end
   end
 
+  describe "create_case_investigation_note!" do
+    setup do
+      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+      audit_meta = Test.Fixtures.audit_meta(creator)
+      lab_result = Test.Fixtures.lab_result_attrs(person, creator, "person1_test_result", ~D[2020-10-04]) |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
+        |> Cases.create_case_investigation!()
+
+      %{creator: creator, person: person, audit_meta: audit_meta, case_investigation: case_investigation}
+    end
+
+    test "makes a revision", %{creator: creator, case_investigation: case_investigation} do
+      case_investigation_note =
+        Test.Fixtures.case_investigation_note_attrs(case_investigation, creator, "note-a", %{text: "Note A"})
+        |> Cases.create_case_investigation_note!()
+
+      author_id = creator.id
+      case_investigation_id = case_investigation.id
+
+      assert %{author_id: ^author_id, change: %{"case_investigation_id" => ^case_investigation_id, "text" => "Note A"}} =
+               recent_audit_log(case_investigation_note)
+    end
+  end
+
   describe "create_exposure" do
     test "makes an exposure and a revision" do
       case_investigation = setup_case_investigation!()

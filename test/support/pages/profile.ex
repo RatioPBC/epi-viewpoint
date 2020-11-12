@@ -278,6 +278,25 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def assert_notes_showing(%View{} = view, number, note_texts) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("[data-role=case-investigation-note-text-#{number}}]")
+    |> Enum.map(&Test.Html.text/1)
+    |> assert_eq(note_texts)
+
+    view
+  end
+
+  def add_note(%View{} = view, number, note_text) do
+    view
+    |> form("#case-investigation-add-note-form-#{number}", %{"form_field_data" => %{"text" => note_text}})
+    |> render_submit()
+
+    view
+  end
+
   # expected_values %{clinical_status: clinical_status, symptom_onset_date: symptom_onset_date}}
   def assert_clinical_details_showing(%View{} = view, number, expected_values) do
     parsed_html =

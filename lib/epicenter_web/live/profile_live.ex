@@ -18,11 +18,14 @@ defmodule EpicenterWeb.ProfileLive do
       interview_buttons: 1
     ]
 
+  import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 2]
+
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Format
+  alias EpicenterWeb.Forms.CaseInvestigationNoteForm.FormFieldData
 
   @clock Application.get_env(:epicenter, :clock)
 
@@ -98,6 +101,27 @@ defmodule EpicenterWeb.ProfileLive do
     {:noreply, assign_person(socket, updated_person)}
   end
 
+  def handle_event("save_note", %{"form_field_data" => params}, socket) do
+    with %Ecto.Changeset{} = form_changeset <- FormFieldData.attrs_to_form_changeset(params, socket.assigns.current_user),
+         {:form, {:ok, case_investigation_note_attrs}} <- {:form, FormFieldData.case_investigation_note_attrs(form_changeset)},
+         {:note, {:ok, _note}} <-
+           {:note,
+            Cases.create_case_investigation_note(
+              {case_investigation_note_attrs,
+               %AuditLog.Meta{
+                 author_id: socket.assigns.current_user.id,
+                 reason_action: "TODO",
+                 reason_event: "TODO"
+               }}
+            )} do
+      assign_case_investigations(socket, socket.assigns.person) |> noreply()
+    else
+      # TODO: error handling
+      _ ->
+        socket |> noreply()
+    end
+  end
+
   def assign_person(socket, person) do
     updated_person = person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to() |> Cases.preload_demographics()
     assign(socket, person: updated_person)
@@ -110,6 +134,7 @@ defmodule EpicenterWeb.ProfileLive do
       person.case_investigations
       |> Cases.preload_initiating_lab_result()
       |> Cases.preload_exposures()
+      |> Cases.preload_case_investigation_notes()
 
     assign(socket, case_investigations: case_investigations)
   end

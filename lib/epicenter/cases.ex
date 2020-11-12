@@ -3,6 +3,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.CaseInvestigationNote
   alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
@@ -34,6 +35,17 @@ defmodule Epicenter.Cases do
   #
   def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
+
+  def change_case_investigation_note(%CaseInvestigationNote{} = case_investigation_note, attrs),
+    do: CaseInvestigationNote.changeset(case_investigation_note, attrs)
+
+  def create_case_investigation_note({attrs, audit_meta}),
+    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert(audit_meta)
+
+  def create_case_investigation_note!({attrs, audit_meta}),
+    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert!(audit_meta)
+
+  def preload_case_investigation_notes(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:notes)
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
   def preload_person(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:person)
 

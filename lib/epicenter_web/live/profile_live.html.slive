@@ -123,6 +123,15 @@
             = live_redirect "Add isolation dates", to: Routes.case_investigation_isolation_monitoring_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationMonitoringLive, case_investigation) , id: "add-isolation-dates-case-investigation-link-001", class: "add-isolation-dates-case-investigation-link"
 
 
+      .case-investigation-notes
+        h3.additional_notes Additional Notes
+        = form_for FormFieldData.add_note_changeset(case_investigation), "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_submit: "save_note"], fn f ->
+              = add_note_form_builder(f, case_investigation)
+        = for note <- case_investigation.notes do
+          div data-role="case-investigation-note-text-#{case_investigation.name}"
+              = note.text
+
+
   section#lab-results data-role="lab-results"
     header
       h2 Lab Results
