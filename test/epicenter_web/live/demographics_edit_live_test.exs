@@ -10,7 +10,14 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   setup %{user: user} do
     person =
       Test.Fixtures.person_attrs(user, "alice")
-      |> Test.Fixtures.add_demographic_attrs(%{ethnicity: nil, occupation: nil, notes: nil})
+      |> Test.Fixtures.add_demographic_attrs(%{
+        employment: nil,
+        ethnicity: nil,
+        gender_identity: nil,
+        marital_status: nil,
+        notes: nil,
+        occupation: nil
+      })
       |> Cases.create_person!()
 
     [person: person]
@@ -113,10 +120,8 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   end
 
   describe "employment" do
-    test "selecting employment status", %{conn: conn, person: person, user: user} do
-      {:ok, person_with_no_jobs} = person |> Cases.update_person({%{marital_status: nil}, Test.Fixtures.audit_meta(user)})
-
-      Pages.DemographicsEdit.visit(conn, person_with_no_jobs)
+    test "selecting employment status", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.DemographicsEdit.assert_employment_selections(%{
         "Not employed" => false,
@@ -127,12 +132,14 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"employment" => ["full_time"]})
       |> Pages.Profile.assert_employment("Full time")
 
-      assert demographics(person_with_no_jobs.id).employment == "full_time"
+      assert demographics(person.id).employment == "full_time"
     end
   end
 
   describe "ethnicity" do
     test "updating ethnicity", %{conn: conn, person: person} do
+      assert demographics(person.id).ethnicity == nil
+
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form",
@@ -144,6 +151,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.Profile.assert_ethnicities(["Declined to answer"])
 
       assert demographics(person.id).ethnicity.major == "declined_to_answer"
+      assert demographics(person.id).ethnicity.detailed == nil
     end
 
     test "choosing detailed ethnicities", %{conn: conn, person: person} do
@@ -165,16 +173,14 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   end
 
   describe "marital status" do
-    test "selecting status", %{conn: conn, person: person, user: user} do
-      {:ok, person_without_marital_status} = person |> Cases.update_person({%{marital_status: nil}, Test.Fixtures.audit_meta(user)})
-
-      Pages.DemographicsEdit.visit(conn, person_without_marital_status)
+    test "selecting status", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.DemographicsEdit.assert_marital_status_selection(%{"Single" => false, "Married" => false, "Unknown" => false})
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"marital_status" => ["single"]})
       |> Pages.Profile.assert_marital_status("Single")
 
-      assert demographics(person_without_marital_status.id).marital_status == "single"
+      assert demographics(person.id).marital_status == "single"
     end
   end
 
