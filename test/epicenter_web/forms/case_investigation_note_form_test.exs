@@ -50,4 +50,12 @@ defmodule EpicenterWeb.Forms.CaseInvestigationNoteFormTest do
     |> Pages.Profile.add_note("001", "A new note")
     |> Pages.Profile.assert_notes_showing("001", ["A new note"])
   end
+
+  test "can't add an empty note", %{person: person, user: user, conn: conn} do
+    build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+
+    Pages.Profile.visit(conn, person)
+    |> Pages.Profile.add_note("001", "")
+    |> Pages.Profile.assert_case_investigation_note_validation_messages("001", %{"form_field_data_text" => "can't be blank"})
+  end
 end

@@ -104,8 +104,11 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def handle_event("save_note", %{"form_field_data" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- FormFieldData.attrs_to_form_changeset(params, socket.assigns.current_user),
-         {:form, {:ok, case_investigation_note_attrs}} <- {:form, FormFieldData.case_investigation_note_attrs(form_changeset)},
+    case_investigation = Enum.find(socket.assigns.case_investigations, &(&1.id == params["case_investigation_id"]))
+
+    with %Ecto.Changeset{} = form_changeset <- FormFieldData.changeset(case_investigation, params),
+         {:form, {:ok, case_investigation_note_attrs}} <-
+           {:form, FormFieldData.case_investigation_note_attrs(form_changeset, socket.assigns.current_user.id)},
          {:note, {:ok, _note}} <-
            {:note,
             Cases.create_case_investigation_note(
@@ -118,7 +121,9 @@ defmodule EpicenterWeb.ProfileLive do
             )} do
       assign_case_investigations(socket, socket.assigns.person) |> noreply()
     else
-      # TODO: error handling
+      {:form, {:error, changeset}} ->
+        socket |> assign(note_changesets: socket.assigns.note_changesets |> Map.put(params["case_investigation_id"], changeset)) |> noreply()
+
       _ ->
         socket |> noreply()
     end
@@ -139,6 +144,7 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_case_investigation_notes()
 
     assign(socket, case_investigations: case_investigations)
+    |> assign(note_changesets: case_investigations |> Enum.map(&{&1.id, FormFieldData.changeset(&1, %{})}) |> Enum.into(%{}))
   end
 
   defp assign_users(socket),

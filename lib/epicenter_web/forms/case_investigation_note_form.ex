@@ -16,29 +16,23 @@ defmodule EpicenterWeb.Forms.CaseInvestigationNoteForm do
 
     @primary_key false
     embedded_schema do
-      field :author_id, :binary_id
       field :case_investigation_id, :binary_id
       field :text, :string
     end
 
-    @required_attrs ~w{author_id case_investigation_id text}a
+    @required_attrs ~w{case_investigation_id text}a
 
-    def add_note_changeset(case_investigation) do
-      %__MODULE__{}
-      |> cast(%{case_investigation_id: case_investigation.id}, @required_attrs)
+    def changeset(case_investigation, params) do
+      %__MODULE__{
+        case_investigation_id: case_investigation.id
+      }
+      |> cast(params, @required_attrs)
       |> validate_required(@required_attrs)
     end
 
-    def attrs_to_form_changeset(attrs, author) do
-      attrs = Map.put(attrs, "author_id", author.id)
-
-      %__MODULE__{}
-      |> cast(attrs, @required_attrs)
-    end
-
-    def case_investigation_note_attrs(%Ecto.Changeset{} = form_changeset) do
+    def case_investigation_note_attrs(%Ecto.Changeset{} = form_changeset, author_id) do
       with {:ok, form_field_data} <- apply_action(form_changeset, :create) do
-        {:ok, %{case_investigation_id: form_field_data.case_investigation_id, text: form_field_data.text, author_id: form_field_data.author_id}}
+        {:ok, %{case_investigation_id: form_field_data.case_investigation_id, text: form_field_data.text, author_id: author_id}}
       else
         other -> other
       end

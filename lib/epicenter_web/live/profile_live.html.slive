@@ -129,7 +129,7 @@
 
       .case-investigation-notes
         h3.additional_notes Additional Notes
-        = form_for FormFieldData.add_note_changeset(case_investigation), "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_submit: "save_note"], fn f ->
+        = form_for @note_changesets[case_investigation.id], "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_submit: "save_note"], fn f ->
               = add_note_form_builder(f, case_investigation)
         = for note <- case_investigation.notes do
           div data-role="case-investigation-note-text-#{case_investigation.name}"
