@@ -39,6 +39,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
     ethnicity
     ethnicity_hispanic_latinx_or_spanish_origin
     gender_identity
+    gender_identity_other
     marital_status
     notes
     occupation
@@ -53,11 +54,15 @@ defmodule EpicenterWeb.Forms.DemographicForm do
   end
 
   def model_to_form_attrs(%Demographic{} = demographic) do
+    {gender_identity, gender_identity_other} =
+      (demographic.gender_identity || []) |> Enum.split_with(&(&1 in Demographic.standard_values(:gender_identity)))
+
     %{
       employment: demographic.employment,
       ethnicity: demographic.ethnicity |> Ethnicity.major(),
       ethnicity_hispanic_latinx_or_spanish_origin: demographic.ethnicity |> Ethnicity.hispanic_latinx_or_spanish_origin(),
-      gender_identity: demographic.gender_identity,
+      gender_identity: gender_identity,
+      gender_identity_other: gender_identity_other,
       marital_status: demographic.marital_status,
       notes: demographic.notes,
       occupation: demographic.occupation,
@@ -73,7 +78,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
       attrs
       |> Euclid.Extra.Map.stringify_keys()
       |> Euclid.Extra.Map.transform(
-        ~w{employment ethnicity marital_status sex_at_birth},
+        ~w{employment ethnicity gender_identity_other marital_status sex_at_birth},
         &Coerce.to_string_or_nil/1
       )
 
@@ -99,12 +104,22 @@ defmodule EpicenterWeb.Forms.DemographicForm do
           |> Map.from_struct()
           |> Map.put(:source, "form")
           |> convert_ethnicity_fields_to_ethnicity()
+          |> convert_gender_identity_fields()
 
         {:ok, attrs}
 
       other ->
         other
     end
+  end
+
+  defp convert_gender_identity_fields(map) do
+    gender_identity = Map.get(map, :gender_identity)
+    gender_identity_other = Map.get(map, :gender_identity_other)
+
+    map
+    |> Map.put(:gender_identity, List.wrap(gender_identity) ++ List.wrap(gender_identity_other))
+    |> Map.delete(:gender_identity_other)
   end
 
   defp convert_ethnicity_fields_to_ethnicity(map) do

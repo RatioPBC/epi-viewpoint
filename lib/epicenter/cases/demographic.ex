@@ -58,9 +58,14 @@ defmodule Epicenter.Cases.Demographic do
     end
   end
 
+  def standard_values(field),
+    do: humanized_values() |> Map.get(field) |> Enum.map(&elem(&1, 1))
+
   def humanized_values do
     %{
       gender_identity: [
+        {"Unknown", "unknown"},
+        {"Declined to answer", "declined_to_answer"},
         {"Female", "female"},
         {"Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
         {"Male", "male"},
@@ -68,11 +73,15 @@ defmodule Epicenter.Cases.Demographic do
         {"Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"}
       ],
       sex_at_birth: [
+        {"Unknown", "unknown"},
+        {"Declined to answer", "declined_to_answer"},
         {"Female", "female"},
         {"Male", "male"},
         {"Intersex", "intersex"}
       ],
       ethnicity: [
+        {"Unknown", "unknown"},
+        {"Declined to answer", "declined_to_answer"},
         {"Not Hispanic, Latino/a, or Spanish origin", "not_hispanic_latinx_or_spanish_origin"},
         {"Hispanic, Latino/a, or Spanish origin", "hispanic_latinx_or_spanish_origin"},
         {"Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx"},
@@ -80,6 +89,8 @@ defmodule Epicenter.Cases.Demographic do
         {"Cuban", "cuban"}
       ],
       race: [
+        {"Unknown", "unknown"},
+        {"Declined to answer", "declined_to_answer"},
         {"White", "white"},
         {"Black or African American", "black_or_african_american"},
         {"American Indian or Alaska Native", "american_indian_or_alaska_native"},
@@ -96,10 +107,12 @@ defmodule Epicenter.Cases.Demographic do
         {"Samoan", "samoan"}
       ],
       marital_status: [
+        {"Unknown", "unknown"},
         {"Single", "single"},
         {"Married", "married"}
       ],
       employment: [
+        {"Unknown", "unknown"},
         {"Not employed", "not_employed"},
         {"Part time", "part_time"},
         {"Full time", "full_time"}

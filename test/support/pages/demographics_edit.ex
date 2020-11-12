@@ -1,4 +1,5 @@
 defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
+  import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
@@ -21,8 +22,15 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
   end
 
   def assert_gender_identity_selections(%View{} = view, expected_selections) do
-    assert Pages.actual_selections(view, "demographic-form-gender-identity", ["checkbox", "radio"]) == expected_selections
+    assert Pages.actual_selections(view, "demographic-form-gender-identity", ["checkbox", "radio", "text"]) == expected_selections
     view
+  end
+
+  def assert_gender_identity_other(%View{} = view, expected) do
+    view
+    |> Pages.parse()
+    |> Test.Html.attr("[data-role=demographic-form-gender-identity] input[type=text]", "value")
+    |> assert_eq([expected], returning: view)
   end
 
   def assert_major_ethnicity_selection(%View{} = view, expected_selections) do

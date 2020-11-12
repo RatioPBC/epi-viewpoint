@@ -28,14 +28,14 @@ defmodule EpicenterWeb.Multiselect do
         case type do
           :checkbox -> [multiselect_checkbox(f, field, value, parent_id), label_text]
           :radio -> [multiselect_radio(f, field, value, parent_id), label_text]
-          :other_checkbox -> [multiselect_checkbox(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
-          :other_radio -> [multiselect_radio(f, field, value, parent_id, true), label_text, multiselect_text(f, field, value)]
+          :other_checkbox -> [multiselect_other(:checkbox, f, field, label_text, parent_id)]
+          :other_radio -> [multiselect_other(:radio, f, field, label_text, parent_id)]
         end
       end
     end
   end
 
-  def multiselect_checkbox(f, field, value, parent_id, other? \\ false) do
+  def multiselect_checkbox(f, field, value, parent_id) do
     checkbox(
       f,
       field,
@@ -44,53 +44,77 @@ defmodule EpicenterWeb.Multiselect do
       data: [multiselect: [parent_id: parent_id]],
       hidden_input: false,
       id: input_id(f, field, value),
-      name: multiselect_input_name(f, field, other?),
+      name: multiselect_input_name(f, field),
       phx_hook: "Multiselect"
     )
   end
 
-  def multiselect_radio(f, field, value, parent_id, other? \\ false) do
+  def multiselect_radio(f, field, value, parent_id) do
     radio_button(
       f,
       field,
       value,
       checked: current_value?(f, field, value),
       data: [multiselect: [parent_id: parent_id]],
-      name: multiselect_input_name(f, field, other?),
+      name: multiselect_input_name(f, field),
       phx_hook: "Multiselect"
     )
   end
 
-  def multiselect_text(f, field, value) do
+  def multiselect_text(f, field, parent_id) do
     content_tag :div, data: [multiselect: "text-wrapper"] do
       text_input(
         f,
         field,
-        data: [multiselect: [parent_id: input_id(f, field, value)]],
-        disabled: !current_value?(f, field, value),
-        name: multiselect_input_name(f, field, true),
-        value: value
+        data: [multiselect: [parent_id: parent_id]],
+        name: input_name(f, field)
       )
     end
   end
 
+  def multiselect_other(input_type, f, field, label_text, parent_id) do
+    field_name = "#{field}_other" |> Euclid.Extra.Atom.from_string()
+    input_name = input_name(f, "#{field_name}__ignore")
+    input_value = input_value(f, field_name)
+    checked = Euclid.Exists.present?(input_value)
+    checkable_id = input_id(f, field, "#{checked}")
+
+    checkable =
+      case input_type do
+        :checkbox ->
+          checkbox(
+            f,
+            field_name,
+            checked: checked,
+            checked_value: checked,
+            data: [multiselect: [parent_id: parent_id]],
+            hidden_input: false,
+            id: checkable_id,
+            name: input_name,
+            phx_hook: "Multiselect"
+          )
+
+        :radio ->
+          radio_button(
+            f,
+            field_name,
+            checked,
+            checked: checked,
+            data: [multiselect: [parent_id: parent_id]],
+            name: input_name,
+            phx_hook: "Multiselect"
+          )
+      end
+
+    [checkable, label_text, multiselect_text(f, field_name, checkable_id)]
+  end
+
   # # #
 
-  def multiselect_input_name(f, field, false = _other?),
+  defp multiselect_input_name(f, field),
     do: input_name(f, field) <> "[]"
 
-  def multiselect_input_name(%{name: nil}, field, true = _other?),
-    do: "#{to_string(field)}_other"
-
-  def multiselect_input_name(%{name: name}, field, true = _other?)
-      when is_atom(field) or is_binary(field),
-      do: "#{name}[#{field}_other]"
-
-  def multiselect_input_name(name, field, true = _other?)
-      when (is_atom(name) and is_atom(field)) or is_binary(field),
-      do: "#{name}[#{field}_other]"
-
-  def current_value?(f, field, value) do
+  defp current_value?(f, field, value) do
     case input_value(f, field) do
       nil -> false
       list when is_list(list) -> value in list

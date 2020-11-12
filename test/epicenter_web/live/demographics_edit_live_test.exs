@@ -56,25 +56,33 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   end
 
   describe "gender identity" do
-    test "selecting gender identity", %{conn: conn, person: person, user: user} do
-      demographics = %{id: Euclid.Extra.List.only!(person.demographics).id, gender_identity: ["female"]}
+    test "selecting multiple gender identities", %{conn: conn, person: person, user: user} do
+      demographics = %{id: Euclid.Extra.List.only!(person.demographics).id, gender_identity: ["female", "Original other"]}
       {:ok, person} = person |> Cases.update_person({%{demographics: [demographics]}, Test.Fixtures.audit_meta(user)})
 
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
+        "Unknown" => false,
         "Declined to answer" => false,
         "Female" => true,
         "Transgender woman/trans woman/male-to-female (MTF)" => false,
         "Male" => false,
         "Transgender man/trans man/female-to-male (FTM)" => false,
         "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
-        "Additional gender category (or other), please specify" => false,
-        "Unknown" => false
+        "Additional gender category (or other), please specify" => true
       })
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"gender_identity" => []})
+      |> Pages.DemographicsEdit.assert_gender_identity_other("Original other")
+      |> Pages.submit_and_follow_redirect(
+        conn,
+        "#demographics-form",
+        demographic_form: %{
+          "gender_identity" => ["female", "transgender_woman"],
+          "gender_identity_other" => "New other"
+        }
+      )
       |> Pages.Profile.assert_here(person)
 
-      assert demographics(person.id).gender_identity == ["female"]
+      demographics(person.id).gender_identity |> assert_eq(["female", "transgender_woman", "New other"], ignore_order: true)
     end
   end
 

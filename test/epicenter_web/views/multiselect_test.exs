@@ -11,6 +11,7 @@ defmodule EpicenterWeb.MultiselectTest do
 
     embedded_schema do
       field :genres, {:array, :string}
+      field :genres_other, :string
     end
   end
 
@@ -142,26 +143,26 @@ defmodule EpicenterWeb.MultiselectTest do
                   }
                 ]}
              ] =
-               phx_form(genres: ["comedy", "musical"])
+               phx_form(genres: ["comedy"], genres_other: "something other")
                |> Multiselect.multiselect_input(:genres, {:other_radio, "Comedy", "comedy"}, nil)
                |> parse()
 
       assert Enum.into(radio_attrs, %{}) == %{
                "checked" => "checked",
                "data-multiselect-parent-id" => "",
-               "id" => "movie_genres_comedy",
-               "name" => "movie[genres_other]",
+               "id" => "movie_genres_other_true",
+               "name" => "movie[genres_other__ignore]",
                "phx-hook" => "Multiselect",
                "type" => "radio",
-               "value" => "comedy"
+               "value" => "true"
              }
 
       assert Enum.into(text_field_attrs, %{}) == %{
-               "data-multiselect-parent-id" => "movie_genres_comedy",
-               "id" => "movie_genres",
+               "data-multiselect-parent-id" => "movie_genres_true",
+               "id" => "movie_genres_other",
                "name" => "movie[genres_other]",
                "type" => "text",
-               "value" => "comedy"
+               "value" => "something other"
              }
     end
   end
@@ -207,31 +208,17 @@ defmodule EpicenterWeb.MultiselectTest do
   describe "multiselect_text" do
     test "renders a text field to be used for 'other'" do
       assert [{"div", [{"data-multiselect", "text-wrapper"}], [{"input", attrs, []}]}] =
-               phx_form(genres: ["comedy", "musical"])
-               |> Multiselect.multiselect_text(:genres, "comedy")
+               phx_form(genres: ["comedy", "musical"], genres_other: "other value")
+               |> Multiselect.multiselect_text(:genres_other, "parent-id")
                |> parse()
 
       assert attrs |> Enum.into(%{}) == %{
-               "data-multiselect-parent-id" => "movie_genres_comedy",
-               "id" => "movie_genres",
+               "data-multiselect-parent-id" => "parent-id",
+               "id" => "movie_genres_other",
                "name" => "movie[genres_other]",
                "type" => "text",
-               "value" => "comedy"
+               "value" => "other value"
              }
-    end
-  end
-
-  describe "multiselect_input_name" do
-    test "when not an 'other' field" do
-      phx_form(genres: ["comedy"]) |> Multiselect.multiselect_input_name(:genres, false) |> assert_eq("movie[genres][]")
-    end
-
-    test "when an 'other' field" do
-      %{name: nil} |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("genres_other")
-      phx_form(genres: ["comedy"]) |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("movie[genres_other]")
-      %{name: "movie"} |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("movie[genres_other]")
-      %{name: :movie} |> Multiselect.multiselect_input_name(:genres, true) |> assert_eq("movie[genres_other]")
-      :movie |> Multiselect.multiselect_input_name("genres", true) |> assert_eq("movie[genres_other]")
     end
   end
 end
