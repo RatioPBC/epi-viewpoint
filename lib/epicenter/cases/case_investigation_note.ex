@@ -14,8 +14,9 @@ defmodule Epicenter.Cases.CaseInvestigationNote do
     field :seq, :integer
     field :text, :string
     field :tid, :string
-    field :author_id, :binary_id
     field :case_investigation_id, :binary_id
+
+    belongs_to :author, Epicenter.Accounts.User
 
     timestamps(type: :utc_datetime)
   end

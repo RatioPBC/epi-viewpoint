@@ -304,15 +304,16 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
-  def assert_notes_showing(%View{} = view, number, note_texts) do
+  def case_investigation_notes(%View{} = view, number) do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.find("[data-role=case-investigation-note-text-#{number}}]")
-    |> Enum.map(&Test.Html.text/1)
-    |> assert_eq(note_texts)
-
-    view
+    |> Test.Html.all("[data-role=case-investigation-note-#{number}}]", fn note_el ->
+      text = Test.Html.find(note_el, "[data-role=case-investigation-note-text]") |> Test.Html.text()
+      author = Test.Html.find(note_el, "[data-role=case-investigation-note-author]") |> Test.Html.text()
+      date = Test.Html.find(note_el, "[data-role=case-investigation-note-date]") |> Test.Html.text()
+      %{text: text, author: author, date: date}
+    end)
   end
 
   def assert_case_investigation_note_validation_messages(%View{} = view, number, messages) do

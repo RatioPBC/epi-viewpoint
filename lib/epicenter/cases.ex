@@ -45,7 +45,7 @@ defmodule Epicenter.Cases do
   def create_case_investigation_note!({attrs, audit_meta}),
     do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert!(audit_meta)
 
-  def preload_case_investigation_notes(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:notes)
+  def preload_case_investigation_notes(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(notes: :author)
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
   def preload_person(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:person)
 
