@@ -268,8 +268,13 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
             link:
               live_redirect(
                 "Edit",
-                to: "#",
-                id: "edit-conclude-isolation-monitoring-link-001",
+                to:
+                  Routes.case_investigation_conclude_isolation_monitoring_path(
+                    EpicenterWeb.Endpoint,
+                    EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
+                    case_investigation
+                  ),
+                id: "edit-isolation-monitoring-conclusion-link-001",
                 class: "case-investigation-link"
               )
           }

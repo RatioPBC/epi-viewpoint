@@ -21,8 +21,10 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
       field :reason, :string
     end
 
-    def changeset(_case_investigation, attrs) do
-      %ConcludeIsolationMonitoringForm{} |> cast(attrs, @required_attrs ++ @optional_attrs) |> validate_required(@required_attrs)
+    def changeset(case_investigation, attrs) do
+      %ConcludeIsolationMonitoringForm{reason: case_investigation.isolation_conclusion_reason}
+      |> cast(attrs, @required_attrs ++ @optional_attrs)
+      |> validate_required(@required_attrs)
     end
 
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do

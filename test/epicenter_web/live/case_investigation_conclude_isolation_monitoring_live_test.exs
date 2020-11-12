@@ -35,6 +35,25 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
     })
   end
 
+  test "prefills the form if there is already a reason on the case investigation", %{conn: conn, case_investigation: case_investigation} do
+    {:ok, _} =
+      Cases.update_case_investigation(
+        case_investigation,
+        {%{isolation_conclusion_reason: "successfully_completed"}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_here()
+    |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_reasons_selection(%{
+      "Successfully completed isolation period" => true,
+      "Person unable to isolate" => false,
+      "Refused to cooperate" => false,
+      "Lost to follow up" => false,
+      "Transferred to another jurisdiction" => false,
+      "Deceased" => false
+    })
+  end
+
   test "saving isolation conclusion reason for a case investigation", %{
     conn: conn,
     case_investigation: case_investigation,
