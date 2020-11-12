@@ -146,6 +146,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     )
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Ongoing isolation monitoring (10 days remaining)", number: "001"})
+    |> Pages.Profile.click_conclude_isolation_monitoring("001")
 
     assert %{
              case_investigations: [

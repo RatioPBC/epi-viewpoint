@@ -193,6 +193,34 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     end
   end
 
+  def isolation_monitoring_button(case_investigation) do
+    case CaseInvestigation.isolation_monitoring_status(case_investigation) do
+      :pending ->
+        live_redirect("Add isolation dates",
+          to:
+            Routes.case_investigation_isolation_monitoring_path(
+              EpicenterWeb.Endpoint,
+              EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
+              case_investigation
+            ),
+          id: "add-isolation-dates-case-investigation-link-001",
+          class: "add-isolation-dates-case-investigation-link"
+        )
+
+      :ongoing ->
+        live_redirect("Conclude isolation",
+          to:
+            Routes.case_investigation_isolation_monitoring_path(
+              EpicenterWeb.Endpoint,
+              EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
+              case_investigation
+            ),
+          id: "conclude-isolation-monitoring-case-investigation-link-001",
+          class: "conclude-isolation-monitoring-case-investigation-link"
+        )
+    end
+  end
+
   def isolation_monitoring_history_items(case_investigation) do
     items = []
 

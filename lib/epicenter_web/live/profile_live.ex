@@ -16,6 +16,7 @@ defmodule EpicenterWeb.ProfileLive do
       displayable_symptoms: 1,
       history_items: 1,
       interview_buttons: 1,
+      isolation_monitoring_button: 1,
       isolation_monitoring_history_items: 1
     ]
 

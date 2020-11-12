@@ -120,7 +120,7 @@
           h3.status data-role="status"
             = displayable_isolation_monitoring_status(case_investigation, @current_date)
           div
-            = live_redirect "Add isolation dates", to: Routes.case_investigation_isolation_monitoring_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationMonitoringLive, case_investigation) , id: "add-isolation-dates-case-investigation-link-001", class: "add-isolation-dates-case-investigation-link"
+            = isolation_monitoring_button(case_investigation)
         .case-investigation-history
           = for item <- isolation_monitoring_history_items(case_investigation) do
             div

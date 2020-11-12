@@ -278,6 +278,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_conclude_isolation_monitoring(%View{} = view, number) do
+    view
+    |> element("#conclude-isolation-monitoring-case-investigation-link-#{number}")
+    |> render_click()
+  end
+
   def click_complete_case_investigation(%View{} = view, number) do
     view
     |> element("#complete-interview-case-investigation-link-#{number}")
