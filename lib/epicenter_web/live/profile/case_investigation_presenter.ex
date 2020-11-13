@@ -263,7 +263,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
           %{
             text:
               "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{
-                humanize_isolation_conclusion_reason(case_investigation)
+                CaseInvestigation.find_humanized_value(:isolation_conclusion_reason, case_investigation.isolation_conclusion_reason)
               }",
             link:
               live_redirect(
@@ -350,17 +350,6 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
 
   defp interview_start_date(case_investigation),
     do: case_investigation.started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
-
-  defp humanize_isolation_conclusion_reason(%{isolation_conclusion_reason: reason}) do
-    %{
-      "successfully_completed" => "Successfully completed isolation period",
-      "unable_to_isolate" => "Person unable to isolate",
-      "refused_to_cooperate" => "Refused to cooperate",
-      "lost_to_follow_up" => "Lost to follow up",
-      "transferred" => "Transferred to another jurisdiction",
-      "deceased" => "Deceased"
-    }[reason]
-  end
 
   defp redirect_to(case_investigation, :complete_interview) do
     live_redirect("Complete interview",

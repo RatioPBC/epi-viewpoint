@@ -5,6 +5,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Form
 
   defmodule ConcludeIsolationMonitoringForm do
@@ -75,20 +76,9 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
   def conclude_isolation_monitoring_form_builder(form) do
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :reason, "Reason", conclude_reason_options(), span: 5))
+    |> Form.line(&Form.radio_button_list(&1, :reason, "Reason", CaseInvestigation.humanized_values()[:isolation_conclusion_reason], span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
-  end
-
-  defp conclude_reason_options() do
-    [
-      {"Successfully completed isolation period", "successfully_completed"},
-      {"Person unable to isolate", "unable_to_isolate"},
-      {"Refused to cooperate", "refused_to_cooperate"},
-      {"Lost to follow up", "lost_to_follow_up"},
-      {"Transferred to another jurisdiction", "transferred"},
-      {"Deceased", "deceased"}
-    ]
   end
 
   defp redirect_to_profile_page(socket),

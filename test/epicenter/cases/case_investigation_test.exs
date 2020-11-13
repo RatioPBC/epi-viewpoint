@@ -111,6 +111,18 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01]}) == :ongoing)
 
     test "concluded when isolation_concluded_at is present",
-      do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01], isolation_concluded_at: ~D[2020-08-02]}) == :concluded)
+      do:
+        assert(
+          CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01], isolation_concluded_at: ~D[2020-08-02]}) ==
+            :concluded
+        )
+  end
+
+  describe "find_humanized_value" do
+    test "gets humanized values for fields" do
+      assert CaseInvestigation.find_humanized_value(:isolation_conclusion_reason, "deceased") == "Deceased"
+      assert CaseInvestigation.find_humanized_value(:isolation_conclusion_reason, "abcdef") == "abcdef"
+      assert CaseInvestigation.find_humanized_value(:bogus_field, "abcdef") == "abcdef"
+    end
   end
 end
