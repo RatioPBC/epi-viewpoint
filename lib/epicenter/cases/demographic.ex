@@ -34,9 +34,6 @@ defmodule Epicenter.Cases.Demographic do
   schema "demographics" do
     field :dob, :date
     field :employment, :string
-
-    embeds_one :ethnicity, Ethnicity, on_replace: :delete
-
     field :external_id, :string
     field :first_name, :string
     field :gender_identity, {:array, :string}
@@ -53,6 +50,7 @@ defmodule Epicenter.Cases.Demographic do
 
     timestamps(type: :utc_datetime)
 
+    embeds_one :ethnicity, Ethnicity, on_replace: :delete
     belongs_to :person, Person
   end
 

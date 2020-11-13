@@ -7,12 +7,44 @@ defmodule Epicenter.Cases.DemographicTest do
   alias Epicenter.Cases.Demographic
   alias Epicenter.Test
 
-  defp new_changeset(attr_updates) do
-    Demographic.changeset(%Demographic{}, attr_updates)
+  describe "schema" do
+    test "fields" do
+      assert_schema(
+        Demographic,
+        [
+          {:dob, :date},
+          {:employment, :string},
+          {:ethnicity, :map},
+          {:external_id, :string},
+          {:first_name, :string},
+          {:gender_identity, {:array, :string}},
+          {:id, :binary_id},
+          {:inserted_at, :utc_datetime},
+          {:last_name, :string},
+          {:marital_status, :string},
+          {:notes, :string},
+          {:occupation, :string},
+          {:person_id, :binary_id},
+          {:preferred_language, :string},
+          {:race, :string},
+          {:seq, :integer},
+          {:sex_at_birth, :string},
+          {:source, :string},
+          {:tid, :string},
+          {:updated_at, :utc_datetime}
+        ]
+      )
+    end
   end
 
-  test "validates personal health information on dob", do: assert_invalid(new_changeset(%{dob: "01-10-2000"}))
-  test "validates personal health information on last_name", do: assert_invalid(new_changeset(%{last_name: "Aliceblat"}))
+  describe "validation" do
+    defp new_changeset(attr_updates) do
+      Demographic.changeset(%Demographic{}, attr_updates)
+    end
+
+    test "validates personal health information on dob", do: assert_invalid(new_changeset(%{dob: "01-10-2000"}))
+    test "validates personal health information on last_name", do: assert_invalid(new_changeset(%{last_name: "Aliceblat"}))
+  end
 
   describe "find_humanized_value" do
     test "gets humanized values for fields" do

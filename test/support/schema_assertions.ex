@@ -142,30 +142,33 @@ defmodule Epicenter.Test.SchemaAssertions do
 
       with {:error, message} <- match_types(assertion_type, database_type, schema_type) do
         flunk("""
-        Schema type mismatch for field #{field_name}:
+        Schema type mismatch!
 
-        #{message}
+        field  : #{field_name}
+        message: #{message}
 
-        Assertion type: #{inspect(assertion_type)}
-        Database type: #{inspect(database_type)}
+        Assertion type    : #{inspect(assertion_type)}
+        Database type     : #{inspect(database_type)}
         Elixir schema type: #{inspect(schema_type)}
         """)
       end
     end
   end
 
+  @datetime_error_message "You should use use a schema type of :utc_datetime when persisting timestamps without a timezone"
   defp match_types(:boolean, %{data_type: "boolean"}, :boolean), do: :ok
   defp match_types(:binary_id, %{data_type: "uuid"}, :binary_id), do: :ok
   defp match_types(:string, %{data_type: "text"}, :string), do: :ok
   defp match_types(:string, %{data_type: "USER-DEFINED", udt_name: "citext"}, :string), do: :ok
-  defp match_types(:naive_datetime, _, _), do: {:error, "You should use use a schema type of :utc_datetime when persisting timestamps without a timezone"}
-  defp match_types(_, _, :naive_datetime), do: {:error, "You should use use a schema type of :utc_datetime when persisting timestamps without a timezone"}
+  defp match_types(:naive_datetime, _, _), do: {:error, @datetime_error_message}
+  defp match_types(_, _, :naive_datetime), do: {:error, @datetime_error_message}
   defp match_types(:utc_datetime, %{data_type: "timestamp without time zone"}, :utc_datetime), do: :ok
   defp match_types(:date, %{data_type: "date"}, :date), do: :ok
   defp match_types(:string, %{data_type: "character varying"}, :string), do: {:error, "You should use a text postgres type for string data"}
   defp match_types(:integer, %{data_type: "bigint"}, :integer), do: :ok
   defp match_types(:bigserial, %{data_type: "bigint"}, :integer), do: :ok
   defp match_types({:array, :string}, %{data_type: "ARRAY", element_data_type: "text"}, {:array, :string}), do: :ok
+  defp match_types(:map, %{data_type: "jsonb"}, {:parameterized, Ecto.Embedded, _}), do: :ok
   defp match_types(_assertion_type, _database_type, _schema_type), do: {:error, "These types did not match"}
 
   defp colon_separated(tuples),
