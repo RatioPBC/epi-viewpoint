@@ -46,6 +46,21 @@ defmodule Epicenter.Cases.DemographicTest do
     test "validates personal health information on last_name", do: assert_invalid(new_changeset(%{last_name: "Aliceblat"}))
   end
 
+  describe "ethnicity" do
+    test "is embedded" do
+      attrs = %{
+        dob: ~D[2020-01-01],
+        first_name: "Alice",
+        last_name: "Testuser",
+        ethnicity: %{major: "major", detailed: ["detailed1", "detailed2"]}
+      }
+
+      ethnicity_changeset = Demographic.changeset(%Demographic{}, attrs) |> Ecto.Changeset.get_change(:ethnicity)
+      ethnicity_changeset |> Ecto.Changeset.get_change(:major) |> assert_eq("major")
+      ethnicity_changeset |> Ecto.Changeset.get_change(:detailed) |> assert_eq(["detailed1", "detailed2"])
+    end
+  end
+
   describe "find_humanized_value" do
     test "gets humanized values for fields" do
       assert Demographic.find_humanized_value(:gender_identity, "male") == "Male"
