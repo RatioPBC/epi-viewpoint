@@ -1,6 +1,12 @@
 #case-investigation-conclude-isolation-monitoring-page data-page="case-investigation-conclude-isolation-monitoring"
+  section
+    header#subnav
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [confirm: @confirmation_prompt, role: "back-link"] do
+        = back_icon()
+        span Back
+
   section#case-investigation-conclude-isolation-monitoring
     h2#conclude-isolation-monitoring-heading= @page_heading
 
-    = form_for @form_changeset, "#", [id: "case-investigation-conclude-isolation-monitoring-form", phx_submit: "save"], fn f ->
+    = form_for @form_changeset, "#", [id: "case-investigation-conclude-isolation-monitoring-form", phx_change: "change", phx_submit: "save"], fn f ->
       = conclude_isolation_monitoring_form_builder(f)

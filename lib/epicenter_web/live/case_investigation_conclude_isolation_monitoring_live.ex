@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
@@ -43,12 +45,18 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
     socket
     |> assign(:case_investigation, case_investigation)
+    |> assign(:confirmation_prompt, nil)
     |> assign(:form_changeset, ConcludeIsolationMonitoringForm.changeset(case_investigation, %{}))
     |> assign(:page_heading, page_heading(case_investigation))
     |> assign(:person, case_investigation.person)
     |> assign_page_title(" Case Investigation Conclude Isolation Monitoring")
     |> authenticate_user(session)
     |> ok()
+  end
+
+  def handle_event("change", %{"conclude_isolation_monitoring_form" => params}, socket) do
+    new_changeset = ConcludeIsolationMonitoringForm.changeset(socket.assigns.case_investigation, params)
+    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
   end
 
   def handle_event("save", full_params, socket) do
@@ -83,6 +91,9 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
   end
 
   # # #
+
+  defp confirmation_prompt(changeset),
+    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 
   def page_heading(case_investigation) do
     case CaseInvestigation.isolation_monitoring_status(case_investigation) do

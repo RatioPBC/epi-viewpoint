@@ -25,6 +25,11 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationConcludeIsolationMonitoring d
     view
   end
 
+  def change_form(view, attrs) do
+    view |> element("#case-investigation-conclude-isolation-monitoring-form") |> render_change(attrs)
+    view
+  end
+
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
     conn |> Pages.visit("/case-investigations/#{case_investigation_id}/conclude-isolation-monitoring")
   end
