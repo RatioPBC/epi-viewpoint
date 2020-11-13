@@ -42,10 +42,11 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     case_investigation = Cases.get_case_investigation(case_investigation_id) |> Cases.preload_person()
 
     socket
-    |> assign_page_title(" Case Investigation Conclude Isolation Monitoring")
     |> assign(:case_investigation, case_investigation)
     |> assign(:form_changeset, ConcludeIsolationMonitoringForm.changeset(case_investigation, %{}))
+    |> assign(:page_heading, page_heading(case_investigation))
     |> assign(:person, case_investigation.person)
+    |> assign_page_title(" Case Investigation Conclude Isolation Monitoring")
     |> authenticate_user(session)
     |> ok()
   end
@@ -79,6 +80,15 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     |> Form.line(&Form.radio_button_list(&1, :reason, "Reason", CaseInvestigation.humanized_values()[:isolation_conclusion_reason], span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
+  end
+
+  # # #
+
+  def page_heading(case_investigation) do
+    case CaseInvestigation.isolation_monitoring_status(case_investigation) do
+      :concluded -> "Edit conclude isolation monitoring"
+      _ -> "Conclude isolation monitoring"
+    end
   end
 
   defp redirect_to_profile_page(socket),

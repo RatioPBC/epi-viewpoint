@@ -25,6 +25,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
   test "shows conclude isolation monitoring form", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_here()
+    |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_page_heading("Conclude isolation monitoring")
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_reasons_selection(%{
       "Successfully completed isolation period" => false,
       "Person unable to isolate" => false,
@@ -39,11 +40,12 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
     {:ok, _} =
       Cases.update_case_investigation(
         case_investigation,
-        {%{isolation_conclusion_reason: "successfully_completed"}, Test.Fixtures.admin_audit_meta()}
+        {%{isolation_conclusion_reason: "successfully_completed", isolation_concluded_at: ~U[2020-10-31 10:30:00Z]}, Test.Fixtures.admin_audit_meta()}
       )
 
     Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_here()
+    |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_page_heading("Edit conclude isolation monitoring")
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_reasons_selection(%{
       "Successfully completed isolation period" => true,
       "Person unable to isolate" => false,
