@@ -72,7 +72,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice_demographic_1.ethnicity.major == "hispanic_latinx_or_spanish_origin"
       assert alice_demographic_1.ethnicity.detailed == []
       assert alice_demographic_1.occupation == "Rocket Scientist"
-      assert alice_demographic_1.race == "Asian Indian"
+      assert alice_demographic_1.race == %{"asian" => ["asian_indian"]}
       assert alice_demographic_1.source == "import"
 
       assert_revision_count(alice, 1)
@@ -204,7 +204,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice_demographics.ethnicity.major == "hispanic_latinx_or_spanish_origin"
       assert alice_demographics.ethnicity.detailed == []
       assert alice_demographics.occupation == "Rocket Scientist"
-      assert alice_demographics.race == "Asian Indian"
+      assert alice_demographics.race == %{"asian" => ["asian_indian"]}
 
       assert_revision_count(alice, 1)
     end
@@ -252,7 +252,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice_demographics.ethnicity.major == "hispanic_latinx_or_spanish_origin"
       assert alice_demographics.ethnicity.detailed == []
       assert alice_demographics.occupation == "Rocket Scientist"
-      assert alice_demographics.race == "Asian Indian"
+      assert alice_demographics.race == %{"asian" => ["asian_indian"]}
 
       assert_revision_count(alice, 1)
     end
@@ -441,7 +441,7 @@ defmodule Epicenter.Cases.ImportTest do
           last_name: "Testuser",
           dob: ~D[1970-01-01],
           sex_at_birth: "female",
-          race: "Asian Indian",
+          race: %{"asian" => "asian_indian"},
           occupation: "Rocket Scientist",
           source: "form"
         })
@@ -480,7 +480,7 @@ defmodule Epicenter.Cases.ImportTest do
           employment: "AAA",
           notes: "AAA",
           sex_at_birth: "AAA",
-          race: "AAA",
+          race: %{"AAA" => nil},
           occupation: "AAA",
           ethnicity: %{major: "AAA", detailed: []}
         })
@@ -524,7 +524,7 @@ defmodule Epicenter.Cases.ImportTest do
           employment: "AAA",
           notes: "AAA",
           sex_at_birth: "AAA",
-          race: "AAA",
+          race: %{"AAA" => nil},
           occupation: nil,
           ethnicity: %{major: "AAA", detailed: []}
         })

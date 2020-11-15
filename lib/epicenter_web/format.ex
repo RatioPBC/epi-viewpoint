@@ -2,13 +2,13 @@ defmodule EpicenterWeb.Format do
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Phone
-  alias Euclid.Extra
+  alias Epicenter.Extra
 
   def address(nil), do: ""
 
   def address(%Address{street: street, city: city, state: state, postal_code: postal_code}) do
-    non_postal_code = [street, city, state] |> Extra.List.compact() |> Enum.join(", ")
-    [non_postal_code, postal_code] |> Extra.List.compact() |> Enum.join(" ")
+    non_postal_code = [street, city, state] |> Euclid.Extra.List.compact() |> Enum.join(", ")
+    [non_postal_code, postal_code] |> Euclid.Extra.List.compact() |> Enum.join(" ")
   end
 
   def date(nil), do: ""
@@ -21,7 +21,8 @@ defmodule EpicenterWeb.Format do
   def date_time_with_zone(%DateTime{} = date_time), do: Calendar.strftime(date_time, "%m/%d/%Y at %I:%M%P %Z")
 
   def demographic(%{major: major, detailed: detailed}, field), do: demographic(List.wrap(major) ++ List.wrap(detailed), field)
-  def demographic(values, field) when is_list(values), do: Enum.map(values, &demographic(&1, field))
+  def demographic(map, field) when is_map(map), do: map |> Extra.Map.to_list(:depth_first) |> demographic(field)
+  def demographic(values, field) when is_list(values), do: values |> Enum.map(&demographic(&1, field)) |> Enum.sort()
   def demographic(nil, _field), do: nil
   def demographic("unknown", _field), do: "Unknown"
   def demographic("declined_to_answer", _field), do: "Declined to answer"

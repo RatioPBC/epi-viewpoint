@@ -169,6 +169,7 @@ defmodule Epicenter.Test.SchemaAssertions do
   defp match_types(:bigserial, %{data_type: "bigint"}, :integer), do: :ok
   defp match_types({:array, :string}, %{data_type: "ARRAY", element_data_type: "text"}, {:array, :string}), do: :ok
   defp match_types(:map, %{data_type: "jsonb"}, {:parameterized, Ecto.Embedded, _}), do: :ok
+  defp match_types(:map, %{data_type: "jsonb"}, :map), do: :ok
   defp match_types(_assertion_type, _database_type, _schema_type), do: {:error, "These types did not match"}
 
   defp colon_separated(tuples),

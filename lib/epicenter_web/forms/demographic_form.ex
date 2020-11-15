@@ -24,7 +24,8 @@ defmodule EpicenterWeb.Forms.DemographicForm do
     field :notes, :string
     field :occupation, :string
 
-    field :race, :string
+    field :race, {:array, :string}
+    field :race_other, :string
     field :race_asian, {:array, :string}
     field :race_asian_other, :string
     field :race_native_hawaiian_or_other_pacific_islander, {:array, :string}
@@ -45,8 +46,11 @@ defmodule EpicenterWeb.Forms.DemographicForm do
     notes
     occupation
     race
+    race_other
     race_asian
+    race_asian_other
     race_native_hawaiian_or_other_pacific_islander
+    race_native_hawaiian_or_other_pacific_islander_other
     sex_at_birth
   }a
 
@@ -67,9 +71,13 @@ defmodule EpicenterWeb.Forms.DemographicForm do
       marital_status: demographic.marital_status,
       notes: demographic.notes,
       occupation: demographic.occupation,
-      race: demographic.race,
-      race_asian: [],
-      race_native_hawaiian_or_other_pacific_islander: [],
+      race: demographic |> Demographic.major(:race, other: false),
+      race_other: demographic |> Demographic.other(:race),
+      race_asian: demographic |> Demographic.detailed(:race, :asian, other: false),
+      race_asian_other: demographic |> Demographic.other(:race, :asian),
+      race_native_hawaiian_or_other_pacific_islander:
+        demographic |> Demographic.detailed(:race, :native_hawaiian_or_other_pacific_islander, other: false),
+      race_native_hawaiian_or_other_pacific_islander_other: demographic |> Demographic.other(:race, :native_hawaiian_or_other_pacific_islander),
       sex_at_birth: demographic.sex_at_birth
     }
   end
@@ -82,15 +90,6 @@ defmodule EpicenterWeb.Forms.DemographicForm do
         ~w{employment ethnicity ethnicity_hispanic_latinx_or_spanish_origin_other gender_identity_other marital_status sex_at_birth},
         &Coerce.to_string_or_nil/1
       )
-
-    # race should eventually be a list but that requires a db change
-    attrs =
-      attrs
-      |> Euclid.Extra.Map.transform("race", fn
-        s when is_binary(s) -> s
-        list when is_list(list) -> List.first(list)
-        nil -> nil
-      end)
 
     %DemographicForm{}
     |> cast(attrs, @required_attrs ++ @optional_attrs)
@@ -108,7 +107,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
            marital_status: form.marital_status,
            notes: form.notes,
            occupation: form.occupation,
-           race: form.race,
+           race: extract_race(form),
            sex_at_birth: form.sex_at_birth,
            source: "form"
          }}
@@ -136,7 +135,31 @@ defmodule EpicenterWeb.Forms.DemographicForm do
     [form.gender_identity, form.gender_identity_other] |> flat_compact()
   end
 
+  defp extract_race(form) do
+    form.race
+    |> List.wrap()
+    |> Enum.reduce(%{}, fn
+      "asian", acc ->
+        Map.put(acc, "asian", [form.race_asian, form.race_asian_other] |> flat_compact())
+
+      "native_hawaiian_or_other_pacific_islander", acc ->
+        Map.put(
+          acc,
+          "native_hawaiian_or_other_pacific_islander",
+          [form.race_native_hawaiian_or_other_pacific_islander, form.race_native_hawaiian_or_other_pacific_islander_other] |> flat_compact()
+        )
+
+      race, acc ->
+        Map.put(acc, race, nil)
+    end)
+    |> (fn extracted ->
+          if Euclid.Exists.present?(form.race_other),
+            do: Map.put(extracted, form.race_other, nil),
+            else: extracted
+        end).()
+  end
+
   defp flat_compact(list) do
-    list |> List.flatten() |> Enum.filter(&Euclid.Exists.present?/1)
+    list |> List.flatten() |> Enum.filter(&Euclid.Exists.present?/1) |> Enum.sort()
   end
 end

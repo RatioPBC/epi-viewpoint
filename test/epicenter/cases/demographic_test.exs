@@ -26,7 +26,7 @@ defmodule Epicenter.Cases.DemographicTest do
           {:occupation, :string},
           {:person_id, :binary_id},
           {:preferred_language, :string},
-          {:race, :string},
+          {:race, :map},
           {:seq, :integer},
           {:sex_at_birth, :string},
           {:source, :string},
@@ -46,8 +46,8 @@ defmodule Epicenter.Cases.DemographicTest do
     test "validates personal health information on last_name", do: assert_invalid(new_changeset(%{last_name: "Aliceblat"}))
   end
 
-  describe "ethnicity" do
-    test "is embedded" do
+  describe "complex fields" do
+    test "ethnicity is embedded" do
       attrs = %{
         dob: ~D[2020-01-01],
         first_name: "Alice",
@@ -55,9 +55,46 @@ defmodule Epicenter.Cases.DemographicTest do
         ethnicity: %{major: "major", detailed: ["detailed1", "detailed2"]}
       }
 
-      ethnicity_changeset = Demographic.changeset(%Demographic{}, attrs) |> Ecto.Changeset.get_change(:ethnicity)
+      ethnicity_changeset = Demographic.changeset(%Demographic{}, attrs) |> assert_valid() |> Ecto.Changeset.get_change(:ethnicity)
       ethnicity_changeset |> Ecto.Changeset.get_change(:major) |> assert_eq("major")
       ethnicity_changeset |> Ecto.Changeset.get_change(:detailed) |> assert_eq(["detailed1", "detailed2"])
+    end
+
+    test "race is a map" do
+      attrs = %{
+        dob: ~D[2020-01-01],
+        first_name: "Alice",
+        last_name: "Testuser",
+        race: %{
+          "black" => [],
+          "asian" => ["filipino", "korean"],
+          "native_hawaiian_or_other_pacific_islander" => ["samoan"],
+          "Other Value" => []
+        }
+      }
+
+      Demographic.changeset(%Demographic{}, attrs)
+      |> assert_valid()
+      |> Ecto.Changeset.get_change(:race)
+      |> assert_eq(%{
+        "black" => [],
+        "asian" => ["filipino", "korean"],
+        "native_hawaiian_or_other_pacific_islander" => ["samoan"],
+        "Other Value" => []
+      })
+    end
+  end
+
+  describe "build_attrs" do
+    test "race" do
+      assert Demographic.build_attrs(nil, :race) == nil
+      assert Demographic.build_attrs("Black or African American", :race) == %{"black_or_african_american" => nil}
+      assert Demographic.build_attrs("black_or_african_american", :race) == %{"black_or_african_american" => nil}
+      assert Demographic.build_attrs("Asian", :race) == %{"asian" => nil}
+      assert Demographic.build_attrs("asian", :race) == %{"asian" => nil}
+      assert Demographic.build_attrs("Japanese", :race) == %{"asian" => ["japanese"]}
+      assert Demographic.build_attrs("japanese", :race) == %{"asian" => ["japanese"]}
+      assert Demographic.build_attrs("Something else", :race) == %{"Something else" => nil}
     end
   end
 
@@ -66,6 +103,47 @@ defmodule Epicenter.Cases.DemographicTest do
       assert Demographic.find_humanized_value(:gender_identity, "male") == "Male"
       assert Demographic.find_humanized_value(:gender_identity, "abcdef") == "abcdef"
       assert Demographic.find_humanized_value(:bogus_field, "abcdef") == "abcdef"
+    end
+  end
+
+  describe "major/detailed/other" do
+    setup do
+      demographic = %{
+        race: %{
+          "black_or_african_american" => nil,
+          "asian" => ["filipino", "korean", "Some other asian"],
+          "Some other race" => nil
+        }
+      }
+
+      [demographic: demographic]
+    end
+
+    test "major", %{demographic: demographic} do
+      assert Demographic.major(%{}, :race, other: true) == nil
+      assert Demographic.major(%{race: nil}, :race, other: true) == nil
+      assert Demographic.major(%{race: %{}}, :race, other: true) == []
+      assert Demographic.major(demographic, :race, other: true) == ["Some other race", "asian", "black_or_african_american"]
+      assert Demographic.major(demographic, :race, other: false) == ["asian", "black_or_african_american"]
+    end
+
+    test "detailed", %{demographic: demographic} do
+      assert Demographic.detailed(%{}, :race, :asian, other: true) == nil
+      assert Demographic.detailed(%{race: nil}, :race, :asian, other: true) == nil
+      assert Demographic.detailed(%{race: %{}}, :race, :asian, other: true) == []
+      assert Demographic.detailed(%{race: %{"asian" => nil}}, :race, :asian, other: true) == []
+      assert Demographic.detailed(%{race: %{"asian" => []}}, :race, :asian, other: true) == []
+      assert Demographic.detailed(demographic, :race, :asian, other: true) == ["Some other asian", "filipino", "korean"]
+      assert Demographic.detailed(demographic, :race, :asian, other: false) == ["filipino", "korean"]
+    end
+
+    test "other", %{demographic: demographic} do
+      assert Demographic.other(%{}, :race) == nil
+      assert Demographic.other(%{race: nil}, :race) == nil
+      assert Demographic.other(%{race: %{}}, :race) == nil
+      assert Demographic.other(%{race: %{}}, :race, :asian) == nil
+      assert Demographic.other(demographic, :race) == "Some other race"
+      assert Demographic.other(demographic, :race, :asian) == "Some other asian"
     end
   end
 

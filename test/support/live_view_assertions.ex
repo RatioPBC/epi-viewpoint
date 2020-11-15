@@ -1,4 +1,5 @@
 defmodule EpicenterWeb.Test.LiveViewAssertions do
+  import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
@@ -80,6 +81,14 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
       """
       |> flunk()
     end
+  end
+
+  def assert_role_list(%Phoenix.LiveViewTest.View{} = view, data_role, expected_values) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.all("[data-role=#{data_role}] li", as: :text)
+    |> assert_eq(expected_values, returning: view)
   end
 
   def assert_role_attribute_value(%Phoenix.LiveViewTest.View{} = view, data_role, expected_value) do

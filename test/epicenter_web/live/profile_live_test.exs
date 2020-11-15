@@ -650,7 +650,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_role_text(page_live, "gender-identity", "Female")
       assert_role_text(page_live, "sex-at-birth", "Female")
       assert_role_text(page_live, "ethnicity", "Not Hispanic, Latino/a, or Spanish origin")
-      assert_role_text(page_live, "race", "Filipino")
+      assert_role_list(page_live, "race", ["Asian", "Filipino"])
       assert_role_text(page_live, "marital-status", "Single")
       assert_role_text(page_live, "employment", "Part time")
       assert_role_text(page_live, "occupation", "architect")

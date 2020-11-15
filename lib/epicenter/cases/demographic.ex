@@ -42,7 +42,7 @@ defmodule Epicenter.Cases.Demographic do
     field :notes, :string
     field :occupation, :string
     field :preferred_language, :string
-    field :race, :string
+    field :race, :map
     field :seq, :integer
     field :sex_at_birth, :string
     field :tid, :string
@@ -61,76 +61,137 @@ defmodule Epicenter.Cases.Demographic do
     |> validate_phi(:demographic)
   end
 
-  def find_humanized_value(field, value) do
-    case Map.get(humanized_values(), field) do
-      nil ->
-        value
-
-      humanized_values_for_field ->
-        default = {value, value}
-        {humanized, _val} = Enum.find(humanized_values_for_field, default, fn {_humanized, val} -> val == value end)
-        humanized
+  def major(demographic, field, other: other?) do
+    case Map.get(demographic, field) do
+      nil -> nil
+      map when is_map(map) -> map |> Map.keys() |> reject_nonstandard_values(:race, !other?) |> Enum.sort()
     end
   end
 
+  def detailed(demographic, field, major, other: other?) do
+    case demographic |> Map.get(field) do
+      nil ->
+        nil
+
+      map when is_map(map) ->
+        case Map.get(map, Euclid.Extra.Atom.to_string(major)) do
+          nil -> []
+          values -> List.wrap(values) |> reject_nonstandard_values(:race, !other?) |> Enum.sort()
+        end
+    end
+  end
+
+  def other(demographic, field) do
+    case major(demographic, field, other: true) do
+      nil -> nil
+      major -> major |> List.wrap() |> reject_standard_values(field) |> List.first()
+    end
+  end
+
+  def other(demographic, field, major) do
+    case detailed(demographic, field, major, other: true) do
+      nil -> nil
+      detailed -> detailed |> List.wrap() |> reject_standard_values(field) |> List.first()
+    end
+  end
+
+  def build_attrs(nil, _field),
+    do: nil
+
+  def build_attrs(value, :race) do
+    case search_humanized(value, :race) do
+      {_humanized, value, nil = _parent} ->
+        %{value => nil}
+
+      {_humanized, value, parent} ->
+        %{parent => [value]}
+    end
+  end
+
+  defp search_humanized(query, field) do
+    default = {query, query, nil}
+
+    case Map.get(humanized_values(), field) do
+      nil ->
+        default
+
+      humanized_values_for_field ->
+        Enum.find(humanized_values_for_field, default, fn {humanized, value, _parent} -> query in [value, humanized] end)
+    end
+  end
+
+  def find_humanized_value(field, value) do
+    {humanized, _value, _parent} = search_humanized(value, field)
+    humanized
+  end
+
   def standard_values(field),
-    do: humanized_values() |> Map.get(field) |> Enum.map(&elem(&1, 1))
+    do: humanized_values() |> Map.get(field) |> Enum.map(fn {_humanized, value, _parent} -> value end)
+
+  def reject_nonstandard_values(values, _field, false = _reject?),
+    do: values
+
+  def reject_nonstandard_values(values, field, true = _reject?),
+    do: MapSet.intersection(MapSet.new(values), MapSet.new(standard_values(field))) |> MapSet.to_list()
+
+  def reject_standard_values(values, field),
+    do: MapSet.difference(MapSet.new(values), MapSet.new(standard_values(field))) |> MapSet.to_list()
 
   def humanized_values do
     %{
       employment: [
-        {"Unknown", "unknown"},
-        {"Not employed", "not_employed"},
-        {"Part time", "part_time"},
-        {"Full time", "full_time"}
+        {"Unknown", "unknown", nil},
+        {"Not employed", "not_employed", nil},
+        {"Part time", "part_time", nil},
+        {"Full time", "full_time", nil}
       ],
       ethnicity: [
-        {"Unknown", "unknown"},
-        {"Declined to answer", "declined_to_answer"},
-        {"Not Hispanic, Latino/a, or Spanish origin", "not_hispanic_latinx_or_spanish_origin"},
-        {"Hispanic, Latino/a, or Spanish origin", "hispanic_latinx_or_spanish_origin"},
-        {"Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx"},
-        {"Puerto Rican", "puerto_rican"},
-        {"Cuban", "cuban"}
+        {"Unknown", "unknown", nil},
+        {"Declined to answer", "declined_to_answer", nil},
+        {"Not Hispanic, Latino/a, or Spanish origin", "not_hispanic_latinx_or_spanish_origin", nil},
+        {"Hispanic, Latino/a, or Spanish origin", "hispanic_latinx_or_spanish_origin", nil},
+        {"Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx", nil},
+        {"Puerto Rican", "puerto_rican", nil},
+        {"Cuban", "cuban", nil}
       ],
       gender_identity: [
-        {"Unknown", "unknown"},
-        {"Declined to answer", "declined_to_answer"},
-        {"Female", "female"},
-        {"Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
-        {"Male", "male"},
-        {"Transgender man/trans man/female-to-male (FTM)", "transgender_man"},
-        {"Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"}
+        {"Unknown", "unknown", nil},
+        {"Declined to answer", "declined_to_answer", nil},
+        {"Female", "female", nil},
+        {"Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman", nil},
+        {"Male", "male", nil},
+        {"Transgender man/trans man/female-to-male (FTM)", "transgender_man", nil},
+        {"Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming", nil}
       ],
       marital_status: [
-        {"Unknown", "unknown"},
-        {"Single", "single"},
-        {"Married", "married"}
+        {"Unknown", "unknown", nil},
+        {"Single", "single", nil},
+        {"Married", "married", nil}
       ],
       race: [
-        {"Unknown", "unknown"},
-        {"Declined to answer", "declined_to_answer"},
-        {"White", "white"},
-        {"Black or African American", "black_or_african_american"},
-        {"American Indian or Alaska Native", "american_indian_or_alaska_native"},
-        {"Asian", "asian"},
-        {"Asian Indian", "asian_indian"},
-        {"Chinese", "chinese"},
-        {"Filipino", "filipino"},
-        {"Japanese", "japanese"},
-        {"Korean", "korean"},
-        {"Vietnamese", "vietnamese"},
-        {"Native Hawaiian or Other Pacific Islander", "native_hawaiian_or_other_pacific_islander"},
-        {"Native Hawaiian", "native_hawaiian"},
-        {"Guamanian or Chamorro", "guamanian_or_chamorro"},
-        {"Samoan", "samoan"}
+        {"Unknown", "unknown", nil},
+        {"Declined to answer", "declined_to_answer", nil},
+        {"White", "white", nil},
+        {"Black or African American", "black_or_african_american", nil},
+        {"American Indian or Alaska Native", "american_indian_or_alaska_native", nil},
+        {"Asian", "asian", nil},
+        {"Asian Indian", "asian_indian", "asian"},
+        {"Chinese", "chinese", "asian"},
+        {"Filipino", "filipino", "asian"},
+        {"Japanese", "japanese", "asian"},
+        {"Korean", "korean", "asian"},
+        {"Vietnamese", "vietnamese", "asian"},
+        {"Native Hawaiian or Other Pacific Islander", "native_hawaiian_or_other_pacific_islander", nil},
+        {"Native Hawaiian", "native_hawaiian", "native_hawaiian_or_other_pacific_islander"},
+        {"Guamanian or Chamorro", "guamanian_or_chamorro", "native_hawaiian_or_other_pacific_islander"},
+        {"Samoan", "samoan", "native_hawaiian_or_other_pacific_islander"}
       ],
       sex_at_birth: [
-        {"Unknown", "unknown"},
-        {"Declined to answer", "declined_to_answer"},
-        {"Female", "female"},
-        {"Male", "male"},
-        {"Intersex", "intersex"}
+        {"Unknown", "unknown", nil},
+        {"Declined to answer", "declined_to_answer", nil},
+        {"Female", "female", nil},
+        {"Male", "male", nil},
+        {"Intersex", "intersex", nil}
       ]
     }
   end

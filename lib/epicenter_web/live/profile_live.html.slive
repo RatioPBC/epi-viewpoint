@@ -184,7 +184,7 @@
           td data-role="gender-identity"= @person |> demographic_field(:gender_identity, :format) |> list_or_unknown()
           td data-role="sex-at-birth"= @person |> demographic_field(:sex_at_birth, :format) |> string_or_unknown()
           td data-role="ethnicity"= @person |> demographic_field(:ethnicity, :format) |> list_or_unknown()
-          td data-role="race"= @person |> demographic_field(:race, :format) |> string_or_unknown()
+          td data-role="race"= @person |> demographic_field(:race, :format) |> list_or_unknown()
       tbody
         tr
           th Marital status

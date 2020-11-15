@@ -43,7 +43,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
           ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]},
           gender_identity: ["female", "transgender_woman"],
           marital_status: "single",
-          race: "asian",
+          race: %{"asian" => nil},
           sex_at_birth: "female"
         )
 
@@ -192,7 +192,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
       updated_person = demographics(person.id)
       assert updated_person.ethnicity.major == "hispanic_latinx_or_spanish_origin"
-      assert updated_person.ethnicity.detailed == ["cuban", "puerto_rican", "Other ethnicity"]
+      assert updated_person.ethnicity.detailed == ["Other ethnicity", "cuban", "puerto_rican"]
     end
   end
 
@@ -238,7 +238,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
   describe "race" do
     test "it shows the existing race and can be edited", %{conn: conn, person: person, user: user} do
-      {:ok, person} = update_demographics(user, person, race: "declined_to_answer")
+      {:ok, person} = update_demographics(user, person, race: %{"declined_to_answer" => nil})
 
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
@@ -255,7 +255,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"race" => ["asian"]})
       |> Pages.Profile.assert_race("Asian")
 
-      assert demographics(person.id).race == "asian"
+      assert demographics(person.id).race == %{"asian" => []}
     end
   end
 

@@ -2,7 +2,7 @@ defmodule Epicenter.Cases.Import do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.Import.Ethnicity
+  alias Epicenter.Cases.Import
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Csv
@@ -212,7 +212,8 @@ defmodule Epicenter.Cases.Import do
     row
     |> Map.take(@person_db_fields_to_insert)
     |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-    |> Ethnicity.build_attrs()
+    |> Import.Ethnicity.build_attrs()
+    |> Map.update("race", nil, &Cases.Demographic.build_attrs(&1, :race))
     |> Map.put("person_id", person.id)
     |> Map.put("source", "import")
     |> in_audit_tuple(originator, AuditLog.Revision.insert_demographics_action())
@@ -224,7 +225,8 @@ defmodule Epicenter.Cases.Import do
       row
       |> Map.take(@person_db_fields_to_insert)
       |> Euclid.Extra.Map.rename_key("person_tid", "tid")
-      |> Ethnicity.build_attrs()
+      |> Import.Ethnicity.build_attrs()
+      |> Map.update("race", nil, &Cases.Demographic.build_attrs(&1, :race))
       |> strip_updates_to_existing_data(person)
       |> in_audit_tuple(originator, AuditLog.Revision.upsert_person_action())
 
