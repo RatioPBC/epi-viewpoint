@@ -40,6 +40,8 @@ defmodule Epicenter.Cases.CaseInvestigation do
     field :isolation_conclusion_reason, :string
     field :isolation_monitoring_end_date, :date
     field :isolation_monitoring_start_date, :date
+    field :isolation_order_clearance_sent_date, :date
+    field :isolation_order_sent_date, :date
     field :name, :string
     field :seq, :integer
     field :started_at, :utc_datetime

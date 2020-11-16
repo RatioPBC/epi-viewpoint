@@ -28,6 +28,8 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:isolation_conclusion_reason, :string},
           {:isolation_monitoring_end_date, :date},
           {:isolation_monitoring_start_date, :date},
+          {:isolation_order_clearance_sent_date, :date},
+          {:isolation_order_sent_date, :date},
           {:name, :string},
           {:person_id, :binary_id},
           {:seq, :integer},
