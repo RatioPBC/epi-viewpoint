@@ -2,10 +2,22 @@ defmodule EpicenterWeb.Forms.CaseInvestigationNoteForm do
   alias EpicenterWeb.Form
 
   def add_note_form_builder(form, _case_investigation) do
+    textarea = fn form ->
+      text = form.f.source |> Ecto.Changeset.fetch_field!(:text)
+
+      if Euclid.Exists.present?(text) do
+        form
+        |> Form.line(&Form.textarea_field(&1, :text, "", span: 6, placeholder: "Add note..."))
+        |> Form.line(&Form.save_button(&1))
+      else
+        form
+        |> Form.line(&Form.textarea_field(&1, :text, "", rows: 1, span: 6, placeholder: "Add note..."))
+      end
+    end
+
     Form.new(form)
     |> Form.line(&Form.hidden_field(&1, :case_investigation_id))
-    |> Form.line(&Form.textarea_field(&1, :text, "", span: 6, placeholder: "Add note..."))
-    |> Form.line(&Form.save_button(&1))
+    |> textarea.()
     |> Form.safe()
   end
 
