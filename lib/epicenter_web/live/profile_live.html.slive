@@ -127,6 +127,15 @@
               span data-role="isolation-monitoring-history-item-text" = item.text
               span class="history-item-link" = item.link
 
+      = if CaseInvestigation.isolation_monitoring_status(case_investigation) == :ongoing do
+        .case-investigation-clinical
+          .clinical-details-header-row
+            h4
+              span
+                | Isolation Order Details
+            .links
+              span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "edit-isolation-order-case-investigation-link"
+
       .case-investigation-notes
         h3.additional_notes Additional Notes
         = form_for @note_changesets[case_investigation.id], "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_change: "change_note", phx_submit: "save_note"], fn f ->

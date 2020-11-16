@@ -139,6 +139,13 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     )
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Ongoing isolation monitoring (10 days remaining)", number: "001"})
+    |> Pages.Profile.click_edit_isolation_order_details_link("001")
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.CaseInvestigationIsolationOrder.assert_here()
+
+    # TODO: submit isolation order form and redirec to profile page
+    conn
+    |> Pages.Profile.visit(person)
     |> Pages.Profile.click_conclude_isolation_monitoring("001")
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_here()

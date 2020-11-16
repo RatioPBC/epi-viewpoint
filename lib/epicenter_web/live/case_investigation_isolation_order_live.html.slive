@@ -1,0 +1,4 @@
+#case-investigation-isolation-order-page data-page="case-investigation-isolation-order"
+  section#case-investigation-isolation-order
+    h2
+      | Isolation order
