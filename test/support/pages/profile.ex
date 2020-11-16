@@ -335,6 +335,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def change_note_form(view, number, attrs) do
+    view |> element("#case-investigation-add-note-form-#{number}") |> render_change(form_field_data: attrs)
+
+    view
+  end
+
   # expected_values %{clinical_status: clinical_status, symptom_onset_date: symptom_onset_date}}
   def assert_clinical_details_showing(%View{} = view, number, expected_values) do
     parsed_html =

@@ -49,3 +49,12 @@ liveSocket.connect();
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket;
+
+document.body.addEventListener('phoenix.link.click', function (e) {
+  if (e.target.dataset["phx-link"] !== "redirect") return true;
+  var message = document.querySelector("[data-confirm-navigation]")?.getAttribute("data-confirm-navigation");
+  if (!message) { return true; }
+  if (!window.confirm(message)) {
+    e.preventDefault();
+  }
+}, false);

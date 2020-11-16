@@ -31,6 +31,10 @@ defmodule EpicenterWeb.Test.Pages do
     view
   end
 
+  def navigation_confirmation_prompt(%View{} = view) do
+    view |> parse() |> Test.Html.find("[data-confirm-navigation]") |> Test.Html.attr("data-confirm-navigation") |> List.first()
+  end
+
   def assert_current_user(conn_or_view_or_html, user_name) do
     conn_or_view_or_html |> parse() |> Test.Html.role_text("current-user-name") |> assert_eq(user_name)
     conn_or_view_or_html

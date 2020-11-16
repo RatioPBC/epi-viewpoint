@@ -534,6 +534,54 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.click_edit_isolation_monitoring_conclusion_link("001")
       |> assert_redirects_to("/case-investigations/#{case_investigation.id}/conclude-isolation-monitoring")
     end
+
+    test "can see existing notes", %{person: person, user: user, conn: conn} do
+      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-a", %{text: "Note A"}) |> Cases.create_case_investigation_note!()
+      Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-b", %{text: "Note B"}) |> Cases.create_case_investigation_note!()
+
+      view =
+        Pages.Profile.visit(conn, person)
+        |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "08/07/2020", number: "001"})
+
+      assert [%{text: "Note A"}, %{text: "Note B"}] = Pages.Profile.case_investigation_notes(view, "001")
+    end
+
+    test "can add a new note", %{person: person, user: user, conn: conn} do
+      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      username = user.name
+
+      view =
+        Pages.Profile.visit(conn, person)
+        |> Pages.Profile.add_note("001", "A new note")
+
+      [note] = Pages.Profile.case_investigation_notes(view, "001")
+      assert %{text: "A new note", author: ^username} = note
+      assert {:ok, _} = Epicenter.DateParser.parse_mm_dd_yyyy(note.date)
+
+      assert [note] = case_investigation |> Cases.preload_case_investigation_notes() |> Map.get(:notes)
+      assert_recent_audit_log(note, user, action: "create-case-investigation-note", event: "profile-case-investigation-note-submission")
+    end
+
+    test "can't add an empty note", %{person: person, user: user, conn: conn} do
+      build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.add_note("001", "")
+      |> Pages.Profile.assert_case_investigation_note_validation_messages("001", %{"form_field_data_text" => "can't be blank"})
+    end
+
+    test "warns you that there are changes if you try to navigate away", %{person: person, user: user, conn: conn} do
+      build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      view = Pages.Profile.visit(conn, person)
+
+      assert Pages.navigation_confirmation_prompt(view) == nil
+
+      view
+      |> Pages.Profile.change_note_form("001", %{"text" => "something present"})
+
+      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+    end
   end
 
   describe "assigning and unassigning user to a person" do

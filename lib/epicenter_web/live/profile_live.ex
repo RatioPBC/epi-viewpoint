@@ -2,6 +2,7 @@ defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
@@ -101,6 +102,16 @@ defmodule EpicenterWeb.ProfileLive do
     Cases.broadcast_people([updated_person])
 
     {:noreply, assign_person(socket, updated_person)}
+  end
+
+  def handle_event("change_note", %{"form_field_data" => params}, socket) do
+    case_investigation = Enum.find(socket.assigns.case_investigations, &(&1.id == params["case_investigation_id"]))
+
+    socket
+    |> assign(
+      note_changesets: socket.assigns.note_changesets |> Map.put(params["case_investigation_id"], FormFieldData.changeset(case_investigation, params))
+    )
+    |> noreply()
   end
 
   def handle_event("save_note", %{"form_field_data" => params}, socket) do
@@ -238,5 +249,15 @@ defmodule EpicenterWeb.ProfileLive do
 
   def unknown_value(text \\ @unknown_text) do
     Phoenix.HTML.Tag.content_tag(:span, text, class: "unknown")
+  end
+
+  def navigation_prompt(note_changesets) do
+    note_changesets
+    |> Enum.map(fn {_, changeset} -> changeset.changes end)
+    |> Euclid.Exists.any?()
+    |> case do
+      true -> abandon_changes_confirmation_text()
+      false -> nil
+    end
   end
 end

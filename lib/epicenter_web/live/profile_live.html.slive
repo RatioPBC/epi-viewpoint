@@ -1,4 +1,4 @@
-#profile-page data-page="profile" data-tid=@person.tid data-role="profile-page"
+#profile-page data-page="profile" data-tid=@person.tid data-role="profile-page" data-confirm-navigation=navigation_prompt(@note_changesets)
 
   section
     header#subnav
@@ -129,7 +129,7 @@
 
       .case-investigation-notes
         h3.additional_notes Additional Notes
-        = form_for @note_changesets[case_investigation.id], "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_submit: "save_note"], fn f ->
+        = form_for @note_changesets[case_investigation.id], "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_change: "change_note", phx_submit: "save_note"], fn f ->
               = add_note_form_builder(f, case_investigation)
         = for note <- case_investigation.notes do
           div.case-investigation-note data-role="case-investigation-note-#{case_investigation.name}"
