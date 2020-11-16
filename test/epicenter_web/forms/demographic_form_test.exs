@@ -43,9 +43,7 @@ defmodule EpicenterWeb.Forms.DemographicFormTest do
           ],
           race_asian: ["filipino", "korean"],
           race_asian_other: "Some other asian",
-          race_native_hawaiian_or_other_pacific_islander: [
-            "samoan"
-          ],
+          race_native_hawaiian_or_other_pacific_islander: "samoan",
           race_native_hawaiian_or_other_pacific_islander_other: "Some other pacific islander",
           race_other: "Some other race",
           sex_at_birth: nil

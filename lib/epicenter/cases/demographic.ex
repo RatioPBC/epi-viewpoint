@@ -196,6 +196,9 @@ defmodule Epicenter.Cases.Demographic do
     }
   end
 
+  def humanized_values(field),
+    do: Map.get(humanized_values(), field)
+
   defmodule Query do
     import Ecto.Query
     alias Epicenter.Cases.Demographic

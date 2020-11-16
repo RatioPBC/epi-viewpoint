@@ -6,6 +6,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Ethnicity
   alias Epicenter.Coerce
+  alias Epicenter.MajorDetailed
   alias EpicenterWeb.Forms.DemographicForm
 
   @primary_key false
@@ -71,15 +72,9 @@ defmodule EpicenterWeb.Forms.DemographicForm do
       marital_status: demographic.marital_status,
       notes: demographic.notes,
       occupation: demographic.occupation,
-      race: demographic |> Demographic.major(:race, other: false),
-      race_other: demographic |> Demographic.other(:race),
-      race_asian: demographic |> Demographic.detailed(:race, :asian, other: false),
-      race_asian_other: demographic |> Demographic.other(:race, :asian),
-      race_native_hawaiian_or_other_pacific_islander:
-        demographic |> Demographic.detailed(:race, :native_hawaiian_or_other_pacific_islander, other: false),
-      race_native_hawaiian_or_other_pacific_islander_other: demographic |> Demographic.other(:race, :native_hawaiian_or_other_pacific_islander),
       sex_at_birth: demographic.sex_at_birth
     }
+    |> Map.merge(MajorDetailed.split(demographic, :race, Demographic.humanized_values(:race)))
   end
 
   def attrs_to_form_changeset(attrs) do
