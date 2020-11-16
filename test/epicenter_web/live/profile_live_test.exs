@@ -537,14 +537,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "can see existing notes", %{person: person, user: user, conn: conn} do
       case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
-      Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-a", %{text: "Note A"}) |> Cases.create_case_investigation_note!()
-      Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-b", %{text: "Note B"}) |> Cases.create_case_investigation_note!()
+
+      Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-a", %{text: "older note"})
+      |> Cases.create_case_investigation_note!()
+
+      Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-b", %{text: "newer note"})
+      |> Cases.create_case_investigation_note!()
 
       view =
         Pages.Profile.visit(conn, person)
         |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "08/07/2020", number: "001"})
 
-      assert [%{text: "Note A"}, %{text: "Note B"}] = Pages.Profile.case_investigation_notes(view, "001")
+      assert [%{text: "newer note"}, %{text: "older note"}] = Pages.Profile.case_investigation_notes(view, "001")
     end
 
     test "can add a new note", %{person: person, user: user, conn: conn} do

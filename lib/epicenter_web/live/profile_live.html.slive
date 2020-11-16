@@ -131,7 +131,7 @@
         h3.additional_notes Additional Notes
         = form_for @note_changesets[case_investigation.id], "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_change: "change_note", phx_submit: "save_note"], fn f ->
               = add_note_form_builder(f, case_investigation)
-        = for note <- case_investigation.notes do
+        = for note <- case_investigation.notes |> Enum.reverse() do
           div.case-investigation-note data-role="case-investigation-note-#{case_investigation.name}"
             div.case-investigation-note-header
               span.case-investigation-note-author data-role="case-investigation-note-author" = note.author.name
