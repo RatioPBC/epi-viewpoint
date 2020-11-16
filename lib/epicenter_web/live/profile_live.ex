@@ -130,7 +130,15 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def assign_person(socket, person) do
-    updated_person = person |> Cases.preload_lab_results() |> Cases.preload_addresses() |> Cases.preload_assigned_to() |> Cases.preload_demographics()
+    updated_person =
+      person
+      |> Cases.preload_lab_results()
+      |> Cases.preload_addresses()
+      |> Cases.preload_assigned_to()
+      |> Cases.preload_demographics()
+      |> Cases.preload_emails()
+      |> Cases.preload_phones()
+
     assign(socket, person: updated_person)
   end
 
@@ -164,7 +172,6 @@ defmodule EpicenterWeb.ProfileLive do
 
   def email_addresses(person) do
     person
-    |> Cases.preload_emails()
     |> Map.get(:emails)
     |> Enum.map(& &1.address)
   end
@@ -175,7 +182,6 @@ defmodule EpicenterWeb.ProfileLive do
 
   def phone_numbers(person) do
     person
-    |> Cases.preload_phones()
     |> Map.get(:phones)
     |> Enum.map(&Format.phone/1)
   end

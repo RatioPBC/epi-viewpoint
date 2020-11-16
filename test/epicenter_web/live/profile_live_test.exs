@@ -13,8 +13,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
   setup :register_and_log_in_user
 
   setup %{user: user} do
-    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_demographics()
-    [person: person, user: user]
+    person =
+      Test.Fixtures.person_attrs(user, "alice")
+      |> Cases.create_person!()
+
+    [person: load(person), user: user]
+  end
+
+  defp load(person) do
+    Cases.get_person(person.id)
+    |> Cases.preload_demographics()
+    |> Cases.preload_emails()
+    |> Cases.preload_phones()
   end
 
   test "disconnected and connected render", %{conn: conn, person: person} do
@@ -54,7 +64,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Test.Fixtures.phone_attrs(user, person, "phone-2", number: "111-111-1001", is_preferred: true) |> Cases.create_phone!()
       Test.Fixtures.address_attrs(user, person, "alice-address", 1000, type: "home") |> Cases.create_address!()
       Test.Fixtures.address_attrs(user, person, "alice-address-preferred", 2000, type: nil, is_preferred: true) |> Cases.create_address!()
-      :ok
+      [person: load(person)]
     end
 
     test "showing person identifying information", %{conn: conn, person: person} do
@@ -73,7 +83,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "phone_numbers", %{person: person, user: user} do
       Test.Fixtures.phone_attrs(user, person, "phone-3", number: "1-111-111-1009") |> Cases.create_phone!()
-      person |> ProfileLive.phone_numbers() |> assert_eq(["(111) 111-1001", "(111) 111-1000", "+1 (111) 111-1009"])
+      person |> load() |> ProfileLive.phone_numbers() |> assert_eq(["(111) 111-1001", "(111) 111-1000", "+1 (111) 111-1009"])
     end
   end
 
