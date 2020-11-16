@@ -4,7 +4,7 @@ defmodule EpicenterWeb.Forms.CaseInvestigationNoteForm do
   def add_note_form_builder(form, _case_investigation) do
     Form.new(form)
     |> Form.line(&Form.hidden_field(&1, :case_investigation_id))
-    |> Form.line(&Form.textarea_field(&1, :text, "Add note", span: 3))
+    |> Form.line(&Form.textarea_field(&1, :text, "", span: 6, placeholder: "Add note..."))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end

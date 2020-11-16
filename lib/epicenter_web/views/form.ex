@@ -150,7 +150,7 @@ defmodule EpicenterWeb.Form do
     [
       label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
-      textarea(f, field, rows: 4, data: grid_data(3, line, opts))
+      textarea(f, field, rows: 4, data: grid_data(3, line, opts), placeholder: Keyword.get(opts, :placeholder))
     ]
     |> add_to_line(line, opts)
   end
