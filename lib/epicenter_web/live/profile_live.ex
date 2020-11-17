@@ -74,7 +74,6 @@ defmodule EpicenterWeb.ProfileLive do
       displayable_clinical_status: 1,
       displayable_interview_status: 1,
       displayable_isolation_monitoring_status: 2,
-      displayable_symptom_onset_date: 1,
       displayable_symptoms: 1,
       history_items: 1,
       interview_buttons: 1,

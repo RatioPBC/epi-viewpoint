@@ -79,12 +79,6 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   def displayable_clinical_status(%{clinical_status: clinical_status}),
     do: Map.get(@clinical_status_map, clinical_status)
 
-  def displayable_symptom_onset_date(%{symptom_onset_date: nil}),
-    do: "None"
-
-  def displayable_symptom_onset_date(%{symptom_onset_date: symptom_onset_date}),
-    do: Format.date(symptom_onset_date)
-
   def displayable_symptoms(%{symptoms: nil}),
     do: "None"
 

@@ -95,7 +95,7 @@
                 td data-role="case-investigation-clinical-status-text"
                   = displayable_clinical_status(case_investigation)
                 td data-role="case-investigation-symptom-onset-date-text"
-                  = displayable_symptom_onset_date(case_investigation)
+                  = Format.date(case_investigation.symptom_onset_date, "None")
                 td data-role="case-investigation-symptoms-text"
                   = displayable_symptoms(case_investigation)
         .case-investigation-contacts id="contacts-#{case_investigation.name}"
