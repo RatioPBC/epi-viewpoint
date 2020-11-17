@@ -144,9 +144,9 @@
             tbody
               tr
                 td data-tid="case-investigation-001-isolation-order-sent-date"
-                  = displayable_date(case_investigation.isolation_order_sent_date, "Not sent")
+                  = Format.date(case_investigation.isolation_order_sent_date, "Not sent")
                 td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
-                  = displayable_date(case_investigation.isolation_clearance_order_sent_date, "Not sent")
+                  = Format.date(case_investigation.isolation_clearance_order_sent_date, "Not sent")
 
       .case-investigation-notes
         h3.additional_notes Additional Notes

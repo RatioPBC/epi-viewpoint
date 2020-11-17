@@ -64,6 +64,7 @@ defmodule EpicenterWeb.ProfileLive do
 
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
+  import EpicenterWeb.LiveComponent.Helpers
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
 
@@ -71,7 +72,6 @@ defmodule EpicenterWeb.ProfileLive do
     only: [
       contact_details_as_list: 1,
       displayable_clinical_status: 1,
-      displayable_date: 2,
       displayable_interview_status: 1,
       displayable_isolation_monitoring_status: 2,
       displayable_symptom_onset_date: 1,
@@ -83,7 +83,6 @@ defmodule EpicenterWeb.ProfileLive do
     ]
 
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
-  import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog

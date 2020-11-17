@@ -11,6 +11,9 @@ defmodule EpicenterWeb.Format do
     [non_postal_code, postal_code] |> Euclid.Extra.List.compact() |> Enum.join(" ")
   end
 
+  def date(nil, default), do: default
+  def date(value, _default), do: date(value)
+
   def date(nil), do: ""
   def date(%Date{} = date), do: "#{zero_pad(date.month, 2)}/#{zero_pad(date.day, 2)}/#{date.year}"
 

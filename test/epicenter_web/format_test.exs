@@ -42,6 +42,22 @@ defmodule EpicenterWeb.FormatTest do
     end
   end
 
+  describe "date (with default)" do
+    import EpicenterWeb.Format, only: [date: 2]
+
+    test "when given a nil, renders default vaue" do
+      assert date(nil, "foo") == "foo"
+    end
+
+    test "when given a date, formats it as mm/dd/yyyy" do
+      assert date(~D[2020-05-19], "foo") == "05/19/2020"
+    end
+
+    test "when given a datetime, formats it as mm/dd/yyyy in New_York" do
+      assert date(~U[2020-01-02 01:00:07Z], "foo") == "01/01/2020"
+    end
+  end
+
   describe "date" do
     import EpicenterWeb.Format, only: [date: 1]
 
