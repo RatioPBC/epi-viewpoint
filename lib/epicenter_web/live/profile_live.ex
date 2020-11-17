@@ -3,6 +3,7 @@ defmodule EpicenterWeb.ProfileLive do
 
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 2]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
@@ -21,7 +22,7 @@ defmodule EpicenterWeb.ProfileLive do
       isolation_monitoring_history_items: 1
     ]
 
-  import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 2]
+  import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
@@ -171,8 +172,6 @@ defmodule EpicenterWeb.ProfileLive do
 
   # # #
 
-  @unknown_text "Unknown"
-
   def age(dob) do
     Date.utc_today() |> Date.diff(dob) |> Integer.floor_div(365)
   end
@@ -195,22 +194,6 @@ defmodule EpicenterWeb.ProfileLive do
     person
     |> Map.get(:phones)
     |> Enum.map(&Format.phone/1)
-  end
-
-  def string_or_unknown(value, text \\ @unknown_text) do
-    if Euclid.Exists.present?(value),
-      do: value,
-      else: unknown_value(text)
-  end
-
-  def list_or_unknown(values) do
-    if Euclid.Exists.present?(values) do
-      Phoenix.HTML.Tag.content_tag :ul do
-        Enum.map(values, &Phoenix.HTML.Tag.content_tag(:li, &1))
-      end
-    else
-      unknown_value()
-    end
   end
 
   @ethnicity_values_map %{
@@ -246,10 +229,6 @@ defmodule EpicenterWeb.ProfileLive do
   def detailed_ethnicities(%{ethnicity: nil}), do: []
   def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
   def detailed_ethnicities(person), do: person.ethnicity.detailed
-
-  def unknown_value(text \\ @unknown_text) do
-    Phoenix.HTML.Tag.content_tag(:span, text, class: "unknown")
-  end
 
   def navigation_prompt(note_changesets) do
     note_changesets

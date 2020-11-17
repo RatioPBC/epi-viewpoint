@@ -8,6 +8,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   alias Epicenter.Extra
   alias Epicenter.Test
   alias Epicenter.Test.HtmlAssertions
+  alias EpicenterWeb.Test.LiveViewAssertions
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
@@ -111,7 +112,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   def assert_race(%View{} = view, expected_race) do
-    view |> Pages.parse() |> Test.Html.text("[data-role=race]") |> assert_eq(expected_race, returning: view)
+    view |> LiveViewAssertions.assert_role_list("race", expected_race)
   end
 
   def assert_sex_at_birth(%View{} = view, expected_sex_at_birth) do

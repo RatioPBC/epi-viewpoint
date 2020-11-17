@@ -3,6 +3,10 @@ defmodule Epicenter.MajorDetailedTest do
 
   alias Epicenter.MajorDetailed
 
+  defmodule TestStruct do
+    defstruct ~w{race race_other}a
+  end
+
   describe "combine" do
     test "combines a bunch of fields into a MajorDetailed map" do
       %{
@@ -23,6 +27,24 @@ defmodule Epicenter.MajorDetailedTest do
         },
         :simple
       )
+    end
+
+    test "works on structs too" do
+      %TestStruct{race: ["asian"], race_other: "Other"}
+      |> MajorDetailed.combine(:race)
+      |> assert_eq(%{"asian" => nil, "Other" => nil}, :simple)
+    end
+
+    test "deals with nils" do
+      %{
+        "race" => ["asian"],
+        "race_asian" => nil,
+        "race_asian_other" => nil,
+        "race_native_hawaiian_or_other_pacific_islander_other" => nil,
+        "race_other" => nil
+      }
+      |> MajorDetailed.combine(:race)
+      |> assert_eq(%{"asian" => nil}, :simple)
     end
   end
 

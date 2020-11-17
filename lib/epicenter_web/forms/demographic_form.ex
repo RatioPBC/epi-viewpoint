@@ -102,7 +102,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
            marital_status: form.marital_status,
            notes: form.notes,
            occupation: form.occupation,
-           race: extract_race(form),
+           race: MajorDetailed.combine(form, :race),
            sex_at_birth: form.sex_at_birth,
            source: "form"
          }}
@@ -128,30 +128,6 @@ defmodule EpicenterWeb.Forms.DemographicForm do
 
   defp extract_gender_identity(form) do
     [form.gender_identity, form.gender_identity_other] |> flat_compact()
-  end
-
-  defp extract_race(form) do
-    form.race
-    |> List.wrap()
-    |> Enum.reduce(%{}, fn
-      "asian", acc ->
-        Map.put(acc, "asian", [form.race_asian, form.race_asian_other] |> flat_compact())
-
-      "native_hawaiian_or_other_pacific_islander", acc ->
-        Map.put(
-          acc,
-          "native_hawaiian_or_other_pacific_islander",
-          [form.race_native_hawaiian_or_other_pacific_islander, form.race_native_hawaiian_or_other_pacific_islander_other] |> flat_compact()
-        )
-
-      race, acc ->
-        Map.put(acc, race, nil)
-    end)
-    |> (fn extracted ->
-          if Euclid.Exists.present?(form.race_other),
-            do: Map.put(extracted, form.race_other, nil),
-            else: extracted
-        end).()
   end
 
   defp flat_compact(list) do

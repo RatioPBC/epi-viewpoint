@@ -1,4 +1,7 @@
 defmodule Epicenter.MajorDetailed do
+  def combine(struct, prefix) when is_struct(struct),
+    do: struct |> Map.from_struct() |> combine(prefix)
+
   def combine(map, prefix) do
     prefix = Euclid.Extra.Atom.to_string(prefix)
     map = map |> Euclid.Extra.Map.stringify_keys()
@@ -17,11 +20,11 @@ defmodule Epicenter.MajorDetailed do
 
         key =~ ~r/^#{prefix}_(.*)_other$/ ->
           [_, new_key] = Regex.run(~r/^#{prefix}_(.*)_other$/, key)
-          put_or_concat_map_value(result, new_key, value)
+          if value, do: put_or_concat_map_value(result, new_key, value), else: result
 
-        key =~ ~r/^#{prefix}_(.*)$/ ->
-          [_, new_key] = Regex.run(~r/^#{prefix}_(.*)$/, key)
-          put_or_concat_map_value(result, new_key, value)
+        key =~ ~r/^#{prefix}_(.*(?<!_other))$/ ->
+          [_, new_key] = Regex.run(~r/^#{prefix}_(.*(?<!_other))$/, key)
+          if value, do: put_or_concat_map_value(result, new_key, value), else: result
       end
     end)
   end
@@ -47,6 +50,9 @@ defmodule Epicenter.MajorDetailed do
   defp standard_value?(value, standard_values) do
     Enum.any?(standard_values, fn {_display, standard_value, _parent} -> value == standard_value end)
   end
+
+  defp put_or_concat_map_value(map, nil, _new_value),
+    do: map
 
   defp put_or_concat_map_value(map, key, new_value) do
     if Map.get(map, key) == nil,

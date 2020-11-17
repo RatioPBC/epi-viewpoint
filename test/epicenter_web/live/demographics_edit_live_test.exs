@@ -252,10 +252,17 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Other" => false,
         "White" => false
       })
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"race" => ["asian"]})
-      |> Pages.Profile.assert_race("Asian")
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form",
+        demographic_form: %{
+          "race" => ["asian"],
+          "race_asian_other" => "",
+          "race_native_hawaiian_or_other_pacific_islander_other" => "",
+          "race_other" => ""
+        }
+      )
+      |> Pages.Profile.assert_race(["Asian"])
 
-      assert demographics(person.id).race == %{"asian" => []}
+      assert demographics(person.id).race == %{"asian" => nil}
     end
   end
 
