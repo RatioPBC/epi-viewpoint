@@ -3,7 +3,7 @@ defmodule Epicenter.Cases.CaseInvestigationNote do
   import Ecto.Changeset
 
   @required_attrs ~w{author_id case_investigation_id text}a
-  @optional_attrs ~w{tid}a
+  @optional_attrs ~w{tid deleted_at}a
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -15,6 +15,7 @@ defmodule Epicenter.Cases.CaseInvestigationNote do
     field :text, :string
     field :tid, :string
     field :case_investigation_id, :binary_id
+    field :deleted_at, :utc_datetime
 
     belongs_to :author, Epicenter.Accounts.User
 

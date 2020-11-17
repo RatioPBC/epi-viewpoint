@@ -14,6 +14,7 @@ defmodule Epicenter.Cases.CaseInvestigationNoteTest do
           {:id, :binary_id},
           {:inserted_at, :utc_datetime},
           {:case_investigation_id, :binary_id},
+          {:deleted_at, :utc_datetime},
           {:seq, :integer},
           {:tid, :string},
           {:text, :string},

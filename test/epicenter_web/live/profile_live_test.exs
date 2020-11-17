@@ -578,6 +578,26 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.assert_case_investigation_note_validation_messages("001", %{"form_field_data_text" => "can't be blank"})
     end
 
+    test "lets you remove your note", %{person: person, user: user, conn: conn} do
+      build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+
+      view =
+        Pages.Profile.visit(conn, person)
+        |> Pages.Profile.add_note("001", "this is my note")
+
+      [note] = Pages.Profile.case_investigation_notes(view, "001")
+
+      assert Pages.Profile.remove_note(view, note.id) == :ok
+
+      assert [] = Pages.Profile.case_investigation_notes(view, "001")
+    end
+
+    # test "doesn't let you remove someone else's note", %{person: person, user: user, conn: conn} do
+    #   view = Pages.Profile.visit(conn, person)
+
+    #   assert Pages.Profile.remove_note(view, someone_elses_note.id) == :remove_button_isnt_there
+    # end
+
     test "warns you that there are changes if you try to navigate away", %{person: person, user: user, conn: conn} do
       build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
       view = Pages.Profile.visit(conn, person)

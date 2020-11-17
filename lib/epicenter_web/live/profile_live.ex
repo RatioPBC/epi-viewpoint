@@ -151,6 +151,39 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
+  @clock Application.fetch_env!(:epicenter, :clock)
+
+  def handle_event("remove-note", %{"note-id" => note_id}, socket) do
+    case_investigation =
+      socket.assigns.case_investigations
+      |> Enum.find(fn case_investigation ->
+        case_investigation.notes |> Enum.find(&(&1.id == note_id))
+      end)
+
+    {:ok, _} =
+      Cases.update_case_investigation(case_investigation, {
+        %{
+          notes:
+            case_investigation.notes
+            |> Enum.map(fn note ->
+              case note.id do
+                ^note_id -> %{id: note_id, deleted_at: @clock.utc_now()}
+                id -> %{id: id}
+              end
+            end)
+        },
+        %AuditLog.Meta{
+          author_id: socket.assigns.current_user.id,
+          reason_action: AuditLog.Revision.remove_case_investigation_note_action(),
+          reason_event: AuditLog.Revision.remove_case_investigation_note_event()
+        }
+      })
+
+    socket
+    |> assign_case_investigations(socket.assigns.person)
+    |> noreply()
+  end
+
   def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
     do: handle_event("form-change", %{"user" => nil}, socket)
 
