@@ -44,15 +44,17 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
     assert ~D[2020-08-11] == case_investigation.isolation_clearance_order_sent_date
   end
 
-  #  test "prefills date started with symptom onset date if present", %{conn: conn, case_investigation: case_investigation} do
-  #    Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
-  #    |> Pages.CaseInvestigationIsolationOrder.assert_here()
-  #    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_date_started(
-  #      "11/03/2020",
-  #      "Onset date: 11/03/2020\n\nPositive lab sample: 10/27/2020"
-  #    )
-  #    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_date_ended("11/13/2020")
-  #  end
+  test "prefills date started with symptom onset date if present", %{conn: conn, case_investigation: case_investigation} do
+    {:ok, _} =
+      Cases.update_case_investigation(
+        case_investigation,
+        {%{isolation_clearance_order_sent_date: ~D[2020-11-11], isolation_order_sent_date: ~D[2020-11-01]}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_order_sent_date("11/01/2020")
+    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_clearance_order_sent_date("11/11/2020")
+  end
 
   describe "validations" do
     test "shows the errors for invalid dates", %{conn: conn, case_investigation: case_investigation} do

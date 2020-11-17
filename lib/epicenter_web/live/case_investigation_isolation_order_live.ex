@@ -8,6 +8,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
   alias Epicenter.DateParser
   alias Epicenter.Validation
   alias EpicenterWeb.Form
+  alias EpicenterWeb.Format
 
   defmodule IsolationOrderForm do
     use Ecto.Schema
@@ -22,8 +23,11 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
       field :order_sent_date, :string
     end
 
-    def changeset(_case_investigation, attrs) do
-      %IsolationOrderForm{clearance_order_sent_date: nil, order_sent_date: nil}
+    def changeset(case_investigation, attrs) do
+      %IsolationOrderForm{
+        clearance_order_sent_date: Format.date(case_investigation.isolation_clearance_order_sent_date),
+        order_sent_date: Format.date(case_investigation.isolation_order_sent_date)
+      }
       |> cast(attrs, @required_attrs ++ @optional_attrs)
       |> Validation.validate_date(:clearance_order_sent_date)
       |> Validation.validate_date(:order_sent_date)
