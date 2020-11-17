@@ -1,4 +1,4 @@
-defmodule CaseInvestigationNoteForm do
+defmodule EpicenterWeb.CaseInvestigationNoteForm do
   use EpicenterWeb, :live_component
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 1]
@@ -88,6 +88,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Format
+  alias EpicenterWeb.CaseInvestigationNoteForm
 
   @clock Application.get_env(:epicenter, :clock)
 
