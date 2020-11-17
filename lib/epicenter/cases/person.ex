@@ -65,6 +65,14 @@ defmodule Epicenter.Cases.Person do
     |> cast_assoc(:phones, with: &Phone.changeset/2)
   end
 
+  def latest_case_investigation(person) do
+    person
+    |> Cases.preload_case_investigations()
+    |> Map.get(:case_investigations)
+    |> Enum.sort_by(& &1.seq, :desc)
+    |> Enum.max_by(& &1.inserted_at, Extra.Date.NilFirst, fn -> nil end)
+  end
+
   def latest_lab_result(person) do
     person
     |> Cases.preload_lab_results()

@@ -6,6 +6,7 @@ defmodule EpicenterWeb.PeopleLive do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
 
@@ -33,9 +34,6 @@ defmodule EpicenterWeb.PeopleLive do
 
   def handle_info({:people, updated_people}, socket),
     do: socket |> set_selected() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
-
-  def handle_event("reload-people", _, socket),
-    do: socket |> set_reload_message(nil) |> load_people() |> noreply()
 
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
     do: socket |> select_person(person_id) |> noreply()
@@ -66,14 +64,14 @@ defmodule EpicenterWeb.PeopleLive do
     socket |> set_selected() |> refresh_existing_people(updated_people) |> noreply()
   end
 
-  def handle_event("toggle-assigned-to-me", _, socket) do
-    socket
-    |> assign(:only_assigned_to_me, !socket.assigns[:only_assigned_to_me])
-    |> noreply()
-  end
-
   def handle_event("form-change", _, socket),
     do: socket |> noreply()
+
+  def handle_event("reload-people", _, socket),
+    do: socket |> set_reload_message(nil) |> load_people() |> noreply()
+
+  def handle_event("toggle-assigned-to-me", _, socket),
+    do: socket |> assign(:only_assigned_to_me, !socket.assigns[:only_assigned_to_me]) |> noreply()
 
   # # # View helpers
 
@@ -83,20 +81,19 @@ defmodule EpicenterWeb.PeopleLive do
   def assigned_to_name(%Person{assigned_to: assignee}),
     do: assignee.name
 
+  def disabled?(selected_people),
+    do: selected_people == %{}
+
+  def external_id(person),
+    do: Person.coalesce_demographics(person).external_id
+
   def full_name(person) do
     demographic = Person.coalesce_demographics(person)
     [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
   end
 
-  def external_id(person) do
-    Person.coalesce_demographics(person).external_id
-  end
-
-  def disabled?(selected_people),
-    do: selected_people == %{}
-
-  def selected?(selected_people, %Person{id: person_id}),
-    do: Map.has_key?(selected_people, person_id)
+  def latest_case_investigation_status(person),
+    do: person |> Person.latest_case_investigation() |> displayable_status()
 
   def latest_result(person) do
     lab_result = Person.latest_lab_result(person)
@@ -110,6 +107,13 @@ defmodule EpicenterWeb.PeopleLive do
     end
   end
 
+  def page_title(:call_list), do: "Call List"
+  def page_title(:contacts), do: "Contacts"
+  def page_title(:with_positive_lab_results), do: "Index Cases"
+
+  def selected?(selected_people, %Person{id: person_id}),
+    do: Map.has_key?(selected_people, person_id)
+
   def visible_people(people, only_assigned_to_me, user)
 
   def visible_people(people, true, user) do
@@ -118,23 +122,48 @@ defmodule EpicenterWeb.PeopleLive do
 
   def visible_people(people, false, _), do: people
 
-  defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
-  defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago_string()
-
-  def page_title(:call_list), do: "Call List"
-  def page_title(:contacts), do: "Contacts"
-  def page_title(:with_positive_lab_results), do: "Index Cases"
-
   # # # Private
 
   defp assign_people(socket, people),
     do: assign(socket, people: people, person_count: length(people))
 
+  defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
+  defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago_string()
+
+  defp displayable_status(nil),
+    do: ""
+
+  defp displayable_status(case_investigation) do
+    case CaseInvestigation.status(case_investigation) do
+      :pending ->
+        "Pending interview"
+
+      :started ->
+        "Ongoing interview"
+
+      :completed_interview ->
+        case CaseInvestigation.isolation_monitoring_status(case_investigation) do
+          :pending -> "Pending monitoring"
+          :ongoing -> "Ongoing monitoring"
+          :concluded -> "Concluded monitoring"
+        end
+
+      :discontinued ->
+        "Discontinued"
+    end
+  end
+
   defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.delete(selected_people, person_id))
 
   defp load_people(socket) do
-    people = Cases.list_people(socket.assigns.filter) |> Cases.preload_lab_results() |> Cases.preload_assigned_to() |> Cases.preload_demographics()
+    people =
+      Cases.list_people(socket.assigns.filter)
+      |> Cases.preload_lab_results()
+      |> Cases.preload_assigned_to()
+      |> Cases.preload_demographics()
+      |> Cases.preload_case_investigations()
+
     assign_people(socket, people)
   end
 

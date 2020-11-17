@@ -33,4 +33,12 @@ defmodule EpicenterWeb.Test.Pages.People do
     assert view |> assignees() == expected_assignees
     view
   end
+
+  def assert_table_contents(%View{} = view, expected_table_content) do
+    assert table_contents(view) == expected_table_content
+    view
+  end
+
+  defp table_contents(index_live, opts \\ []),
+    do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 end

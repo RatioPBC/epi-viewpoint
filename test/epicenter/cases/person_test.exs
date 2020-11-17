@@ -148,6 +148,31 @@ defmodule Epicenter.Cases.PersonTest do
     end
   end
 
+  describe "latest_case_investigation" do
+    test "returns nil if no lab results" do
+      Test.Fixtures.user_attrs(@admin, "user")
+      |> Accounts.register_user!()
+      |> Test.Fixtures.person_attrs("alice")
+      |> Cases.create_person!()
+      |> Person.latest_case_investigation()
+      |> assert_eq(nil)
+    end
+
+    test "returns the case investigation with the most recent created at date" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      new_lab_result = Test.Fixtures.lab_result_attrs(alice, user, "new_lab_result", "06-02-2020") |> Cases.create_lab_result!()
+      newer_lab_result = Test.Fixtures.lab_result_attrs(alice, user, "newer_lab_result", "06-02-2020") |> Cases.create_lab_result!()
+      newest_lab_result = Test.Fixtures.lab_result_attrs(alice, user, "newest_lab_result", "06-02-2020") |> Cases.create_lab_result!()
+
+      Test.Fixtures.case_investigation_attrs(alice, new_lab_result, user, "new") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(alice, newer_lab_result, user, "newer") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(alice, newest_lab_result, user, "newest") |> Cases.create_case_investigation!()
+
+      assert Person.latest_case_investigation(alice).tid == "newest"
+    end
+  end
+
   describe "latest_lab_result" do
     test "returns nil if no lab results" do
       Test.Fixtures.user_attrs(@admin, "user")
