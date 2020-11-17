@@ -17,10 +17,12 @@ defmodule Epicenter.Cases.CaseInvestigation do
     discontinue_reason
     discontinued_at
     interview_proxy_name
+    isolation_clearance_order_sent_date
     isolation_concluded_at
     isolation_conclusion_reason
     isolation_monitoring_end_date
     isolation_monitoring_start_date
+    isolation_order_sent_date
     name
     started_at
     symptom_onset_date

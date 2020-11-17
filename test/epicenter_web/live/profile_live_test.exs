@@ -510,7 +510,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> assert_redirects_to("/case-investigations/#{case_investigation.id}/isolation-monitoring")
     end
 
-    test "case investigations with a isolation monitoring conclusion can be edited", %{conn: conn, person: person, user: user} do
+    test "case investigations with an isolation monitoring conclusion can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
         build_case_investigation(person, user, "case_investigation", nil, %{
           completed_interview_at: ~U[2020-10-05 19:57:00Z],

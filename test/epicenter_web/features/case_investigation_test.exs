@@ -145,7 +145,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-order-form",
       isolation_order_form: %{
         "order_sent_date" => "10/28/2020",
-        "order_clearance_date" => "11/10/2020"
+        "clearance_order_sent_date" => "11/10/2020"
       }
     )
     |> Pages.Profile.assert_here(person)

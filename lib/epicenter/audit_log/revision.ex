@@ -72,6 +72,7 @@ defmodule Epicenter.AuditLog.Revision do
   def discontinue_pending_case_interview_event(), do: "discontinue-pending-case-interview"
   def edit_case_interview_clinical_details_event(), do: "edit-case-investigation-clinical-details"
   def edit_case_investigation_isolation_monitoring_event(), do: "edit-case-investigation-isolation-monitoring"
+  def edit_case_investigation_isolation_order_event(), do: "edit-case-investigation-isolation-order"
   def edit_profile_demographics_event(), do: "edit-profile-demographics"
   def edit_profile_saved_event(), do: "edit-profile-saved"
   def import_csv_event(), do: "import-csv"
