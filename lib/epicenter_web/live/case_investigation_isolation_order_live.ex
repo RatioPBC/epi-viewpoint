@@ -6,6 +6,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.DateParser
+  alias Epicenter.Validation
   alias EpicenterWeb.Form
 
   defmodule IsolationOrderForm do
@@ -24,9 +25,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
     def changeset(_case_investigation, attrs) do
       %IsolationOrderForm{clearance_order_sent_date: nil, order_sent_date: nil}
       |> cast(attrs, @required_attrs ++ @optional_attrs)
-
-      # |> Validation.validate_date(:clearance_order_sent_date)
-      # |> Validation.validate_date(:order_sent_date)
+      |> Validation.validate_date(:clearance_order_sent_date)
+      |> Validation.validate_date(:order_sent_date)
     end
 
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
@@ -79,6 +79,9 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
          {:form, {:ok, model_attrs}} <- {:form, IsolationOrderForm.form_changeset_to_model_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, model_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
+    else
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        socket |> assign(:form_changeset, form_changeset) |> noreply()
     end
   end
 

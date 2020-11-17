@@ -54,21 +54,21 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
   #    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_date_ended("11/13/2020")
   #  end
 
-  #  describe "validations" do
-  #    test "shows the errors for invalid dates", %{conn: conn, case_investigation: case_investigation} do
-  #      Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
-  #      |> Pages.submit_live("#case-investigation-isolation-order-form",
-  #        isolation_order_form: %{
-  #          "order_sent_date" => "02/31/2020",
-  #          "order_clearance_date" => "09/32/2020"
-  #        }
-  #      )
-  #      |> Pages.assert_validation_messages(%{
-  #        "isolation_order_form_order_sent_date" => "must be a valid MM/DD/YYYY date",
-  #        "isolation_order_form_order_clearance_date" => "must be a valid MM/DD/YYYY date"
-  #      })
-  #    end
-  #  end
+  describe "validations" do
+    test "shows the errors for invalid dates", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
+      |> Pages.submit_live("#case-investigation-isolation-order-form",
+        isolation_order_form: %{
+          "order_sent_date" => "02/31/2020",
+          "clearance_order_sent_date" => "09/32/2020"
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "isolation_order_form_order_sent_date" => "must be a valid MM/DD/YYYY date",
+        "isolation_order_form_clearance_order_sent_date" => "must be a valid MM/DD/YYYY date"
+      })
+    end
+  end
 
   #  describe "warning the user when navigation will erase their changes" do
   #    test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
