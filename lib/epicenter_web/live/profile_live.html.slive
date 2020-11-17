@@ -152,16 +152,7 @@
         h3.additional_notes Additional Notes
         = component(@socket, CaseInvestigationNoteForm, case_investigation.id <> "note form", case_investigation_id: case_investigation.id, current_user_id: @current_user.id)
         = for note <- case_investigation.notes |> Enum.reverse() do
-          div.case-investigation-note data-note-id=note.id data-role="case-investigation-note-#{case_investigation.name}"
-            div.case-investigation-note-header
-              span.case-investigation-note-author data-role="case-investigation-note-author" = note.author.name
-              span data-role="case-investigation-note-date" = Format.date(note.inserted_at)
-            div.case-investigation-note-text data-role="case-investigation-note-text" = note.text
-            = if note.author_id == @current_user.id do
-              div
-                a href="#" class="case-investigation-delete-link" data-confirm="Remove your note?" phx-click="remove-note" phx-value-note-id=note.id data-role="remove-note" Delete
-
-
+          = component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user.id)
 
   section#lab-results data-role="lab-results"
     header

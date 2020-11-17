@@ -315,7 +315,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.all("[data-role=case-investigation-note-#{number}}]", fn note_el ->
+    |> Test.Html.all("#case-investigation-#{number} [data-role=case-investigation-note]", fn note_el ->
       id = Test.Html.attr(note_el, "data-note-id") |> List.first()
       text = Test.Html.find(note_el, "[data-role=case-investigation-note-text]") |> Test.Html.text()
       author = Test.Html.find(note_el, "[data-role=case-investigation-note-author]") |> Test.Html.text()

@@ -16,6 +16,8 @@ defmodule Epicenter.Cases do
 
   import Ecto.Query, only: [distinct: 3, first: 1]
 
+  @clock Application.get_env(:epicenter, :clock)
+
   #
   # lab results
   #
@@ -36,16 +38,6 @@ defmodule Epicenter.Cases do
   def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
 
-  def change_case_investigation_note(%CaseInvestigationNote{} = case_investigation_note, attrs),
-    do: CaseInvestigationNote.changeset(case_investigation_note, attrs)
-
-  def create_case_investigation_note({attrs, audit_meta}),
-    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert(audit_meta)
-
-  def create_case_investigation_note!({attrs, audit_meta}),
-    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert!(audit_meta)
-
-  def preload_case_investigation_notes(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(notes: :author)
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
   def preload_person(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:person)
 
@@ -62,13 +54,32 @@ defmodule Epicenter.Cases do
   def broadcast_case_investigation_updated(case_investigation_id) do
     case_investigation = get_case_investigation(case_investigation_id)
     case_investigation = preload_person(case_investigation)
-
     Phoenix.PubSub.broadcast(Epicenter.PubSub, "case_investigation_updated_for:#{case_investigation.person.id}", :case_investigation_updated)
   end
 
   #
+  # case investigation notes
+  #
+  def change_case_investigation_note(%CaseInvestigationNote{} = case_investigation_note, attrs),
+    do: CaseInvestigationNote.changeset(case_investigation_note, attrs)
+
+  def create_case_investigation_note({attrs, audit_meta}),
+    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert(audit_meta)
+
+  def create_case_investigation_note!({attrs, audit_meta}),
+    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert!(audit_meta)
+
+  def delete_case_investigation_note(case_investigation_note, audit_meta),
+    do: CaseInvestigationNote.changeset(case_investigation_note, %{deleted_at: @clock.utc_now()}) |> AuditLog.update(audit_meta)
+
+  def preload_case_investigation_notes(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:notes)
+
+  def preload_author(notes_or_nil), do: notes_or_nil |> Repo.preload(:author)
+
+  #
   # people
   #
+
   def assign_user_to_people(user_id: nil, people_ids: people_ids, audit_meta: audit_meta),
     do: assign_user_to_people(user: nil, people_ids: people_ids, audit_meta: audit_meta)
 

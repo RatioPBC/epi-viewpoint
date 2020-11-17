@@ -1,3 +1,51 @@
+defmodule EpicenterWeb.CaseInvestigationNote do
+  use EpicenterWeb, :live_component
+
+  import EpicenterWeb.LiveHelpers, only: [noreply: 1]
+
+  alias Epicenter.AuditLog
+  alias Epicenter.Cases
+  alias EpicenterWeb.Format
+
+  def preload(assigns) do
+    notes =
+      assigns
+      |> Enum.map(fn a -> a.note end)
+      |> Cases.preload_author()
+
+    assigns
+    |> Enum.with_index()
+    |> Enum.map(fn {a, i} -> Map.put(a, :note, Enum.at(notes, i)) end)
+  end
+
+  def render(assigns) do
+    ~L"""
+    <div class="case-investigation-note" data-role="case-investigation-note" data-note-id="<%= @note.id %>">
+        <div class="case-investigation-note-header">
+          <span class="case-investigation-note-author" data-role="case-investigation-note-author"><%= @note.author.name %></span>
+          <span data-role="case-investigation-note-date"><%= Format.date(@note.inserted_at) %></span>
+        </div>
+        <div class="case-investigation-note-text" data-role="case-investigation-note-text"><%= @note.text %></div>
+      <%= if @note.author_id == @current_user_id do %>
+        <div><a href="#" class="case-investigation-delete-link" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target="<%= @myself %>">Delete</a></div>
+      <% end %>
+    </div>
+    """
+  end
+
+  def handle_event("remove-note", _params, socket) do
+    {:ok, _} =
+      Cases.delete_case_investigation_note(socket.assigns.note, %AuditLog.Meta{
+        author_id: socket.assigns.current_user_id,
+        reason_action: AuditLog.Revision.remove_case_investigation_note_action(),
+        reason_event: AuditLog.Revision.remove_case_investigation_note_event()
+      })
+
+    Cases.broadcast_case_investigation_updated(socket.assigns.note.case_investigation_id)
+    socket |> noreply()
+  end
+end
+
 defmodule EpicenterWeb.CaseInvestigationNoteForm do
   use EpicenterWeb, :live_component
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
@@ -88,6 +136,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Format
+  alias EpicenterWeb.CaseInvestigationNote
   alias EpicenterWeb.CaseInvestigationNoteForm
 
   @clock Application.get_env(:epicenter, :clock)
@@ -144,39 +193,6 @@ defmodule EpicenterWeb.ProfileLive do
         }
       )
     end
-
-    socket
-    |> assign_case_investigations(socket.assigns.person)
-    |> noreply()
-  end
-
-  @clock Application.fetch_env!(:epicenter, :clock)
-
-  def handle_event("remove-note", %{"note-id" => note_id}, socket) do
-    case_investigation =
-      socket.assigns.case_investigations
-      |> Enum.find(fn case_investigation ->
-        case_investigation.notes |> Enum.find(&(&1.id == note_id))
-      end)
-
-    {:ok, _} =
-      Cases.update_case_investigation(case_investigation, {
-        %{
-          notes:
-            case_investigation.notes
-            |> Enum.map(fn note ->
-              case note.id do
-                ^note_id -> %{id: note_id, deleted_at: @clock.utc_now()}
-                id -> %{id: id}
-              end
-            end)
-        },
-        %AuditLog.Meta{
-          author_id: socket.assigns.current_user.id,
-          reason_action: AuditLog.Revision.remove_case_investigation_note_action(),
-          reason_event: AuditLog.Revision.remove_case_investigation_note_event()
-        }
-      })
 
     socket
     |> assign_case_investigations(socket.assigns.person)
