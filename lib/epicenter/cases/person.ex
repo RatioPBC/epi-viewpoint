@@ -63,22 +63,6 @@ defmodule Epicenter.Cases.Person do
     |> cast_assoc(:phones, with: &Phone.changeset/2)
   end
 
-  def latest_case_investigation(person) do
-    person
-    |> Cases.preload_case_investigations()
-    |> Map.get(:case_investigations)
-    |> Enum.sort_by(& &1.seq, :desc)
-    |> Enum.max_by(& &1.inserted_at, Extra.Date.NilFirst, fn -> nil end)
-  end
-
-  def latest_lab_result(person) do
-    person
-    |> Cases.preload_lab_results()
-    |> Map.get(:lab_results)
-    |> Enum.sort_by(& &1.seq, :desc)
-    |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst, fn -> nil end)
-  end
-
   def coalesce_demographics(person) do
     scores = %{"form" => 0, "import" => 1}
 
@@ -101,21 +85,45 @@ defmodule Epicenter.Cases.Person do
     end)
   end
 
+  def latest_case_investigation(person) do
+    person
+    |> Cases.preload_case_investigations()
+    |> Map.get(:case_investigations)
+    |> Enum.sort_by(& &1.seq, :desc)
+    |> Enum.max_by(& &1.inserted_at, Extra.Date.NilFirst, fn -> nil end)
+  end
+
+  def latest_lab_result(person) do
+    person
+    |> Cases.preload_lab_results()
+    |> Map.get(:lab_results)
+    |> Enum.sort_by(& &1.seq, :desc)
+    |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst, fn -> nil end)
+  end
+
   def optional_attrs(), do: @optional_attrs
 
   defmodule Query do
     import Ecto.Query
 
-    def all() do
-      from person in Person,
-        order_by: [asc: person.seq]
+    def all(), do: from(person in Person, order_by: [asc: person.seq])
+
+    def call_list() do
+      fifteen_days_ago = Extra.Date.days_ago(15)
+
+      from person in all(),
+        join: lab_result in assoc(person, :lab_results),
+        where: ilike(lab_result.result, "positive"),
+        or_where: ilike(lab_result.result, "detected"),
+        where: lab_result.sampled_on > ^fifteen_days_ago
     end
 
-    def get_people(ids) do
-      from person in Person,
-        where: person.id in ^ids,
-        order_by: [asc: person.seq]
-    end
+    def get_people(ids), do: from(person in Person, where: person.id in ^ids, order_by: [asc: person.seq])
+
+    @fields_to_replace_from_csv ~w{updated_at}a
+    def opts_for_upsert(), do: [returning: true, on_conflict: {:replace, @fields_to_replace_from_csv}, conflict_target: :fingerprint]
+
+    def with_demographic_field(query, field, value), do: query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
 
     def with_positive_lab_results() do
       from person in Person,
@@ -133,25 +141,6 @@ defmodule Epicenter.Cases.Person do
         where: ilike(lab_result.result, "positive"),
         or_where: ilike(lab_result.result, "detected"),
         group_by: lab_result.person_id
-    end
-
-    def call_list() do
-      fifteen_days_ago = Extra.Date.days_ago(15)
-
-      from person in all(),
-        join: lab_result in assoc(person, :lab_results),
-        where: ilike(lab_result.result, "positive"),
-        or_where: ilike(lab_result.result, "detected"),
-        where: lab_result.sampled_on > ^fifteen_days_ago
-    end
-
-    def with_demographic_field(query, field, value) do
-      query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
-    end
-
-    @fields_to_replace_from_csv ~w{updated_at}a
-    def opts_for_upsert() do
-      [returning: true, on_conflict: {:replace, @fields_to_replace_from_csv}, conflict_target: :fingerprint]
     end
   end
 end
