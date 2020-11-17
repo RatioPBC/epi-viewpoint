@@ -1,4 +1,4 @@
-#profile-page data-page="profile" data-tid=@person.tid data-role="profile-page" data-confirm-navigation=navigation_prompt(@note_changesets)
+#profile-page data-page="profile" data-tid=@person.tid data-role="profile-page"
 
   section
     header#subnav
@@ -52,7 +52,7 @@
 
   a#case-investigations
   = for case_investigation <- @case_investigations do
-    section.case-investigation
+    section.case-investigation id="case-investigation-#{case_investigation.name}"
       header data-role="case-investigation-title"
         h2= "Case investigation #{case_investigation.name}"
 
@@ -150,8 +150,7 @@
 
       .case-investigation-notes
         h3.additional_notes Additional Notes
-        = form_for @note_changesets[case_investigation.id], "#", [id: "case-investigation-add-note-form-#{case_investigation.name}", phx_change: "change_note", phx_submit: "save_note"], fn f ->
-              = add_note_form_builder(f, case_investigation)
+        = component(@socket, CaseInvestigationNoteForm, case_investigation.id <> "note form", case_investigation_id: case_investigation.id, current_user_id: @current_user.id)
         = for note <- case_investigation.notes |> Enum.reverse() do
           div.case-investigation-note data-role="case-investigation-note-#{case_investigation.name}"
             div.case-investigation-note-header

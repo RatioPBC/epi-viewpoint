@@ -55,6 +55,17 @@ defmodule Epicenter.Cases do
   def update_case_investigation(%CaseInvestigation{} = case_investigation, {attrs, audit_meta}),
     do: case_investigation |> change_case_investigation(attrs) |> AuditLog.update(audit_meta)
 
+  def subscribe_to_case_investigation_updates_for(person_id) do
+    Phoenix.PubSub.subscribe(Epicenter.PubSub, "case_investigation_updated_for:#{person_id}")
+  end
+
+  def broadcast_case_investigation_updated(case_investigation_id) do
+    case_investigation = get_case_investigation(case_investigation_id)
+    case_investigation = preload_person(case_investigation)
+
+    Phoenix.PubSub.broadcast(Epicenter.PubSub, "case_investigation_updated_for:#{case_investigation.person.id}", :case_investigation_updated)
+  end
+
   #
   # people
   #

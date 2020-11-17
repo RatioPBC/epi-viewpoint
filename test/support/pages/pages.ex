@@ -135,6 +135,13 @@ defmodule EpicenterWeb.Test.Pages do
         false
     end)
     |> Enum.reduce(%{}, fn
+      {"textarea", _attrs, _children} = element, acc ->
+        acc
+        |> Map.put(
+          Test.Html.attr(element, "name") |> List.first(),
+          Test.Html.text(element)
+        )
+
       {"select", _attrs, _children} = element, acc ->
         acc
         |> Map.put(

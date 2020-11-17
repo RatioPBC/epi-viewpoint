@@ -557,11 +557,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       view =
         Pages.Profile.visit(conn, person)
+        |> Pages.Profile.change_note_form("001", %{"text" => "A new note"})
         |> Pages.Profile.add_note("001", "A new note")
 
       [note] = Pages.Profile.case_investigation_notes(view, "001")
       assert %{text: "A new note", author: ^username} = note
       assert {:ok, _} = Epicenter.DateParser.parse_mm_dd_yyyy(note.date)
+      %{"form_field_data[text]" => text} = Pages.form_state(view)
+      assert text |> Euclid.Exists.blank?()
 
       assert [note] = case_investigation |> Cases.preload_case_investigation_notes() |> Map.get(:notes)
       assert_recent_audit_log(note, user, action: "create-case-investigation-note", event: "profile-case-investigation-note-submission")
@@ -579,7 +582,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
       view = Pages.Profile.visit(conn, person)
 
-      assert Pages.navigation_confirmation_prompt(view) == nil
+      assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
 
       view
       |> Pages.Profile.change_note_form("001", %{"text" => "something present"})

@@ -1,9 +1,68 @@
+defmodule CaseInvestigationNoteForm do
+  use EpicenterWeb, :live_component
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 1]
+  import EpicenterWeb.LiveHelpers, only: [noreply: 1, ok: 1]
+  alias Epicenter.AuditLog
+  alias Epicenter.Cases
+  alias EpicenterWeb.Forms.CaseInvestigationNoteForm.FormFieldData
+
+  def update(assigns, socket) do
+    {:ok, socket |> assign(assigns) |> assign(changeset: socket.assigns[:changeset] || empty_note(assigns))}
+  end
+
+  defp empty_note(assigns) do
+    FormFieldData.changeset(%{id: assigns.case_investigation_id}, %{})
+  end
+
+  def render(assigns) do
+    ~L"""
+    <%= form_for @changeset, "#", [data: [role: "note-form", "confirm-navigation": confirmation_prompt(@changeset)], phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f -> %>
+      <%= add_note_form_builder(f) %>
+    <% end %>
+    """
+  end
+
+  def handle_event("change_note", %{"form_field_data" => params}, socket) do
+    socket
+    |> assign(changeset: FormFieldData.changeset(%{id: socket.assigns.case_investigation_id}, params))
+    |> noreply()
+  end
+
+  def handle_event("save_note", %{"form_field_data" => params}, socket) do
+    with %Ecto.Changeset{} = form_changeset <- FormFieldData.changeset(%{id: socket.assigns.case_investigation_id}, params),
+         {:form, {:ok, case_investigation_note_attrs}} <-
+           {:form, FormFieldData.case_investigation_note_attrs(form_changeset, socket.assigns.current_user_id)},
+         {:note, {:ok, _note}} <-
+           {:note,
+            Cases.create_case_investigation_note(
+              {case_investigation_note_attrs,
+               %AuditLog.Meta{
+                 author_id: socket.assigns.current_user_id,
+                 reason_action: AuditLog.Revision.create_case_investigation_note_action(),
+                 reason_event: AuditLog.Revision.profile_case_investigation_note_submission_event()
+               }}
+            )} do
+      Cases.broadcast_case_investigation_updated(socket.assigns.case_investigation_id)
+      socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()
+    else
+      {:form, {:error, changeset}} ->
+        socket |> assign(changeset: changeset) |> noreply()
+
+      _ ->
+        socket |> noreply()
+    end
+  end
+
+  def confirmation_prompt(changeset) do
+    if changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text()
+  end
+end
+
 defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
-  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
-  import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 2]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
@@ -24,19 +83,21 @@ defmodule EpicenterWeb.ProfileLive do
     ]
 
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
+  import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Format
-  alias EpicenterWeb.Forms.CaseInvestigationNoteForm.FormFieldData
 
   @clock Application.get_env(:epicenter, :clock)
 
   def mount(%{"id" => person_id}, session, socket) do
-    if connected?(socket),
-      do: Cases.subscribe_to_people()
+    if connected?(socket) do
+      Cases.subscribe_to_people()
+      Cases.subscribe_to_case_investigation_updates_for(person_id)
+    end
 
     person = Cases.get_person(person_id) |> Cases.preload_demographics()
 
@@ -58,6 +119,10 @@ defmodule EpicenterWeb.ProfileLive do
       updated_person -> assign_person(socket, updated_person)
     end
     |> noreply()
+  end
+
+  def handle_info(:case_investigation_updated, socket) do
+    socket |> assign_case_investigations(socket.assigns.person) |> noreply()
   end
 
   def assign_current_date(socket) do
@@ -106,42 +171,6 @@ defmodule EpicenterWeb.ProfileLive do
     {:noreply, assign_person(socket, updated_person)}
   end
 
-  def handle_event("change_note", %{"form_field_data" => params}, socket) do
-    case_investigation = Enum.find(socket.assigns.case_investigations, &(&1.id == params["case_investigation_id"]))
-
-    socket
-    |> assign(
-      note_changesets: socket.assigns.note_changesets |> Map.put(params["case_investigation_id"], FormFieldData.changeset(case_investigation, params))
-    )
-    |> noreply()
-  end
-
-  def handle_event("save_note", %{"form_field_data" => params}, socket) do
-    case_investigation = Enum.find(socket.assigns.case_investigations, &(&1.id == params["case_investigation_id"]))
-
-    with %Ecto.Changeset{} = form_changeset <- FormFieldData.changeset(case_investigation, params),
-         {:form, {:ok, case_investigation_note_attrs}} <-
-           {:form, FormFieldData.case_investigation_note_attrs(form_changeset, socket.assigns.current_user.id)},
-         {:note, {:ok, _note}} <-
-           {:note,
-            Cases.create_case_investigation_note(
-              {case_investigation_note_attrs,
-               %AuditLog.Meta{
-                 author_id: socket.assigns.current_user.id,
-                 reason_action: AuditLog.Revision.create_case_investigation_note_action(),
-                 reason_event: AuditLog.Revision.profile_case_investigation_note_submission_event()
-               }}
-            )} do
-      assign_case_investigations(socket, socket.assigns.person) |> noreply()
-    else
-      {:form, {:error, changeset}} ->
-        socket |> assign(note_changesets: socket.assigns.note_changesets |> Map.put(params["case_investigation_id"], changeset)) |> noreply()
-
-      _ ->
-        socket |> noreply()
-    end
-  end
-
   def assign_person(socket, person) do
     updated_person =
       person
@@ -165,7 +194,6 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_case_investigation_notes()
 
     assign(socket, case_investigations: case_investigations)
-    |> assign(note_changesets: case_investigations |> Enum.map(&{&1.id, FormFieldData.changeset(&1, %{})}) |> Enum.into(%{}))
   end
 
   defp assign_users(socket),
@@ -230,14 +258,4 @@ defmodule EpicenterWeb.ProfileLive do
   def detailed_ethnicities(%{ethnicity: nil}), do: []
   def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
   def detailed_ethnicities(person), do: person.ethnicity.detailed
-
-  def navigation_prompt(note_changesets) do
-    note_changesets
-    |> Enum.map(fn {_, changeset} -> changeset.changes end)
-    |> Euclid.Exists.any?()
-    |> case do
-      true -> abandon_changes_confirmation_text()
-      false -> nil
-    end
-  end
 end

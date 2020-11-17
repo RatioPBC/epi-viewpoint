@@ -327,7 +327,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.find("#case-investigation-add-note-form-#{number}")
+    |> Test.Html.find("#case-investigation-#{number} [data-role=note-form]")
     |> Test.Html.html()
     |> Pages.assert_validation_messages(messages)
 
@@ -336,14 +336,14 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def add_note(%View{} = view, number, note_text) do
     view
-    |> form("#case-investigation-add-note-form-#{number}", %{"form_field_data" => %{"text" => note_text}})
+    |> form("#case-investigation-#{number} [data-role=note-form]", %{"form_field_data" => %{"text" => note_text}})
     |> render_submit()
 
     view
   end
 
   def change_note_form(view, number, attrs) do
-    view |> element("#case-investigation-add-note-form-#{number}") |> render_change(form_field_data: attrs)
+    view |> element("#case-investigation-#{number} [data-role=note-form]") |> render_change(form_field_data: attrs)
 
     view
   end

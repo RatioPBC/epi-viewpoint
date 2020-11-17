@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.Forms.CaseInvestigationNoteForm do
   alias EpicenterWeb.Form
 
-  def add_note_form_builder(form, _case_investigation) do
+  def add_note_form_builder(form) do
     textarea = fn form ->
       text = form.f.source |> Ecto.Changeset.fetch_field!(:text)
 
