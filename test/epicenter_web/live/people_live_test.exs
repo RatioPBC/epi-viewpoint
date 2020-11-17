@@ -20,102 +20,78 @@ defmodule EpicenterWeb.PeopleLiveTest do
     test "users can limit shown people to just those assigned to themselves", %{conn: conn, people: [alice | _], user: user} do
       {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
 
-      view =
-        Pages.People.visit(conn)
-        |> Pages.People.assert_table_contents([
-          ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-          ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-          ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
-        ])
-
-      assert_unchecked(view, "[data-tid=assigned-to-me-checkbox]")
-      view |> element("[data-tid=assigned-to-me-checkbox]") |> render_click()
-
-      view
-      |> table_contents()
-      |> assert_eq([
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents([
+        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
+      ])
+      |> Pages.People.assert_unchecked("[data-tid=assigned-to-me-checkbox]")
+      |> Pages.People.click_assigned_to_me_checkbox()
+      |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
       ])
-
-      assert_checked(view, "[data-tid=assigned-to-me-checkbox]")
+      |> Pages.People.assert_checked("[data-tid=assigned-to-me-checkbox]")
     end
 
-    # I check person 1 (who is not assigned to me)
-    # I check person 2 (who is assigned to me)
-    # I toggle so that person 1 is hidden
-    # I try to assign to someone
-    # that shouldn't change the assignment of person 1
-    # but should change the assignment of person 2
-    test "people who have been filtered out should not be assigned during a bulk assignment", %{
-      assignee: assignee,
-      conn: conn,
-      people: [alice, billy | _],
-      user: user
-    } do
-      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
-      {:ok, index_live, _} = live(conn, "/people")
+    test "people who have been filtered out should not be assigned during a bulk assignment", %{conn: conn, people: [alice, billy | _]} = context do
+      # I check person 1 (who is not assigned to me)
+      # I check person 2 (who is assigned to me)
+      # I toggle so that person 1 is hidden
+      # I try to assign to someone
+      # that shouldn't change the assignment of person 1
+      # but should change the assignment of person 2
+      {:ok, _} = Cases.assign_user_to_people(user_id: context.user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
 
-      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      index_live |> element("[data-tid=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
-      index_live |> element("[data-tid=assigned-to-me-checkbox]") |> render_click()
-
-      index_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
+      Pages.People.visit(conn)
+      |> Pages.People.click_person_checkbox(person: alice, value: "on")
+      |> Pages.People.click_person_checkbox(person: billy, value: "on")
+      |> Pages.People.click_assigned_to_me_checkbox()
+      |> Pages.People.change_form(%{"user" => context.assignee.id})
 
       Cases.get_people([alice.id, billy.id])
       |> Euclid.Extra.Enum.pluck(:assigned_to_id)
-      |> assert_eq([assignee.id, nil])
+      |> assert_eq([context.assignee.id, nil])
     end
 
     test "user can be assigned to people", %{assignee: assignee, conn: conn, people: [alice | _]} do
-      {:ok, index_live, _} = live(conn, "/people")
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
       ])
-
-      assert_select_dropdown_options(view: index_live, data_role: "users", expected: ["", "Unassigned", "assignee", "fixture admin", "user"])
-
-      assert_unchecked(index_live, "[data-tid=#{alice.tid}]")
-      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      assert_checked(index_live, "[data-tid=alice.tid]")
-
-      index_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
+      |> Pages.People.assert_assign_dropdown_options(data_role: "users", expected: ["", "Unassigned", "assignee", "fixture admin", "user"])
+      |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
+      |> Pages.People.click_person_checkbox(person: alice, value: "on")
+      |> Pages.People.assert_checked("[data-tid=alice.tid]")
+      |> Pages.People.change_form(%{"user" => assignee.id})
+      |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "", "assignee"]
       ])
-
-      assert_unchecked(index_live, "[data-tid=alice.tid]")
+      |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
     end
 
     test "users can be unassigned from people", %{assignee: assignee, conn: conn, people: [alice, billy | _], user: user} do
       Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.audit_meta(user))
 
-      {:ok, index_live, _} = live(conn, "/people")
-
-      index_live
-      |> table_contents(columns: ["Name", "Assignee"])
-      |> assert_eq([
-        ["Name", "Assignee"],
-        ["Billy Testuser", "assignee"],
-        ["Alice Testuser", "assignee"]
-      ])
-
-      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      index_live |> element("[data-tid=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
-
-      index_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
-      assert_unchecked(index_live, "[data-tid=alice.tid]")
-      assert_unchecked(index_live, "[data-tid=billy.tid]")
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Assignee"],
+          ["Billy Testuser", "assignee"],
+          ["Alice Testuser", "assignee"]
+        ],
+        columns: ["Name", "Assignee"]
+      )
+      |> Pages.People.click_person_checkbox(person: alice, value: "on")
+      |> Pages.People.click_person_checkbox(person: billy, value: "on")
+      |> Pages.People.change_form(%{"user" => "-unassigned-"})
+      |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
+      |> Pages.People.assert_unchecked("[data-tid=#{billy.tid}]")
 
       Cases.get_people([alice.id, billy.id])
       |> Cases.preload_assigned_to()
@@ -124,22 +100,19 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "shows assignee update from different client", %{assignee: assignee, conn: conn, people: [alice | _]} do
-      {:ok, index_live, _} = live(conn, "/people")
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
-        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
-      ])
+      view =
+        Pages.People.visit(conn)
+        |> Pages.People.assert_table_contents([
+          ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
+          ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
+          ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
+        ])
 
       updated_people = [%{alice | assigned_to: assignee}]
       Cases.broadcast_people(updated_people)
 
-      index_live
-      |> table_contents()
-      |> assert_eq([
+      view
+      |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "", "assignee"]
@@ -147,73 +120,66 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "shows people with positive lab tests", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, "/people")
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
-        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
-      ])
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Latest test result"],
+          ["Billy Testuser", "Detected, 3 days ago"],
+          ["Alice Testuser", "positive, 1 day ago"]
+        ],
+        columns: ["Name", "Latest test result"]
+      )
     end
 
     test "shows case investigation statuses", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, "/people")
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
-        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
-      ])
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Billy Testuser", ""],
+          ["Alice Testuser", ""]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
     end
 
-    @tag :skip
     test "shows a reload message after broadcasting with a new list of people", %{conn: conn, user: user} do
-      {:ok, index_live, _html} = live(conn, "/people")
+      # start with existing people
+      view =
+        Pages.People.visit(conn)
+        |> Pages.People.assert_table_contents([
+          ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
+          ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
+          ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
+        ])
+        |> Pages.People.assert_reload_message("")
 
-      # start off with no people
-      assert_role_text(index_live, "reload-message", "")
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
-        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"]
-      ])
-
-      # import 3 people, only 2 of which have positive lab results
-      [users: _, people: people] = create_people_and_lab_results(user)
-
+      people = import_three_people_with_two_positive_results(user)
       Cases.broadcast_people(people)
 
       # show a button to make the people visible
       # TODO: should we actually state 2 people here?
-      assert_role_text(index_live, "reload-message", "An import was completed. Show new people.")
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
-        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"]
-      ])
-
-      # show the new people after the button is clicked
-      render_click(index_live, "reload-people")
-      assert_role_text(index_live, "reload-message", "")
-
-      index_live
-      |> table_contents()
-      |> assert_eq([
+      Pages.People.assert_reload_message(view, "An import was completed. Show new people.")
+      |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
       ])
+      |> Pages.People.click_reload_people()
+      |> Pages.People.assert_reload_message("")
+      |> Pages.People.assert_table_contents([
+        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
+        ["", "David Testuser", "billy-id", "Detected, 3 days ago", "", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", "", ""],
+        ["", "Cindy Testuser", "", "positive, 1 day ago", "", ""]
+      ])
 
       # refresh the people
       Cases.broadcast_people(people)
+
       # TODO: we probably state 0 people here, as the test previously did...
-      assert_role_text(index_live, "reload-message", "An import was completed. Show new people.")
+      Pages.People.assert_reload_message(view, "An import was completed. Show new people.")
     end
   end
 
@@ -282,9 +248,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
   end
 
-  defp table_contents(index_live, opts \\ []),
-    do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
-
   defp create_people_and_lab_results(%{user: user} = _context) do
     assignee = Test.Fixtures.user_attrs(Test.Fixtures.admin(), "assignee") |> Accounts.register_user!()
 
@@ -300,5 +263,19 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
     people = [alice, billy, nancy] |> Cases.preload_assigned_to() |> Cases.preload_lab_results() |> Cases.preload_case_investigations()
     [assignee: assignee, people: people, user: user]
+  end
+
+  defp import_three_people_with_two_positive_results(user) do
+    cindy = Test.Fixtures.person_attrs(user, "cindy") |> Cases.create_person!()
+    Test.Fixtures.lab_result_attrs(cindy, user, "cindy-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
+    Test.Fixtures.lab_result_attrs(cindy, user, "cindy-result-2", Extra.Date.days_ago(2), result: "negative") |> Cases.create_lab_result!()
+
+    david = Test.Fixtures.person_attrs(user, "david") |> Test.Fixtures.add_demographic_attrs(%{external_id: "billy-id"}) |> Cases.create_person!()
+    Test.Fixtures.lab_result_attrs(david, user, "david-result-1", Extra.Date.days_ago(3), result: "Detected") |> Cases.create_lab_result!()
+
+    emily = Test.Fixtures.person_attrs(user, "emily") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
+    Test.Fixtures.lab_result_attrs(emily, user, "emily-result-1", Extra.Date.days_ago(3), result: "negative") |> Cases.create_lab_result!()
+
+    [cindy, david, emily] |> Cases.preload_assigned_to() |> Cases.preload_lab_results() |> Cases.preload_case_investigations()
   end
 end

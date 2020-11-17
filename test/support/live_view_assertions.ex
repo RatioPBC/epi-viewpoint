@@ -21,14 +21,6 @@ defmodule EpicenterWeb.Test.LiveViewAssertions do
     end
   end
 
-  def assert_checked(%Phoenix.LiveViewTest.View{} = view, selector) do
-    assert_attribute(view, selector, "checked", ["checked"])
-  end
-
-  def assert_unchecked(%Phoenix.LiveViewTest.View{} = view, selector) do
-    assert_attribute(view, selector, "checked", [])
-  end
-
   def assert_disabled(%Phoenix.LiveViewTest.View{} = view, selector) do
     assert_attribute(view, selector, "disabled", ["disabled"])
   end
