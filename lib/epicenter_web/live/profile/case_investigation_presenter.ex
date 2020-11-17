@@ -49,6 +49,10 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     end
   end
 
+  def displayable_date(column, default) do
+    if Euclid.Exists.blank?(column), do: default, else: Format.date(column)
+  end
+
   def displayable_isolation_monitoring_status(case_investigation, current_date) do
     case CaseInvestigation.isolation_monitoring_status(case_investigation) do
       :pending ->

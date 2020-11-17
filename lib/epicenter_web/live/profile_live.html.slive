@@ -129,12 +129,24 @@
 
       = if CaseInvestigation.isolation_monitoring_status(case_investigation) == :ongoing do
         .case-investigation-clinical
-          .clinical-details-header-row
+          .clinical-details-header-row data-tid="isolation-order-details-001"
             h4
-              span
-                | Isolation Order Details
+              span Isolation Order Details
             .links
               span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "edit-isolation-order-case-investigation-link"
+
+          table.clinical-data
+            thead
+              tr data-role="table-column-names"
+                th Date isolation order sent
+                th Date isolation clearance order sent
+
+            tbody
+              tr
+                td data-tid="case-investigation-001-isolation-order-sent-date"
+                  = displayable_date(case_investigation.isolation_order_sent_date, "Not sent")
+                td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
+                  = displayable_date(case_investigation.isolation_clearance_order_sent_date, "Not sent")
 
       .case-investigation-notes
         h3.additional_notes Additional Notes

@@ -401,6 +401,25 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_isolation_order_details(%View{} = view, number, %{
+        order_sent_date: expected_order_sent_date,
+        clearance_order_sent_date: expected_clearance_order_sent_date
+      }) do
+    parsed_html = view |> render() |> Test.Html.parse()
+
+    parsed_html
+    |> Test.Html.find("[data-tid=case-investigation-#{number}-isolation-order-sent-date]")
+    |> Test.Html.text()
+    |> assert_eq(expected_order_sent_date)
+
+    parsed_html
+    |> Test.Html.find("[data-tid=case-investigation-#{number}-isolation-clearance-order-sent-date]")
+    |> Test.Html.text()
+    |> assert_eq(expected_clearance_order_sent_date)
+
+    view
+  end
+
   def refute_clinical_details_showing(%View{} = view, number) do
     view
     |> render()

@@ -12,6 +12,7 @@ defmodule EpicenterWeb.ProfileLive do
     only: [
       contact_details_as_list: 1,
       displayable_clinical_status: 1,
+      displayable_date: 2,
       displayable_interview_status: 1,
       displayable_isolation_monitoring_status: 2,
       displayable_symptom_onset_date: 1,
