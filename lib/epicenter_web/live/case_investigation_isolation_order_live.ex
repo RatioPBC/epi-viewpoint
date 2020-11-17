@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
@@ -48,6 +50,11 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
     end
   end
 
+  def handle_event("change", %{"isolation_order_form" => params}, socket) do
+    new_changeset = IsolationOrderForm.changeset(socket.assigns.case_investigation, params)
+    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
+  end
+
   def handle_event("save", %{"isolation_order_form" => params}, socket) do
     save_and_redirect(socket, params)
   end
@@ -74,6 +81,9 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
   end
 
   # # #
+
+  defp confirmation_prompt(changeset),
+    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 
   defp redirect_to_profile_page(socket),
     do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")

@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationOrder do
   import ExUnit.Assertions
+  import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Test
@@ -17,6 +18,16 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationOrder do
 
   def assert_isolation_order_sent_date(%View{} = view, expected_date_string) do
     assert actual_date(view, "input#isolation_order_form_order_sent_date") == [expected_date_string]
+    view
+  end
+
+  def assert_page_heading(%View{} = view, expected_heading) do
+    assert view |> render() |> Test.Html.parse() |> Test.Html.text("[data-test=isolation-order-heading]") == expected_heading
+    view
+  end
+
+  def change_form(view, attrs) do
+    view |> element("#case-investigation-isolation-order-form") |> render_change(attrs)
     view
   end
 

@@ -26,6 +26,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
   test "shows isolation order form", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
     |> Pages.CaseInvestigationIsolationOrder.assert_here()
+    |> Pages.CaseInvestigationIsolationOrder.assert_page_heading("Edit isolation details")
   end
 
   test "saving isolation monitoring dates for a case investigation", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
@@ -44,7 +45,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
     assert ~D[2020-08-11] == case_investigation.isolation_clearance_order_sent_date
   end
 
-  test "prefills date started with symptom onset date if present", %{conn: conn, case_investigation: case_investigation} do
+  test "prefills dates if present", %{conn: conn, case_investigation: case_investigation} do
     {:ok, _} =
       Cases.update_case_investigation(
         case_investigation,
@@ -52,6 +53,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
       )
 
     Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationIsolationOrder.assert_page_heading("Edit isolation details")
     |> Pages.CaseInvestigationIsolationOrder.assert_isolation_order_sent_date("11/01/2020")
     |> Pages.CaseInvestigationIsolationOrder.assert_isolation_clearance_order_sent_date("11/11/2020")
   end
@@ -72,16 +74,16 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
     end
   end
 
-  #  describe "warning the user when navigation will erase their changes" do
-  #    test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
-  #      Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
-  #      |> Pages.assert_confirmation_prompt("")
-  #    end
-  #
-  #    test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
-  #      Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
-  #      |> Pages.CaseInvestigationIsolationOrder.change_form(isolation_order_form: %{"order_clearance_date" => "09/06/2020"})
-  #      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
-  #    end
-  #  end
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
+      |> Pages.assert_confirmation_prompt("")
+    end
+
+    test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationIsolationOrder.change_form(isolation_order_form: %{"order_clearance_date" => "09/06/2020"})
+      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+    end
+  end
 end
