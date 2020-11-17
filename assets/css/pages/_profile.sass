@@ -141,8 +141,11 @@
               background-color: currentColor
 
     .case-investigation-notes
+      border-top: 2px solid $divider-color
+      padding-top: 2rem
+
       form
-        @include form-grid
+        @include form-grid($vertical-flow-margin: 1rem)
         margin-bottom: 0
 
       .case-investigation-note

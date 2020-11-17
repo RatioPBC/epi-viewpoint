@@ -241,8 +241,8 @@
     @include has-icon($error-color)
 
 // work-in-progress grid-based form to possibly replace the other form mixin
-@mixin form-grid
-  @include vertical-flow
+@mixin form-grid($vertical-flow-margin: 2rem)
+  @include vertical-flow($margin: $vertical-flow-margin)
   margin-bottom: 10rem
 
   fieldset
