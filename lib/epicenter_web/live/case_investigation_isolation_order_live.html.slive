@@ -2,3 +2,6 @@
   section#case-investigation-isolation-order
     h2
       | Isolation order
+
+    = form_for @form_changeset, "#", [id: "case-investigation-isolation-order-form", phx_submit: "save"], fn f ->
+      = isolation_order_form_builder(f, @case_investigation)

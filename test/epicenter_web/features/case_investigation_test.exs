@@ -142,10 +142,13 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.Profile.click_edit_isolation_order_details_link("001")
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.CaseInvestigationIsolationOrder.assert_here()
-
-    # TODO: submit isolation order form and redirec to profile page
-    conn
-    |> Pages.Profile.visit(person)
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-order-form",
+      isolation_order_form: %{
+        "order_sent_date" => "10/28/2020",
+        "order_clearance_date" => "11/10/2020"
+      }
+    )
+    |> Pages.Profile.assert_here(person)
     |> Pages.Profile.click_conclude_isolation_monitoring("001")
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_here()
