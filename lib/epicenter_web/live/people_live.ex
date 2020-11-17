@@ -10,6 +10,8 @@ defmodule EpicenterWeb.PeopleLive do
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
 
+  @clock Application.get_env(:epicenter, :clock)
+
   def mount(_params, session, socket) do
     if connected?(socket),
       do: Cases.subscribe_to_people()
@@ -17,6 +19,7 @@ defmodule EpicenterWeb.PeopleLive do
     socket
     |> authenticate_user(session)
     |> assign_page_title("People")
+    |> assign_current_date()
     |> set_reload_message(nil)
     |> set_filter(:with_positive_lab_results)
     |> assign(:only_assigned_to_me, false)
@@ -92,8 +95,8 @@ defmodule EpicenterWeb.PeopleLive do
     [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
   end
 
-  def latest_case_investigation_status(person),
-    do: person |> Person.latest_case_investigation() |> displayable_status()
+  def latest_case_investigation_status(person, current_date),
+    do: person |> Person.latest_case_investigation() |> displayable_status(current_date)
 
   def latest_result(person) do
     lab_result = Person.latest_lab_result(person)
@@ -124,16 +127,22 @@ defmodule EpicenterWeb.PeopleLive do
 
   # # # Private
 
+  def assign_current_date(socket) do
+    timezone = EpicenterWeb.PresentationConstants.presented_time_zone()
+    current_date = @clock.utc_now() |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
+    socket |> assign(current_date: current_date)
+  end
+
   defp assign_people(socket, people),
     do: assign(socket, people: people, person_count: length(people))
 
   defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
   defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago_string()
 
-  defp displayable_status(nil),
+  defp displayable_status(nil, _),
     do: ""
 
-  defp displayable_status(case_investigation) do
+  defp displayable_status(case_investigation, current_date) do
     case CaseInvestigation.status(case_investigation) do
       :pending ->
         "Pending interview"
@@ -143,9 +152,15 @@ defmodule EpicenterWeb.PeopleLive do
 
       :completed_interview ->
         case CaseInvestigation.isolation_monitoring_status(case_investigation) do
-          :pending -> "Pending monitoring"
-          :ongoing -> "Ongoing monitoring"
-          :concluded -> "Concluded monitoring"
+          :pending ->
+            "Pending monitoring"
+
+          :ongoing ->
+            diff = Date.diff(case_investigation.isolation_monitoring_end_date, current_date)
+            "Ongoing monitoring (#{diff} days remaining)"
+
+          :concluded ->
+            "Concluded monitoring"
         end
 
       :discontinued ->

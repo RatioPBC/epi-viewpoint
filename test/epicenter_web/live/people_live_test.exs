@@ -171,7 +171,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
           ["Name", "Investigation status"],
           ["Billy Testuser", "Ongoing interview"],
           ["Nancy Testuser", "Discontinued"],
-          ["David Testuser", "Ongoing monitoring"],
+          ["David Testuser", "Ongoing monitoring (13 days remaining)"],
           ["Emily Testuser", "Pending monitoring"],
           ["Alice Testuser", "Pending interview"],
           ["Cindy Testuser", "Concluded monitoring"]

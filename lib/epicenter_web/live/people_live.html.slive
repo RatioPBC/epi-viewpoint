@@ -38,7 +38,7 @@ section#people-page data-page="people"
         th width="20%" Name
         th width="15%" ID
         th width="25%" Latest test result
-        th width="15%" Investigation status
+        th width="20%" Investigation status
         th width="25%" Assignee
 
     tbody
@@ -49,5 +49,5 @@ section#people-page data-page="people"
           td= live_redirect full_name(person), to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)
           td= external_id(person)
           td= latest_result(person)
-          td= latest_case_investigation_status(person)
+          td= latest_case_investigation_status(person, @current_date)
           td= assigned_to_name(person)
