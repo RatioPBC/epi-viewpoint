@@ -1,8 +1,8 @@
-#case-investigation-clinical-details-page data-page="case-investigation-contact"
+#case-investigation-clinical-details-page data-page="case-investigation-contact" data-confirm-navigation=confirmation_prompt(@changeset)
 
   section
     header#subnav
-      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [confirm: confirmation_prompt(@changeset), role: "back-link"] do
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do
         = back_icon()
         span Back
 

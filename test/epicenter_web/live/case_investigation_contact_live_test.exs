@@ -404,14 +404,16 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
-      Pages.CaseInvestigationContact.visit(conn, case_investigation)
-      |> Pages.assert_confirmation_prompt("")
+      assert Pages.CaseInvestigationContact.visit(conn, case_investigation)
+             |> Pages.navigation_confirmation_prompt()
+             |> Euclid.Exists.blank?()
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
-      Pages.CaseInvestigationContact.visit(conn, case_investigation)
-      |> Pages.CaseInvestigationContact.change_form(contact_form: %{"first_name" => "Alice"})
-      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+      assert "Your updates have not been saved. Discard updates?" =
+               Pages.CaseInvestigationContact.visit(conn, case_investigation)
+               |> Pages.CaseInvestigationContact.change_form(contact_form: %{"first_name" => "Alice"})
+               |> Pages.navigation_confirmation_prompt()
     end
   end
 end

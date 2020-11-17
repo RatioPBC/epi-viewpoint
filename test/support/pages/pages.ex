@@ -26,11 +26,6 @@ defmodule EpicenterWeb.Test.Pages do
     |> Map.new()
   end
 
-  def assert_confirmation_prompt(%View{} = view, expected_prompt) do
-    view |> parse() |> Test.Html.attr("[data-role=back-link]", "data-confirm") |> assert_eq([expected_prompt])
-    view
-  end
-
   def navigation_confirmation_prompt(%View{} = view) do
     view |> parse() |> Test.Html.find("[data-confirm-navigation]") |> Test.Html.attr("data-confirm-navigation") |> List.first()
   end

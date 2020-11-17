@@ -49,14 +49,18 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
   end
 
   test "prefills with saved isolation monitoring dates", %{conn: conn, case_investigation: case_investigation} do
-    {:ok, _} = Cases.update_case_investigation(case_investigation, {%{isolation_monitoring_start_date: ~D[2020-11-01], isolation_monitoring_end_date: ~D[2020-11-11]}, Test.Fixtures.admin_audit_meta()})
+    {:ok, _} =
+      Cases.update_case_investigation(
+        case_investigation,
+        {%{isolation_monitoring_start_date: ~D[2020-11-01], isolation_monitoring_end_date: ~D[2020-11-11]}, Test.Fixtures.admin_audit_meta()}
+      )
 
     Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
     |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_started(
-         "11/01/2020",
-         "Onset date: 11/03/2020\n\nPositive lab sample: 10/27/2020"
-       )
+      "11/01/2020",
+      "Onset date: 11/03/2020\n\nPositive lab sample: 10/27/2020"
+    )
     |> Pages.CaseInvestigationIsolationMonitoring.assert_isolation_date_ended("11/11/2020")
   end
 
@@ -94,14 +98,16 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
-      Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
-      |> Pages.assert_confirmation_prompt("")
+      assert Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
+             |> Pages.navigation_confirmation_prompt()
+             |> Euclid.Exists.blank?()
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
-      Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
-      |> Pages.CaseInvestigationIsolationMonitoring.change_form(isolation_monitoring_form: %{"date_ended" => "09/06/2020"})
-      |> Pages.assert_confirmation_prompt("Your updates have not been saved. Discard updates?")
+      assert "Your updates have not been saved. Discard updates?" =
+               Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
+               |> Pages.CaseInvestigationIsolationMonitoring.change_form(isolation_monitoring_form: %{"date_ended" => "09/06/2020"})
+               |> Pages.navigation_confirmation_prompt()
     end
   end
 end
