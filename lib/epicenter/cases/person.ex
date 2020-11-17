@@ -51,8 +51,6 @@ defmodule Epicenter.Cases.Person do
     end
   end
 
-  def optional_attrs(), do: @optional_attrs
-
   def assignment_changeset(person, nil = _user), do: person |> changeset(%{assigned_to_id: nil})
   def assignment_changeset(person, %User{} = user), do: person |> changeset(%{assigned_to_id: user.id})
 
@@ -102,6 +100,8 @@ defmodule Epicenter.Cases.Person do
       end
     end)
   end
+
+  def optional_attrs(), do: @optional_attrs
 
   defmodule Query do
     import Ecto.Query
