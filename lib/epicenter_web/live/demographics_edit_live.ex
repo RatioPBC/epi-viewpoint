@@ -161,7 +161,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> Form.line(&Form.multiselect(&1, :employment, "Employment status", @employment_options, span: 8))
     |> Form.line(&Form.text_field(&1, :occupation, "Occupation", span: 6))
     |> Form.line(&Form.textarea_field(&1, :notes, "Notes", span: 6))
-    |> Form.line(&Form.footer(&1, nil, span: 8))
+    |> Form.line(&Form.footer(&1, nil, span: 8, sticky: true))
     |> Form.safe()
   end
 end

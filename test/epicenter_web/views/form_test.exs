@@ -175,9 +175,9 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <footer data-grid-col="1" data-grid-row="1" data-grid-span="8">
+      <footer data-grid-col="1" data-grid-row="1" data-grid-span="8" data-sticky="false">
         <button type="submit">Save</button>
-        <div class="form-error-message" data-form-error-message="some error message" data-sticky="false">some error message</div>
+        <div class="form-error-message" data-form-error-message="some error message">some error message</div>
       </footer>
     </fieldset>
     """)
