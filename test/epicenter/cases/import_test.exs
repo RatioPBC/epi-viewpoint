@@ -59,7 +59,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_2.request_facility_name == nil
       assert lab_result_2.source == "import"
 
-      [alice, billy] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
+      [alice, billy] = Cases.list_people(:all) |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
       [alice_demographic_1] = alice.demographics
       assert alice_demographic_1.dob == ~D[1970-01-01]
       assert alice_demographic_1.external_id == "10000"
@@ -114,7 +114,7 @@ defmodule Epicenter.Cases.ImportTest do
                }
                |> Import.import_csv(originator)
 
-      [alice, _billy] = Cases.list_people() |> Cases.preload_case_investigations()
+      [alice, _billy] = Cases.list_people(:all) |> Cases.preload_case_investigations()
       case_investigations = alice.case_investigations
       assert [%CaseInvestigation{} = case_investigation] = case_investigations
       case_investigation = case_investigation |> Cases.preload_initiating_lab_result()
@@ -191,7 +191,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.request_facility_name == "Lab Co South"
       assert lab_result_1.source == "import"
 
-      [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
+      [alice] = Cases.list_people(:all) |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.phones |> pluck(:source) == ["import"]
       [alice_demographics] = alice.demographics
@@ -239,7 +239,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.request_facility_name == "Lab Co South"
       assert lab_result_1.source == "import"
 
-      [alice] = Cases.list_people() |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
+      [alice] = Cases.list_people(:all) |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.phones |> pluck(:source) == ["import"]
       [alice_demographics] = alice.demographics

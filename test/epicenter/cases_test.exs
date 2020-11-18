@@ -15,7 +15,7 @@ defmodule Epicenter.CasesTest do
   @admin Test.Fixtures.admin()
   describe "importing" do
     defp first_names() do
-      Cases.list_people() |> Cases.preload_demographics() |> Enum.map(&(&1.demographics |> List.first() |> Map.get(:first_name)))
+      Cases.list_people(:all) |> Cases.preload_demographics() |> Enum.map(&(&1.demographics |> List.first() |> Map.get(:first_name)))
     end
 
     test "import_lab_results imports lab results and creates lab_result and person records" do
@@ -223,7 +223,7 @@ defmodule Epicenter.CasesTest do
       |> Test.Fixtures.lab_result_attrs(user, "last-1", Extra.Date.days_ago(4))
       |> Cases.create_lab_result!()
 
-      Cases.list_people() |> tids() |> assert_eq(~w{first middle last})
+      Cases.list_people(:all) |> tids() |> assert_eq(~w{first middle last})
       Cases.list_people(:all) |> tids() |> assert_eq(~w{first middle last})
       Cases.list_people(:call_list) |> tids() |> assert_eq(~w{last})
       Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{first middle last})

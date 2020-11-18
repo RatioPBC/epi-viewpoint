@@ -26,7 +26,7 @@ section#people-page data-page="people"
         = if @reload_message do
           = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
       label#assigned-to-me-button
-        input type="checkbox" phx-click="toggle-assigned-to-me" checked=@only_assigned_to_me data-tid="assigned-to-me-checkbox"
+        input type="checkbox" phx-click="toggle-assigned-to-me" checked=@display_people_assigned_to_me data-tid="assigned-to-me-checkbox"
         span My Assignments Only
       = live_redirect "Import labs", to: "/import/start", id: "import-labs"
 
@@ -42,7 +42,7 @@ section#people-page data-page="people"
         th width="25%" Assignee
 
     tbody
-      = for person <- visible_people(@people, @only_assigned_to_me, @current_user) do
+      = for person <- visible_people(@people, @display_people_assigned_to_me, @current_user) do
         tr data-role="person"
           td
             input type="checkbox" checked=selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"

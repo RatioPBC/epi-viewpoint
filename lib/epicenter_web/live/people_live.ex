@@ -22,7 +22,7 @@ defmodule EpicenterWeb.PeopleLive do
     |> assign_current_date()
     |> assign_reload_message(nil)
     |> assign_filter(:with_positive_lab_results)
-    |> assign(:only_assigned_to_me, false)
+    |> assign(:display_people_assigned_to_me, false)
     |> load_and_assign_people()
     |> load_and_assign_users()
     |> assign_selected_to_empty()
@@ -52,7 +52,7 @@ defmodule EpicenterWeb.PeopleLive do
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids:
-          visible_people(socket.assigns[:people], socket.assigns[:only_assigned_to_me], socket.assigns[:current_user])
+          visible_people(socket.assigns[:people], socket.assigns[:display_people_assigned_to_me], socket.assigns[:current_user])
           |> Enum.filter(fn person -> Map.get(socket.assigns.selected_people, person.id) end)
           |> Euclid.Extra.Enum.pluck(:id),
         audit_meta: %AuditLog.Meta{
@@ -74,7 +74,10 @@ defmodule EpicenterWeb.PeopleLive do
     do: socket |> assign_reload_message(nil) |> load_and_assign_people() |> noreply()
 
   def handle_event("toggle-assigned-to-me", _, socket),
-    do: socket |> assign(:only_assigned_to_me, !socket.assigns[:only_assigned_to_me]) |> noreply()
+    do:
+      socket
+      |> assign(:display_people_assigned_to_me, !socket.assigns[:display_people_assigned_to_me])
+      |> noreply()
 
   # # # View helpers
 
@@ -117,7 +120,7 @@ defmodule EpicenterWeb.PeopleLive do
   def selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)
 
-  def visible_people(people, only_assigned_to_me, user)
+  def visible_people(people, display_people_assigned_to_me, user)
 
   def visible_people(people, true, user) do
     Enum.filter(people, fn person -> person.assigned_to_id == user.id end)
