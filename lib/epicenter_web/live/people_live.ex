@@ -22,14 +22,15 @@ defmodule EpicenterWeb.PeopleLive do
     |> assign_current_date()
     |> assign_reload_message(nil)
     |> assign(:display_people_assigned_to_me, false)
-    |> assign_filter_and_assign_people(:with_positive_lab_results)
+    |> assign_filter(:with_positive_lab_results)
+    |> load_and_assign_people()
     |> load_and_assign_users()
     |> assign_selected_to_empty()
     |> ok()
   end
 
   def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_positive_lab_results},
-    do: socket |> assign_filter_and_assign_people(filter) |> noreply()
+    do: socket |> assign_filter(filter) |> load_and_assign_people() |> noreply()
 
   def handle_params(_, _url, socket),
     do: socket |> noreply()
@@ -199,11 +200,11 @@ defmodule EpicenterWeb.PeopleLive do
   defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.put(selected_people, person_id, true))
 
-  defp assign_filter_and_assign_people(socket, filter) when is_binary(filter),
-    do: socket |> assign_filter_and_assign_people(Euclid.Extra.Atom.from_string(filter))
+  defp assign_filter(socket, filter) when is_binary(filter),
+    do: socket |> assign_filter(Euclid.Extra.Atom.from_string(filter))
 
-  defp assign_filter_and_assign_people(socket, filter) when is_atom(filter),
-    do: socket |> assign(filter: filter, page_title: page_title(filter)) |> load_and_assign_people()
+  defp assign_filter(socket, filter) when is_atom(filter),
+    do: socket |> assign(filter: filter, page_title: page_title(filter))
 
   defp assign_reload_message(socket, message),
     do: socket |> assign(reload_message: message)
