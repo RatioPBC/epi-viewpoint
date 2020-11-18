@@ -42,7 +42,7 @@ section#people-page data-page="people"
         th width="25%" Assignee
 
     tbody
-      = for person <- visible_people(@people, @display_people_assigned_to_me, @current_user) do
+      = for person <- @people do
         tr data-role="person"
           td
             input type="checkbox" checked=selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"

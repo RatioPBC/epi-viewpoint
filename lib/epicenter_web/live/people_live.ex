@@ -21,16 +21,15 @@ defmodule EpicenterWeb.PeopleLive do
     |> assign_page_title("People")
     |> assign_current_date()
     |> assign_reload_message(nil)
-    |> assign_filter(:with_positive_lab_results)
     |> assign(:display_people_assigned_to_me, false)
-    |> load_and_assign_people()
+    |> assign_filter_and_assign_people(:with_positive_lab_results)
     |> load_and_assign_users()
     |> assign_selected_to_empty()
     |> ok()
   end
 
   def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_positive_lab_results},
-    do: socket |> assign_filter(filter) |> noreply()
+    do: socket |> assign_filter_and_assign_people(filter) |> noreply()
 
   def handle_params(_, _url, socket),
     do: socket |> noreply()
@@ -52,7 +51,7 @@ defmodule EpicenterWeb.PeopleLive do
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids:
-          visible_people(socket.assigns[:people], socket.assigns[:display_people_assigned_to_me], socket.assigns[:current_user])
+          socket.assigns.people
           |> Enum.filter(fn person -> Map.get(socket.assigns.selected_people, person.id) end)
           |> Euclid.Extra.Enum.pluck(:id),
         audit_meta: %AuditLog.Meta{
@@ -77,6 +76,7 @@ defmodule EpicenterWeb.PeopleLive do
     do:
       socket
       |> assign(:display_people_assigned_to_me, !socket.assigns[:display_people_assigned_to_me])
+      |> load_and_assign_people()
       |> noreply()
 
   # # # View helpers
@@ -119,14 +119,6 @@ defmodule EpicenterWeb.PeopleLive do
 
   def selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)
-
-  def visible_people(people, display_people_assigned_to_me, user)
-
-  def visible_people(people, true, user) do
-    Enum.filter(people, fn person -> person.assigned_to_id == user.id end)
-  end
-
-  def visible_people(people, false, _), do: people
 
   # # # Private
 
@@ -176,7 +168,13 @@ defmodule EpicenterWeb.PeopleLive do
 
   defp load_and_assign_people(socket) do
     people =
-      Cases.list_people(socket.assigns.filter)
+      cond do
+        socket.assigns.display_people_assigned_to_me ->
+          Cases.list_people(socket.assigns.filter, assigned_to_id: socket.assigns.current_user.id)
+
+        true ->
+          Cases.list_people(socket.assigns.filter)
+      end
       |> Cases.preload_lab_results()
       |> Cases.preload_assigned_to()
       |> Cases.preload_demographics()
@@ -201,10 +199,10 @@ defmodule EpicenterWeb.PeopleLive do
   defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.put(selected_people, person_id, true))
 
-  defp assign_filter(socket, filter) when is_binary(filter),
-    do: socket |> assign_filter(Euclid.Extra.Atom.from_string(filter))
+  defp assign_filter_and_assign_people(socket, filter) when is_binary(filter),
+    do: socket |> assign_filter_and_assign_people(Euclid.Extra.Atom.from_string(filter))
 
-  defp assign_filter(socket, filter) when is_atom(filter),
+  defp assign_filter_and_assign_people(socket, filter) when is_atom(filter),
     do: socket |> assign(filter: filter, page_title: page_title(filter)) |> load_and_assign_people()
 
   defp assign_reload_message(socket, message),
