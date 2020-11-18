@@ -141,8 +141,8 @@ defmodule EpicenterWeb.FormHelpersTest do
   end
 
   describe "radio_button_list" do
-    test "renders radio buttons in reverse order, which get un-reversed via css", %{form: form} do
-      FormHelpers.radio_button_list(form, :language, ["English", "German", "Italian"], id: "language-list")
+    test "renders radio buttons in reverse order, which get un-reversed via css, with label text via gettext", %{form: form} do
+      FormHelpers.radio_button_list(form, :language, ["deceased", "German", "Italian"], id: "language-list")
       |> assert_html_eq("""
       <div class="radio-button-list" id="language-list">
         <label data-role="movie-language">\v
@@ -154,8 +154,8 @@ defmodule EpicenterWeb.FormHelpersTest do
           German\v
         </label>
         <label data-role="movie-language">\v
-          <input id="movie_language_English" name="movie[language]" type="radio" value="English"/>\v
-          English\v
+          <input id="movie_language_deceased" name="movie[language]" type="radio" value="deceased"/>\v
+          Deceased\v
         </label>
       </div>
       """)

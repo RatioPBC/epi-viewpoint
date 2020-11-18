@@ -85,7 +85,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
   def conclude_isolation_monitoring_form_builder(form) do
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :reason, "Reason", CaseInvestigation.humanized_values()[:isolation_conclusion_reason], span: 5))
+    |> Form.line(&Form.radio_button_list(&1, :reason, "Reason", CaseInvestigation.text_field_values()[:isolation_conclusion_reason], span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end

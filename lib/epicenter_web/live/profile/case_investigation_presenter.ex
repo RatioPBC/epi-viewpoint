@@ -257,7 +257,7 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
           %{
             text:
               "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{
-                CaseInvestigation.find_humanized_value(:isolation_conclusion_reason, case_investigation.isolation_conclusion_reason)
+                Gettext.gettext(Epicenter.Gettext, case_investigation.isolation_conclusion_reason)
               }",
             link:
               live_redirect(

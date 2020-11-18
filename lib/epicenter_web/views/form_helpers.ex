@@ -112,7 +112,7 @@ defmodule EpicenterWeb.FormHelpers do
     do: radio_button_with_label(form, field, value, label_text)
 
   def radio_button_with_label(form, field, value),
-    do: radio_button_with_label(form, field, value, value)
+    do: radio_button_with_label(form, field, value, Gettext.gettext(Epicenter.Gettext, value))
 
   def radio_button_with_label(form, field, value, label_text) do
     label(data: [role: input_list_label_role(form, field)]) do

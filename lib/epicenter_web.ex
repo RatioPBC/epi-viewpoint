@@ -22,7 +22,7 @@ defmodule EpicenterWeb do
       use Phoenix.Controller, namespace: EpicenterWeb
 
       import Plug.Conn
-      import EpicenterWeb.Gettext
+      import Epicenter.Gettext
       alias EpicenterWeb.Router.Helpers, as: Routes
     end
   end
@@ -75,7 +75,7 @@ defmodule EpicenterWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import EpicenterWeb.Gettext
+      import Epicenter.Gettext
     end
   end
 
@@ -90,8 +90,8 @@ defmodule EpicenterWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
+      import Epicenter.Gettext
       import EpicenterWeb.ErrorHelpers
-      import EpicenterWeb.Gettext
       alias EpicenterWeb.Router.Helpers, as: Routes
     end
   end

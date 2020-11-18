@@ -3,6 +3,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
 
   import Ecto.Changeset
   import Epicenter.EctoRedactionJasonEncoder
+  import Epicenter.Gettext
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.CaseInvestigationNote
@@ -73,29 +74,17 @@ defmodule Epicenter.Cases.CaseInvestigation do
   def isolation_monitoring_status(%{isolation_monitoring_start_date: date}) when not is_nil(date), do: :ongoing
   def isolation_monitoring_status(_), do: :pending
 
-  def humanized_values() do
+  def text_field_values() do
     %{
       isolation_conclusion_reason: [
-        {"Successfully completed isolation period", "successfully_completed"},
-        {"Person unable to isolate", "unable_to_isolate"},
-        {"Refused to cooperate", "refused_to_cooperate"},
-        {"Lost to follow up", "lost_to_follow_up"},
-        {"Transferred to another jurisdiction", "transferred"},
-        {"Deceased", "deceased"}
+        gettext_noop("successfully_completed"),
+        gettext_noop("unable_to_isolate"),
+        gettext_noop("refused_to_cooperate"),
+        gettext_noop("lost_to_follow_up"),
+        gettext_noop("transferred"),
+        gettext_noop("deceased")
       ]
     }
-  end
-
-  def find_humanized_value(field, value) do
-    case Map.get(humanized_values(), field) do
-      nil ->
-        value
-
-      humanized_values_for_field ->
-        default = {value, value}
-        {humanized, _val} = Enum.find(humanized_values_for_field, default, fn {_humanized, val} -> val == value end)
-        humanized
-    end
   end
 
   @spec status(%CaseInvestigation{}) :: :pending | :started | :discontinued | :completed_interview

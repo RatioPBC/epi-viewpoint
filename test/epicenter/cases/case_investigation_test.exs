@@ -119,12 +119,4 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
             :concluded
         )
   end
-
-  describe "find_humanized_value" do
-    test "gets humanized values for fields" do
-      assert CaseInvestigation.find_humanized_value(:isolation_conclusion_reason, "deceased") == "Deceased"
-      assert CaseInvestigation.find_humanized_value(:isolation_conclusion_reason, "abcdef") == "abcdef"
-      assert CaseInvestigation.find_humanized_value(:bogus_field, "abcdef") == "abcdef"
-    end
-  end
 end
