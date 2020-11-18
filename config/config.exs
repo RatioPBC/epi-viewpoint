@@ -13,6 +13,7 @@ config :tzdata, :autoupdate, :disabled
 config :epicenter,
   clock: DateTime,
   ecto_repos: [Epicenter.Repo],
+  health_check: Epicenter.HealthCheck,
   seeds_enabled?: false,
   unpersisted_admin_id: "00000000-0000-0000-0000-000000000000"
 

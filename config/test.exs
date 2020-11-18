@@ -25,7 +25,11 @@ config :epicenter, EpicenterWeb.Endpoint,
 
 config :epicenter,
   clock: FakeDateTime,
+  health_check: Epicenter.Test.HealthCheckMock,
   totp: Epicenter.Test.TOTPMock
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :phoenix_integration,
+  endpoint: EpicenterWeb.Endpoint

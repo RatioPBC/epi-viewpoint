@@ -17,6 +17,7 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
+    get "/healthcheck", HealthCheckController, :show
     get "/users/login", UserSessionController, :new
     post "/users/login", UserSessionController, :create
     #    get "/users/reset-password", UserResetPasswordController, :new

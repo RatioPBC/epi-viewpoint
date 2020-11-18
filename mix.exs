@@ -62,6 +62,7 @@ defmodule Epicenter.MixProject do
       {:phoenix, "~> 1.5.4"},
       {:phoenix_ecto, "~> 4.1"},
       {:phoenix_html, "~> 2.11"},
+      {:phoenix_integration, "~> 0.8.2", only: :test},
       {:phoenix_live_dashboard, "~> 0.3.6"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.14.8"},
