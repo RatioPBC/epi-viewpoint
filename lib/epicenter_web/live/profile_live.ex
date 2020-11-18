@@ -1,3 +1,24 @@
+defmodule EpicenterWeb.CaseInvestigationNoteSection do
+  use EpicenterWeb, :live_component
+
+  import EpicenterWeb.LiveHelpers, only: [noreply: 1]
+  import EpicenterWeb.LiveComponent.Helpers
+
+  alias EpicenterWeb.CaseInvestigationNote
+  alias EpicenterWeb.CaseInvestigationNoteForm
+
+  def render(assigns) do
+    ~L"""
+    <div class="case-investigation-notes">
+      <h3 class="additional_notes">Additional Notes</h3>
+      <%= component(@socket, CaseInvestigationNoteForm, @case_investigation.id <> "note form", case_investigation_id: @case_investigation.id, current_user_id: @current_user_id) %>
+      <%= for note <- @case_investigation.notes |> Enum.reverse() do %>
+        <%= component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user_id) %>
+      <% end %>
+    """
+  end
+end
+
 defmodule EpicenterWeb.CaseInvestigationNote do
   use EpicenterWeb, :live_component
 
@@ -136,8 +157,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Format
-  alias EpicenterWeb.CaseInvestigationNote
-  alias EpicenterWeb.CaseInvestigationNoteForm
+  alias EpicenterWeb.CaseInvestigationNoteSection
 
   @clock Application.get_env(:epicenter, :clock)
 

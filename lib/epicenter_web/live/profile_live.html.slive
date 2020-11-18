@@ -148,11 +148,7 @@
                 td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
                   = Format.date(case_investigation.isolation_clearance_order_sent_date, "Not sent")
 
-      .case-investigation-notes
-        h3.additional_notes Additional Notes
-        = component(@socket, CaseInvestigationNoteForm, case_investigation.id <> "note form", case_investigation_id: case_investigation.id, current_user_id: @current_user.id)
-        = for note <- case_investigation.notes |> Enum.reverse() do
-          = component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user.id)
+      = component(@socket, CaseInvestigationNoteSection, case_investigation.id <> "note section", case_investigation: case_investigation, current_user_id: @current_user.id)
 
   section#lab-results data-role="lab-results"
     header
