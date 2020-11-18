@@ -74,8 +74,13 @@ defmodule Epicenter.Cases.CaseInvestigation do
   def isolation_monitoring_status(%{isolation_monitoring_start_date: date}) when not is_nil(date), do: :ongoing
   def isolation_monitoring_status(_), do: :pending
 
-  def text_field_values() do
+  def text_field_values(field_name) do
     %{
+      clinical_status: [
+        gettext_noop("unknown"),
+        gettext_noop("symptomatic"),
+        gettext_noop("asymptomatic")
+      ],
       isolation_conclusion_reason: [
         gettext_noop("successfully_completed"),
         gettext_noop("unable_to_isolate"),
@@ -84,7 +89,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
         gettext_noop("transferred"),
         gettext_noop("deceased")
       ]
-    }
+    }[field_name]
   end
 
   @spec status(%CaseInvestigation{}) :: :pending | :started | :discontinued | :completed_interview

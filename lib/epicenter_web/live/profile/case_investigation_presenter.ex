@@ -10,13 +10,6 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  @clinical_status_map %{
-    nil => "None",
-    "unknown" => "Unknown",
-    "symptomatic" => "Symptomatic",
-    "asymptomatic" => "Asymptomatic"
-  }
-
   @symptoms_map %{
     "abdominal_pain" => "Abdominal pain",
     "chills" => "Chills",
@@ -34,14 +27,6 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
     "subjective_fever" => "Subjective fever (felt feverish)",
     "vomiting" => "Vomiting"
   }
-
-  def clinical_statuses_options() do
-    [
-      {"Unknown", "unknown"},
-      {"Symptomatic", "symptomatic"},
-      {"Asymptomatic", "asymptomatic"}
-    ]
-  end
 
   def contact_details_as_list(%Exposure{} = exposure) do
     content_tag :ul do
@@ -76,8 +61,10 @@ defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
   def displayable_interview_status(_),
     do: [content_tag(:span, "Discontinued", class: :discontinued)]
 
+  def displayable_clinical_status(%{clinical_status: nil}), do: "None"
+
   def displayable_clinical_status(%{clinical_status: clinical_status}),
-    do: Map.get(@clinical_status_map, clinical_status)
+    do: Gettext.gettext(Epicenter.Gettext, clinical_status)
 
   def displayable_symptoms(%{symptoms: nil}),
     do: "None"

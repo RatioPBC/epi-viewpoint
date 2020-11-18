@@ -4,7 +4,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
-  import EpicenterWeb.Profile.CaseInvestigationPresenter, only: [clinical_statuses_options: 0, symptoms_options: 0]
+  import EpicenterWeb.Profile.CaseInvestigationPresenter, only: [symptoms_options: 0]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -79,7 +79,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
       "If asymptomatic, date of first positive test (#{Format.date(case_investigation.initiating_lab_result.sampled_on)})"
 
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", clinical_statuses_options(), span: 5))
+    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", CaseInvestigation.text_field_values(:clinical_status), span: 5))
     |> Form.line(&Form.date_field(&1, :symptom_onset_date, "Symptom onset date*", explanation_text: symptom_onset_date_explanation_text, span: 5))
     |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), span: 5))
     |> Form.line(&Form.save_button(&1))
