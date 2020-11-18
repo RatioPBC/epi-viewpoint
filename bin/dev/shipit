@@ -5,11 +5,27 @@ set -o pipefail
 
 trap "exit" INT
 
+source "bin/_support/cecho.sh"
 source "bin/_support/step.sh"
+
+check_for_committed_changes() {
+  command="git diff-index --quiet HEAD --"
+  step_header "Checking for uncommitted changes" "${command}"
+  if eval "${command}"; then
+    cecho --green "OK"
+  else
+    cecho --red "FAILED"
+    git status
+    cecho --red "\n\nThere are uncommitted changes in the working tree. Please commit them and try again."
+    exit
+  fi
+}
 
 step "Checking for unused elixir deps" 'mix deps.unlock --check-unused'
 step "Auditing elixir deps" "mix deps.audit"
 step "Auditing javascript deps" "npm audit --audit-level=moderate --prefix assets"
+step "Formatting elixir code" "mix format"
+check_for_committed_changes
 bin/dev/update
 bin/dev/test
 
