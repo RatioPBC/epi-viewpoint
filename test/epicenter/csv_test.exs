@@ -70,6 +70,15 @@ defmodule Epicenter.CsvTest do
       |> assert_eq({:ok, [%{"column_a" => "value, a", "column b" => "value b", "column_c" => "value c"}]})
     end
 
+    test "handles DOS files (files with BOM as leading character)" do
+      optional_columns =
+        ~w{datereportedtolhd_0 caseid_1 caseclassificationstatus_2 search_lastname_4 dateofbirth_5 age_6 agetype_7 sex_8 diagaddress_street1_9 diagaddress_city_10 diagaddress_zip_11 diagaddress_state_11 phonenumber_13 dateofdeath_14 race_15 ethnicity_16 testname_17 result_18 reference_19 organism_20 specimentype_21 datecollected_22 resultdate_23 specimenid_24 facilityname_25 address_street_26 address_city_27 address_state_28 orderingfacilityname_30 orderingfacilitycity_31 orderingproviderfirstname_32 orderingproviderlastname_33 orderingprovidercity_34}
+
+      assert {:ok, [%{"search_firstname_3" => "AminaT"}]} =
+               File.read!("test/support/fixtures/import_dos_file.csv")
+               |> Csv.read(&Function.identity/1, required: ["search_firstname_3"], optional: optional_columns)
+    end
+
     test "gives a nicer error message when there are spaces between commas and quotes" do
       expected_message =
         "unexpected escape character \" in \"column_a   , \\\"column b\\\" , column_c\\n\"" <>
