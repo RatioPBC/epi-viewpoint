@@ -120,6 +120,10 @@ defmodule Epicenter.Cases.Person do
         where: lab_result.sampled_on > ^fifteen_days_ago
     end
 
+    def filter(:all), do: Person.Query.all()
+    def filter(:call_list), do: Person.Query.call_list()
+    def filter(:with_positive_lab_results), do: Person.Query.with_positive_lab_results()
+
     def get_people(ids), do: from(person in Person, where: person.id in ^ids, order_by: [asc: person.seq])
 
     @fields_to_replace_from_csv ~w{updated_at}a

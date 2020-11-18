@@ -216,9 +216,12 @@ defmodule Epicenter.CasesTest do
       |> Test.Fixtures.lab_result_attrs(user, "alice-1", ~D[2020-06-02])
       |> Cases.create_lab_result!()
 
-      Test.Fixtures.person_attrs(user, "billy", dob: ~D[2000-06-01], first_name: "Billy", last_name: "Testuser")
-      |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs(user, "billy-1", ~D[2020-06-03])
+      billy =
+        Test.Fixtures.person_attrs(user, "billy", dob: ~D[2000-06-01], first_name: "Billy", last_name: "Testuser")
+        |> Cases.create_person!()
+
+      billy
+      |> Test.Fixtures.lab_result_attrs(user, "billy-1", ~D[2020-06-03], %{result: "negative"})
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "cindy", dob: ~D[2000-07-01], first_name: "Cindy", last_name: "Testuser")
@@ -226,12 +229,14 @@ defmodule Epicenter.CasesTest do
       |> Test.Fixtures.lab_result_attrs(user, "cindy-1", Extra.Date.days_ago(4))
       |> Cases.create_lab_result!()
 
-      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.admin_audit_meta())
 
       Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy cindy})
       Cases.list_people(:call_list) |> tids() |> assert_eq(~w{cindy})
-      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice billy cindy})
-      Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice})
+      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice cindy})
+
+      Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy})
+      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice})
     end
 
     test "assign_user_to_people updates people's assigned user" do
