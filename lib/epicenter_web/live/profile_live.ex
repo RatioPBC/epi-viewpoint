@@ -15,6 +15,7 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
       <%= for note <- @case_investigation.notes |> Enum.reverse() do %>
         <%= component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user_id) %>
       <% end %>
+    </div>
     """
   end
 end
@@ -42,14 +43,15 @@ defmodule EpicenterWeb.CaseInvestigationNote do
   def render(assigns) do
     ~L"""
     <div class="case-investigation-note" data-role="case-investigation-note" data-note-id="<%= @note.id %>">
-        <div class="case-investigation-note-header">
-          <span class="case-investigation-note-author" data-role="case-investigation-note-author"><%= @note.author.name %></span>
-          <span data-role="case-investigation-note-date"><%= Format.date(@note.inserted_at) %></span>
-        </div>
-        <div class="case-investigation-note-text" data-role="case-investigation-note-text"><%= @note.text %></div>
-      <%= if @note.author_id == @current_user_id do %>
-        <div><a href="#" class="case-investigation-delete-link" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target="<%= @myself %>">Delete</a></div>
-      <% end %>
+      <div class="case-investigation-note-header">
+        <span class="case-investigation-note-author" data-role="case-investigation-note-author"><%= @note.author.name %></span>
+        <span data-role="case-investigation-note-date"><%= Format.date(@note.inserted_at) %></span>
+      </div>
+      <div class="case-investigation-note-text" data-role="case-investigation-note-text"><%= @note.text %></div>
+        <%= if @note.author_id == @current_user_id do %>
+          <div><a href="#" class="case-investigation-delete-link" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target="<%= @myself %>">Delete</a></div>
+        <% end %>
+      </div>
     </div>
     """
   end
