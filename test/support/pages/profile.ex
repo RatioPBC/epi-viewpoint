@@ -345,8 +345,6 @@ defmodule EpicenterWeb.Test.Pages.Profile do
       _ ->
         flunk("too many delete buttons")
     end
-
-    :ok
   end
 
   def assert_case_investigation_note_validation_messages(%View{} = view, number, messages) do

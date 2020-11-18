@@ -592,11 +592,19 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert [] = Pages.Profile.case_investigation_notes(view, "001")
     end
 
-    # test "doesn't let you remove someone else's note", %{person: person, user: user, conn: conn} do
-    #   view = Pages.Profile.visit(conn, person)
+    test "doesn't let you remove someone else's note", %{person: person, user: user, conn: conn} do
+      other_user = Epicenter.AccountsFixtures.user_fixture(%{tid: "someone_else"})
+      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
-    #   assert Pages.Profile.remove_note(view, someone_elses_note.id) == :remove_button_isnt_there
-    # end
+      someone_elses_note =
+        Test.Fixtures.case_investigation_note_attrs(case_investigation, other_user, "note-a", %{text: "some other user's note"})
+        |> Cases.create_case_investigation_note!()
+        |> Cases.preload_author()
+
+      view = Pages.Profile.visit(conn, person)
+
+      assert Pages.Profile.remove_note(view, someone_elses_note.id) == :delete_button_not_found
+    end
 
     test "warns you that there are changes if you try to navigate away", %{person: person, user: user, conn: conn} do
       build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
