@@ -20,23 +20,23 @@ defmodule EpicenterWeb.PeopleLive do
     |> authenticate_user(session)
     |> assign_page_title("People")
     |> assign_current_date()
-    |> set_reload_message(nil)
-    |> set_filter(:with_positive_lab_results)
+    |> assign_reload_message(nil)
+    |> assign_filter(:with_positive_lab_results)
     |> assign(:only_assigned_to_me, false)
-    |> load_people()
-    |> load_users()
-    |> set_selected()
+    |> load_and_assign_people()
+    |> load_and_assign_users()
+    |> assign_selected_to_empty()
     |> ok()
   end
 
   def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_positive_lab_results},
-    do: socket |> set_filter(filter) |> noreply()
+    do: socket |> assign_filter(filter) |> noreply()
 
   def handle_params(_, _url, socket),
     do: socket |> noreply()
 
   def handle_info({:people, updated_people}, socket),
-    do: socket |> set_selected() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
+    do: socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
 
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
     do: socket |> select_person(person_id) |> noreply()
@@ -64,14 +64,14 @@ defmodule EpicenterWeb.PeopleLive do
 
     Cases.broadcast_people(updated_people)
 
-    socket |> set_selected() |> refresh_existing_people(updated_people) |> noreply()
+    socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> noreply()
   end
 
   def handle_event("form-change", _, socket),
     do: socket |> noreply()
 
   def handle_event("reload-people", _, socket),
-    do: socket |> set_reload_message(nil) |> load_people() |> noreply()
+    do: socket |> assign_reload_message(nil) |> load_and_assign_people() |> noreply()
 
   def handle_event("toggle-assigned-to-me", _, socket),
     do: socket |> assign(:only_assigned_to_me, !socket.assigns[:only_assigned_to_me]) |> noreply()
@@ -171,7 +171,7 @@ defmodule EpicenterWeb.PeopleLive do
   defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.delete(selected_people, person_id))
 
-  defp load_people(socket) do
+  defp load_and_assign_people(socket) do
     people =
       Cases.list_people(socket.assigns.filter)
       |> Cases.preload_lab_results()
@@ -182,11 +182,11 @@ defmodule EpicenterWeb.PeopleLive do
     assign_people(socket, people)
   end
 
-  defp load_users(socket),
+  defp load_and_assign_users(socket),
     do: socket |> assign(users: Accounts.list_users())
 
   defp prompt_to_reload(socket, _people) do
-    set_reload_message(socket, "An import was completed. Show new people.")
+    assign_reload_message(socket, "An import was completed. Show new people.")
   end
 
   defp refresh_existing_people(socket, updated_people) do
@@ -198,15 +198,15 @@ defmodule EpicenterWeb.PeopleLive do
   defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.put(selected_people, person_id, true))
 
-  defp set_filter(socket, filter) when is_binary(filter),
-    do: socket |> set_filter(Euclid.Extra.Atom.from_string(filter))
+  defp assign_filter(socket, filter) when is_binary(filter),
+    do: socket |> assign_filter(Euclid.Extra.Atom.from_string(filter))
 
-  defp set_filter(socket, filter) when is_atom(filter),
-    do: socket |> assign(filter: filter, page_title: page_title(filter)) |> load_people()
+  defp assign_filter(socket, filter) when is_atom(filter),
+    do: socket |> assign(filter: filter, page_title: page_title(filter)) |> load_and_assign_people()
 
-  defp set_reload_message(socket, message),
+  defp assign_reload_message(socket, message),
     do: socket |> assign(reload_message: message)
 
-  defp set_selected(socket),
+  defp assign_selected_to_empty(socket),
     do: socket |> assign(selected_people: %{})
 end
