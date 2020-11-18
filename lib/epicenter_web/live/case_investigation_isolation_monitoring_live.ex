@@ -50,7 +50,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       end
     end
 
-
     defp isolation_dates(%CaseInvestigation{isolation_monitoring_start_date: nil, isolation_monitoring_end_date: nil} = case_investigation) do
       suggested_isolation_dates(case_investigation)
     end

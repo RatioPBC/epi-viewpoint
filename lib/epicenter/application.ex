@@ -20,12 +20,12 @@ defmodule Epicenter.Application do
     ]
 
     :ok =
-    :telemetry.attach(
-      "logger-json-ecto",
-      [:epicenter, :repo, :query],
-      &LoggerJSON.Ecto.telemetry_logging_handler/4,
-      :debug
-    )
+      :telemetry.attach(
+        "logger-json-ecto",
+        [:epicenter, :repo, :query],
+        &LoggerJSON.Ecto.telemetry_logging_handler/4,
+        :debug
+      )
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
