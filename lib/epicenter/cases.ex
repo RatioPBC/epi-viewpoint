@@ -127,6 +127,7 @@ defmodule Epicenter.Cases do
   def list_people(:all), do: Person.Query.all() |> Repo.all()
   def list_people(:call_list), do: Person.Query.call_list() |> Repo.all()
   def list_people(:with_positive_lab_results), do: Person.Query.with_positive_lab_results() |> Repo.all()
+  def list_people(:all, assigned_to_id: user_id), do: Person.Query.all() |> Person.Query.assigned_to_id(user_id) |> Repo.all()
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)

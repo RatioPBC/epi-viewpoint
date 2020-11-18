@@ -108,6 +108,8 @@ defmodule Epicenter.Cases.Person do
 
     def all(), do: from(person in Person, order_by: [asc: person.seq])
 
+    def assigned_to_id(query, user_id), do: query |> where([p], p.assigned_to_id == ^user_id)
+
     def call_list() do
       fifteen_days_ago = Extra.Date.days_ago(15)
 
