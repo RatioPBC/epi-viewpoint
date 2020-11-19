@@ -699,38 +699,97 @@ defmodule Epicenter.Cases.ImportTest do
     end
   end
 
-  describe "create_case_investigation_if_no_other" do
+  describe "find_or_create_case_investigation_for_positive_lab_result" do
     setup %{originator: originator} do
       alice = Test.Fixtures.person_attrs(originator, "alice") |> Cases.create_person!()
-      lab_result = Test.Fixtures.lab_result_attrs(alice, originator, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
-      [alice: alice, lab_result: lab_result]
+
+      positive_lab_result =
+        Test.Fixtures.lab_result_attrs(alice, originator, "positive_lab_result1", ~D[2020-10-27], %{result: "Positive"}) |> Cases.create_lab_result!()
+
+      detected_lab_result =
+        Test.Fixtures.lab_result_attrs(alice, originator, "detected_lab_result1", ~D[2020-10-27], %{result: "Detected"}) |> Cases.create_lab_result!()
+
+      negative_lab_result =
+        Test.Fixtures.lab_result_attrs(alice, originator, "negative_lab_result1", ~D[2020-10-27], %{result: "Negative"}) |> Cases.create_lab_result!()
+
+      null_lab_result =
+        Test.Fixtures.lab_result_attrs(alice, originator, "negative_lab_result1", ~D[2020-10-27], %{result: nil}) |> Cases.create_lab_result!()
+
+      [
+        alice: alice,
+        positive_lab_result: positive_lab_result,
+        detected_lab_result: detected_lab_result,
+        negative_lab_result: negative_lab_result,
+        null_lab_result: null_lab_result
+      ]
     end
 
-    test "creates case investigation for a lab result when there are no other case investigations", %{
+    test "creates case investigation for a positive lab result when there are no other case investigations", %{
       originator: originator,
       alice: alice,
-      lab_result: lab_result
+      positive_lab_result: positive_lab_result
     } do
-      %CaseInvestigation{} = Import.create_case_investigation_if_no_other(lab_result, alice, originator)
+      :ok = Import.find_or_create_case_investigation_for_positive_lab_result(positive_lab_result, alice, originator)
 
       case_investigation = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Euclid.Extra.List.only!()
 
       assert case_investigation.person_id == alice.id
-      assert case_investigation.initiating_lab_result_id == lab_result.id
+      assert case_investigation.initiating_lab_result_id == positive_lab_result.id
     end
 
-    test "does not create case investigation for a lab result when there is an existing case investigation", %{
+    test "creates case investigation for a detected lab result when there are no other case investigations", %{
       originator: originator,
       alice: alice,
-      lab_result: lab_result
+      detected_lab_result: detected_lab_result
+    } do
+      :ok = Import.find_or_create_case_investigation_for_positive_lab_result(detected_lab_result, alice, originator)
+
+      case_investigation = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Euclid.Extra.List.only!()
+
+      assert case_investigation.person_id == alice.id
+      assert case_investigation.initiating_lab_result_id == detected_lab_result.id
+    end
+
+    test "does not create case investigation for a positive lab result when there is an existing case investigation", %{
+      originator: originator,
+      alice: alice,
+      positive_lab_result: positive_lab_result,
+      detected_lab_result: detected_lab_result
     } do
       case_investigation =
-        Test.Fixtures.case_investigation_attrs(alice, lab_result, originator, "investigation")
+        Test.Fixtures.case_investigation_attrs(alice, positive_lab_result, originator, "investigation")
         |> Cases.create_case_investigation!()
 
-      Import.create_case_investigation_if_no_other(lab_result, alice, originator)
+      :already_exists = Import.find_or_create_case_investigation_for_positive_lab_result(detected_lab_result, alice, originator)
       existing_case_investigation = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Euclid.Extra.List.only!()
       assert case_investigation.id == existing_case_investigation.id
+    end
+
+    test "does not create case investigation for a negative or blank lab result", %{
+      originator: originator,
+      alice: alice,
+      negative_lab_result: negative_lab_result,
+      null_lab_result: null_lab_result
+    } do
+      :not_positive = Import.find_or_create_case_investigation_for_positive_lab_result(negative_lab_result, alice, originator)
+      :not_positive = Import.find_or_create_case_investigation_for_positive_lab_result(null_lab_result, alice, originator)
+
+      assert [] = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations)
+    end
+
+    test "a negative lab result followed by a positive lab result creates a case investigation", %{
+      originator: originator,
+      alice: alice,
+      negative_lab_result: negative_lab_result,
+      positive_lab_result: positive_lab_result
+    } do
+      :not_positive = Import.find_or_create_case_investigation_for_positive_lab_result(negative_lab_result, alice, originator)
+      :ok = Import.find_or_create_case_investigation_for_positive_lab_result(positive_lab_result, alice, originator)
+
+      case_investigation = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Euclid.Extra.List.only!()
+
+      assert case_investigation.person_id == alice.id
+      assert case_investigation.initiating_lab_result_id == positive_lab_result.id
     end
   end
 end

@@ -185,26 +185,36 @@ defmodule Epicenter.Cases.Import do
     with {:ok, person} <- import_person(person, row, originator),
          {:ok, _} <- import_demographic(person, row, originator) do
       %LabResult{} = lab_result = import_lab_result(row, person, originator)
-      create_case_investigation_if_no_other(lab_result, person, originator)
+      find_or_create_case_investigation_for_positive_lab_result(lab_result, person, originator)
       import_phone_number(row, person, originator)
       import_address(row, person, originator)
       %{person: person, lab_result: lab_result}
     end
   end
 
-  def create_case_investigation_if_no_other(%LabResult{id: lab_result_id}, %Person{id: person_id} = person, originator) do
+  def find_or_create_case_investigation_for_positive_lab_result(%LabResult{result: result} = lab_result, person, originator) do
+    cond do
+      is_nil(result) -> :not_positive
+      String.downcase(result) in ["positive", "detected"] -> find_or_create_case_investigation(lab_result, person, originator)
+      true -> :not_positive
+    end
+  end
+
+  defp find_or_create_case_investigation(%LabResult{id: lab_result_id}, %Person{id: person_id} = person, originator) do
     person
     |> Cases.preload_case_investigations()
     |> Map.get(:case_investigations)
     |> case do
-      [case_investigation] ->
-        case_investigation
+      [_case_investigation] ->
+        :already_exists
 
       [] ->
         # TODO currently assuming max of 1 case investigation and so, hardcoding name to "001"
         %{person_id: person_id, initiating_lab_result_id: lab_result_id, name: "001"}
         |> in_audit_tuple(originator, AuditLog.Revision.insert_case_investigation_action())
         |> Cases.create_case_investigation!()
+
+        :ok
     end
   end
 
