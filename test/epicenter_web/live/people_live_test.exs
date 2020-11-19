@@ -167,7 +167,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "David Testuser", "billy-id", "positive, 3 days ago", "", ""],
+        ["", "David Testuser", "david-id", "positive, 3 days ago", "", ""],
         ["", "Emily Testuser", "nancy-id", "positive, 3 days ago", "", ""],
         ["", "Alice Testuser", "", "positive, 1 day ago", "", ""],
         ["", "Cindy Testuser", "", "positive, 1 day ago", "", ""]
@@ -182,20 +182,51 @@ defmodule EpicenterWeb.PeopleLiveTest do
   end
 
   describe "filtering" do
+    setup %{user: user, people: people} do
+      [alice, billy, nancy, cindy, david, emily] = people ++ import_three_people_with_two_positive_results(user)
+
+      [
+        Test.Fixtures.case_investigation_attrs(alice, Person.latest_lab_result(alice), user, "pending-interview"),
+        Test.Fixtures.case_investigation_attrs(billy, Person.latest_lab_result(billy), user, "ongoing-interview", %{
+          started_at: ~U[2020-10-31 23:03:07Z]
+        }),
+        Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
+          completed_interview_at: ~U[2020-10-31 23:03:07Z],
+          isolation_monitoring_start_date: ~D[2020-11-03],
+          isolation_monitoring_end_date: ~D[2020-11-13],
+          isolation_concluded_at: ~U[2020-10-31 10:30:00Z]
+        }),
+        Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
+          completed_interview_at: ~U[2020-10-31 23:03:07Z],
+          isolation_monitoring_start_date: ~D[2020-11-03],
+          isolation_monitoring_end_date: ~D[2020-11-13]
+        }),
+        Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
+          completed_interview_at: ~U[2020-10-31 23:03:07Z]
+        })
+      ]
+      |> Enum.map(&Cases.create_case_investigation!/1)
+
+      [people: [alice, billy, nancy, cindy, david, emily]]
+    end
+
     test "users can limit shown people to just those assigned to themselves", %{conn: conn, people: [alice | _], user: user} do
       {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
 
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "Ongoing interview", ""],
+        ["", "David Testuser", "david-id", "positive, 3 days ago", "Ongoing monitoring (13 days remaining)", ""],
+        ["", "Emily Testuser", "nancy-id", "positive, 3 days ago", "Pending monitoring", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", "Pending interview", user.name],
+        ["", "Cindy Testuser", "", "positive, 1 day ago", "Concluded monitoring", ""]
       ])
       |> Pages.People.assert_unchecked("[data-tid=assigned-to-me-checkbox]")
       |> Pages.People.click_assigned_to_me_checkbox()
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
+        ["", "Alice Testuser", "", "positive, 1 day ago", "Pending interview", user.name]
       ])
       |> Pages.People.assert_checked("[data-tid=assigned-to-me-checkbox]")
     end
@@ -220,31 +251,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> assert_eq([context.assignee.id, nil])
     end
 
-    test "users can filter cases by pending interview status", %{conn: conn, people: people, user: user} do
-      [alice, billy, _nancy, cindy, david, emily] = people ++ import_three_people_with_two_positive_results(user)
-
-      [
-        Test.Fixtures.case_investigation_attrs(alice, Person.latest_lab_result(alice), user, "pending-interview"),
-        Test.Fixtures.case_investigation_attrs(billy, Person.latest_lab_result(billy), user, "ongoing-interview", %{
-          started_at: ~U[2020-10-31 23:03:07Z]
-        }),
-        Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
-          completed_interview_at: ~U[2020-10-31 23:03:07Z],
-          isolation_monitoring_start_date: ~D[2020-11-03],
-          isolation_monitoring_end_date: ~D[2020-11-13],
-          isolation_concluded_at: ~U[2020-10-31 10:30:00Z]
-        }),
-        Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
-          completed_interview_at: ~U[2020-10-31 23:03:07Z],
-          isolation_monitoring_start_date: ~D[2020-11-03],
-          isolation_monitoring_end_date: ~D[2020-11-13]
-        }),
-        Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
-          completed_interview_at: ~U[2020-10-31 23:03:07Z]
-        })
-      ]
-      |> Enum.map(&Cases.create_case_investigation!/1)
-
+    test "users can filter cases by pending interview status", %{conn: conn} do
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents(
         [
@@ -357,7 +364,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
     cindy = Test.Fixtures.person_attrs(user, "cindy") |> Cases.create_person!()
     Test.Fixtures.lab_result_attrs(cindy, user, "cindy-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
 
-    david = Test.Fixtures.person_attrs(user, "david") |> Test.Fixtures.add_demographic_attrs(%{external_id: "billy-id"}) |> Cases.create_person!()
+    david = Test.Fixtures.person_attrs(user, "david") |> Test.Fixtures.add_demographic_attrs(%{external_id: "david-id"}) |> Cases.create_person!()
     Test.Fixtures.lab_result_attrs(david, user, "david-result-1", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
 
     emily = Test.Fixtures.person_attrs(user, "emily") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
