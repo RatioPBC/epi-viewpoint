@@ -9,6 +9,7 @@ defmodule EpicenterWeb.PeopleFilter do
     ~L"""
     <%= live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_positive_lab_results), class: "button", data: [active: assigns.filter in [:with_positive_lab_results, nil], role: "people-filter", tid: "all"] %>
     <%= live_patch "Pending interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_pending_interview), class: "button", data: [active: assigns.filter == :with_pending_interview, role: "people-filter", tid: "with_pending_interview"] %>
+    <%= live_patch "Ongoing interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_ongoing_interview), class: "button", data: [active: assigns.filter == :with_ongoing_interview, role: "people-filter", tid: "with_ongoing_interview"] %>
     <label id="assigned-to-me-button">
       <input type="checkbox" phx-click="toggle-assigned-to-me" <%= checked %> data-tid="assigned-to-me-checkbox" phx-target="<%= @myself %>">
       <span>My Assignments Only</span>
@@ -101,7 +102,7 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_info({:people, updated_people}, socket),
     do: socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
 
-  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{with_pending_interview with_positive_lab_results} do
+  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{with_ongoing_interview with_pending_interview with_positive_lab_results} do
     socket |> assign_filter(filter) |> load_and_assign_people() |> noreply()
   end
 
@@ -147,6 +148,7 @@ defmodule EpicenterWeb.PeopleLive do
   end
 
   def page_title(:contacts), do: "Contacts"
+  def page_title(:with_ongoing_interview), do: "Ongoing interviews"
   def page_title(:with_pending_interview), do: "Pending interviews"
   def page_title(:with_positive_lab_results), do: "Index Cases"
 

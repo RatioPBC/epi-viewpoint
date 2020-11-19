@@ -275,7 +275,29 @@ defmodule EpicenterWeb.PeopleLiveTest do
       )
     end
 
-    # TODO: check that filters combine with assigned to me checkbox correctly
+    test "users can filter cases by ongoing interview status", %{conn: conn} do
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Billy Testuser", "Ongoing interview"],
+          ["David Testuser", "Ongoing monitoring (13 days remaining)"],
+          ["Emily Testuser", "Pending monitoring"],
+          ["Alice Testuser", "Pending interview"],
+          ["Cindy Testuser", "Concluded monitoring"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+      |> Pages.People.assert_filter_selected(:all)
+      |> Pages.People.select_filter(:with_ongoing_interview)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Billy Testuser", "Ongoing interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+    end
   end
 
   describe "save button" do
