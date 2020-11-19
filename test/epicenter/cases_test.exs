@@ -204,8 +204,10 @@ defmodule Epicenter.CasesTest do
       fetched = Cases.get_person(person.id)
       assert fetched.tid == "alice"
     end
+  end
 
-    test "list_people" do
+  describe "list_people" do
+    setup do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
 
       alice =
@@ -230,114 +232,119 @@ defmodule Epicenter.CasesTest do
       |> Cases.create_lab_result!()
 
       {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      [user: user]
+    end
 
+    test "all", %{user: user} do
       Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy cindy})
-      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice cindy})
-
       Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy})
+    end
+
+    test "with_positive_lab_results", %{user: user} do
+      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice cindy})
       Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice})
     end
+  end
 
-    test "assign_user_to_people updates people's assigned user" do
-      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
-      updater = Test.Fixtures.user_attrs(@admin, "updater") |> Accounts.register_user!()
+  test "assign_user_to_people updates people's assigned user" do
+    creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
+    updater = Test.Fixtures.user_attrs(@admin, "updater") |> Accounts.register_user!()
 
-      assigned_to_user = Test.Fixtures.user_attrs(@admin, "assigned-to") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
-      bobby = Test.Fixtures.person_attrs(creator, "bobby") |> Cases.create_person!()
+    assigned_to_user = Test.Fixtures.user_attrs(@admin, "assigned-to") |> Accounts.register_user!()
+    alice = Test.Fixtures.person_attrs(creator, "alice") |> Cases.create_person!()
+    bobby = Test.Fixtures.person_attrs(creator, "bobby") |> Cases.create_person!()
 
-      {:ok, [updated_alice]} =
-        Cases.assign_user_to_people(
-          user_id: assigned_to_user.id,
-          people_ids: [alice.id],
-          audit_meta: Test.Fixtures.audit_meta(updater)
-        )
-
-      assert updated_alice |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) |> Map.get(:tid) == "assigned-to"
-      assert updated_alice.assigned_to.tid == "assigned-to"
-
-      assert_revision_count(updated_alice, 2)
-
-      assert_recent_audit_log(
-        updated_alice,
-        updater,
-        %{"assigned_to_id" => assigned_to_user.id}
+    {:ok, [updated_alice]} =
+      Cases.assign_user_to_people(
+        user_id: assigned_to_user.id,
+        people_ids: [alice.id],
+        audit_meta: Test.Fixtures.audit_meta(updater)
       )
 
-      assert bobby |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) == nil
-    end
+    assert updated_alice |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) |> Map.get(:tid) == "assigned-to"
+    assert updated_alice.assigned_to.tid == "assigned-to"
 
-    test "update_person updates a person" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    assert_revision_count(updated_alice, 2)
 
-      person =
-        Test.Fixtures.person_attrs(user, "versioned") |> Test.Fixtures.add_demographic_attrs(%{first_name: "version-1"}) |> Cases.create_person!()
+    assert_recent_audit_log(
+      updated_alice,
+      updater,
+      %{"assigned_to_id" => assigned_to_user.id}
+    )
 
-      [%{id: demographic_id}] = person.demographics
+    assert bobby |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) == nil
+  end
 
-      {:ok, updated_person} =
-        person |> Cases.update_person({%{demographics: [%{id: demographic_id, first_name: "version-2"}]}, Test.Fixtures.audit_meta(user)})
+  test "update_person updates a person" do
+    user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
 
-      updated_person = updated_person |> Cases.preload_demographics()
-      assert Person.coalesce_demographics(updated_person).first_name == "version-2"
+    person =
+      Test.Fixtures.person_attrs(user, "versioned") |> Test.Fixtures.add_demographic_attrs(%{first_name: "version-1"}) |> Cases.create_person!()
 
-      assert_revision_count(person, 2)
+    [%{id: demographic_id}] = person.demographics
 
-      assert %{
-               "demographics" => [
-                 %{
-                   "id" => ^demographic_id,
-                   "first_name" => "version-2"
-                 }
-               ]
-             } = recent_audit_log(person).change
-    end
+    {:ok, updated_person} =
+      person |> Cases.update_person({%{demographics: [%{id: demographic_id, first_name: "version-2"}]}, Test.Fixtures.audit_meta(user)})
 
-    test "find_matching_person finds a person by their dob, first_name, and last_name" do
-      dob = ~D[2000-01-01]
-      strip_seq = fn map -> Map.put(map, :seq, nil) end
-      person = Test.Fixtures.person_attrs(@admin, "alice", dob: dob) |> Cases.create_person!() |> strip_seq.()
+    updated_person = updated_person |> Cases.preload_demographics()
+    assert Person.coalesce_demographics(updated_person).first_name == "version-2"
 
-      match = Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => dob})
+    assert_revision_count(person, 2)
 
-      assert match.id == person.id
+    assert %{
+             "demographics" => [
+               %{
+                 "id" => ^demographic_id,
+                 "first_name" => "version-2"
+               }
+             ]
+           } = recent_audit_log(person).change
+  end
 
-      refute Cases.find_matching_person(%{"first_name" => "billy", "last_name" => "Testuser", "dob" => dob})
-      refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testy", "dob" => dob})
-      refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
-    end
+  test "find_matching_person finds a person by their dob, first_name, and last_name" do
+    dob = ~D[2000-01-01]
+    strip_seq = fn map -> Map.put(map, :seq, nil) end
+    person = Test.Fixtures.person_attrs(@admin, "alice", dob: dob) |> Cases.create_person!() |> strip_seq.()
 
-    test "find_matching_person finds a person with their dob, first_name, and last_name spread accross three records" do
-      dob = ~D[2000-01-01]
+    match = Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => dob})
 
-      person =
-        Test.Fixtures.person_attrs(@admin, "alice")
-        |> (fn {attrs, meta} -> {Map.put(attrs, :demographics, [%{first_name: "Firsty"}, %{last_name: "Testuser"}, %{dob: dob}]), meta} end).()
-        |> Cases.create_person!()
+    assert match.id == person.id
 
-      match = Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testuser", "dob" => dob})
+    refute Cases.find_matching_person(%{"first_name" => "billy", "last_name" => "Testuser", "dob" => dob})
+    refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testy", "dob" => dob})
+    refute Cases.find_matching_person(%{"first_name" => "Alice", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
+  end
 
-      assert match.id == person.id
+  test "find_matching_person finds a person with their dob, first_name, and last_name spread accross three records" do
+    dob = ~D[2000-01-01]
 
-      refute Cases.find_matching_person(%{"first_name" => "billy", "last_name" => "Testuser", "dob" => dob})
-      refute Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testy", "dob" => dob})
-      refute Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
-    end
+    person =
+      Test.Fixtures.person_attrs(@admin, "alice")
+      |> (fn {attrs, meta} -> {Map.put(attrs, :demographics, [%{first_name: "Firsty"}, %{last_name: "Testuser"}, %{dob: dob}]), meta} end).()
+      |> Cases.create_person!()
 
-    test "create_demographic/2" do
-      person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+    match = Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testuser", "dob" => dob})
 
-      {:ok, demo1} =
-        Cases.create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "second", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
+    assert match.id == person.id
 
-      {:ok, demo2} =
-        Cases.create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "third", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
+    refute Cases.find_matching_person(%{"first_name" => "billy", "last_name" => "Testuser", "dob" => dob})
+    refute Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testy", "dob" => dob})
+    refute Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
+  end
 
-      assert demographics(person.id) |> length() == 3
+  test "create_demographic/2" do
+    person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
 
-      assert %{change: %{"tid" => "second"}} = recent_audit_log(demo1)
-      assert %{change: %{"tid" => "third"}} = recent_audit_log(demo2)
-    end
+    {:ok, demo1} =
+      Cases.create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "second", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
+
+    {:ok, demo2} =
+      Cases.create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "third", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
+
+    assert demographics(person.id) |> length() == 3
+
+    assert %{change: %{"tid" => "second"}} = recent_audit_log(demo1)
+    assert %{change: %{"tid" => "third"}} = recent_audit_log(demo2)
   end
 
   describe "create_phone!" do
