@@ -146,7 +146,6 @@ defmodule EpicenterWeb.PeopleLive do
     end
   end
 
-  def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"
   def page_title(:with_pending_interview), do: "Pending interviews"
   def page_title(:with_positive_lab_results), do: "Index Cases"
