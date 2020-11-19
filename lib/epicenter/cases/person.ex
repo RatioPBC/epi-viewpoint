@@ -123,24 +123,16 @@ defmodule Epicenter.Cases.Person do
     def with_demographic_field(query, field, value), do: query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
 
     def with_ongoing_interview() do
-      from person in Person,
-        distinct: person.id,
-        join: case_investigation in CaseInvestigation,
-        on: case_investigation.person_id == person.id,
+      from [_person, case_investigation] in person_with_case_investigation(),
         where:
           not is_nil(case_investigation.started_at) and is_nil(case_investigation.completed_interview_at) and
-            is_nil(case_investigation.discontinued_at),
-        order_by: [desc: case_investigation.seq, desc: case_investigation.inserted_at]
+            is_nil(case_investigation.discontinued_at)
     end
 
     def with_pending_interview() do
-      from person in Person,
-        distinct: person.id,
-        join: case_investigation in CaseInvestigation,
-        on: case_investigation.person_id == person.id,
+      from [_person, case_investigation] in person_with_case_investigation(),
         where:
-          is_nil(case_investigation.started_at) and is_nil(case_investigation.completed_interview_at) and is_nil(case_investigation.discontinued_at),
-        order_by: [desc: case_investigation.seq, desc: case_investigation.inserted_at]
+          is_nil(case_investigation.started_at) and is_nil(case_investigation.completed_interview_at) and is_nil(case_investigation.discontinued_at)
     end
 
     def with_positive_lab_results() do
@@ -159,6 +151,14 @@ defmodule Epicenter.Cases.Person do
         where: ilike(lab_result.result, "positive"),
         or_where: ilike(lab_result.result, "detected"),
         group_by: lab_result.person_id
+    end
+
+    defp person_with_case_investigation() do
+      from person in Person,
+        distinct: person.id,
+        join: case_investigation in CaseInvestigation,
+        on: case_investigation.person_id == person.id,
+        order_by: [desc: case_investigation.seq, desc: case_investigation.inserted_at]
     end
   end
 end
