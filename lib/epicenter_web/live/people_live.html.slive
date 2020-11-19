@@ -20,7 +20,7 @@ section#people-page data-page="people"
       div data-role="reload-message"
         = if @reload_message do
           = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
-      = component(@socket, PeopleFilter, "people filter", display_people_assigned_to_me: @display_people_assigned_to_me, filter: @filter)
+      = component(@socket, PeopleFilter, "people filter", display_people_assigned_to_me: @display_people_assigned_to_me, filter: @filter, on_toggle_assigned_to_me: &on_toggle_assigned_to_me/1)
       = live_redirect "Import labs", to: "/import/start", id: "import-labs"
 
 

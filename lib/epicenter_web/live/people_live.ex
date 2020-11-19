@@ -18,7 +18,7 @@ defmodule EpicenterWeb.PeopleFilter do
 
   def handle_event("toggle-assigned-to-me", _, socket) do
     socket = socket |> assign(:display_people_assigned_to_me, !socket.assigns.display_people_assigned_to_me)
-    send(self(), {:display_people_assigned_to_me_toggled, socket.assigns.display_people_assigned_to_me})
+    socket.assigns.on_toggle_assigned_to_me.(socket.assigns.display_people_assigned_to_me)
     socket |> noreply()
   end
 end
@@ -107,6 +107,10 @@ defmodule EpicenterWeb.PeopleLive do
 
   def handle_params(_, _url, socket),
     do: socket |> noreply()
+
+  def on_toggle_assigned_to_me(display_people_assigned_to_me) do
+    send(self(), {:display_people_assigned_to_me_toggled, display_people_assigned_to_me})
+  end
 
   # # # View helpers
 
