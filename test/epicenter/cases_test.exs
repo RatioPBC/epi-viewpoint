@@ -218,6 +218,9 @@ defmodule Epicenter.CasesTest do
       |> Test.Fixtures.lab_result_attrs(user, "alice-1", ~D[2020-06-02])
       |> Cases.create_lab_result!()
 
+      Test.Fixtures.case_investigation_attrs(alice, Person.latest_lab_result(alice), user, "pending-interview")
+      |> Cases.create_case_investigation!()
+
       billy =
         Test.Fixtures.person_attrs(user, "billy", dob: ~D[2000-06-01], first_name: "Billy", last_name: "Testuser")
         |> Cases.create_person!()
@@ -238,6 +241,11 @@ defmodule Epicenter.CasesTest do
     test "all", %{user: user} do
       Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy cindy})
       Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy})
+    end
+
+    test "with_pending_interview", %{user: user} do
+      Cases.list_people(:with_pending_interview) |> tids() |> assert_eq(~w{alice})
+      Cases.list_people(:with_pending_interview, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice})
     end
 
     test "with_positive_lab_results", %{user: user} do
