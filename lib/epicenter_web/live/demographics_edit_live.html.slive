@@ -1,4 +1,4 @@
-#demographics-edit-page data-role="demographics-edit-page" data-page="demographics-edit" data-confirm-navigation=nil
+#demographics-edit-page data-role="demographics-edit-page" data-page="demographics-edit" data-confirm-navigation=@confirmation_prompt
 
   section
     header#subnav

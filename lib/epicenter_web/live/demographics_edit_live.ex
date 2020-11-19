@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.DemographicsEditLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
@@ -20,13 +21,14 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign_form_changeset(DemographicForm.model_to_form_changeset(demographic))
     |> assign(person: person)
+    |> assign(confirmation_prompt: nil)
     |> ok()
   end
 
   # temporarily does nothing until another issue is worked out
   def handle_event("form-change", _params, socket) do
-    #    IO.inspect(params, label: "params")
-    socket |> noreply()
+    # IO.inspect(params, label: "params")
+    socket |> assign(confirmation_prompt: abandon_changes_confirmation_text()) |> noreply()
   end
 
   def handle_event("save", params, socket) do
