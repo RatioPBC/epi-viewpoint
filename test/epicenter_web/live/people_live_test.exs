@@ -16,46 +16,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
   setup [:register_and_log_in_user, :create_people_and_lab_results]
 
   describe "rendering" do
-    test("disconnected and connected render", %{conn: conn}, do: Pages.People.visit(conn) |> Pages.People.assert_here())
-
-    test "users can limit shown people to just those assigned to themselves", %{conn: conn, people: [alice | _], user: user} do
-      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Pages.People.visit(conn)
-      |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
-      ])
-      |> Pages.People.assert_unchecked("[data-tid=assigned-to-me-checkbox]")
-      |> Pages.People.click_assigned_to_me_checkbox()
-      |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
-      ])
-      |> Pages.People.assert_checked("[data-tid=assigned-to-me-checkbox]")
-    end
-
-    test "people who have been filtered out should not be assigned during a bulk assignment", %{conn: conn, people: [alice, billy | _]} = context do
-      # I check person 1 (who is not assigned to me)
-      # I check person 2 (who is assigned to me)
-      # I toggle so that person 1 is hidden
-      # I try to assign to someone
-      # that shouldn't change the assignment of person 1
-      # but should change the assignment of person 2
-      {:ok, _} = Cases.assign_user_to_people(user_id: context.user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Pages.People.visit(conn)
-      |> Pages.People.click_person_checkbox(person: alice, value: "on")
-      |> Pages.People.click_person_checkbox(person: billy, value: "on")
-      |> Pages.People.click_assigned_to_me_checkbox()
-      |> Pages.People.change_form(%{"user" => context.assignee.id})
-
-      Cases.get_people([alice.id, billy.id])
-      |> Euclid.Extra.Enum.pluck(:assigned_to_id)
-      |> assert_eq([context.assignee.id, nil])
-    end
-
     test "user can be assigned to people", %{assignee: assignee, conn: conn, people: [alice | _]} do
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents([
@@ -219,6 +179,96 @@ defmodule EpicenterWeb.PeopleLiveTest do
       # TODO: we probably state 0 people here, as the test previously did...
       Pages.People.assert_reload_message(view, "An import was completed. Show new people.")
     end
+  end
+
+  describe "filtering" do
+    test "users can limit shown people to just those assigned to themselves", %{conn: conn, people: [alice | _], user: user} do
+      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents([
+        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
+        ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
+      ])
+      |> Pages.People.assert_unchecked("[data-tid=assigned-to-me-checkbox]")
+      |> Pages.People.click_assigned_to_me_checkbox()
+      |> Pages.People.assert_table_contents([
+        ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
+        ["", "Alice Testuser", "", "positive, 1 day ago", "", user.name]
+      ])
+      |> Pages.People.assert_checked("[data-tid=assigned-to-me-checkbox]")
+    end
+
+    test "people who have been filtered out should not be assigned during a bulk assignment", %{conn: conn, people: [alice, billy | _]} = context do
+      # I check person 1 (who is not assigned to me)
+      # I check person 2 (who is assigned to me)
+      # I toggle so that person 1 is hidden
+      # I try to assign to someone
+      # that shouldn't change the assignment of person 1
+      # but should change the assignment of person 2
+      {:ok, _} = Cases.assign_user_to_people(user_id: context.user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+
+      Pages.People.visit(conn)
+      |> Pages.People.click_person_checkbox(person: alice, value: "on")
+      |> Pages.People.click_person_checkbox(person: billy, value: "on")
+      |> Pages.People.click_assigned_to_me_checkbox()
+      |> Pages.People.change_form(%{"user" => context.assignee.id})
+
+      Cases.get_people([alice.id, billy.id])
+      |> Euclid.Extra.Enum.pluck(:assigned_to_id)
+      |> assert_eq([context.assignee.id, nil])
+    end
+
+    test "users can filter cases by pending interview status", %{conn: conn, people: people, user: user} do
+      [alice, billy, _nancy, cindy, david, emily] = people ++ import_three_people_with_two_positive_results(user)
+
+      [
+        Test.Fixtures.case_investigation_attrs(alice, Person.latest_lab_result(alice), user, "pending-interview"),
+        Test.Fixtures.case_investigation_attrs(billy, Person.latest_lab_result(billy), user, "ongoing-interview", %{
+          started_at: ~U[2020-10-31 23:03:07Z]
+        }),
+        Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
+          completed_interview_at: ~U[2020-10-31 23:03:07Z],
+          isolation_monitoring_start_date: ~D[2020-11-03],
+          isolation_monitoring_end_date: ~D[2020-11-13],
+          isolation_concluded_at: ~U[2020-10-31 10:30:00Z]
+        }),
+        Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
+          completed_interview_at: ~U[2020-10-31 23:03:07Z],
+          isolation_monitoring_start_date: ~D[2020-11-03],
+          isolation_monitoring_end_date: ~D[2020-11-13]
+        }),
+        Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
+          completed_interview_at: ~U[2020-10-31 23:03:07Z]
+        })
+      ]
+      |> Enum.map(&Cases.create_case_investigation!/1)
+
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Billy Testuser", "Ongoing interview"],
+          ["David Testuser", "Ongoing monitoring (13 days remaining)"],
+          ["Emily Testuser", "Pending monitoring"],
+          ["Alice Testuser", "Pending interview"],
+          ["Cindy Testuser", "Concluded monitoring"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+      |> Pages.People.assert_filter_selected(:all)
+      |> Pages.People.select_filter(:with_pending_interview)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Alice Testuser", "Pending interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+    end
+
+    # TODO: check that filters combine with assigned to me checkbox correctly
   end
 
   describe "save button" do

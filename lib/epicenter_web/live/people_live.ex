@@ -1,7 +1,38 @@
+defmodule EpicenterWeb.PeopleFilter do
+  use EpicenterWeb, :live_component
+
+  import EpicenterWeb.LiveHelpers, only: [noreply: 1]
+
+  def render(assigns) do
+    checked = if(assigns.display_people_assigned_to_me, do: "checked", else: "")
+
+    ~L"""
+    <%= live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_positive_lab_results), class: "button", data: [active: assigns.filter in [:with_positive_lab_results, nil], role: "people-filter", tid: "all"] %>
+    <%= live_patch "Pending interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :pending_interview), class: "button", data: [active: assigns.filter == :pending_interview, role: "people-filter", tid: "pending_interview"] %>
+    <label id="assigned-to-me-button">
+      <input type="checkbox" phx-click="toggle-assigned-to-me" <%= checked %> data-tid="assigned-to-me-checkbox" phx-target="<%= @myself %>">
+      <span>My Assignments Only</span>
+    </label>
+    """
+
+    # TODO: put the filters in the stuff above
+    #    / #filter
+    #    = live_patch "Call list", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :call_list), class: "button", data: [active: @filter == :call_list]
+    #    = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
+  end
+
+  def handle_event("toggle-assigned-to-me", _, socket) do
+    socket = socket |> assign(:display_people_assigned_to_me, !socket.assigns.display_people_assigned_to_me)
+    send(self(), {:display_people_assigned_to_me_toggled, socket.assigns.display_people_assigned_to_me})
+    socket |> noreply()
+  end
+end
+
 defmodule EpicenterWeb.PeopleLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
@@ -9,6 +40,7 @@ defmodule EpicenterWeb.PeopleLive do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
+  alias EpicenterWeb.PeopleFilter
 
   @clock Application.get_env(:epicenter, :clock)
 
@@ -28,15 +60,6 @@ defmodule EpicenterWeb.PeopleLive do
     |> assign_selected_to_empty()
     |> ok()
   end
-
-  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{call_list contacts with_positive_lab_results},
-    do: socket |> assign_filter(filter) |> load_and_assign_people() |> noreply()
-
-  def handle_params(_, _url, socket),
-    do: socket |> noreply()
-
-  def handle_info({:people, updated_people}, socket),
-    do: socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
 
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
     do: socket |> select_person(person_id) |> noreply()
@@ -73,12 +96,22 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_event("reload-people", _, socket),
     do: socket |> assign_reload_message(nil) |> load_and_assign_people() |> noreply()
 
-  def handle_event("toggle-assigned-to-me", _, socket),
-    do:
-      socket
-      |> assign(:display_people_assigned_to_me, !socket.assigns[:display_people_assigned_to_me])
-      |> load_and_assign_people()
-      |> noreply()
+  def handle_info({:display_people_assigned_to_me_toggled, display_people_assigned_to_me}, socket) do
+    socket
+    |> assign(:display_people_assigned_to_me, display_people_assigned_to_me)
+    |> load_and_assign_people()
+    |> noreply()
+  end
+
+  def handle_info({:people, updated_people}, socket),
+    do: socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
+
+  def handle_params(%{"filter" => filter}, _url, socket) when filter in ~w{with_pending_interview with_positive_lab_results} do
+    socket |> assign_filter(filter) |> load_and_assign_people() |> noreply()
+  end
+
+  def handle_params(_, _url, socket),
+    do: socket |> noreply()
 
   # # # View helpers
 
@@ -116,6 +149,7 @@ defmodule EpicenterWeb.PeopleLive do
 
   def page_title(:call_list), do: "Call List"
   def page_title(:contacts), do: "Contacts"
+  def page_title(:with_pending_interview), do: "Pending interviews"
   def page_title(:with_positive_lab_results), do: "Index Cases"
 
   def selected?(selected_people, %Person{id: person_id}),

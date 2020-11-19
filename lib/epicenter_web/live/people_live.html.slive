@@ -25,9 +25,7 @@ section#people-page data-page="people"
       div data-role="reload-message"
         = if @reload_message do
           = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
-      label#assigned-to-me-button
-        input type="checkbox" phx-click="toggle-assigned-to-me" checked=@display_people_assigned_to_me data-tid="assigned-to-me-checkbox"
-        span My Assignments Only
+      = component(@socket, PeopleFilter, "people filter", display_people_assigned_to_me: @display_people_assigned_to_me, filter: @filter)
       = live_redirect "Import labs", to: "/import/start", id: "import-labs"
 
 

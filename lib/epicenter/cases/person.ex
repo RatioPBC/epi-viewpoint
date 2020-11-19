@@ -122,6 +122,7 @@ defmodule Epicenter.Cases.Person do
 
     def filter(:all), do: Person.Query.all()
     def filter(:call_list), do: Person.Query.call_list()
+    def filter(:with_pending_interview), do: Person.Query.with_pending_interview()
     def filter(:with_positive_lab_results), do: Person.Query.with_positive_lab_results()
 
     def get_people(ids), do: from(person in Person, where: person.id in ^ids, order_by: [asc: person.seq])
@@ -130,6 +131,16 @@ defmodule Epicenter.Cases.Person do
     def opts_for_upsert(), do: [returning: true, on_conflict: {:replace, @fields_to_replace_from_csv}, conflict_target: :fingerprint]
 
     def with_demographic_field(query, field, value), do: query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
+
+    def with_pending_interview() do
+      from person in Person,
+        distinct: person.id,
+        join: case_investigation in CaseInvestigation,
+        on: case_investigation.person_id == person.id,
+        where:
+          is_nil(case_investigation.started_at) and is_nil(case_investigation.completed_interview_at) and is_nil(case_investigation.discontinued_at),
+        order_by: [desc: case_investigation.seq, desc: case_investigation.inserted_at]
+    end
 
     def with_positive_lab_results() do
       from person in Person,

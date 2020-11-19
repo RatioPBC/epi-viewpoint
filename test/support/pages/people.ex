@@ -45,6 +45,11 @@ defmodule EpicenterWeb.Test.Pages.People do
     view
   end
 
+  def assert_filter_selected(%View{} = view, filter_name) do
+    LiveViewAssertions.assert_attribute(view, "[data-role=people-filter][data-tid=#{filter_name}]", "data-active", ["true"])
+    view
+  end
+
   def assert_reload_message(%View{} = view, expected_value) do
     LiveViewAssertions.assert_role_text(view, "reload-message", expected_value)
     view
@@ -77,6 +82,11 @@ defmodule EpicenterWeb.Test.Pages.People do
 
   def change_form(%View{} = view, params) do
     view |> element("#assignment-form") |> render_change(params)
+    view
+  end
+
+  def select_filter(%View{} = view, filter_name) do
+    render_patch(view, "/people?filter=#{filter_name}")
     view
   end
 
