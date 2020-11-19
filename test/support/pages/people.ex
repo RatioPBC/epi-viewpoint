@@ -86,7 +86,7 @@ defmodule EpicenterWeb.Test.Pages.People do
   end
 
   def select_filter(%View{} = view, filter_name) do
-    render_patch(view, "/people?filter=#{filter_name}")
+    view |> element("[data-tid=#{filter_name}]") |> render_click()
     view
   end
 
