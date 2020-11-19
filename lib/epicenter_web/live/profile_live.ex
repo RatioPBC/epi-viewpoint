@@ -48,10 +48,9 @@ defmodule EpicenterWeb.CaseInvestigationNote do
         <span data-role="case-investigation-note-date"><%= Format.date(@note.inserted_at) %></span>
       </div>
       <div class="case-investigation-note-text" data-role="case-investigation-note-text"><%= @note.text %></div>
-        <%= if @note.author_id == @current_user_id do %>
-          <div><a href="#" class="case-investigation-delete-link" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target="<%= @myself %>">Delete</a></div>
-        <% end %>
-      </div>
+      <%= if @note.author_id == @current_user_id do %>
+        <div><a href="#" class="case-investigation-delete-link" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target="<%= @myself %>">Delete</a></div>
+      <% end %>
     </div>
     """
   end
