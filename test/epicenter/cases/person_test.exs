@@ -5,7 +5,6 @@ defmodule Epicenter.Cases.PersonTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
-  alias Epicenter.Extra
   alias Epicenter.Cases.Person
   alias Epicenter.Test
 
@@ -245,35 +244,6 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.person_attrs(user, "last", dob: ~D{2000-07-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
 
       Person.Query.all() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
-    end
-  end
-
-  describe "call_list" do
-    test "sorts by recent positive lab results" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      Test.Fixtures.person_attrs(user, "no-results") |> Cases.create_person!()
-
-      Test.Fixtures.person_attrs(user, "old-positive-result")
-      |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs(user, "old-positive-result", Extra.Date.days_ago(20), result: "positive")
-      |> Cases.create_lab_result!()
-
-      Test.Fixtures.person_attrs(user, "recent-negative-result")
-      |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs(user, "recent-negative-result", Extra.Date.days_ago(1), result: "negative")
-      |> Cases.create_lab_result!()
-
-      Test.Fixtures.person_attrs(user, "recent-positive-result")
-      |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs(user, "recent-positive-result", Extra.Date.days_ago(2), result: "poSiTiVe")
-      |> Cases.create_lab_result!()
-
-      Test.Fixtures.person_attrs(user, "recent-detected-result")
-      |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs(user, "recent-positive-result", Extra.Date.days_ago(1), result: "dEtEcTed")
-      |> Cases.create_lab_result!()
-
-      Person.Query.call_list() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{recent-positive-result recent-detected-result})
     end
   end
 

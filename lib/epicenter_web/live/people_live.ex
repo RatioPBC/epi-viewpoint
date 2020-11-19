@@ -14,11 +14,6 @@ defmodule EpicenterWeb.PeopleFilter do
       <span>My Assignments Only</span>
     </label>
     """
-
-    # TODO: put the filters in the stuff above
-    #    / #filter
-    #    = live_patch "Call list", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :call_list), class: "button", data: [active: @filter == :call_list]
-    #    = live_patch "Contacts", to: "#", class: "button", data: [active: @filter == :contacts, disabled: true]
   end
 
   def handle_event("toggle-assigned-to-me", _, socket) do

@@ -110,18 +110,7 @@ defmodule Epicenter.Cases.Person do
 
     def assigned_to_id(query, user_id), do: query |> where([p], p.assigned_to_id == ^user_id)
 
-    def call_list() do
-      fifteen_days_ago = Extra.Date.days_ago(15)
-
-      from person in all(),
-        join: lab_result in assoc(person, :lab_results),
-        where: ilike(lab_result.result, "positive"),
-        or_where: ilike(lab_result.result, "detected"),
-        where: lab_result.sampled_on > ^fifteen_days_ago
-    end
-
     def filter(:all), do: Person.Query.all()
-    def filter(:call_list), do: Person.Query.call_list()
     def filter(:with_pending_interview), do: Person.Query.with_pending_interview()
     def filter(:with_positive_lab_results), do: Person.Query.with_positive_lab_results()
 
