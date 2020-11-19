@@ -226,7 +226,20 @@ defmodule Epicenter.CasesTest do
         |> Cases.create_person!()
 
       billy
-      |> Test.Fixtures.lab_result_attrs(user, "billy-1", ~D[2020-06-03], %{result: "negative"})
+      |> Test.Fixtures.lab_result_attrs(user, "billy-1", ~D[2020-06-03], %{result: "detected"})
+      |> Cases.create_lab_result!()
+
+      Test.Fixtures.case_investigation_attrs(billy, Person.latest_lab_result(billy), user, "ongoing-interview", %{
+        started_at: ~U[2020-10-31 23:03:07Z]
+      })
+      |> Cases.create_case_investigation!()
+
+      nancy =
+        Test.Fixtures.person_attrs(user, "nancy", dob: ~D[2000-06-01], first_name: "Nancy", last_name: "Testuser")
+        |> Cases.create_person!()
+
+      nancy
+      |> Test.Fixtures.lab_result_attrs(user, "nancy-1", ~D[2020-06-03], %{result: "negative"})
       |> Cases.create_lab_result!()
 
       Test.Fixtures.person_attrs(user, "cindy", dob: ~D[2000-07-01], first_name: "Cindy", last_name: "Testuser")
@@ -234,13 +247,20 @@ defmodule Epicenter.CasesTest do
       |> Test.Fixtures.lab_result_attrs(user, "cindy-1", Extra.Date.days_ago(4))
       |> Cases.create_lab_result!()
 
-      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      {:ok, _} =
+        Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id, nancy.id], audit_meta: Test.Fixtures.admin_audit_meta())
+
       [user: user]
     end
 
     test "all", %{user: user} do
-      Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy cindy})
-      Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy})
+      Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy nancy cindy})
+      Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy nancy})
+    end
+
+    test "with_ongoing_interview", %{user: user} do
+      Cases.list_people(:with_ongoing_interview) |> tids() |> assert_eq(~w{billy})
+      Cases.list_people(:with_ongoing_interview, assigned_to_id: user.id) |> tids() |> assert_eq(~w{billy})
     end
 
     test "with_pending_interview", %{user: user} do
@@ -249,8 +269,8 @@ defmodule Epicenter.CasesTest do
     end
 
     test "with_positive_lab_results", %{user: user} do
-      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice cindy})
-      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice})
+      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice billy cindy})
+      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy})
     end
   end
 
