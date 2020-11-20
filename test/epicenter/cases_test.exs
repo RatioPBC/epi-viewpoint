@@ -234,6 +234,39 @@ defmodule Epicenter.CasesTest do
       })
       |> Cases.create_case_investigation!()
 
+      cindy =
+        Test.Fixtures.person_attrs(user, "cindy", dob: ~D[2000-07-01], first_name: "Cindy", last_name: "Testuser")
+        |> Cases.create_person!()
+
+      Test.Fixtures.lab_result_attrs(cindy, user, "cindy-1", Extra.Date.days_ago(4))
+      |> Cases.create_lab_result!()
+
+      Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
+        completed_interview_at: ~U[2020-10-31 23:03:07Z],
+        isolation_monitoring_start_date: ~D[2020-11-03],
+        isolation_monitoring_end_date: ~D[2020-11-13],
+        isolation_concluded_at: ~U[2020-10-31 10:30:00Z]
+      })
+      |> Cases.create_case_investigation!()
+
+      david = Test.Fixtures.person_attrs(user, "david") |> Test.Fixtures.add_demographic_attrs(%{external_id: "david-id"}) |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(david, user, "david-result-1", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
+
+      emily = Test.Fixtures.person_attrs(user, "emily") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(emily, user, "emily-result-1", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
+
+      Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
+        completed_interview_at: ~U[2020-10-31 23:03:07Z],
+        isolation_monitoring_start_date: ~D[2020-11-03],
+        isolation_monitoring_end_date: ~D[2020-11-13]
+      })
+      |> Cases.create_case_investigation!()
+
+      Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
+        completed_interview_at: ~U[2020-10-31 23:03:07Z]
+      })
+      |> Cases.create_case_investigation!()
+
       nancy =
         Test.Fixtures.person_attrs(user, "nancy", dob: ~D[2000-06-01], first_name: "Nancy", last_name: "Testuser")
         |> Cases.create_person!()
@@ -242,20 +275,24 @@ defmodule Epicenter.CasesTest do
       |> Test.Fixtures.lab_result_attrs(user, "nancy-1", ~D[2020-06-03], %{result: "negative"})
       |> Cases.create_lab_result!()
 
-      Test.Fixtures.person_attrs(user, "cindy", dob: ~D[2000-07-01], first_name: "Cindy", last_name: "Testuser")
-      |> Cases.create_person!()
-      |> Test.Fixtures.lab_result_attrs(user, "cindy-1", Extra.Date.days_ago(4))
-      |> Cases.create_lab_result!()
-
       {:ok, _} =
-        Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id, nancy.id], audit_meta: Test.Fixtures.admin_audit_meta())
+        Cases.assign_user_to_people(
+          user_id: user.id,
+          people_ids: [alice.id, billy.id, emily.id, nancy.id],
+          audit_meta: Test.Fixtures.admin_audit_meta()
+        )
 
       [user: user]
     end
 
     test "all", %{user: user} do
-      Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy nancy cindy})
-      Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy nancy})
+      Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy cindy david emily nancy})
+      Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy emily nancy})
+    end
+
+    test "with_isolation_monitoring", %{user: user} do
+      Cases.list_people(:with_isolation_monitoring) |> tids() |> assert_eq(~w{david emily})
+      Cases.list_people(:with_isolation_monitoring, assigned_to_id: user.id) |> tids() |> assert_eq(~w{emily})
     end
 
     test "with_ongoing_interview", %{user: user} do
@@ -269,8 +306,8 @@ defmodule Epicenter.CasesTest do
     end
 
     test "with_positive_lab_results", %{user: user} do
-      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice billy cindy})
-      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy})
+      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice billy cindy david emily})
+      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy emily})
     end
   end
 

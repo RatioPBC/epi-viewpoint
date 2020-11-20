@@ -111,6 +111,7 @@ defmodule Epicenter.Cases.Person do
     def assigned_to_id(query, user_id), do: query |> where([p], p.assigned_to_id == ^user_id)
 
     def filter(:all), do: Person.Query.all()
+    def filter(:with_isolation_monitoring), do: Person.Query.with_isolation_monitoring()
     def filter(:with_ongoing_interview), do: Person.Query.with_ongoing_interview()
     def filter(:with_pending_interview), do: Person.Query.with_pending_interview()
     def filter(:with_positive_lab_results), do: Person.Query.with_positive_lab_results()
@@ -121,6 +122,11 @@ defmodule Epicenter.Cases.Person do
     def opts_for_upsert(), do: [returning: true, on_conflict: {:replace, @fields_to_replace_from_csv}, conflict_target: :fingerprint]
 
     def with_demographic_field(query, field, value), do: query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
+
+    def with_isolation_monitoring() do
+      from [_person, case_investigation] in person_with_case_investigation(),
+        where: not is_nil(case_investigation.completed_interview_at) and is_nil(case_investigation.isolation_concluded_at)
+    end
 
     def with_ongoing_interview() do
       from [_person, case_investigation] in person_with_case_investigation(),
@@ -155,10 +161,9 @@ defmodule Epicenter.Cases.Person do
 
     defp person_with_case_investigation() do
       from person in Person,
-        distinct: person.id,
         join: case_investigation in CaseInvestigation,
         on: case_investigation.person_id == person.id,
-        order_by: [desc: case_investigation.seq, desc: case_investigation.inserted_at]
+        distinct: [desc: case_investigation.inserted_at, desc: case_investigation.seq, desc: person.seq, desc: person.id]
     end
   end
 end
