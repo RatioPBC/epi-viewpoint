@@ -90,7 +90,8 @@ defmodule Epicenter.Test.Fixtures do
           %{
             number: "1111111543"
           }
-        ]
+        ],
+        tid: "exposed_person_#{tid}"
       },
       under_18: false
     }

@@ -13,10 +13,11 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_here()
     end
 
-    test "People with  exposures are listed", %{conn: conn} do
+    test "People with  exposures are listed", %{conn: conn, exposure: exposure} do
       Pages.Contacts.visit(conn)
       |> Pages.Contacts.assert_table_contents([
-        ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"]
+        ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],
+        ["", "Caroline Testuser", exposure.exposed_person.id, "10/31/2020", "", ""]
       ])
     end
   end

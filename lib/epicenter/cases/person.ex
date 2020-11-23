@@ -7,6 +7,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Email
+  alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Demographic
@@ -28,6 +29,7 @@ defmodule Epicenter.Cases.Person do
     has_many :addresses, Address
     has_many :case_investigations, CaseInvestigation
     has_many :emails, Email, on_replace: :delete
+    has_many :exposures, Exposure, on_replace: :delete, foreign_key: :exposed_person_id
     has_many :lab_results, LabResult
     has_many :phones, Phone, on_replace: :delete
   end
@@ -107,6 +109,13 @@ defmodule Epicenter.Cases.Person do
     import Ecto.Query
 
     def all(), do: from(person in Person, order_by: [asc: person.seq])
+
+    def all_exposed() do
+      from person in Person,
+        join: exposure in assoc(person, :exposures),
+        on: person.id == exposure.exposed_person_id,
+        order_by: [asc: person.seq]
+    end
 
     def assigned_to_id(query, user_id), do: query |> where([p], p.assigned_to_id == ^user_id)
 

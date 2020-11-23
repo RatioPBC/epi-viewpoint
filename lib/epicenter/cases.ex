@@ -125,10 +125,13 @@ defmodule Epicenter.Cases do
   def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)
 
+  def list_exposed_people(), do: Person.Query.all_exposed() |> Repo.all()
+
   def list_people(filter), do: Person.Query.filter(filter) |> Repo.all()
   def list_people(filter, assigned_to_id: user_id), do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all()
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
+  def preload_exposures_for_people(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:exposures])
   def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
 
@@ -181,21 +184,13 @@ defmodule Epicenter.Cases do
   # exposures
   #
   def change_exposure(%Exposure{} = exposure, attrs), do: Exposure.changeset(exposure, attrs)
+  def create_exposure({attrs, audit_meta}), do: %Exposure{} |> change_exposure(attrs) |> AuditLog.insert(audit_meta)
+  def get_exposure(id), do: Exposure |> Repo.get(id)
+
+  def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
 
   def preload_exposures(case_investigations_or_nil),
     do: case_investigations_or_nil |> Repo.preload(exposures: [exposed_person: [:demographics, :phones]])
 
-  def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
-
-  def create_exposure({attrs, audit_meta}) do
-    %Exposure{} |> change_exposure(attrs) |> AuditLog.insert(audit_meta)
-  end
-
-  def update_exposure(exposure, {attrs, audit_meta}) do
-    exposure |> change_exposure(attrs) |> AuditLog.update(audit_meta)
-  end
-
-  def get_exposure(id) do
-    Exposure |> Repo.get(id)
-  end
+  def update_exposure(exposure, {attrs, audit_meta}), do: exposure |> change_exposure(attrs) |> AuditLog.update(audit_meta)
 end

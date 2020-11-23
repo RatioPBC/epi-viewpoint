@@ -15,3 +15,11 @@ section#contacts-page data-page="contacts"
         th width="25%" Assignee
 
     tbody
+      = for person <- @exposed_people do
+        tr data-role="person"
+          td
+          td= full_name(person)
+          td= person.id
+          td= exposure_date(person)
+          td
+          td
