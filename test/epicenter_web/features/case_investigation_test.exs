@@ -171,6 +171,16 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
       )
     )
 
+    Pages.Contacts.visit(conn)
+    |> Pages.Contacts.assert_here()
+    |> Pages.Contacts.assert_table_contents(
+      [
+        ["Name", "Exposure date"],
+        ["Connie Testuser", "10/31/2020"]
+      ],
+      columns: ["Name", "Exposure date"]
+    )
+
     assert %{
              case_investigations: [
                %{
