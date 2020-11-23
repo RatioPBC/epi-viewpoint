@@ -25,6 +25,7 @@ html lang="en"
                 = logo_icon()
 
               = link "Index cases", to: "/people"
+              = link "Contacts", to: "/contacts"
 
             #nav-right
               #user-menu

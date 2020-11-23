@@ -1,0 +1,4 @@
+section#contacts-page data-page="contacts"
+  h2
+    #title
+      span Contacts

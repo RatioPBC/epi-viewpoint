@@ -46,9 +46,12 @@ defmodule EpicenterWeb.Router do
     end
 
     get "/", RootController, :show, as: :root
+    live "/contacts", ContactsLive, as: :contacts
+
     live "/import/start", ImportLive, as: :import_start
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
+
     live "/people", PeopleLive, as: :people
     live "/people/:id", ProfileLive, as: :profile
     live "/case-investigations/:id/start-interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
