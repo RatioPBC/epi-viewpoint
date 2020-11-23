@@ -8,14 +8,12 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
   alias EpicenterWeb.CaseInvestigationNoteForm
 
   def render(assigns) do
-    ~L"""
-    <div class="case-investigation-notes">
-      <h3 class="additional_notes">Additional Notes</h3>
-      <%= component(@socket, CaseInvestigationNoteForm, @case_investigation.id <> "note form", case_investigation_id: @case_investigation.id, current_user_id: @current_user_id) %>
-      <%= for note <- @case_investigation.notes |> Enum.reverse() do %>
-        <%= component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user_id) %>
-      <% end %>
-    </div>
+    ~H"""
+    .case-investigation-notes
+      h3.additional_notes Additional Notes
+      = component(@socket, CaseInvestigationNoteForm, @case_investigation.id <> "note form", case_investigation_id: @case_investigation.id, current_user_id: @current_user_id)
+      = for note <- @case_investigation.notes |> Enum.reverse() do
+        = component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user_id)
     """
   end
 end
@@ -41,17 +39,15 @@ defmodule EpicenterWeb.CaseInvestigationNote do
   end
 
   def render(assigns) do
-    ~L"""
-    <div class="case-investigation-note" data-role="case-investigation-note" data-note-id="<%= @note.id %>">
-      <div class="case-investigation-note-header">
-        <span class="case-investigation-note-author" data-role="case-investigation-note-author"><%= @note.author.name %></span>
-        <span data-role="case-investigation-note-date"><%= Format.date(@note.inserted_at) %></span>
-      </div>
-      <div class="case-investigation-note-text" data-role="case-investigation-note-text"><%= @note.text %></div>
-      <%= if @note.author_id == @current_user_id do %>
-        <div><a href="#" class="case-investigation-delete-link" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target="<%= @myself %>">Delete</a></div>
-      <% end %>
-    </div>
+    ~H"""
+    .case-investigation-note data-role="case-investigation-note" data-note-id=@note.id
+      .case-investigation-note-header
+        span.case-investigation-note-author data-role="case-investigation-note-author" = @note.author.name
+        span data-role="case-investigation-note-date" = Format.date(@note.inserted_at)
+      .case-investigation-note-text data-role="case-investigation-note-text" = @note.text
+      = if @note.author_id == @current_user_id do
+        div
+          a.case-investigation-delete-link href="#" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target=@myself Delete
     """
   end
 
@@ -65,67 +61,6 @@ defmodule EpicenterWeb.CaseInvestigationNote do
 
     Cases.broadcast_case_investigation_updated(socket.assigns.note.case_investigation_id)
     socket |> noreply()
-  end
-end
-
-defmodule EpicenterWeb.CaseInvestigationNoteForm do
-  use EpicenterWeb, :live_component
-  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
-  import EpicenterWeb.Forms.CaseInvestigationNoteForm, only: [add_note_form_builder: 1]
-  import EpicenterWeb.LiveHelpers, only: [noreply: 1, ok: 1]
-  alias Epicenter.AuditLog
-  alias Epicenter.Cases
-  alias EpicenterWeb.Forms.CaseInvestigationNoteForm.FormFieldData
-
-  def update(assigns, socket) do
-    {:ok, socket |> assign(assigns) |> assign(changeset: socket.assigns[:changeset] || empty_note(assigns))}
-  end
-
-  defp empty_note(assigns) do
-    FormFieldData.changeset(%{id: assigns.case_investigation_id}, %{})
-  end
-
-  def render(assigns) do
-    ~L"""
-    <%= form_for @changeset, "#", [data: [role: "note-form", "confirm-navigation": confirmation_prompt(@changeset)], phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f -> %>
-      <%= add_note_form_builder(f) %>
-    <% end %>
-    """
-  end
-
-  def handle_event("change_note", %{"form_field_data" => params}, socket) do
-    socket
-    |> assign(changeset: FormFieldData.changeset(%{id: socket.assigns.case_investigation_id}, params))
-    |> noreply()
-  end
-
-  def handle_event("save_note", %{"form_field_data" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- FormFieldData.changeset(%{id: socket.assigns.case_investigation_id}, params),
-         {:form, {:ok, case_investigation_note_attrs}} <-
-           {:form, FormFieldData.case_investigation_note_attrs(form_changeset, socket.assigns.current_user_id)},
-         {:note, {:ok, _note}} <-
-           {:note,
-            Cases.create_case_investigation_note(
-              {case_investigation_note_attrs,
-               %AuditLog.Meta{
-                 author_id: socket.assigns.current_user_id,
-                 reason_action: AuditLog.Revision.create_case_investigation_note_action(),
-                 reason_event: AuditLog.Revision.profile_case_investigation_note_submission_event()
-               }}
-            )} do
-      Cases.broadcast_case_investigation_updated(socket.assigns.case_investigation_id)
-      socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()
-    else
-      {:form, {:error, changeset}} ->
-        socket |> assign(changeset: changeset) |> noreply()
-
-      _ ->
-        socket |> noreply()
-    end
-  end
-
-  def confirmation_prompt(changeset) do
-    if changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text()
   end
 end
 
