@@ -24,6 +24,12 @@ defmodule EpicenterWeb.ContactsLive do
     [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
   end
 
+  def assigned_to_name(%Person{assigned_to: nil}),
+    do: ""
+
+  def assigned_to_name(%Person{assigned_to: assignee}),
+    do: assignee.name
+
   # # #
 
   defp load_and_assign_exposed_people(socket) do
@@ -31,6 +37,7 @@ defmodule EpicenterWeb.ContactsLive do
       Cases.list_exposed_people()
       |> Cases.preload_exposures_for_people()
       |> Cases.preload_demographics()
+      |> Cases.preload_assigned_to()
 
     assign(socket, exposed_people: exposed_people)
   end

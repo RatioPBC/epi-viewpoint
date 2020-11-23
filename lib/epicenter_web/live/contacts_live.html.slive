@@ -22,4 +22,4 @@ section#contacts-page data-page="contacts"
           td= person.id
           td= exposure_date(person)
           td
-          td
+          td= assigned_to_name(person)
