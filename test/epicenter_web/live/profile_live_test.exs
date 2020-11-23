@@ -782,6 +782,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_role_text(page_live, "occupation", "Unknown")
       assert_role_text(page_live, "notes", "--")
       assert_role_text(page_live, "date-of-birth", "Unknown")
+      assert_role_text(page_live, "full-name", "Unknown")
     end
 
     @tag :skip

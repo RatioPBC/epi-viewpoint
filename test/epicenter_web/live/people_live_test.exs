@@ -92,6 +92,26 @@ defmodule EpicenterWeb.PeopleLiveTest do
       )
     end
 
+    test "shows unknown as the name of people that lack a first and last name", %{conn: conn, user: user} do
+      nameless =
+        Test.Fixtures.person_attrs(user, "nameless")
+        |> Test.Fixtures.add_demographic_attrs(%{first_name: nil, last_name: nil})
+        |> Cases.create_person!()
+
+      Test.Fixtures.lab_result_attrs(nameless, user, "nameless-result-1", Extra.Date.days_ago(4), result: "positive") |> Cases.create_lab_result!()
+
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents(
+        [
+          ["Name", "Latest test result"],
+          ["Unknown", "positive, 4 days ago"],
+          ["Billy Testuser", "Detected, 3 days ago"],
+          ["Alice Testuser", "positive, 1 day ago"]
+        ],
+        columns: ["Name", "Latest test result"]
+      )
+    end
+
     test "shows case investigation statuses", %{conn: conn, people: people, user: user} do
       [alice, billy, nancy, cindy, david, emily] = people ++ import_three_people_with_two_positive_results(user)
 

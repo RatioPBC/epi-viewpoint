@@ -35,6 +35,7 @@ defmodule EpicenterWeb.PeopleLive do
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
   alias EpicenterWeb.PeopleFilter
+  alias EpicenterWeb.Unknown
 
   @clock Application.get_env(:epicenter, :clock)
 
@@ -128,7 +129,7 @@ defmodule EpicenterWeb.PeopleLive do
 
   def full_name(person) do
     demographic = Person.coalesce_demographics(person)
-    [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
+    [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ") |> Unknown.string_or_unknown()
   end
 
   def latest_case_investigation_status(person, current_date),
