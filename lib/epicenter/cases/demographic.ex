@@ -7,13 +7,12 @@ defmodule Epicenter.Cases.Demographic do
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Ethnicity
 
-  @required_attrs ~w{
+  @required_attrs ~w{}a
+  @optional_attrs ~w{
     dob
+    external_id
     first_name
     last_name
-  }a
-  @optional_attrs ~w{
-    external_id
     preferred_language
     tid
     employment
@@ -58,6 +57,7 @@ defmodule Epicenter.Cases.Demographic do
     demographic
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
     |> cast_embed(:ethnicity, with: &Ethnicity.changeset/2)
+    |> validate_required(@required_attrs)
     |> validate_phi(:demographic)
   end
 
