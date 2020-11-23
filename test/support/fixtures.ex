@@ -77,7 +77,21 @@ defmodule Epicenter.Test.Fixtures do
       relationship_to_case: "Family",
       most_recent_date_together: ~D[2020-10-31],
       household_member: false,
-      exposed_person: %{},
+      exposed_person: %{
+        demographics: [
+          %{
+            source: "form",
+            first_name: "Caroline",
+            last_name: "Testuser",
+            preferred_language: "Haitian Creole"
+          }
+        ],
+        phones: [
+          %{
+            number: "1111111543"
+          }
+        ]
+      },
       under_18: false
     }
     |> merge_attrs(attrs)
