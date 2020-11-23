@@ -4,23 +4,20 @@ defmodule EpicenterWeb.PeopleFilter do
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
   def render(assigns) do
-    checked = if(assigns.display_people_assigned_to_me, do: "checked", else: "")
-
-    ~L"""
-    <%= live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_positive_lab_results), class: "button", data: [active: assigns.filter in [:with_positive_lab_results, nil], role: "people-filter", tid: "all"] %>
-    <%= live_patch "Pending interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_pending_interview), class: "button", data: [active: assigns.filter == :with_pending_interview, role: "people-filter", tid: "with_pending_interview"] %>
-    <%= live_patch "Ongoing interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_ongoing_interview), class: "button", data: [active: assigns.filter == :with_ongoing_interview, role: "people-filter", tid: "with_ongoing_interview"] %>
-    <%= live_patch "Isolation monitoring", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_isolation_monitoring), class: "button", data: [active: assigns.filter == :with_isolation_monitoring, role: "people-filter", tid: "with_isolation_monitoring"] %>
-    <label id="assigned-to-me-button">
-      <input type="checkbox" phx-click="toggle-assigned-to-me" <%= checked %> data-tid="assigned-to-me-checkbox" phx-target="<%= @myself %>">
-      <span>My Assignments Only</span>
-    </label>
+    ~H"""
+    #status-filter
+      = live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_positive_lab_results), class: "button", data: [active: assigns.filter in [:with_positive_lab_results, nil], role: "people-filter", tid: "all"]
+      = live_patch "Pending interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_pending_interview), class: "button", data: [active: assigns.filter == :with_pending_interview, role: "people-filter", tid: "with_pending_interview"]
+      = live_patch "Ongoing interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_ongoing_interview), class: "button", data: [active: assigns.filter == :with_ongoing_interview, role: "people-filter", tid: "with_ongoing_interview"]
+      = live_patch "Isolation monitoring", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_isolation_monitoring), class: "button", data: [active: assigns.filter == :with_isolation_monitoring, role: "people-filter", tid: "with_isolation_monitoring"]
+    label#assigned-to-me-button
+      input type="checkbox" phx-click="toggle-assigned-to-me" checked=@display_people_assigned_to_me data-tid="assigned-to-me-checkbox" phx-target=@myself
+      span My Assignments Only
     """
   end
 
   def handle_event("toggle-assigned-to-me", _, socket) do
-    socket = socket |> assign(:display_people_assigned_to_me, !socket.assigns.display_people_assigned_to_me)
-    socket.assigns.on_toggle_assigned_to_me.(socket.assigns.display_people_assigned_to_me)
+    socket.assigns.on_toggle_assigned_to_me.()
     socket |> noreply()
   end
 end
@@ -93,9 +90,9 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_event("reload-people", _, socket),
     do: socket |> assign_reload_message(nil) |> load_and_assign_people() |> noreply()
 
-  def handle_info({:display_people_assigned_to_me_toggled, display_people_assigned_to_me}, socket) do
+  def handle_info(:display_people_assigned_to_me_toggled, socket) do
     socket
-    |> assign(:display_people_assigned_to_me, display_people_assigned_to_me)
+    |> assign(:display_people_assigned_to_me, !socket.assigns.display_people_assigned_to_me)
     |> load_and_assign_people()
     |> noreply()
   end
@@ -111,8 +108,8 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_params(_, _url, socket),
     do: socket |> noreply()
 
-  def on_toggle_assigned_to_me(display_people_assigned_to_me) do
-    send(self(), {:display_people_assigned_to_me_toggled, display_people_assigned_to_me})
+  def on_toggle_assigned_to_me() do
+    send(self(), :display_people_assigned_to_me_toggled)
   end
 
   # # # View helpers

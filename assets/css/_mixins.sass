@@ -51,22 +51,19 @@
 
 @mixin button-list
   .button
-    @include button-outline($size: small)
-    background-color: white
-    border-radius: 0
-    border-right-width: 0
-    font-weight: normal
+    @include button-secondary
+
+    &:not(:last-of-type)
+      border-right-color: $button-list-divider-color
 
     &[data-active=true]
       text-decoration: underline
 
     &:first-of-type
       border-radius: 2px 0 0 2px
-      border-right-width: 0
 
     &:last-of-type
       border-radius: 0 2px 2px 0
-      border-right-width: 1px
 
 @mixin -button($size: regular, $hover-bg-color: $button-hover-color, $disabled-bg-color: $disabled-button-color)
   background-color: $button-color
