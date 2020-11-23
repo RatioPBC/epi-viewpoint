@@ -1,0 +1,13 @@
+@import "../mixins"
+
+#contacts-page
+  @include vertical-flow
+
+  h2
+    @include level($justify: space-between)
+
+    #title
+      @include level($justify: left)
+
+  table
+    @include data-table

@@ -9,10 +9,10 @@ section#contacts-page data-page="contacts"
       tr data-role="table-column-names"
         th width="1%"
         th width="20%" Name
-        th width="15%" Viewpoint ID
-        th width="25%" Exposure date
+        th width="20%" Viewpoint ID
+        th width="20%" Exposure date
         th width="20%" Investigation status
-        th width="25%" Assignee
+        th width="20%" Assignee
 
     tbody
       = for person <- @exposed_people do
