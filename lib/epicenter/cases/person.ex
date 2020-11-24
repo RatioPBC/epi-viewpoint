@@ -89,7 +89,6 @@ defmodule Epicenter.Cases.Person do
 
   def latest_case_investigation(person) do
     person
-    |> Cases.preload_case_investigations()
     |> Map.get(:case_investigations)
     |> Enum.sort_by(& &1.seq, :desc)
     |> Enum.max_by(& &1.inserted_at, Extra.Date.NilFirst, fn -> nil end)

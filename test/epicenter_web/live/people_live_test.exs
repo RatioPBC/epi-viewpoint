@@ -357,8 +357,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
           ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
         ])
 
-      updated_people = [%{alice | assigned_to: assignee}]
-      Cases.broadcast_people(updated_people, from: self())
+      {:ok, people} = Cases.assign_user_to_people(user: assignee, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      Cases.broadcast_people(people, from: self())
 
       view
       |> Pages.People.assert_table_contents([

@@ -153,6 +153,7 @@ defmodule Epicenter.Cases.PersonTest do
       |> Accounts.register_user!()
       |> Test.Fixtures.person_attrs("alice")
       |> Cases.create_person!()
+      |> Cases.preload_case_investigations()
       |> Person.latest_case_investigation()
       |> assert_eq(nil)
     end
@@ -167,6 +168,8 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.case_investigation_attrs(alice, new_lab_result, user, "new") |> Cases.create_case_investigation!()
       Test.Fixtures.case_investigation_attrs(alice, newer_lab_result, user, "newer") |> Cases.create_case_investigation!()
       Test.Fixtures.case_investigation_attrs(alice, newest_lab_result, user, "newest") |> Cases.create_case_investigation!()
+
+      alice = alice |> Cases.preload_case_investigations()
 
       assert Person.latest_case_investigation(alice).tid == "newest"
     end

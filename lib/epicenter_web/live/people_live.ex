@@ -151,6 +151,15 @@ defmodule EpicenterWeb.PeopleLive do
         true ->
           Cases.list_people(socket.assigns.filter)
       end
+
+    socket
+    |> assign_people(people)
+    |> preload_and_assign_people()
+  end
+
+  defp preload_and_assign_people(socket) do
+    people =
+      socket.assigns.people
       |> Cases.preload_lab_results()
       |> Cases.preload_assigned_to()
       |> Cases.preload_demographics()
@@ -169,7 +178,9 @@ defmodule EpicenterWeb.PeopleLive do
   defp refresh_existing_people(socket, updated_people) do
     id_to_people_map = updated_people |> Enum.reduce(%{}, fn person, acc -> acc |> Map.put(person.id, person) end)
     refreshed_people = socket.assigns.people |> Enum.map(fn person -> Map.get(id_to_people_map, person.id, person) end)
+
     assign_people(socket, refreshed_people)
+    |> preload_and_assign_people()
   end
 
   defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
