@@ -25,7 +25,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
   end
 
   describe "assigning case investigator to a contact" do
-    test "case investigator can be unassigned and assigned to contacts", %{caroline: caroline, conn: conn} do
+    test "case investigator can be unassigned and assigned to contacts", %{assignee: assignee, caroline: caroline, donald: donald, conn: conn} do
       Pages.Contacts.visit(conn)
       |> Pages.Contacts.assert_table_contents(
         [
@@ -54,6 +54,20 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Cases.preload_assigned_to()
       |> Euclid.Extra.Enum.pluck(:assigned_to)
       |> assert_eq([nil])
+
+      Pages.Contacts.visit(conn)
+      |> Pages.Contacts.click_person_checkbox(person: donald, value: "on")
+      |> Pages.Contacts.assert_checked("[data-tid=#{donald.tid}]")
+      |> Pages.Contacts.change_form(%{"user" => assignee.id})
+      |> Pages.Contacts.assert_unchecked("[data-tid=#{donald.tid}]")
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Assignee"],
+          ["Caroline Testuser", ""],
+          ["Donald Testuser", "assignee"]
+        ],
+        columns: ["Name", "Assignee"]
+      )
     end
   end
 
@@ -68,7 +82,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
 
     {:ok, donald_exposure} =
       {Test.Fixtures.exposure_attrs(case_investigation, "donald_exposure", %{
-         exposed_person: %{demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
+         exposed_person: %{tid: "donald", demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
        }), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_exposure()
 
