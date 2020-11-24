@@ -4,11 +4,18 @@ defmodule EpicenterWeb.ContactsLive do
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.LiveComponent.Helpers
 
+  import EpicenterWeb.Presenters.PeoplePresenter,
+    only: [
+      assigned_to_name: 1,
+      disabled?: 1,
+      exposure_date: 1,
+      full_name: 1,
+      selected?: 2
+    ]
+
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.Person
-  alias EpicenterWeb.Format
 
   def mount(_params, session, socket) do
     if connected?(socket), do: Cases.subscribe_to_people()
@@ -63,27 +70,6 @@ defmodule EpicenterWeb.ContactsLive do
 
     assign(socket, exposed_people: exposed_people)
   end
-
-  def assigned_to_name(%Person{assigned_to: nil}),
-    do: ""
-
-  def assigned_to_name(%Person{assigned_to: assignee}),
-    do: assignee.name
-
-  def disabled?(selected_people),
-    do: selected_people == %{}
-
-  def exposure_date(person) do
-    person.exposures |> hd() |> Map.get(:most_recent_date_together) |> Format.date()
-  end
-
-  def full_name(person) do
-    demographic = Person.coalesce_demographics(person)
-    [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ")
-  end
-
-  def selected?(selected_people, %Person{id: person_id}),
-    do: Map.has_key?(selected_people, person_id)
 
   # # # Private
 

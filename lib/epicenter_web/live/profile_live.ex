@@ -73,7 +73,7 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
 
-  import EpicenterWeb.Profile.CaseInvestigationPresenter,
+  import EpicenterWeb.Presenters.CaseInvestigationPresenter,
     only: [
       contact_details_as_list: 1,
       displayable_clinical_status: 1,

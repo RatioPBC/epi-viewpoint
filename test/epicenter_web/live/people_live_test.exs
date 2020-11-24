@@ -11,10 +11,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Test
   alias Epicenter.TimeHelper
   alias EpicenterWeb.ImportController
-  alias EpicenterWeb.PeopleLive
   alias EpicenterWeb.Test.Pages
-
-  @admin Test.Fixtures.admin()
 
   setup [:register_and_log_in_user, :create_people_and_lab_results]
 
@@ -404,57 +401,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
       assert_disabled(index_live, "[data-role=users]")
       index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
       assert_enabled(index_live, "[data-role=users]")
-    end
-  end
-
-  describe "full_name" do
-    defp wrap(demo_attrs) do
-      {:ok, person} = Test.Fixtures.person_attrs(@admin, "test") |> Test.Fixtures.add_demographic_attrs(demo_attrs) |> Cases.create_person()
-      person
-    end
-
-    test "renders first and last name",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: "First", last_name: "TestuserLast"})) == "First TestuserLast")
-
-    test "when there's just a first name",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: "First", last_name: nil})) == "First")
-
-    test "when there's just a last name",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: nil, last_name: "TestuserLast"})) == "TestuserLast")
-
-    test "when first name is blank",
-      do: assert(PeopleLive.full_name(wrap(%{first_name: "", last_name: "TestuserLast"})) == "TestuserLast")
-  end
-
-  describe "latest_result" do
-    setup %{user: user} do
-      person = user |> Test.Fixtures.person_attrs("person") |> Cases.create_person!()
-
-      [person: person]
-    end
-
-    test "when the person has no lab results", %{person: person} do
-      assert PeopleLive.latest_result(person) == ""
-    end
-
-    test "when there is a result and a sample date", %{person: person, user: user} do
-      Test.Fixtures.lab_result_attrs(person, user, "lab-result", ~D[2020-01-01], result: "positive") |> Cases.create_lab_result!()
-      assert PeopleLive.latest_result(person) =~ ~r|positive, \d+ days ago|
-    end
-
-    test "when there is a lab result and a sample date, but the lab result lacks a result value", %{person: person, user: user} do
-      Test.Fixtures.lab_result_attrs(person, user, "lab-result", ~D[2020-01-01], result: nil) |> Cases.create_lab_result!()
-      assert PeopleLive.latest_result(person) =~ ~r|unknown, \d+ days ago|
-    end
-
-    test "when there is a result and no sample date", %{person: person, user: user} do
-      Test.Fixtures.lab_result_attrs(person, user, "lab-result", nil, result: "positive") |> Cases.create_lab_result!()
-      assert PeopleLive.latest_result(person) =~ ~r|positive, unknown date|
-    end
-
-    test "when there is a lab result and no result or sample date", %{person: person, user: user} do
-      Test.Fixtures.lab_result_attrs(person, user, "lab-result", nil, result: nil) |> Cases.create_lab_result!()
-      assert PeopleLive.latest_result(person) =~ ~r|unknown, unknown date|
     end
   end
 

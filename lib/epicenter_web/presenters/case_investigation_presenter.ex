@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Profile.CaseInvestigationPresenter do
+defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   import Phoenix.LiveView.Helpers
   import Phoenix.HTML.Tag
 
