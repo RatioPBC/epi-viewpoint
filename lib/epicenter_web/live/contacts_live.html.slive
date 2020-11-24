@@ -3,6 +3,18 @@ section#contacts-page data-page="contacts"
     #title
       span Contacts
 
+  #toolbar
+    #toolbar-left
+      form id="assignment-form" phx-change="form-change" data-disabled=disabled?(@selected_people)
+        #user-list
+          span#assign-to-label Assign to
+          #select-wrapper
+            select name="user" data-role="users" disabled=disabled?(@selected_people)
+              option value=""
+              option value="-unassigned-" Unassigned
+              = for user <- @users do
+                option value="#{user.id}" #{user.name}
+        #assignment-dropdown-tooltip Select people below, then assign them to a user
 
   table data-role="contacts"
     thead
@@ -18,6 +30,7 @@ section#contacts-page data-page="contacts"
       = for person <- @exposed_people do
         tr data-role="person"
           td
+            input type="checkbox" checked=selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
           td= full_name(person)
           td= person.id
           td= exposure_date(person)
