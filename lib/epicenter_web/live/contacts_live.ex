@@ -10,6 +10,8 @@ defmodule EpicenterWeb.ContactsLive do
   alias EpicenterWeb.Format
 
   def mount(_params, session, socket) do
+    if connected?(socket), do: Cases.subscribe_to_people()
+
     socket
     |> authenticate_user(session)
     |> assign_page_title("Contacts")
@@ -26,7 +28,7 @@ defmodule EpicenterWeb.ContactsLive do
     do: handle_event("form-change", %{"user" => nil}, socket)
 
   def handle_event("form-change", %{"user" => user_id}, socket) do
-    {:ok, _updated_people} =
+    {:ok, updated_people} =
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids:
@@ -40,7 +42,13 @@ defmodule EpicenterWeb.ContactsLive do
         }
       )
 
+    Cases.broadcast_people(updated_people, from: self())
+
     socket |> assign_selected_to_empty() |> assign_people(Cases.list_exposed_people()) |> noreply()
+  end
+
+  def handle_info({:people, _people}, socket) do
+    socket |> assign_people(Cases.list_exposed_people()) |> noreply()
   end
 
   # # # Helpers
