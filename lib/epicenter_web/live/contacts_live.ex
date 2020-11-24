@@ -2,6 +2,7 @@ defmodule EpicenterWeb.ContactsLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
@@ -27,7 +28,11 @@ defmodule EpicenterWeb.ContactsLive do
   def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
     do: handle_event("form-change", %{"user" => nil}, socket)
 
-  def handle_event("form-change", %{"user" => user_id}, socket) do
+  def handle_info({:people, _people}, socket) do
+    socket |> assign_people(Cases.list_exposed_people()) |> noreply()
+  end
+
+  def handle_info({:assignee_selected, user_id}, socket) do
     {:ok, updated_people} =
       Cases.assign_user_to_people(
         user_id: user_id,
@@ -45,10 +50,6 @@ defmodule EpicenterWeb.ContactsLive do
     Cases.broadcast_people(updated_people, from: self())
 
     socket |> assign_selected_to_empty() |> assign_people(Cases.list_exposed_people()) |> noreply()
-  end
-
-  def handle_info({:people, _people}, socket) do
-    socket |> assign_people(Cases.list_exposed_people()) |> noreply()
   end
 
   # # # Helpers
