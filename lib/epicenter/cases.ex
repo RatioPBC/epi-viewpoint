@@ -103,7 +103,7 @@ defmodule Epicenter.Cases do
     {:ok, all_updated}
   end
 
-  def broadcast_people(people), do: Phoenix.PubSub.broadcast(Epicenter.PubSub, "people", {:people, people})
+  def broadcast_people(people, from: pid), do: Phoenix.PubSub.broadcast_from(Epicenter.PubSub, pid, "people", {:people, people})
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
   def count_people(), do: Person |> Repo.aggregate(:count)
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)

@@ -170,7 +170,7 @@ defmodule EpicenterWeb.ProfileLive do
         }
       )
 
-    Cases.broadcast_people([updated_person])
+    Cases.broadcast_people([updated_person], from: self())
 
     {:noreply, assign_person(socket, updated_person)}
   end

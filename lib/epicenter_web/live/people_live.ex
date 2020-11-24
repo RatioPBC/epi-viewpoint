@@ -80,7 +80,7 @@ defmodule EpicenterWeb.PeopleLive do
         }
       )
 
-    Cases.broadcast_people(updated_people)
+    Cases.broadcast_people(updated_people, from: self())
 
     socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> noreply()
   end
@@ -223,7 +223,7 @@ defmodule EpicenterWeb.PeopleLive do
     do: socket |> assign(users: Accounts.list_users())
 
   defp prompt_to_reload(socket, _people) do
-    assign_reload_message(socket, "An import was completed. Show new people.")
+    assign_reload_message(socket, "Changes have been made. Click here to refresh.")
   end
 
   defp refresh_existing_people(socket, updated_people) do

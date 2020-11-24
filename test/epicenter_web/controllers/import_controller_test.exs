@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.ImportControllerTest do
   use EpicenterWeb.ConnCase, async: true
 
-  alias Epicenter.Cases
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Tempfile
   alias EpicenterWeb.Session
@@ -10,8 +9,6 @@ defmodule EpicenterWeb.ImportControllerTest do
 
   describe "create" do
     test "accepts file upload", %{conn: conn} do
-      Cases.subscribe_to_people()
-
       temp_file_path =
         """
         search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , datereportedtolhd_44 , result_39 , glorp , person_tid
@@ -23,8 +20,6 @@ defmodule EpicenterWeb.ImportControllerTest do
       on_exit(fn -> File.rm!(temp_file_path) end)
 
       conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
-
-      assert_receive({:people, [%Cases.Person{tid: "alice"}, %Cases.Person{tid: "billy"}]})
 
       assert conn |> redirected_to() == "/import/complete"
 
