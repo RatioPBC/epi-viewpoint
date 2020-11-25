@@ -177,6 +177,40 @@ defmodule Epicenter.CasesTest do
       {:ok, person} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person()
 
       assert_revision_count(person, 1)
+      assert Cases.get_person(person.id)
+
+      assert %{
+               "demographics" => [
+                 %{
+                   "dob" => "2000-01-01",
+                   "first_name" => "Alice",
+                   "last_name" => "Testuser",
+                   "preferred_language" => "English"
+                 }
+               ],
+               "tid" => "alice"
+             } = recent_audit_log(person).change
+    end
+
+    test "create_person accepts a form demographic field" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      remove_demographics_list = fn {params, audit_meta} -> {params |> Map.delete(:demographics), audit_meta} end
+      add_form_demographic = fn {params, audit_meta}, form_demographic -> {params |> Map.put(:form_demographic, form_demographic), audit_meta} end
+
+      {:ok, person} =
+        Test.Fixtures.person_attrs(user, "alice")
+        |> remove_demographics_list.()
+        |> add_form_demographic.(%{
+          "dob" => "2000-01-01",
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "preferred_language" => "English"
+        })
+        |> Cases.create_person()
+
+      assert Cases.get_person(person.id)
+
+      assert_revision_count(person, 1)
 
       assert %{
                "demographics" => [
@@ -387,6 +421,42 @@ defmodule Epicenter.CasesTest do
                }
              ]
            } = recent_audit_log(person).change
+  end
+
+  test "update_person accepts form_demographic" do
+    originator = Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()
+
+    {:ok, _} =
+      %{
+        file_name: "test.csv",
+        contents: """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , result_39 , person_tid
+        Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/03/2020    , positive  , alice
+        """
+      }
+      |> Cases.import_lab_results(originator)
+
+    [alice] = Cases.list_people(:all) |> Cases.preload_demographics()
+
+    {:ok, _} =
+      Cases.update_person(
+        alice,
+        {%{
+           form_demographic: %{
+             "dob" => "2000-02-01",
+             "first_name" => "Ally",
+             "last_name" => "Testuser",
+             "preferred_language" => "English"
+           }
+         }, Test.Fixtures.admin_audit_meta()}
+      )
+
+    assert %{
+             demographics: [
+               %{source: "import", first_name: "Alice"},
+               %{source: "form", first_name: "Ally"}
+             ]
+           } = Cases.get_person(alice.id) |> Cases.preload_demographics()
   end
 
   test "find_matching_person finds a person by their dob, first_name, and last_name" do

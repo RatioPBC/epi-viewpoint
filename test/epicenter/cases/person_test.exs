@@ -105,7 +105,13 @@ defmodule Epicenter.Cases.PersonTest do
 
     test "demographic attributes" do
       changes =
-        (new_changeset(%{}, %{ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]}, external_id: "10000"}).changes.demographics
+        (new_changeset(%{}, %{
+           ethnicity: %{
+             major: "hispanic_latinx_or_spanish_origin",
+             detailed: ["cuban", "puerto_rican"]
+           },
+           external_id: "10000"
+         }).changes.demographics
          |> List.first()).changes
 
       assert changes.dob == ~D[2000-01-01]
@@ -124,6 +130,21 @@ defmodule Epicenter.Cases.PersonTest do
       ethnicity_changes = changes.ethnicity.changes
       assert ethnicity_changes.major == "hispanic_latinx_or_spanish_origin"
       assert ethnicity_changes.detailed == ["cuban", "puerto_rican"]
+    end
+
+    test "form demographics can be additively changed with a string (vs and atom)" do
+      person = %Person{
+        demographics: [
+          %{
+            source: "form",
+            first_name: "Ally"
+          }
+        ]
+      }
+
+      changeset = Person.changeset(person, %{"form_demographic" => %{first_name: "Bill"}})
+
+      assert {:ok, %{demographics: [%{source: "form", first_name: "Bill"}]}} = apply_action(changeset, :test)
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))

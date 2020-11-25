@@ -58,10 +58,44 @@ defmodule Epicenter.Cases.Person do
   def changeset(person, attrs) do
     person
     |> cast(Enum.into(attrs, %{}), @optional_attrs)
+    |> cast_demographics_assoc(attrs)
     |> cast_assoc(:demographics, with: &Demographic.changeset/2)
     |> cast_assoc(:addresses, with: &Address.changeset/2)
     |> cast_assoc(:emails, with: &Email.changeset/2)
     |> cast_assoc(:phones, with: &Phone.changeset/2)
+  end
+
+  defp cast_demographics_assoc(changeset, attrs) do
+    attrs =
+      with {:ok, form_demographic_params} <- Map.fetch(attrs, "form_demographic") do
+        attrs
+        |> Map.delete("form_demographic")
+        |> Map.put(:form_demographic, form_demographic_params)
+      else
+        _ -> attrs
+      end
+
+    with {:ok, form_demographic_params} <- Map.fetch(attrs, :form_demographic) do
+      existing_demographics = if changeset.data.id, do: changeset.data.demographics, else: []
+      form_demographic = existing_demographics |> Enum.find(&(&1.source == "form"))
+
+      changesets =
+        existing_demographics
+        |> Enum.map(fn demo ->
+          if demo == form_demographic do
+            Demographic.changeset(demo, form_demographic_params)
+          else
+            Demographic.changeset(demo, %{})
+          end
+        end)
+
+      changesets =
+        if form_demographic, do: changesets, else: changesets ++ [Demographic.changeset(%Demographic{source: "form"}, form_demographic_params)]
+
+      changeset |> put_change(:demographics, changesets)
+    else
+      _ -> changeset
+    end
   end
 
   def coalesce_demographics(person) do
