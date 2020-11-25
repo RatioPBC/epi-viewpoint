@@ -5,7 +5,9 @@ defmodule Epicenter.Cases.PersonTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
+  alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Phone
   alias Epicenter.Test
 
   setup :persist_admin
@@ -147,6 +149,30 @@ defmodule Epicenter.Cases.PersonTest do
       assert {:ok, %{demographics: [%{source: "form", first_name: "Bill"}]}} = apply_action(changeset, :test)
     end
 
+    # The caller must choose whether they are replacing the demographics, or additively changing them
+    test "setting demographics and form_demographic at the same time is not supported" do
+      person = %Person{
+        demographics: [
+          %Demographic{
+            source: "form",
+            first_name: "Ally"
+          }
+        ]
+      }
+
+      assert catch_throw(
+               Person.changeset(person, %{
+                 "demographics" => [
+                   %{
+                     source: "form",
+                     first_name: "Ally2"
+                   }
+                 ],
+                 "form_demographic" => %{first_name: "Bill"}
+               })
+             )
+    end
+
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
 
     test "associations - emails" do
@@ -157,6 +183,61 @@ defmodule Epicenter.Cases.PersonTest do
     test "associations - phones" do
       phone_changeset = new_changeset(%{phones: [%{number: "1111111003"}]}).changes.phones |> Euclid.Extra.List.first()
       assert phone_changeset.changes.number == "1111111003"
+    end
+
+    test "additively inserting a phone number without deleting any" do
+      person = %Person{
+        phones: [
+          %Phone{
+            number: "1111111000"
+          }
+        ]
+      }
+
+      changeset = Person.changeset(person, %{"additive_phone" => %{number: "1111111002", source: "blah"}})
+
+      assert {:ok, %{phones: [%{number: "1111111000"}, %{source: "blah", number: "1111111002"}]}} = apply_action(changeset, :test)
+    end
+
+    test "additively inserting a phone number when the phone number already exists" do
+      person = %Person{
+        phones: [
+          %Phone{
+            number: "1111111000"
+          }
+        ]
+      }
+
+      changeset = Person.changeset(person, %{"additive_phone" => %{number: "1111111000", source: "blah"}})
+
+      assert {:ok, %{phones: [%{number: "1111111000"}]}} = apply_action(changeset, :test)
+    end
+
+    test "additively inserting a phone number when the key is an atom" do
+      person = %Person{
+        phones: [
+          %Phone{
+            number: "1111111000"
+          }
+        ]
+      }
+
+      changeset = Person.changeset(person, %{:additive_phone => %{number: "1111111002", source: "blah"}})
+
+      assert {:ok, %{phones: [%{number: "1111111000"}, %{source: "blah", number: "1111111002"}]}} = apply_action(changeset, :test)
+    end
+
+    # The caller must choose whether they are replacing the phones, or additively changing them
+    test "setting phones and additive_phone at the same time is not supported" do
+      person = %Person{
+        phones: [
+          %Phone{
+            number: "1111111000"
+          }
+        ]
+      }
+
+      assert catch_throw(Person.changeset(person, %{:phones => [], :additive_phone => %{number: "1111111002", source: "blah"}}))
     end
 
     test "associations - address" do

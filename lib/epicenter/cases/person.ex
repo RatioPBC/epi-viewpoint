@@ -59,13 +59,14 @@ defmodule Epicenter.Cases.Person do
     person
     |> cast(Enum.into(attrs, %{}), @optional_attrs)
     |> cast_demographics_assoc(attrs)
-    |> cast_assoc(:demographics, with: &Demographic.changeset/2)
     |> cast_assoc(:addresses, with: &Address.changeset/2)
     |> cast_assoc(:emails, with: &Email.changeset/2)
-    |> cast_assoc(:phones, with: &Phone.changeset/2)
+    |> cast_phones_assoc(attrs)
   end
 
   defp cast_demographics_assoc(changeset, attrs) do
+    changeset = changeset |> cast_assoc(:demographics, with: &Demographic.changeset/2)
+
     attrs =
       with {:ok, form_demographic_params} <- Map.fetch(attrs, "form_demographic") do
         attrs
@@ -74,6 +75,10 @@ defmodule Epicenter.Cases.Person do
       else
         _ -> attrs
       end
+
+    if Map.has_key?(attrs, :form_demographic) && get_change(changeset, :demographics) do
+      throw("person changeset cannot contain both phones and additive phones because we haven't thought about which ones take precendence")
+    end
 
     with {:ok, form_demographic_params} <- Map.fetch(attrs, :form_demographic) do
       existing_demographics = if changeset.data.id, do: changeset.data.demographics, else: []
@@ -93,6 +98,36 @@ defmodule Epicenter.Cases.Person do
         if form_demographic, do: changesets, else: changesets ++ [Demographic.changeset(%Demographic{source: "form"}, form_demographic_params)]
 
       changeset |> put_change(:demographics, changesets)
+    else
+      _ -> changeset
+    end
+  end
+
+  defp cast_phones_assoc(changeset, attrs) do
+    changeset = changeset |> cast_assoc(:phones, with: &Phone.changeset/2)
+
+    attrs =
+      with {:ok, additive_phone_params} <- Map.fetch(attrs, "additive_phone") do
+        attrs
+        |> Map.delete("additive_phone")
+        |> Map.put(:additive_phone, additive_phone_params)
+      else
+        _ -> attrs
+      end
+
+    if Map.has_key?(attrs, :additive_phone) && get_change(changeset, :phones) do
+      throw("person changeset cannot contain both phones and additive phones because we haven't thought about which ones take precendence")
+    end
+
+    with {:ok, additive_phone_params} <- Map.fetch(attrs, :additive_phone),
+         additive_phone_changeset = Phone.changeset(%Phone{}, additive_phone_params),
+         new_phone_number <- get_change(additive_phone_changeset, :number),
+         nil <- Enum.find(changeset.data.phones, fn p -> p.number == new_phone_number end) do
+      existing_phone_empty_changesets = changeset.data.phones |> Enum.map(fn phone -> Phone.changeset(phone, %{}) end)
+
+      changesets = existing_phone_empty_changesets ++ [additive_phone_changeset]
+
+      changeset |> put_change(:phones, changesets)
     else
       _ -> changeset
     end
