@@ -3,7 +3,6 @@ defmodule Epicenter.Cases.Person do
 
   import Ecto.Changeset
   alias Epicenter.Accounts.User
-  alias Epicenter.Cases
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Email
@@ -96,7 +95,6 @@ defmodule Epicenter.Cases.Person do
 
   def latest_lab_result(person) do
     person
-    |> Cases.preload_lab_results()
     |> Map.get(:lab_results)
     |> Enum.sort_by(& &1.seq, :desc)
     |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst, fn -> nil end)

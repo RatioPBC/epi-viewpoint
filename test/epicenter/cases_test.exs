@@ -231,6 +231,8 @@ defmodule Epicenter.CasesTest do
       |> Test.Fixtures.lab_result_attrs(user, "alice-1", ~D[2020-06-02])
       |> Cases.create_lab_result!()
 
+      alice = alice |> Cases.preload_lab_results()
+
       Test.Fixtures.case_investigation_attrs(alice, Person.latest_lab_result(alice), user, "pending-interview")
       |> Cases.create_case_investigation!()
 
@@ -241,6 +243,8 @@ defmodule Epicenter.CasesTest do
       billy
       |> Test.Fixtures.lab_result_attrs(user, "billy-1", ~D[2020-06-03], %{result: "detected"})
       |> Cases.create_lab_result!()
+
+      billy = billy |> Cases.preload_lab_results()
 
       Test.Fixtures.case_investigation_attrs(billy, Person.latest_lab_result(billy), user, "ongoing-interview", %{
         started_at: ~U[2020-10-31 23:03:07Z]
@@ -254,6 +258,8 @@ defmodule Epicenter.CasesTest do
       Test.Fixtures.lab_result_attrs(cindy, user, "cindy-1", Extra.Date.days_ago(4))
       |> Cases.create_lab_result!()
 
+      cindy = cindy |> Cases.preload_lab_results()
+
       Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
         completed_interview_at: ~U[2020-10-31 23:03:07Z],
         isolation_monitoring_start_date: ~D[2020-11-03],
@@ -265,8 +271,12 @@ defmodule Epicenter.CasesTest do
       david = Test.Fixtures.person_attrs(user, "david") |> Test.Fixtures.add_demographic_attrs(%{external_id: "david-id"}) |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(david, user, "david-result-1", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
 
+      david = david |> Cases.preload_lab_results()
+
       emily = Test.Fixtures.person_attrs(user, "emily") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(emily, user, "emily-result-1", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
+
+      emily = emily |> Cases.preload_lab_results()
 
       Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
         completed_interview_at: ~U[2020-10-31 23:03:07Z],

@@ -181,6 +181,7 @@ defmodule Epicenter.Cases.PersonTest do
       |> Accounts.register_user!()
       |> Test.Fixtures.person_attrs("alice")
       |> Cases.create_person!()
+      |> Cases.preload_lab_results()
       |> Person.latest_lab_result()
       |> assert_eq(nil)
     end
@@ -191,6 +192,7 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
 
+      alice = alice |> Cases.preload_lab_results()
       assert Person.latest_lab_result(alice).tid == "newer"
     end
 
@@ -201,6 +203,7 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
 
+      alice = alice |> Cases.preload_lab_results()
       assert Person.latest_lab_result(alice).tid == "unknown"
     end
 
@@ -210,6 +213,7 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "newer unknown", nil) |> Cases.create_lab_result!()
 
+      alice = alice |> Cases.preload_lab_results()
       assert Person.latest_lab_result(alice).tid == "newer unknown"
     end
   end
