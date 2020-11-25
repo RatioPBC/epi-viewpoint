@@ -119,18 +119,32 @@ defmodule Epicenter.Cases.Person do
       throw("person changeset cannot contain both phones and additive phones because we haven't thought about which ones take precendence")
     end
 
-    with {:ok, additive_phone_params} <- Map.fetch(attrs, :additive_phone),
+    with {:ok, additive_phone_params} when not is_nil(additive_phone_params) <- Map.fetch(attrs, :additive_phone),
+         {:ok, existing_phones} <- extract_existing_phones(changeset.data),
          additive_phone_changeset = Phone.changeset(%Phone{}, additive_phone_params),
          new_phone_number <- get_change(additive_phone_changeset, :number),
-         nil <- Enum.find(changeset.data.phones, fn p -> p.number == new_phone_number end) do
-      existing_phone_empty_changesets = changeset.data.phones |> Enum.map(fn phone -> Phone.changeset(phone, %{}) end)
+         nil <- Enum.find(existing_phones, fn p -> p.number == new_phone_number end) do
+      existing_phone_empty_changesets = existing_phones |> Enum.map(fn phone -> Phone.changeset(phone, %{}) end)
 
       changesets = existing_phone_empty_changesets ++ [additive_phone_changeset]
 
       changeset |> put_change(:phones, changesets)
     else
+      :phones_are_not_preloaded -> throw("necessary phone numbers are not preloaded")
       _ -> changeset
     end
+  end
+
+  defp extract_existing_phones(%{id: person_id, phones: %Ecto.Association.NotLoaded{}}) when not is_nil(person_id) do
+    :phones_are_not_preloaded
+  end
+
+  defp extract_existing_phones(%{phones: phones}) when is_list(phones) do
+    {:ok, phones}
+  end
+
+  defp extract_existing_phones(%{id: nil}) do
+    {:ok, []}
   end
 
   def coalesce_demographics(person) do

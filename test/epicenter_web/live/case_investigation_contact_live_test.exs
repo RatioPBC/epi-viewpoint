@@ -280,6 +280,10 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              exposed_person: %{
                demographics: [
                  %{
+                   source: "import",
+                   first_name: "ImportedBilly"
+                 },
+                 %{
                    source: "form",
                    first_name: "Billy",
                    last_name: "Testuser",
@@ -367,6 +371,10 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    exposed_person: %{
                      demographics: [
                        %{
+                         source: "import",
+                         first_name: "ImportedBilly"
+                       },
+                       %{
                          source: "form",
                          first_name: "Cindy",
                          last_name: "Testuser",
@@ -374,6 +382,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                        }
                      ],
                      phones: [
+                       %{
+                         number: "1111111542"
+                       },
                        %{
                          source: "form",
                          number: "1111111321"

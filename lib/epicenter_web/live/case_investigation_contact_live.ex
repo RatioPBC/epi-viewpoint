@@ -86,11 +86,11 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     def contact_params(%Ecto.Changeset{} = formdata) do
       with {:ok, data} <- apply_action(formdata, :insert) do
-        phones =
+        phone =
           if Euclid.Exists.present?(data.phone) do
-            [%{id: data.phone_id, source: "form", number: data.phone}]
+            %{source: "form", number: data.phone}
           else
-            []
+            nil
           end
 
         {:ok,
@@ -104,16 +104,14 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
            household_member: data.same_household,
            exposed_person: %{
              id: data.person_id,
-             demographics: [
-               %{
-                 id: data.demographic_id,
-                 source: "form",
-                 first_name: data.first_name,
-                 last_name: data.last_name,
-                 preferred_language: data.preferred_language
-               }
-             ],
-             phones: phones
+             form_demographic: %{
+               id: data.demographic_id,
+               source: "form",
+               first_name: data.first_name,
+               last_name: data.last_name,
+               preferred_language: data.preferred_language
+             },
+             additive_phone: phone
            }
          }}
       end
