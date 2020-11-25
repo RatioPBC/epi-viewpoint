@@ -9,7 +9,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Extra
   alias Epicenter.Tempfile
   alias Epicenter.Test
-  alias Epicenter.TimeHelper
   alias EpicenterWeb.ImportController
   alias EpicenterWeb.Test.Pages
 
@@ -155,7 +154,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       conn_with_user = Plug.Conn.assign(conn, :current_user, user)
       ImportController.create(conn_with_user, %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 
-      TimeHelper.wait_until(fn -> Pages.People.assert_reload_message(view, "Changes have been made. Click here to refresh.") end)
+      retry_until(fn -> Pages.People.assert_reload_message(view, "Changes have been made. Click here to refresh.") end)
     end
   end
 
@@ -378,7 +377,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.change_form(%{"user" => assignee.id})
       |> Pages.People.assert_reload_message("")
 
-      TimeHelper.wait_until(fn ->
+      retry_until(fn ->
         view_b
         |> Pages.People.assert_table_contents([
           ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
