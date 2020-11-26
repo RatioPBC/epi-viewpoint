@@ -301,7 +301,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
          exposed_person: exposed_person
        }) do
     demographic = Person.coalesce_demographics(exposed_person)
-    phone = List.first(exposed_person.phones)
+    phones = exposed_person.phones |> Enum.map(fn phone -> Format.phone(phone) end)
 
     details = [relationship_to_case]
     details = if household_member, do: details ++ ["Household"], else: details
@@ -313,7 +313,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         details = if Euclid.Exists.present?(guardian_phone), do: details ++ [Format.phone(guardian_phone)], else: details
         details
       else
-        if Euclid.Exists.present?(phone), do: details ++ [Format.phone(phone)], else: details
+        details ++ phones
       end
 
     details = if Euclid.Exists.present?(demographic.preferred_language), do: details ++ [demographic.preferred_language], else: details

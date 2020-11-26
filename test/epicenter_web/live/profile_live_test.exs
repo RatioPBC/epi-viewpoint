@@ -365,6 +365,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
                phones: [
                  %{
                    number: "1111111542"
+                 },
+                 %{
+                   number: "1111111543"
                  }
                ]
              }
@@ -394,7 +397,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       assert [
                "Complete Testuser Family Household Minor Guardian: Jacob (111) 111-1832 Haitian Creole Last together 10/31/2020",
-               "Adult Testuser Friend (111) 111-1542 Last together 11/30/2020",
+               "Adult Testuser Friend (111) 111-1542 (111) 111-1543 Last together 11/30/2020",
                "Partial Testuser Friend Last together 11/30/2020"
              ] =
                Pages.Profile.visit(conn, person)

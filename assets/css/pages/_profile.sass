@@ -128,7 +128,11 @@
             font-weight: bold
 
           ul
-            @include horizontal-flow(left, 0)
+            align-items: flex-start
+            display: inline
+
+            & > *
+              display: inline-block
 
             li + li::before
               content: ''
