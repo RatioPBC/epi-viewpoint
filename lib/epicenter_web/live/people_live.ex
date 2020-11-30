@@ -41,6 +41,7 @@ defmodule EpicenterWeb.PeopleLive do
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
+  alias Epicenter.CaseInvestigationFilterError
   alias Epicenter.Cases
   alias EpicenterWeb.PeopleFilter
 
@@ -108,10 +109,13 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_info({:people, updated_people}, socket),
     do: socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
 
-  def handle_params(%{"filter" => filter}, _url, socket)
-      when filter in ~w{with_ongoing_interview with_pending_interview with_positive_lab_results with_isolation_monitoring} do
-    socket |> assign_filter(filter) |> load_and_assign_people() |> noreply()
-  end
+  @case_investigation_filters ~w{with_ongoing_interview with_pending_interview with_positive_lab_results with_isolation_monitoring}
+
+  def handle_params(%{"filter" => filter}, _url, socket) when filter in @case_investigation_filters,
+    do: socket |> assign_filter(filter) |> load_and_assign_people() |> noreply()
+
+  def handle_params(%{"filter" => unmatched_filter}, _url, _socket),
+    do: raise(CaseInvestigationFilterError, user_readable: "Unmatched filter “#{unmatched_filter}”")
 
   def handle_params(_, _url, socket),
     do: socket |> noreply()

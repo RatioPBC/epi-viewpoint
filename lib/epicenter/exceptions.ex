@@ -15,3 +15,11 @@ defmodule Epicenter.AdminRequiredError do
   defexception []
   def message(%{}), do: "Action can only be performed by administrators"
 end
+
+defmodule Epicenter.CaseInvestigationFilterError do
+  @moduledoc """
+  Raised when we cannot match a given filter for case investigation status.
+  """
+  defexception [:user_readable]
+  def message(%{user_readable: user_readable}), do: user_readable
+end

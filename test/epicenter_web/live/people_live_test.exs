@@ -10,6 +10,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Tempfile
   alias Epicenter.Test
   alias EpicenterWeb.ImportController
+  alias EpicenterWeb.PeopleLive
   alias EpicenterWeb.Test.Pages
 
   setup [:register_and_log_in_user, :create_people_and_lab_results]
@@ -386,6 +387,14 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ])
         |> Pages.People.assert_reload_message("Changes have been made. Click here to refresh.")
       end)
+    end
+  end
+
+  describe "handle_params" do
+    test "blows up when an unknown filter is provided" do
+      assert_raise Epicenter.CaseInvestigationFilterError, "Unmatched filter “foo_bar”", fn ->
+        PeopleLive.handle_params(%{"filter" => "foo_bar"}, "http://example.com", %Phoenix.LiveView.Socket{})
+      end
     end
   end
 
