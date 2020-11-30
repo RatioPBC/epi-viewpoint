@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+source "bin/_support/cecho.sh"
+source "bin/_support/step.sh"
+
+step_header "Elixir" "mix hex.outdated"
+mix hex.outdated
+
+step_header "JS" "npm outdated --prefix assets"
+npm outdated --prefix assets
+
+echo ""
+cecho --bright-bold-yellow "Update Elixir deps with" --bright-white "mix deps.update [<package-name>...]"
+cecho --bright-bold-yellow "Update JS deps with" --bright-white "npm update --prefix assets [<package-name>...]"
