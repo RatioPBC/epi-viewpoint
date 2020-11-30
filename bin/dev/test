@@ -3,8 +3,6 @@ set -e
 
 source "bin/_support/step.sh"
 
-step "js tests" "bin/dev/js-test"
-
 step "compiling" "MIX_ENV=test mix compile --force --warnings-as-errors || (MIX_ENV=test mix clean && false)"
 if [ -z "${MIX_TEST_MAX_CASES}" ]; then
   step "running tests" "mix test --color"

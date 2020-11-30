@@ -9,3 +9,6 @@ npm install prettier --save-dev --prefix assets
 
 # install jest
 npm install --save-dev jest --prefix assets
+
+# uninstall jest
+npm uninstall --save-dev jest --prefix assets
