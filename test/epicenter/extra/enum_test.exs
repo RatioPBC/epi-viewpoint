@@ -18,4 +18,11 @@ defmodule Epicenter.Extra.EnumTest do
       |> assert_eq([1, 3, 5])
     end
   end
+
+  describe "reject_blank" do
+    test "rejects blank values" do
+      assert Extra.Enum.reject_blank(["a", "", "b", " ", "c", nil, "d"]) == ["a", "b", "c", "d"]
+      assert Extra.Enum.reject_blank([]) == []
+    end
+  end
 end

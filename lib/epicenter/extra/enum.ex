@@ -18,4 +18,7 @@ defmodule Epicenter.Extra.Enum do
       Enum.find_index(enum, &(value == &1))
     end
   end
+
+  def reject_blank(enum),
+    do: Enum.reject(enum, &Euclid.Exists.blank?/1)
 end

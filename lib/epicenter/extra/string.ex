@@ -1,4 +1,6 @@
 defmodule Epicenter.Extra.String do
+  alias Epicenter.Extra
+
   def add_numeric_suffix(s), do: "#{s}_#{Enum.random(1..99)}"
   def remove_numeric_suffix(s), do: String.replace(s, ~r[(\w+)_\d+$], "\\1")
   def add_placeholder_suffix(s), do: "#{s}_xx"
@@ -23,6 +25,6 @@ defmodule Epicenter.Extra.String do
   def trim(nil), do: nil
   def trim(s) when is_binary(s), do: Elixir.String.trim(s)
 
-  def underscore(list) when is_list(list), do: list |> Enum.map(&underscore/1) |> Enum.join("_")
+  def underscore(list) when is_list(list), do: list |> Extra.Enum.reject_blank() |> Enum.map(&underscore/1) |> Enum.join("_")
   def underscore(item), do: item |> to_string() |> String.replace("-", "_")
 end

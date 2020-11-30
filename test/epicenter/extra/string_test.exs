@@ -12,8 +12,9 @@ defmodule Epicenter.Extra.StringTest do
       assert Extra.String.dasherize(:foo_bar_baz) == "foo-bar-baz"
     end
 
-    test "with a list, dasherizes each item and joins with a dash" do
+    test "with a list, flattens and dasherizes each item and joins with a dash" do
       assert Extra.String.dasherize(["foo", :bar, :baz_fez]) == "foo-bar-baz-fez"
+      assert Extra.String.dasherize(["foo", :bar, [:baz, "fez"]]) == "foo-bar-baz-fez"
     end
   end
 
@@ -75,6 +76,12 @@ defmodule Epicenter.Extra.StringTest do
 
     test "with a list, underscores each item and joins with an underscore" do
       assert Extra.String.underscore(["foo", :bar, "baz-fez"]) == "foo_bar_baz_fez"
+    end
+
+    test "handles nils and blank strings" do
+      assert Extra.String.underscore(nil) == ""
+      assert Extra.String.underscore("") == ""
+      assert Extra.String.underscore(["foo", nil, "bar", "", "baz"]) == "foo_bar_baz"
     end
   end
 end
