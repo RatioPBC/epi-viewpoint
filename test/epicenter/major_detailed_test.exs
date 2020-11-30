@@ -4,98 +4,177 @@ defmodule Epicenter.MajorDetailedTest do
   alias Epicenter.MajorDetailed
 
   defmodule TestStruct do
-    defstruct ~w{race race_other}a
+    defstruct ~w{major detailed}a
   end
 
-  describe "combine" do
-    test "combines a bunch of fields into a MajorDetailed map" do
+  describe "clean" do
+    test "removes empty fields, and converts keys to strings" do
       %{
-        race: ["asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"],
-        race_other: "Some other race",
-        race_asian: ["filipino", "korean"],
-        race_asian_other: "Some other asian",
-        race_native_hawaiian_or_other_pacific_islander: ["samoan"],
-        race_native_hawaiian_or_other_pacific_islander_other: "Other pacific islander"
+        :detailed => %{
+          "asian" => %{"other" => ""},
+          "native_hawaiian_or_other_pacific_islander" => %{"other" => "Other PI"}
+        },
+        "major" => %{:other => "", :values => ["asian", "black_or_african_american"]}
       }
-      |> MajorDetailed.combine(:race)
+      |> MajorDetailed.clean()
       |> assert_eq(
         %{
-          "asian" => ["Some other asian", "filipino", "korean"],
-          "black_or_african_american" => nil,
-          "native_hawaiian_or_other_pacific_islander" => ["Other pacific islander", "samoan"],
-          "Some other race" => nil
+          "major" => %{"values" => ["asian", "black_or_african_american"]},
+          "detailed" => %{"native_hawaiian_or_other_pacific_islander" => %{"other" => "Other PI"}}
         },
         :simple
       )
     end
 
-    test "works on structs too" do
-      %TestStruct{race: ["asian"], race_other: "Other"}
-      |> MajorDetailed.combine(:race)
-      |> assert_eq(%{"asian" => nil, "Other" => nil}, :simple)
-    end
-
-    test "deals with nils" do
-      %{
-        "race" => ["asian"],
-        "race_asian" => nil,
-        "race_asian_other" => nil,
-        "race_native_hawaiian_or_other_pacific_islander_other" => nil,
-        "race_other" => nil
-      }
-      |> MajorDetailed.combine(:race)
-      |> assert_eq(%{"asian" => nil}, :simple)
+    test "empty state" do
+      nil |> MajorDetailed.clean() |> assert_eq(%{})
     end
   end
 
-  describe "split" do
-    test "splits a MajorDetailed map up into multiple fields" do
+  describe "for_form" do
+    test "extracts standard and non-standard values into 'values' and 'other' lists" do
       standard_values = [
-        {"Unknown", "unknown", nil},
-        {"Declined to answer", "declined_to_answer", nil},
-        {"White", "white", nil},
-        {"Black or African American", "black_or_african_american", nil},
-        {"American Indian or Alaska Native", "american_indian_or_alaska_native", nil},
-        {"Asian", "asian", nil},
-        {"Asian Indian", "asian_indian", "asian"},
-        {"Chinese", "chinese", "asian"},
-        {"Filipino", "filipino", "asian"},
-        {"Japanese", "japanese", "asian"},
-        {"Korean", "korean", "asian"},
-        {"Vietnamese", "vietnamese", "asian"},
-        {"Native Hawaiian or Other Pacific Islander", "native_hawaiian_or_other_pacific_islander", nil},
-        {"Native Hawaiian", "native_hawaiian", "native_hawaiian_or_other_pacific_islander"},
-        {"Guamanian or Chamorro", "guamanian_or_chamorro", "native_hawaiian_or_other_pacific_islander"},
-        {"Samoan", "samoan", "native_hawaiian_or_other_pacific_islander"}
+        "black_or_african_american",
+        "asian",
+        "chinese",
+        "filipino",
+        "native_hawaiian_or_other_pacific_islander"
       ]
 
       %{
-        race: %{
-          "black_or_african_american" => nil,
-          "asian" => ["filipino", "korean", "Some other asian"],
-          "native_hawaiian_or_other_pacific_islander" => ["samoan"],
-          "Some other race" => nil
-        }
+        major: ["Other race", "asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"],
+        detailed: %{asian: ["chinese", "filipino"], native_hawaiian_or_other_pacific_islander: ["Other PI"]}
       }
-      |> MajorDetailed.split(:race, standard_values)
+      |> MajorDetailed.for_form(standard_values)
       |> assert_eq(
         %{
-          race: ["asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"],
-          race_other: "Some other race",
-          race_asian: ["filipino", "korean"],
-          race_asian_other: "Some other asian",
-          race_native_hawaiian_or_other_pacific_islander: "samoan"
+          "major" => %{"other" => "Other race", "values" => ["asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"]},
+          "detailed" => %{"asian" => %{"values" => ["chinese", "filipino"]}, "native_hawaiian_or_other_pacific_islander" => %{"other" => "Other PI"}}
         },
         :simple
       )
     end
 
-    test "when the key doesn't exist in the map" do
-      %{foo: %{}} |> MajorDetailed.split(:race, []) |> assert_eq(%{})
+    test "handles nil and scalar values" do
+      %{major: ["blue"], detailed: nil}
+      |> MajorDetailed.for_form(["blue"])
+      |> assert_eq(%{"major" => %{"values" => ["blue"]}, "detailed" => %{}})
     end
 
-    test "when the value for the key is nil" do
-      %{race: nil} |> MajorDetailed.split(:race, []) |> assert_eq(%{})
+    test "when given a struct, converts into a map" do
+      %TestStruct{major: ["blue"], detailed: %{"blue" => ["cyan", "powder blue"]}}
+      |> MajorDetailed.for_form(["blue", "cyan"])
+      |> assert_eq(%{
+        "major" => %{"values" => ["blue"]},
+        "detailed" => %{"blue" => %{"values" => ["cyan"], "other" => "powder blue"}}
+      })
+    end
+
+    test "also supports 'major' as a string and 'detailed' as a list" do
+      %TestStruct{major: "blue", detailed: ["cyan", "powder blue"]}
+      |> MajorDetailed.for_form(["blue", "cyan"])
+      |> assert_eq(
+        %{
+          "major" => %{"values" => ["blue"]},
+          "detailed" => %{"blue" => %{"values" => ["cyan"], "other" => "powder blue"}}
+        },
+        :simple
+      )
+    end
+
+    test "when given a list, uses the list as 'major' and 'other' values" do
+      ["ant", "bat", "car"]
+      |> MajorDetailed.for_form(["ant", "bat"])
+      |> assert_eq(%{"major" => %{"values" => ["ant", "bat"], "other" => "car"}, "detailed" => %{}})
+    end
+
+    test "empty state" do
+      nil
+      |> MajorDetailed.for_form([])
+      |> assert_eq(%{"major" => %{}, "detailed" => %{}}, :simple)
+
+      %{}
+      |> MajorDetailed.for_form([])
+      |> assert_eq(%{"major" => %{}, "detailed" => %{}}, :simple)
+
+      %{"major" => [], "detailed" => %{}}
+      |> MajorDetailed.for_form([])
+      |> assert_eq(%{"major" => %{}, "detailed" => %{}}, :simple)
+    end
+  end
+
+  describe "for_model(_, :map)" do
+    test "collapses 'values' and 'other' lists into a map" do
+      %{
+        major: %{values: ["asian", "black_or_african_american"], other: "Other race"},
+        detailed: %{
+          asian: %{values: ["chinese", "filipino"], other: ""},
+          native_hawaiian_or_other_pacific_islander: %{values: [], other: "Other PI"}
+        }
+      }
+      |> MajorDetailed.for_model(:map)
+      |> assert_eq(
+        %{
+          "major" => ["Other race", "asian", "black_or_african_american"],
+          "detailed" => %{"asian" => ["chinese", "filipino"], "native_hawaiian_or_other_pacific_islander" => ["Other PI"]}
+        },
+        :simple
+      )
+    end
+
+    test "empty state" do
+      %{
+        "detailed" => %{
+          "asian" => %{"other" => ""},
+          "native_hawaiian_or_other_pacific_islander" => %{"other" => ""}
+        },
+        "major" => %{"other" => ""}
+      }
+      |> MajorDetailed.for_model(:map)
+      |> assert_eq(%{"major" => [], "detailed" => %{}}, :simple)
+    end
+  end
+
+  describe "for_model(_, :list)" do
+    test "collapses 'values' and 'other' lists into a list" do
+      %{
+        major: %{values: ["asian", "black_or_african_american"], other: "Other race"},
+        detailed: %{}
+      }
+      |> MajorDetailed.for_model(:list)
+      |> assert_eq(["Other race", "asian", "black_or_african_american"], :simple)
+    end
+
+    test "blows up when there are 'detailed' values" do
+      assert_raise RuntimeError, "Detailed values not allowed when converting to a list", fn ->
+        %{
+          major: %{values: ["asian", "black_or_african_american"], other: "Other race"},
+          detailed: %{asian: %{values: ["filipino"]}}
+        }
+        |> MajorDetailed.for_model(:list)
+      end
+    end
+
+    test "empty state" do
+      %{"major" => %{"values" => [], "other" => ""}} |> MajorDetailed.for_model(:list) |> assert_eq([])
+    end
+  end
+
+  describe "for_display" do
+    test "returns a collapsed list" do
+      %{
+        major: ["Other race", "asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"],
+        detailed: %{asian: ["chinese", "filipino"], native_hawaiian_or_other_pacific_islander: ["Other PI"]}
+      }
+      |> MajorDetailed.for_display()
+      |> assert_eq(
+        ["Other race", "asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander", "chinese", "filipino", "Other PI"],
+        ignore_order: true
+      )
+    end
+
+    test "empty state" do
+      %{major: [], detailed: %{}} |> MajorDetailed.for_display() |> assert_eq([])
     end
   end
 end

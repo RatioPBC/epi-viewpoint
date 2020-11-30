@@ -126,7 +126,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert changes.notes == "lorem ipsum"
       assert changes.occupation == "architect"
       assert changes.preferred_language == "English"
-      assert changes.race == %{"asian" => ["filipino"]}
+      assert changes.race == %{detailed: %{asian: ["filipino"]}, major: ["asian"]}
       assert changes.sex_at_birth == "female"
 
       ethnicity_changes = changes.ethnicity.changes

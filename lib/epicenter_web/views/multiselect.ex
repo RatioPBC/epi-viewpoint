@@ -3,122 +3,143 @@ defmodule EpicenterWeb.Multiselect do
 
   alias Epicenter.Extra
 
-  def multiselect_inputs(f, field, values, parent_id \\ nil) do
+  def multiselect_inputs(f, field, specs, level \\ :parent) do
     inputs =
-      for value <- values do
-        {:safe, input} = multiselect_input(f, field, value, parent_id)
+      for spec <- specs do
+        {:safe, input} = multiselect_input(f, field, spec, level)
         input
       end
 
     {:safe, inputs}
   end
 
-  def multiselect_input(f, field, {type, label_text, value, children}, parent_id) do
-    child_field = Extra.String.underscore([field, value]) |> Euclid.Extra.Atom.from_string()
-    {:safe, parent_input} = multiselect_input(f, field, {type, label_text, value}, parent_id)
-    {:safe, child_inputs} = multiselect_inputs(f, child_field, children, input_id(f, field, value))
+  def multiselect_input(f, field, {type, option_label, option_value, children} = _spec, _level) do
+    {:safe, parent_input} = multiselect_input(f, field, {type, option_label, option_value}, :parent)
+    {:safe, child_inputs} = multiselect_inputs(f, [field, option_value], children, :child)
     {:safe, [parent_input] ++ child_inputs}
   end
 
-  def multiselect_input(f, field, {type, label_text, value}, parent_id) do
-    level = if parent_id == nil, do: "parent", else: "child"
-
+  def multiselect_input(f, field, {type, option_label, option_value} = _spec, level) do
     content_tag :div, class: "label-wrapper" do
       label data: [multiselect: level, role: Extra.String.dasherize([f.name, field])] do
         case type do
-          :checkbox -> [multiselect_checkbox(f, field, value, parent_id), label_text]
-          :radio -> [multiselect_radio(f, field, value, parent_id), label_text]
-          :other_checkbox -> [multiselect_other(:checkbox, f, field, label_text, parent_id)]
-          :other_radio -> [multiselect_other(:radio, f, field, label_text, parent_id)]
+          :checkbox -> [multiselect_chradio(f, field, option_value, :checkbox), option_label]
+          :radio -> [multiselect_chradio(f, field, option_value, :radio), option_label]
+          :other_checkbox -> [multiselect_other(f, field, option_label, :checkbox)]
+          :other_radio -> [multiselect_other(f, field, option_label, :radio)]
         end
       end
     end
   end
 
-  def multiselect_checkbox(f, field, value, parent_id) do
-    checkbox(
-      f,
-      field,
-      checked: current_value?(f, field, value),
-      checked_value: value,
-      data: [multiselect: [parent_id: parent_id]],
-      hidden_input: false,
+  def multiselect_chradio(f, field, value, type) when type in [:checkbox, :radio] do
+    selected_values =
+      case field do
+        [field, _subfield] -> input_value(f, field)
+        field -> input_value(f, field)
+      end
+
+    {field, _subfield, keypath} =
+      case field do
+        [field, subfield] ->
+          if is_map(selected_values),
+            do: {field, subfield, ["detailed", subfield, "values"]},
+            else: {field, subfield, [subfield]}
+
+        field ->
+          if is_map(selected_values),
+            do: {field, nil, ["major", "values"]},
+            else: {field, nil, []}
+      end
+
+    checked =
+      cond do
+        is_map(selected_values) -> checked?(value, selected_values, keypath)
+        is_list(selected_values) -> checked?(value, selected_values)
+        true -> checked?(value, selected_values)
+      end
+
+    name =
+      cond do
+        is_map(selected_values) or is_list(selected_values) -> nested_name(f, field, keypath, :multi)
+        true -> nested_name(f, field, keypath, :single)
+      end
+
+    tag(
+      :input,
+      checked: checked,
       id: input_id(f, field, value),
-      name: multiselect_input_name(f, field),
-      phx_hook: "Multiselect"
+      name: name,
+      type: type,
+      value: html_escape(value)
     )
   end
 
-  def multiselect_radio(f, field, value, parent_id) do
-    radio_button(
-      f,
-      field,
-      value,
-      checked: current_value?(f, field, value),
-      data: [multiselect: [parent_id: parent_id]],
-      name: multiselect_input_name(f, field),
-      phx_hook: "Multiselect"
-    )
-  end
+  def multiselect_text(f, field) do
+    {field, _subfield, keypath} =
+      case field do
+        [field, subfield] -> {field, subfield, ["detailed", subfield, "other"]}
+        field -> {field, nil, ["major", "other"]}
+      end
 
-  def multiselect_text(f, field, parent_id) do
     content_tag :div, data: [multiselect: "text-wrapper"] do
       text_input(
         f,
         field,
-        data: [multiselect: [parent_id: parent_id]],
-        name: input_name(f, field)
+        id: input_id(f, field, "_other"),
+        name: nested_name(f, field, keypath, :single),
+        placeholder: "Please specify",
+        value: input_value(f, field) |> get_in(keypath) || ""
       )
     end
   end
 
-  def multiselect_other(input_type, f, field, label_text, parent_id) do
-    field_name = "#{field}_other" |> Euclid.Extra.Atom.from_string()
-    input_name = input_name(f, "#{field_name}__ignore")
-    input_value = input_value(f, field_name)
-    checked = Euclid.Exists.present?(input_value)
-    checkable_id = input_id(f, field, "#{checked}")
+  def multiselect_other(f, field, option_label, type) when type in [:checkbox, :radio] do
+    text_field = multiselect_text(f, field)
 
-    checkable =
-      case input_type do
-        :checkbox ->
-          checkbox(
-            f,
-            field_name,
-            checked: checked,
-            checked_value: checked,
-            data: [multiselect: [parent_id: parent_id]],
-            hidden_input: false,
-            id: checkable_id,
-            name: input_name,
-            phx_hook: "Multiselect"
-          )
-
-        :radio ->
-          radio_button(
-            f,
-            field_name,
-            checked,
-            checked: checked,
-            data: [multiselect: [parent_id: parent_id]],
-            name: input_name,
-            phx_hook: "Multiselect"
-          )
+    {field, subfield, keypath} =
+      case field do
+        [field, subfield] -> {field, subfield, ["detailed", subfield, "other"]}
+        field -> {field, nil, ["major", "other"]}
       end
 
-    [checkable, label_text, multiselect_text(f, field_name, checkable_id)]
+    selected_values = input_value(f, field)
+    other_checkbox_checked = checked?("true", selected_values, ["_ignore" | keypath])
+    other_field_has_value = get_in(selected_values, keypath) |> Euclid.Exists.present?()
+
+    chradio =
+      tag(
+        :input,
+        checked: other_checkbox_checked || other_field_has_value,
+        id: input_id(f, Extra.String.underscore([field, subfield, "other"])),
+        name: nested_name(f, field, ["_ignore" | keypath], :single),
+        type: type,
+        value: "true"
+      )
+
+    [chradio, option_label, text_field] |> to_safe()
   end
 
   # # #
 
-  defp multiselect_input_name(f, field),
-    do: input_name(f, field) <> "[]"
+  def checked?(value, map, keys) when is_map(map) and is_list(keys),
+    do: checked?(value, get_in(map, keys) || [])
 
-  defp current_value?(f, field, value) do
-    case input_value(f, field) do
-      nil -> false
-      list when is_list(list) -> value in list
-      other -> value == other
-    end
+  def checked?(value, list) when is_list(list),
+    do: list |> Enum.any?(&checked?(value, &1))
+
+  def checked?(value, scalar),
+    do: html_escape(value) == html_escape(scalar)
+
+  def nested_name(f, field, keypath, selection_type) when selection_type in [:single, :multi] do
+    path = keypath |> Enum.map(fn key -> "[#{key}]" end) |> Enum.join("")
+    suffix = if selection_type == :multi, do: "[]", else: ""
+    "#{input_name(f, field)}#{path}#{suffix}"
   end
+
+  defp to_safe(list) when is_list(list),
+    do: {:safe, list |> Enum.map(&to_safe/1) |> Enum.map(fn {:safe, contents} -> contents end)}
+
+  defp to_safe(other),
+    do: html_escape(other)
 end

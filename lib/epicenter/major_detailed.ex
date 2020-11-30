@@ -1,64 +1,83 @@
 defmodule Epicenter.MajorDetailed do
-  def combine(struct, prefix) when is_struct(struct),
-    do: struct |> Map.from_struct() |> combine(prefix)
+  alias Epicenter.Extra
 
-  def combine(map, prefix) do
-    prefix = Euclid.Extra.Atom.to_string(prefix)
-    map = map |> Euclid.Extra.Map.stringify_keys()
-    keys = map |> Map.keys() |> Enum.filter(&String.starts_with?(&1, prefix))
+  def for_form(nil, standard_values),
+    do: for_form(%{}, standard_values)
 
-    Enum.reduce(keys, %{}, fn key, result ->
-      value = Map.get(map, key)
+  def for_form(list, standard_values) when is_list(list),
+    do: for_form(%{"major" => list}, standard_values)
 
-      cond do
-        key == prefix ->
-          value |> List.wrap() |> Enum.reduce(result, fn new_key, acc -> put_or_concat_map_value(acc, new_key, nil) end)
+  def for_form(struct, standard_values) when is_struct(struct),
+    do: for_form(Map.from_struct(struct), standard_values)
 
-        key == prefix <> "_other" ->
-          new_key = value
-          put_or_concat_map_value(result, new_key, nil)
+  def for_form(map, standard_values) when is_map(map) do
+    cleaned = map |> clean()
 
-        key =~ ~r/^#{prefix}_(.*)_other$/ ->
-          [_, new_key] = Regex.run(~r/^#{prefix}_(.*)_other$/, key)
-          if value, do: put_or_concat_map_value(result, new_key, value), else: result
+    case {Map.get(cleaned, "major", []), Map.get(cleaned, "detailed", [])} do
+      {major, detailed} when is_binary(major) and is_list(detailed) ->
+        %{
+          "major" => [major] |> split_values_and_other(standard_values),
+          "detailed" => %{major => detailed |> split_values_and_other(standard_values)}
+        }
 
-        key =~ ~r/^#{prefix}_(.*(?<!_other))$/ ->
-          [_, new_key] = Regex.run(~r/^#{prefix}_(.*(?<!_other))$/, key)
-          if value, do: put_or_concat_map_value(result, new_key, value), else: result
-      end
+      {major, detailed} ->
+        %{
+          "major" => major |> List.wrap() |> split_values_and_other(standard_values),
+          "detailed" => detailed |> Map.new(fn {k, v} -> {k, split_values_and_other(v, standard_values)} end)
+        }
+    end
+  end
+
+  def for_model(map, :map = _model_data_structure) do
+    cleaned = map |> clean()
+
+    %{
+      "major" => cleaned |> Map.get("major", %{}) |> combine_values_and_other(),
+      "detailed" => cleaned |> Map.get("detailed", %{}) |> Map.new(fn {k, v} -> {k, combine_values_and_other(v)} end)
+    }
+  end
+
+  def for_model(map, :list = _model_data_structure) do
+    cleaned = map |> clean()
+
+    if !(Map.get(cleaned, "detailed") in [nil, %{}]),
+      do: raise("Detailed values not allowed when converting to a list")
+
+    cleaned |> Map.get("major", %{}) |> combine_values_and_other()
+  end
+
+  def for_display(map) do
+    cleaned = map |> clean()
+
+    major = Map.get(cleaned, "major", [])
+    detailed = Map.get(cleaned, "detailed", %{}) |> Enum.reduce([], fn {_k, v}, acc -> [v | acc] end)
+
+    Extra.List.sorted_flat_compact([major, detailed])
+  end
+
+  # # #
+
+  def clean(nil),
+    do: clean(%{})
+
+  def clean(map) when is_map(map) do
+    Enum.reduce(map, %{}, fn {k, v}, acc ->
+      k = Euclid.Extra.Atom.to_string(k)
+      v = if is_map(v), do: clean(v), else: v
+      if Euclid.Exists.blank?(v), do: acc, else: Map.put(acc, k, v)
     end)
   end
 
-  def split(map, prefix, standard_values) do
-    map = Map.get(map, prefix) || %{}
-
-    Enum.reduce(map, %{}, fn
-      {key, nil}, result ->
-        if standard_value?(key, standard_values),
-          do: put_or_concat_map_value(result, prefix, key),
-          else: put_or_concat_map_value(result, :"#{prefix}_other", key)
-
-      {key, value_or_values}, result ->
-        Enum.reduce(List.wrap(value_or_values), result, fn value, acc ->
-          if standard_value?(value, standard_values),
-            do: acc |> put_or_concat_map_value(prefix, key) |> put_or_concat_map_value(:"#{prefix}_#{key}", value),
-            else: put_or_concat_map_value(acc, :"#{prefix}_#{key}_other", value)
-        end)
-    end)
+  def combine_values_and_other(map) do
+    sorted_list_concat(Map.get(map, "values", []), Map.get(map, "other", []))
   end
 
-  defp standard_value?(value, standard_values) do
-    Enum.any?(standard_values, fn {_display, standard_value, _parent} -> value == standard_value end)
+  def split_values_and_other(list, standard_values) do
+    {values, other} = Enum.split_with(list, &Enum.member?(standard_values, &1))
+    %{"values" => Enum.sort(values), "other" => List.first(other)} |> Enum.filter(fn {_k, v} -> Euclid.Exists.present?(v) end) |> Enum.into(%{})
   end
 
-  defp put_or_concat_map_value(map, nil, _new_value),
-    do: map
-
-  defp put_or_concat_map_value(map, key, new_value) do
-    if Map.get(map, key) == nil,
-      do: Map.put(map, key, new_value),
-      else: Map.update(map, key, [], fn existing -> sorted_list_concat(new_value, existing) end)
-  end
+  # # #
 
   defp sorted_list_concat(a, b) do
     (List.wrap(a) ++ List.wrap(b)) |> Enum.sort() |> Enum.uniq()

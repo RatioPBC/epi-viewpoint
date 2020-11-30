@@ -16,6 +16,15 @@ defmodule Epicenter.Cases.Ethnicity do
   def changeset(changeset, attrs),
     do: changeset |> cast(attrs, @attrs)
 
+  def from_major_detailed(map) do
+    major = map |> Map.get("major", []) |> List.first()
+    detailed = map |> get_in(["detailed", major])
+
+    if Euclid.Exists.blank?(major) && Euclid.Exists.blank?(detailed),
+      do: nil,
+      else: %{"major" => major, "detailed" => detailed}
+  end
+
   def major(nil),
     do: nil
 

@@ -23,7 +23,8 @@ defmodule EpicenterWeb.Format do
   def date_time_with_zone(nil), do: ""
   def date_time_with_zone(%DateTime{} = date_time), do: Calendar.strftime(date_time, "%m/%d/%Y at %I:%M%P %Z")
 
-  def demographic(%{major: major, detailed: detailed}, field), do: demographic(List.wrap(major) ++ List.wrap(detailed), field)
+  def demographic(%{"major" => major, "detailed" => detailed}, field), do: demographic(%{major: major, detailed: detailed}, field)
+  def demographic(%{major: major, detailed: detailed}, field), do: demographic(Extra.List.sorted_flat_compact([major, detailed]), field)
   def demographic(map, field) when is_map(map), do: map |> Extra.Map.to_list(:depth_first) |> demographic(field)
   def demographic(values, field) when is_list(values), do: values |> Enum.map(&demographic(&1, field)) |> Enum.sort()
   def demographic(nil, _field), do: nil

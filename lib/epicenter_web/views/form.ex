@@ -75,6 +75,9 @@ defmodule EpicenterWeb.Form do
 
   `type` can be: `:checkbox`, `:radio`, `:other_checkbox`, or `:other_radio`
 
+  The form field ecto type can be: `:string`, `{:array, :string}`, or `:map`. When it's a map, it should be
+  in the shape returned by `MajorDetailed.for_form`.
+
   ## Options
 
     * `:span` - the number of grid columns the field should span

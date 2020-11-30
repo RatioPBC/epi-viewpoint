@@ -97,6 +97,8 @@ defmodule EpicenterWeb.FormatTest do
       assert demographic("Yet another value", :bogus_field) == "Yet another value"
       assert demographic("transgender_woman", :gender_identity) == "Transgender woman/trans woman/male-to-female (MTF)"
       assert demographic(["female", "male"], :gender_identity) == ["Female", "Male"]
+      assert demographic(%{major: ["m1", "m2"], detailed: "d1"}, :foo) == ["d1", "m1", "m2"]
+      assert demographic(%{"major" => ["m1", "m2"], "detailed" => "d1"}, :foo) == ["d1", "m1", "m2"]
     end
   end
 

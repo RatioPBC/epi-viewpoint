@@ -132,7 +132,7 @@ defmodule Epicenter.Test.Fixtures do
         notes: "lorem ipsum",
         occupation: "architect",
         preferred_language: "English",
-        race: %{"asian" => ["filipino"]},
+        race: %{major: ["asian"], detailed: %{asian: ["filipino"]}},
         sex_at_birth: "female"
       }
       |> merge_attrs(person_demographic_attrs)

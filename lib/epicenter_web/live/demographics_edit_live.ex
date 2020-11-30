@@ -11,6 +11,75 @@ defmodule EpicenterWeb.DemographicsEditLive do
   alias EpicenterWeb.Format
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.DemographicForm
+  alias EpicenterWeb.Multiselect
+
+  @specs %{
+    gender_identity: [
+      {:radio, "Unknown", "unknown"},
+      {:radio, "Declined to answer", "declined_to_answer"},
+      {:checkbox, "Female", "female"},
+      {:checkbox, "Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
+      {:checkbox, "Male", "male"},
+      {:checkbox, "Transgender man/trans man/female-to-male (FTM)", "transgender_man"},
+      {:checkbox, "Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"},
+      {:other_checkbox, "Additional gender category (or other)", ""}
+    ],
+    sex_at_birth: [
+      {:radio, "Unknown", "unknown"},
+      {:radio, "Declined to answer", "declined_to_answer"},
+      {:radio, "Female", "female"},
+      {:radio, "Male", "male"},
+      {:radio, "Intersex", "intersex"}
+    ],
+    ethnicity: [
+      {:radio, "Unknown", "unknown"},
+      {:radio, "Declined to answer", "declined_to_answer"},
+      {:radio, "Not Hispanic, Latino/a, or Spanish origin", "not_hispanic_latinx_or_spanish_origin"},
+      {:radio, "Hispanic, Latino/a, or Spanish origin", "hispanic_latinx_or_spanish_origin",
+       [
+         {:checkbox, "Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx"},
+         {:checkbox, "Puerto Rican", "puerto_rican"},
+         {:checkbox, "Cuban", "cuban"},
+         {:other_checkbox, "Another Hispanic, Latino/a or Spanish origin", ""}
+       ]}
+    ],
+    race: [
+      {:radio, "Unknown", "unknown"},
+      {:radio, "Declined to answer", "declined_to_answer"},
+      {:checkbox, "White", "white"},
+      {:checkbox, "Black or African American", "black_or_african_american"},
+      {:checkbox, "American Indian or Alaska Native", "american_indian_or_alaska_native"},
+      {:checkbox, "Asian", "asian",
+       [
+         {:checkbox, "Asian Indian", "asian_indian"},
+         {:checkbox, "Chinese", "chinese"},
+         {:checkbox, "Filipino", "filipino"},
+         {:checkbox, "Japanese", "japanese"},
+         {:checkbox, "Korean", "korean"},
+         {:checkbox, "Vietnamese", "vietnamese"},
+         {:other_checkbox, "Other Asian", ""}
+       ]},
+      {:checkbox, "Native Hawaiian or Other Pacific Islander", "native_hawaiian_or_other_pacific_islander",
+       [
+         {:checkbox, "Native Hawaiian", "native_hawaiian"},
+         {:checkbox, "Guamanian or Chamorro", "guamanian_or_chamorro"},
+         {:checkbox, "Samoan", "samoan"},
+         {:other_checkbox, "Other Pacific Islander", ""}
+       ]},
+      {:other_checkbox, "Other", ""}
+    ],
+    marital_status: [
+      {:radio, "Unknown", "unknown"},
+      {:radio, "Single", "single"},
+      {:radio, "Married", "married"}
+    ],
+    employment: [
+      {:radio, "Unknown", "unknown"},
+      {:radio, "Not employed", "not_employed"},
+      {:radio, "Part time", "part_time"},
+      {:radio, "Full time", "full_time"}
+    ]
+  }
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
@@ -25,10 +94,20 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> ok()
   end
 
-  # temporarily does nothing until another issue is worked out
-  def handle_event("form-change", _params, socket) do
-    # IO.inspect(params, label: "params")
-    socket |> assign(confirmation_prompt: abandon_changes_confirmation_text()) |> noreply()
+  def handle_event("form-change", params, socket) do
+    form_changeset =
+      Multiselect.Changeset.conform(
+        socket.assigns.form_changeset,
+        Map.get(params, "demographic_form", %{}) |> DemographicForm.attrs_to_form_changeset(),
+        params,
+        "demographic_form",
+        @specs
+      )
+
+    socket
+    |> assign(confirmation_prompt: abandon_changes_confirmation_text())
+    |> assign_form_changeset(form_changeset)
+    |> noreply()
   end
 
   def handle_event("save", params, socket) do
@@ -82,85 +161,14 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   # # #
 
-  @gender_identity_options [
-    {:radio, "Unknown", "unknown"},
-    {:radio, "Declined to answer", "declined_to_answer"},
-    {:checkbox, "Female", "female"},
-    {:checkbox, "Transgender woman/trans woman/male-to-female (MTF)", "transgender_woman"},
-    {:checkbox, "Male", "male"},
-    {:checkbox, "Transgender man/trans man/female-to-male (FTM)", "transgender_man"},
-    {:checkbox, "Genderqueer/gender nonconforming neither exclusively male nor female", "gender_nonconforming"},
-    {:other_checkbox, "Additional gender category (or other), please specify", ""}
-  ]
-
-  @sex_at_birth_options [
-    {:radio, "Unknown", "unknown"},
-    {:radio, "Declined to answer", "declined_to_answer"},
-    {:radio, "Female", "female"},
-    {:radio, "Male", "male"},
-    {:radio, "Intersex", "intersex"}
-  ]
-
-  @ethnicity_options [
-    {:radio, "Unknown", "unknown"},
-    {:radio, "Declined to answer", "declined_to_answer"},
-    {:radio, "Not Hispanic, Latino/a, or Spanish origin", "not_hispanic_latinx_or_spanish_origin"},
-    {:radio, "Hispanic, Latino/a, or Spanish origin", "hispanic_latinx_or_spanish_origin",
-     [
-       {:checkbox, "Mexican, Mexican American, Chicano/a", "mexican_mexican_american_chicanx"},
-       {:checkbox, "Puerto Rican", "puerto_rican"},
-       {:checkbox, "Cuban", "cuban"},
-       {:other_checkbox, "Another Hispanic, Latino/a or Spanish origin, please specify", ""}
-     ]}
-  ]
-
-  @race_options [
-    {:radio, "Unknown", "unknown"},
-    {:radio, "Declined to answer", "declined_to_answer"},
-    {:checkbox, "White", "white"},
-    {:checkbox, "Black or African American", "black_or_african_american"},
-    {:checkbox, "American Indian or Alaska Native", "american_indian_or_alaska_native"},
-    {:checkbox, "Asian", "asian",
-     [
-       {:checkbox, "Asian Indian", "asian_indian"},
-       {:checkbox, "Chinese", "chinese"},
-       {:checkbox, "Filipino", "filipino"},
-       {:checkbox, "Japanese", "japanese"},
-       {:checkbox, "Korean", "korean"},
-       {:checkbox, "Vietnamese", "vietnamese"},
-       {:other_checkbox, "Other Asian, please specify", ""}
-     ]},
-    {:checkbox, "Native Hawaiian or Other Pacific Islander", "native_hawaiian_or_other_pacific_islander",
-     [
-       {:checkbox, "Native Hawaiian", "native_hawaiian"},
-       {:checkbox, "Guamanian or Chamorro", "guamanian_or_chamorro"},
-       {:checkbox, "Samoan", "samoan"},
-       {:other_checkbox, "Other Pacific Islander, please specify", ""}
-     ]},
-    {:other_checkbox, "Other", ""}
-  ]
-
-  @marital_status_options [
-    {:radio, "Unknown", "unknown"},
-    {:radio, "Single", "single"},
-    {:radio, "Married", "married"}
-  ]
-
-  @employment_options [
-    {:radio, "Unknown", "unknown"},
-    {:radio, "Not employed", "not_employed"},
-    {:radio, "Part time", "part_time"},
-    {:radio, "Full time", "full_time"}
-  ]
-
   def form_builder(form) do
     Form.new(form)
-    |> Form.line(&Form.multiselect(&1, :gender_identity, "Gender identity", @gender_identity_options, span: 8))
-    |> Form.line(&Form.multiselect(&1, :sex_at_birth, "Sex at birth", @sex_at_birth_options, span: 8))
-    |> Form.line(&Form.multiselect(&1, :ethnicity, "Ethnicity", @ethnicity_options, span: 8))
-    |> Form.line(&Form.multiselect(&1, :race, "Race", @race_options, span: 8))
-    |> Form.line(&Form.multiselect(&1, :marital_status, "Marital status", @marital_status_options, span: 8))
-    |> Form.line(&Form.multiselect(&1, :employment, "Employment status", @employment_options, span: 8))
+    |> Form.line(&Form.multiselect(&1, :gender_identity, "Gender identity", @specs.gender_identity, span: 8))
+    |> Form.line(&Form.multiselect(&1, :sex_at_birth, "Sex at birth", @specs.sex_at_birth, span: 8))
+    |> Form.line(&Form.multiselect(&1, :ethnicity, "Ethnicity", @specs.ethnicity, span: 8))
+    |> Form.line(&Form.multiselect(&1, :race, "Race", @specs.race, span: 8))
+    |> Form.line(&Form.multiselect(&1, :marital_status, "Marital status", @specs.marital_status, span: 8))
+    |> Form.line(&Form.multiselect(&1, :employment, "Employment status", @specs.employment, span: 8))
     |> Form.line(&Form.text_field(&1, :occupation, "Occupation", span: 6))
     |> Form.line(&Form.textarea_field(&1, :notes, "Notes", span: 6))
     |> Form.line(&Form.footer(&1, nil, span: 8, sticky: true))

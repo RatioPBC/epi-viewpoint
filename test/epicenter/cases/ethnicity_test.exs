@@ -3,6 +3,33 @@ defmodule Epicenter.Cases.EthnicityTest do
 
   alias Epicenter.Cases.Ethnicity
 
+  describe "from_major_detailed converts MajorDetailed map to Ethnicity" do
+    test "with major" do
+      %{
+        "detailed" => %{},
+        "major" => ["not_hispanic_latinx_or_spanish_origin"]
+      }
+      |> Ethnicity.from_major_detailed()
+      |> assert_eq(%{"major" => "not_hispanic_latinx_or_spanish_origin", "detailed" => nil}, :simple)
+    end
+
+    test "with major and detailed" do
+      %{
+        "detailed" => %{"hispanic_latinx_or_spanish_origin" => ["cuban", "puerto_rican"]},
+        "major" => ["hispanic_latinx_or_spanish_origin"]
+      }
+      |> Ethnicity.from_major_detailed()
+      |> assert_eq(%{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => ["cuban", "puerto_rican"]}, :simple)
+    end
+
+    test "empty case" do
+      %{} |> Ethnicity.from_major_detailed() |> assert_eq(nil)
+      %{"major" => []} |> Ethnicity.from_major_detailed() |> assert_eq(nil)
+      %{"detailed" => %{}} |> Ethnicity.from_major_detailed() |> assert_eq(nil)
+      %{"major" => [], "detailed" => %{}} |> Ethnicity.from_major_detailed() |> assert_eq(nil)
+    end
+  end
+
   describe "major" do
     test "returns nil if there is no ethnicity or if the major ethnicity is nil" do
       assert Ethnicity.major(nil) == nil

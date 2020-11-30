@@ -43,7 +43,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
           ethnicity: %{major: "hispanic_latinx_or_spanish_origin", detailed: ["cuban", "puerto_rican"]},
           gender_identity: ["female", "transgender_woman"],
           marital_status: "single",
-          race: %{"asian" => nil},
+          race: %{"major" => ["asian"]},
           sex_at_birth: "female"
         )
 
@@ -59,7 +59,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Mexican, Mexican American, Chicano/a" => false,
         "Puerto Rican" => true,
         "Cuban" => true,
-        "Another Hispanic, Latino/a or Spanish origin, please specify" => false
+        "Another Hispanic, Latino/a or Spanish origin" => false
       })
       |> Pages.DemographicsEdit.assert_gender_identity_selections(%{
         "Declined to answer" => false,
@@ -68,7 +68,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Male" => false,
         "Transgender man/trans man/female-to-male (FTM)" => false,
         "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
-        "Additional gender category (or other), please specify" => false,
+        "Additional gender category (or other)" => false,
         "Unknown" => false
       })
       |> Pages.DemographicsEdit.assert_marital_status_selection(%{
@@ -109,15 +109,14 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Male" => false,
         "Transgender man/trans man/female-to-male (FTM)" => false,
         "Genderqueer/gender nonconforming neither exclusively male nor female" => false,
-        "Additional gender category (or other), please specify" => true
+        "Additional gender category (or other)" => true
       })
       |> Pages.DemographicsEdit.assert_gender_identity_other("Original other")
       |> Pages.submit_and_follow_redirect(
         conn,
         "#demographics-form",
         demographic_form: %{
-          "gender_identity" => ["female", "transgender_woman"],
-          "gender_identity_other" => "New other"
+          "gender_identity" => %{"major" => %{"values" => ["female", "transgender_woman"], "other" => "New other"}}
         }
       )
       |> Pages.Profile.assert_here(person)
@@ -138,7 +137,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Full time" => false,
         "Unknown" => false
       })
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"employment" => ["full_time"]})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"employment" => "full_time"})
       |> Pages.Profile.assert_employment("Full time")
 
       assert demographics(person.id).employment == "full_time"
@@ -160,8 +159,10 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       })
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form",
         demographic_form: %{
-          "ethnicity" => ["declined_to_answer"],
-          "ethnicity_hispanic_latinx_or_spanish_origin" => []
+          "ethnicity" => %{
+            "major" => %{"values" => ["declined_to_answer"]},
+            "detailed" => %{}
+          }
         }
       )
       |> Pages.Profile.assert_ethnicities(["Declined to answer"])
@@ -176,16 +177,17 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.DemographicsEdit.assert_detailed_ethnicity_selections(%{
-        "Another Hispanic, Latino/a or Spanish origin, please specify" => false,
+        "Another Hispanic, Latino/a or Spanish origin" => false,
         "Cuban" => false,
         "Mexican, Mexican American, Chicano/a" => false,
         "Puerto Rican" => true
       })
       |> Pages.submit_and_follow_redirect(conn, "#demographics-form",
         demographic_form: %{
-          "ethnicity" => ["hispanic_latinx_or_spanish_origin"],
-          "ethnicity_hispanic_latinx_or_spanish_origin" => ["cuban", "puerto_rican"],
-          "ethnicity_hispanic_latinx_or_spanish_origin_other" => "Other ethnicity"
+          "ethnicity" => %{
+            "major" => %{"values" => ["hispanic_latinx_or_spanish_origin"]},
+            "detailed" => %{"hispanic_latinx_or_spanish_origin" => %{"values" => ["cuban", "puerto_rican"], "other" => "Other ethnicity"}}
+          }
         }
       )
       |> Pages.Profile.assert_ethnicities(["Hispanic, Latino/a, or Spanish origin", "Cuban", "Puerto Rican", "Other ethnicity"])
@@ -203,7 +205,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
       |> Pages.DemographicsEdit.assert_marital_status_selection(%{"Single" => false, "Married" => true, "Unknown" => false})
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"marital_status" => ["single"]})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"marital_status" => "single"})
       |> Pages.Profile.assert_marital_status("Single")
 
       assert demographics(person.id).marital_status == "single"
@@ -238,7 +240,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
   describe "race" do
     test "it shows the existing race and can be edited", %{conn: conn, person: person, user: user} do
-      {:ok, person} = update_demographics(user, person, race: %{"declined_to_answer" => nil})
+      {:ok, person} = update_demographics(user, person, race: %{"major" => ["declined_to_answer"]})
 
       Pages.DemographicsEdit.visit(conn, person)
       |> Pages.DemographicsEdit.assert_here()
@@ -252,17 +254,10 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Other" => false,
         "White" => false
       })
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form",
-        demographic_form: %{
-          "race" => ["asian"],
-          "race_asian_other" => "",
-          "race_native_hawaiian_or_other_pacific_islander_other" => "",
-          "race_other" => ""
-        }
-      )
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"race" => %{"major" => %{"values" => ["asian"]}}})
       |> Pages.Profile.assert_race(["Asian"])
 
-      assert demographics(person.id).race == %{"asian" => nil}
+      assert demographics(person.id).race == %{"detailed" => %{}, "major" => ["asian"]}
     end
   end
 
@@ -279,7 +274,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
         "Intersex" => false,
         "Male" => false
       })
-      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"sex_at_birth" => ["male"]})
+      |> Pages.submit_and_follow_redirect(conn, "#demographics-form", demographic_form: %{"sex_at_birth" => "male"})
       |> Pages.Profile.assert_sex_at_birth("Male")
 
       assert demographics(person.id).sex_at_birth == "male"
