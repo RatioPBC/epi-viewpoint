@@ -225,9 +225,23 @@ defmodule Epicenter.Cases.Person do
     end
 
     def with_pending_interview() do
-      from [_person, case_investigation] in person_with_case_investigation(),
+      lab_results =
+        from lab_result in LabResult,
+          where: ilike(lab_result.result, "positive"),
+          or_where: ilike(lab_result.result, "detected"),
+          distinct: [desc: lab_result.person_id],
+          order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on]
+
+      from person in Person,
+        join: case_investigation in CaseInvestigation,
+        on: case_investigation.person_id == person.id,
         where:
-          is_nil(case_investigation.started_at) and is_nil(case_investigation.completed_interview_at) and is_nil(case_investigation.discontinued_at)
+          is_nil(case_investigation.started_at) and is_nil(case_investigation.completed_interview_at) and is_nil(case_investigation.discontinued_at),
+        left_join: assignee in User,
+        on: assignee.id == person.assigned_to_id,
+        join: lab_result in subquery(lab_results),
+        on: lab_result.person_id == person.id,
+        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
     end
 
     def with_positive_lab_results() do
