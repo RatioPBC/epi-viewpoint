@@ -48,18 +48,14 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     end
   end
 
-  def displayable_interview_status(case_investigation)
-
-  def displayable_interview_status(%{interview_discontinued_at: nil} = case_investigation) do
-    case case_investigation.interview_status do
+  def displayable_interview_status(%{interview_status: status} = _case_investigation) do
+    case status do
       "pending" -> styled_status("Pending", :pending, :interview)
       "started" -> styled_status("Ongoing", :started, :interview)
       "completed" -> styled_status("Completed", "completed-interview", :interview)
+      _ -> [content_tag(:span, "Discontinued", class: :discontinued)]
     end
   end
-
-  def displayable_interview_status(_),
-    do: [content_tag(:span, "Discontinued", class: :discontinued)]
 
   def displayable_clinical_status(%{clinical_status: nil}), do: "None"
 
