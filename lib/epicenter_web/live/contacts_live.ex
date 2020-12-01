@@ -18,8 +18,6 @@ defmodule EpicenterWeb.ContactsLive do
   alias Epicenter.Cases
 
   def mount(_params, session, socket) do
-    if connected?(socket), do: Cases.subscribe_to_people()
-
     socket
     |> authenticate_user(session)
     |> assign_page_title("Contacts")
@@ -40,7 +38,7 @@ defmodule EpicenterWeb.ContactsLive do
   end
 
   def handle_info({:assignee_selected, user_id}, socket) do
-    {:ok, updated_people} =
+    {:ok, _updated_people} =
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids:
@@ -53,8 +51,6 @@ defmodule EpicenterWeb.ContactsLive do
           reason_event: AuditLog.Revision.people_selected_assignee_event()
         }
       )
-
-    Cases.broadcast_people(updated_people, from: self())
 
     socket |> assign_selected_to_empty() |> assign_people(Cases.list_exposed_people()) |> noreply()
   end

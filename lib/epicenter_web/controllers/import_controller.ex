@@ -17,8 +17,7 @@ defmodule EpicenterWeb.ImportController do
 
     case result do
       {:ok, import_info} ->
-        {imported_people, popped_import_info} = import_info |> Map.pop(:imported_people)
-        Cases.broadcast_people(imported_people, from: self())
+        {_imported_people, popped_import_info} = import_info |> Map.pop(:imported_people)
 
         conn
         |> Session.set_last_csv_import_info(popped_import_info)

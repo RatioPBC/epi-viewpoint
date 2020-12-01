@@ -1,8 +1,6 @@
 defmodule EpicenterWeb.ContactsLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import Epicenter.AsyncHelpers
-
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Test
@@ -79,37 +77,6 @@ defmodule EpicenterWeb.ContactsLiveTest do
         ],
         columns: ["Name", "Assignee"]
       )
-    end
-
-    test "assignment updates broadcast to other browsers", %{assignee: assignee, donald: donald, conn: conn} do
-      view_1 = Pages.Contacts.visit(conn)
-      view_2 = Pages.Contacts.visit(conn)
-
-      view_1
-      |> Pages.Contacts.click_person_checkbox(person: donald, value: "on")
-      |> Pages.Contacts.change_form(%{"user" => assignee.id})
-
-      view_1
-      |> Pages.Contacts.assert_table_contents(
-        [
-          ["Name", "Assignee"],
-          ["Caroline Testuser", "assignee"],
-          ["Donald Testuser", "assignee"]
-        ],
-        columns: ["Name", "Assignee"]
-      )
-
-      retry_until(fn ->
-        view_2
-        |> Pages.Contacts.assert_table_contents(
-          [
-            ["Name", "Assignee"],
-            ["Caroline Testuser", "assignee"],
-            ["Donald Testuser", "assignee"]
-          ],
-          columns: ["Name", "Assignee"]
-        )
-      end)
     end
   end
 

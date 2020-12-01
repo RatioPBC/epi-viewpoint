@@ -661,7 +661,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert updated_socket.assigns.person.tid == "alice"
     end
 
-    test "people can be assigned to users on index and show page, with cross-client updating", %{
+    test "people can be assigned to users on index and show page", %{
       conn: conn,
       person: alice,
       assignee: assignee,
@@ -687,35 +687,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
       assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
 
-      # "assignee" shows up on index page
-      index_page_live
-      |> table_contents(columns: ["Name", "Assignee"])
-      |> assert_eq([
-        ["Name", "Assignee"],
-        ["Alice Testuser", "assignee"],
-        ["Billy Testuser", ""]
-      ])
-
       # unassign "assignee" via show page
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["Unassigned"])
       assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
-
-      # "assignee" disappears from index page
-      index_page_live
-      |> table_contents(columns: ["Name", "Assignee"])
-      |> assert_eq([
-        ["Name", "Assignee"],
-        ["Alice Testuser", ""],
-        ["Billy Testuser", ""]
-      ])
-
-      # choose "assignee" via index page
-      index_page_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      index_page_live |> element("[data-tid=#{billy.tid}]") |> render_click(%{"person-id" => billy.id, "value" => "on"})
-      index_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
-
-      assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
     end
 
     test "handles assign_users message when the changed people include the current person", %{person: alice, assignee: assignee} do

@@ -103,7 +103,6 @@ defmodule Epicenter.Cases do
     {:ok, all_updated}
   end
 
-  def broadcast_people(people, from: pid), do: Phoenix.PubSub.broadcast_from(Epicenter.PubSub, pid, "people", {:people, people})
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
   def count_people(), do: Person |> Repo.aggregate(:count)
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)
@@ -132,7 +131,6 @@ defmodule Epicenter.Cases do
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def preload_exposures_for_people(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:exposures])
-  def subscribe_to_people(), do: Phoenix.PubSub.subscribe(Epicenter.PubSub, "people")
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
 
   #

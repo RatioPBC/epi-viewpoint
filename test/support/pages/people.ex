@@ -50,11 +50,6 @@ defmodule EpicenterWeb.Test.Pages.People do
     view
   end
 
-  def assert_reload_message(%View{} = view, expected_value) do
-    LiveViewAssertions.assert_role_text(view, "reload-message", expected_value)
-    view
-  end
-
   def assert_table_contents(%View{} = view, expected_table_content, opts \\ []) do
     assert table_contents(view, opts) == expected_table_content
     view

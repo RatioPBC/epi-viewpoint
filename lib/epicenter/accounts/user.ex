@@ -12,15 +12,15 @@ defmodule Epicenter.Accounts.User do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
-    field :admin, :boolean
+    field :admin, :boolean, read_after_writes: true
     field :confirmed_at, :utc_datetime
     field :email, :string
     field :hashed_password, :string, redact: true
     field :mfa_secret, :string, redact: true
     field :name, :string
     field :password, :string, virtual: true, redact: true
-    field :disabled, :boolean
-    field :seq, :integer
+    field :disabled, :boolean, read_after_writes: true
+    field :seq, :integer, read_after_writes: true
     field :tid, :string
 
     timestamps(type: :utc_datetime)

@@ -48,9 +48,6 @@ defmodule EpicenterWeb.PeopleLive do
   @clock Application.get_env(:epicenter, :clock)
 
   def mount(_params, session, socket) do
-    if connected?(socket),
-      do: Cases.subscribe_to_people()
-
     socket
     |> authenticate_user(session)
     |> assign_page_title("People")
@@ -87,8 +84,6 @@ defmodule EpicenterWeb.PeopleLive do
           reason_event: AuditLog.Revision.people_selected_assignee_event()
         }
       )
-
-    Cases.broadcast_people(updated_people, from: self())
 
     socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> noreply()
   end

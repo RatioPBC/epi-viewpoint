@@ -98,7 +98,6 @@ defmodule EpicenterWeb.ProfileLive do
 
   def mount(%{"id" => person_id}, session, socket) do
     if connected?(socket) do
-      Cases.subscribe_to_people()
       Cases.subscribe_to_case_investigation_updates_for(person_id)
     end
 
@@ -168,8 +167,6 @@ defmodule EpicenterWeb.ProfileLive do
           reason_event: AuditLog.Revision.profile_selected_assignee_event()
         }
       )
-
-    Cases.broadcast_people([updated_person], from: self())
 
     {:noreply, assign_person(socket, updated_person)}
   end
