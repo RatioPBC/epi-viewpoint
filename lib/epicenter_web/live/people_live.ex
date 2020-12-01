@@ -12,7 +12,7 @@ defmodule EpicenterWeb.PeopleFilter do
       = live_patch "Isolation monitoring", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_isolation_monitoring), class: "button", data: [active: assigns.filter == :with_isolation_monitoring, role: "people-filter", tid: "with_isolation_monitoring"]
     label#assigned-to-me-button
       input type="checkbox" phx-click="toggle-assigned-to-me" checked=@display_people_assigned_to_me data-tid="assigned-to-me-checkbox" phx-target=@myself
-      span My Assignments Only
+      span My assignments only
     """
   end
 
