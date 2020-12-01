@@ -218,24 +218,25 @@ defmodule Epicenter.Cases.Person do
     end
 
     def with_ongoing_interview() do
-      from [_person, case_investigation] in person_with_case_investigation(),
-        where: case_investigation.interview_status == "started"
+      from person in Person,
+        join: case_investigation in CaseInvestigation,
+        on: case_investigation.person_id == person.id,
+        left_join: assignee in User,
+        on: assignee.id == person.assigned_to_id,
+        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on()),
+        on: lab_result.person_id == person.id,
+        where: case_investigation.interview_status == "started",
+        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
     end
 
     def with_pending_interview() do
-      lab_results =
-        from lab_result in LabResult,
-          where: lab_result.is_positive_or_detected == true,
-          distinct: [desc: lab_result.person_id],
-          order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on]
-
       from person in Person,
         join: case_investigation in CaseInvestigation,
         on: case_investigation.person_id == person.id,
         where: case_investigation.interview_status == "pending",
         left_join: assignee in User,
         on: assignee.id == person.assigned_to_id,
-        join: lab_result in subquery(lab_results),
+        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on()),
         on: lab_result.person_id == person.id,
         order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
     end
@@ -255,6 +256,13 @@ defmodule Epicenter.Cases.Person do
         },
         where: lab_result.is_positive_or_detected == true,
         group_by: lab_result.person_id
+    end
+
+    defp person_latest_positive_lab_results_most_recently_sampled_on() do
+      from lab_result in LabResult,
+        where: lab_result.is_positive_or_detected == true,
+        distinct: [desc: lab_result.person_id],
+        order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on]
     end
 
     defp person_with_case_investigation() do
