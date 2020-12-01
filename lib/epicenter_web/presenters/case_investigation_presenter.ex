@@ -51,10 +51,10 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   def displayable_interview_status(case_investigation)
 
   def displayable_interview_status(%{interview_discontinued_at: nil} = case_investigation) do
-    case CaseInvestigation.status(case_investigation) do
-      :pending -> styled_status("Pending", :pending, :interview)
-      :started -> styled_status("Ongoing", :started, :interview)
-      :completed_interview -> styled_status("Completed", "completed-interview", :interview)
+    case case_investigation.interview_status do
+      "pending" -> styled_status("Pending", :pending, :interview)
+      "started" -> styled_status("Ongoing", :started, :interview)
+      "completed" -> styled_status("Completed", "completed-interview", :interview)
     end
   end
 
@@ -156,23 +156,23 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   end
 
   def interview_buttons(case_investigation) do
-    case CaseInvestigation.status(case_investigation) do
-      :pending ->
+    case case_investigation.interview_status do
+      "pending" ->
         [
           redirect_to(case_investigation, :start_interview),
           redirect_to(case_investigation, :discontinue_interview)
         ]
 
-      :started ->
+      "started" ->
         [
           redirect_to(case_investigation, :complete_interview),
           redirect_to(case_investigation, :discontinue_interview)
         ]
 
-      :completed_interview ->
+      "completed" ->
         []
 
-      :discontinued ->
+      "discontinued" ->
         []
     end
   end

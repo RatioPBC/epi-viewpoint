@@ -53,14 +53,14 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
     do: ""
 
   defp displayable_status(case_investigation, current_date) do
-    case CaseInvestigation.status(case_investigation) do
-      :pending ->
+    case case_investigation.interview_status do
+      "pending" ->
         "Pending interview"
 
-      :started ->
+      "started" ->
         "Ongoing interview"
 
-      :completed_interview ->
+      "completed" ->
         case CaseInvestigation.isolation_monitoring_status(case_investigation) do
           :pending ->
             "Pending monitoring"
@@ -73,7 +73,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
             "Concluded monitoring"
         end
 
-      :discontinued ->
+      "discontinued" ->
         "Discontinued"
     end
   end

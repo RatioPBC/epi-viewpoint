@@ -14,6 +14,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
     case_investigation =
       Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation", %{
         interview_completed_at: ~N[2020-01-01 23:03:07],
+        interview_started_at: ~N[2020-01-01 22:03:07],
         symptom_onset_on: ~D[2020-11-03]
       })
       |> Cases.create_case_investigation!()

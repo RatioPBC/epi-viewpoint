@@ -489,7 +489,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "case investigations with completed interviews render correctly", %{conn: conn, person: person, user: user} do
       completed_at = ~U[2020-11-05 19:57:00Z]
-      case_investigation = build_case_investigation(person, user, "case_investigation", nil, %{interview_completed_at: completed_at})
+      started_at = ~U[2020-11-05 18:57:00Z]
+
+      case_investigation =
+        build_case_investigation(person, user, "case_investigation", nil, %{interview_completed_at: completed_at, interview_started_at: started_at})
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
@@ -498,7 +501,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
         reported_on: "Unknown",
         number: "001"
       })
-      |> Pages.Profile.assert_case_investigation_has_history("Completed interview on 11/05/2020 at 02:57pm EST")
+      |> Pages.Profile.assert_case_investigation_has_history(
+        "Started interview with Alice Testuser on 11/05/2020 at 01:57pm EST Completed interview on 11/05/2020 at 02:57pm EST"
+      )
       |> Pages.Profile.refute_complete_interview_button("001")
       |> Pages.Profile.click_edit_complete_interview_link("001")
       |> assert_redirects_to("/case-investigations/#{case_investigation.id}/complete-interview")
@@ -508,6 +513,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       case_investigation =
         build_case_investigation(person, user, "case_investigation", nil, %{
           interview_completed_at: ~U[2020-10-05 19:57:00Z],
+          interview_started_at: ~U[2020-10-05 18:57:00Z],
           isolation_monitoring_started_on: ~D[2020-11-05],
           isolation_monitoring_ended_on: ~D[2020-11-15]
         })
@@ -523,10 +529,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
       case_investigation =
         build_case_investigation(person, user, "case_investigation", nil, %{
           interview_completed_at: ~U[2020-10-05 19:57:00Z],
-          isolation_monitoring_started_on: ~D[2020-11-05],
-          isolation_monitoring_ended_on: ~D[2020-11-15],
+          interview_started_at: ~U[2020-10-05 18:57:00Z],
           isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
-          isolation_conclusion_reason: "successfully_completed"
+          isolation_conclusion_reason: "successfully_completed",
+          isolation_monitoring_ended_on: ~D[2020-11-15],
+          isolation_monitoring_started_on: ~D[2020-11-05]
         })
 
       Pages.Profile.visit(conn, person)

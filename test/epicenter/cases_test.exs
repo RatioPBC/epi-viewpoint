@@ -5,7 +5,6 @@ defmodule Epicenter.CasesTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
-  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Extra
@@ -751,14 +750,6 @@ defmodule Epicenter.CasesTest do
       lab_result = Test.Fixtures.lab_result_attrs(person, creator, "person1_test_result", ~D[2020-10-04]) |> Cases.create_lab_result!()
 
       %{creator: creator, person: person, audit_meta: audit_meta, lab_result: lab_result}
-    end
-
-    test "gets default status from db default", %{person: person, lab_result: lab_result, creator: creator} do
-      case_investigation =
-        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
-        |> Cases.create_case_investigation!()
-
-      assert CaseInvestigation.status(case_investigation) == :pending
     end
 
     test "makes a revision", %{person: person, lab_result: lab_result, creator: creator} do

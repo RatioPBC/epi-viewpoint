@@ -115,7 +115,7 @@
                 span=" "
                 a href="#" data-confirm="Remove #{Format.person(exposure.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-exposure-id=exposure.id data-role="remove-contact" Remove
 
-      = if CaseInvestigation.status(case_investigation) == :completed_interview do
+      = if case_investigation.interview_status == "completed" do
         .case-investigation-isolation-monitoring-status id="isolation-monitoring-#{case_investigation.name}"
           h3.status data-role="status"
             = displayable_isolation_monitoring_status(case_investigation, @current_date)

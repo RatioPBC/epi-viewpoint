@@ -7,7 +7,6 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   alias Ecto.Changeset
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Form
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
@@ -50,7 +49,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     end
   end
 
-  def reasons(:started) do
+  def reasons("started") do
     ["Deceased", "Transferred to another jurisdiction", "Lost to follow up", "Refused to cooperate"]
   end
 
@@ -64,7 +63,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     Form.new(changeset)
     |> Form.line(fn line ->
       line
-      |> Form.radio_button_list(:interview_discontinue_reason, "Reason", reasons(CaseInvestigation.status(changeset.data)),
+      |> Form.radio_button_list(:interview_discontinue_reason, "Reason", reasons(changeset.data.interview_status),
         other: "Other",
         span: 8
       )

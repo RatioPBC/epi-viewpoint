@@ -57,17 +57,20 @@ defmodule EpicenterWeb.PeopleLiveTest do
           interview_started_at: ~U[2020-10-31 23:03:07Z]
         }),
         Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
+          interview_started_at: ~U[2020-10-31 22:03:07Z],
           interview_completed_at: ~U[2020-10-31 23:03:07Z],
           isolation_monitoring_started_on: ~D[2020-11-03],
           isolation_monitoring_ended_on: ~D[2020-11-13],
           isolation_concluded_at: ~U[2020-10-31 10:30:00Z]
         }),
         Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
+          interview_started_at: ~U[2020-10-31 22:03:07Z],
           interview_completed_at: ~U[2020-10-31 23:03:07Z],
           isolation_monitoring_started_on: ~D[2020-11-03],
           isolation_monitoring_ended_on: ~D[2020-11-13]
         }),
         Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
+          interview_started_at: ~U[2020-10-31 22:03:07Z],
           interview_completed_at: ~U[2020-10-31 23:03:07Z]
         })
       ]
@@ -77,7 +80,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
         Test.Fixtures.lab_result_attrs(nancy, user, "nancy-positive", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
 
       Test.Fixtures.case_investigation_attrs(nancy, nancy_positive_lab_result, user, "discontinued-investigation", %{
-        interview_discontinued_at: ~U[2020-10-31 23:03:07Z]
+        interview_discontinued_at: ~U[2020-10-31 23:03:07Z],
+        interview_started_at: ~U[2020-10-31 22:03:07Z]
       })
       |> Cases.create_case_investigation!()
 
@@ -170,17 +174,20 @@ defmodule EpicenterWeb.PeopleLiveTest do
         }),
         Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
           interview_completed_at: ~U[2020-10-31 23:03:07Z],
-          isolation_monitoring_started_on: ~D[2020-11-03],
+          interview_started_at: ~U[2020-10-31 22:03:07Z],
+          isolation_concluded_at: ~U[2020-10-31 10:30:00Z],
           isolation_monitoring_ended_on: ~D[2020-11-13],
-          isolation_concluded_at: ~U[2020-10-31 10:30:00Z]
+          isolation_monitoring_started_on: ~D[2020-11-03]
         }),
         Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
           interview_completed_at: ~U[2020-10-31 23:03:07Z],
-          isolation_monitoring_started_on: ~D[2020-11-03],
-          isolation_monitoring_ended_on: ~D[2020-11-13]
+          interview_started_at: ~U[2020-10-31 22:03:07Z],
+          isolation_monitoring_ended_on: ~D[2020-11-13],
+          isolation_monitoring_started_on: ~D[2020-11-03]
         }),
         Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
-          interview_completed_at: ~U[2020-10-31 23:03:07Z]
+          interview_completed_at: ~U[2020-10-31 23:03:07Z],
+          interview_started_at: ~U[2020-10-31 22:03:07Z]
         })
       ]
       |> Enum.map(&Cases.create_case_investigation!/1)

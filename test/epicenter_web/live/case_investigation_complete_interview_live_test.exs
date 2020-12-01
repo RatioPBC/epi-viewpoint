@@ -12,7 +12,11 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
   setup %{user: user} do
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
     lab_result = Test.Fixtures.lab_result_attrs(person, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
-    case_investigation = Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation") |> Cases.create_case_investigation!()
+
+    case_investigation =
+      Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation", %{interview_started_at: ~N[2020-01-01 22:03:07]})
+      |> Cases.create_case_investigation!()
+
     [case_investigation: case_investigation, person: person, user: user]
   end
 
@@ -56,7 +60,9 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
       }
     )
     |> Pages.Profile.assert_here(person)
-    |> Pages.Profile.assert_case_investigation_has_history("Completed interview on 09/06/2020 at 03:45pm EDT")
+    |> Pages.Profile.assert_case_investigation_has_history(
+      "Started interview with Alice Testuser on 01/01/2020 at 05:03pm EST Completed interview on 09/06/2020 at 03:45pm EDT"
+    )
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.interview_completed_at

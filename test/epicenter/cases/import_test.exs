@@ -119,7 +119,7 @@ defmodule Epicenter.Cases.ImportTest do
       assert [%CaseInvestigation{} = case_investigation] = case_investigations
       case_investigation = case_investigation |> Cases.preload_initiating_lab_result()
       assert case_investigation.initiating_lab_result.reported_on == ~D[2020-06-05]
-      assert CaseInvestigation.status(case_investigation) == :pending
+      assert case_investigation.interview_status == "pending"
     end
 
     test "can successfully import sample_data/lab_results.csv", %{originator: originator} do

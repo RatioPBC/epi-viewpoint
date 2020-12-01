@@ -93,12 +93,6 @@ defmodule Epicenter.Cases.CaseInvestigation do
     }[field_name]
   end
 
-  @spec status(%CaseInvestigation{}) :: :pending | :started | :discontinued | :completed_interview
-  def status(%{interview_discontinued_at: timestamp}) when not is_nil(timestamp), do: :discontinued
-  def status(%{interview_completed_at: timestamp}) when not is_nil(timestamp), do: :completed_interview
-  def status(%{interview_started_at: timestamp}) when not is_nil(timestamp), do: :started
-  def status(_), do: :pending
-
   defmodule Query do
     import Ecto.Query
 
