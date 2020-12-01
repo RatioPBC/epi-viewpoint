@@ -13,8 +13,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
 
     case_investigation =
       Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation", %{
-        completed_interview_at: ~N[2020-01-01 23:03:07],
-        symptom_onset_date: ~D[2020-11-03]
+        interview_completed_at: ~N[2020-01-01 23:03:07],
+        symptom_onset_on: ~D[2020-11-03]
       })
       |> Cases.create_case_investigation!()
 
@@ -37,7 +37,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
   end
 
   test "prefills date started with lab collection date when symptom onset date is not present", %{conn: conn, case_investigation: case_investigation} do
-    {:ok, _} = Cases.update_case_investigation(case_investigation, {%{symptom_onset_date: nil}, Test.Fixtures.admin_audit_meta()})
+    {:ok, _} = Cases.update_case_investigation(case_investigation, {%{symptom_onset_on: nil}, Test.Fixtures.admin_audit_meta()})
 
     Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
     |> Pages.CaseInvestigationIsolationMonitoring.assert_here()
@@ -52,7 +52,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
     {:ok, _} =
       Cases.update_case_investigation(
         case_investigation,
-        {%{isolation_monitoring_start_date: ~D[2020-11-01], isolation_monitoring_end_date: ~D[2020-11-11]}, Test.Fixtures.admin_audit_meta()}
+        {%{isolation_monitoring_started_on: ~D[2020-11-01], isolation_monitoring_ended_on: ~D[2020-11-11]}, Test.Fixtures.admin_audit_meta()}
       )
 
     Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
@@ -76,8 +76,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
 
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "edit-case-investigation-isolation-monitoring")
     case_investigation = Cases.get_case_investigation(case_investigation.id)
-    assert ~D[2020-08-01] == case_investigation.isolation_monitoring_start_date
-    assert ~D[2020-08-11] == case_investigation.isolation_monitoring_end_date
+    assert ~D[2020-08-01] == case_investigation.isolation_monitoring_started_on
+    assert ~D[2020-08-11] == case_investigation.isolation_monitoring_ended_on
   end
 
   describe "validations" do

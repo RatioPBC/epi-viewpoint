@@ -13,10 +13,10 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
 
     case_investigation =
       Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation", %{
-        completed_interview_at: ~N[2020-01-01 23:03:07],
-        isolation_monitoring_end_date: ~D[2020-11-15],
-        isolation_monitoring_start_date: ~D[2020-11-05],
-        symptom_onset_date: ~D[2020-11-03]
+        interview_completed_at: ~N[2020-01-01 23:03:07],
+        isolation_monitoring_ended_on: ~D[2020-11-15],
+        isolation_monitoring_started_on: ~D[2020-11-05],
+        symptom_onset_on: ~D[2020-11-03]
       })
       |> Cases.create_case_investigation!()
 
@@ -33,29 +33,29 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
     Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-order-form",
       isolation_order_form: %{
-        "order_sent_date" => "08/01/2020",
-        "clearance_order_sent_date" => "08/11/2020"
+        "order_sent_on" => "08/01/2020",
+        "clearance_order_sent_on" => "08/11/2020"
       }
     )
     |> Pages.Profile.assert_here(person)
 
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "edit-case-investigation-isolation-order")
     case_investigation = Cases.get_case_investigation(case_investigation.id)
-    assert ~D[2020-08-01] == case_investigation.isolation_order_sent_date
-    assert ~D[2020-08-11] == case_investigation.isolation_clearance_order_sent_date
+    assert ~D[2020-08-01] == case_investigation.isolation_order_sent_on
+    assert ~D[2020-08-11] == case_investigation.isolation_clearance_order_sent_on
   end
 
   test "prefills dates if present", %{conn: conn, case_investigation: case_investigation} do
     {:ok, _} =
       Cases.update_case_investigation(
         case_investigation,
-        {%{isolation_clearance_order_sent_date: ~D[2020-11-11], isolation_order_sent_date: ~D[2020-11-01]}, Test.Fixtures.admin_audit_meta()}
+        {%{isolation_clearance_order_sent_on: ~D[2020-11-11], isolation_order_sent_on: ~D[2020-11-01]}, Test.Fixtures.admin_audit_meta()}
       )
 
     Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
     |> Pages.CaseInvestigationIsolationOrder.assert_page_heading("Edit isolation details")
-    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_order_sent_date("11/01/2020")
-    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_clearance_order_sent_date("11/11/2020")
+    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_order_sent_on("11/01/2020")
+    |> Pages.CaseInvestigationIsolationOrder.assert_isolation_clearance_order_sent_on("11/11/2020")
   end
 
   describe "validations" do
@@ -63,13 +63,13 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
       Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-isolation-order-form",
         isolation_order_form: %{
-          "order_sent_date" => "02/31/2020",
-          "clearance_order_sent_date" => "09/32/2020"
+          "order_sent_on" => "02/31/2020",
+          "clearance_order_sent_on" => "09/32/2020"
         }
       )
       |> Pages.assert_validation_messages(%{
-        "isolation_order_form_order_sent_date" => "must be a valid MM/DD/YYYY date",
-        "isolation_order_form_clearance_order_sent_date" => "must be a valid MM/DD/YYYY date"
+        "isolation_order_form_order_sent_on" => "must be a valid MM/DD/YYYY date",
+        "isolation_order_form_clearance_order_sent_on" => "must be a valid MM/DD/YYYY date"
       })
     end
   end

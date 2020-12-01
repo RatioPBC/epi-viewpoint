@@ -16,7 +16,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     case_investigation =
       Test.Fixtures.case_investigation_attrs(person, lab_result, user, "alice-case-investigation", %{
         clinical_status: "asymptomatic",
-        symptom_onset_date: ~D[2020-11-03],
+        symptom_onset_on: ~D[2020-11-03],
         symptoms: ["cough", "headache"]
       })
       |> Cases.create_case_investigation!()
@@ -32,8 +32,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       "Symptomatic" => false,
       "Asymptomatic" => true
     })
-    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_explanation_text("08/06/2020")
-    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_date_value("11/03/2020")
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_on_explanation_text("08/06/2020")
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptom_onset_on_value("11/03/2020")
     |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
       "Fever > 100.4F" => false,
       "Subjective fever (felt feverish)" => false,
@@ -66,7 +66,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
-        "symptom_onset_date" => "09/06/2020",
+        "symptom_onset_on" => "09/06/2020",
         "symptoms" => ["fever", "chills", "groggy"],
         "symptoms_other" => true
       }
@@ -77,7 +77,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
 
     assert_recent_audit_log(case_investigation, user, %{
       clinical_status: "symptomatic",
-      symptom_onset_date: "2020-09-06",
+      symptom_onset_on: "2020-09-06",
       symptoms: ["fever", "chills", "groggy"]
     })
   end
@@ -87,7 +87,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
-        "symptom_onset_date" => "09/06/2020",
+        "symptom_onset_on" => "09/06/2020",
         "symptoms" => ["fever", "chills"]
       }
     )
@@ -97,7 +97,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
 
     assert_recent_audit_log(case_investigation, user, %{
       clinical_status: "symptomatic",
-      symptom_onset_date: "2020-09-06",
+      symptom_onset_on: "2020-09-06",
       symptoms: ["fever", "chills"]
     })
   end
@@ -108,7 +108,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
-        "symptom_onset_date" => "09/06/2020",
+        "symptom_onset_on" => "09/06/2020",
         "symptoms" => ["fever", "chills"],
         "symptoms_other" => true
       }
@@ -119,7 +119,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
 
     assert_recent_audit_log(case_investigation, user, %{
       clinical_status: "symptomatic",
-      symptom_onset_date: "2020-09-06",
+      symptom_onset_on: "2020-09-06",
       symptoms: ["fever", "chills"]
     })
   end
@@ -128,7 +128,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
-        "symptom_onset_date" => "",
+        "symptom_onset_on" => "",
         "symptoms" => []
       }
     )
@@ -136,7 +136,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
     assert Euclid.Exists.blank?(case_investigation.symptoms)
-    assert case_investigation.symptom_onset_date == nil
+    assert case_investigation.symptom_onset_on == nil
     assert case_investigation.clinical_status == "asymptomatic"
   end
 
@@ -145,11 +145,11 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.submit_live("#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
-        "symptom_onset_date" => "09/32/2020",
+        "symptom_onset_on" => "09/32/2020",
         "symptoms" => ["fever", "chills"]
       }
     )
-    |> Pages.assert_validation_messages(%{"clinical_details_form_symptom_onset_date" => "must be a valid MM/DD/YYYY date"})
+    |> Pages.assert_validation_messages(%{"clinical_details_form_symptom_onset_on" => "must be a valid MM/DD/YYYY date"})
   end
 
   @tag :skip
@@ -158,7 +158,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
-        "symptom_onset_date" => "09/02/2020",
+        "symptom_onset_on" => "09/02/2020",
         "symptoms" => ["fever", "groggy"]
       }
     )

@@ -10,7 +10,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationDiscontinue do
   end
 
   def assert_reason_selections(%View{} = view, expected_reasons) do
-    assert Pages.actual_selections(view, "case-investigation-discontinue-reason", "radio") == expected_reasons
+    assert Pages.actual_selections(view, "case-investigation-interview-discontinue-reason", "radio") == expected_reasons
     view
   end
 

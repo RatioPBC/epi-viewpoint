@@ -225,8 +225,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
       date = ~N[2020-01-02 01:00:07]
 
       build_case_investigation(person, user, "case_investigation", nil, %{
-        discontinued_at: date,
-        discontinue_reason: "Unable to reach"
+        interview_discontinued_at: date,
+        interview_discontinue_reason: "Unable to reach"
       })
 
       Pages.Profile.visit(conn, person)
@@ -243,8 +243,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "discontinuation reason can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
         build_case_investigation(person, user, "case_investigation", nil, %{
-          discontinued_at: NaiveDateTime.utc_now(),
-          discontinue_reason: "Unable to reach"
+          interview_discontinued_at: NaiveDateTime.utc_now(),
+          interview_discontinue_reason: "Unable to reach"
         })
 
       Pages.Profile.visit(conn, person)
@@ -253,7 +253,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations say so", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now(), clinical_status: "symptomatic"})
+      build_case_investigation(person, user, "case_investigation", nil, %{
+        interview_started_at: NaiveDateTime.utc_now(),
+        clinical_status: "symptomatic"
+      })
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", status_value: "started", reported_on: "Unknown", number: "001"})
@@ -263,34 +266,34 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "started case investigations that lack a clinical details show the values as 'None'", %{conn: conn, person: person, user: user} do
       build_case_investigation(person, user, "case_investigation", nil, %{
-        started_at: NaiveDateTime.utc_now(),
+        interview_started_at: NaiveDateTime.utc_now(),
         clinical_status: nil,
-        symptom_onset_date: nil
+        symptom_onset_on: nil
       })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "None", symptom_onset_date: "None", symptoms: "None"})
+      |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "None", symptom_onset_on: "None", symptoms: "None"})
     end
 
     test "started case investigations with a clinical details asymptomatic render correctly", %{conn: conn, person: person, user: user} do
       build_case_investigation(person, user, "case_investigation", nil, %{
-        started_at: NaiveDateTime.utc_now(),
+        interview_started_at: NaiveDateTime.utc_now(),
         clinical_status: "asymptomatic",
-        symptom_onset_date: ~D[2020-09-12],
+        symptom_onset_on: ~D[2020-09-12],
         symptoms: ["nasal_congestion", "Custom Symptom"]
       })
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_clinical_details_showing("001", %{
         clinical_status: "Asymptomatic",
-        symptom_onset_date: "09/12/2020",
+        symptom_onset_on: "09/12/2020",
         symptoms: "Nasal congestion, Custom Symptom"
       })
     end
 
     test "started case investigations with a unknown clinical details render correctly", %{conn: conn, person: person, user: user} do
       build_case_investigation(person, user, "case_investigation", nil, %{
-        started_at: NaiveDateTime.utc_now(),
+        interview_started_at: NaiveDateTime.utc_now(),
         clinical_status: "unknown"
       })
 
@@ -300,7 +303,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "started case investigations with empty lists of symptoms show None for symptoms", %{conn: conn, person: person, user: user} do
       build_case_investigation(person, user, "case_investigation", nil, %{
-        started_at: NaiveDateTime.utc_now(),
+        interview_started_at: NaiveDateTime.utc_now(),
         symptoms: []
       })
 
@@ -309,14 +312,15 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{started_at: NaiveDateTime.utc_now()})
+      build_case_investigation(person, user, "case_investigation", nil, %{interview_started_at: NaiveDateTime.utc_now()})
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigation_complete_button_title("001", "Complete interview")
     end
 
     test "started case investigations show contacts", %{conn: conn, person: person, user: user} do
-      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{started_at: NaiveDateTime.utc_now()})
+      case_investigation =
+        build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, _} =
         Cases.create_exposure(
@@ -406,7 +410,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "a contact can be edited", %{conn: conn, person: person, user: user} do
-      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{started_at: NaiveDateTime.utc_now()})
+      case_investigation =
+        build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, exposure} =
         Cases.create_exposure(
@@ -441,7 +446,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "a contact can be removed", %{conn: conn, person: person, user: user} do
-      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{started_at: NaiveDateTime.utc_now()})
+      case_investigation =
+        build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, exposure} =
         Cases.create_exposure(
@@ -483,7 +489,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "case investigations with completed interviews render correctly", %{conn: conn, person: person, user: user} do
       completed_at = ~U[2020-11-05 19:57:00Z]
-      case_investigation = build_case_investigation(person, user, "case_investigation", nil, %{completed_interview_at: completed_at})
+      case_investigation = build_case_investigation(person, user, "case_investigation", nil, %{interview_completed_at: completed_at})
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
@@ -501,9 +507,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "case investigations with isolation monitoring dates can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
         build_case_investigation(person, user, "case_investigation", nil, %{
-          completed_interview_at: ~U[2020-10-05 19:57:00Z],
-          isolation_monitoring_start_date: ~D[2020-11-05],
-          isolation_monitoring_end_date: ~D[2020-11-15]
+          interview_completed_at: ~U[2020-10-05 19:57:00Z],
+          isolation_monitoring_started_on: ~D[2020-11-05],
+          isolation_monitoring_ended_on: ~D[2020-11-15]
         })
 
       Pages.Profile.visit(conn, person)
@@ -516,9 +522,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "case investigations with an isolation monitoring conclusion can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
         build_case_investigation(person, user, "case_investigation", nil, %{
-          completed_interview_at: ~U[2020-10-05 19:57:00Z],
-          isolation_monitoring_start_date: ~D[2020-11-05],
-          isolation_monitoring_end_date: ~D[2020-11-15],
+          interview_completed_at: ~U[2020-10-05 19:57:00Z],
+          isolation_monitoring_started_on: ~D[2020-11-05],
+          isolation_monitoring_ended_on: ~D[2020-11-15],
           isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
           isolation_conclusion_reason: "successfully_completed"
         })

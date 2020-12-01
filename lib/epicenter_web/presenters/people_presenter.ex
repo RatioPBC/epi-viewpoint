@@ -66,7 +66,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
             "Pending monitoring"
 
           :ongoing ->
-            diff = Date.diff(case_investigation.isolation_monitoring_end_date, current_date)
+            diff = Date.diff(case_investigation.isolation_monitoring_ended_on, current_date)
             "Ongoing monitoring (#{diff} days remaining)"
 
           :concluded ->

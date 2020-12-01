@@ -14,19 +14,19 @@ defmodule Epicenter.Cases.CaseInvestigation do
   @required_attrs ~w{initiating_lab_result_id person_id}a
   @optional_attrs ~w{
     clinical_status
-    completed_interview_at
-    discontinue_reason
-    discontinued_at
+    interview_completed_at
+    interview_discontinue_reason
+    interview_discontinued_at
     interview_proxy_name
-    isolation_clearance_order_sent_date
+    interview_started_at
+    isolation_clearance_order_sent_on
     isolation_concluded_at
     isolation_conclusion_reason
-    isolation_monitoring_end_date
-    isolation_monitoring_start_date
-    isolation_order_sent_date
+    isolation_monitoring_ended_on
+    isolation_monitoring_started_on
+    isolation_order_sent_on
     name
-    started_at
-    symptom_onset_date
+    symptom_onset_on
     symptoms
     tid
   }a
@@ -35,20 +35,20 @@ defmodule Epicenter.Cases.CaseInvestigation do
   @foreign_key_type :binary_id
   schema "case_investigations" do
     field :clinical_status, :string
-    field :completed_interview_at, :utc_datetime
-    field :discontinue_reason, :string
-    field :discontinued_at, :utc_datetime
+    field :interview_completed_at, :utc_datetime
+    field :interview_discontinue_reason, :string
+    field :interview_discontinued_at, :utc_datetime
     field :interview_proxy_name, :string
+    field :interview_started_at, :utc_datetime
+    field :isolation_clearance_order_sent_on, :date
     field :isolation_concluded_at, :utc_datetime
     field :isolation_conclusion_reason, :string
-    field :isolation_monitoring_end_date, :date
-    field :isolation_monitoring_start_date, :date
-    field :isolation_clearance_order_sent_date, :date
-    field :isolation_order_sent_date, :date
+    field :isolation_monitoring_ended_on, :date
+    field :isolation_monitoring_started_on, :date
+    field :isolation_order_sent_on, :date
     field :name, :string
     field :seq, :integer
-    field :started_at, :utc_datetime
-    field :symptom_onset_date, :date
+    field :symptom_onset_on, :date
     field :symptoms, {:array, :string}
     field :tid, :string
 
@@ -71,7 +71,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
   end
 
   def isolation_monitoring_status(%{isolation_concluded_at: timestamp}) when not is_nil(timestamp), do: :concluded
-  def isolation_monitoring_status(%{isolation_monitoring_start_date: date}) when not is_nil(date), do: :ongoing
+  def isolation_monitoring_status(%{isolation_monitoring_started_on: date}) when not is_nil(date), do: :ongoing
   def isolation_monitoring_status(_), do: :pending
 
   def text_field_values(field_name) do
@@ -93,9 +93,9 @@ defmodule Epicenter.Cases.CaseInvestigation do
   end
 
   @spec status(%CaseInvestigation{}) :: :pending | :started | :discontinued | :completed_interview
-  def status(%{discontinued_at: timestamp}) when not is_nil(timestamp), do: :discontinued
-  def status(%{completed_interview_at: timestamp}) when not is_nil(timestamp), do: :completed_interview
-  def status(%{started_at: timestamp}) when not is_nil(timestamp), do: :started
+  def status(%{interview_discontinued_at: timestamp}) when not is_nil(timestamp), do: :discontinued
+  def status(%{interview_completed_at: timestamp}) when not is_nil(timestamp), do: :completed_interview
+  def status(%{interview_started_at: timestamp}) when not is_nil(timestamp), do: :started
   def status(_), do: :pending
 
   defmodule Query do

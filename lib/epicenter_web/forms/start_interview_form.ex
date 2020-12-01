@@ -34,7 +34,7 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
 
     time =
       with(
-        time when not is_nil(time) <- case_investigation.started_at,
+        time when not is_nil(time) <- case_investigation.interview_started_at,
         do: Timex.Timezone.convert(time, EpicenterWeb.PresentationConstants.presented_time_zone())
       ) || local_now
 
@@ -49,8 +49,8 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   def case_investigation_attrs(%Ecto.Changeset{} = form_changeset) do
     with {:ok, case_investigation_start_form} <- apply_action(form_changeset, :create) do
       interview_proxy_name = convert_name(case_investigation_start_form)
-      {:ok, started_at} = convert_time_started_and_date_started(case_investigation_start_form)
-      {:ok, %{interview_proxy_name: interview_proxy_name, started_at: started_at}}
+      {:ok, interview_started_at} = convert_time_started_and_date_started(case_investigation_start_form)
+      {:ok, %{interview_proxy_name: interview_proxy_name, interview_started_at: interview_started_at}}
     else
       other -> other
     end

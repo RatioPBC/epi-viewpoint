@@ -281,7 +281,7 @@ defmodule Epicenter.CasesTest do
       billy = billy |> Cases.preload_lab_results()
 
       Test.Fixtures.case_investigation_attrs(billy, Person.latest_lab_result(billy), user, "ongoing-interview", %{
-        started_at: ~U[2020-10-31 23:03:07Z]
+        interview_started_at: ~U[2020-10-31 23:03:07Z]
       })
       |> Cases.create_case_investigation!()
 
@@ -295,9 +295,9 @@ defmodule Epicenter.CasesTest do
       cindy = cindy |> Cases.preload_lab_results()
 
       Test.Fixtures.case_investigation_attrs(cindy, Person.latest_lab_result(cindy), user, "concluded-monitoring", %{
-        completed_interview_at: ~U[2020-10-31 23:03:07Z],
-        isolation_monitoring_start_date: ~D[2020-11-03],
-        isolation_monitoring_end_date: ~D[2020-11-13],
+        interview_completed_at: ~U[2020-10-31 23:03:07Z],
+        isolation_monitoring_started_on: ~D[2020-11-03],
+        isolation_monitoring_ended_on: ~D[2020-11-13],
         isolation_concluded_at: ~U[2020-10-31 10:30:00Z]
       })
       |> Cases.create_case_investigation!()
@@ -313,14 +313,14 @@ defmodule Epicenter.CasesTest do
       emily = emily |> Cases.preload_lab_results()
 
       Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
-        completed_interview_at: ~U[2020-10-31 23:03:07Z],
-        isolation_monitoring_start_date: ~D[2020-11-03],
-        isolation_monitoring_end_date: ~D[2020-11-13]
+        interview_completed_at: ~U[2020-10-31 23:03:07Z],
+        isolation_monitoring_started_on: ~D[2020-11-03],
+        isolation_monitoring_ended_on: ~D[2020-11-13]
       })
       |> Cases.create_case_investigation!()
 
       Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
-        completed_interview_at: ~U[2020-10-31 23:03:07Z]
+        interview_completed_at: ~U[2020-10-31 23:03:07Z]
       })
       |> Cases.create_case_investigation!()
 

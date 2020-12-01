@@ -16,17 +16,17 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
     view_or_conn_or_html |> Pages.assert_on_page("case-investigation-clinical-details")
   end
 
-  def assert_symptom_onset_date_value(%View{} = view, value) do
+  def assert_symptom_onset_on_value(%View{} = view, value) do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.attr("#clinical_details_form_symptom_onset_date", "value")
+    |> Test.Html.attr("#clinical_details_form_symptom_onset_on", "value")
     |> assert_eq([value])
 
     view
   end
 
-  def assert_symptom_onset_date_explanation_text(%View{} = view, date) do
+  def assert_symptom_onset_on_explanation_text(%View{} = view, date) do
     html =
       view
       |> render()

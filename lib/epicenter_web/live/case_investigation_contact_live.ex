@@ -213,7 +213,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     "Service provider"
   ]
   def contact_form_builder(form, case_investigation, form_error) do
-    onset_date = case_investigation.symptom_onset_date
+    onset_date = case_investigation.symptom_onset_on
     sampled_date = case_investigation.initiating_lab_result.sampled_on
     infectious_seed_date = onset_date || sampled_date
 

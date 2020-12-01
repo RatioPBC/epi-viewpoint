@@ -16,7 +16,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
     case_investigation =
       Test.Fixtures.case_investigation_attrs(person, lab_result, user, "alice-case-investigation", %{
         clinical_status: "asymptomatic",
-        symptom_onset_date: ~D[2020-11-03],
+        symptom_onset_on: ~D[2020-11-03],
         symptoms: ["cough", "headache"]
       })
       |> Cases.create_case_investigation!()
@@ -98,7 +98,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       conn: conn,
       case_investigation: case_investigation
     } do
-      {:ok, case_investigation} = Cases.update_case_investigation(case_investigation, {%{symptom_onset_date: nil}, Test.Fixtures.admin_audit_meta()})
+      {:ok, case_investigation} = Cases.update_case_investigation(case_investigation, {%{symptom_onset_on: nil}, Test.Fixtures.admin_audit_meta()})
 
       text =
         Pages.CaseInvestigationContact.visit(conn, case_investigation)
@@ -122,7 +122,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       {:ok, case_investigation} =
         Cases.update_case_investigation(
           case_investigation,
-          {%{symptom_onset_date: nil, initiating_lab_result_id: lab_result.id}, Test.Fixtures.admin_audit_meta()}
+          {%{symptom_onset_on: nil, initiating_lab_result_id: lab_result.id}, Test.Fixtures.admin_audit_meta()}
         )
 
       text =

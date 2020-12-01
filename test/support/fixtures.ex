@@ -50,7 +50,7 @@ defmodule Epicenter.Test.Fixtures do
       %{
         initiating_lab_result_id: initiating_lab_result_id,
         person_id: person_id,
-        started_at: nil,
+        interview_started_at: nil,
         tid: tid
       }
       |> merge_attrs(attrs)

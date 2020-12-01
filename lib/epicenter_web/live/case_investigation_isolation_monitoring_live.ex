@@ -41,8 +41,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
         {:ok, form} ->
           {:ok,
            %{
-             isolation_monitoring_start_date: form |> Map.get(:date_started) |> DateParser.parse_mm_dd_yyyy!(),
-             isolation_monitoring_end_date: form |> Map.get(:date_ended) |> DateParser.parse_mm_dd_yyyy!()
+             isolation_monitoring_started_on: form |> Map.get(:date_started) |> DateParser.parse_mm_dd_yyyy!(),
+             isolation_monitoring_ended_on: form |> Map.get(:date_ended) |> DateParser.parse_mm_dd_yyyy!()
            }}
 
         other ->
@@ -50,21 +50,21 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       end
     end
 
-    defp isolation_dates(%CaseInvestigation{isolation_monitoring_start_date: nil, isolation_monitoring_end_date: nil} = case_investigation) do
+    defp isolation_dates(%CaseInvestigation{isolation_monitoring_started_on: nil, isolation_monitoring_ended_on: nil} = case_investigation) do
       suggested_isolation_dates(case_investigation)
     end
 
-    defp isolation_dates(%CaseInvestigation{isolation_monitoring_start_date: start_date, isolation_monitoring_end_date: end_date}) do
+    defp isolation_dates(%CaseInvestigation{isolation_monitoring_started_on: start_date, isolation_monitoring_ended_on: end_date}) do
       {Format.date(start_date), Format.date(end_date)}
     end
 
-    defp suggested_isolation_dates(%CaseInvestigation{symptom_onset_date: nil} = case_investigation) do
+    defp suggested_isolation_dates(%CaseInvestigation{symptom_onset_on: nil} = case_investigation) do
       start = case_investigation |> Map.get(:initiating_lab_result) |> Map.get(:sampled_on)
       {start |> Format.date(), start |> Date.add(10) |> Format.date()}
     end
 
-    defp suggested_isolation_dates(%CaseInvestigation{symptom_onset_date: symptom_onset_date}) do
-      {symptom_onset_date |> Format.date(), symptom_onset_date |> Date.add(10) |> Format.date()}
+    defp suggested_isolation_dates(%CaseInvestigation{symptom_onset_on: symptom_onset_on}) do
+      {symptom_onset_on |> Format.date(), symptom_onset_on |> Date.add(10) |> Format.date()}
     end
   end
 
@@ -79,7 +79,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   end
 
   def isolation_monitoring_form_builder(form, case_investigation) do
-    onset_date = case_investigation.symptom_onset_date
+    onset_date = case_investigation.symptom_onset_on
     sampled_date = case_investigation.initiating_lab_result.sampled_on
 
     explanation_text =

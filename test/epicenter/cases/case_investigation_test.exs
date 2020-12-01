@@ -17,24 +17,24 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         CaseInvestigation,
         [
           {:clinical_status, :string},
-          {:completed_interview_at, :utc_datetime},
-          {:discontinue_reason, :string},
-          {:discontinued_at, :utc_datetime},
           {:id, :binary_id},
           {:initiating_lab_result_id, :binary_id},
           {:inserted_at, :utc_datetime},
+          {:interview_completed_at, :utc_datetime},
+          {:interview_discontinue_reason, :string},
+          {:interview_discontinued_at, :utc_datetime},
           {:interview_proxy_name, :string},
+          {:interview_started_at, :utc_datetime},
+          {:isolation_clearance_order_sent_on, :date},
           {:isolation_concluded_at, :utc_datetime},
           {:isolation_conclusion_reason, :string},
-          {:isolation_monitoring_end_date, :date},
-          {:isolation_monitoring_start_date, :date},
-          {:isolation_clearance_order_sent_date, :date},
-          {:isolation_order_sent_date, :date},
+          {:isolation_monitoring_ended_on, :date},
+          {:isolation_monitoring_started_on, :date},
+          {:isolation_order_sent_on, :date},
           {:name, :string},
           {:person_id, :binary_id},
           {:seq, :integer},
-          {:started_at, :utc_datetime},
-          {:symptom_onset_date, :date},
+          {:symptom_onset_on, :date},
           {:symptoms, {:array, :string}},
           {:tid, :string},
           {:updated_at, :utc_datetime}
@@ -99,23 +99,26 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
 
   describe "case investigation status" do
     test "pending by default", do: assert(CaseInvestigation.status(%{}) == :pending)
-    test "discontinued when discontinued_at", do: assert(CaseInvestigation.status(%{discontinued_at: ~D[2020-08-01]}) == :discontinued)
-    test "started when started_at", do: assert(CaseInvestigation.status(%{started_at: ~D[2020-08-01]}) == :started)
 
-    test "completed interview when completed_interview_at",
-      do: assert(CaseInvestigation.status(%{completed_interview_at: ~D[2020-08-01]}) == :completed_interview)
+    test "discontinued when interview_discontinued_at",
+      do: assert(CaseInvestigation.status(%{interview_discontinued_at: ~D[2020-08-01]}) == :discontinued)
+
+    test "started when interview_started_at", do: assert(CaseInvestigation.status(%{interview_started_at: ~D[2020-08-01]}) == :started)
+
+    test "completed interview when interview_completed_at",
+      do: assert(CaseInvestigation.status(%{interview_completed_at: ~D[2020-08-01]}) == :completed_interview)
   end
 
   describe "isolation monitoring status" do
     test "pending by default", do: assert(CaseInvestigation.isolation_monitoring_status(%{}) == :pending)
 
-    test "ongoing when isolation_monitoring_start_date",
-      do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01]}) == :ongoing)
+    test "ongoing when isolation_monitoring_started_on",
+      do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_started_on: ~D[2020-08-01]}) == :ongoing)
 
     test "concluded when isolation_concluded_at is present",
       do:
         assert(
-          CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_start_date: ~D[2020-08-01], isolation_concluded_at: ~D[2020-08-02]}) ==
+          CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_started_on: ~D[2020-08-01], isolation_concluded_at: ~D[2020-08-02]}) ==
             :concluded
         )
   end

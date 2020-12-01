@@ -17,22 +17,22 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
 
     import Ecto.Changeset
 
-    @required_attrs ~w{clearance_order_sent_date order_sent_date}a
+    @required_attrs ~w{clearance_order_sent_on order_sent_on}a
     @optional_attrs ~w{}a
     @primary_key false
     embedded_schema do
-      field :clearance_order_sent_date, :string
-      field :order_sent_date, :string
+      field :clearance_order_sent_on, :string
+      field :order_sent_on, :string
     end
 
     def changeset(case_investigation, attrs) do
       %IsolationOrderForm{
-        clearance_order_sent_date: Format.date(case_investigation.isolation_clearance_order_sent_date),
-        order_sent_date: Format.date(case_investigation.isolation_order_sent_date)
+        clearance_order_sent_on: Format.date(case_investigation.isolation_clearance_order_sent_on),
+        order_sent_on: Format.date(case_investigation.isolation_order_sent_on)
       }
       |> cast(attrs, @required_attrs ++ @optional_attrs)
-      |> Validation.validate_date(:clearance_order_sent_date)
-      |> Validation.validate_date(:order_sent_date)
+      |> Validation.validate_date(:clearance_order_sent_on)
+      |> Validation.validate_date(:order_sent_on)
     end
 
     def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset) do
@@ -40,8 +40,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
         {:ok, form} ->
           {:ok,
            %{
-             isolation_clearance_order_sent_date: form |> Map.get(:clearance_order_sent_date) |> DateParser.parse_mm_dd_yyyy!(),
-             isolation_order_sent_date: form |> Map.get(:order_sent_date) |> DateParser.parse_mm_dd_yyyy!()
+             isolation_clearance_order_sent_on: form |> Map.get(:clearance_order_sent_on) |> DateParser.parse_mm_dd_yyyy!(),
+             isolation_order_sent_on: form |> Map.get(:order_sent_on) |> DateParser.parse_mm_dd_yyyy!()
            }}
 
         other ->
@@ -61,8 +61,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
 
   def isolation_order_form_builder(form, _case_investigation) do
     Form.new(form)
-    |> Form.line(&Form.date_field(&1, :order_sent_date, "Date isolation order sent", span: 3))
-    |> Form.line(&Form.date_field(&1, :clearance_order_sent_date, "Date isolation clearance order sent", span: 3))
+    |> Form.line(&Form.date_field(&1, :order_sent_on, "Date isolation order sent", span: 3))
+    |> Form.line(&Form.date_field(&1, :clearance_order_sent_on, "Date isolation clearance order sent", span: 3))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end

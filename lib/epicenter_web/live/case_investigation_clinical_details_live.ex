@@ -22,21 +22,21 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     @primary_key false
     embedded_schema do
       field :clinical_status, :string
-      field :symptom_onset_date, :string
+      field :symptom_onset_on, :string
       field :symptoms, {:array, :string}
     end
 
     @required_attrs ~w{}a
-    @optional_attrs ~w{clinical_status symptom_onset_date symptoms}a
+    @optional_attrs ~w{clinical_status symptom_onset_on symptoms}a
 
     def changeset(%CaseInvestigation{} = case_investigation, attrs \\ %{}) do
       %ClinicalDetailsForm{
         clinical_status: case_investigation.clinical_status,
         symptoms: case_investigation.symptoms,
-        symptom_onset_date: Format.date(case_investigation.symptom_onset_date)
+        symptom_onset_on: Format.date(case_investigation.symptom_onset_on)
       }
       |> cast(attrs, @required_attrs ++ @optional_attrs)
-      |> Validation.validate_date(:symptom_onset_date)
+      |> Validation.validate_date(:symptom_onset_on)
     end
 
     def case_investigation_attrs(%Ecto.Changeset{} = changeset) do
@@ -47,18 +47,18 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     end
 
     def case_investigation_attrs(%ClinicalDetailsForm{} = clinical_details_form) do
-      {:ok, symptom_onset_date} = convert_symptom_onset_date(clinical_details_form)
+      {:ok, symptom_onset_on} = convert_symptom_onset_date(clinical_details_form)
 
       %{
         clinical_status: clinical_details_form.clinical_status,
-        symptom_onset_date: symptom_onset_date,
+        symptom_onset_on: symptom_onset_on,
         symptoms: clinical_details_form.symptoms
       }
     end
 
     defp convert_symptom_onset_date(attrs) do
-      datestring = attrs |> Map.get(:symptom_onset_date)
-      DateParser.parse_mm_dd_yyyy(datestring)
+      date = attrs |> Map.get(:symptom_onset_on)
+      DateParser.parse_mm_dd_yyyy(date)
     end
   end
 
@@ -75,12 +75,12 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   end
 
   def clinical_details_form_builder(form, case_investigation) do
-    symptom_onset_date_explanation_text =
+    symptom_onset_on_explanation_text =
       "If asymptomatic, date of first positive test (#{Format.date(case_investigation.initiating_lab_result.sampled_on)})"
 
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", CaseInvestigation.text_field_values(:clinical_status), span: 5))
-    |> Form.line(&Form.date_field(&1, :symptom_onset_date, "Symptom onset date*", explanation_text: symptom_onset_date_explanation_text, span: 5))
+    |> Form.line(&Form.date_field(&1, :symptom_onset_on, "Symptom onset date*", explanation_text: symptom_onset_on_explanation_text, span: 5))
     |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()

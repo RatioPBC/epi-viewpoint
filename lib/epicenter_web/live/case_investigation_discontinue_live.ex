@@ -24,12 +24,12 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   end
 
   def handle_event("save", %{"case_investigation" => params}, socket) do
-    params = Map.put(params, "discontinued_at", DateTime.utc_now())
+    params = Map.put(params, "interview_discontinued_at", DateTime.utc_now())
 
     with {:ok, _} <-
            socket.assigns.changeset
-           |> Changeset.cast(params, [:discontinue_reason])
-           |> Changeset.validate_required([:discontinue_reason])
+           |> Changeset.cast(params, [:interview_discontinue_reason])
+           |> Changeset.validate_required([:interview_discontinue_reason])
            |> Changeset.apply_action(:update),
          {:ok, _} <-
            Cases.update_case_investigation(
@@ -64,7 +64,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     Form.new(changeset)
     |> Form.line(fn line ->
       line
-      |> Form.radio_button_list(:discontinue_reason, "Reason", reasons(CaseInvestigation.status(changeset.data)),
+      |> Form.radio_button_list(:interview_discontinue_reason, "Reason", reasons(CaseInvestigation.status(changeset.data)),
         other: "Other",
         span: 8
       )

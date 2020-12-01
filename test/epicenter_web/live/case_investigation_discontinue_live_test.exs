@@ -44,12 +44,14 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     case_investigation: case_investigation
   } do
     Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
-    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-discontinue-form", case_investigation: %{"discontinue_reason" => "Unable to reach"})
+    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-discontinue-form",
+      case_investigation: %{"interview_discontinue_reason" => "Unable to reach"}
+    )
     |> Pages.Profile.assert_here(person)
 
     case_investigation = Cases.get_case_investigation(case_investigation.id)
-    assert "Unable to reach" = case_investigation.discontinue_reason
-    assert_datetime_approximate(case_investigation.discontinued_at, DateTime.utc_now(), 2)
+    assert "Unable to reach" = case_investigation.interview_discontinue_reason
+    assert_datetime_approximate(case_investigation.interview_discontinued_at, DateTime.utc_now(), 2)
   end
 
   test "reasons for discontinuing are different between case investigation that have started and those that have not", %{
@@ -60,7 +62,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     assert preset_reasons(view) == ["Deceased", "Transferred to another jurisdiction", "Unable to reach"]
 
     {:ok, case_investigation} =
-      Cases.update_case_investigation(case_investigation, {%{started_at: NaiveDateTime.utc_now()}, Test.Fixtures.admin_audit_meta()})
+      Cases.update_case_investigation(case_investigation, {%{interview_started_at: NaiveDateTime.utc_now()}, Test.Fixtures.admin_audit_meta()})
 
     view = Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
 
@@ -71,16 +73,16 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.all("[name='case_investigation[discontinue_reason]']", fn element -> Test.Html.attr(element, "value") |> List.first() end)
+    |> Test.Html.all("[name='case_investigation[interview_discontinue_reason]']", fn element -> Test.Html.attr(element, "value") |> List.first() end)
     |> Enum.reject(&Euclid.Exists.blank?/1)
   end
 
   test "discontinuing requires a reason", %{conn: conn, case_investigation: case_investigation} do
     view =
       Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
-      |> Pages.submit_live("#case-investigation-discontinue-form", case_investigation: %{"discontinue_reason" => ""})
+      |> Pages.submit_live("#case-investigation-discontinue-form", case_investigation: %{"interview_discontinue_reason" => ""})
       |> Pages.CaseInvestigationDiscontinue.assert_here()
 
-    view |> render() |> Pages.assert_validation_messages(%{"case_investigation_discontinue_reason" => "can't be blank"})
+    view |> render() |> Pages.assert_validation_messages(%{"case_investigation_interview_discontinue_reason" => "can't be blank"})
   end
 end

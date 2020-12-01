@@ -74,7 +74,7 @@
             span data-role="case-investigation-history-item-text" = history_item.text
             span class="history-item-link" = history_item.link
 
-      = if case_investigation.started_at != nil do
+      = if case_investigation.interview_started_at != nil do
         .case-investigation-clinical
           .clinical-details-header-row
             h4
@@ -95,7 +95,7 @@
                 td data-role="case-investigation-clinical-status-text"
                   = displayable_clinical_status(case_investigation)
                 td data-role="case-investigation-symptom-onset-date-text"
-                  = Format.date(case_investigation.symptom_onset_date, "None")
+                  = Format.date(case_investigation.symptom_onset_on, "None")
                 td data-role="case-investigation-symptoms-text"
                   = displayable_symptoms(case_investigation)
         .case-investigation-contacts id="contacts-#{case_investigation.name}"
@@ -144,9 +144,9 @@
             tbody
               tr
                 td data-tid="case-investigation-001-isolation-order-sent-date"
-                  = Format.date(case_investigation.isolation_order_sent_date, "Not sent")
+                  = Format.date(case_investigation.isolation_order_sent_on, "Not sent")
                 td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
-                  = Format.date(case_investigation.isolation_clearance_order_sent_date, "Not sent")
+                  = Format.date(case_investigation.isolation_clearance_order_sent_on, "Not sent")
 
       = component(@socket, CaseInvestigationNoteSection, case_investigation.id <> "note section", case_investigation: case_investigation, current_user_id: @current_user.id)
 

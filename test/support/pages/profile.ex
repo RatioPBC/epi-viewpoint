@@ -372,7 +372,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
-  # expected_values %{clinical_status: clinical_status, symptom_onset_date: symptom_onset_date}}
+  # expected_values %{clinical_status: clinical_status, symptom_onset_on: symptom_onset_on}}
   def assert_clinical_details_showing(%View{} = view, number, expected_values) do
     parsed_html =
       view
@@ -388,11 +388,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
       |> assert_eq(clinical_status)
     end
 
-    with symptom_onset_date when not is_nil(symptom_onset_date) <- Map.get(expected_values, :symptom_onset_date) do
+    with symptom_onset_on when not is_nil(symptom_onset_on) <- Map.get(expected_values, :symptom_onset_on) do
       parsed_html
       |> Test.Html.find("[data-role=case-investigation-symptom-onset-date-text]")
       |> Test.Html.text()
-      |> assert_eq(symptom_onset_date)
+      |> assert_eq(symptom_onset_on)
     end
 
     with symptoms when not is_nil(symptoms) <- Map.get(expected_values, :symptoms) do
@@ -426,20 +426,20 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   def assert_isolation_order_details(%View{} = view, number, %{
-        order_sent_date: expected_order_sent_date,
-        clearance_order_sent_date: expected_clearance_order_sent_date
+        order_sent_on: expected_order_sent_on,
+        clearance_order_sent_on: expected_clearance_order_sent_on
       }) do
     parsed_html = view |> render() |> Test.Html.parse()
 
     parsed_html
     |> Test.Html.find("[data-tid=case-investigation-#{number}-isolation-order-sent-date]")
     |> Test.Html.text()
-    |> assert_eq(expected_order_sent_date)
+    |> assert_eq(expected_order_sent_on)
 
     parsed_html
     |> Test.Html.find("[data-tid=case-investigation-#{number}-isolation-clearance-order-sent-date]")
     |> Test.Html.text()
-    |> assert_eq(expected_clearance_order_sent_date)
+    |> assert_eq(expected_clearance_order_sent_on)
 
     view
   end

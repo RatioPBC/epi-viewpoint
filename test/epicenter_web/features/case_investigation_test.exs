@@ -42,7 +42,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
-        "symptom_onset_date" => "09/06/2020",
+        "symptom_onset_on" => "09/06/2020",
         "symptoms" => ["fever", "chills", "groggy"],
         "symptoms_other" => true
       }
@@ -52,7 +52,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
              case_investigations: [
                %{
                  clinical_status: "symptomatic",
-                 symptom_onset_date: ~D[2020-09-06],
+                 symptom_onset_on: ~D[2020-09-06],
                  symptoms: ["fever", "chills", "groggy"]
                }
              ]
@@ -94,7 +94,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
         "clinical_status" => "symptomatic",
-        "symptom_onset_date" => "09/06/2020",
+        "symptom_onset_on" => "09/06/2020",
         "symptoms" => ["fever", "chills"]
       }
     )
@@ -139,18 +139,18 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
     )
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Ongoing isolation monitoring (10 days remaining)", number: "001"})
-    |> Pages.Profile.assert_isolation_order_details("001", %{order_sent_date: "Not sent", clearance_order_sent_date: "Not sent"})
+    |> Pages.Profile.assert_isolation_order_details("001", %{order_sent_on: "Not sent", clearance_order_sent_on: "Not sent"})
     |> Pages.Profile.click_edit_isolation_order_details_link("001")
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.CaseInvestigationIsolationOrder.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-isolation-order-form",
       isolation_order_form: %{
-        "order_sent_date" => "10/28/2020",
-        "clearance_order_sent_date" => "11/10/2020"
+        "order_sent_on" => "10/28/2020",
+        "clearance_order_sent_on" => "11/10/2020"
       }
     )
     |> Pages.Profile.assert_here(person)
-    |> Pages.Profile.assert_isolation_order_details("001", %{order_sent_date: "10/28/2020", clearance_order_sent_date: "11/10/2020"})
+    |> Pages.Profile.assert_isolation_order_details("001", %{order_sent_on: "10/28/2020", clearance_order_sent_on: "11/10/2020"})
     |> Pages.Profile.click_conclude_isolation_monitoring("001")
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.CaseInvestigationConcludeIsolationMonitoring.assert_here()
@@ -186,7 +186,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
                %{
                  id: case_investigation_id,
                  clinical_status: "symptomatic",
-                 symptom_onset_date: ~D[2020-09-06],
+                 symptom_onset_on: ~D[2020-09-06],
                  symptoms: ["fever", "chills"]
                }
              ]
