@@ -227,8 +227,7 @@ defmodule Epicenter.Cases.Person do
     def with_pending_interview() do
       lab_results =
         from lab_result in LabResult,
-          where: ilike(lab_result.result, "positive"),
-          or_where: ilike(lab_result.result, "detected"),
+          where: lab_result.is_positive_or_detected == true,
           distinct: [desc: lab_result.person_id],
           order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on]
 
@@ -257,8 +256,7 @@ defmodule Epicenter.Cases.Person do
           person_id: lab_result.person_id,
           max_sampled_on: max(lab_result.sampled_on)
         },
-        where: ilike(lab_result.result, "positive"),
-        or_where: ilike(lab_result.result, "detected"),
+        where: lab_result.is_positive_or_detected == true,
         group_by: lab_result.person_id
     end
 

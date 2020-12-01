@@ -192,10 +192,13 @@ defmodule Epicenter.Cases.Import do
     end
   end
 
-  def find_or_create_case_investigation_for_positive_lab_result(%LabResult{result: result} = lab_result, person, originator) do
+  def find_or_create_case_investigation_for_positive_lab_result(
+        %LabResult{is_positive_or_detected: is_positive_or_detected} = lab_result,
+        person,
+        originator
+      ) do
     cond do
-      is_nil(result) -> :not_positive
-      String.downcase(result) in ["positive", "detected"] -> find_or_create_case_investigation(lab_result, person, originator)
+      is_positive_or_detected -> find_or_create_case_investigation(lab_result, person, originator)
       true -> :not_positive
     end
   end
