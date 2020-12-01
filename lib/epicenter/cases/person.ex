@@ -217,29 +217,8 @@ defmodule Epicenter.Cases.Person do
         where: case_investigation.interview_status == "completed" and case_investigation.isolation_monitoring_status in ["pending", "ongoing"]
     end
 
-    def with_ongoing_interview() do
-      from person in Person,
-        join: case_investigation in CaseInvestigation,
-        on: case_investigation.person_id == person.id,
-        left_join: assignee in User,
-        on: assignee.id == person.assigned_to_id,
-        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on()),
-        on: lab_result.person_id == person.id,
-        where: case_investigation.interview_status == "started",
-        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
-    end
-
-    def with_pending_interview() do
-      from person in Person,
-        join: case_investigation in CaseInvestigation,
-        on: case_investigation.person_id == person.id,
-        where: case_investigation.interview_status == "pending",
-        left_join: assignee in User,
-        on: assignee.id == person.assigned_to_id,
-        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on()),
-        on: lab_result.person_id == person.id,
-        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
-    end
+    def with_ongoing_interview(), do: sorted_people_with_case_investigation_interview_status("started")
+    def with_pending_interview(), do: sorted_people_with_case_investigation_interview_status("pending")
 
     def with_positive_lab_results() do
       from person in Person,
@@ -270,6 +249,18 @@ defmodule Epicenter.Cases.Person do
         join: case_investigation in CaseInvestigation,
         on: case_investigation.person_id == person.id,
         distinct: [desc: case_investigation.inserted_at, desc: case_investigation.seq, desc: person.seq, desc: person.id]
+    end
+
+    defp sorted_people_with_case_investigation_interview_status(interview_status) do
+      from person in Person,
+        join: case_investigation in CaseInvestigation,
+        on: case_investigation.person_id == person.id,
+        left_join: assignee in User,
+        on: assignee.id == person.assigned_to_id,
+        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on()),
+        on: lab_result.person_id == person.id,
+        where: case_investigation.interview_status == ^interview_status,
+        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
     end
   end
 end
