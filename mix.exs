@@ -68,7 +68,6 @@ defmodule Epicenter.MixProject do
       {:phoenix_live_view, "~> 0.14.8"},
       {:phoenix_slime, "~> 0.13.1"},
       {:phoenix_slime_live_view_collocated_template, "~> 0.1.0"},
-      {:phx_gen_auth, "~> 0.5", only: [:dev], runtime: false},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
       {:table_rex, "~> 3.0"},
