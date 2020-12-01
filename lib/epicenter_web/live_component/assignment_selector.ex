@@ -6,15 +6,15 @@ defmodule EpicenterWeb.AssignmentSelector do
   def render(assigns) do
     ~H"""
     form id="assignment-form" phx-change="form-change" data-disabled=@disabled phx-target=@myself
-    #user-list
-      span#assign-to-label Assign to
-      #select-wrapper
-        select name="user" data-role="users" disabled=@disabled
-          option value=""
-          option value="-unassigned-" Unassigned
-          = for user <- @users do
-            option value="#{user.id}" #{user.name}
-    #assignment-dropdown-tooltip Select people below, then assign them to a user
+      #user-list
+        span#assign-to-label Assign to
+        #select-wrapper
+          select name="user" data-role="users" disabled=@disabled
+            option value=""
+            option value="-unassigned-" Unassigned
+            = for user <- @users do
+              option value="#{user.id}" #{user.name}
+      #assignment-dropdown-tooltip Select people below, then assign them to a user
     """
   end
 
