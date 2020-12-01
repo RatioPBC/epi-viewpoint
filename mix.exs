@@ -21,7 +21,7 @@ defmodule Epicenter.MixProject do
   def application do
     [
       mod: {Epicenter.Application, []},
-      extra_applications: [:crypto, :jason, :logger_json, :runtime_tools]
+      extra_applications: [:jason, :logger_json, :runtime_tools]
     ]
   end
 
