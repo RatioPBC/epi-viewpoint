@@ -18,6 +18,7 @@ defmodule Epicenter.Cases.LabResultTest do
           {:fingerprint, :string},
           {:id, :binary_id},
           {:inserted_at, :utc_datetime},
+          {:is_positive_or_detected, :boolean},
           {:person_id, :binary_id},
           {:reported_on, :date},
           {:request_accession_number, :string},
@@ -84,6 +85,41 @@ defmodule Epicenter.Cases.LabResultTest do
       {attrs_2, _} = Test.Fixtures.lab_result_attrs(%Cases.Person{id: "0987654321"}, user, "result-2", "06-02-2020")
       fingerprint_2 = Cases.change_lab_result(%LabResult{}, attrs_2) |> LabResult.generate_fingerprint()
       assert fingerprint_2 == "62db806d0670342467c51af7d4049f8c7bf47504f07b8682ec405bf38eea17da"
+    end
+  end
+
+  describe "is_positive_or_detected" do
+    test "is true when the lab result is 'detected'" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person!()
+
+      lab_result =
+        Test.Fixtures.lab_result_attrs(person, user, "result-1", "06-01-2020", result: "dEtEctEd")
+        |> Cases.create_lab_result!()
+
+      assert lab_result.is_positive_or_detected
+    end
+
+    test "is true when the lab result is 'positive'" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person!()
+
+      lab_result =
+        Test.Fixtures.lab_result_attrs(person, user, "result-1", "06-01-2020", result: "pOsItIvE")
+        |> Cases.create_lab_result!()
+
+      assert lab_result.is_positive_or_detected
+    end
+
+    test "is false when the lab result is anything else" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person!()
+
+      lab_result =
+        Test.Fixtures.lab_result_attrs(person, user, "result-1", "06-01-2020", result: "negative")
+        |> Cases.create_lab_result!()
+
+      refute lab_result.is_positive_or_detected
     end
   end
 

@@ -17,6 +17,7 @@ defmodule Epicenter.Cases.LabResult do
   schema "lab_results" do
     field :analyzed_on, :date
     field :fingerprint, :string
+    field :is_positive_or_detected, :boolean, read_after_writes: true
     field :reported_on, :date
     field :request_accession_number, :string
     field :request_facility_code, :string
