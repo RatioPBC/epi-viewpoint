@@ -214,14 +214,12 @@ defmodule Epicenter.Cases.Person do
 
     def with_isolation_monitoring() do
       from [_person, case_investigation] in person_with_case_investigation(),
-        where: not is_nil(case_investigation.interview_completed_at) and is_nil(case_investigation.isolation_concluded_at)
+        where: case_investigation.interview_status == "completed" and case_investigation.isolation_monitoring_status in ["pending", "ongoing"]
     end
 
     def with_ongoing_interview() do
       from [_person, case_investigation] in person_with_case_investigation(),
-        where:
-          not is_nil(case_investigation.interview_started_at) and is_nil(case_investigation.interview_completed_at) and
-            is_nil(case_investigation.interview_discontinued_at)
+        where: case_investigation.interview_status == "started"
     end
 
     def with_pending_interview() do
@@ -234,9 +232,7 @@ defmodule Epicenter.Cases.Person do
       from person in Person,
         join: case_investigation in CaseInvestigation,
         on: case_investigation.person_id == person.id,
-        where:
-          is_nil(case_investigation.interview_started_at) and is_nil(case_investigation.interview_completed_at) and
-            is_nil(case_investigation.interview_discontinued_at),
+        where: case_investigation.interview_status == "pending",
         left_join: assignee in User,
         on: assignee.id == person.assigned_to_id,
         join: lab_result in subquery(lab_results),

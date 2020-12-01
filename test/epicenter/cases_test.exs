@@ -306,19 +306,21 @@ defmodule Epicenter.CasesTest do
 
       david = david |> Cases.preload_lab_results()
 
-      emily = Test.Fixtures.person_attrs(user, "emily") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(emily, user, "emily-result-1", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
-
-      emily = emily |> Cases.preload_lab_results()
-
       Test.Fixtures.case_investigation_attrs(david, Person.latest_lab_result(david), user, "ongoing-monitoring", %{
+        interview_started_at: ~U[2020-10-31 22:03:07Z],
         interview_completed_at: ~U[2020-10-31 23:03:07Z],
         isolation_monitoring_started_on: ~D[2020-11-03],
         isolation_monitoring_ended_on: ~D[2020-11-13]
       })
       |> Cases.create_case_investigation!()
 
+      emily = Test.Fixtures.person_attrs(user, "emily") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(emily, user, "emily-result-1", Extra.Date.days_ago(3), result: "positive") |> Cases.create_lab_result!()
+
+      emily = emily |> Cases.preload_lab_results()
+
       Test.Fixtures.case_investigation_attrs(emily, Person.latest_lab_result(emily), user, "pending-monitoring", %{
+        interview_started_at: ~U[2020-10-31 22:03:07Z],
         interview_completed_at: ~U[2020-10-31 23:03:07Z]
       })
       |> Cases.create_case_investigation!()
