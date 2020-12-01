@@ -11,9 +11,9 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
     ~H"""
     .case-investigation-notes
       h3.additional_notes Additional Notes
-      = component(@socket, CaseInvestigationNoteForm, @case_investigation.id <> "note form", case_investigation_id: @case_investigation.id, current_user_id: @current_user_id)
+      = component(@socket, CaseInvestigationNoteForm, @case_investigation.id <> "note form", case_investigation_id: @case_investigation.id, current_user_id: @current_user_id, on_add: @on_note_added )
       = for note <- @case_investigation.notes |> Enum.reverse() do
-        = component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user_id)
+        = component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_note_deleted)
     """
   end
 end
@@ -59,7 +59,7 @@ defmodule EpicenterWeb.CaseInvestigationNote do
         reason_event: AuditLog.Revision.remove_case_investigation_note_event()
       })
 
-    Cases.broadcast_case_investigation_updated(socket.assigns.note.case_investigation_id)
+    socket.assigns.on_delete.(socket.assigns.note)
     socket |> noreply()
   end
 end
@@ -97,10 +97,6 @@ defmodule EpicenterWeb.ProfileLive do
   @clock Application.get_env(:epicenter, :clock)
 
   def mount(%{"id" => person_id}, session, socket) do
-    if connected?(socket) do
-      Cases.subscribe_to_case_investigation_updates_for(person_id)
-    end
-
     person = Cases.get_person(person_id) |> Cases.preload_demographics()
 
     socket
@@ -123,7 +119,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
-  def handle_info(:case_investigation_updated, socket) do
+  def handle_info(:reload_case_investigations, socket) do
     socket |> assign_case_investigations(socket.assigns.person) |> noreply()
   end
 

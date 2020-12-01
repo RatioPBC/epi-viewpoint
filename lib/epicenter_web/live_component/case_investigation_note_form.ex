@@ -63,7 +63,7 @@ defmodule EpicenterWeb.CaseInvestigationNoteForm do
     with %Ecto.Changeset{} = form_changeset <- FormFieldData.changeset(%{id: socket.assigns.case_investigation_id}, params),
          {:form, {:ok, case_investigation_note_attrs}} <-
            {:form, FormFieldData.case_investigation_note_attrs(form_changeset, socket.assigns.current_user_id)},
-         {:note, {:ok, _note}} <-
+         {:note, {:ok, note}} <-
            {:note,
             Cases.create_case_investigation_note(
               {case_investigation_note_attrs,
@@ -73,7 +73,7 @@ defmodule EpicenterWeb.CaseInvestigationNoteForm do
                  reason_event: AuditLog.Revision.profile_case_investigation_note_submission_event()
                }}
             )} do
-      Cases.broadcast_case_investigation_updated(socket.assigns.case_investigation_id)
+      socket.assigns.on_add.(note)
       socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()
     else
       {:form, {:error, changeset}} ->
