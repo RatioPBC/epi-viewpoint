@@ -31,6 +31,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:isolation_conclusion_reason, :string},
           {:isolation_monitoring_ended_on, :date},
           {:isolation_monitoring_started_on, :date},
+          {:isolation_monitoring_status, :string},
           {:isolation_order_sent_on, :date},
           {:name, :string},
           {:person_id, :binary_id},
@@ -105,7 +106,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
   end
 
   describe "case investigation interview status using generated column" do
-    test "pending_interview by default" do
+    test "pending by default" do
       {:ok, case_investigation} = new_changeset(%{}) |> Repo.insert()
       assert case_investigation.interview_status == "pending"
     end
@@ -127,6 +128,65 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         |> Repo.insert()
 
       assert case_investigation.interview_status == "completed"
+    end
+  end
+
+  describe "case investigation isolation monitoring status using generated column" do
+    test "pending by default" do
+      {:ok, empty_case_investigation} = new_changeset(%{}) |> Repo.insert()
+      assert empty_case_investigation.isolation_monitoring_status == "pending"
+    end
+
+    test "pending when interview is started" do
+      {:ok, interview_started_case_investigation} = new_changeset(%{interview_started_at: DateTime.utc_now()}) |> Repo.insert()
+
+      assert interview_started_case_investigation.isolation_monitoring_status == "pending"
+    end
+
+    test "pending when interview is complete and monitoring is not started" do
+      {:ok, interview_completed_case_investigation} =
+        new_changeset(%{interview_started_at: DateTime.utc_now(), interview_completed_at: DateTime.utc_now()}) |> Repo.insert()
+
+      assert interview_completed_case_investigation.isolation_monitoring_status == "pending"
+    end
+
+    test "pending when interview is discontinued" do
+      {:ok, interview_discontinued_case_investigation} =
+        %{
+          interview_started_at: DateTime.utc_now(),
+          interview_discontinued_at: DateTime.utc_now()
+        }
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert interview_discontinued_case_investigation.isolation_monitoring_status == "pending"
+    end
+
+    test "ongoing when investigation has monitoring started on" do
+      {:ok, monitoring_started_case_investigation} =
+        %{
+          interview_started_at: DateTime.utc_now(),
+          interview_completed_at: DateTime.utc_now(),
+          isolation_monitoring_started_on: ~D[2020-08-01]
+        }
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert monitoring_started_case_investigation.isolation_monitoring_status == "ongoing"
+    end
+
+    test "concluded when investigation has monitoring started on and concluded on" do
+      {:ok, monitoring_concluded_case_investigation} =
+        %{
+          interview_started_at: DateTime.utc_now(),
+          interview_completed_at: DateTime.utc_now(),
+          isolation_monitoring_started_on: ~D[2020-08-01],
+          isolation_concluded_at: DateTime.utc_now()
+        }
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert monitoring_concluded_case_investigation.isolation_monitoring_status == "concluded"
     end
   end
 
