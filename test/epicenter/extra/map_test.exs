@@ -5,18 +5,18 @@ defmodule Epicenter.Extra.MapTest do
 
   describe "delete_in" do
     test "removes the value at the keypath" do
-      %{a: %{b: %{c: 1, d: 2}, e: 3}} |> Extra.Map.delete_in([:a, :b, :c]) |> assert_eq(%{a: %{b: %{d: 2}, e: 3}}, :simple)
+      %{a: %{b: %{c: 1, d: 2}, e: 3}} |> Extra.Map.delete_in([:a, :b, :c]) |> assert_eq(%{a: %{b: %{d: 2}, e: 3}})
     end
 
     test "does nothing if there is nothing at the keypath" do
-      %{a: %{b: 1}} |> Extra.Map.delete_in([:a, :b, :c]) |> assert_eq(%{a: %{b: 1}}, :simple)
+      %{a: %{b: 1}} |> Extra.Map.delete_in([:a, :b, :c]) |> assert_eq(%{a: %{b: 1}})
     end
   end
 
   describe "get_in" do
     test "gets the value at the keypath" do
-      %{a: %{b: [1, 2]}} |> Extra.Map.get_in([:a, :b]) |> assert_eq([1, 2], :simple)
-      %{"a" => %{"b" => [1, 2]}} |> Extra.Map.get_in(["a", "b"]) |> assert_eq([1, 2], :simple)
+      %{a: %{b: [1, 2]}} |> Extra.Map.get_in([:a, :b]) |> assert_eq([1, 2])
+      %{"a" => %{"b" => [1, 2]}} |> Extra.Map.get_in(["a", "b"]) |> assert_eq([1, 2])
     end
 
     test "returns nil if there is nothing at the keypath" do
@@ -27,29 +27,29 @@ defmodule Epicenter.Extra.MapTest do
 
   describe "put_in" do
     test "with :replace, if the new value is already in the map, does nothing" do
-      %{a: %{b: 1}} |> Extra.Map.put_in([:a, :b], 1, on_conflict: :replace) |> assert_eq(%{a: %{b: 1}}, :simple)
+      %{a: %{b: 1}} |> Extra.Map.put_in([:a, :b], 1, on_conflict: :replace) |> assert_eq(%{a: %{b: 1}})
     end
 
     test "with :replace, if the keypath doesn't exist, the new value is added at the keypath" do
-      %{} |> Extra.Map.put_in([:x, :y], 10, on_conflict: :replace) |> assert_eq(%{x: %{y: 10}}, :simple)
-      %{a: %{b: 1}} |> Extra.Map.put_in([:x, :y], 10, on_conflict: :replace) |> assert_eq(%{a: %{b: 1}, x: %{y: 10}}, :simple)
+      %{} |> Extra.Map.put_in([:x, :y], 10, on_conflict: :replace) |> assert_eq(%{x: %{y: 10}})
+      %{a: %{b: 1}} |> Extra.Map.put_in([:x, :y], 10, on_conflict: :replace) |> assert_eq(%{a: %{b: 1}, x: %{y: 10}})
     end
 
     test "with :replace, if a value exists at the keypath, it is replaced" do
-      %{a: %{b: 1}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :replace) |> assert_eq(%{a: %{b: 10}}, :simple)
-      %{a: %{b: [1, 2]}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :replace) |> assert_eq(%{a: %{b: 10}}, :simple)
+      %{a: %{b: 1}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :replace) |> assert_eq(%{a: %{b: 10}})
+      %{a: %{b: [1, 2]}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :replace) |> assert_eq(%{a: %{b: 10}})
     end
 
     test "with :list_append, if the existing value contains the new value, nothing is changed" do
-      %{a: %{b: [1, 2]}} |> Extra.Map.put_in([:a, :b], 1, on_conflict: :list_append) |> assert_eq(%{a: %{b: [1, 2]}}, :simple)
+      %{a: %{b: [1, 2]}} |> Extra.Map.put_in([:a, :b], 1, on_conflict: :list_append) |> assert_eq(%{a: %{b: [1, 2]}})
     end
 
     test "with :list_append, if the keypath exists, its value is replaced with a list containing the old value and the new value" do
-      %{a: %{b: 1}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :list_append) |> assert_eq(%{a: %{b: [1, 10]}}, :simple)
+      %{a: %{b: 1}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :list_append) |> assert_eq(%{a: %{b: [1, 10]}})
     end
 
     test "with :list_append, if the keypath exists and its value is a list, the new value is appended" do
-      %{a: %{b: [1, 2]}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :list_append) |> assert_eq(%{a: %{b: [1, 2, 10]}}, :simple)
+      %{a: %{b: [1, 2]}} |> Extra.Map.put_in([:a, :b], 10, on_conflict: :list_append) |> assert_eq(%{a: %{b: [1, 2, 10]}})
     end
   end
 

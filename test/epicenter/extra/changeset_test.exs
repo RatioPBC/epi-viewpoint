@@ -20,7 +20,7 @@ defmodule Epicenter.Extra.ChangesetTest do
     test "drops errors from top level changes" do
       %Ecto.Changeset{errors: [address: {"can't be blank", [validation: :required]}]}
       |> Changeset.clear_validation_errors()
-      |> assert_eq(%Ecto.Changeset{errors: []}, :simple)
+      |> assert_eq(%Ecto.Changeset{errors: []})
     end
 
     test "drops errors from child changeset" do
@@ -31,7 +31,7 @@ defmodule Epicenter.Extra.ChangesetTest do
         }
       }
       |> Changeset.clear_validation_errors()
-      |> assert_eq(%Ecto.Changeset{errors: [], changes: %{language: %Ecto.Changeset{errors: []}}}, :simple)
+      |> assert_eq(%Ecto.Changeset{errors: [], changes: %{language: %Ecto.Changeset{errors: []}}})
     end
 
     test "drops errors from list of child changesets" do
@@ -46,10 +46,10 @@ defmodule Epicenter.Extra.ChangesetTest do
         }
       }
       |> Changeset.clear_validation_errors()
-      |> assert_eq(
-        %Ecto.Changeset{errors: [], changes: %{emails: [%Ecto.Changeset{errors: []}, %Ecto.Changeset{errors: []}], foo_should_not_change: [1, 2]}},
-        :simple
-      )
+      |> assert_eq(%Ecto.Changeset{
+        errors: [],
+        changes: %{emails: [%Ecto.Changeset{errors: []}, %Ecto.Changeset{errors: []}], foo_should_not_change: [1, 2]}
+      })
     end
   end
 
@@ -68,14 +68,11 @@ defmodule Epicenter.Extra.ChangesetTest do
       ]
     }
     |> Changeset.rewrite_changeset_error_message(:dob, "please enter dates as mm/dd/yyyy")
-    |> assert_eq(
-      %Ecto.Changeset{
-        errors: [
-          dob: {"please enter dates as mm/dd/yyyy", [type: :date, validation: :cast]},
-          address: {"can't be blank", [validation: :required]}
-        ]
-      },
-      :simple
-    )
+    |> assert_eq(%Ecto.Changeset{
+      errors: [
+        dob: {"please enter dates as mm/dd/yyyy", [type: :date, validation: :cast]},
+        address: {"can't be blank", [validation: :required]}
+      ]
+    })
   end
 end

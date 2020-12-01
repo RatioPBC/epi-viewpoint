@@ -526,7 +526,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render()
     |> Test.Html.parse()
     |> Test.Table.table_contents(Keyword.merge([role: "lab-result-table"], table_opts))
-    |> assert_eq(expected, :simple)
+    |> assert_eq(expected)
 
     view
   end

@@ -19,7 +19,7 @@ defmodule EpicenterWeb.Test.Pages.Users do
     |> render()
     |> Test.Html.parse()
     |> Test.Table.table_contents(role: "users-table")
-    |> assert_eq(expected_users, :simple)
+    |> assert_eq(expected_users)
 
     view
   end

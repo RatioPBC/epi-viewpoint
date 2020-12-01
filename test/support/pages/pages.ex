@@ -51,7 +51,7 @@ defmodule EpicenterWeb.Test.Pages do
     |> Test.Html.find!("[data-page]")
     |> Test.Html.attr("data-page")
     |> List.first()
-    |> assert_eq(data_page_value, :simple)
+    |> assert_eq(data_page_value)
 
     conn_or_view_or_html
   end
@@ -68,7 +68,7 @@ defmodule EpicenterWeb.Test.Pages do
       {Test.Html.attr(validation_message, "phx-feedback-for") |> List.first(), Test.Html.text(validation_message)}
     end)
     |> Enum.into(%{})
-    |> assert_eq(expected_messages, :simple)
+    |> assert_eq(expected_messages)
   end
 
   def assert_save_error(%View{} = view, expected_message) do

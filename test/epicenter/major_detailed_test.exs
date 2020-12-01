@@ -17,13 +17,10 @@ defmodule Epicenter.MajorDetailedTest do
         "major" => %{:other => "", :values => ["asian", "black_or_african_american"]}
       }
       |> MajorDetailed.clean()
-      |> assert_eq(
-        %{
-          "major" => %{"values" => ["asian", "black_or_african_american"]},
-          "detailed" => %{"native_hawaiian_or_other_pacific_islander" => %{"other" => "Other PI"}}
-        },
-        :simple
-      )
+      |> assert_eq(%{
+        "major" => %{"values" => ["asian", "black_or_african_american"]},
+        "detailed" => %{"native_hawaiian_or_other_pacific_islander" => %{"other" => "Other PI"}}
+      })
     end
 
     test "empty state" do
@@ -46,13 +43,10 @@ defmodule Epicenter.MajorDetailedTest do
         detailed: %{asian: ["chinese", "filipino"], native_hawaiian_or_other_pacific_islander: ["Other PI"]}
       }
       |> MajorDetailed.for_form(standard_values)
-      |> assert_eq(
-        %{
-          "major" => %{"other" => "Other race", "values" => ["asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"]},
-          "detailed" => %{"asian" => %{"values" => ["chinese", "filipino"]}, "native_hawaiian_or_other_pacific_islander" => %{"other" => "Other PI"}}
-        },
-        :simple
-      )
+      |> assert_eq(%{
+        "major" => %{"other" => "Other race", "values" => ["asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"]},
+        "detailed" => %{"asian" => %{"values" => ["chinese", "filipino"]}, "native_hawaiian_or_other_pacific_islander" => %{"other" => "Other PI"}}
+      })
     end
 
     test "handles nil and scalar values" do
@@ -73,13 +67,10 @@ defmodule Epicenter.MajorDetailedTest do
     test "also supports 'major' as a string and 'detailed' as a list" do
       %TestStruct{major: "blue", detailed: ["cyan", "powder blue"]}
       |> MajorDetailed.for_form(["blue", "cyan"])
-      |> assert_eq(
-        %{
-          "major" => %{"values" => ["blue"]},
-          "detailed" => %{"blue" => %{"values" => ["cyan"], "other" => "powder blue"}}
-        },
-        :simple
-      )
+      |> assert_eq(%{
+        "major" => %{"values" => ["blue"]},
+        "detailed" => %{"blue" => %{"values" => ["cyan"], "other" => "powder blue"}}
+      })
     end
 
     test "when given a list, uses the list as 'major' and 'other' values" do
@@ -91,15 +82,15 @@ defmodule Epicenter.MajorDetailedTest do
     test "empty state" do
       nil
       |> MajorDetailed.for_form([])
-      |> assert_eq(%{"major" => %{}, "detailed" => %{}}, :simple)
+      |> assert_eq(%{"major" => %{}, "detailed" => %{}})
 
       %{}
       |> MajorDetailed.for_form([])
-      |> assert_eq(%{"major" => %{}, "detailed" => %{}}, :simple)
+      |> assert_eq(%{"major" => %{}, "detailed" => %{}})
 
       %{"major" => [], "detailed" => %{}}
       |> MajorDetailed.for_form([])
-      |> assert_eq(%{"major" => %{}, "detailed" => %{}}, :simple)
+      |> assert_eq(%{"major" => %{}, "detailed" => %{}})
     end
   end
 
@@ -113,13 +104,10 @@ defmodule Epicenter.MajorDetailedTest do
         }
       }
       |> MajorDetailed.for_model(:map)
-      |> assert_eq(
-        %{
-          "major" => ["Other race", "asian", "black_or_african_american"],
-          "detailed" => %{"asian" => ["chinese", "filipino"], "native_hawaiian_or_other_pacific_islander" => ["Other PI"]}
-        },
-        :simple
-      )
+      |> assert_eq(%{
+        "major" => ["Other race", "asian", "black_or_african_american"],
+        "detailed" => %{"asian" => ["chinese", "filipino"], "native_hawaiian_or_other_pacific_islander" => ["Other PI"]}
+      })
     end
 
     test "empty state" do
@@ -131,7 +119,7 @@ defmodule Epicenter.MajorDetailedTest do
         "major" => %{"other" => ""}
       }
       |> MajorDetailed.for_model(:map)
-      |> assert_eq(%{"major" => [], "detailed" => %{}}, :simple)
+      |> assert_eq(%{"major" => [], "detailed" => %{}})
     end
   end
 
@@ -142,7 +130,7 @@ defmodule Epicenter.MajorDetailedTest do
         detailed: %{}
       }
       |> MajorDetailed.for_model(:list)
-      |> assert_eq(["Other race", "asian", "black_or_african_american"], :simple)
+      |> assert_eq(["Other race", "asian", "black_or_african_american"])
     end
 
     test "blows up when there are 'detailed' values" do

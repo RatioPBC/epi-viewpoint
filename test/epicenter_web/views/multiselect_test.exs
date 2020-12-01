@@ -44,7 +44,7 @@ defmodule EpicenterWeb.MultiselectTest do
 
       generated
       |> form_params()
-      |> assert_eq(%{movie: %{genres: %{major: %{values: ["comedy", "scifi"]}}}}, :simple)
+      |> assert_eq(%{movie: %{genres: %{major: %{values: ["comedy", "scifi"]}}}})
 
       generated
       |> render()
@@ -80,14 +80,14 @@ defmodule EpicenterWeb.MultiselectTest do
       phx_form(status: "in-stock")
       |> Multiselect.multiselect_inputs(:status, spec, nil)
       |> form_params()
-      |> assert_eq(%{movie: %{status: "in-stock"}}, :simple)
+      |> assert_eq(%{movie: %{status: "in-stock"}})
 
       spec = [{:checkbox, "English", "english"}, {:checkbox, "French", "french"}, {:checkbox, "German", "german"}]
 
       phx_form(languages: ["english", "german"])
       |> Multiselect.multiselect_inputs(:languages, spec, nil)
       |> form_params()
-      |> assert_eq(%{movie: %{languages: ["english", "german"]}}, :simple)
+      |> assert_eq(%{movie: %{languages: ["english", "german"]}})
     end
 
     test "when field is a map and spec has children, results in a set of form fields that phoenix parses as a map" do
@@ -107,18 +107,15 @@ defmodule EpicenterWeb.MultiselectTest do
       )
       |> Multiselect.multiselect_inputs(:genres, spec, nil)
       |> form_params()
-      |> assert_eq(
-        %{
-          movie: %{
-            genres: %{
-              _ignore: %{major: %{other: "true"}, detailed: %{scifi: %{other: "true"}}},
-              major: %{values: ["comedy", "drama", "scifi"], other: "Something else"},
-              detailed: %{comedy: %{values: ["musical-comedy"]}, scifi: %{values: ["dystopian"], other: "Polytopian"}}
-            }
+      |> assert_eq(%{
+        movie: %{
+          genres: %{
+            _ignore: %{major: %{other: "true"}, detailed: %{scifi: %{other: "true"}}},
+            major: %{values: ["comedy", "drama", "scifi"], other: "Something else"},
+            detailed: %{comedy: %{values: ["musical-comedy"]}, scifi: %{values: ["dystopian"], other: "Polytopian"}}
           }
-        },
-        :simple
-      )
+        }
+      })
     end
   end
 
@@ -250,7 +247,7 @@ defmodule EpicenterWeb.MultiselectTest do
 
       generated
       |> form_params()
-      |> assert_eq(%{movie: %{genres: %{_ignore: %{major: %{other: "true"}}, major: %{other: "Something else"}}}}, :simple)
+      |> assert_eq(%{movie: %{genres: %{_ignore: %{major: %{other: "true"}}, major: %{other: "Something else"}}}})
 
       generated
       |> render()
@@ -326,7 +323,7 @@ defmodule EpicenterWeb.MultiselectTest do
 
       generated
       |> form_params()
-      |> assert_eq(%{movie: %{genres: %{major: %{other: "Something else"}, _ignore: %{major: %{other: "true"}}}}}, :simple)
+      |> assert_eq(%{movie: %{genres: %{major: %{other: "Something else"}, _ignore: %{major: %{other: "true"}}}}})
 
       generated
       |> render()

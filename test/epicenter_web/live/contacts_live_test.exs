@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.ContactsLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import Epicenter.AsyncHelpers
+
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Test

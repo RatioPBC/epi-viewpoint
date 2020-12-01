@@ -21,7 +21,7 @@ defmodule Epicenter.MixProject do
   def application do
     [
       mod: {Epicenter.Application, []},
-      extra_applications: [:jason, :logger_json, :runtime_tools]
+      extra_applications: [:crypto, :jason, :logger_json, :runtime_tools]
     ]
   end
 
@@ -44,7 +44,7 @@ defmodule Epicenter.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      local_or_remote(:remote, :euclid, version: "~> 1.0", organization: "geometer", path: System.get_env("EUCLID_PATH", "../euclid")),
+      local_or_remote(:remote, :euclid, version: "~> 0.1", path: System.get_env("EUCLID_PATH", "../euclid")),
       {:bcrypt_elixir, "~> 2.1"},
       {:ecto_sql, "~> 3.5"},
       {:eqrcode, "~> 0.1.7"},
@@ -95,7 +95,7 @@ defmodule Epicenter.MixProject do
   end
 
   defp local_or_remote(:local, package, options) do
-    {package, options |> Keyword.delete(:organization) |> Keyword.delete(:version)}
+    {package, options |> Keyword.delete(:version)}
   end
 
   defp local_or_remote(:remote, package, options) do

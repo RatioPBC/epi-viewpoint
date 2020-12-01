@@ -27,29 +27,26 @@ defmodule EpicenterWeb.Forms.DemographicFormTest do
     test "all fields", %{demographic: demographic} do
       demographic
       |> DemographicForm.model_to_form_attrs()
-      |> assert_eq(
-        %{
-          employment: nil,
-          ethnicity: %{"detailed" => %{}, "major" => %{}},
-          ethnicity_hispanic_latinx_or_spanish_origin: nil,
-          gender_identity: %{"detailed" => %{}, "major" => %{}},
-          marital_status: nil,
-          notes: nil,
-          occupation: nil,
-          race: %{
-            "major" => %{
-              "values" => ["asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"],
-              "other" => "Some other race"
-            },
-            "detailed" => %{
-              "asian" => %{"values" => ["filipino", "korean"], "other" => "Some other asian"},
-              "native_hawaiian_or_other_pacific_islander" => %{"values" => ["samoan"], "other" => "Some other pacific islander"}
-            }
+      |> assert_eq(%{
+        employment: nil,
+        ethnicity: %{"detailed" => %{}, "major" => %{}},
+        ethnicity_hispanic_latinx_or_spanish_origin: nil,
+        gender_identity: %{"detailed" => %{}, "major" => %{}},
+        marital_status: nil,
+        notes: nil,
+        occupation: nil,
+        race: %{
+          "major" => %{
+            "values" => ["asian", "black_or_african_american", "native_hawaiian_or_other_pacific_islander"],
+            "other" => "Some other race"
           },
-          sex_at_birth: nil
+          "detailed" => %{
+            "asian" => %{"values" => ["filipino", "korean"], "other" => "Some other asian"},
+            "native_hawaiian_or_other_pacific_islander" => %{"values" => ["samoan"], "other" => "Some other pacific islander"}
+          }
         },
-        :simple
-      )
+        sex_at_birth: nil
+      })
     end
   end
 

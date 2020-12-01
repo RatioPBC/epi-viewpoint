@@ -10,7 +10,7 @@ defmodule Epicenter.Cases.EthnicityTest do
         "major" => ["not_hispanic_latinx_or_spanish_origin"]
       }
       |> Ethnicity.from_major_detailed()
-      |> assert_eq(%{"major" => "not_hispanic_latinx_or_spanish_origin", "detailed" => nil}, :simple)
+      |> assert_eq(%{"major" => "not_hispanic_latinx_or_spanish_origin", "detailed" => nil})
     end
 
     test "with major and detailed" do
@@ -19,7 +19,7 @@ defmodule Epicenter.Cases.EthnicityTest do
         "major" => ["hispanic_latinx_or_spanish_origin"]
       }
       |> Ethnicity.from_major_detailed()
-      |> assert_eq(%{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => ["cuban", "puerto_rican"]}, :simple)
+      |> assert_eq(%{"major" => "hispanic_latinx_or_spanish_origin", "detailed" => ["cuban", "puerto_rican"]})
     end
 
     test "empty case" do

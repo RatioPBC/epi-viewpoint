@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.PeopleLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import Epicenter.AsyncHelpers
   import Phoenix.LiveViewTest
 
   alias Epicenter.Accounts

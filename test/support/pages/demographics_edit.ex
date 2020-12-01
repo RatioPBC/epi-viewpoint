@@ -104,7 +104,7 @@ defmodule EpicenterWeb.Test.Pages.DemographicsEdit do
   end
 
   def assert_sex_at_birth_selection(%View{} = view, expected_sex_at_birth) do
-    view |> Pages.actual_selections("demographic-form-sex-at-birth", ["radio", "checkbox"]) |> assert_eq(expected_sex_at_birth, :simple)
+    view |> Pages.actual_selections("demographic-form-sex-at-birth", ["radio", "checkbox"]) |> assert_eq(expected_sex_at_birth)
     view
   end
 

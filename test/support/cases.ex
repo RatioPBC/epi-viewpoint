@@ -16,6 +16,6 @@ defmodule Epicenter.Test.Cases do
   def assert_assignees(%{} = expected) do
     Enum.map(expected, fn {person, _} -> {person, assignee_tid(person)} end)
     |> Enum.into(%{})
-    |> assert_eq(expected, :simple)
+    |> assert_eq(expected)
   end
 end

@@ -14,31 +14,31 @@ defmodule EpicenterWeb.Multiselect.ChangesetTest do
     test "does nothing when nothing changes" do
       %{"major" => %{"values" => ["c1", "c2"]}}
       |> Changeset.apply_event(:nothing, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}})
     end
 
     test "when a radio button is added, all other values are removed" do
       %{"major" => %{"values" => ["c1", "c2", "r1"]}}
       |> Changeset.apply_event({:add, :radio, ["major", "values"], "r1"}, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => "r1"}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => "r1"}})
     end
 
     test "when a checkbox is added, all radio buttons are removed" do
       %{"major" => %{"values" => ["r1", "c1", "r2", "c2"]}}
       |> Changeset.apply_event({:add, :checkbox, ["major", "values"], "c1"}, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}})
     end
 
     test "when a detailed checkbox is added, its major is checked" do
       %{"major" => %{"values" => ["c1"]}, "detailed" => %{"c2" => %{"values" => ["c2.1"]}}}
       |> Changeset.apply_event({:add, :checkbox, ["detailed", "c2", "values"], "c2.1"}, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}, "detailed" => %{"c2" => %{"values" => ["c2.1"]}}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}, "detailed" => %{"c2" => %{"values" => ["c2.1"]}}})
     end
 
     test "when a major checkbox is removed, its detailed are removed" do
       %{"major" => %{"values" => ["c1"]}, "detailed" => %{"c1" => %{"values" => ["c1.1"]}, "c2" => %{"values" => ["c2.1"]}}}
       |> Changeset.apply_event({:remove, :checkbox, ["major", "values"], "c2"}, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c1"]}, "detailed" => %{"c1" => %{"values" => ["c1.1"]}}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c1"]}, "detailed" => %{"c1" => %{"values" => ["c1.1"]}}})
     end
 
     test "when a major checkbox is removed, its 'other' checkbox and value are removed" do
@@ -48,20 +48,17 @@ defmodule EpicenterWeb.Multiselect.ChangesetTest do
         "detailed" => %{"c1" => %{"other" => "other-c1", "values" => ["c1.1"]}, "c2" => %{"other" => "other-c2", "values" => ["c2.1"]}}
       }
       |> Changeset.apply_event({:remove, :checkbox, ["major", "values"], "c2"}, @test_spec)
-      |> assert_eq(
-        %{
-          "_ignore" => %{"detailed" => %{"c1" => %{"other" => "true"}}},
-          "major" => %{"values" => ["c1"]},
-          "detailed" => %{"c1" => %{"other" => "other-c1", "values" => ["c1.1"]}}
-        },
-        :simple
-      )
+      |> assert_eq(%{
+        "_ignore" => %{"detailed" => %{"c1" => %{"other" => "true"}}},
+        "major" => %{"values" => ["c1"]},
+        "detailed" => %{"c1" => %{"other" => "other-c1", "values" => ["c1.1"]}}
+      })
     end
 
     test "when a major 'other' checkbox is added, all radio buttons are removed" do
       %{"major" => %{"values" => ["r1", "r2", "c2"]}}
       |> Changeset.apply_event({:add, :other, ["detailed", "c1", "other"], "true"}, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c2", "c1"]}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c2", "c1"]}})
     end
 
     test "when a major 'other' checkbox is removed, its 'other' value is removed" do
@@ -69,24 +66,21 @@ defmodule EpicenterWeb.Multiselect.ChangesetTest do
         "major" => %{"other" => "other-major", "values" => ["c1"]}
       }
       |> Changeset.apply_event({:remove, :other, ["major"], "other"}, @test_spec)
-      |> assert_eq(
-        %{
-          "major" => %{"values" => ["c1"]}
-        },
-        :simple
-      )
+      |> assert_eq(%{
+        "major" => %{"values" => ["c1"]}
+      })
     end
 
     test "when a detailed 'other' checkbox is added, its parent is added" do
       %{}
       |> Changeset.apply_event({:add, :other, ["detailed", "c1", "other"], "true"}, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c1"]}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c1"]}})
     end
 
     test "when a detailed 'other' checkbox is added, all radio buttons are removed" do
       %{"major" => %{"values" => ["r1", "r2", "c2"]}}
       |> Changeset.apply_event({:add, :other, ["detailed", "c1", "other"], "true"}, @test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c2", "c1"]}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c2", "c1"]}})
     end
 
     test "when a detailed 'other' checkbox is removed, its 'other' value is removed" do
@@ -96,14 +90,11 @@ defmodule EpicenterWeb.Multiselect.ChangesetTest do
         "detailed" => %{"c1" => %{"other" => "other-c1", "values" => ["c1.1"]}, "c2" => %{"other" => "other-c2", "values" => ["c2.1"]}}
       }
       |> Changeset.apply_event({:remove, :other, ["detailed", "c1"], "other"}, @test_spec)
-      |> assert_eq(
-        %{
-          "_ignore" => %{"detailed" => %{"c2" => %{"other" => "true"}}},
-          "major" => %{"values" => ["c1"]},
-          "detailed" => %{"c1" => %{"values" => ["c1.1"]}, "c2" => %{"other" => "other-c2", "values" => ["c2.1"]}}
-        },
-        :simple
-      )
+      |> assert_eq(%{
+        "_ignore" => %{"detailed" => %{"c2" => %{"other" => "true"}}},
+        "major" => %{"values" => ["c1"]},
+        "detailed" => %{"c1" => %{"values" => ["c1.1"]}, "c2" => %{"other" => "other-c2", "values" => ["c2.1"]}}
+      })
     end
   end
 
@@ -209,7 +200,7 @@ defmodule EpicenterWeb.Multiselect.ChangesetTest do
     test "removes all radios" do
       %{"major" => %{"values" => ["c1", "r1", "c2", "r2"]}}
       |> Changeset.remove_all_radios(@test_spec)
-      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}}, :simple)
+      |> assert_eq(%{"major" => %{"values" => ["c1", "c2"]}})
     end
   end
 
