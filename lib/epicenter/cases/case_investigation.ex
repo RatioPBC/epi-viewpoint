@@ -40,6 +40,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     field :interview_discontinued_at, :utc_datetime
     field :interview_proxy_name, :string
     field :interview_started_at, :utc_datetime
+    field :interview_status, :string, read_after_writes: true
     field :isolation_clearance_order_sent_on, :date
     field :isolation_concluded_at, :utc_datetime
     field :isolation_conclusion_reason, :string

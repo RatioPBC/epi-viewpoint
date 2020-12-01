@@ -25,6 +25,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:interview_discontinued_at, :utc_datetime},
           {:interview_proxy_name, :string},
           {:interview_started_at, :utc_datetime},
+          {:interview_status, :string},
           {:isolation_clearance_order_sent_on, :date},
           {:isolation_concluded_at, :utc_datetime},
           {:isolation_conclusion_reason, :string},
@@ -84,14 +85,6 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
   end
 
   describe "changeset" do
-    defp new_changeset(attr_updates) do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      lab_result = Test.Fixtures.lab_result_attrs(person, user, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
-      {default_attrs, _} = Test.Fixtures.case_investigation_attrs(person, lab_result, user, "case_investigation")
-      Cases.change_case_investigation(%CaseInvestigation{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
-    end
-
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "person_id is required", do: assert_invalid(new_changeset(person_id: nil))
     test "initiating_lab_result_id is required", do: assert_invalid(new_changeset(initiating_lab_result_id: nil))
@@ -121,5 +114,39 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_started_on: ~D[2020-08-01], isolation_concluded_at: ~D[2020-08-02]}) ==
             :concluded
         )
+  end
+
+  describe "case investigation interview status using generated column" do
+    test "pending_interview by default" do
+      {:ok, case_investigation} = new_changeset(%{}) |> Repo.insert()
+      assert case_investigation.interview_status == "pending"
+    end
+
+    test "discontinued when interview_discontinued_at is not null" do
+      {:ok, case_investigation} = %{interview_discontinued_at: DateTime.utc_now()} |> new_changeset() |> Repo.insert()
+      assert case_investigation.interview_status == "discontinued"
+    end
+
+    test "started when interview_started_at is not null" do
+      {:ok, case_investigation} = %{interview_started_at: DateTime.utc_now()} |> new_changeset() |> Repo.insert()
+      assert case_investigation.interview_status == "started"
+    end
+
+    test "completed when interview_completed_interview is not null and interview_started_at is not null" do
+      {:ok, case_investigation} =
+        %{interview_completed_at: DateTime.utc_now(), interview_started_at: DateTime.utc_now()}
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert case_investigation.interview_status == "completed"
+    end
+  end
+
+  defp new_changeset(attr_updates) do
+    user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    lab_result = Test.Fixtures.lab_result_attrs(person, user, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
+    {default_attrs, _} = Test.Fixtures.case_investigation_attrs(person, lab_result, user, "case_investigation")
+    Cases.change_case_investigation(%CaseInvestigation{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
   end
 end
