@@ -91,7 +91,6 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Format
   alias EpicenterWeb.CaseInvestigationNoteSection
 

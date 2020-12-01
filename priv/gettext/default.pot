@@ -11,46 +11,46 @@ msgid ""
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:87
+#: lib/epicenter/cases/case_investigation.ex:83
 msgid "successfully_completed"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:88
+#: lib/epicenter/cases/case_investigation.ex:84
 msgid "unable_to_isolate"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:92
+#: lib/epicenter/cases/case_investigation.ex:88
 msgid "deceased"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:90
+#: lib/epicenter/cases/case_investigation.ex:86
 msgid "lost_to_follow_up"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:89
+#: lib/epicenter/cases/case_investigation.ex:85
 msgid "refused_to_cooperate"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:91
+#: lib/epicenter/cases/case_investigation.ex:87
 msgid "transferred"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:84
+#: lib/epicenter/cases/case_investigation.ex:80
 msgid "asymptomatic"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:83
+#: lib/epicenter/cases/case_investigation.ex:79
 msgid "symptomatic"
 msgstr ""
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:82
+#: lib/epicenter/cases/case_investigation.ex:78
 msgid "unknown"
 msgstr ""

@@ -96,8 +96,8 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 
   def page_heading(case_investigation) do
-    case CaseInvestigation.isolation_monitoring_status(case_investigation) do
-      :concluded -> "Edit conclude isolation monitoring"
+    case case_investigation.isolation_monitoring_status do
+      "concluded" -> "Edit conclude isolation monitoring"
       _ -> "Conclude isolation monitoring"
     end
   end

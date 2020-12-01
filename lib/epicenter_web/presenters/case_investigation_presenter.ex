@@ -35,15 +35,15 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   end
 
   def displayable_isolation_monitoring_status(case_investigation, current_date) do
-    case CaseInvestigation.isolation_monitoring_status(case_investigation) do
-      :pending ->
+    case case_investigation.isolation_monitoring_status do
+      "pending" ->
         styled_status("Pending", :pending, :isolation_monitoring)
 
-      :ongoing ->
+      "ongoing" ->
         diff = Date.diff(case_investigation.isolation_monitoring_ended_on, current_date)
         styled_status("Ongoing", :ongoing, :isolation_monitoring, "(#{diff} days remaining)")
 
-      :concluded ->
+      "concluded" ->
         styled_status("Concluded", :concluded, :isolation_monitoring)
     end
   end
@@ -178,8 +178,8 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   end
 
   def isolation_monitoring_button(case_investigation) do
-    case CaseInvestigation.isolation_monitoring_status(case_investigation) do
-      :pending ->
+    case case_investigation.isolation_monitoring_status do
+      "pending" ->
         live_redirect("Add isolation dates",
           to:
             Routes.case_investigation_isolation_monitoring_path(
@@ -191,7 +191,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
           class: "add-isolation-dates-case-investigation-link"
         )
 
-      :ongoing ->
+      "ongoing" ->
         live_redirect("Conclude isolation",
           to:
             Routes.case_investigation_conclude_isolation_monitoring_path(
@@ -203,7 +203,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
           class: "conclude-isolation-monitoring-case-investigation-link"
         )
 
-      :concluded ->
+      "concluded" ->
         nil
     end
   end

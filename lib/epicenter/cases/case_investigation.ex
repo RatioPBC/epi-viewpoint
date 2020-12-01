@@ -72,10 +72,6 @@ defmodule Epicenter.Cases.CaseInvestigation do
     |> validate_required(@required_attrs)
   end
 
-  def isolation_monitoring_status(%{isolation_concluded_at: timestamp}) when not is_nil(timestamp), do: :concluded
-  def isolation_monitoring_status(%{isolation_monitoring_started_on: date}) when not is_nil(date), do: :ongoing
-  def isolation_monitoring_status(_), do: :pending
-
   def text_field_values(field_name) do
     %{
       clinical_status: [

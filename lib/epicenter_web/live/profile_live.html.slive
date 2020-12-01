@@ -127,7 +127,7 @@
               span data-role="isolation-monitoring-history-item-text" = item.text
               span class="history-item-link" = item.link
 
-      = if CaseInvestigation.isolation_monitoring_status(case_investigation) == :ongoing do
+      = if case_investigation.isolation_monitoring_status == "ongoing" do
         .case-investigation-clinical
           .clinical-details-header-row data-tid="isolation-order-details-001"
             h4

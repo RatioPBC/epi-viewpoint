@@ -91,20 +91,6 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
     test "initiating_lab_result_id is required", do: assert_invalid(new_changeset(initiating_lab_result_id: nil))
   end
 
-  describe "isolation monitoring status" do
-    test "pending by default", do: assert(CaseInvestigation.isolation_monitoring_status(%{}) == :pending)
-
-    test "ongoing when isolation_monitoring_started_on",
-      do: assert(CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_started_on: ~D[2020-08-01]}) == :ongoing)
-
-    test "concluded when isolation_concluded_at is present",
-      do:
-        assert(
-          CaseInvestigation.isolation_monitoring_status(%{isolation_monitoring_started_on: ~D[2020-08-01], isolation_concluded_at: ~D[2020-08-02]}) ==
-            :concluded
-        )
-  end
-
   describe "case investigation interview status using generated column" do
     test "pending by default" do
       {:ok, case_investigation} = new_changeset(%{}) |> Repo.insert()

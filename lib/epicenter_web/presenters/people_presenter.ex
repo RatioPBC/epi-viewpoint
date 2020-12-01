@@ -1,5 +1,4 @@
 defmodule EpicenterWeb.Presenters.PeoplePresenter do
-  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
   alias EpicenterWeb.Format
@@ -61,15 +60,15 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
         "Ongoing interview"
 
       "completed" ->
-        case CaseInvestigation.isolation_monitoring_status(case_investigation) do
-          :pending ->
+        case case_investigation.isolation_monitoring_status do
+          "pending" ->
             "Pending monitoring"
 
-          :ongoing ->
+          "ongoing" ->
             diff = Date.diff(case_investigation.isolation_monitoring_ended_on, current_date)
             "Ongoing monitoring (#{diff} days remaining)"
 
-          :concluded ->
+          "concluded" ->
             "Concluded monitoring"
         end
 
