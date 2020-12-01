@@ -70,9 +70,6 @@ COPY mix.exs .
 COPY mix.lock .
 
 # Fetch the application dependencies and build the application
-ARG HEX_GEOMETER_READ_ONLY_KEY
-
-RUN mix hex.organization auth geometer --key ${HEX_GEOMETER_READ_ONLY_KEY}
 RUN mix deps.get --only=prod
 RUN mix deps.compile
 

@@ -29,7 +29,6 @@ test:
     - npm install --prefix assets
     - mix local.rebar --force
     - mix local.hex --force
-    - mix hex.organization auth geometer --key "$HEX_GEOMETER_READ_ONLY_KEY"
     - mix deps.get
     - mix deps.unlock --check-unused
     - mix deps.audit

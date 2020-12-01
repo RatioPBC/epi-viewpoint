@@ -2,14 +2,11 @@
 
 set -e
 
-: "${HEX_GEOMETER_READ_ONLY_KEY:?Variable not set or empty}"
-
 trap "exit" INT
 
 source "bin/_support/step.sh"
 
 step "Pulling" "git pull --rebase"
 step "Running doctor" "bin/dev/doctor"
-step "Authing for geometer deps" "MIX_QUIET=true mix hex.organization auth geometer --key ${HEX_GEOMETER_READ_ONLY_KEY}"
 step "Updating deps" "MIX_QUIET=true mix deps.get"
 step "Running migrations" "MIX_QUIET=true mix ecto.migrate"

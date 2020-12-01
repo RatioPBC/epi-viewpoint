@@ -90,10 +90,6 @@ check "elixir: rebar3 installed" \
   "mix local.rebar --if-missing --force" \
   "mix local.rebar --force"
 
-check "elixir: authenticated with Hex.pm" \
-  "mix hex.organization list | grep geometer" \
-  "mix hex.organization auth geometer --key \$HEX_GEOMETER_READ_ONLY_KEY"
-
 check "elixir: deps installed" \
   "test $(mix deps | grep -c 'the dependency is not available') -eq 0" \
   "mix deps.get"
