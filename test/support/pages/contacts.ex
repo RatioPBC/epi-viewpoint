@@ -43,6 +43,9 @@ defmodule EpicenterWeb.Test.Pages.Contacts do
   def visit(%Plug.Conn{} = conn),
     do: conn |> Pages.visit("/contacts")
 
+  def click_to_person_profile(%View{} = view, person),
+    do: view |> element("[data-role=profile-link-#{person.id}]") |> render_click()
+
   defp table_contents(index_live, opts),
     do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "contacts"))
 end

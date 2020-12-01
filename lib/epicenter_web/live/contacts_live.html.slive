@@ -22,7 +22,7 @@ section#contacts-page data-page="contacts"
         tr data-role="person"
           td
             input type="checkbox" checked=selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
-          td= full_name(person)
+          td= live_redirect full_name(person), to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person), data: [role: "profile-link-#{person.id}"]
           td= person.id
           td= exposure_date(person)
           td

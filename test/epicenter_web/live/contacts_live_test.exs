@@ -22,6 +22,15 @@ defmodule EpicenterWeb.ContactsLiveTest do
         ["", "Donald Testuser", donald.id, "10/31/2020", "", ""]
       ])
     end
+
+    test "can visit an individual exposed person", %{conn: conn, caroline: caroline} do
+      response =
+        Pages.Contacts.visit(conn)
+        |> Pages.Contacts.click_to_person_profile(caroline)
+
+      caroline_id = caroline.id
+      assert {:error, {:live_redirect, %{to: "/people/" <> ^caroline_id}}} = response
+    end
   end
 
   describe "assigning case investigator to a contact" do
