@@ -42,7 +42,7 @@ defmodule Epicenter.Cases.Demographic do
     field :occupation, :string
     field :preferred_language, :string
     field :race, :map
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :sex_at_birth, :string
     field :tid, :string
     field :source, :string

@@ -49,7 +49,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     field :isolation_monitoring_status, :string, read_after_writes: true
     field :isolation_order_sent_on, :date
     field :name, :string
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :symptom_onset_on, :date
     field :symptoms, {:array, :string}
     field :tid, :string

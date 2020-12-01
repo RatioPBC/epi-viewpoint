@@ -18,7 +18,7 @@ defmodule Epicenter.Cases.Person do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "people" do
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :tid, :string
 
     timestamps(type: :utc_datetime)

@@ -16,7 +16,7 @@ defmodule Epicenter.Cases.Exposure do
   schema "exposures" do
     field :guardian_name, :string
     field :guardian_phone, :string
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :tid, :string
     field :deleted_at, :utc_datetime
     field :relationship_to_case, :string

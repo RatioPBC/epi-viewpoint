@@ -24,7 +24,7 @@ defmodule Epicenter.Cases.LabResult do
     field :request_facility_name, :string
     field :result, :string
     field :sampled_on, :date
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :source, :string
     field :test_type, :string
     field :tid, :string

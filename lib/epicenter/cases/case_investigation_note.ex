@@ -11,7 +11,7 @@ defmodule Epicenter.Cases.CaseInvestigationNote do
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   schema "case_investigation_notes" do
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :text, :string
     field :tid, :string
     field :case_investigation_id, :binary_id

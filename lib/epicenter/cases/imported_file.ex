@@ -15,7 +15,7 @@ defmodule Epicenter.Cases.ImportedFile do
   schema "imported_files" do
     field :contents, :string, redact: true
     field :file_name, :string
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :tid, :string
 
     timestamps(type: :utc_datetime)

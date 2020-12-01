@@ -16,7 +16,7 @@ defmodule Epicenter.AuditLog.Revision do
     field :changed_type, :string
     field :reason_action, :string
     field :reason_event, :string
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :tid, :string
 
     timestamps(updated_at: false)

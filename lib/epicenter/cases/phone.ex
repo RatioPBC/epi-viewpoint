@@ -20,7 +20,7 @@ defmodule Epicenter.Cases.Phone do
     field :number, :string
     field :delete, :boolean, virtual: true
     field :is_preferred, :boolean
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :source, :string
     field :tid, :string
     field :type, :string

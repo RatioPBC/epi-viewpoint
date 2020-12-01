@@ -19,7 +19,7 @@ defmodule Epicenter.Cases.Address do
     field :city, :string
     field :state, :string
     field :postal_code, :string
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :source, :string
     field :tid, :string
     field :type, :string

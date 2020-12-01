@@ -18,7 +18,7 @@ defmodule Epicenter.Cases.Email do
     field :address, :string
     field :delete, :boolean, virtual: true
     field :is_preferred, :boolean
-    field :seq, :integer
+    field :seq, :integer, read_after_writes: true
     field :source, :string
     field :tid, :string
     field :person_id, :binary_id
