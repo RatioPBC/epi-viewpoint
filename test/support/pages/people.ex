@@ -70,11 +70,6 @@ defmodule EpicenterWeb.Test.Pages.People do
     view
   end
 
-  def click_reload_people(%View{} = view) do
-    render_click(view, "reload-people")
-    view
-  end
-
   def change_form(%View{} = view, params) do
     view |> element("#assignment-form") |> render_change(params)
     view

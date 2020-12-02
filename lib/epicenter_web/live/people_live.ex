@@ -91,9 +91,6 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_event("form-change", _, socket),
     do: socket |> noreply()
 
-  def handle_event("reload-people", _, socket),
-    do: socket |> assign_reload_message(nil) |> load_and_assign_people() |> noreply()
-
   def handle_info(:display_people_assigned_to_me_toggled, socket) do
     socket
     |> assign(:display_people_assigned_to_me, !socket.assigns.display_people_assigned_to_me)

@@ -17,12 +17,8 @@ section#people-page data-page="people"
         #assignment-dropdown-tooltip Select people below, then assign them to a user
 
     #toolbar-right
-      div data-role="reload-message"
-        = if @reload_message do
-          = link @reload_message, to: "#", phx_click: "reload-people", id: "reload-message"
       = component(@socket, PeopleFilter, "people filter", display_people_assigned_to_me: @display_people_assigned_to_me, filter: @filter, on_toggle_assigned_to_me: &on_toggle_assigned_to_me/0)
       = live_redirect "Import labs", to: "/import/start", id: "import-labs"
-
 
   table data-role="people"
     thead
