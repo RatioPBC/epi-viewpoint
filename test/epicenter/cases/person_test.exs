@@ -664,15 +664,15 @@ defmodule Epicenter.Cases.PersonTest do
     person
   end
 
-  defp setup_case_investigation(user, person_tid, {interview_completed_at, isolation_monitoring_started_on, isolation_monitoring_ended_on}, person) do
+  defp setup_case_investigation(user, person_tid, {interview_completed_at, isolation_monitoring_starts_on, isolation_monitoring_ends_on}, person) do
     lab_result =
       Test.Fixtures.lab_result_attrs(person, user, "#{person_tid}_lab_result", ~D{2020-11-21}, result: "positive") |> Cases.create_lab_result!()
 
     Test.Fixtures.case_investigation_attrs(person, lab_result, user, "unassigned_last_case_investigation", %{
       interview_started_at: interview_completed_at,
       interview_completed_at: interview_completed_at,
-      isolation_monitoring_started_on: isolation_monitoring_started_on,
-      isolation_monitoring_ended_on: isolation_monitoring_ended_on
+      isolation_monitoring_starts_on: isolation_monitoring_starts_on,
+      isolation_monitoring_ends_on: isolation_monitoring_ends_on
     })
     |> Cases.create_case_investigation!()
   end

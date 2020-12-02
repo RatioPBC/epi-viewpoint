@@ -504,8 +504,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
         build_case_investigation(person, user, "case_investigation", nil, %{
           interview_completed_at: ~U[2020-10-05 19:57:00Z],
           interview_started_at: ~U[2020-10-05 18:57:00Z],
-          isolation_monitoring_started_on: ~D[2020-11-05],
-          isolation_monitoring_ended_on: ~D[2020-11-15]
+          isolation_monitoring_starts_on: ~D[2020-11-05],
+          isolation_monitoring_ends_on: ~D[2020-11-15]
         })
 
       Pages.Profile.visit(conn, person)
@@ -522,8 +522,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
           interview_started_at: ~U[2020-10-05 18:57:00Z],
           isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
           isolation_conclusion_reason: "successfully_completed",
-          isolation_monitoring_ended_on: ~D[2020-11-15],
-          isolation_monitoring_started_on: ~D[2020-11-05]
+          isolation_monitoring_ends_on: ~D[2020-11-15],
+          isolation_monitoring_starts_on: ~D[2020-11-05]
         })
 
       Pages.Profile.visit(conn, person)

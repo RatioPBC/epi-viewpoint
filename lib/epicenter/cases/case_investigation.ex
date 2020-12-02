@@ -22,8 +22,8 @@ defmodule Epicenter.Cases.CaseInvestigation do
     isolation_clearance_order_sent_on
     isolation_concluded_at
     isolation_conclusion_reason
-    isolation_monitoring_ended_on
-    isolation_monitoring_started_on
+    isolation_monitoring_ends_on
+    isolation_monitoring_starts_on
     isolation_order_sent_on
     name
     symptom_onset_on
@@ -44,8 +44,8 @@ defmodule Epicenter.Cases.CaseInvestigation do
     field :isolation_clearance_order_sent_on, :date
     field :isolation_concluded_at, :utc_datetime
     field :isolation_conclusion_reason, :string
-    field :isolation_monitoring_ended_on, :date
-    field :isolation_monitoring_started_on, :date
+    field :isolation_monitoring_ends_on, :date
+    field :isolation_monitoring_starts_on, :date
     field :isolation_monitoring_status, :string, read_after_writes: true
     field :isolation_order_sent_on, :date
     field :name, :string

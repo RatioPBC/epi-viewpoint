@@ -53,7 +53,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
     {:ok, _} =
       Cases.update_case_investigation(
         case_investigation,
-        {%{isolation_monitoring_started_on: ~D[2020-11-01], isolation_monitoring_ended_on: ~D[2020-11-11]}, Test.Fixtures.admin_audit_meta()}
+        {%{isolation_monitoring_starts_on: ~D[2020-11-01], isolation_monitoring_ends_on: ~D[2020-11-11]}, Test.Fixtures.admin_audit_meta()}
       )
 
     Pages.CaseInvestigationIsolationMonitoring.visit(conn, case_investigation)
@@ -77,8 +77,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
 
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "edit-case-investigation-isolation-monitoring")
     case_investigation = Cases.get_case_investigation(case_investigation.id)
-    assert ~D[2020-08-01] == case_investigation.isolation_monitoring_started_on
-    assert ~D[2020-08-11] == case_investigation.isolation_monitoring_ended_on
+    assert ~D[2020-08-01] == case_investigation.isolation_monitoring_starts_on
+    assert ~D[2020-08-11] == case_investigation.isolation_monitoring_ends_on
   end
 
   describe "validations" do

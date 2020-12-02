@@ -40,7 +40,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         styled_status("Pending", :pending, :isolation_monitoring)
 
       "ongoing" ->
-        diff = Date.diff(case_investigation.isolation_monitoring_ended_on, current_date)
+        diff = Date.diff(case_investigation.isolation_monitoring_ends_on, current_date)
         styled_status("Ongoing", :ongoing, :isolation_monitoring, "(#{diff} days remaining)")
 
       "concluded" ->
@@ -208,12 +208,12 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     items = []
 
     items =
-      if case_investigation.isolation_monitoring_started_on do
+      if case_investigation.isolation_monitoring_starts_on do
         [
           %{
             text:
-              "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_started_on)} - #{
-                Format.date(case_investigation.isolation_monitoring_ended_on)
+              "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_starts_on)} - #{
+                Format.date(case_investigation.isolation_monitoring_ends_on)
               }",
             link:
               live_redirect(

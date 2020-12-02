@@ -226,7 +226,7 @@ defmodule Epicenter.Cases.Person do
         inner_lateral_join: case_investigation in subquery(case_investigations_in_isolation_monitoring),
         order_by: [
           desc: case_investigation.isolation_monitoring_status,
-          asc: case_investigation.isolation_monitoring_ended_on,
+          asc: case_investigation.isolation_monitoring_ends_on,
           desc: case_investigation.interview_completed_at,
           desc: person.seq
         ]

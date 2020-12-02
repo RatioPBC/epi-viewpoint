@@ -41,8 +41,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
         {:ok, form} ->
           {:ok,
            %{
-             isolation_monitoring_started_on: form |> Map.get(:date_started) |> DateParser.parse_mm_dd_yyyy!(),
-             isolation_monitoring_ended_on: form |> Map.get(:date_ended) |> DateParser.parse_mm_dd_yyyy!()
+             isolation_monitoring_starts_on: form |> Map.get(:date_started) |> DateParser.parse_mm_dd_yyyy!(),
+             isolation_monitoring_ends_on: form |> Map.get(:date_ended) |> DateParser.parse_mm_dd_yyyy!()
            }}
 
         other ->
@@ -50,11 +50,11 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       end
     end
 
-    defp isolation_dates(%CaseInvestigation{isolation_monitoring_started_on: nil, isolation_monitoring_ended_on: nil} = case_investigation) do
+    defp isolation_dates(%CaseInvestigation{isolation_monitoring_starts_on: nil, isolation_monitoring_ends_on: nil} = case_investigation) do
       suggested_isolation_dates(case_investigation)
     end
 
-    defp isolation_dates(%CaseInvestigation{isolation_monitoring_started_on: start_date, isolation_monitoring_ended_on: end_date}) do
+    defp isolation_dates(%CaseInvestigation{isolation_monitoring_starts_on: start_date, isolation_monitoring_ends_on: end_date}) do
       {Format.date(start_date), Format.date(end_date)}
     end
 

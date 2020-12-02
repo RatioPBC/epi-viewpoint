@@ -29,8 +29,8 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
           {:isolation_clearance_order_sent_on, :date},
           {:isolation_concluded_at, :utc_datetime},
           {:isolation_conclusion_reason, :string},
-          {:isolation_monitoring_ended_on, :date},
-          {:isolation_monitoring_started_on, :date},
+          {:isolation_monitoring_ends_on, :date},
+          {:isolation_monitoring_starts_on, :date},
           {:isolation_monitoring_status, :string},
           {:isolation_order_sent_on, :date},
           {:name, :string},
@@ -156,7 +156,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         %{
           interview_started_at: DateTime.utc_now(),
           interview_completed_at: DateTime.utc_now(),
-          isolation_monitoring_started_on: ~D[2020-08-01]
+          isolation_monitoring_starts_on: ~D[2020-08-01]
         }
         |> new_changeset()
         |> Repo.insert()
@@ -169,7 +169,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         %{
           interview_started_at: DateTime.utc_now(),
           interview_completed_at: DateTime.utc_now(),
-          isolation_monitoring_started_on: ~D[2020-08-01],
+          isolation_monitoring_starts_on: ~D[2020-08-01],
           isolation_concluded_at: DateTime.utc_now()
         }
         |> new_changeset()
