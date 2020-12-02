@@ -178,7 +178,9 @@ defmodule Epicenter.Cases do
   def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
 
   def preload_exposures(case_investigations_or_nil),
-    do: case_investigations_or_nil |> Repo.preload(exposures: [exposed_person: [:demographics, :phones]])
+    do:
+      case_investigations_or_nil
+      |> Repo.preload(exposures: [exposed_person: [:phones, demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]])
 
   def update_exposure(exposure, {attrs, audit_meta}), do: exposure |> change_exposure(attrs) |> AuditLog.update(audit_meta)
 end
