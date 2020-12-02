@@ -518,6 +518,25 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   #
+  # case investigations
+  #
+
+  def contact_investigations(%View{} = view) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.all("[data-role=contact-investigation]", fn contact_investigation ->
+      id = Test.Html.attr(contact_investigation, "data-exposure-id") |> List.first()
+      initiating_case_text = Test.Html.find(contact_investigation, "[data-role=initiating-case]") |> Test.Html.text()
+
+      %{
+        id: id,
+        initiating_case_text: initiating_case_text
+      }
+    end)
+  end
+
+  #
   # lab results
   #
 

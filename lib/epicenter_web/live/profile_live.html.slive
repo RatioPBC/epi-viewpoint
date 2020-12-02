@@ -156,6 +156,9 @@
                   on_note_added: fn _new_note -> send(self(), :reload_case_investigations) end,
                   on_note_deleted: fn _deleted_note -> send(self(), :reload_case_investigations) end
 
+  = for exposure <- @exposures do
+    = component(@socket, ContactInvestigation, exposure.id <> "contact investigation", exposure: exposure)
+
   section#lab-results data-role="lab-results"
     header
       h2 Lab Results

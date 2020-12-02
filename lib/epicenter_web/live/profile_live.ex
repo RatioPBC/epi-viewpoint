@@ -64,6 +64,21 @@ defmodule EpicenterWeb.CaseInvestigationNote do
   end
 end
 
+defmodule EpicenterWeb.ContactInvestigation do
+  use EpicenterWeb, :live_component
+
+  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_person_id: 1]
+
+  def render(assigns) do
+    ~H"""
+    section.contact-investigation data-role="contact-investigation" data-exposure-id="#{@exposure.id}"
+      h2= "Contact investigation"
+      div data-role="initiating-case"
+        = "Initiated by index case #{exposing_case_person_id(@exposure)}"
+    """
+  end
+end
+
 defmodule EpicenterWeb.ProfileLive do
   use EpicenterWeb, :live_view
 
@@ -93,6 +108,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Cases
   alias EpicenterWeb.Format
   alias EpicenterWeb.CaseInvestigationNoteSection
+  alias EpicenterWeb.ContactInvestigation
 
   @clock Application.get_env(:epicenter, :clock)
 
@@ -104,6 +120,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> assign_page_title(Format.person(person))
     |> assign_person(person)
     |> assign_case_investigations(person)
+    |> assign_exposures(person)
     |> assign_users()
     |> assign_current_date()
     |> ok()
@@ -190,6 +207,16 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_case_investigation_notes()
 
     assign(socket, case_investigations: case_investigations)
+  end
+
+  defp assign_exposures(socket, person) do
+    person = Cases.preload_exposures(person)
+
+    exposures =
+      person.exposures
+      |> Cases.preload_exposing_case()
+
+    assign(socket, exposures: exposures)
   end
 
   defp assign_users(socket),

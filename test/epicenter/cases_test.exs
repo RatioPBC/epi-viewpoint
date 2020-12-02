@@ -245,7 +245,10 @@ defmodule Epicenter.CasesTest do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
-      {:ok, _exposure} = {Test.Fixtures.exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+
+      {:ok, _exposure} =
+        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+
       :ok
     end
 
@@ -800,7 +803,7 @@ defmodule Epicenter.CasesTest do
 
       {:ok, exposure} =
         Cases.create_exposure({
-          Test.Fixtures.exposure_attrs(case_investigation, "exposure", %{under_18: true, guardian_name: "Jacob"})
+          Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure", %{under_18: true, guardian_name: "Jacob"})
           |> Map.put(:exposed_person, %{}),
           Test.Fixtures.admin_audit_meta()
         })
@@ -821,7 +824,7 @@ defmodule Epicenter.CasesTest do
 
       {:ok, exposure} =
         Cases.create_exposure({
-          Test.Fixtures.exposure_attrs(case_investigation, "exposure")
+          Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure")
           |> Map.put(:exposed_person, %{}),
           Test.Fixtures.admin_audit_meta()
         })
@@ -844,7 +847,7 @@ defmodule Epicenter.CasesTest do
 
       {:ok, _exposure} =
         Cases.create_exposure({
-          Test.Fixtures.exposure_attrs(case_investigation, "exposure")
+          Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure")
           |> Map.put(:exposed_person, %{
             demographics: [
               %{first_name: "Cindy"}
@@ -879,7 +882,7 @@ defmodule Epicenter.CasesTest do
 
       {:ok, exposure} =
         Cases.create_exposure({
-          Test.Fixtures.exposure_attrs(case_investigation, "exposure")
+          Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure")
           |> Map.put(:exposed_person, %{
             demographics: [
               %{first_name: "Cindy"}

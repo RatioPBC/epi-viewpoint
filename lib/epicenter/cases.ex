@@ -176,6 +176,7 @@ defmodule Epicenter.Cases do
   def get_exposure(id), do: Exposure |> Repo.get(id)
 
   def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
+  def preload_exposing_case(exposures), do: exposures |> Repo.preload(exposing_case: [person: [:demographics]])
 
   def preload_exposures(case_investigations_or_nil),
     do:

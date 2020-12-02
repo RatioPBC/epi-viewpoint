@@ -15,6 +15,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   setup %{user: user} do
     person =
       Test.Fixtures.person_attrs(user, "alice")
+      |> Test.Fixtures.add_demographic_attrs(%{external_id: "alice-external-id"})
       |> Cases.create_person!()
 
     [person: load(person), user: user]
@@ -158,27 +159,6 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   describe "case investigations" do
-    defp build_case_investigation(person, user, tid, reported_on, attrs \\ %{}) do
-      lab_result =
-        Test.Fixtures.lab_result_attrs(person, user, "lab_result_#{tid}", reported_on, %{
-          result: "positive",
-          request_facility_name: "Big Big Hospital",
-          reported_on: reported_on,
-          test_type: "PCR"
-        })
-        |> Cases.create_lab_result!()
-
-      Test.Fixtures.case_investigation_attrs(
-        person,
-        lab_result,
-        user,
-        tid,
-        %{name: "001"}
-        |> Map.merge(attrs)
-      )
-      |> Cases.create_case_investigation!()
-    end
-
     test "it shows a pending case investigation", %{conn: conn, person: person, user: user} do
       build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
@@ -635,6 +615,65 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
   end
 
+  describe "contact investigations" do
+    test "show up", %{conn: conn, user: user, person: sick_person} do
+      lab_result =
+        Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], %{})
+        |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
+        |> Cases.create_case_investigation!()
+
+      {:ok, exposure} =
+        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+
+      exposure_id = exposure.id
+      exposed_person = exposure.exposed_person
+
+      view = Pages.Profile.visit(conn, exposed_person)
+
+      assert [
+               %{
+                 id: ^exposure_id,
+                 initiating_case_text: "Initiated by index case alice-external-id"
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end
+
+    test "use the viewpoint id if external id is missing", %{conn: conn, user: user} do
+      sick_person =
+        Test.Fixtures.person_attrs(user, "sick_person ")
+        |> Test.Fixtures.add_demographic_attrs(%{})
+        |> Cases.create_person!()
+
+      lab_result =
+        Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], %{})
+        |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
+        |> Cases.create_case_investigation!()
+
+      {:ok, exposure} =
+        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+
+      exposure_id = exposure.id
+      exposed_person = exposure.exposed_person
+
+      view = Pages.Profile.visit(conn, exposed_person)
+
+      initiating_case_text = "Initiated by index case #{sick_person.id}"
+
+      assert [
+               %{
+                 id: ^exposure_id,
+                 initiating_case_text: ^initiating_case_text
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end
+  end
+
   describe "assigning and unassigning user to a person" do
     defp table_contents(live, opts),
       do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
@@ -811,5 +850,26 @@ defmodule EpicenterWeb.ProfileLiveTest do
       %{ethnicity: %{detailed: nil}} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
       %{ethnicity: nil} |> ProfileLive.detailed_ethnicities() |> assert_eq([])
     end
+  end
+
+  defp build_case_investigation(person, user, tid, reported_on, attrs \\ %{}) do
+    lab_result =
+      Test.Fixtures.lab_result_attrs(person, user, "lab_result_#{tid}", reported_on, %{
+        result: "positive",
+        request_facility_name: "Big Big Hospital",
+        reported_on: reported_on,
+        test_type: "PCR"
+      })
+      |> Cases.create_lab_result!()
+
+    Test.Fixtures.case_investigation_attrs(
+      person,
+      lab_result,
+      user,
+      tid,
+      %{name: "001"}
+      |> Map.merge(attrs)
+    )
+    |> Cases.create_case_investigation!()
   end
 end

@@ -30,7 +30,7 @@ defmodule Epicenter.Cases.ExposureTest do
   end
 
   defp new_changeset(attr_updates) do
-    default_attrs = Test.Fixtures.exposure_attrs(%CaseInvestigation{id: "flimflams"}, "validation example")
+    default_attrs = Test.Fixtures.case_investigation_exposure_attrs(%CaseInvestigation{id: "flimflams"}, "validation example")
     Exposure.changeset(%Exposure{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
   end
 

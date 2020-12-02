@@ -70,10 +70,13 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(author)}
   end
 
-  def exposure_attrs(%CaseInvestigation{id: case_investigation_id}, tid, attrs \\ %{}) do
+  def case_investigation_exposure_attrs(%CaseInvestigation{id: case_investigation_id}, tid, attrs \\ %{}) do
+    exposure_attrs(tid, attrs |> Map.put(:exposing_case_id, case_investigation_id))
+  end
+
+  def exposure_attrs(tid, attrs \\ %{}) do
     %{
       tid: tid,
-      exposing_case_id: case_investigation_id,
       relationship_to_case: "Family",
       most_recent_date_together: ~D[2020-10-31],
       household_member: false,

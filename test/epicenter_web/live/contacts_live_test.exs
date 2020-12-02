@@ -87,10 +87,11 @@ defmodule EpicenterWeb.ContactsLiveTest do
     case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
     {:ok, caroline_exposure} =
-      {Test.Fixtures.exposure_attrs(case_investigation, "caroline_exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "caroline_exposure"), Test.Fixtures.admin_audit_meta()}
+      |> Cases.create_exposure()
 
     {:ok, donald_exposure} =
-      {Test.Fixtures.exposure_attrs(case_investigation, "donald_exposure", %{
+      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "donald_exposure", %{
          exposed_person: %{tid: "donald", demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
        }), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_exposure()
