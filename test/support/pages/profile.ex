@@ -517,6 +517,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_on_contact(%View{} = view, number, exposed_person_name) do
+    view
+    |> element("#contacts-#{number} [data-role=visit-contact-link]", exposed_person_name)
+    |> render_click()
+  end
+
   #
   # case investigations
   #

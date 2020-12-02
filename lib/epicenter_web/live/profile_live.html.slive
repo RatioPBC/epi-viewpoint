@@ -108,7 +108,11 @@
           = for exposure <- case_investigation.exposures do
             .contact
               .contact-details
-                .contact-name = Format.person(exposure.exposed_person)
+                div
+                  = live_redirect Format.person(exposure.exposed_person),
+                                  to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, exposure.exposed_person),
+                                  data: [role: "visit-contact-link"],
+                                  class: "contact-name"
                 = contact_details_as_list(exposure)
               div
                 = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, exposure) , data: [role: "edit-contact", exposure: exposure.id]

@@ -302,7 +302,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       case_investigation =
         build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
-      {:ok, _} =
+      {:ok, complete_exposure} =
         Cases.create_exposure(
           {%{
              exposing_case_id: case_investigation.id,
@@ -313,6 +313,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
              guardian_name: "Jacob",
              guardian_phone: "(111) 111-1832",
              exposed_person: %{
+               tid: "complete",
                demographics: [
                  %{
                    source: "form",
@@ -379,14 +380,23 @@ defmodule EpicenterWeb.ProfileLiveTest do
            }, Test.Fixtures.admin_audit_meta()}
         )
 
+      view = Pages.Profile.visit(conn, person)
+
       assert [
                "Complete Testuser Family Household Minor Guardian: Jacob (111) 111-1832 Haitian Creole Last together 10/31/2020",
                "Adult Testuser Friend (111) 111-1542 (111) 111-1543 Last together 11/30/2020",
                "Partial Testuser Friend Last together 11/30/2020"
              ] =
-               Pages.Profile.visit(conn, person)
+               view
                |> Pages.Profile.assert_contacts_showing("001")
                |> Pages.Profile.case_investigation_contact_details("001")
+
+      exposed_person = Cases.get_person(complete_exposure.exposed_person_id)
+
+      view
+      |> Pages.Profile.click_on_contact("001", "Complete Testuser")
+      |> Pages.follow_live_view_redirect(conn)
+      |> Pages.Profile.assert_here(exposed_person)
     end
 
     test "a contact can be edited", %{conn: conn, person: person, user: user} do
