@@ -236,39 +236,37 @@ defmodule Epicenter.Cases.Person do
     def with_pending_interview(), do: sorted_people_with_case_investigation_interview_status("pending")
 
     defp sorted_people_with_case_investigation_interview_status(interview_status) do
+      person_latest_positive_lab_results_most_recently_sampled_on =
+        from lab_result in LabResult,
+          where: lab_result.is_positive_or_detected == true,
+          distinct: [desc: lab_result.person_id],
+          order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on]
+
       from person in Person,
         join: case_investigation in CaseInvestigation,
         on: case_investigation.person_id == person.id,
         left_join: assignee in User,
         on: assignee.id == person.assigned_to_id,
-        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on()),
+        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on),
         on: lab_result.person_id == person.id,
         where: case_investigation.interview_status == ^interview_status,
         order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
     end
 
-    defp person_latest_positive_lab_results_most_recently_sampled_on() do
-      from lab_result in LabResult,
-        where: lab_result.is_positive_or_detected == true,
-        distinct: [desc: lab_result.person_id],
-        order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on]
-    end
-
     def with_positive_lab_results() do
+      newest_positive_lab_result =
+        from lab_result in LabResult,
+          select: %{
+            person_id: lab_result.person_id,
+            max_sampled_on: max(lab_result.sampled_on)
+          },
+          where: lab_result.is_positive_or_detected == true,
+          group_by: lab_result.person_id
+
       from person in Person,
-        inner_join: lab_result in subquery(newest_positive_lab_result()),
+        inner_join: lab_result in subquery(newest_positive_lab_result),
         on: lab_result.person_id == person.id,
         order_by: [asc: lab_result.max_sampled_on, asc: person.seq]
-    end
-
-    defp newest_positive_lab_result() do
-      from lab_result in LabResult,
-        select: %{
-          person_id: lab_result.person_id,
-          max_sampled_on: max(lab_result.sampled_on)
-        },
-        where: lab_result.is_positive_or_detected == true,
-        group_by: lab_result.person_id
     end
   end
 end
