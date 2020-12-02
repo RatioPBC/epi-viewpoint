@@ -352,7 +352,7 @@ defmodule Epicenter.CasesTest do
     end
 
     test "with_isolation_monitoring", %{user: user} do
-      Cases.list_people(:with_isolation_monitoring) |> tids() |> assert_eq(~w{david emily})
+      Cases.list_people(:with_isolation_monitoring) |> tids() |> assert_eq(~w{emily david})
       Cases.list_people(:with_isolation_monitoring, assigned_to_id: user.id) |> tids() |> assert_eq(~w{emily})
     end
 

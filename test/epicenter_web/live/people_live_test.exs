@@ -238,8 +238,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_table_contents(
         [
           ["Name", "Investigation status"],
-          ["David Testuser", "Ongoing monitoring (13 days remaining)"],
-          ["Emily Testuser", "Pending monitoring"]
+          ["Emily Testuser", "Pending monitoring"],
+          ["David Testuser", "Ongoing monitoring (13 days remaining)"]
         ],
         columns: ["Name", "Investigation status"]
       )

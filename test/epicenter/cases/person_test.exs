@@ -356,6 +356,28 @@ defmodule Epicenter.Cases.PersonTest do
     end
   end
 
+  describe "with_isolation_monitoring" do
+    setup do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      setup_person_with_case_investigation(user, "pending_new", {~U{2020-11-29 10:30:00Z}, nil, nil})
+      setup_person_with_case_investigation(user, "pending_old", {~U{2020-11-21 10:30:00Z}, nil, nil})
+      setup_person_with_case_investigation(user, "ongoing_ends_soon", {~U{2020-11-21 10:30:00Z}, ~D{2020-11-25}, ~D{2020-12-05}})
+
+      # Adds a duplicate case investigation for a person - we should only see one row per person in the filtered results
+      person = setup_person_with_case_investigation(user, "ongoing_ends_later", {~U{2020-11-21 10:30:00Z}, ~D{2020-11-25}, ~D{2020-12-10}})
+      setup_person_with_case_investigation(user, "duplicate_ongoing_ends_later", {~U{2020-11-21 10:30:00Z}, ~D{2020-11-25}, ~D{2020-12-10}}, person)
+
+      :ok
+    end
+
+    test "sorts by isolation_monitoring_status, then tie-breaks with monitoring-end-time" do
+      Person.Query.with_isolation_monitoring()
+      |> Epicenter.Repo.all()
+      |> tids()
+      |> assert_eq(~w{pending_new pending_old ongoing_ends_soon ongoing_ends_later})
+    end
+  end
+
   describe "with_pending_interview" do
     test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
@@ -420,7 +442,6 @@ defmodule Epicenter.Cases.PersonTest do
       # Subject action
       Person.Query.with_pending_interview()
       |> Epicenter.Repo.all()
-      |> Cases.preload_lab_results()
       |> tids()
       |> assert_eq(~w{unassigned_first unassigned_last assigned_first assigned_middle assigned_last})
     end
@@ -500,7 +521,6 @@ defmodule Epicenter.Cases.PersonTest do
       # Subject action
       Person.Query.with_ongoing_interview()
       |> Epicenter.Repo.all()
-      |> Cases.preload_lab_results()
       |> tids()
       |> assert_eq(~w{unassigned_first unassigned_last assigned_first assigned_middle assigned_last})
     end
@@ -628,5 +648,32 @@ defmodule Epicenter.Cases.PersonTest do
       refute result_json =~ "lab_results"
       refute result_json =~ "phones"
     end
+  end
+
+  defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, person \\ nil)
+
+  defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, nil) do
+    person = Test.Fixtures.person_attrs(user, person_tid) |> Cases.create_person!()
+    setup_case_investigation(user, person_tid, case_investigation_attrs, person)
+
+    person
+  end
+
+  defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, person) do
+    setup_case_investigation(user, person_tid, case_investigation_attrs, person)
+    person
+  end
+
+  defp setup_case_investigation(user, person_tid, {interview_completed_at, isolation_monitoring_started_on, isolation_monitoring_ended_on}, person) do
+    lab_result =
+      Test.Fixtures.lab_result_attrs(person, user, "#{person_tid}_lab_result", ~D{2020-11-21}, result: "positive") |> Cases.create_lab_result!()
+
+    Test.Fixtures.case_investigation_attrs(person, lab_result, user, "unassigned_last_case_investigation", %{
+      interview_started_at: interview_completed_at,
+      interview_completed_at: interview_completed_at,
+      isolation_monitoring_started_on: isolation_monitoring_started_on,
+      isolation_monitoring_ended_on: isolation_monitoring_ended_on
+    })
+    |> Cases.create_case_investigation!()
   end
 end
