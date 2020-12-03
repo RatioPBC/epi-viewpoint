@@ -82,6 +82,11 @@ defmodule EpicenterWeb.ContactInvestigation do
           li data-role="detail" Minor
           li data-role="detail" Guardian: #{@exposure.guardian_name}
           li data-role="detail" Guardian phone: #{Format.phone(@exposure.guardian_phone)}
+      ul.dotted-details data-role="exposure-details"
+        = if @exposure.household_member do
+          li data-role="detail" Same household
+        li data-role="detail" #{@exposure.relationship_to_case}
+        li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
     """
   end
 end

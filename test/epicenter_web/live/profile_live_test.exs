@@ -627,16 +627,13 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "contact investigations" do
     test "show up", %{conn: conn, user: user, person: sick_person} do
-      lab_result =
-        Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], %{})
-        |> Cases.create_lab_result!()
-
-      case_investigation =
-        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
-        |> Cases.create_case_investigation!()
-
-      {:ok, exposure} =
-        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+      exposure =
+        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+          tid: "exposure",
+          household_member: true,
+          relationship_to_case: "Partner or roommate",
+          most_recent_date_together: ~D{2020-08-06}
+        })
 
       exposure_id = exposure.id
       exposed_person = exposure.exposed_person
@@ -646,7 +643,27 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert [
                %{
                  id: ^exposure_id,
-                 initiating_case_text: "Initiated by index case alice-external-id"
+                 initiating_case_text: "Initiated by index case alice-external-id",
+                 minor_details: [],
+                 exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"]
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end
+
+    test "the exposure is not from the same household", %{conn: conn, user: user, person: sick_person} do
+      exposure =
+        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+          tid: "exposure",
+          household_member: false,
+          relationship_to_case: "Healthcare worker",
+          most_recent_date_together: ~D{2020-08-06}
+        })
+
+      view = Pages.Profile.visit(conn, exposure.exposed_person)
+
+      assert [
+               %{
+                 exposure_details: ["Healthcare worker", "Last together on 08/06/2020"]
                }
              ] = Pages.Profile.contact_investigations(view)
     end
@@ -654,32 +671,21 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "use the viewpoint id if external id is missing", %{conn: conn, user: user} do
       sick_person =
         Test.Fixtures.person_attrs(user, "sick_person ")
-        |> Test.Fixtures.add_demographic_attrs(%{})
         |> Cases.create_person!()
 
-      lab_result =
-        Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], %{})
-        |> Cases.create_lab_result!()
-
-      case_investigation =
-        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
-        |> Cases.create_case_investigation!()
-
-      {:ok, exposure} =
-        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+      exposure =
+        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+          tid: "exposure"
+        })
 
       exposure_id = exposure.id
-      exposed_person = exposure.exposed_person
-
-      view = Pages.Profile.visit(conn, exposed_person)
-
+      view = Pages.Profile.visit(conn, exposure.exposed_person)
       initiating_case_text = "Initiated by index case #{sick_person.id}"
 
       assert [
                %{
                  id: ^exposure_id,
-                 initiating_case_text: ^initiating_case_text,
-                 minor_details: []
+                 initiating_case_text: ^initiating_case_text
                }
              ] = Pages.Profile.contact_investigations(view)
     end

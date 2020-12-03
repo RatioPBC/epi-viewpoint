@@ -540,10 +540,16 @@ defmodule EpicenterWeb.Test.Pages.Profile do
           Test.Html.text(detail)
         end)
 
+      exposure_details =
+        Test.Html.all(contact_investigation, "[data-role=exposure-details] [data-role=detail]", fn detail ->
+          Test.Html.text(detail)
+        end)
+
       %{
         id: id,
         initiating_case_text: initiating_case_text,
-        minor_details: minor_details
+        minor_details: minor_details,
+        exposure_details: exposure_details
       }
     end)
   end
