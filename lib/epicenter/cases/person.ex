@@ -240,7 +240,7 @@ defmodule Epicenter.Cases.Person do
         from lab_result in LabResult,
           where: lab_result.is_positive_or_detected == true,
           distinct: [desc: lab_result.person_id],
-          order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on]
+          order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on, asc: lab_result.seq]
 
       from person in Person,
         join: case_investigation in CaseInvestigation,
