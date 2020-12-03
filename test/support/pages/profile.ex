@@ -533,6 +533,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> Test.Html.parse()
     |> Test.Html.all("[data-role=contact-investigation]", fn contact_investigation ->
       id = Test.Html.attr(contact_investigation, "data-exposure-id") |> List.first()
+      title = Test.Html.find(contact_investigation, "[data-role=contact-investigation-title]") |> Test.Html.text()
+      creation_timestamp = Test.Html.find(contact_investigation, "[data-role=contact-investigation-timestamp]") |> Test.Html.text()
       initiating_case_text = Test.Html.find(contact_investigation, "[data-role=initiating-case]") |> Test.Html.text()
 
       minor_details =
@@ -547,6 +549,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
       %{
         id: id,
+        title: title,
+        creation_timestamp: creation_timestamp,
         initiating_case_text: initiating_case_text,
         minor_details: minor_details,
         exposure_details: exposure_details

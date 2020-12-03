@@ -7,6 +7,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias EpicenterWeb.Format
   alias EpicenterWeb.ProfileLive
   alias EpicenterWeb.Test.Pages
 
@@ -643,11 +644,17 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert [
                %{
                  id: ^exposure_id,
+                 title: "Contact investigation 08/06/2020",
                  initiating_case_text: "Initiated by index case alice-external-id",
                  minor_details: [],
                  exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"]
                }
              ] = Pages.Profile.contact_investigations(view)
+
+      actual = Pages.Profile.contact_investigations(view) |> hd()
+      today = Date.utc_today()
+      expected_creation_timestamp = "Created on #{Format.date(today)}"
+      assert ^expected_creation_timestamp = actual.creation_timestamp
     end
 
     test "the exposure is not from the same household", %{conn: conn, user: user, person: sick_person} do
