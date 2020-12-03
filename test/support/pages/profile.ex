@@ -535,9 +535,15 @@ defmodule EpicenterWeb.Test.Pages.Profile do
       id = Test.Html.attr(contact_investigation, "data-exposure-id") |> List.first()
       initiating_case_text = Test.Html.find(contact_investigation, "[data-role=initiating-case]") |> Test.Html.text()
 
+      minor_details =
+        Test.Html.all(contact_investigation, "[data-role=minor-details] [data-role=detail]", fn detail ->
+          Test.Html.text(detail)
+        end)
+
       %{
         id: id,
-        initiating_case_text: initiating_case_text
+        initiating_case_text: initiating_case_text,
+        minor_details: minor_details
       }
     end)
   end

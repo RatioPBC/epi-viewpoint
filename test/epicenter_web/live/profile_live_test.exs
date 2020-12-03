@@ -678,9 +678,45 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert [
                %{
                  id: ^exposure_id,
-                 initiating_case_text: ^initiating_case_text
+                 initiating_case_text: ^initiating_case_text,
+                 minor_details: []
                }
              ] = Pages.Profile.contact_investigations(view)
+    end
+
+    test "the exposed person is a minor", %{conn: conn, user: user, person: sick_person} do
+      exposure =
+        create_exposure_with_prereqs(
+          user,
+          sick_person,
+          %{},
+          %{},
+          %{guardian_name: "Alex Testuser", guardian_phone: "1111111222", under_18: true}
+        )
+
+      view = Pages.Profile.visit(conn, exposure.exposed_person)
+
+      assert [
+               %{
+                 minor_details: ["Minor", "Guardian: Alex Testuser", "Guardian phone: (111) 111-1222"]
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end
+
+    defp create_exposure_with_prereqs(user, sick_person, lab_result_attrs, case_investigation_attrs, exposure_attrs) do
+      lab_result =
+        Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], lab_result_attrs)
+        |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation", case_investigation_attrs)
+        |> Cases.create_case_investigation!()
+
+      {:ok, exposure} =
+        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure", exposure_attrs), Test.Fixtures.admin_audit_meta()}
+        |> Cases.create_exposure()
+
+      exposure
     end
   end
 

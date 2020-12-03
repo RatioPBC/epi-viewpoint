@@ -169,6 +169,25 @@
 
   section.contact-investigation
     @include card
+
+
+    ul.dotted-details
+      align-items: flex-start
+      display: inline
+
+      & > *
+        display: inline-block
+
+      li + li::before
+        content: ''
+        display: inline-block
+        vertical-align: middle
+        margin: 0 0.75rem
+        width: 0.5rem
+        height: 0.5rem
+        border-radius: 50%
+        background-color: currentColor
+
   section#demographics
     @include card
 

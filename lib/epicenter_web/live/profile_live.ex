@@ -69,12 +69,19 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_person_id: 1]
 
+  alias EpicenterWeb.Format
+
   def render(assigns) do
     ~H"""
     section.contact-investigation data-role="contact-investigation" data-exposure-id="#{@exposure.id}"
       h2= "Contact investigation"
       div data-role="initiating-case"
         = "Initiated by index case #{exposing_case_person_id(@exposure)}"
+      = if @exposure.under_18 do
+        ul.dotted-details data-role="minor-details"
+          li data-role="detail" Minor
+          li data-role="detail" Guardian: #{@exposure.guardian_name}
+          li data-role="detail" Guardian phone: #{Format.phone(@exposure.guardian_phone)}
     """
   end
 end
