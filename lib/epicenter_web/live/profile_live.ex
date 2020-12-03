@@ -74,7 +74,8 @@ defmodule EpicenterWeb.ContactInvestigation do
   def render(assigns) do
     ~H"""
     section.contact-investigation data-role="contact-investigation" data-exposure-id="#{@exposure.id}"
-      h2= "Contact investigation"
+      header data-role="case-investigation-title"
+        h2= "Contact investigation"
       div data-role="initiating-case"
         = "Initiated by index case #{exposing_case_person_id(@exposure)}"
       = if @exposure.under_18 do
