@@ -386,62 +386,47 @@ defmodule Epicenter.Cases.PersonTest do
   describe "with_pending_interview" do
     setup %{user: user} do
       first_assignee = Test.Fixtures.user_attrs(@admin, "assignee") |> Accounts.register_user!()
+      second_assignee = Test.Fixtures.user_attrs(@admin, "second_assignee") |> Accounts.register_user!()
 
       # Assigned last
-      assigned_last = Test.Fixtures.person_attrs(user, "assigned_last") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(assigned_last, user, "assigned_last_1", ~D[2020-06-04], result: "negative") |> Cases.create_lab_result!()
-
-      assigned_last_l_r =
-        Test.Fixtures.lab_result_attrs(assigned_last, user, "assigned_last_2", ~D[2020-06-06], result: "pOsItIvE") |> Cases.create_lab_result!()
-
-      Cases.assign_user_to_people(user: user, people_ids: [assigned_last.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Test.Fixtures.case_investigation_attrs(assigned_last, assigned_last_l_r, user, "assigned_last_case_investigation")
-      |> Cases.create_case_investigation!()
+      setup_case_investigation_with_assigns(user, second_assignee, "assigned_last",
+        result_1: "negative",
+        result_2: "pOsItIvE",
+        sampled_on_1: ~D[2020-06-04],
+        sampled_on_2: ~D[2020-06-06]
+      )
 
       # Assigned middle
-      assigned_middle = Test.Fixtures.person_attrs(user, "assigned_middle") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(assigned_middle, user, "assigned_middle_1", ~D[2020-06-04], result: "negative") |> Cases.create_lab_result!()
-
-      assigned_middle_l_r =
-        Test.Fixtures.lab_result_attrs(assigned_middle, user, "assigned_middle_2", ~D[2020-06-05], result: "pOsItIvE") |> Cases.create_lab_result!()
-
-      Cases.assign_user_to_people(user: first_assignee, people_ids: [assigned_middle.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Test.Fixtures.case_investigation_attrs(assigned_middle, assigned_middle_l_r, user, "assigned_middle_case_investigation")
-      |> Cases.create_case_investigation!()
+      setup_case_investigation_with_assigns(user, first_assignee, "assigned_middle",
+        result_1: "negative",
+        result_2: "pOsItIvE",
+        sampled_on_1: ~D[2020-06-04],
+        sampled_on_2: ~D[2020-06-05]
+      )
 
       # Assigned first
-      assigned_first = Test.Fixtures.person_attrs(user, "assigned_first") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(assigned_first, user, "assigned_first_1", ~D[2020-06-08], result: "DeTectEd") |> Cases.create_lab_result!()
-
-      assigned_first_l_r =
-        Test.Fixtures.lab_result_attrs(assigned_first, user, "assigned_first_2", ~D[2020-05-08], result: "DeTectEd") |> Cases.create_lab_result!()
-
-      Cases.assign_user_to_people(user: first_assignee, people_ids: [assigned_first.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Test.Fixtures.case_investigation_attrs(assigned_first, assigned_first_l_r, user, "assigned_first_case_investigation")
-      |> Cases.create_case_investigation!()
+      setup_case_investigation_with_assigns(user, first_assignee, "assigned_first",
+        result_1: "DeTectEd",
+        result_2: "DeTectEd",
+        sampled_on_1: ~D[2020-06-08],
+        sampled_on_2: ~D[2020-05-08]
+      )
 
       # Unassigned last
-      unassigned_last = Test.Fixtures.person_attrs(user, "unassigned_last") |> Cases.create_person!()
-
-      unassigned_last_l_r =
-        Test.Fixtures.lab_result_attrs(unassigned_last, user, "unassigned_last_1", ~D[2020-05-03], result: "positive") |> Cases.create_lab_result!()
-
-      Test.Fixtures.lab_result_attrs(unassigned_last, user, "unassigned_last_2", ~D[2020-06-04], result: "negative") |> Cases.create_lab_result!()
-
-      Test.Fixtures.case_investigation_attrs(unassigned_last, unassigned_last_l_r, user, "unassigned_last_case_investigation")
-      |> Cases.create_case_investigation!()
+      setup_case_investigation_with_assigns(user, nil, "unassigned_last",
+        result_1: "positive",
+        result_2: "negative",
+        sampled_on_1: ~D[2020-05-03],
+        sampled_on_2: ~D[2020-06-04]
+      )
 
       # Unassigned first
-      unassigned_first = Test.Fixtures.person_attrs(user, "unassigned_first") |> Cases.create_person!()
-
-      unnassigned_first_l_r =
-        Test.Fixtures.lab_result_attrs(unassigned_first, user, "unassigned_first_1", ~D[2020-06-03], result: "positive") |> Cases.create_lab_result!()
-
-      Test.Fixtures.case_investigation_attrs(unassigned_first, unnassigned_first_l_r, user, "unassigned_first_case_investigation")
-      |> Cases.create_case_investigation!()
+      setup_case_investigation_with_assigns(user, nil, "unassigned_first",
+        result_1: "positive",
+        result_2: "negative",
+        sampled_on_1: ~D[2020-06-03],
+        sampled_on_2: ~D[2020-06-02]
+      )
 
       :ok
     end
@@ -455,75 +440,59 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "with_ongoing_interview" do
-    test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top", %{user: user} do
+    setup %{user: user} do
       first_assignee = Test.Fixtures.user_attrs(@admin, "assignee") |> Accounts.register_user!()
+      second_assignee = Test.Fixtures.user_attrs(@admin, "second_assignee") |> Accounts.register_user!()
 
       # Assigned last
-      assigned_last = Test.Fixtures.person_attrs(user, "assigned_last") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(assigned_last, user, "assigned_last_1", ~D[2020-06-04], result: "negative") |> Cases.create_lab_result!()
-
-      assigned_last_l_r =
-        Test.Fixtures.lab_result_attrs(assigned_last, user, "assigned_last_2", ~D[2020-06-06], result: "pOsItIvE") |> Cases.create_lab_result!()
-
-      Cases.assign_user_to_people(user: user, people_ids: [assigned_last.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Test.Fixtures.case_investigation_attrs(assigned_last, assigned_last_l_r, user, "assigned_last_case_investigation", %{
+      setup_case_investigation_with_assigns(user, second_assignee, "assigned_last",
+        result_1: "negative",
+        result_2: "pOsItIvE",
+        sampled_on_1: ~D[2020-06-04],
+        sampled_on_2: ~D[2020-06-06],
         interview_started_at: ~U[2020-01-01 22:03:07Z]
-      })
-      |> Cases.create_case_investigation!()
+      )
 
       # Assigned middle
-      assigned_middle = Test.Fixtures.person_attrs(user, "assigned_middle") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(assigned_middle, user, "assigned_middle_1", ~D[2020-06-04], result: "negative") |> Cases.create_lab_result!()
-
-      assigned_middle_l_r =
-        Test.Fixtures.lab_result_attrs(assigned_middle, user, "assigned_middle_2", ~D[2020-06-05], result: "pOsItIvE") |> Cases.create_lab_result!()
-
-      Cases.assign_user_to_people(user: first_assignee, people_ids: [assigned_middle.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Test.Fixtures.case_investigation_attrs(assigned_middle, assigned_middle_l_r, user, "assigned_middle_case_investigation", %{
+      setup_case_investigation_with_assigns(user, first_assignee, "assigned_middle",
+        result_1: "negative",
+        result_2: "pOsItIvE",
+        sampled_on_1: ~D[2020-06-04],
+        sampled_on_2: ~D[2020-06-05],
         interview_started_at: ~U[2020-01-01 22:03:07Z]
-      })
-      |> Cases.create_case_investigation!()
+      )
 
       # Assigned first
-      assigned_first = Test.Fixtures.person_attrs(user, "assigned_first") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(assigned_first, user, "assigned_first_1", ~D[2020-06-08], result: "DeTectEd") |> Cases.create_lab_result!()
-
-      assigned_first_l_r =
-        Test.Fixtures.lab_result_attrs(assigned_first, user, "assigned_first_2", ~D[2020-05-08], result: "DeTectEd") |> Cases.create_lab_result!()
-
-      Cases.assign_user_to_people(user: first_assignee, people_ids: [assigned_first.id], audit_meta: Test.Fixtures.admin_audit_meta())
-
-      Test.Fixtures.case_investigation_attrs(assigned_first, assigned_first_l_r, user, "assigned_first_case_investigation", %{
+      setup_case_investigation_with_assigns(user, first_assignee, "assigned_first",
+        result_1: "DeTectEd",
+        result_2: "DeTectEd",
+        sampled_on_1: ~D[2020-06-08],
+        sampled_on_2: ~D[2020-05-08],
         interview_started_at: ~U[2020-01-01 22:03:07Z]
-      })
-      |> Cases.create_case_investigation!()
+      )
 
       # Unassigned last
-      unassigned_last = Test.Fixtures.person_attrs(user, "unassigned_last") |> Cases.create_person!()
-
-      unassigned_last_l_r =
-        Test.Fixtures.lab_result_attrs(unassigned_last, user, "unassigned_last_1", ~D[2020-05-03], result: "positive") |> Cases.create_lab_result!()
-
-      Test.Fixtures.lab_result_attrs(unassigned_last, user, "unassigned_last_2", ~D[2020-06-04], result: "negative") |> Cases.create_lab_result!()
-
-      Test.Fixtures.case_investigation_attrs(unassigned_last, unassigned_last_l_r, user, "unassigned_last_case_investigation", %{
+      setup_case_investigation_with_assigns(user, nil, "unassigned_last",
+        result_1: "positive",
+        result_2: "negative",
+        sampled_on_1: ~D[2020-05-03],
+        sampled_on_2: ~D[2020-06-04],
         interview_started_at: ~U[2020-01-01 22:03:07Z]
-      })
-      |> Cases.create_case_investigation!()
+      )
 
       # Unassigned first
-      unassigned_first = Test.Fixtures.person_attrs(user, "unassigned_first") |> Cases.create_person!()
-
-      unnassigned_first_l_r =
-        Test.Fixtures.lab_result_attrs(unassigned_first, user, "unassigned_first_1", ~D[2020-06-03], result: "positive") |> Cases.create_lab_result!()
-
-      Test.Fixtures.case_investigation_attrs(unassigned_first, unnassigned_first_l_r, user, "unassigned_first_case_investigation", %{
+      setup_case_investigation_with_assigns(user, nil, "unassigned_first",
+        result_1: "positive",
+        result_2: "negative",
+        sampled_on_1: ~D[2020-06-03],
+        sampled_on_2: ~D[2020-06-02],
         interview_started_at: ~U[2020-01-01 22:03:07Z]
-      })
-      |> Cases.create_case_investigation!()
+      )
 
+      :ok
+    end
+
+    test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
       # Subject action
       Person.Query.with_ongoing_interview()
       |> Epicenter.Repo.all()
@@ -588,6 +557,41 @@ defmodule Epicenter.Cases.PersonTest do
       interview_completed_at: interview_completed_at,
       isolation_monitoring_starts_on: isolation_monitoring_starts_on,
       isolation_monitoring_ends_on: isolation_monitoring_ends_on
+    })
+    |> Cases.create_case_investigation!()
+  end
+
+  defp setup_case_investigation_with_assigns(user, assignee, assign_tid,
+         result_1: result_1,
+         result_2: result_2,
+         sampled_on_1: sampled_on_1,
+         sampled_on_2: sampled_on_2
+       ) do
+    setup_case_investigation_with_assigns(user, assignee, assign_tid,
+      result_1: result_1,
+      result_2: result_2,
+      sampled_on_1: sampled_on_1,
+      sampled_on_2: sampled_on_2,
+      interview_started_at: nil
+    )
+  end
+
+  defp setup_case_investigation_with_assigns(user, assignee, assign_tid,
+         result_1: result_1,
+         result_2: result_2,
+         sampled_on_1: sampled_on_1,
+         sampled_on_2: sampled_on_2,
+         interview_started_at: interview_started_at
+       ) do
+    person = Test.Fixtures.person_attrs(user, assign_tid) |> Cases.create_person!()
+    Test.Fixtures.lab_result_attrs(person, user, "#{assign_tid}_1", sampled_on_1, result: result_1) |> Cases.create_lab_result!()
+
+    person_lab_result = Test.Fixtures.lab_result_attrs(person, user, "#{assign_tid}_2", sampled_on_2, result: result_2) |> Cases.create_lab_result!()
+
+    Cases.assign_user_to_people(user: assignee, people_ids: [person.id], audit_meta: Test.Fixtures.admin_audit_meta())
+
+    Test.Fixtures.case_investigation_attrs(person, person_lab_result, user, "#{assign_tid}_case_investigation", %{
+      interview_started_at: interview_started_at
     })
     |> Cases.create_case_investigation!()
   end
