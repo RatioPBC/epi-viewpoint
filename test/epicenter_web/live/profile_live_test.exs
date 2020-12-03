@@ -581,7 +581,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.add_note("001", "")
-      |> Pages.Profile.assert_case_investigation_note_validation_messages("001", %{"form_field_data_text" => "can't be blank"})
+      |> Pages.Profile.assert_case_investigation_note_validation_messages("001", %{"form_field_data[text]" => "can't be blank"})
     end
 
     test "lets you remove your note", %{person: person, user: user, conn: conn} do

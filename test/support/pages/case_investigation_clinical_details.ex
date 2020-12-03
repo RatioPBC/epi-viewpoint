@@ -8,6 +8,8 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
+  @form_id "case-investigation-clinical-details-form"
+
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: id}) do
     conn |> Pages.visit("/case-investigations/#{id}/clinical-details")
   end
@@ -20,7 +22,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.attr("#clinical_details_form_symptom_onset_on", "value")
+    |> Test.Html.attr("##{@form_id}_symptom_onset_on", "value")
     |> assert_eq([value])
 
     view
@@ -66,7 +68,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
     view
   end
 
-  def change_form(view, attrs, target \\ ["clinical_details_form[clinical_status]"]) do
+  def change_form(view, attrs, target \\ ["#{@form_id}[clinical_status]"]) do
     view |> element("#case-investigation-clinical-details-form") |> render_change(attrs |> Map.put(:_target, target))
 
     view

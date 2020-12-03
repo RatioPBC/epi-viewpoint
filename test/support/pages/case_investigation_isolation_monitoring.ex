@@ -18,7 +18,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
   def assert_isolation_date_started(%View{} = view, expected_date_string, expected_explanation_text) do
     assert view
            |> Pages.parse()
-           |> Test.Html.find("input#isolation_monitoring_form_date_started")
+           |> Test.Html.find("input#case-investigation-isolation-monitoring-form_date_started")
            |> Test.Html.attr("value") == [expected_date_string]
 
     assert view
@@ -31,7 +31,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
   def assert_isolation_date_ended(%View{} = view, expected_date_string) do
     assert view
            |> Pages.parse()
-           |> Test.Html.find("input#isolation_monitoring_form_date_ended")
+           |> Test.Html.find("input#case-investigation-isolation-monitoring-form_date_ended")
            |> Test.Html.attr("value") == [expected_date_string]
 
     view

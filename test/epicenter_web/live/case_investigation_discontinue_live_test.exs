@@ -83,6 +83,6 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
       |> Pages.submit_live("#case-investigation-discontinue-form", case_investigation: %{"interview_discontinue_reason" => ""})
       |> Pages.CaseInvestigationDiscontinue.assert_here()
 
-    view |> render() |> Pages.assert_validation_messages(%{"case_investigation_interview_discontinue_reason" => "can't be blank"})
+    view |> render() |> Pages.assert_validation_messages(%{"case_investigation[interview_discontinue_reason]" => "can't be blank"})
   end
 end

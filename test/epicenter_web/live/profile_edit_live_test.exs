@@ -39,7 +39,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       view
       |> form("#profile-form", changes)
       |> render_submit()
-      |> Pages.assert_validation_messages(%{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
+      |> Pages.assert_validation_messages(%{"form_data[dob]" => "please enter dates as mm/dd/yyyy"})
     end
 
     test "making a 'form' demographic", %{conn: conn, person: person} do
@@ -92,7 +92,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       rendered = view |> form("#profile-form", form_data: %{"dob" => "Jan 4 1928"}) |> render_submit()
 
       assert_attribute(view, "input[data-role=dob]", "value", ["Jan 4 1928"])
-      Pages.assert_validation_messages(rendered, %{"form_data_dob" => "please enter dates as mm/dd/yyyy"})
+      Pages.assert_validation_messages(rendered, %{"form_data[dob]" => "please enter dates as mm/dd/yyyy"})
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do

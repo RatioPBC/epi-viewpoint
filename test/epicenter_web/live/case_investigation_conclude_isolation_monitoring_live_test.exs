@@ -111,7 +111,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
       Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
       |> Pages.submit_live("#case-investigation-conclude-isolation-monitoring-form", conclude_isolation_monitoring_form: %{})
       |> Pages.assert_validation_messages(%{
-        "conclude_isolation_monitoring_form_reason" => "can't be blank"
+        "conclude_isolation_monitoring_form[reason]" => "can't be blank"
       })
 
       assert_revision_count(case_investigation, 1)

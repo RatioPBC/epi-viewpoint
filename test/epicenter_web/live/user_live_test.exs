@@ -57,7 +57,7 @@ defmodule EpicenterWeb.UserLiveTest do
           user_form: %{"name" => "New User", "email" => "an invalid email address", "type" => "member", "status" => "active"}
         )
 
-      Pages.assert_validation_messages(render(view), %{"user_form_email" => "must have the @ sign and no spaces"})
+      Pages.assert_validation_messages(render(view), %{"user_form[email]" => "must have the @ sign and no spaces"})
     end
 
     test "all fields are required", %{conn: conn} do
@@ -67,7 +67,7 @@ defmodule EpicenterWeb.UserLiveTest do
           user_form: %{"name" => "", "email" => "", "type" => "member", "status" => "active"}
         )
 
-      Pages.assert_validation_messages(render(view), %{"user_form_email" => "can't be blank", "user_form_name" => "can't be blank"})
+      Pages.assert_validation_messages(render(view), %{"user_form[email]" => "can't be blank", "user_form[name]" => "can't be blank"})
     end
 
     test "must have unique emails", %{conn: conn} do
@@ -78,7 +78,7 @@ defmodule EpicenterWeb.UserLiveTest do
         )
         |> Pages.User.assert_here()
 
-      Pages.assert_validation_messages(render(view), %{"user_form_email" => "has already been taken"})
+      Pages.assert_validation_messages(render(view), %{"user_form[email]" => "has already been taken"})
     end
   end
 

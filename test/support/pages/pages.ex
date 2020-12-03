@@ -62,10 +62,13 @@ defmodule EpicenterWeb.Test.Pages do
   end
 
   def assert_validation_messages(html_string, expected_messages) when is_binary(html_string) do
-    html_string
-    |> Test.Html.parse()
+    document = html_string |> Test.Html.parse()
+
+    document
     |> Test.Html.all("[phx-feedback-for]", fn validation_message ->
-      {Test.Html.attr(validation_message, "phx-feedback-for") |> List.first(), Test.Html.text(validation_message)}
+      id = Test.Html.attr(validation_message, "phx-feedback-for") |> List.first()
+      name = Test.Html.find!(document, "[id^=#{id}]") |> Test.Html.attr("name") |> List.first()
+      {name, Test.Html.text(validation_message)}
     end)
     |> Enum.into(%{})
     |> assert_eq(expected_messages)

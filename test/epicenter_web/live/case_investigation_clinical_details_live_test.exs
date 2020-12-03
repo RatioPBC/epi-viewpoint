@@ -149,7 +149,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
         "symptoms" => ["fever", "chills"]
       }
     )
-    |> Pages.assert_validation_messages(%{"clinical_details_form_symptom_onset_on" => "must be a valid MM/DD/YYYY date"})
+    |> Pages.assert_validation_messages(%{"clinical_details_form[symptom_onset_on]" => "must be a valid MM/DD/YYYY date"})
   end
 
   @tag :skip

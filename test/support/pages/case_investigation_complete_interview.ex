@@ -7,6 +7,8 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
+  @form_id "case-investigation-interview-complete-form"
+
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
     conn |> Pages.visit("/case-investigations/#{case_investigation_id}/complete-interview")
   end
@@ -32,7 +34,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   defp actual_date_completed(%View{} = view) do
     view
     |> Pages.parse()
-    |> Test.Html.find("input#complete_interview_form_date_completed")
+    |> Test.Html.find("input##{@form_id}_date_completed")
     |> Test.Html.attr("value")
   end
 
@@ -57,12 +59,12 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
 
     [actual_time] =
       parsed
-      |> Test.Html.find("input#complete_interview_form_time_completed")
+      |> Test.Html.find("input##{@form_id}_time_completed")
       |> Test.Html.attr("value")
 
     [actual_am_pm] =
       parsed
-      |> Test.Html.find("select#complete_interview_form_time_completed_am_pm option[selected]")
+      |> Test.Html.find("select##{@form_id}_time_completed_am_pm option[selected]")
       |> Enum.map(&Test.Html.text(&1))
 
     {actual_time, actual_am_pm}

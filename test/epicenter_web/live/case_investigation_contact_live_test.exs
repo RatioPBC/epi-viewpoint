@@ -159,10 +159,10 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         }
       )
       |> Pages.assert_validation_messages(%{
-        "contact_form_first_name" => "can't be blank",
-        "contact_form_last_name" => "can't be blank",
-        "contact_form_most_recent_date_together" => "can't be blank",
-        "contact_form_relationship_to_case" => "can't be blank"
+        "contact_form[first_name]" => "can't be blank",
+        "contact_form[last_name]" => "can't be blank",
+        "contact_form[most_recent_date_together]" => "can't be blank",
+        "contact_form[relationship_to_case]" => "can't be blank"
       })
       |> Pages.submit_live("#case-investigation-contact-form",
         contact_form: %{
@@ -176,7 +176,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         }
       )
       |> Pages.assert_validation_messages(%{
-        "contact_form_most_recent_date_together" => "must be a valid MM/DD/YYYY date"
+        "contact_form[most_recent_date_together]" => "must be a valid MM/DD/YYYY date"
       })
     end
 
@@ -223,7 +223,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       view
       |> render()
       |> Pages.assert_validation_messages(%{
-        "contact_form_guardian_name" => "can't be blank"
+        "contact_form[guardian_name]" => "can't be blank"
       })
 
       view
@@ -404,10 +404,10 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       |> Pages.refute_save_error()
       |> Pages.submit_live("#case-investigation-contact-form", complete_interview_contact_form: %{})
       |> Pages.assert_validation_messages(%{
-        "contact_form_first_name" => "can't be blank",
-        "contact_form_last_name" => "can't be blank",
-        "contact_form_most_recent_date_together" => "can't be blank",
-        "contact_form_relationship_to_case" => "can't be blank"
+        "contact_form[first_name]" => "can't be blank",
+        "contact_form[last_name]" => "can't be blank",
+        "contact_form[most_recent_date_together]" => "can't be blank",
+        "contact_form[relationship_to_case]" => "can't be blank"
       })
       |> Pages.assert_save_error("Check errors above")
     end

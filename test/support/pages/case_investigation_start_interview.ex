@@ -6,6 +6,8 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
+  @form_id "case-investigation-interview-start-form"
+
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
     conn |> Pages.visit("/case-investigations/#{case_investigation_id}/start-interview")
   end
@@ -14,7 +16,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
     [actual_date] =
       view
       |> Pages.parse()
-      |> Test.Html.find("input#start_interview_form_date_started")
+      |> Test.Html.find("input##{@form_id}_date_started")
       |> Test.Html.attr("value")
 
     assert actual_date =~ ~r"\d\d\/\d\d\/\d\d\d\d"
@@ -25,7 +27,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
     [actual_date] =
       view
       |> Pages.parse()
-      |> Test.Html.find("input#start_interview_form_date_started")
+      |> Test.Html.find("input##{@form_id}_date_started")
       |> Test.Html.attr("value")
 
     assert actual_date == date_string
@@ -46,7 +48,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
     [actual] =
       view
       |> Pages.parse()
-      |> Test.Html.find("input#start_interview_form_person_interviewed___self__[type=radio]")
+      |> Test.Html.find("input##{@form_id}_person_interviewed___self__[type=radio]")
       |> Test.Html.attr("value")
 
     assert actual == expected_value
@@ -60,7 +62,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
     [actual_name] =
       view
       |> Pages.parse()
-      |> Test.Html.find("input#start_interview_form_person_interviewed[type=text]")
+      |> Test.Html.find("input##{@form_id}_person_interviewed[type=text]")
       |> Test.Html.attr("value")
 
     assert actual_name == expected_proxy_name
@@ -88,12 +90,12 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
 
     [actual_time] =
       parsed
-      |> Test.Html.find("input#start_interview_form_time_started")
+      |> Test.Html.find("input##{@form_id}_time_started")
       |> Test.Html.attr("value")
 
     [actual_am_pm] =
       parsed
-      |> Test.Html.find("select#start_interview_form_time_started_am_pm option[selected]")
+      |> Test.Html.find("select##{@form_id}_time_started_am_pm option[selected]")
       |> Enum.map(&Test.Html.text(&1))
 
     {actual_time, actual_am_pm}
@@ -102,9 +104,9 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
   def datetime_started(%View{} = view) do
     state = view |> Pages.form_state()
 
-    datestring = state["start_interview_form[date_started]"]
-    timestring = state["start_interview_form[time_started]"]
-    ampmstring = state["start_interview_form[time_started_am_pm]"]
+    datestring = state["#{@form_id}[date_started]"]
+    timestring = state["#{@form_id}[time_started]"]
+    ampmstring = state["#{@form_id}[time_started_am_pm]"]
 
     Timex.parse!("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}")
   end

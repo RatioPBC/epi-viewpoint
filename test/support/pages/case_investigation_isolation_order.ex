@@ -12,12 +12,12 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationOrder do
   end
 
   def assert_isolation_clearance_order_sent_on(%View{} = view, expected_date_string) do
-    assert actual_date(view, "input#isolation_order_form_clearance_order_sent_on") == [expected_date_string]
+    assert Pages.form_state(view)["isolation_order_form[clearance_order_sent_on]"] == expected_date_string
     view
   end
 
   def assert_isolation_order_sent_on(%View{} = view, expected_date_string) do
-    assert actual_date(view, "input#isolation_order_form_order_sent_on") == [expected_date_string]
+    assert Pages.form_state(view)["isolation_order_form[order_sent_on]"] == expected_date_string
     view
   end
 
@@ -33,14 +33,5 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationOrder do
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
     conn |> Pages.visit("/case-investigations/#{case_investigation_id}/isolation-order")
-  end
-
-  # # #
-
-  defp actual_date(view, selector) do
-    view
-    |> Pages.parse()
-    |> Test.Html.find(selector)
-    |> Test.Html.attr("value")
   end
 end
