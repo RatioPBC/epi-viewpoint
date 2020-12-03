@@ -206,6 +206,16 @@
         ' @include horizontal-flow($justify: space-between)
         small The children are spaced apart evenly
 
+    .styleguide-example
+      #dotted-details
+        ul
+          li Minor
+          li Guardian: Alice
+          li Guardian phone: (111) 111-1222
+      code
+        ' @include dotted-details
+        small The list items flow horizontally, separated by dots
+
     .styleguide-example-title Vertical Flow
     .styleguide-example
       #vertical-flow

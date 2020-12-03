@@ -398,6 +398,23 @@
   & > *:not(:first-child)
     margin-left: $spacing
 
+@mixin dotted-details()
+  align-items: flex-start
+  display: inline
+
+  & > *
+    display: inline-block
+
+  li + li::before
+    content: ''
+    display: inline-block
+    vertical-align: middle
+    margin: 0 0.75rem
+    width: 0.5rem
+    height: 0.5rem
+    border-radius: 50%
+    background-color: currentColor
+
 @mixin level($justify: left, $spacing: 1rem)
   @include horizontal-flow($justify: $justify, $spacing: $spacing)
   align-items: center

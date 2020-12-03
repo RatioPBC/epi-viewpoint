@@ -128,21 +128,7 @@
             font-weight: bold
 
           ul
-            align-items: flex-start
-            display: inline
-
-            & > *
-              display: inline-block
-
-            li + li::before
-              content: ''
-              display: inline-block
-              vertical-align: middle
-              margin: 0 0.75rem
-              width: 0.5rem
-              height: 0.5rem
-              border-radius: 50%
-              background-color: currentColor
+            @include dotted-details
 
     .case-investigation-notes
       border-top: 2px solid $divider-color
@@ -171,22 +157,9 @@
     @include card
 
 
-    ul.dotted-details
-      align-items: flex-start
-      display: inline
+    .dotted-details
+      @include dotted-details
 
-      & > *
-        display: inline-block
-
-      li + li::before
-        content: ''
-        display: inline-block
-        vertical-align: middle
-        margin: 0 0.75rem
-        width: 0.5rem
-        height: 0.5rem
-        border-radius: 50%
-        background-color: currentColor
 
   section#demographics
     @include card
