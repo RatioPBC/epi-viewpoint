@@ -185,7 +185,7 @@
           = for lab_result <- @person.lab_results do
             tr data-tid=lab_result.tid
               td= string_or_unknown(Format.date(lab_result.sampled_on))
-              td= string_or_unknown(lab_result.result)
+              td= pretty_result(lab_result.result)
               td= string_or_unknown(lab_result.request_facility_name)
               td= string_or_unknown(Format.date(lab_result.analyzed_on))
               td= string_or_unknown(Format.date(lab_result.reported_on))

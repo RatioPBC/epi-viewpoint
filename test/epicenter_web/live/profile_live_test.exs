@@ -113,12 +113,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "shows lab results", %{conn: conn, person: person, user: user} do
       build_lab_result(person, user, "lab1", ~D[2020-04-10], ~D[2020-04-11], ~D[2020-04-12])
       build_lab_result(person, user, "lab2", ~D[2020-04-12], ~D[2020-04-13], ~D[2020-04-14])
+      Test.Fixtures.lab_result_attrs(person, user, "lab3", ~D[2020-04-12], %{result: "dEtEcTeD"}) |> Cases.create_lab_result!()
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_lab_results([
         ["Collection", "Result", "Ordering Facility", "Analysis", "Reported", "Type"],
-        ["04/12/2020", "positive", "Big Big Hospital", "04/13/2020", "04/14/2020", "PCR"],
-        ["04/10/2020", "positive", "Big Big Hospital", "04/11/2020", "04/12/2020", "PCR"]
+        ["04/12/2020", "Detected", "lab3 Lab, Inc.", "Unknown", "Unknown", "Unknown"],
+        ["04/12/2020", "Positive", "Big Big Hospital", "04/13/2020", "04/14/2020", "PCR"],
+        ["04/10/2020", "Positive", "Big Big Hospital", "04/11/2020", "04/12/2020", "PCR"]
       ])
     end
 

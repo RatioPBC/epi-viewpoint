@@ -115,6 +115,7 @@ defmodule EpicenterWeb.ProfileLive do
       isolation_monitoring_history_items: 1
     ]
 
+  import EpicenterWeb.Presenters.LabResultPresenter, only: [pretty_result: 1]
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
