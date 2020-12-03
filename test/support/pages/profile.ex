@@ -524,7 +524,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   #
-  # case investigations
+  # contact investigations
   #
 
   def contact_investigations(%View{} = view) do
