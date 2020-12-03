@@ -13,6 +13,10 @@ defmodule Epicenter.Cases.PersonTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
 
+  setup do
+    [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]
+  end
+
   describe "schema" do
     test "fields" do
       assert_schema(
@@ -30,15 +34,15 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "associations" do
-    test "can have zero lab_results" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    setup %{user: user} do
+      [alice: Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()]
+    end
+
+    test "can have zero lab_results", %{alice: alice} do
       alice |> Cases.preload_lab_results() |> Map.get(:lab_results) |> assert_eq([])
     end
 
-    test "has many lab_results" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    test "has many lab_results", %{alice: alice, user: user} do
       Test.Fixtures.lab_result_attrs(alice, user, "result1", "06-01-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "result2", "06-02-2020") |> Cases.create_lab_result!()
 
@@ -49,9 +53,7 @@ defmodule Epicenter.Cases.PersonTest do
       |> assert_eq(~w{result1 result2}, ignore_order: true)
     end
 
-    test "has many case_investigations" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    test "has many case_investigations", %{alice: alice, user: user} do
       lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
       Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation1") |> Cases.create_case_investigation!()
       Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation2") |> Cases.create_case_investigation!()
@@ -63,18 +65,14 @@ defmodule Epicenter.Cases.PersonTest do
       |> assert_eq(~w{investigation1 investigation2}, ignore_order: true)
     end
 
-    test "has many phone numbers" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    test "has many phone numbers", %{alice: alice, user: user} do
       Test.Fixtures.phone_attrs(user, alice, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
       Test.Fixtures.phone_attrs(user, alice, "phone-2", number: "111-111-1001") |> Cases.create_phone!()
 
       assert alice |> Cases.preload_phones() |> Map.get(:phones) |> tids() == ~w{phone-1 phone-2}
     end
 
-    test "has many email addresses" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    test "has many email addresses", %{alice: alice, user: user} do
       Test.Fixtures.email_attrs(user, alice, "email-1") |> Cases.create_email!()
       Test.Fixtures.email_attrs(user, alice, "email-2") |> Cases.create_email!()
 
@@ -135,41 +133,17 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "form demographics can be additively changed with a string (vs and atom)" do
-      person = %Person{
-        demographics: [
-          %{
-            source: "form",
-            first_name: "Ally"
-          }
-        ]
-      }
-
+      person = %Person{demographics: [%{source: "form", first_name: "Ally"}]}
       changeset = Person.changeset(person, %{"form_demographic" => %{first_name: "Bill"}})
-
       assert {:ok, %{demographics: [%{source: "form", first_name: "Bill"}]}} = apply_action(changeset, :test)
     end
 
     # The caller must choose whether they are replacing the demographics, or additively changing them
     test "setting demographics and form_demographic at the same time is not supported" do
-      person = %Person{
-        demographics: [
-          %Demographic{
-            source: "form",
-            first_name: "Ally"
-          }
-        ]
-      }
+      person = %Person{demographics: [%Demographic{source: "form", first_name: "Ally"}]}
 
       assert catch_throw(
-               Person.changeset(person, %{
-                 "demographics" => [
-                   %{
-                     source: "form",
-                     first_name: "Ally2"
-                   }
-                 ],
-                 "form_demographic" => %{first_name: "Bill"}
-               })
+               Person.changeset(person, %{"demographics" => [%{source: "form", first_name: "Ally2"}], "form_demographic" => %{first_name: "Bill"}})
              )
     end
 
@@ -186,57 +160,26 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "additively inserting a phone number without deleting any" do
-      person = %Person{
-        phones: [
-          %Phone{
-            number: "1111111000"
-          }
-        ]
-      }
-
+      person = %Person{phones: [%Phone{number: "1111111000"}]}
       changeset = Person.changeset(person, %{"additive_phone" => %{number: "1111111002", source: "blah"}})
-
       assert {:ok, %{phones: [%{number: "1111111000"}, %{source: "blah", number: "1111111002"}]}} = apply_action(changeset, :test)
     end
 
     test "additively inserting a phone number when the phone number already exists" do
-      person = %Person{
-        phones: [
-          %Phone{
-            number: "1111111000"
-          }
-        ]
-      }
-
+      person = %Person{phones: [%Phone{number: "1111111000"}]}
       changeset = Person.changeset(person, %{"additive_phone" => %{number: "1111111000", source: "blah"}})
-
       assert {:ok, %{phones: [%{number: "1111111000"}]}} = apply_action(changeset, :test)
     end
 
     test "additively inserting a phone number when the key is an atom" do
-      person = %Person{
-        phones: [
-          %Phone{
-            number: "1111111000"
-          }
-        ]
-      }
-
+      person = %Person{phones: [%Phone{number: "1111111000"}]}
       changeset = Person.changeset(person, %{:additive_phone => %{number: "1111111002", source: "blah"}})
-
       assert {:ok, %{phones: [%{number: "1111111000"}, %{source: "blah", number: "1111111002"}]}} = apply_action(changeset, :test)
     end
 
     # The caller must choose whether they are replacing the phones, or additively changing them
     test "setting phones and additive_phone at the same time is not supported" do
-      person = %Person{
-        phones: [
-          %Phone{
-            number: "1111111000"
-          }
-        ]
-      }
-
+      person = %Person{phones: [%Phone{number: "1111111000"}]}
       assert catch_throw(Person.changeset(person, %{:phones => [], :additive_phone => %{number: "1111111002", source: "blah"}}))
     end
 
@@ -250,9 +193,8 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "latest_case_investigation" do
-    test "returns nil if no lab results" do
-      Test.Fixtures.user_attrs(@admin, "user")
-      |> Accounts.register_user!()
+    test "returns nil if no lab results", %{user: user} do
+      user
       |> Test.Fixtures.person_attrs("alice")
       |> Cases.create_person!()
       |> Cases.preload_case_investigations()
@@ -260,8 +202,7 @@ defmodule Epicenter.Cases.PersonTest do
       |> assert_eq(nil)
     end
 
-    test "returns the case investigation with the most recent created at date" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    test "returns the case investigation with the most recent created at date", %{user: user} do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       new_lab_result = Test.Fixtures.lab_result_attrs(alice, user, "new_lab_result", "06-02-2020") |> Cases.create_lab_result!()
       newer_lab_result = Test.Fixtures.lab_result_attrs(alice, user, "newer_lab_result", "06-02-2020") |> Cases.create_lab_result!()
@@ -278,9 +219,8 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "latest_lab_result" do
-    test "returns nil if no lab results" do
-      Test.Fixtures.user_attrs(@admin, "user")
-      |> Accounts.register_user!()
+    test "returns nil if no lab results", %{user: user} do
+      user
       |> Test.Fixtures.person_attrs("alice")
       |> Cases.create_person!()
       |> Cases.preload_lab_results()
@@ -288,8 +228,7 @@ defmodule Epicenter.Cases.PersonTest do
       |> assert_eq(nil)
     end
 
-    test "returns the lab result with the most recent sample date" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    test "returns the lab result with the most recent sample date", %{user: user} do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
@@ -298,8 +237,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert Person.latest_lab_result(alice).tid == "newer"
     end
 
-    test "when there is a null sampled_on, returns that record first" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    test "when there is a null sampled_on, returns that record first", %{user: user} do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
@@ -309,8 +247,7 @@ defmodule Epicenter.Cases.PersonTest do
       assert Person.latest_lab_result(alice).tid == "unknown"
     end
 
-    test "when there are two records with null sampled_on, returns the lab results with the largest seq" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    test "when there are two records with null sampled_on, returns the lab results with the largest seq", %{user: user} do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
       Test.Fixtures.lab_result_attrs(alice, user, "newer unknown", nil) |> Cases.create_lab_result!()
@@ -343,11 +280,80 @@ defmodule Epicenter.Cases.PersonTest do
     end
   end
 
+  describe "serializing for audit logs" do
+    setup do
+      person = Test.Fixtures.person_attrs(@admin, "old-positive-result") |> Cases.create_person!()
+      person |> Test.Fixtures.lab_result_attrs(@admin, "old-positive-result", "09/18/2020", result: "positive") |> Cases.create_lab_result!()
+      Test.Fixtures.email_attrs(@admin, person, "email") |> Cases.create_email!()
+      Test.Fixtures.phone_attrs(@admin, person, "phone") |> Cases.create_phone!()
+      [person: person]
+    end
+
+    test "with preloaded email/lab_result/phone", %{person: person} do
+      person = person |> Cases.preload_phones() |> Cases.preload_emails() |> Cases.preload_lab_results()
+
+      result = person |> Jason.encode!() |> Jason.decode!()
+
+      person_id = person.id
+      first_id = fn list -> Enum.at(list, 0).id end
+      email_id = person.emails |> first_id.()
+      phone_id = person.phones |> first_id.()
+      lab_result_id = person.lab_results |> first_id.()
+
+      assert %{
+               "id" => ^person_id,
+               "emails" => [
+                 %{
+                   "id" => ^email_id,
+                   "address" => "email@example.com",
+                   "delete" => nil,
+                   "is_preferred" => nil,
+                   "person_id" => ^person_id,
+                   "tid" => "email"
+                 }
+               ],
+               "lab_results" => [
+                 %{
+                   "id" => ^lab_result_id,
+                   "person_id" => ^person_id,
+                   "analyzed_on" => nil,
+                   "reported_on" => nil,
+                   "request_accession_number" => "accession-old-positive-result",
+                   "request_facility_code" => "facility-old-positive-result",
+                   "request_facility_name" => "old-positive-result Lab, Inc.",
+                   "result" => "positive",
+                   "sampled_on" => "2020-09-18",
+                   "test_type" => nil,
+                   "tid" => "old-positive-result"
+                 }
+               ],
+               "phones" => [
+                 %{
+                   "id" => ^phone_id,
+                   "number" => "1111111000",
+                   "delete" => nil,
+                   "is_preferred" => nil,
+                   "person_id" => ^person_id,
+                   "tid" => "phone",
+                   "type" => "home"
+                 }
+               ]
+             } = result
+    end
+
+    test "with nothing preloaded", %{person: person} do
+      result_json = Jason.encode!(person)
+
+      refute result_json =~ "emails"
+      refute result_json =~ "lab_results"
+      refute result_json =~ "phones"
+    end
+  end
+
   # # # Query
 
   describe "all" do
-    test "sorts by creation order" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    test "sorts by creation order", %{user: user} do
       Test.Fixtures.person_attrs(user, "first", dob: ~D{2000-06-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
       Test.Fixtures.person_attrs(user, "middle", dob: ~D{2000-06-01}, first_name: "Billy", last_name: "Testuser") |> Cases.create_person!()
       Test.Fixtures.person_attrs(user, "last", dob: ~D{2000-07-01}, first_name: "Alice", last_name: "Testuser") |> Cases.create_person!()
@@ -357,8 +363,7 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "with_isolation_monitoring" do
-    setup do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    setup %{user: user} do
       setup_person_with_case_investigation(user, "pending_new", {~U{2020-11-29 10:30:00Z}, nil, nil})
       setup_person_with_case_investigation(user, "pending_old", {~U{2020-11-21 10:30:00Z}, nil, nil})
       setup_person_with_case_investigation(user, "ongoing_ends_soon", {~U{2020-11-21 10:30:00Z}, ~D{2020-11-25}, ~D{2020-12-05}})
@@ -379,8 +384,7 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "with_pending_interview" do
-    test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    setup %{user: user} do
       first_assignee = Test.Fixtures.user_attrs(@admin, "assignee") |> Accounts.register_user!()
 
       # Assigned last
@@ -439,7 +443,10 @@ defmodule Epicenter.Cases.PersonTest do
       Test.Fixtures.case_investigation_attrs(unassigned_first, unnassigned_first_l_r, user, "unassigned_first_case_investigation")
       |> Cases.create_case_investigation!()
 
-      # Subject action
+      :ok
+    end
+
+    test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
       Person.Query.with_pending_interview()
       |> Epicenter.Repo.all()
       |> tids()
@@ -448,8 +455,7 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "with_ongoing_interview" do
-    test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+    test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top", %{user: user} do
       first_assignee = Test.Fixtures.user_attrs(@admin, "assignee") |> Accounts.register_user!()
 
       # Assigned last
@@ -527,9 +533,7 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "with_positive_lab_results" do
-    test "filters for people with positive lab results, sorting by lab result sample date ascending" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-
+    test "filters for people with positive lab results, sorting by lab result sample date ascending", %{user: user} do
       middle = Test.Fixtures.person_attrs(user, "middle", dob: ~D[2000-06-01], first_name: "Middle", last_name: "Testuser") |> Cases.create_person!()
       Test.Fixtures.lab_result_attrs(middle, user, "middle-1", ~D[2020-06-03], result: "positive") |> Cases.create_lab_result!()
 
@@ -549,104 +553,15 @@ defmodule Epicenter.Cases.PersonTest do
       Person.Query.with_positive_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end
 
-    test "excludes people without lab results" do
-      user =
-        Test.Fixtures.user_attrs(@admin, "user")
-        |> Accounts.register_user!()
-
+    test "excludes people without lab results", %{user: user} do
       Test.Fixtures.person_attrs(user, "with-lab-result")
       |> Cases.create_person!()
       |> Test.Fixtures.lab_result_attrs(user, "lab-result", ~D[2020-06-02])
       |> Cases.create_lab_result!()
 
-      Test.Fixtures.person_attrs(user, "without-lab-result")
-      |> Cases.create_person!()
+      Test.Fixtures.person_attrs(user, "without-lab-result") |> Cases.create_person!()
 
-      Person.Query.with_positive_lab_results()
-      |> Epicenter.Repo.all()
-      |> tids()
-      |> assert_eq(~w{with-lab-result})
-    end
-  end
-
-  describe "serializing for audit logs" do
-    setup do
-      person =
-        Test.Fixtures.person_attrs(@admin, "old-positive-result")
-        |> Cases.create_person!()
-
-      person
-      |> Test.Fixtures.lab_result_attrs(@admin, "old-positive-result", "09/18/2020", result: "positive")
-      |> Cases.create_lab_result!()
-
-      Test.Fixtures.email_attrs(@admin, person, "email")
-      |> Cases.create_email!()
-
-      Test.Fixtures.phone_attrs(@admin, person, "phone")
-      |> Cases.create_phone!()
-
-      person = Cases.get_person(person.id)
-      [person: person]
-    end
-
-    test "with preloaded email/lab_result/phone", %{person: person} do
-      person = person |> Cases.preload_phones() |> Cases.preload_emails() |> Cases.preload_lab_results()
-
-      result = person |> Jason.encode!() |> Jason.decode!()
-
-      person_id = person.id
-      first_id = fn list -> Enum.at(list, 0).id end
-      email_id = person.emails |> first_id.()
-      phone_id = person.phones |> first_id.()
-      lab_result_id = person.lab_results |> first_id.()
-
-      assert %{
-               "id" => ^person_id,
-               "emails" => [
-                 %{
-                   "id" => ^email_id,
-                   "address" => "email@example.com",
-                   "delete" => nil,
-                   "is_preferred" => nil,
-                   "person_id" => ^person_id,
-                   "tid" => "email"
-                 }
-               ],
-               "lab_results" => [
-                 %{
-                   "id" => ^lab_result_id,
-                   "person_id" => ^person_id,
-                   "analyzed_on" => nil,
-                   "reported_on" => nil,
-                   "request_accession_number" => "accession-old-positive-result",
-                   "request_facility_code" => "facility-old-positive-result",
-                   "request_facility_name" => "old-positive-result Lab, Inc.",
-                   "result" => "positive",
-                   "sampled_on" => "2020-09-18",
-                   "test_type" => nil,
-                   "tid" => "old-positive-result"
-                 }
-               ],
-               "phones" => [
-                 %{
-                   "id" => ^phone_id,
-                   "number" => "1111111000",
-                   "delete" => nil,
-                   "is_preferred" => nil,
-                   "person_id" => ^person_id,
-                   "tid" => "phone",
-                   "type" => "home"
-                 }
-               ]
-             } = result
-    end
-
-    test "with nothing preloaded", %{person: person} do
-      result_json = Jason.encode!(person)
-
-      refute result_json =~ "emails"
-      refute result_json =~ "lab_results"
-      refute result_json =~ "phones"
+      Person.Query.with_positive_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{with-lab-result})
     end
   end
 
