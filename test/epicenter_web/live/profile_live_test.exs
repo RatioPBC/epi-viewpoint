@@ -647,16 +647,28 @@ defmodule EpicenterWeb.ProfileLiveTest do
                %{
                  id: ^exposure_id,
                  title: "Contact investigation 08/06/2020",
-                 initiating_case_text: "Initiated by index case alice-external-id",
+                 initiating_case_text: "Initiated by index case #alice-external-id",
                  minor_details: [],
                  exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"]
                }
              ] = Pages.Profile.contact_investigations(view)
 
       actual = Pages.Profile.contact_investigations(view) |> hd()
-      today = Date.utc_today()
-      expected_creation_timestamp = "Created on #{Format.date(today)}"
+
+      expected_creation_timestamp = "Created on #{Format.date(exposure.inserted_at)}"
       assert ^expected_creation_timestamp = actual.creation_timestamp
+    end
+
+    test "navigating to the exposing case", %{conn: conn, user: user, person: sick_person} do
+      exposure =
+        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+          tid: "exposure"
+        })
+
+      Pages.Profile.visit(conn, exposure.exposed_person)
+      |> Pages.Profile.click_on_exposing_case(exposure.tid)
+      |> Pages.follow_live_view_redirect(conn)
+      |> Pages.Profile.assert_here(sick_person)
     end
 
     test "the exposure is not from the same household", %{conn: conn, user: user, person: sick_person} do
@@ -689,7 +701,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       exposure_id = exposure.id
       view = Pages.Profile.visit(conn, exposure.exposed_person)
-      initiating_case_text = "Initiated by index case #{sick_person.id}"
+      initiating_case_text = "Initiated by index case \##{sick_person.id}"
 
       assert [
                %{

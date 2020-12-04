@@ -558,6 +558,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     end)
   end
 
+  def click_on_exposing_case(%View{} = view, contact_investigation_tid) do
+    view
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=visit-exposing-case-link]")
+    |> render_click()
+  end
+
   #
   # lab results
   #

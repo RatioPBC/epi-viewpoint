@@ -67,18 +67,19 @@ end
 defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
 
-  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_person_id: 1]
+  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1]
 
   alias EpicenterWeb.Format
 
   def render(assigns) do
     ~H"""
-    section.contact-investigation data-role="contact-investigation" data-exposure-id="#{@exposure.id}"
-      header data-role="case-investigation-title"
+    section.contact-investigation data-role="contact-investigation" data-exposure-id="#{@exposure.id}" data-tid="#{@exposure.tid}"
+      header
         h2 data-role="contact-investigation-title" Contact investigation #{Format.date(@exposure.most_recent_date_together)}
         span.contact-investigation-timestamp data-role="contact-investigation-timestamp" Created on #{Format.date(@exposure.inserted_at)}
       div data-role="initiating-case"
-        = "Initiated by index case #{exposing_case_person_id(@exposure)}"
+        span Initiated by index case
+        = exposing_case_link(@exposure)
       = if @exposure.under_18 do
         ul.dotted-details data-role="minor-details"
           li data-role="detail" Minor
