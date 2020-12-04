@@ -50,13 +50,6 @@ defmodule EpicenterWeb.Multiselect do
             else: {field, nil, []}
       end
 
-    checked =
-      cond do
-        is_map(input_value) -> checked?(value, input_value, keypath)
-        is_list(input_value) -> checked?(value, input_value)
-        true -> checked?(value, input_value)
-      end
-
     name =
       cond do
         is_map(input_value) or is_list(input_value) -> input_name(f, field, keypath, :multi)
@@ -65,7 +58,7 @@ defmodule EpicenterWeb.Multiselect do
 
     Tag.tag(
       :input,
-      checked: checked,
+      checked: checked?(value, input_value, keypath),
       id: input_id(f, field, value),
       name: name,
       type: type,
@@ -120,13 +113,15 @@ defmodule EpicenterWeb.Multiselect do
 
   # # #
 
+  def checked?(value, map, keys \\ nil)
+
   def checked?(value, map, keys) when is_map(map) and is_list(keys),
     do: checked?(value, get_in(map, keys) || [])
 
-  def checked?(value, list) when is_list(list),
+  def checked?(value, list, _keys) when is_list(list),
     do: list |> Enum.any?(&checked?(value, &1))
 
-  def checked?(value, scalar),
+  def checked?(value, scalar, _keys),
     do: html_escape(value) == html_escape(scalar)
 
   def input_id(f, [field, subfield], value) when is_nil(subfield),
