@@ -10,6 +10,7 @@ defmodule Epicenter.Cases.ExposureTest do
       assert_schema(
         Exposure,
         [
+          {:deleted_at, :utc_datetime},
           {:exposed_person_id, :binary_id},
           {:exposing_case_id, :binary_id},
           {:guardian_name, :string},
@@ -17,10 +18,11 @@ defmodule Epicenter.Cases.ExposureTest do
           {:household_member, :boolean},
           {:id, :binary_id},
           {:inserted_at, :utc_datetime},
+          {:interview_discontinue_reason, :string},
+          {:interview_discontinued_at, :utc_datetime},
           {:most_recent_date_together, :date},
           {:relationship_to_case, :string},
           {:seq, :integer},
-          {:deleted_at, :utc_datetime},
           {:tid, :string},
           {:under_18, :boolean},
           {:updated_at, :utc_datetime}

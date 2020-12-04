@@ -6,23 +6,34 @@ defmodule Epicenter.Cases.Exposure do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
 
-  @required_attrs ~w{relationship_to_case most_recent_date_together exposing_case_id}a
-  @optional_attrs ~w(household_member under_18 tid guardian_phone guardian_name deleted_at)a
+  @required_attrs ~w{exposing_case_id most_recent_date_together relationship_to_case}a
+  @optional_attrs ~w{
+    deleted_at
+    guardian_name
+    guardian_phone
+    household_member
+    interview_discontinue_reason
+    interview_discontinued_at
+    tid
+    under_18
+  }a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "exposures" do
+    field :deleted_at, :utc_datetime
     field :guardian_name, :string
     field :guardian_phone, :string
+    field :household_member, :boolean
+    field :interview_discontinue_reason, :string
+    field :interview_discontinued_at, :utc_datetime
+    field :most_recent_date_together, :date
+    field :relationship_to_case, :string
     field :seq, :integer, read_after_writes: true
     field :tid, :string
-    field :deleted_at, :utc_datetime
-    field :relationship_to_case, :string
-    field :household_member, :boolean
     field :under_18, :boolean
-    field :most_recent_date_together, :date
 
     timestamps(type: :utc_datetime)
 
