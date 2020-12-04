@@ -35,35 +35,31 @@ defmodule EpicenterWeb.Multiselect do
   end
 
   def multiselect_chradio(f, field, value, type) when type in [:checkbox, :radio] do
-    selected_values =
-      case field do
-        [field, _subfield] -> Form.input_value(f, field)
-        field -> Form.input_value(f, field)
-      end
+    input_value = input_value(f, field)
 
     {field, _subfield, keypath} =
       case field do
         [field, subfield] ->
-          if is_map(selected_values),
+          if is_map(input_value),
             do: {field, subfield, ["detailed", subfield, "values"]},
             else: {field, subfield, [subfield]}
 
         field ->
-          if is_map(selected_values),
+          if is_map(input_value),
             do: {field, nil, ["major", "values"]},
             else: {field, nil, []}
       end
 
     checked =
       cond do
-        is_map(selected_values) -> checked?(value, selected_values, keypath)
-        is_list(selected_values) -> checked?(value, selected_values)
-        true -> checked?(value, selected_values)
+        is_map(input_value) -> checked?(value, input_value, keypath)
+        is_list(input_value) -> checked?(value, input_value)
+        true -> checked?(value, input_value)
       end
 
     name =
       cond do
-        is_map(selected_values) or is_list(selected_values) -> nested_name(f, field, keypath, :multi)
+        is_map(input_value) or is_list(input_value) -> nested_name(f, field, keypath, :multi)
         true -> nested_name(f, field, keypath, :single)
       end
 
@@ -91,7 +87,7 @@ defmodule EpicenterWeb.Multiselect do
         id: Form.input_id(f, field, "_other"),
         name: nested_name(f, field, keypath, :single),
         placeholder: "Please specify",
-        value: Form.input_value(f, field) |> get_in(keypath) || ""
+        value: input_value(f, field) |> get_in(keypath) || ""
       )
     end
   end
@@ -105,7 +101,7 @@ defmodule EpicenterWeb.Multiselect do
         field -> {field, nil, ["major", "other"]}
       end
 
-    selected_values = Form.input_value(f, field)
+    selected_values = input_value(f, field)
     other_checkbox_checked = checked?("true", selected_values, ["_ignore" | keypath])
     other_field_has_value = get_in(selected_values, keypath) |> Euclid.Exists.present?()
 
@@ -132,6 +128,12 @@ defmodule EpicenterWeb.Multiselect do
 
   def checked?(value, scalar),
     do: html_escape(value) == html_escape(scalar)
+
+  def input_value(f, [field, _subfield]),
+    do: Form.input_value(f, field)
+
+  def input_value(f, field),
+    do: Form.input_value(f, field)
 
   def nested_name(f, field, keypath, selection_type) when selection_type in [:single, :multi] do
     path = keypath |> Enum.map(fn key -> "[#{key}]" end) |> Enum.join("")
