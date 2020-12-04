@@ -36,19 +36,7 @@ defmodule EpicenterWeb.Multiselect do
 
   def multiselect_chradio(f, field, value, type) when type in [:checkbox, :radio] do
     input_value = input_value(f, field)
-
-    {field, _subfield, keypath} =
-      case field do
-        [field, subfield] ->
-          if is_map(input_value),
-            do: {field, subfield, ["detailed", subfield, "values"]},
-            else: {field, subfield, [subfield]}
-
-        field ->
-          if is_map(input_value),
-            do: {field, nil, ["major", "values"]},
-            else: {field, nil, []}
-      end
+    {field, _subfield, keypath} = field_info(field, input_value)
 
     name =
       cond do
@@ -67,11 +55,7 @@ defmodule EpicenterWeb.Multiselect do
   end
 
   def multiselect_text(f, field) do
-    {field, _subfield, keypath} =
-      case field do
-        [field, subfield] -> {field, subfield, ["detailed", subfield, "other"]}
-        field -> {field, nil, ["major", "other"]}
-      end
+    {field, _subfield, keypath} = field_info(field)
 
     Tag.content_tag :div, data: [multiselect: "text-wrapper"] do
       Form.text_input(
@@ -87,13 +71,7 @@ defmodule EpicenterWeb.Multiselect do
 
   def multiselect_other(f, field, option_label, type) when type in [:checkbox, :radio] do
     text_field = multiselect_text(f, field)
-
-    {field, subfield, keypath} =
-      case field do
-        [field, subfield] -> {field, subfield, ["detailed", subfield, "other"]}
-        field -> {field, nil, ["major", "other"]}
-      end
-
+    {field, subfield, keypath} = field_info(field)
     selected_values = input_value(f, field)
     other_checkbox_checked = checked?("true", selected_values, ["_ignore" | keypath])
     other_field_has_value = get_in(selected_values, keypath) |> Euclid.Exists.present?()
@@ -123,6 +101,24 @@ defmodule EpicenterWeb.Multiselect do
 
   def checked?(value, scalar, _keys),
     do: html_escape(value) == html_escape(scalar)
+
+  def field_info([field, subfield]),
+    do: {field, subfield, ["detailed", subfield, "other"]}
+
+  def field_info(field),
+    do: {field, nil, ["major", "other"]}
+
+  def field_info([field, subfield], input_value) when is_map(input_value),
+    do: {field, subfield, ["detailed", subfield, "values"]}
+
+  def field_info([field, subfield], _input_value),
+    do: {field, subfield, [subfield]}
+
+  def field_info(field, input_value) when is_map(input_value),
+    do: {field, nil, ["major", "values"]}
+
+  def field_info(field, _input_value),
+    do: {field, nil, []}
 
   def input_id(f, [field, subfield], value) when is_nil(subfield),
     do: Form.input_id(f, field, value)
