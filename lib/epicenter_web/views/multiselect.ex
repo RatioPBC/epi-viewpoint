@@ -59,8 +59,8 @@ defmodule EpicenterWeb.Multiselect do
 
     name =
       cond do
-        is_map(input_value) or is_list(input_value) -> nested_name(f, field, keypath, :multi)
-        true -> nested_name(f, field, keypath, :single)
+        is_map(input_value) or is_list(input_value) -> input_name(f, field, keypath, :multi)
+        true -> input_name(f, field, keypath, :single)
       end
 
     Tag.tag(
@@ -85,7 +85,7 @@ defmodule EpicenterWeb.Multiselect do
         f,
         field,
         id: Form.input_id(f, field, "_other"),
-        name: nested_name(f, field, keypath, :single),
+        name: input_name(f, field, keypath, :single),
         placeholder: "Please specify",
         value: input_value(f, field) |> get_in(keypath) || ""
       )
@@ -110,7 +110,7 @@ defmodule EpicenterWeb.Multiselect do
         :input,
         checked: other_checkbox_checked || other_field_has_value,
         id: Form.input_id(f, Extra.String.underscore([field, subfield, "other"])),
-        name: nested_name(f, field, ["_ignore" | keypath], :single),
+        name: input_name(f, field, ["_ignore" | keypath], :single),
         type: type,
         value: "true"
       )
@@ -129,17 +129,17 @@ defmodule EpicenterWeb.Multiselect do
   def checked?(value, scalar),
     do: html_escape(value) == html_escape(scalar)
 
+  def input_name(f, field, keypath, selection_type) when selection_type in [:single, :multi] do
+    path = keypath |> Enum.map(fn key -> "[#{key}]" end) |> Enum.join("")
+    suffix = if selection_type == :multi, do: "[]", else: ""
+    "#{Form.input_name(f, field)}#{path}#{suffix}"
+  end
+
   def input_value(f, [field, _subfield]),
     do: Form.input_value(f, field)
 
   def input_value(f, field),
     do: Form.input_value(f, field)
-
-  def nested_name(f, field, keypath, selection_type) when selection_type in [:single, :multi] do
-    path = keypath |> Enum.map(fn key -> "[#{key}]" end) |> Enum.join("")
-    suffix = if selection_type == :multi, do: "[]", else: ""
-    "#{Form.input_name(f, field)}#{path}#{suffix}"
-  end
 
   defp to_safe(list) when is_list(list),
     do: {:safe, list |> Enum.map(&to_safe/1) |> Enum.map(fn {:safe, contents} -> contents end)}
