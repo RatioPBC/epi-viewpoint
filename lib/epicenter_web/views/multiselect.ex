@@ -66,7 +66,7 @@ defmodule EpicenterWeb.Multiselect do
     Tag.tag(
       :input,
       checked: checked,
-      id: Form.input_id(f, field, value),
+      id: input_id(f, field, value),
       name: name,
       type: type,
       value: html_escape(value)
@@ -84,7 +84,7 @@ defmodule EpicenterWeb.Multiselect do
       Form.text_input(
         f,
         field,
-        id: Form.input_id(f, field, "_other"),
+        id: input_id(f, field, "other"),
         name: input_name(f, field, keypath, :single),
         placeholder: "Please specify",
         value: input_value(f, field) |> get_in(keypath) || ""
@@ -109,7 +109,7 @@ defmodule EpicenterWeb.Multiselect do
       Tag.tag(
         :input,
         checked: other_checkbox_checked || other_field_has_value,
-        id: Form.input_id(f, Extra.String.underscore([field, subfield, "other"])),
+        id: input_id(f, [field, subfield], "other"),
         name: input_name(f, field, ["_ignore" | keypath], :single),
         type: type,
         value: "true"
@@ -128,6 +128,15 @@ defmodule EpicenterWeb.Multiselect do
 
   def checked?(value, scalar),
     do: html_escape(value) == html_escape(scalar)
+
+  def input_id(f, [field, subfield], value) when is_nil(subfield),
+    do: Form.input_id(f, field, value)
+
+  def input_id(f, [field, subfield], value),
+    do: Form.input_id(f, "#{field}_#{subfield}", value)
+
+  def input_id(f, field, value),
+    do: Form.input_id(f, field, value)
 
   def input_name(f, field, keypath, selection_type) when selection_type in [:single, :multi] do
     path = keypath |> Enum.map(fn key -> "[#{key}]" end) |> Enum.join("")
