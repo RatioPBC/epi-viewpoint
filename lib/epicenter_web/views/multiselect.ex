@@ -1,7 +1,9 @@
 defmodule EpicenterWeb.Multiselect do
-  use Phoenix.HTML
+  import Phoenix.HTML, only: [html_escape: 1]
 
   alias Epicenter.Extra
+  alias Phoenix.HTML.Form
+  alias Phoenix.HTML.Tag
 
   def multiselect_inputs(f, field, specs, level \\ :parent) do
     inputs =
@@ -20,8 +22,8 @@ defmodule EpicenterWeb.Multiselect do
   end
 
   def multiselect_input(f, field, {type, option_label, option_value} = _spec, level) do
-    content_tag :div, class: "label-wrapper" do
-      label data: [multiselect: level, role: Extra.String.dasherize([f.name, field])] do
+    Tag.content_tag :div, class: "label-wrapper" do
+      Form.label data: [multiselect: level, role: Extra.String.dasherize([f.name, field])] do
         case type do
           :checkbox -> [multiselect_chradio(f, field, option_value, :checkbox), option_label]
           :radio -> [multiselect_chradio(f, field, option_value, :radio), option_label]
@@ -35,8 +37,8 @@ defmodule EpicenterWeb.Multiselect do
   def multiselect_chradio(f, field, value, type) when type in [:checkbox, :radio] do
     selected_values =
       case field do
-        [field, _subfield] -> input_value(f, field)
-        field -> input_value(f, field)
+        [field, _subfield] -> Form.input_value(f, field)
+        field -> Form.input_value(f, field)
       end
 
     {field, _subfield, keypath} =
@@ -65,10 +67,10 @@ defmodule EpicenterWeb.Multiselect do
         true -> nested_name(f, field, keypath, :single)
       end
 
-    tag(
+    Tag.tag(
       :input,
       checked: checked,
-      id: input_id(f, field, value),
+      id: Form.input_id(f, field, value),
       name: name,
       type: type,
       value: html_escape(value)
@@ -82,14 +84,14 @@ defmodule EpicenterWeb.Multiselect do
         field -> {field, nil, ["major", "other"]}
       end
 
-    content_tag :div, data: [multiselect: "text-wrapper"] do
-      text_input(
+    Tag.content_tag :div, data: [multiselect: "text-wrapper"] do
+      Form.text_input(
         f,
         field,
-        id: input_id(f, field, "_other"),
+        id: Form.input_id(f, field, "_other"),
         name: nested_name(f, field, keypath, :single),
         placeholder: "Please specify",
-        value: input_value(f, field) |> get_in(keypath) || ""
+        value: Form.input_value(f, field) |> get_in(keypath) || ""
       )
     end
   end
@@ -103,15 +105,15 @@ defmodule EpicenterWeb.Multiselect do
         field -> {field, nil, ["major", "other"]}
       end
 
-    selected_values = input_value(f, field)
+    selected_values = Form.input_value(f, field)
     other_checkbox_checked = checked?("true", selected_values, ["_ignore" | keypath])
     other_field_has_value = get_in(selected_values, keypath) |> Euclid.Exists.present?()
 
     chradio =
-      tag(
+      Tag.tag(
         :input,
         checked: other_checkbox_checked || other_field_has_value,
-        id: input_id(f, Extra.String.underscore([field, subfield, "other"])),
+        id: Form.input_id(f, Extra.String.underscore([field, subfield, "other"])),
         name: nested_name(f, field, ["_ignore" | keypath], :single),
         type: type,
         value: "true"
@@ -134,7 +136,7 @@ defmodule EpicenterWeb.Multiselect do
   def nested_name(f, field, keypath, selection_type) when selection_type in [:single, :multi] do
     path = keypath |> Enum.map(fn key -> "[#{key}]" end) |> Enum.join("")
     suffix = if selection_type == :multi, do: "[]", else: ""
-    "#{input_name(f, field)}#{path}#{suffix}"
+    "#{Form.input_name(f, field)}#{path}#{suffix}"
   end
 
   defp to_safe(list) when is_list(list),
