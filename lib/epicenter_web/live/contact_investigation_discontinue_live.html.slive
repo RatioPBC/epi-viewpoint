@@ -1,8 +1,14 @@
-div#contact-investigation-discontinue-page data-role="contact-investigation-discontinue-page" data-exposure-id=@exposure.id
+div#contact-investigation-discontinue-page data-role="contact-investigation-discontinue-page" data-exposure-id=@exposure.id data-confirm-navigation=confirmation_prompt(@changeset)
+
+  section
+    header#subnav
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "back-link"] do
+        = back_icon()
+        span Back
 
   .InvestigationDiscontinueForm
     header
       h2 Discontinue interview
       h3.InvestigationDiscontinueForm__Subtitle before interview start
-    = form_for @changeset, "#", [id: "contact-investigation-discontinue-form", class: "InvestigationDiscontinueForm__Form", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "contact-investigation-discontinue-form", class: "InvestigationDiscontinueForm__Form", phx_change: "change", phx_submit: "save"], fn f ->
       = discontinue_form_builder(f)

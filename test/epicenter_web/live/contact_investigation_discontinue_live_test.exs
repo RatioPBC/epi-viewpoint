@@ -70,6 +70,21 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
     view |> Pages.assert_validation_messages(%{"exposure[interview_discontinue_reason]" => "can't be blank"})
   end
 
+  test "warns you that there are changes if you try to navigate away", %{conn: conn, exposure: exposure} do
+    view = Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
+
+    assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
+
+    view
+    |> Pages.ContactInvestigationDiscontinue.change_form(exposure: %{"interview_discontinue_reason" => "Transferred to another jurisdiction"})
+
+    assert %{
+             "exposure[interview_discontinue_reason]" => "Transferred to another jurisdiction"
+           } = Pages.form_state(view)
+
+    assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+  end
+
   defp create_exposure(user) do
     sick_person =
       Test.Fixtures.person_attrs(user, "alice")

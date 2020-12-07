@@ -17,4 +17,12 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationDiscontinue do
 
     view
   end
+
+  def change_form(%View{} = view, attrs) do
+    view
+    |> form("#contact-investigation-discontinue-form", attrs)
+    |> render_change()
+
+    view
+  end
 end

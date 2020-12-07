@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Ecto.Changeset
@@ -21,6 +23,14 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
     |> assign(changeset: Cases.change_exposure(exposure, %{}))
     |> assign(person: person)
     |> ok()
+  end
+
+  def handle_event("change", %{"exposure" => params}, socket) do
+    changeset = Cases.change_exposure(socket.assigns.exposure, params)
+
+    socket
+    |> assign(:changeset, changeset)
+    |> noreply()
   end
 
   def handle_event("save", %{"exposure" => params}, socket) do
@@ -50,17 +60,13 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
     end
   end
 
-  # def reasons("started") do
-  #   ["Deceased", "Transferred to another jurisdiction", "Lost to follow up", "Refused to cooperate"]
-  # end
+  # # #
 
-  def reasons(_) do
+  defp reasons(_) do
     ["Unable to reach", "Another contact investigation already underway", "Transferred to another jurisdiction", "Deceased"]
   end
 
-  # # #
-
-  def discontinue_form_builder(changeset) do
+  defp discontinue_form_builder(changeset) do
     Form.new(changeset)
     |> Form.line(fn line ->
       line
@@ -74,5 +80,9 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
       |> Form.save_button()
     end)
     |> Form.safe()
+  end
+
+  defp confirmation_prompt(changeset) do
+    if changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text()
   end
 end
