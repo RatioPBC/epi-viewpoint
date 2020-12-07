@@ -63,12 +63,30 @@ defmodule EpicenterWeb.CaseInvestigationNote do
   end
 end
 
+defmodule EpicenterWeb.ContactInvestigationStatusRow do
+  use EpicenterWeb, :live_component
+
+  def render(assigns) do
+    ~H"""
+    .contact-investigation-status
+      h3.status data-role="status"
+        | Pending interview
+
+      .links
+        = live_redirect("Discontinue",
+            to: Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, @exposure),
+            data: [role: "discontinue-contact-investigation"])
+    """
+  end
+end
+
 defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
 
   import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1]
 
   alias EpicenterWeb.Format
+  alias EpicenterWeb.ContactInvestigationStatusRow
 
   def render(assigns) do
     ~H"""
@@ -89,6 +107,8 @@ defmodule EpicenterWeb.ContactInvestigation do
           li data-role="detail" Same household
         li data-role="detail" #{@exposure.relationship_to_case}
         li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
+      div
+        = component(@socket, ContactInvestigationStatusRow, @key <> "status", exposure: @exposure)
     """
   end
 end
