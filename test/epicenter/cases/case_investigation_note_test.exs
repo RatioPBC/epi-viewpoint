@@ -1,9 +1,9 @@
-defmodule Epicenter.Cases.CaseInvestigationNoteTest do
+defmodule Epicenter.Cases.InvestigationNoteTest do
   use Epicenter.DataCase, async: true
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
-  alias Epicenter.Cases.CaseInvestigationNote
+  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Repo
   alias Epicenter.Test
 
@@ -13,7 +13,7 @@ defmodule Epicenter.Cases.CaseInvestigationNoteTest do
   describe "schema" do
     test "fields" do
       assert_schema(
-        CaseInvestigationNote,
+        InvestigationNote,
         [
           {:author_id, :binary_id},
           {:id, :binary_id},
@@ -36,7 +36,7 @@ defmodule Epicenter.Cases.CaseInvestigationNoteTest do
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
       note =
-        CaseInvestigationNote.changeset(%CaseInvestigationNote{}, %{
+        InvestigationNote.changeset(%InvestigationNote{}, %{
           author_id: user.id,
           case_investigation_id: case_investigation.id,
           text: "foo",
@@ -61,7 +61,7 @@ defmodule Epicenter.Cases.CaseInvestigationNoteTest do
         |> Cases.create_exposure()
 
       note =
-        CaseInvestigationNote.changeset(%CaseInvestigationNote{}, %{
+        InvestigationNote.changeset(%InvestigationNote{}, %{
           author_id: user.id,
           exposure_id: exposure.id,
           text: "foo",

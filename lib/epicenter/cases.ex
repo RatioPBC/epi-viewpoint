@@ -3,7 +3,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.CaseInvestigationNote
+  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
@@ -48,21 +48,21 @@ defmodule Epicenter.Cases do
     do: case_investigation |> change_case_investigation(attrs) |> AuditLog.update(audit_meta)
 
   #
-  # case investigation notes
+  # investigation notes
   #
-  def change_case_investigation_note(%CaseInvestigationNote{} = case_investigation_note, attrs),
-    do: CaseInvestigationNote.changeset(case_investigation_note, attrs)
+  def change_investigation_note(%InvestigationNote{} = investigation_note, attrs),
+    do: InvestigationNote.changeset(investigation_note, attrs)
 
-  def create_case_investigation_note({attrs, audit_meta}),
-    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert(audit_meta)
+  def create_investigation_note({attrs, audit_meta}),
+    do: %InvestigationNote{} |> change_investigation_note(attrs) |> AuditLog.insert(audit_meta)
 
-  def create_case_investigation_note!({attrs, audit_meta}),
-    do: %CaseInvestigationNote{} |> change_case_investigation_note(attrs) |> AuditLog.insert!(audit_meta)
+  def create_investigation_note!({attrs, audit_meta}),
+    do: %InvestigationNote{} |> change_investigation_note(attrs) |> AuditLog.insert!(audit_meta)
 
-  def delete_case_investigation_note(case_investigation_note, audit_meta),
-    do: CaseInvestigationNote.changeset(case_investigation_note, %{deleted_at: @clock.utc_now()}) |> AuditLog.update(audit_meta)
+  def delete_investigation_note(investigation_note, audit_meta),
+    do: InvestigationNote.changeset(investigation_note, %{deleted_at: @clock.utc_now()}) |> AuditLog.update(audit_meta)
 
-  def preload_case_investigation_notes(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:notes)
+  def preload_investigation_notes(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:notes)
 
   def preload_author(notes_or_nil), do: notes_or_nil |> Repo.preload(:author)
 

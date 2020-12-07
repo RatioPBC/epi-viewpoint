@@ -6,7 +6,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
   import Epicenter.Gettext
 
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.CaseInvestigationNote
+  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
@@ -60,7 +60,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     belongs_to :person, Person
 
     has_many :exposures, Exposure, foreign_key: :exposing_case_id, where: [deleted_at: nil]
-    has_many :notes, CaseInvestigationNote, foreign_key: :case_investigation_id, where: [deleted_at: nil]
+    has_many :notes, InvestigationNote, foreign_key: :case_investigation_id, where: [deleted_at: nil]
   end
 
   derive_jason_encoder(except: [:seq])
@@ -68,7 +68,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
   def changeset(case_investigation, attrs) do
     case_investigation
     |> cast(attrs, @required_attrs ++ @optional_attrs)
-    |> cast_assoc(:notes, with: &CaseInvestigationNote.changeset/2)
+    |> cast_assoc(:notes, with: &InvestigationNote.changeset/2)
     |> validate_required(@required_attrs)
   end
 

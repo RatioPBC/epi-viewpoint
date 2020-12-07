@@ -770,7 +770,7 @@ defmodule Epicenter.CasesTest do
     end
   end
 
-  describe "create_case_investigation_note!" do
+  describe "create_investigation_note!" do
     setup do
       creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
       {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
@@ -787,7 +787,7 @@ defmodule Epicenter.CasesTest do
     test "makes a revision", %{creator: creator, case_investigation: case_investigation} do
       case_investigation_note =
         Test.Fixtures.case_investigation_note_attrs(case_investigation, creator, "note-a", %{text: "Note A"})
-        |> Cases.create_case_investigation_note!()
+        |> Cases.create_investigation_note!()
 
       author_id = creator.id
       case_investigation_id = case_investigation.id

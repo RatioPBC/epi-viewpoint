@@ -548,10 +548,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
       case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-a", %{text: "older note"})
-      |> Cases.create_case_investigation_note!()
+      |> Cases.create_investigation_note!()
 
       Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-b", %{text: "newer note"})
-      |> Cases.create_case_investigation_note!()
+      |> Cases.create_investigation_note!()
 
       view =
         Pages.Profile.visit(conn, person)
@@ -575,7 +575,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       %{"form_field_data[text]" => text} = Pages.form_state(view)
       assert text |> Euclid.Exists.blank?()
 
-      assert [note] = case_investigation |> Cases.preload_case_investigation_notes() |> Map.get(:notes)
+      assert [note] = case_investigation |> Cases.preload_investigation_notes() |> Map.get(:notes)
       assert_recent_audit_log(note, user, action: "create-case-investigation-note", event: "profile-case-investigation-note-submission")
     end
 
@@ -607,7 +607,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       someone_elses_note =
         Test.Fixtures.case_investigation_note_attrs(case_investigation, other_user, "note-a", %{text: "some other user's note"})
-        |> Cases.create_case_investigation_note!()
+        |> Cases.create_investigation_note!()
         |> Cases.preload_author()
 
       view = Pages.Profile.visit(conn, person)

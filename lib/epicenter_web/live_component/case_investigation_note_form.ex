@@ -65,7 +65,7 @@ defmodule EpicenterWeb.CaseInvestigationNoteForm do
            {:form, FormFieldData.case_investigation_note_attrs(form_changeset, socket.assigns.current_user_id)},
          {:note, {:ok, note}} <-
            {:note,
-            Cases.create_case_investigation_note(
+            Cases.create_investigation_note(
               {case_investigation_note_attrs,
                %AuditLog.Meta{
                  author_id: socket.assigns.current_user_id,

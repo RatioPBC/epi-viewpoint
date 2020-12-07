@@ -53,7 +53,7 @@ defmodule EpicenterWeb.CaseInvestigationNote do
 
   def handle_event("remove-note", _params, socket) do
     {:ok, _} =
-      Cases.delete_case_investigation_note(socket.assigns.note, %AuditLog.Meta{
+      Cases.delete_investigation_note(socket.assigns.note, %AuditLog.Meta{
         author_id: socket.assigns.current_user_id,
         reason_action: AuditLog.Revision.remove_case_investigation_note_action(),
         reason_event: AuditLog.Revision.remove_case_investigation_note_event()
@@ -220,7 +220,7 @@ defmodule EpicenterWeb.ProfileLive do
       person.case_investigations
       |> Cases.preload_initiating_lab_result()
       |> Cases.preload_exposures()
-      |> Cases.preload_case_investigation_notes()
+      |> Cases.preload_investigation_notes()
 
     assign(socket, case_investigations: case_investigations)
   end

@@ -1,4 +1,4 @@
-defmodule Epicenter.Cases.CaseInvestigationNote do
+defmodule Epicenter.Cases.InvestigationNote do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,7 +10,7 @@ defmodule Epicenter.Cases.CaseInvestigationNote do
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
-  schema "case_investigation_notes" do
+  schema "investigation_notes" do
     field :deleted_at, :utc_datetime
     field :seq, :integer, read_after_writes: true
     field :text, :string
@@ -24,8 +24,8 @@ defmodule Epicenter.Cases.CaseInvestigationNote do
   end
 
   @doc false
-  def changeset(case_investigation_note, attrs) do
-    case_investigation_note
+  def changeset(investigation_note, attrs) do
+    investigation_note
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
   end
