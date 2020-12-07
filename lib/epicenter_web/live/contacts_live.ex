@@ -2,7 +2,6 @@ defmodule EpicenterWeb.ContactsLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
-  import EpicenterWeb.LiveComponent.Helpers
 
   import EpicenterWeb.Presenters.PeoplePresenter,
     only: [
