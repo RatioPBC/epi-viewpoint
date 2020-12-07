@@ -106,7 +106,7 @@ defmodule EpicenterWeb.Test.Pages do
       |> Test.Html.parse()
 
     parsed
-    |> Test.Html.all("label[for]", fn label ->
+    |> Test.Html.all("label[for]:not([type=radio])", fn label ->
       html_for = label |> Test.Html.attr("for") |> List.first()
 
       with input when not is_nil(input) <- Test.Html.find(parsed, "##{html_for}") do
@@ -117,7 +117,52 @@ defmodule EpicenterWeb.Test.Pages do
         _ -> nil
       end
     end)
+    |> Enum.concat(
+      parsed
+      |> Test.Html.all("[type=radio]", attr: "name")
+      |> Enum.uniq()
+      |> Enum.map(fn radio_input_name ->
+        {radio_input_name, radio_options(view, radio_input_name) |> Enum.map(& &1.label)}
+      end)
+    )
     |> Enum.into(%{})
+  end
+
+  def radio_options(view, input_name) do
+    document =
+      view
+      |> render()
+      |> Test.Html.parse()
+
+    document
+    |> Test.Html.all("[type=radio][name='#{input_name}']", fn element ->
+      value = Test.Html.attr(element, "value") |> List.first()
+      id = Test.Html.attr(element, "id") |> List.first()
+
+      parent_label =
+        Test.Html.all(document, "label", fn label ->
+          label
+        end)
+        |> Enum.reject(fn label ->
+          Test.Html.find(label, "##{id}") |> Euclid.Exists.blank?()
+        end)
+        |> List.first()
+
+      id_match_label = document |> Test.Html.find("[for=#{id}]")
+
+      label =
+        with label when not is_nil(label) <- parent_label || id_match_label do
+          label |> Test.Html.text()
+        else
+          _ -> nil
+        end
+
+      %{
+        value: value,
+        label: label
+      }
+    end)
+    |> Enum.reject(&Euclid.Exists.blank?/1)
   end
 
   def form_state(%View{} = view) do

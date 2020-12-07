@@ -1,0 +1,4 @@
+div data-role="contact-investigation-discontinue-page" data-exposure-id=@exposure.id
+
+  = form_for @changeset, "#", [id: "contact-investigation-discontinue-form", phx_submit: "save"], fn f ->
+      = discontinue_form_builder(f)
