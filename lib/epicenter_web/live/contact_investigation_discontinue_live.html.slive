@@ -1,4 +1,8 @@
-div data-role="contact-investigation-discontinue-page" data-exposure-id=@exposure.id
+div#contact-investigation-discontinue-page data-role="contact-investigation-discontinue-page" data-exposure-id=@exposure.id
 
-  = form_for @changeset, "#", [id: "contact-investigation-discontinue-form", phx_submit: "save"], fn f ->
+  .InvestigationDiscontinueForm
+    header
+      h2 Discontinue interview
+      h3.InvestigationDiscontinueForm__Subtitle before interview start
+    = form_for @changeset, "#", [id: "contact-investigation-discontinue-form", class: "InvestigationDiscontinueForm__Form", phx_submit: "save"], fn f ->
       = discontinue_form_builder(f)
