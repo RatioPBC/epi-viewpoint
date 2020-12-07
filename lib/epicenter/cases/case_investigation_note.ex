@@ -14,10 +14,10 @@ defmodule Epicenter.Cases.CaseInvestigationNote do
     field :seq, :integer, read_after_writes: true
     field :text, :string
     field :tid, :string
-    field :case_investigation_id, :binary_id
     field :deleted_at, :utc_datetime
 
     belongs_to :author, Epicenter.Accounts.User
+    belongs_to :case_investigation, Epicenter.Cases.CaseInvestigation
 
     timestamps(type: :utc_datetime)
   end
