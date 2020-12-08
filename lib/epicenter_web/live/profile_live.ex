@@ -100,7 +100,7 @@ defmodule EpicenterWeb.ContactInvestigation do
             = for button <- interview_buttons(@exposure) do
               div data-role="contact-investigation-interview-button"
                 = button
-      .contact-investigation-history-items
+      .contact-investigation-history
         = for history_item <- history_items(@exposure) do
           div
             span data-role="contact-investigation-history-item-text" = history_item.text
