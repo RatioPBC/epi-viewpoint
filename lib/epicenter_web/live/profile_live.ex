@@ -77,19 +77,20 @@ defmodule EpicenterWeb.ContactInvestigation do
       header
         h2 data-role="contact-investigation-title" Contact investigation #{Format.date(@exposure.most_recent_date_together)}
         span.contact-investigation-timestamp data-role="contact-investigation-timestamp" Created on #{Format.date(@exposure.inserted_at)}
-      div data-role="initiating-case"
-        span Initiated by index case
-        = exposing_case_link(@exposure)
-      = if @exposure.under_18 do
-        ul.dotted-details data-role="minor-details"
-          li data-role="detail" Minor
-          li data-role="detail" Guardian: #{@exposure.guardian_name}
-          li data-role="detail" Guardian phone: #{Format.phone(@exposure.guardian_phone)}
-      ul.dotted-details data-role="exposure-details"
-        = if @exposure.household_member do
-          li data-role="detail" Same household
-        li data-role="detail" #{@exposure.relationship_to_case}
-        li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
+      div
+        div data-role="initiating-case"
+          span Initiated by index case
+          = exposing_case_link(@exposure)
+        = if @exposure.under_18 do
+          ul.dotted-details data-role="minor-details"
+            li data-role="detail" Minor
+            li data-role="detail" Guardian: #{@exposure.guardian_name}
+            li data-role="detail" Guardian phone: #{Format.phone(@exposure.guardian_phone)}
+        ul.dotted-details data-role="exposure-details"
+          = if @exposure.household_member do
+            li data-role="detail" Same household
+          li data-role="detail" #{@exposure.relationship_to_case}
+          li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
       div
         .contact-investigation-status-row
           h3
