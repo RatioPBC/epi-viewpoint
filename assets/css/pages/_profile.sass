@@ -165,11 +165,20 @@
     .dotted-details
       @include dotted-details
 
+    .contact-investigation-status-row
+      @include level($justify: space-between)
+
+      .PendingStatus
+        color: $pending-color
+
+      .DiscontinuedStatus
+        color: $discontinued-color
+      
+      .discontinue-link
+        @include button-secondary
+
   section#demographics
     @include card
 
     table#demographics-data
       @include detail-table
-
-.ContactInvestigationStatus
-  @include level($justify: space-between)

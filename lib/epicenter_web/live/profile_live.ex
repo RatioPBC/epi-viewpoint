@@ -63,19 +63,40 @@ defmodule EpicenterWeb.CaseInvestigationNote do
   end
 end
 
-defmodule EpicenterWeb.ContactInvestigationStatusRow do
+defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
 
+  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1]
+
   alias Epicenter.Cases.Exposure
+  alias EpicenterWeb.Format
 
   def render(assigns) do
     ~H"""
-    .ContactInvestigationStatus
-      h3
-        span data-role="contact-investigation-status" class="ContactInvestigationStatus__#{status_class(@exposure)}" = status_text(@exposure)
-        |  interview
+    section.contact-investigation data-role="contact-investigation" data-exposure-id="#{@exposure.id}" data-tid="#{@exposure.tid}"
+      header
+        h2 data-role="contact-investigation-title" Contact investigation #{Format.date(@exposure.most_recent_date_together)}
+        span.contact-investigation-timestamp data-role="contact-investigation-timestamp" Created on #{Format.date(@exposure.inserted_at)}
+      div data-role="initiating-case"
+        span Initiated by index case
+        = exposing_case_link(@exposure)
+      = if @exposure.under_18 do
+        ul.dotted-details data-role="minor-details"
+          li data-role="detail" Minor
+          li data-role="detail" Guardian: #{@exposure.guardian_name}
+          li data-role="detail" Guardian phone: #{Format.phone(@exposure.guardian_phone)}
+      ul.dotted-details data-role="exposure-details"
+        = if @exposure.household_member do
+          li data-role="detail" Same household
+        li data-role="detail" #{@exposure.relationship_to_case}
+        li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
       div
-        = interview_buttons(@exposure)
+        .contact-investigation-status-row
+          h3
+            span data-role="contact-investigation-status" class=status_class(@exposure) = status_text(@exposure)
+            |  interview
+          div
+            = interview_buttons(@exposure)
     """
   end
 
@@ -100,42 +121,9 @@ defmodule EpicenterWeb.ContactInvestigationStatusRow do
   defp redirect_to(exposure, :discontinue_interview) do
     live_redirect("Discontinue",
       to: Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, exposure),
-      class: "ContactInvestigationStatus__DiscontinueLink",
+      class: "discontinue-link",
       data: [role: "discontinue-contact-investigation"]
     )
-  end
-end
-
-defmodule EpicenterWeb.ContactInvestigation do
-  use EpicenterWeb, :live_component
-
-  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1]
-
-  alias EpicenterWeb.Format
-  alias EpicenterWeb.ContactInvestigationStatusRow
-
-  def render(assigns) do
-    ~H"""
-    section.contact-investigation data-role="contact-investigation" data-exposure-id="#{@exposure.id}" data-tid="#{@exposure.tid}"
-      header
-        h2 data-role="contact-investigation-title" Contact investigation #{Format.date(@exposure.most_recent_date_together)}
-        span.contact-investigation-timestamp data-role="contact-investigation-timestamp" Created on #{Format.date(@exposure.inserted_at)}
-      div data-role="initiating-case"
-        span Initiated by index case
-        = exposing_case_link(@exposure)
-      = if @exposure.under_18 do
-        ul.dotted-details data-role="minor-details"
-          li data-role="detail" Minor
-          li data-role="detail" Guardian: #{@exposure.guardian_name}
-          li data-role="detail" Guardian phone: #{Format.phone(@exposure.guardian_phone)}
-      ul.dotted-details data-role="exposure-details"
-        = if @exposure.household_member do
-          li data-role="detail" Same household
-        li data-role="detail" #{@exposure.relationship_to_case}
-        li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
-      div
-        = component(@socket, ContactInvestigationStatusRow, @key <> "status", exposure: @exposure)
-    """
   end
 end
 
