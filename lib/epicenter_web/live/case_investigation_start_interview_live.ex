@@ -22,6 +22,8 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
     |> ok()
   end
 
+  # this one lets you discard changes without a confirmation prompt
+
   def handle_event("save", %{"start_interview_form" => params}, socket) do
     with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.case_investigation, params),
          {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},

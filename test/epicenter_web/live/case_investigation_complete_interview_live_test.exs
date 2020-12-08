@@ -77,10 +77,15 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
+      view =
+        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.CaseInvestigationCompleteInterview.change_form(complete_interview_form: %{"date_completed" => "09/06/2020"})
+
       assert "Your updates have not been saved. Discard updates?" =
-               Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-               |> Pages.CaseInvestigationCompleteInterview.change_form(%{"date_completed" => "09/06/2020"})
+               view
                |> Pages.navigation_confirmation_prompt()
+
+      assert %{"complete_interview_form[date_completed]" => "09/06/2020"} = Pages.form_state(view)
     end
   end
 

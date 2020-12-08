@@ -20,7 +20,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     |> assign_page_title("Complete interview")
     |> assign(:case_investigation, case_investigation)
     |> assign(:confirmation_prompt, nil)
-    |> assign(:form_changeset, CompleteInterviewForm.changeset(case_investigation))
+    |> assign(:form_changeset, CompleteInterviewForm.changeset(case_investigation, %{}))
     |> assign(:person, person)
     |> ok()
   end
@@ -41,13 +41,13 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
   end
 
   def handle_event("change", %{"complete_interview_form" => params}, socket) do
-    new_changeset = CompleteInterviewForm.changeset(socket.assigns.case_investigation) |> CompleteInterviewForm.cast(params)
+    new_changeset = CompleteInterviewForm.changeset(socket.assigns.case_investigation, params)
 
-    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"complete_interview_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- CompleteInterviewForm.changeset(params),
+    with %Ecto.Changeset{} = form_changeset <- CompleteInterviewForm.changeset(socket.assigns.case_investigation, params),
          {:form, {:ok, case_investigation_attrs}} <- {:form, CompleteInterviewForm.case_investigation_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, case_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
@@ -56,7 +56,9 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
         socket |> assign_form_changeset(form_changeset) |> noreply()
 
       {:case_investigation, {:error, _}} ->
-        socket |> assign_form_changeset(CompleteInterviewForm.changeset(params), "An unexpected error occurred") |> noreply()
+        socket
+        |> assign_form_changeset(CompleteInterviewForm.changeset(socket.assigns.case_investigation, params), "An unexpected error occurred")
+        |> noreply()
     end
   end
 

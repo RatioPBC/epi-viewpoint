@@ -70,8 +70,8 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
     {actual_time, actual_am_pm}
   end
 
-  def change_form(view, attrs, target \\ ["complete_interview_form[date_completed]"]) do
-    view |> element("#case-investigation-interview-complete-form") |> render_change(attrs |> Map.put(:_target, target))
+  def change_form(view, attrs) do
+    view |> element("#case-investigation-interview-complete-form") |> render_change(attrs)
 
     view
   end

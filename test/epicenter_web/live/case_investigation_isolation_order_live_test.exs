@@ -83,10 +83,12 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
-      assert "Your updates have not been saved. Discard updates?" =
-               Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
-               |> Pages.CaseInvestigationIsolationOrder.change_form(isolation_order_form: %{"order_clearance_date" => "09/06/2020"})
-               |> Pages.navigation_confirmation_prompt()
+      view =
+        Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation)
+        |> Pages.CaseInvestigationIsolationOrder.change_form(isolation_order_form: %{"clearance_order_sent_on" => "09/06/2020"})
+
+      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+      assert %{"isolation_order_form[clearance_order_sent_on]" => "09/06/2020"} = Pages.form_state(view)
     end
   end
 end

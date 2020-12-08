@@ -6,7 +6,6 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
 
   alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Format
-  alias EpicenterWeb.Forms.CompleteInterviewForm
 
   @primary_key false
   embedded_schema do
@@ -17,19 +16,15 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
 
   @required_attrs ~w{date_completed time_completed time_completed_am_pm}a
 
-  def changeset(%CaseInvestigation{} = case_investigation),
-    do: case_investigation |> case_investigation_complete_investigation_form_attrs() |> changeset()
-
-  def changeset(attrs) do
-    %CompleteInterviewForm{}
-    |> CompleteInterviewForm.cast(attrs)
+  def changeset(%CaseInvestigation{} = case_investigation, attrs) do
+    case_investigation
+    |> case_investigation_complete_investigation_form_attrs()
+    |> cast(attrs, @required_attrs)
     |> validate_required(@required_attrs)
     |> extract_and_validate_date(:date_completed, :time_completed, :time_completed_am_pm)
   end
 
-  def cast(data, attrs), do: cast(data, attrs, @required_attrs)
-
-  def case_investigation_complete_investigation_form_attrs(%CaseInvestigation{} = case_investigation) do
+  defp case_investigation_complete_investigation_form_attrs(%CaseInvestigation{} = case_investigation) do
     %{interview_completed_at: interview_completed_at} = case_investigation
 
     if interview_completed_at == nil do
@@ -59,7 +54,7 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
   end
 
   defp form_attrs_from_date_time(date_time) do
-    %{
+    %__MODULE__{
       date_completed: Format.date(date_time |> DateTime.to_date()),
       time_completed: Format.time(date_time |> DateTime.to_time()),
       time_completed_am_pm: if(date_time.hour >= 12, do: "PM", else: "AM")

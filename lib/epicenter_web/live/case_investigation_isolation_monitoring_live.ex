@@ -70,8 +70,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
 
   def handle_event("change", %{"isolation_monitoring_form" => params}, socket) do
     new_changeset = IsolationMonitoringForm.changeset(socket.assigns.case_investigation, params)
-
-    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"isolation_monitoring_form" => params}, socket) do

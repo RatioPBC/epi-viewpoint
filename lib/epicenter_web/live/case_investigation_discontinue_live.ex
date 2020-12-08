@@ -22,6 +22,8 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     |> ok()
   end
 
+  # this one doesn't have the issue but lets you discard changes without a confirmation, a similar issue
+
   def handle_event("save", %{"case_investigation" => params}, socket) do
     params = Map.put(params, "interview_discontinued_at", DateTime.utc_now())
 

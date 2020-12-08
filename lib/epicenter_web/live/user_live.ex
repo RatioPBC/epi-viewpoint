@@ -80,6 +80,8 @@ defmodule EpicenterWeb.UserLive do
     |> ok()
   end
 
+  # this form lets you discard changes
+
   def handle_event("save", %{"user_form" => params}, socket) do
     form_changeset = UserForm.changeset(params)
     user = socket.assigns.user
