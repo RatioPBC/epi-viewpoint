@@ -68,8 +68,8 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationClinicalDetails do
     view
   end
 
-  def change_form(view, attrs, target \\ ["#{@form_id}[clinical_status]"]) do
-    view |> element("#case-investigation-clinical-details-form") |> render_change(attrs |> Map.put(:_target, target))
+  def change_form(view, attrs) do
+    view |> element("#case-investigation-clinical-details-form") |> render_change(attrs)
 
     view
   end

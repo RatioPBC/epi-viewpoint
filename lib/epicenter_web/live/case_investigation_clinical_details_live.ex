@@ -96,7 +96,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
     new_changeset = ClinicalDetailsForm.changeset(socket.assigns.case_investigation, params)
 
-    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"clinical_details_form" => params}, socket) do

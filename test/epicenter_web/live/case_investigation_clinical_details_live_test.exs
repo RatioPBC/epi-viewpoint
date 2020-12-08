@@ -174,10 +174,15 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
-      assert "Your updates have not been saved. Discard updates?" =
-               Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
-               |> Pages.CaseInvestigationClinicalDetails.change_form(%{"clinical_status" => "symptomatic"})
-               |> Pages.navigation_confirmation_prompt()
+      view =
+        Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+        |> Pages.CaseInvestigationClinicalDetails.change_form(clinical_details_form: %{"clinical_status" => "symptomatic"})
+
+      assert view |> Pages.navigation_confirmation_prompt() == "Your updates have not been saved. Discard updates?"
+
+      assert %{
+               "clinical_details_form[clinical_status]" => "symptomatic"
+             } = Pages.form_state(view)
     end
   end
 end
