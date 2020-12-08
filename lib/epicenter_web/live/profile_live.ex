@@ -63,20 +63,58 @@ defmodule EpicenterWeb.CaseInvestigationNote do
   end
 end
 
-defmodule EpicenterWeb.ContactInvestigationStatusRow do
+defmodule EpicenterWeb.Flex do
   use EpicenterWeb, :live_component
 
   def render(assigns) do
     ~H"""
-    .contact-investigation-status
-      h3.status data-role="status"
-        | Pending interview
-
-      .links
-        = live_redirect("Discontinue",
-            to: Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, @exposure),
-            data: [role: "discontinue-contact-investigation"])
+    div class="Flex Flex--direction-#{@direction} Flex--justify-#{@justify}"
+      = render_block(@inner_block)
     """
+  end
+end
+
+defmodule EpicenterWeb.ContactInvestigationStatusRow do
+  use EpicenterWeb, :live_component
+
+  alias Epicenter.Cases.Exposure
+
+  def render(assigns) do
+    ~H"""
+    .ContactInvestigationStatus
+      = component(@socket, EpicenterWeb.Flex, @key <> "flex", direction: "row", justify: "space-between") do
+        h3
+          span data-role="contact-investigation-status" class="ContactInvestigationStatus__#{status_class(@exposure)}" = status_text(@exposure)
+          |  interview
+        div
+          = interview_buttons(@exposure)
+    """
+  end
+
+  defp status_class(%Exposure{} = %{interview_status: status}) do
+    case status do
+      "discontinued" -> "DiscontinuedStatus"
+      _ -> "PendingStatus"
+    end
+  end
+
+  defp status_text(%Exposure{} = %{interview_status: status}) do
+    case status do
+      "discontinued" -> "Discontinued"
+      _ -> "Pending"
+    end
+  end
+
+  defp interview_buttons(exposure) do
+    [redirect_to(exposure, :discontinue_interview)]
+  end
+
+  defp redirect_to(exposure, :discontinue_interview) do
+    live_redirect("Discontinue",
+      to: Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, exposure),
+      class: "ContactInvestigationStatus__DiscontinueLink",
+      data: [role: "discontinue-contact-investigation"]
+    )
   end
 end
 
