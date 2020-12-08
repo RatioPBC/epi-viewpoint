@@ -66,7 +66,7 @@ end
 defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
 
-  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1]
+  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1]
 
   alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
@@ -96,7 +96,14 @@ defmodule EpicenterWeb.ContactInvestigation do
             span data-role="contact-investigation-status" class=status_class(@exposure) = status_text(@exposure)
             |  interview
           div
-            = interview_buttons(@exposure)
+            = for button <- interview_buttons(@exposure) do
+              div data-role="contact-investigation-interview-button"
+                = button
+      .contact-investigation-history-items
+        = for history_item <- history_items(@exposure) do
+          div
+            span data-role="contact-investigation-history-item-text" = history_item.text
+            span class="history-item-link" = history_item.link
     """
   end
 
@@ -115,7 +122,16 @@ defmodule EpicenterWeb.ContactInvestigation do
   end
 
   defp interview_buttons(exposure) do
-    [redirect_to(exposure, :discontinue_interview)]
+    buttons = []
+
+    buttons =
+      if exposure.interview_status != "discontinued" do
+        [redirect_to(exposure, :discontinue_interview) | buttons]
+      else
+        buttons
+      end
+
+    buttons
   end
 
   defp redirect_to(exposure, :discontinue_interview) do

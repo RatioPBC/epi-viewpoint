@@ -649,7 +649,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
                  title: "Contact investigation 08/06/2020",
                  initiating_case_text: "Initiated by index case #alice-external-id",
                  minor_details: [],
-                 exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"]
+                 exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"],
+                 interview_buttons: ["Discontinue"]
                }
              ] = Pages.Profile.contact_investigations(view)
 
@@ -728,6 +729,30 @@ defmodule EpicenterWeb.ProfileLiveTest do
                  minor_details: ["Minor", "Guardian: Alex Testuser", "Guardian phone: (111) 111-1222"]
                }
              ] = Pages.Profile.contact_investigations(view)
+    end
+
+    test "looking at a discontinued contact investigation", %{conn: conn, user: user, person: sick_person} do
+      exposure =
+        create_exposure_with_prereqs(
+          user,
+          sick_person,
+          %{},
+          %{},
+          %{tid: "exposure", interview_discontinued_at: ~U[2020-12-08 11:00:00Z], interview_discontinue_reason: "Transferred to another jurisdiction"}
+        )
+
+      view = Pages.Profile.visit(conn, exposure.exposed_person)
+
+      assert [
+               %{
+                 interview_buttons: [],
+                 interview_history_items: ["Discontinued interview on 12/08/2020 at 06:00am EST: Transferred to another jurisdiction"]
+               }
+             ] = Pages.Profile.contact_investigations(view)
+
+      view
+      |> Pages.Profile.click_edit_interview_discontinuation_details_and_follow_redirect("exposure")
+      |> assert_redirects_to("/contact-investigations/#{exposure.id}/discontinue")
     end
 
     defp create_exposure_with_prereqs(user, sick_person, lab_result_attrs, case_investigation_attrs, exposure_attrs) do

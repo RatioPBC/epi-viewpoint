@@ -527,6 +527,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # contact investigations
   #
 
+  def click_edit_interview_discontinuation_details_and_follow_redirect(%View{} = view, exposure_tid) do
+    view
+    |> element("[data-tid=#{exposure_tid}] [data-role=edit-discontinue-contact-investigation-interview-link]")
+    |> render_click()
+  end
+
   def contact_investigations(%View{} = view) do
     view
     |> render()
@@ -536,7 +542,6 @@ defmodule EpicenterWeb.Test.Pages.Profile do
       title = Test.Html.find(contact_investigation, "[data-role=contact-investigation-title]") |> Test.Html.text()
       creation_timestamp = Test.Html.find(contact_investigation, "[data-role=contact-investigation-timestamp]") |> Test.Html.text()
       initiating_case_text = Test.Html.find(contact_investigation, "[data-role=initiating-case]") |> Test.Html.text()
-      status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-status]") |> Test.Html.text()
 
       minor_details =
         Test.Html.all(contact_investigation, "[data-role=minor-details] [data-role=detail]", fn detail ->
@@ -548,6 +553,18 @@ defmodule EpicenterWeb.Test.Pages.Profile do
           Test.Html.text(detail)
         end)
 
+      status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-status]") |> Test.Html.text()
+
+      interview_buttons =
+        Test.Html.all(contact_investigation, "[data-role=contact-investigation-interview-button]", fn detail ->
+          Test.Html.text(detail)
+        end)
+
+      interview_history_items =
+        Test.Html.all(contact_investigation, "[data-role=contact-investigation-history-item-text]", fn detail ->
+          Test.Html.text(detail)
+        end)
+
       %{
         id: id,
         title: title,
@@ -555,7 +572,9 @@ defmodule EpicenterWeb.Test.Pages.Profile do
         initiating_case_text: initiating_case_text,
         minor_details: minor_details,
         exposure_details: exposure_details,
-        status: status
+        status: status,
+        interview_buttons: interview_buttons,
+        interview_history_items: interview_history_items
       }
     end)
   end
