@@ -11,7 +11,7 @@ defmodule EpicenterWeb.Presenters.LabResultPresenter do
     lab_result = LabResult.latest(lab_results, :positive)
 
     if lab_result do
-      "#{lab_result.result}, #{days_ago(lab_result)}"
+      "#{pretty_result(lab_result.result)}, #{days_ago(lab_result)}"
     else
       ""
     end

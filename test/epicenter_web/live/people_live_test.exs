@@ -21,7 +21,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
         [
           ["Name", "Latest test result"],
           ["Billy Testuser", "Detected, 3 days ago"],
-          ["Alice Testuser", "positive, 1 day ago"]
+          ["Alice Testuser", "Positive, 1 day ago"]
         ],
         columns: ["Name", "Latest test result"]
       )
@@ -34,7 +34,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_table_contents(
         [
           ["Name", "Latest test result"],
-          ["Alice Testuser", "positive, 4 days ago"],
+          ["Alice Testuser", "Positive, 4 days ago"],
           ["Billy Testuser", "Detected, 3 days ago"]
         ],
         columns: ["Name", "Latest test result"]
@@ -53,9 +53,9 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_table_contents(
         [
           ["Name", "Latest test result"],
-          ["Unknown", "positive, 4 days ago"],
+          ["Unknown", "Positive, 4 days ago"],
           ["Billy Testuser", "Detected, 3 days ago"],
-          ["Alice Testuser", "positive, 1 day ago"]
+          ["Alice Testuser", "Positive, 1 day ago"]
         ],
         columns: ["Name", "Latest test result"]
       )
@@ -153,16 +153,16 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "Ongoing interview", ""],
-        ["", "David Testuser", "david-id", "positive, 3 days ago", "Ongoing monitoring (13 days remaining)", ""],
-        ["", "Emily Testuser", "nancy-id", "positive, 3 days ago", "Pending monitoring", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "Pending interview", user.name],
-        ["", "Cindy Testuser", "", "positive, 1 day ago", "Concluded monitoring", ""]
+        ["", "David Testuser", "david-id", "Positive, 3 days ago", "Ongoing monitoring (13 days remaining)", ""],
+        ["", "Emily Testuser", "nancy-id", "Positive, 3 days ago", "Pending monitoring", ""],
+        ["", "Alice Testuser", "", "Positive, 1 day ago", "Pending interview", user.name],
+        ["", "Cindy Testuser", "", "Positive, 1 day ago", "Concluded monitoring", ""]
       ])
       |> Pages.People.assert_unchecked("[data-tid=assigned-to-me-checkbox]")
       |> Pages.People.click_assigned_to_me_checkbox()
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "Pending interview", user.name]
+        ["", "Alice Testuser", "", "Positive, 1 day ago", "Pending interview", user.name]
       ])
       |> Pages.People.assert_checked("[data-tid=assigned-to-me-checkbox]")
     end
@@ -267,7 +267,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", ""]
+        ["", "Alice Testuser", "", "Positive, 1 day ago", "", ""]
       ])
       |> Pages.People.assert_assign_dropdown_options(data_role: "users", expected: ["", "Unassigned", "assignee", "fixture admin", "user"])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
@@ -277,7 +277,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest test result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "Detected, 3 days ago", "", ""],
-        ["", "Alice Testuser", "", "positive, 1 day ago", "", "assignee"]
+        ["", "Alice Testuser", "", "Positive, 1 day ago", "", "assignee"]
       ])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
 
