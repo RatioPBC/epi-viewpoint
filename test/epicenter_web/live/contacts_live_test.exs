@@ -18,8 +18,8 @@ defmodule EpicenterWeb.ContactsLiveTest do
       Pages.Contacts.visit(conn)
       |> Pages.Contacts.assert_table_contents([
         ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],
-        ["", "Caroline Testuser", caroline.id, "10/31/2020", "", "assignee"],
-        ["", "Donald Testuser", donald.id, "10/31/2020", "", ""]
+        ["", "Caroline Testuser", caroline.id, "10/31/2020", "Pending", "assignee"],
+        ["", "Donald Testuser", donald.id, "10/31/2020", "Discontinued", ""]
       ])
     end
 
@@ -92,6 +92,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
 
     {:ok, donald_exposure} =
       {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "donald_exposure", %{
+         interview_discontinued_at: ~U[2020-01-01 12:00:00Z],
          exposed_person: %{tid: "donald", demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
        }), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_exposure()
