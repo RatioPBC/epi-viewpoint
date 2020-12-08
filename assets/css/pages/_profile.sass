@@ -173,9 +173,15 @@
 
       .DiscontinuedStatus
         color: $discontinued-color
-      
-      .discontinue-link
-        @include button-secondary
+
+      .contact-investigation-interview-buttons
+        @include level($justify: space-between)
+
+        .discontinue-link
+          @include button-secondary
+
+        .start-link
+          @include button-primary
 
     .contact-investigation-history
       color: $secondary-text-color

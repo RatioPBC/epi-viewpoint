@@ -1,0 +1,7 @@
+#contact-investigation-start-interview-page data-role="contact-investigation-start-interview-page" data-page="contact-investigation-start-interview"
+
+  section
+    header#subnav
+
+    section#contact-investigation-start-interview
+      h2 Start interview

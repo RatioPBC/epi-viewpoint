@@ -650,7 +650,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
                  initiating_case_text: "Initiated by index case #alice-external-id",
                  minor_details: [],
                  exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"],
-                 interview_buttons: ["Discontinue"]
+                 interview_buttons: ["Start interview", "Discontinue"]
                }
              ] = Pages.Profile.contact_investigations(view)
 

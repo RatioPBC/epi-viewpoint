@@ -96,9 +96,9 @@ defmodule EpicenterWeb.ContactInvestigation do
           h3
             span data-role="contact-investigation-status" class=status_class(@exposure) = status_text(@exposure)
             |  interview
-          div
+          div.contact-investigation-interview-buttons
             = for button <- interview_buttons(@exposure) do
-              div data-role="contact-investigation-interview-button"
+              span data-role="contact-investigation-interview-button"
                 = button
       .contact-investigation-history
         = for history_item <- history_items(@exposure) do
@@ -132,6 +132,13 @@ defmodule EpicenterWeb.ContactInvestigation do
         buttons
       end
 
+    buttons =
+      if exposure.interview_status != "discontinued" do
+        [redirect_to(exposure, :start_interview) | buttons]
+      else
+        buttons
+      end
+
     buttons
   end
 
@@ -140,6 +147,14 @@ defmodule EpicenterWeb.ContactInvestigation do
       to: Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, exposure),
       class: "discontinue-link",
       data: [role: "discontinue-contact-investigation"]
+    )
+  end
+
+  defp redirect_to(exposure, :start_interview) do
+    live_redirect("Start interview",
+      to: Routes.contact_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationStartInterviewLive, exposure),
+      class: "start-link",
+      data: [role: "start-contact-investigation"]
     )
   end
 end

@@ -591,6 +591,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_start_contact_investigation(%View{} = view, tid) do
+    view
+    |> element("[data-role=contact-investigation][data-tid=#{tid}] [data-role=start-contact-investigation]")
+    |> render_click()
+  end
+
   #
   # lab results
   #
