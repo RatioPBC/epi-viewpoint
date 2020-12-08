@@ -23,6 +23,8 @@ defmodule Epicenter.Cases.ExposureTest do
           {:inserted_at, :utc_datetime},
           {:interview_discontinue_reason, :string},
           {:interview_discontinued_at, :utc_datetime},
+          {:interview_proxy_name, :string},
+          {:interview_started_at, :utc_datetime},
           {:interview_status, :string},
           {:most_recent_date_together, :date},
           {:relationship_to_case, :string},

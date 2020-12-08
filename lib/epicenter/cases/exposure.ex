@@ -29,6 +29,8 @@ defmodule Epicenter.Cases.Exposure do
     field :household_member, :boolean
     field :interview_discontinue_reason, :string
     field :interview_discontinued_at, :utc_datetime
+    field :interview_proxy_name, :string
+    field :interview_started_at, :utc_datetime
     field :interview_status, :string, read_after_writes: true
     field :most_recent_date_together, :date
     field :relationship_to_case, :string
