@@ -218,45 +218,6 @@ defmodule Epicenter.Cases.PersonTest do
     end
   end
 
-  describe "latest_lab_result" do
-    test "returns nil if no lab results", %{user: user} do
-      user
-      |> Test.Fixtures.person_attrs("alice")
-      |> Cases.create_person!()
-      |> Cases.preload_lab_results()
-      |> Person.latest_lab_result()
-      |> assert_eq(nil)
-    end
-
-    test "returns the lab result with the most recent sample date", %{user: user} do
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
-
-      alice = alice |> Cases.preload_lab_results()
-      assert Person.latest_lab_result(alice).tid == "newer"
-    end
-
-    test "when there is a null sampled_on, returns that record first", %{user: user} do
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
-
-      alice = alice |> Cases.preload_lab_results()
-      assert Person.latest_lab_result(alice).tid == "unknown"
-    end
-
-    test "when there are two records with null sampled_on, returns the lab results with the largest seq", %{user: user} do
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
-      Test.Fixtures.lab_result_attrs(alice, user, "newer unknown", nil) |> Cases.create_lab_result!()
-
-      alice = alice |> Cases.preload_lab_results()
-      assert Person.latest_lab_result(alice).tid == "newer unknown"
-    end
-  end
-
   describe "coalesce_demographics" do
     test "prioritizes manual data > old import data > new import data" do
       older_import_attrs = %{dob: ~D[2000-01-01], first_name: "Older-Import", source: "import", inserted_at: ~N[2020-01-01 00:00:00]}

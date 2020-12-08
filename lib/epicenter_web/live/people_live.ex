@@ -34,7 +34,6 @@ defmodule EpicenterWeb.PeopleLive do
       external_id: 1,
       full_name: 1,
       latest_case_investigation_status: 2,
-      latest_result: 1,
       selected?: 2
     ]
 
@@ -43,6 +42,7 @@ defmodule EpicenterWeb.PeopleLive do
   alias Epicenter.CaseInvestigationFilterError
   alias Epicenter.Cases
   alias EpicenterWeb.PeopleFilter
+  alias EpicenterWeb.Presenters.LabResultPresenter
 
   @clock Application.get_env(:epicenter, :clock)
 

@@ -1,6 +1,5 @@
 defmodule EpicenterWeb.Presenters.PeoplePresenter do
   alias Epicenter.Cases.Person
-  alias Epicenter.Extra
   alias EpicenterWeb.Format
   alias EpicenterWeb.Unknown
 
@@ -28,25 +27,10 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   def latest_case_investigation_status(person, current_date),
     do: person |> Person.latest_case_investigation() |> displayable_status(current_date)
 
-  def latest_result(person) do
-    lab_result = Person.latest_lab_result(person)
-
-    if lab_result do
-      result = lab_result.result || "unknown"
-
-      "#{result}, #{days_ago(lab_result)}"
-    else
-      ""
-    end
-  end
-
   def selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)
 
   # # # Private
-
-  defp days_ago(%{sampled_on: nil} = _lab_result), do: "unknown date"
-  defp days_ago(%{sampled_on: sampled_on} = _lab_result), do: sampled_on |> Extra.Date.days_ago_string()
 
   defp displayable_status(nil, _),
     do: ""

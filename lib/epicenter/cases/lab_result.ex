@@ -60,6 +60,16 @@ defmodule Epicenter.Cases.LabResult do
     |> Extra.String.sha256()
   end
 
+  def latest(lab_results, :positive) do
+    lab_results |> Enum.filter(fn r -> r.is_positive_or_detected end) |> latest()
+  end
+
+  def latest(lab_results) do
+    lab_results
+    |> Enum.sort_by(& &1.seq, :desc)
+    |> Enum.max_by(& &1.sampled_on, Extra.Date.NilFirst, fn -> nil end)
+  end
+
   @doc """
   *** WARNING ***
   If this list of fields changes, the fingerprint column in the table *MAY* not be useful for de-duplication anymore.

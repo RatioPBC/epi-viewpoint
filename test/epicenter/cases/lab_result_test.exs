@@ -123,6 +123,59 @@ defmodule Epicenter.Cases.LabResultTest do
     end
   end
 
+  describe "latest" do
+    setup do
+      [user: Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()]
+    end
+
+    test "returns nil if no lab results", %{user: user} do
+      person =
+        user
+        |> Test.Fixtures.person_attrs("alice")
+        |> Cases.create_person!()
+        |> Cases.preload_lab_results()
+
+      LabResult.latest(person.lab_results) |> assert_eq(nil)
+    end
+
+    test "returns the lab result with the most recent sample date", %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
+
+      alice = alice |> Cases.preload_lab_results()
+      assert LabResult.latest(alice.lab_results).tid == "newer"
+    end
+
+    test "when there is a null sampled_on, returns that record first", %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer", "06-02-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "older", "06-01-2020") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
+
+      alice = alice |> Cases.preload_lab_results()
+      assert LabResult.latest(alice.lab_results).tid == "unknown"
+    end
+
+    test "when there are two records with null sampled_on, returns the lab results with the largest seq", %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, user, "unknown", nil) |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "newer unknown", nil) |> Cases.create_lab_result!()
+
+      alice = alice |> Cases.preload_lab_results()
+      assert LabResult.latest(alice.lab_results).tid == "newer unknown"
+    end
+
+    test "can filter positive only", %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.lab_result_attrs(alice, user, "alice-negative", "06-02-2020", result: "negative") |> Cases.create_lab_result!()
+      Test.Fixtures.lab_result_attrs(alice, user, "alice-positive", "06-01-2020", result: "positive") |> Cases.create_lab_result!()
+
+      alice = alice |> Cases.preload_lab_results()
+      assert LabResult.latest(alice.lab_results, :positive).tid == "alice-positive"
+    end
+  end
+
   describe "query" do
     import Euclid.Extra.Enum, only: [tids: 1]
 
