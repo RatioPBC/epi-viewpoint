@@ -1,9 +1,12 @@
 defmodule Epicenter.Cases.ExposureTest do
   use Epicenter.DataCase, async: true
 
-  alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases
   alias Epicenter.Cases.Exposure
   alias Epicenter.Test
+
+  setup :persist_admin
+  @admin Test.Fixtures.admin()
 
   describe "schema" do
     test "fields" do
@@ -20,6 +23,7 @@ defmodule Epicenter.Cases.ExposureTest do
           {:inserted_at, :utc_datetime},
           {:interview_discontinue_reason, :string},
           {:interview_discontinued_at, :utc_datetime},
+          {:interview_status, :string},
           {:most_recent_date_together, :date},
           {:relationship_to_case, :string},
           {:seq, :integer},
@@ -31,8 +35,12 @@ defmodule Epicenter.Cases.ExposureTest do
     end
   end
 
-  defp new_changeset(attr_updates) do
-    default_attrs = Test.Fixtures.case_investigation_exposure_attrs(%CaseInvestigation{id: "flimflams"}, "validation example")
+  defp new_changeset(attr_updates \\ %{}) do
+    person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+    lab_result = Test.Fixtures.lab_result_attrs(person, @admin, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
+    exposing_case = Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case_investigation") |> Cases.create_case_investigation!()
+
+    default_attrs = Test.Fixtures.case_investigation_exposure_attrs(exposing_case, "validation example")
     Exposure.changeset(%Exposure{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
   end
 
@@ -47,5 +55,17 @@ defmodule Epicenter.Cases.ExposureTest do
   test "validates guardian_name if a minor" do
     assert_invalid(new_changeset(guardian_name: "", under_18: true))
     assert_valid(new_changeset(guardian_name: "", under_18: false))
+  end
+
+  describe "contact investigation interview status using generated column" do
+    test "pending by default" do
+      {:ok, contact_investigation} = new_changeset() |> Repo.insert()
+      assert contact_investigation.interview_status == "pending"
+    end
+
+    test "discontinued when interview_discontinued_at is not null" do
+      {:ok, contact_investigation} = new_changeset(interview_discontinued_at: DateTime.utc_now()) |> Repo.insert()
+      assert contact_investigation.interview_status == "discontinued"
+    end
   end
 end
