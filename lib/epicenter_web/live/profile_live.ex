@@ -63,17 +63,6 @@ defmodule EpicenterWeb.CaseInvestigationNote do
   end
 end
 
-defmodule EpicenterWeb.Flex do
-  use EpicenterWeb, :live_component
-
-  def render(assigns) do
-    ~H"""
-    div class="Flex Flex--direction-#{@direction} Flex--justify-#{@justify}"
-      = render_block(@inner_block)
-    """
-  end
-end
-
 defmodule EpicenterWeb.ContactInvestigationStatusRow do
   use EpicenterWeb, :live_component
 
@@ -82,12 +71,11 @@ defmodule EpicenterWeb.ContactInvestigationStatusRow do
   def render(assigns) do
     ~H"""
     .ContactInvestigationStatus
-      = component(@socket, EpicenterWeb.Flex, @key <> "flex", direction: "row", justify: "space-between") do
-        h3
-          span data-role="contact-investigation-status" class="ContactInvestigationStatus__#{status_class(@exposure)}" = status_text(@exposure)
-          |  interview
-        div
-          = interview_buttons(@exposure)
+      h3
+        span data-role="contact-investigation-status" class="ContactInvestigationStatus__#{status_class(@exposure)}" = status_text(@exposure)
+        |  interview
+      div
+        = interview_buttons(@exposure)
     """
   end
 
