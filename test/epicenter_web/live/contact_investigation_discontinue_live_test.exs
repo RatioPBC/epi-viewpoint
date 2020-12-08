@@ -37,6 +37,8 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
                "Unable to reach"
              ]
            }
+
+    assert Pages.ContactInvestigationDiscontinue.form_title(view) == "Discontinue interview"
   end
 
   test "allows the user to set a discontinuation reason and saves a timestamp of when that happened", %{conn: conn, exposure: exposure, user: user} do
@@ -83,6 +85,13 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
            } = Pages.form_state(view)
 
     assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+  end
+
+  test "editing discontinuation reason has a different title", %{conn: conn, exposure: exposure, user: user} do
+    {:ok, _} = exposure |> Cases.update_exposure({%{interview_discontinued_at: ~U[2020-01-01 12:00:00Z]}, Test.Fixtures.audit_meta(user)})
+    view = Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
+
+    assert Pages.ContactInvestigationDiscontinue.form_title(view) == "Edit discontinue interview"
   end
 
   defp create_exposure(user) do

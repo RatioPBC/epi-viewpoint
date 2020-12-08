@@ -25,4 +25,12 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationDiscontinue do
 
     view
   end
+
+  def form_title(%View{} = view) do
+    view
+    |> render()
+    |> Pages.parse()
+    |> Test.Html.find!(".InvestigationDiscontinueForm [data-role=form-title]")
+    |> Test.Html.text()
+  end
 end
