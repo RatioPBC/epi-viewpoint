@@ -13,8 +13,7 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
       = component(@socket,
         InvestigationNoteForm,
         @case_investigation.id <> "note form",
-        case_investigation_id: @case_investigation.id,
-        exposure_id: nil,
+        subject_id: @case_investigation.id,
         current_user_id: @current_user_id,
         on_add: @on_note_added )
       = for note <- @case_investigation.notes |> Enum.reverse() do
@@ -105,8 +104,7 @@ defmodule EpicenterWeb.ContactInvestigation do
         = component(@socket,
           InvestigationNoteForm,
           @exposure.id <> "note form",
-          case_investigation_id: nil,
-          exposure_id: @exposure.id,
+          subject_id: @exposure.id,
           current_user_id: @current_user_id,
           on_add: @on_note_added)
         = for note <- @exposure.notes |> Enum.reverse() do
@@ -186,6 +184,7 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
+  import Euclid.Extra.Map, only: [rename_key: 3]
 
   import EpicenterWeb.Presenters.CaseInvestigationPresenter,
     only: [
@@ -259,16 +258,21 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   defp audit_log_event_names(note_attrs) do
-    if note_attrs.case_investigation_id do
-      {
-        AuditLog.Revision.create_case_investigation_note_action(),
-        AuditLog.Revision.profile_case_investigation_note_submission_event()
-      }
-    else
-      {
-        AuditLog.Revision.create_exposure_note_action(),
-        AuditLog.Revision.profile_exposure_note_submission_event()
-      }
+    case note_attrs do
+      %{case_investigation_id: _} ->
+        {
+          AuditLog.Revision.create_case_investigation_note_action(),
+          AuditLog.Revision.profile_case_investigation_note_submission_event()
+        }
+
+      %{exposure_id: _} ->
+        {
+          AuditLog.Revision.create_exposure_note_action(),
+          AuditLog.Revision.profile_exposure_note_submission_event()
+        }
+
+      _ ->
+        :error
     end
   end
 

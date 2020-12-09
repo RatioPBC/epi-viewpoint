@@ -23,8 +23,7 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
           InvestigationNoteForm,
           "styleguide-note-form",
           handler: "#styleguide-note-example",
-          case_investigation_id: nil,
-          exposure_id: nil,
+          subject_id: nil,
           current_user_id: "author-1",
           on_add: @on_add)
         = for note <- @notes do
@@ -58,7 +57,7 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
     note_attrs
     |> Map.put(:inserted_at, ~U[2020-10-31 10:30:00Z])
     |> Map.put(:author, %User{name: "Billy"})
-    |> Map.put(:id, "fake-user")
+    |> Map.put(:id, "fake-note-#{:os.system_time(:millisecond)}")
     |> Map.put(:__struct__, InvestigationNote)
   end
 end
