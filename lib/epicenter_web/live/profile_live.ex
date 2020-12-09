@@ -144,23 +144,21 @@ defmodule EpicenterWeb.ContactInvestigation do
   end
 
   defp interview_buttons(exposure) do
-    buttons = []
+    case exposure.interview_status do
+      "pending" ->
+        [
+          redirect_to(exposure, :start_interview),
+          redirect_to(exposure, :discontinue_interview)
+        ]
 
-    buttons =
-      if exposure.interview_status != "discontinued" do
-        [redirect_to(exposure, :discontinue_interview) | buttons]
-      else
-        buttons
-      end
+      "started" ->
+        [
+          redirect_to(exposure, :discontinue_interview)
+        ]
 
-    buttons =
-      if exposure.interview_status != "discontinued" do
-        [redirect_to(exposure, :start_interview) | buttons]
-      else
-        buttons
-      end
-
-    buttons
+      "discontinued" ->
+        []
+    end
   end
 
   defp redirect_to(exposure, :discontinue_interview) do

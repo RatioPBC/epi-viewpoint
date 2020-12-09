@@ -94,6 +94,12 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
              interview_proxy_name: "Alice's guardian"
            } = Cases.get_exposure(exposure.id)
 
-    assert [%{status: "Started"}] = Pages.Profile.contact_investigations(view)
+    assert [
+             %{
+               interview_buttons: ["Discontinue"],
+               interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
+               status: "Started"
+             }
+           ] = Pages.Profile.contact_investigations(view)
   end
 end
