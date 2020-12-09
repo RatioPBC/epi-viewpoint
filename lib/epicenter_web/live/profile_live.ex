@@ -235,6 +235,35 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
+  def handle_info({:submitted_note_form, note_attrs}, socket) do
+    {reason_action, reason_event} = audit_log_event_names(note_attrs)
+
+    Cases.create_investigation_note(
+      {note_attrs,
+       %AuditLog.Meta{
+         author_id: socket.assigns.current_user.id,
+         reason_action: reason_action,
+         reason_event: reason_event
+       }}
+    )
+
+    handle_info(:reload_investigations, socket)
+  end
+
+  defp audit_log_event_names(note_attrs) do
+    if note_attrs.case_investigation_id do
+      {
+        AuditLog.Revision.create_case_investigation_note_action(),
+        AuditLog.Revision.profile_case_investigation_note_submission_event()
+      }
+    else
+      {
+        AuditLog.Revision.create_exposure_note_action(),
+        AuditLog.Revision.profile_exposure_note_submission_event()
+      }
+    end
+  end
+
   def handle_info(:reload_investigations, socket) do
     socket
     |> assign_case_investigations(socket.assigns.person)

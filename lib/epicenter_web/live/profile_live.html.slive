@@ -157,7 +157,7 @@
                   case_investigation.id <> "note section",
                   case_investigation: case_investigation,
                   current_user_id: @current_user.id,
-                  on_note_added: fn _new_note -> send(self(), :reload_investigations) end,
+                  on_note_added: fn note_attrs -> send(self(), {:submitted_note_form, note_attrs}) end,
                   on_note_deleted: fn _deleted_note -> send(self(), :reload_investigations) end
 
   a#contact-investigations
@@ -167,7 +167,7 @@
                 exposure.id <> "contact investigation",
                 exposure: exposure,
                 current_user_id: @current_user.id,
-                on_note_added: fn _new_note -> send(self(), :reload_investigations) end,
+                on_note_added: fn note_attrs -> send(self(), {:submitted_note_form, note_attrs}) end,
                 on_note_deleted: fn _deleted_note -> send(self(), :reload_investigations) end
 
   section#lab-results data-role="lab-results"

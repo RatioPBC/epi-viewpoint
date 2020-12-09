@@ -4,8 +4,6 @@ defmodule EpicenterWeb.InvestigationNoteForm do
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
-  alias Epicenter.AuditLog
-  alias Epicenter.Cases
   alias EpicenterWeb.Form
 
   defmodule FormFieldData do
@@ -23,11 +21,8 @@ defmodule EpicenterWeb.InvestigationNoteForm do
     @optional_attrs ~w{case_investigation_id exposure_id}a
     @required_attrs ~w{text}a
 
-    def changeset(case_investigation, exposure, params) do
-      %__MODULE__{
-        case_investigation_id: case_investigation.id,
-        exposure_id: exposure.id
-      }
+    def changeset(params) do
+      %__MODULE__{}
       |> cast(params, @optional_attrs ++ @required_attrs)
       |> validate_required(@required_attrs)
     end
@@ -51,8 +46,8 @@ defmodule EpicenterWeb.InvestigationNoteForm do
     {:ok, socket |> assign(assigns) |> assign(changeset: socket.assigns[:changeset] || empty_note(assigns))}
   end
 
-  defp empty_note(assigns) do
-    FormFieldData.changeset(%{id: assigns.case_investigation_id}, %{id: assigns.exposure_id}, %{})
+  defp empty_note(_assigns) do
+    FormFieldData.changeset(%{})
   end
 
   def render(assigns) do
@@ -64,49 +59,19 @@ defmodule EpicenterWeb.InvestigationNoteForm do
 
   def handle_event("change_note", %{"form_field_data" => params}, socket) do
     socket
-    |> assign(changeset: FormFieldData.changeset(%{id: socket.assigns.case_investigation_id}, %{id: socket.assigns.exposure_id}, params))
+    |> assign(changeset: FormFieldData.changeset(Map.merge(%{"case_investigation_id" => socket.assigns.case_investigation_id, "exposure_id" => socket.assigns.exposure_id}, params)))
     |> noreply()
   end
 
   def handle_event("save_note", %{"form_field_data" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <-
-           FormFieldData.changeset(%{id: socket.assigns.case_investigation_id}, %{id: socket.assigns.exposure_id}, params),
-         {reason_action, reason_event} <- audit_log_event_names(form_changeset),
-         {:form, {:ok, investigation_note_attrs}} <-
-           {:form, FormFieldData.investigation_note_attrs(form_changeset, socket.assigns.current_user_id)},
-         {:note, {:ok, note}} <-
-           {:note,
-            Cases.create_investigation_note(
-              {investigation_note_attrs,
-               %AuditLog.Meta{
-                 author_id: socket.assigns.current_user_id,
-                 reason_action: reason_action,
-                 reason_event: reason_event
-               }}
-            )} do
-      socket.assigns.on_add.(note)
-      socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()
-    else
-      {:form, {:error, changeset}} ->
-        socket |> assign(changeset: changeset) |> noreply()
-
-      _ ->
-        socket |> noreply()
-    end
-  end
-
-  defp audit_log_event_names(form_changeset) do
-    if form_changeset.data.case_investigation_id != nil do
-      {
-        AuditLog.Revision.create_case_investigation_note_action(),
-        AuditLog.Revision.profile_case_investigation_note_submission_event()
-      }
-    else
-      {
-        AuditLog.Revision.create_exposure_note_action(),
-        AuditLog.Revision.profile_exposure_note_submission_event()
-      }
-    end
+      changeset = FormFieldData.changeset(Map.merge(%{"case_investigation_id" => socket.assigns.case_investigation_id, "exposure_id" => socket.assigns.exposure_id}, params))
+      case FormFieldData.investigation_note_attrs(changeset, socket.assigns.current_user_id) do
+        {:ok, note_attrs} ->
+          socket.assigns.on_add.(note_attrs)
+          socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()
+        {:error, error_changeset} ->
+          socket |> assign(changeset: error_changeset) |> noreply()
+      end
   end
 
   def confirmation_prompt(changeset) do
@@ -130,7 +95,6 @@ defmodule EpicenterWeb.InvestigationNoteForm do
     end
 
     Form.new(form)
-    #    |> Form.line(&Form.hidden_field(&1, :case_investigation_id))
     |> textarea.()
     |> Form.safe()
   end

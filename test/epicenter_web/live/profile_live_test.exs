@@ -569,6 +569,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
         |> Pages.Profile.change_case_investigation_note_form("001", %{"text" => "A new note"})
         |> Pages.Profile.add_case_investigation_note("001", "A new note")
 
+      # TODO: Figure out how to wait for the messages to settle
+      :timer.sleep(10)
       [note] = Pages.Profile.case_investigation_notes(view, "001")
       assert %{text: "A new note", author: ^username} = note
       assert {:ok, _} = Epicenter.DateParser.parse_mm_dd_yyyy(note.date)
@@ -594,6 +596,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
         Pages.Profile.visit(conn, person)
         |> Pages.Profile.add_case_investigation_note("001", "this is my note")
 
+      # TODO: Figure out how to wait for the messages to settle
+      :timer.sleep(10)
       [note] = Pages.Profile.case_investigation_notes(view, "001")
 
       assert Pages.Profile.remove_note(view, note.id) == :ok
@@ -739,6 +743,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
         Pages.Profile.visit(conn, exposure.exposed_person)
         |> Pages.Profile.add_contact_investigation_note(exposure.tid, "A new note")
 
+      # TODO: Figure out how to wait for the messages to settle
+      :timer.sleep(10)
       assert [note] = exposure |> Cases.preload_investigation_notes() |> Map.get(:notes)
       assert_recent_audit_log(note, user, action: "create-exposure-note", event: "profile-exposure-note-submission")
 
