@@ -3,7 +3,9 @@ defmodule Epicenter.Cases.Exposure do
 
   import Ecto.Changeset
   import Epicenter.PhiValidation, only: [validate_phi: 2]
+
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.Person
 
   @required_attrs ~w{exposing_case_id most_recent_date_together relationship_to_case}a
@@ -42,6 +44,7 @@ defmodule Epicenter.Cases.Exposure do
 
     belongs_to :exposed_person, Person
     belongs_to :exposing_case, CaseInvestigation
+    has_many :notes, InvestigationNote, foreign_key: :exposure_id, where: [deleted_at: nil]
   end
 
   def changeset(exposure, attrs) do

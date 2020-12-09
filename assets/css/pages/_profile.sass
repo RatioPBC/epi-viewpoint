@@ -130,7 +130,7 @@
           ul
             @include dotted-details
 
-    .case-investigation-notes
+    .case-investigation-notes, .contact-investigation-notes
       border-top: 2px solid $divider-color
       padding-top: 2rem
 
@@ -138,19 +138,19 @@
         @include form-grid($vertical-flow-margin: 1rem)
         margin-bottom: 0
 
-      .case-investigation-note
+      .investigation-note
         padding-top: 2rem
 
-      .case-investigation-note-header
+      .investigation-note-header
         @include level
 
-        .case-investigation-note-author
+        .investigation-note-author
           font-weight: bold
 
-      .case-investigation-note-text
+      .investigation-note-text
           padding-top: .5rem
       
-      .case-investigation-delete-link
+      .investigation-note-delete-link
         color: $delete-link-color
 
   section.contact-investigation

@@ -220,7 +220,7 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>\v
-      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" type="submit">Save</button>\v
+      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="save-button" type="submit">Save</button>\v
     </fieldset>
     """)
   end

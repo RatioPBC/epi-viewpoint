@@ -315,11 +315,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.all("#case-investigation-#{number} [data-role=case-investigation-note]", fn note_el ->
+    |> Test.Html.all("#case-investigation-#{number} [data-role=investigation-note]", fn note_el ->
       id = Test.Html.attr(note_el, "data-note-id") |> List.first()
-      text = Test.Html.find(note_el, "[data-role=case-investigation-note-text]") |> Test.Html.text()
-      author = Test.Html.find(note_el, "[data-role=case-investigation-note-author]") |> Test.Html.text()
-      date = Test.Html.find(note_el, "[data-role=case-investigation-note-date]") |> Test.Html.text()
+      text = Test.Html.find(note_el, "[data-role=investigation-note-text]") |> Test.Html.text()
+      author = Test.Html.find(note_el, "[data-role=investigation-note-author]") |> Test.Html.text()
+      date = Test.Html.find(note_el, "[data-role=investigation-note-date]") |> Test.Html.text()
       %{id: id, text: text, author: author, date: date}
     end)
   end
@@ -358,7 +358,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
-  def add_note(%View{} = view, number, note_text) do
+  def add_case_investigation_note(%View{} = view, number, note_text) do
     view
     |> form("#case-investigation-#{number} [data-role=note-form]", %{"form_field_data" => %{"text" => note_text}})
     |> render_submit()
@@ -366,7 +366,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
-  def change_note_form(view, number, attrs) do
+  def change_case_investigation_note_form(view, number, attrs) do
     view |> element("#case-investigation-#{number} [data-role=note-form]") |> render_change(form_field_data: attrs)
 
     view
@@ -527,10 +527,28 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # contact investigations
   #
 
+  def add_contact_investigation_note(view, exposure_tid, note_text) do
+    view
+    |> form("[data-tid=#{exposure_tid}][data-role=contact-investigation] [data-role=note-form]", %{"form_field_data" => %{"text" => note_text}})
+    |> render_submit()
+
+    view
+  end
+
+  def click_on_exposing_case(%View{} = view, contact_investigation_tid) do
+    view
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=visit-exposing-case-link]")
+    |> render_click()
+  end
+
   def click_edit_interview_discontinuation_details_and_follow_redirect(%View{} = view, exposure_tid) do
     view
     |> element("[data-tid=#{exposure_tid}] [data-role=edit-discontinue-contact-investigation-interview-link]")
     |> render_click()
+  end
+
+  def change_contact_investigation_note_form(view, contact_investigation_tid, attrs) do
+    view |> element("[data-tid=#{contact_investigation_tid}] [data-role=note-form]") |> render_change(form_field_data: attrs)
   end
 
   def contact_investigations(%View{} = view) do
@@ -579,10 +597,17 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     end)
   end
 
-  def click_on_exposing_case(%View{} = view, contact_investigation_tid) do
+  def contact_investigation_notes(%View{} = view, exposure_tid) do
     view
-    |> element("[data-tid=#{contact_investigation_tid}] [data-role=visit-exposing-case-link]")
-    |> render_click()
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.all("[data-role=contact-investigation][data-tid=#{exposure_tid}] [data-role=investigation-note]", fn note_el ->
+      id = Test.Html.attr(note_el, "data-note-id") |> List.first()
+      text = Test.Html.find(note_el, "[data-role=investigation-note-text]") |> Test.Html.text()
+      author = Test.Html.find(note_el, "[data-role=investigation-note-author]") |> Test.Html.text()
+      date = Test.Html.find(note_el, "[data-role=investigation-note-date]") |> Test.Html.text()
+      %{id: id, text: text, author: author, date: date}
+    end)
   end
 
   def click_discontinue_contact_investigation(%View{} = view, tid) do

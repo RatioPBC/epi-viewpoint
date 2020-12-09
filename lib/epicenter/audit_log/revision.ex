@@ -34,6 +34,7 @@ defmodule Epicenter.AuditLog.Revision do
   # action = what was the code that made this change trying to accomplish?
   def create_case_investigation_note_action(), do: "create-case-investigation-note"
   def create_contact_action(), do: "create-contact"
+  def create_exposure_note_action(), do: "create-exposure-note"
   def create_user_action(), do: "create-user"
   def demote_user_action(), do: "demote-user"
   def enable_user_action(), do: "enable-user"
@@ -81,6 +82,7 @@ defmodule Epicenter.AuditLog.Revision do
   def login_user_event(), do: "login-user"
   def people_selected_assignee_event(), do: "people-selected-assignee"
   def profile_case_investigation_note_submission_event(), do: "profile-case-investigation-note-submission"
+  def profile_exposure_note_submission_event(), do: "profile-exposure-note-submission"
   def profile_selected_assignee_event(), do: "profile-selected-assignee"
   def register_user_event(), do: "register-user"
   def releases_event(), do: "releases"

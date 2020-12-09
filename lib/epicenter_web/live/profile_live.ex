@@ -3,21 +3,27 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
 
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
-  alias EpicenterWeb.CaseInvestigationNote
-  alias EpicenterWeb.CaseInvestigationNoteForm
+  alias EpicenterWeb.InvestigationNoteComponent
+  alias EpicenterWeb.InvestigationNoteForm
 
   def render(assigns) do
     ~H"""
     .case-investigation-notes
       h3.additional_notes Additional Notes
-      = component(@socket, CaseInvestigationNoteForm, @case_investigation.id <> "note form", case_investigation_id: @case_investigation.id, current_user_id: @current_user_id, on_add: @on_note_added )
+      = component(@socket,
+        InvestigationNoteForm,
+        @case_investigation.id <> "note form",
+        case_investigation_id: @case_investigation.id,
+        exposure_id: nil,
+        current_user_id: @current_user_id,
+        on_add: @on_note_added )
       = for note <- @case_investigation.notes |> Enum.reverse() do
-        = component(@socket, CaseInvestigationNote, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_note_deleted)
+        = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_note_deleted)
     """
   end
 end
 
-defmodule EpicenterWeb.CaseInvestigationNote do
+defmodule EpicenterWeb.InvestigationNoteComponent do
   use EpicenterWeb, :live_component
 
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
@@ -39,14 +45,14 @@ defmodule EpicenterWeb.CaseInvestigationNote do
 
   def render(assigns) do
     ~H"""
-    .case-investigation-note data-role="case-investigation-note" data-note-id=@note.id
-      .case-investigation-note-header
-        span.case-investigation-note-author data-role="case-investigation-note-author" = @note.author.name
-        span data-role="case-investigation-note-date" = Format.date(@note.inserted_at)
-      .case-investigation-note-text data-role="case-investigation-note-text" = @note.text
+    .investigation-note data-role="investigation-note" data-note-id=@note.id
+      .investigation-note-header
+        span.investigation-note-author data-role="investigation-note-author" = @note.author.name
+        span data-role="investigation-note-date" = Format.date(@note.inserted_at)
+      .investigation-note-text data-role="investigation-note-text" = @note.text
       = if @note.author_id == @current_user_id do
         div
-          a.case-investigation-delete-link href="#" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target=@myself Delete
+          a.investigation-note-delete-link href="#" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target=@myself Delete
     """
   end
 
@@ -66,10 +72,13 @@ end
 defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
 
+  import EpicenterWeb.LiveComponent.Helpers
   import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1]
 
   alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
+  alias EpicenterWeb.InvestigationNoteComponent
+  alias EpicenterWeb.InvestigationNoteForm
 
   def render(assigns) do
     ~H"""
@@ -91,6 +100,17 @@ defmodule EpicenterWeb.ContactInvestigation do
             li data-role="detail" Same household
           li data-role="detail" #{@exposure.relationship_to_case}
           li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
+      .contact-investigation-notes
+        h3.additional_notes Additional Notes
+        = component(@socket,
+          InvestigationNoteForm,
+          @exposure.id <> "note form",
+          case_investigation_id: nil,
+          exposure_id: @exposure.id,
+          current_user_id: @current_user_id,
+          on_add: @on_note_added)
+        = for note <- @exposure.notes |> Enum.reverse() do
+          = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_note_deleted)
       div
         .contact-investigation-status-row
           h3
@@ -216,8 +236,11 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
-  def handle_info(:reload_case_investigations, socket) do
-    socket |> assign_case_investigations(socket.assigns.person) |> noreply()
+  def handle_info(:reload_investigations, socket) do
+    socket
+    |> assign_case_investigations(socket.assigns.person)
+    |> assign_exposures(socket.assigns.person)
+    |> noreply()
   end
 
   def assign_current_date(socket) do
@@ -295,6 +318,7 @@ defmodule EpicenterWeb.ProfileLive do
     exposures =
       person.exposures
       |> Cases.preload_exposing_case()
+      |> Cases.preload_investigation_notes()
 
     assign(socket, exposures: exposures)
   end

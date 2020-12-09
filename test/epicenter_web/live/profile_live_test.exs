@@ -566,8 +566,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       view =
         Pages.Profile.visit(conn, person)
-        |> Pages.Profile.change_note_form("001", %{"text" => "A new note"})
-        |> Pages.Profile.add_note("001", "A new note")
+        |> Pages.Profile.change_case_investigation_note_form("001", %{"text" => "A new note"})
+        |> Pages.Profile.add_case_investigation_note("001", "A new note")
 
       [note] = Pages.Profile.case_investigation_notes(view, "001")
       assert %{text: "A new note", author: ^username} = note
@@ -583,7 +583,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.add_note("001", "")
+      |> Pages.Profile.add_case_investigation_note("001", "")
       |> Pages.Profile.assert_case_investigation_note_validation_messages("001", %{"form_field_data[text]" => "can't be blank"})
     end
 
@@ -592,7 +592,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       view =
         Pages.Profile.visit(conn, person)
-        |> Pages.Profile.add_note("001", "this is my note")
+        |> Pages.Profile.add_case_investigation_note("001", "this is my note")
 
       [note] = Pages.Profile.case_investigation_notes(view, "001")
 
@@ -622,7 +622,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
 
       view
-      |> Pages.Profile.change_note_form("001", %{"text" => "something present"})
+      |> Pages.Profile.change_case_investigation_note_form("001", %{"text" => "something present"})
 
       assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
     end
@@ -729,6 +729,24 @@ defmodule EpicenterWeb.ProfileLiveTest do
                  minor_details: ["Minor", "Guardian: Alex Testuser", "Guardian phone: (111) 111-1222"]
                }
              ] = Pages.Profile.contact_investigations(view)
+    end
+
+    test "can add a new note", %{person: sick_person, user: user, conn: conn} do
+      exposure = create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{tid: "exposure"})
+      username = user.name
+
+      view =
+        Pages.Profile.visit(conn, exposure.exposed_person)
+        |> Pages.Profile.add_contact_investigation_note(exposure.tid, "A new note")
+
+      assert [note] = exposure |> Cases.preload_investigation_notes() |> Map.get(:notes)
+      assert_recent_audit_log(note, user, action: "create-exposure-note", event: "profile-exposure-note-submission")
+
+      [note] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
+      assert %{text: "A new note", author: ^username} = note
+      assert {:ok, _} = Epicenter.DateParser.parse_mm_dd_yyyy(note.date)
+      %{"form_field_data[text]" => text} = Pages.form_state(view)
+      assert text |> Euclid.Exists.blank?()
     end
 
     test "looking at a discontinued contact investigation", %{conn: conn, user: user, person: sick_person} do
