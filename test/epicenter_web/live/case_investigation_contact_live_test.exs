@@ -31,8 +31,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         |> Pages.CaseInvestigationContact.assert_here()
 
       assert %{
-               "contact_form[first_name]" => nil,
-               "contact_form[last_name]" => nil,
+               "contact_form[first_name]" => "",
+               "contact_form[last_name]" => "",
                "contact_form[phone]" => ""
              } = Pages.form_state(view)
 
@@ -142,8 +142,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         |> Pages.CaseInvestigationContact.assert_here()
 
       assert %{
-               "contact_form[first_name]" => nil,
-               "contact_form[last_name]" => nil,
+               "contact_form[first_name]" => "",
+               "contact_form[last_name]" => "",
                "contact_form[phone]" => ""
              } = Pages.form_state(view)
 

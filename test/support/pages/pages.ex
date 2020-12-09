@@ -198,7 +198,7 @@ defmodule EpicenterWeb.Test.Pages do
         )
 
       element, acc ->
-        acc |> Map.put(Test.Html.attr(element, "name") |> List.first(), Test.Html.attr(element, "value") |> List.first())
+        acc |> Map.put(Test.Html.attr(element, "name") |> List.first(), Test.Html.attr(element, "value") |> List.first() |> Kernel.||(""))
     end)
   end
 
