@@ -47,7 +47,6 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
   end
 
   def handle_event(_event, _params, socket) do
-    IO.puts("*** handling the event!")
     socket |> noreply()
   end
 end
