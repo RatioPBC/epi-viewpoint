@@ -46,7 +46,8 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
                     EpicenterWeb.ContactInvestigationStartInterviewLive,
                     exposure
                   ),
-                class: "contact-investigation-link"
+                class: "contact-investigation-link",
+                data: [role: "edit-start-contact-investigation-interview-link"]
               )
           }
           | items

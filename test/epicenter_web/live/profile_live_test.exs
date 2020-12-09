@@ -779,7 +779,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
              ] = Pages.Profile.contact_investigations(view)
 
       view
-      |> Pages.Profile.click_edit_interview_discontinuation_details_and_follow_redirect("exposure")
+      |> Pages.Profile.click_edit_interview_discontinuation_details("exposure")
       |> assert_redirects_to("/contact-investigations/#{exposure.id}/discontinue")
     end
   end

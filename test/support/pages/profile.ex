@@ -540,9 +540,15 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
-  def click_edit_interview_discontinuation_details_and_follow_redirect(%View{} = view, exposure_tid) do
+  def click_edit_interview_discontinuation_details(%View{} = view, exposure_tid) do
     view
     |> element("[data-tid=#{exposure_tid}] [data-role=edit-discontinue-contact-investigation-interview-link]")
+    |> render_click()
+  end
+
+  def click_edit_interview_start_details(%View{} = view, exposure_tid) do
+    view
+    |> element("[data-tid=#{exposure_tid}] [data-role=edit-start-contact-investigation-interview-link]")
     |> render_click()
   end
 
