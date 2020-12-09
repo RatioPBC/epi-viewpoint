@@ -16,14 +16,14 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
     socket
     |> assign_page_title("Start Case Investigation")
-    |> assign_form_changeset(StartInterviewForm.form_changeset(case_investigation))
+    |> assign_form_changeset(StartInterviewForm.changeset(case_investigation, %{}))
     |> assign(case_investigation: case_investigation)
     |> assign(person: person)
     |> ok()
   end
 
   def handle_event("save", %{"start_interview_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.form_changeset(params),
+    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.case_investigation, params),
          {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, cast_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
@@ -32,7 +32,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
         socket |> assign_form_changeset(form_changeset) |> noreply()
 
       {:case_investigation, {:error, _}} ->
-        socket |> assign_form_changeset(StartInterviewForm.form_changeset(params), "An unexpected error occurred") |> noreply()
+        socket
+        |> assign_form_changeset(StartInterviewForm.changeset(socket.assigns.case_investigation, params), "An unexpected error occurred")
+        |> noreply()
     end
   end
 
