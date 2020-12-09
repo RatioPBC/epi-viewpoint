@@ -4,8 +4,6 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   import Ecto.Changeset
   import EpicenterWeb.Views.DateExtraction, only: [convert_time: 3, extract_and_validate_date: 4]
 
-  alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.StartInterviewForm
@@ -22,14 +20,9 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   @required_attrs ~w{date_started person_interviewed time_started time_started_am_pm}a
   @interview_non_proxy_sentinel_value "~~self~~"
 
-  def form_changeset(%CaseInvestigation{} = case_investigation),
-    do: case_investigation |> investigation_start_interview_form_attrs() |> form_changeset()
-
-  def form_changeset(%Exposure{} = contact_investigation),
-    do: contact_investigation |> investigation_start_interview_form_attrs() |> form_changeset()
-
-  def form_changeset(attrs) do
-    %StartInterviewForm{}
+  def changeset(investigation, attrs) do
+    investigation
+    |> investigation_start_interview_form_attrs()
     |> cast(attrs, @required_attrs)
     |> validate_required(@required_attrs)
     |> extract_and_validate_date(:date_started, :time_started, :time_started_am_pm)
@@ -37,21 +30,15 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
 
   # Pre-filling the form
 
-  defp investigation_start_interview_form_attrs(
-         %{
-           interview_started_at: interview_started_at,
-           interview_proxy_name: _interview_proxy_name
-         } = investigation
-       ) do
-    local_now = Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
-
+  defp investigation_start_interview_form_attrs(%{interview_started_at: interview_started_at} = investigation) do
     time =
-      with(
-        time when not is_nil(time) <- interview_started_at,
-        do: Timex.Timezone.convert(time, EpicenterWeb.PresentationConstants.presented_time_zone())
-      ) || local_now
+      if interview_started_at do
+        Timex.Timezone.convert(interview_started_at, EpicenterWeb.PresentationConstants.presented_time_zone())
+      else
+        Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
+      end
 
-    %{
+    %StartInterviewForm{
       person_interviewed: person_interviewed(investigation),
       date_started: Format.date(time |> DateTime.to_date()),
       time_started: Format.time(time |> DateTime.to_time()),

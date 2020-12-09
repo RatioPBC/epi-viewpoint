@@ -1,12 +1,12 @@
 defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.Forms.StartInterviewForm, only: [start_interview_form_builder: 2]
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-
   alias EpicenterWeb.Forms.StartInterviewForm
 
   def mount(%{"exposure_id" => exposure_id}, session, socket) do
@@ -16,14 +16,20 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
     socket
     |> assign_page_title("Start Contact Investigation")
-    |> assign_form_changeset(StartInterviewForm.form_changeset(exposure))
+    |> assign(:confirmation_prompt, nil)
+    |> assign_form_changeset(StartInterviewForm.changeset(exposure, %{}))
     |> assign(exposure: exposure)
     |> assign(person: person)
     |> ok()
   end
 
+  def handle_event("change", %{"start_interview_form" => params}, socket) do
+    new_changeset = StartInterviewForm.changeset(socket.assigns.exposure, params)
+    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
+  end
+
   def handle_event("save", %{"start_interview_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.form_changeset(params),
+    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.exposure, params),
          {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
          {:exposure, {:ok, _exposure}} <-
            {:exposure, update_exposure(socket, cast_investigation_attrs)} do
@@ -33,7 +39,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
         socket |> assign_form_changeset(form_changeset) |> noreply()
 
       {:case_investigation, {:error, _}} ->
-        socket |> assign_form_changeset(StartInterviewForm.form_changeset(params), "An unexpected error occurred") |> noreply()
+        socket |> assign_form_changeset(StartInterviewForm.changeset(socket.assigns.exposure, params), "An unexpected error occurred") |> noreply()
     end
   end
 
@@ -56,4 +62,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
        }}
     )
   end
+
+  defp confirmation_prompt(changeset),
+    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 end

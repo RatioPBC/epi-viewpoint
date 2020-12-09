@@ -1,4 +1,4 @@
-#contact-investigation-start-interview-page data-role="contact-investigation-start-interview-page" data-page="contact-investigation-start-interview"
+#contact-investigation-start-interview-page data-role="contact-investigation-start-interview-page" data-page="contact-investigation-start-interview" data-confirm-navigation=@confirmation_prompt
 
   section
     header#subnav
@@ -6,5 +6,8 @@
     section#contact-investigation-start-interview
       h2 Start interview
 
-      = form_for @form_changeset, "#", [id: "contact-investigation-interview-start-form", phx_submit: "save"], fn f ->
+      = form_for @form_changeset,
+                  "#",
+                  [id: "contact-investigation-interview-start-form", phx_change: "change", phx_submit: "save", data: [role: "start-interview-form"]],
+                  fn f ->
         = start_interview_form_builder(f, @person)
