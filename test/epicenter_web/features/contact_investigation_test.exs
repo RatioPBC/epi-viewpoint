@@ -73,22 +73,27 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
     assert [%{status: "Pending"}] = Pages.Profile.contact_investigations(view)
 
-    view
-    |> Pages.Profile.click_start_contact_investigation(exposure.tid)
-    |> Pages.follow_live_view_redirect(conn)
-    |> Pages.ContactInvestigationStartInterview.assert_here()
+    view =
+      view
+      |> Pages.Profile.click_start_contact_investigation(exposure.tid)
+      |> Pages.follow_live_view_redirect(conn)
+      |> Pages.ContactInvestigationStartInterview.assert_here()
+      |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
+        start_interview_form: %{
+          "person_interviewed" => "Alice's guardian",
+          "date_started" => "09/06/2020",
+          "time_started" => "03:45",
+          "time_started_am_pm" => "PM"
+        }
+      )
+      |> Pages.Profile.assert_here(exposure.exposed_person)
 
-    # TODO bring back as part of #175693906
-    #      |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-start-form",
-    #        start_interview_form: %{
-    #          "person_interviewed" => "Alice's guardian",
-    #          "date_started" => "09/06/2020",
-    #          "time_started" => "03:45",
-    #          "time_started_am_pm" => "PM"
-    #        }
-    #      )
-    #      |> Pages.Profile.assert_here(exposure.exposed_person)
-    #
-    #    assert [%{status: "Started"}] = Pages.Profile.contact_investigations(view)
+    assert %{
+             interview_status: "started",
+             interview_started_at: ~U[2020-09-06 19:45:00Z],
+             interview_proxy_name: "Alice's guardian"
+           } = Cases.get_exposure(exposure.id)
+
+    assert [%{status: "Started"}] = Pages.Profile.contact_investigations(view)
   end
 end

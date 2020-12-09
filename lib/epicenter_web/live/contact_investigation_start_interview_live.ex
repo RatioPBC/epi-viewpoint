@@ -1,13 +1,59 @@
 defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.Forms.StartInterviewForm, only: [start_interview_form_builder: 2]
+  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
-  def mount(%{"exposure_id" => _case_investigation_id}, session, socket) do
+  alias Epicenter.AuditLog
+  alias Epicenter.Cases
+
+  alias EpicenterWeb.Forms.StartInterviewForm
+
+  def mount(%{"exposure_id" => exposure_id}, session, socket) do
     socket = socket |> authenticate_user(session)
+    exposure = exposure_id |> Cases.get_exposure() |> Cases.preload_exposed_person()
+    person = exposure.exposed_person |> Cases.preload_demographics()
 
     socket
-    |> assign_page_title("Start Contact Investigation -- Coming soon")
+    |> assign_page_title("Start Contact Investigation")
+    |> assign_form_changeset(StartInterviewForm.form_changeset(exposure))
+    |> assign(exposure: exposure)
+    |> assign(person: person)
     |> ok()
+  end
+
+  def handle_event("save", %{"start_interview_form" => params}, socket) do
+    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.form_changeset(params),
+         {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
+         {:exposure, {:ok, _exposure}} <-
+           {:exposure, update_exposure(socket, cast_investigation_attrs)} do
+      socket |> redirect_to_profile_page() |> noreply()
+    else
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        socket |> assign_form_changeset(form_changeset) |> noreply()
+
+      {:case_investigation, {:error, _}} ->
+        socket |> assign_form_changeset(StartInterviewForm.form_changeset(params), "An unexpected error occurred") |> noreply()
+    end
+  end
+
+  # # #
+
+  def assign_form_changeset(socket, form_changeset, form_error \\ nil),
+    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
+
+  defp redirect_to_profile_page(socket),
+    do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
+
+  defp update_exposure(socket, params) do
+    Cases.update_exposure(
+      socket.assigns.exposure,
+      {params,
+       %AuditLog.Meta{
+         author_id: socket.assigns.current_user.id,
+         reason_action: AuditLog.Revision.update_exposure_action(),
+         reason_event: AuditLog.Revision.start_interview_event()
+       }}
+    )
   end
 end

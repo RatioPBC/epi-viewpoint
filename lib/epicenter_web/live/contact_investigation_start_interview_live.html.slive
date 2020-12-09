@@ -5,3 +5,6 @@
 
     section#contact-investigation-start-interview
       h2 Start interview
+
+      = form_for @form_changeset, "#", [id: "contact-investigation-interview-start-form", phx_submit: "save"], fn f ->
+        = start_interview_form_builder(f, @person)

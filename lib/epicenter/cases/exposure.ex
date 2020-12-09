@@ -16,6 +16,8 @@ defmodule Epicenter.Cases.Exposure do
     household_member
     interview_discontinue_reason
     interview_discontinued_at
+    interview_proxy_name
+    interview_started_at
     tid
     under_18
   }a

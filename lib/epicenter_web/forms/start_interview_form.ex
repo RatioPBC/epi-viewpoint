@@ -5,8 +5,11 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   import EpicenterWeb.Views.DateExtraction, only: [convert_time: 3, extract_and_validate_date: 4]
 
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
+  alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.StartInterviewForm
+  alias EpicenterWeb.PresentationConstants
 
   @primary_key false
   embedded_schema do
@@ -19,34 +22,52 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   @required_attrs ~w{date_started person_interviewed time_started time_started_am_pm}a
   @interview_non_proxy_sentinel_value "~~self~~"
 
-  def changeset(%CaseInvestigation{} = case_investigation),
-    do: case_investigation |> case_investigation_start_interview_form_attrs() |> changeset()
+  def form_changeset(%CaseInvestigation{} = case_investigation),
+    do: case_investigation |> investigation_start_interview_form_attrs() |> form_changeset()
 
-  def changeset(attrs) do
+  def form_changeset(%Exposure{} = contact_investigation),
+    do: contact_investigation |> investigation_start_interview_form_attrs() |> form_changeset()
+
+  def form_changeset(attrs) do
     %StartInterviewForm{}
     |> cast(attrs, @required_attrs)
     |> validate_required(@required_attrs)
     |> extract_and_validate_date(:date_started, :time_started, :time_started_am_pm)
   end
 
-  def case_investigation_start_interview_form_attrs(%CaseInvestigation{} = case_investigation) do
+  # Pre-filling the form
+
+  defp investigation_start_interview_form_attrs(
+         %{
+           interview_started_at: interview_started_at,
+           interview_proxy_name: _interview_proxy_name
+         } = investigation
+       ) do
     local_now = Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
 
     time =
       with(
-        time when not is_nil(time) <- case_investigation.interview_started_at,
+        time when not is_nil(time) <- interview_started_at,
         do: Timex.Timezone.convert(time, EpicenterWeb.PresentationConstants.presented_time_zone())
       ) || local_now
 
     %{
-      person_interviewed: person_interviewed(case_investigation),
+      person_interviewed: person_interviewed(investigation),
       date_started: Format.date(time |> DateTime.to_date()),
       time_started: Format.time(time |> DateTime.to_time()),
       time_started_am_pm: if(time.hour >= 12, do: "PM", else: "AM")
     }
   end
 
-  def case_investigation_attrs(%Ecto.Changeset{} = form_changeset) do
+  defp person_interviewed(%{interview_proxy_name: nil}),
+    do: @interview_non_proxy_sentinel_value
+
+  defp person_interviewed(%{interview_proxy_name: interview_proxy_name}),
+    do: interview_proxy_name
+
+  # Extract from form
+
+  def investigation_attrs(%Ecto.Changeset{} = form_changeset) do
     with {:ok, case_investigation_start_form} <- apply_action(form_changeset, :create) do
       interview_proxy_name = convert_name(case_investigation_start_form)
       {:ok, interview_started_at} = convert_time_started_and_date_started(case_investigation_start_form)
@@ -69,12 +90,24 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
     convert_time(date, time, am_pm)
   end
 
-  def interview_non_proxy_sentinel_value(),
-    do: @interview_non_proxy_sentinel_value
+  # Rendering the form
 
-  defp person_interviewed(%CaseInvestigation{interview_proxy_name: nil}),
-    do: interview_non_proxy_sentinel_value()
+  def start_interview_form_builder(form, person) do
+    timezone = Timex.timezone(PresentationConstants.presented_time_zone(), Timex.now())
 
-  defp person_interviewed(%CaseInvestigation{interview_proxy_name: interview_proxy_name}),
-    do: interview_proxy_name
+    Form.new(form)
+    |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
+    |> Form.line(&Form.date_field(&1, :date_started, "Date started"))
+    |> Form.line(fn line ->
+      line
+      |> Form.text_field(:time_started, "Time interviewed")
+      |> Form.select(:time_started_am_pm, "", PresentationConstants.am_pm_options(), span: 1)
+      |> Form.content_div(timezone.abbreviation, row: 3)
+    end)
+    |> Form.line(&Form.save_button(&1))
+    |> Form.safe()
+  end
+
+  defp people_interviewed(person),
+    do: [{Format.person(person), @interview_non_proxy_sentinel_value}]
 end
