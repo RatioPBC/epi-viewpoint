@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
@@ -22,7 +23,10 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     |> ok()
   end
 
-  # this one doesn't have the issue but lets you discard changes without a confirmation, a similar issue
+  def handle_event("change", %{"case_investigation" => params}, socket) do
+    changeset = socket.assigns.case_investigation |> Cases.change_case_investigation(params)
+    socket |> assign(changeset: changeset) |> noreply()
+  end
 
   def handle_event("save", %{"case_investigation" => params}, socket) do
     params = Map.put(params, "interview_discontinued_at", DateTime.utc_now())
@@ -76,4 +80,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     end)
     |> Form.safe()
   end
+
+  defp confirmation_prompt(changeset),
+    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 end

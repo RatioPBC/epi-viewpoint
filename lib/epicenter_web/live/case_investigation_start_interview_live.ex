@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.Forms.StartInterviewForm, only: [start_interview_form_builder: 2]
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
@@ -22,7 +23,10 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
     |> ok()
   end
 
-  # this one lets you discard changes without a confirmation prompt
+  def handle_event("change", %{"start_interview_form" => params}, socket) do
+    changeset = socket.assigns.case_investigation |> StartInterviewForm.changeset(params)
+    socket |> assign(form_changeset: changeset) |> noreply()
+  end
 
   def handle_event("save", %{"start_interview_form" => params}, socket) do
     with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.case_investigation, params),
@@ -59,4 +63,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
        }}
     )
   end
+
+  defp confirmation_prompt(changeset),
+    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 end

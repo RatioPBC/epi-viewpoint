@@ -1,4 +1,4 @@
-#case-investigation-discontinue-page data-role="case-investigation-discontinue-page" data-page="case-investigation-discontinue"
+#case-investigation-discontinue-page data-role="case-investigation-discontinue-page" data-page="case-investigation-discontinue" data-confirm-navigation=confirmation_prompt(@changeset)
 
   section
     header#subnav
@@ -10,5 +10,5 @@
     h2 Discontinue interview
     h3 before interview start
 
-    = form_for @changeset, "#", [id: "case-investigation-discontinue-form", phx_submit: "save"], fn f ->
+    = form_for @changeset, "#", [id: "case-investigation-discontinue-form", phx_change: "change", phx_submit: "save"], fn f ->
       = discontinue_form_builder(f)

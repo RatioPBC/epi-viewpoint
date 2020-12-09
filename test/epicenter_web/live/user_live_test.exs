@@ -147,4 +147,21 @@ defmodule EpicenterWeb.UserLiveTest do
       assert Accounts.get_user(email: "existinguser@example.com") == nil
     end
   end
+
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn} do
+      assert Pages.User.visit(conn)
+             |> Pages.navigation_confirmation_prompt()
+             |> Euclid.Exists.blank?()
+    end
+
+    test "when the user changes something", %{conn: conn} do
+      view =
+        Pages.User.visit(conn)
+        |> Pages.User.change_form(user_form: %{"name" => "james"})
+
+      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+      assert %{"user_form[name]" => "james"} = Pages.form_state(view)
+    end
+  end
 end

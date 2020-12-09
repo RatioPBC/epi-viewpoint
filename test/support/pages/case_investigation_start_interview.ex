@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
   import ExUnit.Assertions
+  import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Test
@@ -99,6 +100,12 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
       |> Enum.map(&Test.Html.text(&1))
 
     {actual_time, actual_am_pm}
+  end
+
+  def change_form(%View{} = view, attrs) do
+    view |> element("#" <> @form_id) |> render_change(attrs)
+
+    view
   end
 
   def datetime_started(%View{} = view) do

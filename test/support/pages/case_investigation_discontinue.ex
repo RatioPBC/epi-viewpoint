@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Test.Pages.CaseInvestigationDiscontinue do
   import ExUnit.Assertions
+  import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Test.Pages
@@ -16,5 +17,11 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationDiscontinue do
 
   def assert_here(view_or_conn_or_html) do
     view_or_conn_or_html |> Pages.assert_on_page("case-investigation-discontinue")
+  end
+
+  def change_form(%View{} = view, attrs) do
+    view |> element("#case-investigation-discontinue-form") |> render_change(attrs)
+
+    view
   end
 end

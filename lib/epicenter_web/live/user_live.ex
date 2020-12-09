@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.UserLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_admin_user!: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
@@ -27,9 +28,9 @@ defmodule EpicenterWeb.UserLive do
     @required_attrs ~w{email name status type}a
     @optional_attrs ~w{}a
 
-    def changeset(form_attrs) do
-      %UserForm{}
-      |> cast(form_attrs, @required_attrs ++ @optional_attrs)
+    def changeset(user, attrs) do
+      struct(__MODULE__, user_form_attrs(user))
+      |> cast(attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
       |> Validation.validate_email_format(:email)
     end
@@ -48,9 +49,9 @@ defmodule EpicenterWeb.UserLive do
       |> Map.put(:disabled, user_form.status == "inactive")
     end
 
-    def user_form_attrs(nil), do: %{type: "member", status: "active", email: "", name: ""}
+    defp user_form_attrs(nil), do: %{type: "member", status: "active", email: "", name: ""}
 
-    def user_form_attrs(%User{} = user) do
+    defp user_form_attrs(%User{} = user) do
       %{
         type: if(user.admin, do: "admin", else: "member"),
         status: if(user.disabled, do: "inactive", else: "active"),
@@ -70,20 +71,21 @@ defmodule EpicenterWeb.UserLive do
           nil
       end
 
-    form_seed_data = user |> UserForm.user_form_attrs()
-
     socket
     |> authenticate_admin_user!(session)
     |> assign_page_title("User")
     |> assign(user: user)
-    |> assign_form_changeset(UserForm.changeset(form_seed_data))
+    |> assign_form_changeset(UserForm.changeset(user, %{}))
     |> ok()
   end
 
-  # this form lets you discard changes
+  def handle_event("change", %{"user_form" => params}, socket) do
+    changeset = socket.assigns.user |> UserForm.changeset(params)
+    socket |> assign(form_changeset: changeset) |> noreply()
+  end
 
   def handle_event("save", %{"user_form" => params}, socket) do
-    form_changeset = UserForm.changeset(params)
+    form_changeset = UserForm.changeset(socket.assigns.user, params)
     user = socket.assigns.user
 
     with {:form, {:ok, user_attrs}} <- {:form, UserForm.user_attrs(form_changeset)},
@@ -168,4 +170,7 @@ defmodule EpicenterWeb.UserLive do
   defp assign_form_changeset(socket, form_changeset, form_error \\ nil) do
     socket |> assign(form_changeset: form_changeset, form_error: form_error)
   end
+
+  defp confirmation_prompt(changeset),
+    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 end
