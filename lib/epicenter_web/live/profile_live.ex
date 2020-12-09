@@ -250,6 +250,13 @@ defmodule EpicenterWeb.ProfileLive do
     handle_info(:reload_investigations, socket)
   end
 
+  def handle_info(:reload_investigations, socket) do
+    socket
+    |> assign_case_investigations(socket.assigns.person)
+    |> assign_exposures(socket.assigns.person)
+    |> noreply()
+  end
+
   defp audit_log_event_names(note_attrs) do
     if note_attrs.case_investigation_id do
       {
@@ -262,13 +269,6 @@ defmodule EpicenterWeb.ProfileLive do
         AuditLog.Revision.profile_exposure_note_submission_event()
       }
     end
-  end
-
-  def handle_info(:reload_investigations, socket) do
-    socket
-    |> assign_case_investigations(socket.assigns.person)
-    |> assign_exposures(socket.assigns.person)
-    |> noreply()
   end
 
   def assign_current_date(socket) do

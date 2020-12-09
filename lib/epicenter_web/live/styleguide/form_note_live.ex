@@ -12,7 +12,7 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
   def mount(_params, _session, socket) do
     socket
     |> assign_page_title("Styleguide: note")
-    |> assign(notes: example_notes())
+    |> assign(notes: example_notes(), on_add: fn note -> send(self(), {:on_add, note}) end)
     |> ok()
   end
 
@@ -26,7 +26,7 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
           case_investigation_id: nil,
           exposure_id: nil,
           current_user_id: "author-1",
-          on_add: fn _ -> nil end)
+          on_add: @on_add)
         = for note <- @notes do
           = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: "author-1", on_delete: fn _ -> nil end)
     </div>
@@ -46,7 +46,19 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
     ]
   end
 
+  def handle_info({:on_add, note_attrs}, socket) do
+    socket |> assign(notes: [build_note(note_attrs) | socket.assigns.notes]) |> noreply()
+  end
+
   def handle_event(_event, _params, socket) do
     socket |> noreply()
+  end
+
+  def build_note(note_attrs) do
+    note_attrs
+    |> Map.put(:inserted_at, ~U[2020-10-31 10:30:00Z])
+    |> Map.put(:author, %User{name: "Billy"})
+    |> Map.put(:id, "fake-user")
+    |> Map.put(:__struct__, InvestigationNote)
   end
 end

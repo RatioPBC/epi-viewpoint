@@ -11,13 +11,13 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
     use EpicenterWeb, :live_view
 
     import EpicenterWeb.LiveComponent.Helpers
-   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
+    import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
     alias EpicenterWeb.InvestigationNoteForm
 
-     def mount(_params, _session, socket) do
-       {:ok, socket |> assign(exposure_id: nil, case_investigation_id: nil, on_add: &Function.identity/1)}
-     end
+    def mount(_params, _session, socket) do
+      {:ok, socket |> assign(exposure_id: nil, case_investigation_id: nil, on_add: &Function.identity/1)}
+    end
 
     def render(assigns) do
       ~H"""
@@ -53,8 +53,8 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
   describe "typing text into the text area" do
     test "shows the save button", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
-      view |> form("[data-role=note-form]", %{"form_field_data" => %{"text" => "A new note"}})
-      |> render_change()
+
+      view |> element("form") |> render_change(%{"form_field_data" => %{"text" => "A new note"}})
 
       assert has_element?(view, "button[data-role='save-button']")
     end
@@ -66,7 +66,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
       on_add = fn note_attrs -> send(pid, {:received_on_add, note_attrs}) end
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      send view.pid, {:assigns, on_add: on_add}
+      send(view.pid, {:assigns, on_add: on_add})
 
       view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
 
@@ -78,7 +78,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
       on_add = fn note_attrs -> send(pid, {:received_on_add, note_attrs}) end
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      send view.pid, {:assigns, on_add: on_add, exposure_id: "test-exposure-id"}
+      send(view.pid, {:assigns, on_add: on_add, exposure_id: "test-exposure-id"})
 
       view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
 
@@ -90,17 +90,18 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
       on_add = fn note_attrs -> send(pid, {:received_on_add, note_attrs}) end
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      send view.pid, {:assigns, on_add: on_add, case_investigation_id: "case-investigation-id"}
+      send(view.pid, {:assigns, on_add: on_add, case_investigation_id: "case-investigation-id"})
 
       view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
 
-      assert_receive {:received_on_add, %{author_id: "test-user", case_investigation_id: "case-investigation-id", exposure_id: nil, text: "A new note"}}
+      assert_receive {:received_on_add,
+                      %{author_id: "test-user", case_investigation_id: "case-investigation-id", exposure_id: nil, text: "A new note"}}
     end
 
     test "clears the form", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      view |> form("[data-role=note-form]", %{"form_field_data" => %{"text" => "A new note"}}) |> render_change()
+      view |> element("form") |> render_change(%{"form_field_data" => %{"text" => "A new note"}})
       %{"form_field_data[text]" => text} = Pages.form_state(view)
       assert text |> Euclid.Exists.present?()
 
@@ -123,7 +124,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
       on_add = fn note_attrs -> send(pid, {:received_on_add, note_attrs}) end
 
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
-      send view.pid, {:assigns, on_add: on_add}
+      send(view.pid, {:assigns, on_add: on_add})
       view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => ""}})
 
       refute_receive {:received_on_add, _}

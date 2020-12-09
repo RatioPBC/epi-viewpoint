@@ -59,19 +59,29 @@ defmodule EpicenterWeb.InvestigationNoteForm do
 
   def handle_event("change_note", %{"form_field_data" => params}, socket) do
     socket
-    |> assign(changeset: FormFieldData.changeset(Map.merge(%{"case_investigation_id" => socket.assigns.case_investigation_id, "exposure_id" => socket.assigns.exposure_id}, params)))
+    |> assign(
+      changeset:
+        FormFieldData.changeset(
+          Map.merge(%{"case_investigation_id" => socket.assigns.case_investigation_id, "exposure_id" => socket.assigns.exposure_id}, params)
+        )
+    )
     |> noreply()
   end
 
   def handle_event("save_note", %{"form_field_data" => params}, socket) do
-      changeset = FormFieldData.changeset(Map.merge(%{"case_investigation_id" => socket.assigns.case_investigation_id, "exposure_id" => socket.assigns.exposure_id}, params))
-      case FormFieldData.investigation_note_attrs(changeset, socket.assigns.current_user_id) do
-        {:ok, note_attrs} ->
-          socket.assigns.on_add.(note_attrs)
-          socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()
-        {:error, error_changeset} ->
-          socket |> assign(changeset: error_changeset) |> noreply()
-      end
+    changeset =
+      FormFieldData.changeset(
+        Map.merge(%{"case_investigation_id" => socket.assigns.case_investigation_id, "exposure_id" => socket.assigns.exposure_id}, params)
+      )
+
+    case FormFieldData.investigation_note_attrs(changeset, socket.assigns.current_user_id) do
+      {:ok, note_attrs} ->
+        socket.assigns.on_add.(note_attrs)
+        socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()
+
+      {:error, error_changeset} ->
+        socket |> assign(changeset: error_changeset) |> noreply()
+    end
   end
 
   def confirmation_prompt(changeset) do
