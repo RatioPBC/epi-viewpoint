@@ -368,7 +368,6 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def change_case_investigation_note_form(view, number, attrs) do
     view |> element("#case-investigation-#{number} [data-role=note-form]") |> render_change(form_field_data: attrs)
-
     view
   end
 
@@ -549,6 +548,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def change_contact_investigation_note_form(view, contact_investigation_tid, attrs) do
     view |> element("[data-tid=#{contact_investigation_tid}] [data-role=note-form]") |> render_change(form_field_data: attrs)
+    view
   end
 
   def contact_investigations(%View{} = view) do

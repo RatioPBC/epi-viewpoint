@@ -163,7 +163,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "case investigations" do
     test "it shows a pending case investigation", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "08/07/2020", number: "001"})
@@ -172,7 +172,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "if lab result is missing reported_on, initiated date is unknown", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil)
+      create_case_investigation(person, user, "case_investigation", nil)
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "Unknown", number: "001"})
@@ -184,7 +184,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "starting a case investigation", %{conn: conn, person: person, user: user} do
-      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      case_investigation = create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.click_start_interview_case_investigation("001")
@@ -207,7 +207,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "discontinued case investigations say so", %{conn: conn, person: person, user: user} do
       date = ~N[2020-01-02 01:00:07]
 
-      build_case_investigation(person, user, "case_investigation", nil, %{
+      create_case_investigation(person, user, "case_investigation", nil, %{
         interview_discontinued_at: date,
         interview_discontinue_reason: "Unable to reach"
       })
@@ -225,7 +225,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "discontinuation reason can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
-        build_case_investigation(person, user, "case_investigation", nil, %{
+        create_case_investigation(person, user, "case_investigation", nil, %{
           interview_discontinued_at: NaiveDateTime.utc_now(),
           interview_discontinue_reason: "Unable to reach"
         })
@@ -236,7 +236,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations say so", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{
+      create_case_investigation(person, user, "case_investigation", nil, %{
         interview_started_at: NaiveDateTime.utc_now(),
         clinical_status: "symptomatic"
       })
@@ -248,7 +248,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations that lack a clinical details show the values as 'None'", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{
+      create_case_investigation(person, user, "case_investigation", nil, %{
         interview_started_at: NaiveDateTime.utc_now(),
         clinical_status: nil,
         symptom_onset_on: nil
@@ -259,7 +259,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations with a clinical details asymptomatic render correctly", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{
+      create_case_investigation(person, user, "case_investigation", nil, %{
         interview_started_at: NaiveDateTime.utc_now(),
         clinical_status: "asymptomatic",
         symptom_onset_on: ~D[2020-09-12],
@@ -275,7 +275,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations with a unknown clinical details render correctly", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{
+      create_case_investigation(person, user, "case_investigation", nil, %{
         interview_started_at: NaiveDateTime.utc_now(),
         clinical_status: "unknown"
       })
@@ -285,7 +285,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations with empty lists of symptoms show None for symptoms", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{
+      create_case_investigation(person, user, "case_investigation", nil, %{
         interview_started_at: NaiveDateTime.utc_now(),
         symptoms: []
       })
@@ -295,7 +295,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations can be completed", %{conn: conn, person: person, user: user} do
-      build_case_investigation(person, user, "case_investigation", nil, %{interview_started_at: NaiveDateTime.utc_now()})
+      create_case_investigation(person, user, "case_investigation", nil, %{interview_started_at: NaiveDateTime.utc_now()})
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigation_complete_button_title("001", "Complete interview")
@@ -303,7 +303,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "started case investigations show contacts", %{conn: conn, person: person, user: user} do
       case_investigation =
-        build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
+        create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, complete_exposure} =
         Cases.create_exposure(
@@ -404,7 +404,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "a contact can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
-        build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
+        create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, exposure} =
         Cases.create_exposure(
@@ -440,7 +440,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "a contact can be removed", %{conn: conn, person: person, user: user} do
       case_investigation =
-        build_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
+        create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, exposure} =
         Cases.create_exposure(
@@ -485,7 +485,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       started_at = ~U[2020-11-05 18:57:00Z]
 
       case_investigation =
-        build_case_investigation(person, user, "case_investigation", nil, %{interview_completed_at: completed_at, interview_started_at: started_at})
+        create_case_investigation(person, user, "case_investigation", nil, %{interview_completed_at: completed_at, interview_started_at: started_at})
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
@@ -504,7 +504,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "case investigations with isolation monitoring dates can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
-        build_case_investigation(person, user, "case_investigation", nil, %{
+        create_case_investigation(person, user, "case_investigation", nil, %{
           interview_completed_at: ~U[2020-10-05 19:57:00Z],
           interview_started_at: ~U[2020-10-05 18:57:00Z],
           isolation_monitoring_starts_on: ~D[2020-11-05],
@@ -520,7 +520,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "case investigations with an isolation monitoring conclusion can be edited", %{conn: conn, person: person, user: user} do
       case_investigation =
-        build_case_investigation(person, user, "case_investigation", nil, %{
+        create_case_investigation(person, user, "case_investigation", nil, %{
           interview_completed_at: ~U[2020-10-05 19:57:00Z],
           interview_started_at: ~U[2020-10-05 18:57:00Z],
           isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
@@ -545,7 +545,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "can see existing notes", %{person: person, user: user, conn: conn} do
-      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      case_investigation = create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-a", %{text: "older note"})
       |> Cases.create_investigation_note!()
@@ -561,7 +561,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "can add a new note", %{person: person, user: user, conn: conn} do
-      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      case_investigation = create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
       username = user.name
 
       view =
@@ -580,7 +580,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "can't add an empty note", %{person: person, user: user, conn: conn} do
-      build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.add_case_investigation_note("001", "")
@@ -588,7 +588,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "lets you remove your note", %{person: person, user: user, conn: conn} do
-      build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       view =
         Pages.Profile.visit(conn, person)
@@ -603,7 +603,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "doesn't let you remove someone else's note", %{person: person, user: user, conn: conn} do
       other_user = Epicenter.AccountsFixtures.user_fixture(%{tid: "someone_else"})
-      case_investigation = build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      case_investigation = create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       someone_elses_note =
         Test.Fixtures.case_investigation_note_attrs(case_investigation, other_user, "note-a", %{text: "some other user's note"})
@@ -616,7 +616,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "warns you that there are changes if you try to navigate away", %{person: person, user: user, conn: conn} do
-      build_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
       view = Pages.Profile.visit(conn, person)
 
       assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
@@ -631,7 +631,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   describe "contact investigations" do
     test "show up", %{conn: conn, user: user, person: sick_person} do
       exposure =
-        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+        create_exposure(user, sick_person, %{}, %{}, %{
           tid: "exposure",
           household_member: true,
           relationship_to_case: "Partner or roommate",
@@ -662,7 +662,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "navigating to the exposing case", %{conn: conn, user: user, person: sick_person} do
       exposure =
-        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+        create_exposure(user, sick_person, %{}, %{}, %{
           tid: "exposure"
         })
 
@@ -674,7 +674,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "the exposure is not from the same household", %{conn: conn, user: user, person: sick_person} do
       exposure =
-        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+        create_exposure(user, sick_person, %{}, %{}, %{
           tid: "exposure",
           household_member: false,
           relationship_to_case: "Healthcare worker",
@@ -696,7 +696,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         |> Cases.create_person!()
 
       exposure =
-        create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{
+        create_exposure(user, sick_person, %{}, %{}, %{
           tid: "exposure"
         })
 
@@ -714,7 +714,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "the exposed person is a minor", %{conn: conn, user: user, person: sick_person} do
       exposure =
-        create_exposure_with_prereqs(
+        create_exposure(
           user,
           sick_person,
           %{},
@@ -732,7 +732,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "can add a new note", %{person: sick_person, user: user, conn: conn} do
-      exposure = create_exposure_with_prereqs(user, sick_person, %{}, %{}, %{tid: "exposure"})
+      exposure = create_exposure(user, sick_person, %{}, %{}, %{tid: "exposure"})
       username = user.name
 
       view =
@@ -749,9 +749,19 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert text |> Euclid.Exists.blank?()
     end
 
+    test "warns you that there are changes if you try to navigate away", %{person: sick_person, user: user, conn: conn} do
+      exposure = create_exposure(user, sick_person, %{}, %{}, %{tid: "exposure"})
+
+      view = Pages.Profile.visit(conn, exposure.exposed_person)
+      assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
+
+      view |> Pages.Profile.change_contact_investigation_note_form(exposure.tid, %{"text" => "something present"})
+      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+    end
+
     test "looking at a discontinued contact investigation", %{conn: conn, user: user, person: sick_person} do
       exposure =
-        create_exposure_with_prereqs(
+        create_exposure(
           user,
           sick_person,
           %{},
@@ -771,22 +781,6 @@ defmodule EpicenterWeb.ProfileLiveTest do
       view
       |> Pages.Profile.click_edit_interview_discontinuation_details_and_follow_redirect("exposure")
       |> assert_redirects_to("/contact-investigations/#{exposure.id}/discontinue")
-    end
-
-    defp create_exposure_with_prereqs(user, sick_person, lab_result_attrs, case_investigation_attrs, exposure_attrs) do
-      lab_result =
-        Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], lab_result_attrs)
-        |> Cases.create_lab_result!()
-
-      case_investigation =
-        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation", case_investigation_attrs)
-        |> Cases.create_case_investigation!()
-
-      {:ok, exposure} =
-        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure", exposure_attrs), Test.Fixtures.admin_audit_meta()}
-        |> Cases.create_exposure()
-
-      exposure
     end
   end
 
@@ -968,7 +962,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
   end
 
-  defp build_case_investigation(person, user, tid, reported_on, attrs \\ %{}) do
+  defp create_case_investigation(person, user, tid, reported_on, attrs \\ %{}) do
     lab_result =
       Test.Fixtures.lab_result_attrs(person, user, "lab_result_#{tid}", reported_on, %{
         result: "positive",
@@ -987,5 +981,21 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Map.merge(attrs)
     )
     |> Cases.create_case_investigation!()
+  end
+
+  defp create_exposure(user, sick_person, lab_result_attrs, case_investigation_attrs, exposure_attrs) do
+    lab_result =
+      Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], lab_result_attrs)
+      |> Cases.create_lab_result!()
+
+    case_investigation =
+      Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation", case_investigation_attrs)
+      |> Cases.create_case_investigation!()
+
+    {:ok, exposure} =
+      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure", exposure_attrs), Test.Fixtures.admin_audit_meta()}
+      |> Cases.create_exposure()
+
+    exposure
   end
 end
