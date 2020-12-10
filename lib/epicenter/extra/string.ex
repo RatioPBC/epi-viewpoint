@@ -8,6 +8,13 @@ defmodule Epicenter.Extra.String do
   def dasherize(list) when is_list(list), do: list |> Enum.map(&dasherize/1) |> Enum.join("-")
   def dasherize(item), do: item |> to_string() |> String.replace("_", "-")
 
+  def is_existing_atom?(s) do
+    String.to_existing_atom(s) && true
+  rescue
+    _ ->
+      false
+  end
+
   def pluralize(1, singular, _plural), do: "1 #{singular}"
   def pluralize(n, _singular, plural) when is_integer(n), do: "#{n} #{plural}"
 

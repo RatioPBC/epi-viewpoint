@@ -53,6 +53,20 @@ defmodule Epicenter.Extra.MapTest do
     end
   end
 
+  describe "has_key? with :coerce_key_to_existing_atom" do
+    test "returns true if the map has the given atom as a key" do
+      map = %{key: "value"}
+      assert Extra.Map.has_key?(map, :key, :coerce_key_to_existing_atom)
+      refute Extra.Map.has_key?(map, :not_key, :coerce_key_to_existing_atom)
+    end
+
+    test "returns true if the map has an atom key that matches the given string key" do
+      map = %{key: "value"}
+      assert Extra.Map.has_key?(map, "key", :coerce_key_to_existing_atom)
+      refute Extra.Map.has_key?(map, "not_key", :coerce_key_to_existing_atom)
+    end
+  end
+
   describe "to_list :depth_first" do
     test "converts a map of 'key -> value' or 'key -> values' into a list by alphabetizing keys and traversing depth-first" do
       %{"z" => "z1", "a" => "a1"} |> Extra.Map.to_list(:depth_first) |> assert_eq(["a", "a1", "z", "z1"])

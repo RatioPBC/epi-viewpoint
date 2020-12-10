@@ -18,6 +18,19 @@ defmodule Epicenter.Extra.StringTest do
     end
   end
 
+  describe "is_existing_atom?" do
+    test "returns true if the given string matches an existing atom" do
+      string = Euclid.Extra.Random.string()
+      _atom = String.to_atom(string)
+      assert Extra.String.is_existing_atom?(string)
+    end
+
+    test "returns false if the given string does not match an existing atom" do
+      string = Euclid.Extra.Random.string()
+      refute Extra.String.is_existing_atom?(string)
+    end
+  end
+
   describe "pluralize" do
     test "zero", do: assert(Extra.String.pluralize(0, "nerd", "nerds") == "0 nerds")
     test "one", do: assert(Extra.String.pluralize(1, "nerd", "nerds") == "1 nerd")

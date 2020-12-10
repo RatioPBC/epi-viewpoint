@@ -50,6 +50,14 @@ defmodule Epicenter.Extra.Map do
     new_map
   end
 
+  # # #
+
+  def has_key?(map, key, :coerce_key_to_existing_atom) when is_atom(key),
+    do: Map.has_key?(map, key)
+
+  def has_key?(map, key, :coerce_key_to_existing_atom) when is_binary(key),
+    do: Extra.String.is_existing_atom?(key) && Map.has_key?(map, String.to_existing_atom(key))
+
   @doc """
   Converts a map to a list that contains the keys and values of the map, by alphabetizing the keys
   and then traversing in depth-first order. Values can be scalars or lists.

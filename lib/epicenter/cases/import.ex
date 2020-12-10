@@ -255,10 +255,9 @@ defmodule Epicenter.Cases.Import do
   defp strip_updates_to_existing_data(row, person) do
     keys =
       Enum.reduce(row, [], fn {key, _value}, update_keys ->
-        case Map.get(person, key |> String.to_atom()) do
-          nil -> [key | update_keys]
-          _ -> update_keys
-        end
+        if Extra.Map.has_key?(person, key, :coerce_key_to_existing_atom),
+          do: update_keys,
+          else: [key | update_keys]
       end)
 
     Map.take(row, keys)
