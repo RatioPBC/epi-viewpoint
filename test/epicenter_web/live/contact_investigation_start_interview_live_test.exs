@@ -27,19 +27,35 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     [exposure: exposure]
   end
 
-  #  test "prefills with existing data when existing data is available", %{conn: conn, exposure: exposure} do
-  #    {:ok, _} =
-  #      Cases.update_exposure(
-  #        exposure,
-  #        {%{interview_started_at: ~N[2020-01-01 23:03:07], interview_proxy_name: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
-  #      )
-  #
-  #    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
-  #    |> Pages.ContactInvestigationStartInterview.assert_here()
-  #    |> Pages.ContactInvestigationStartInterview.assert_proxy_selected("Jackson Publick")
-  #    |> Pages.ContactInvestigationStartInterview.assert_time_started("06:03", "PM")
-  #    |> Pages.ContactInvestigationStartInterview.assert_date_started("01/01/2020")
-  #  end
+  @tag :skip
+  test "saving a start interview contact investigation"
+
+  test "prefills with existing data when existing data is available", %{conn: conn, exposure: exposure} do
+    {:ok, _} =
+      Cases.update_exposure(
+        exposure,
+        {%{interview_started_at: ~N[2020-01-01 23:03:07], interview_proxy_name: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+    |> Pages.ContactInvestigationStartInterview.assert_here()
+    |> Pages.ContactInvestigationStartInterview.assert_time_started("06:03", "PM")
+    |> Pages.ContactInvestigationStartInterview.assert_date_started("01/01/2020")
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
+      start_interview_form: %{
+        "person_interviewed" => "~~self~~",
+        "date_started" => "09/07/2020",
+        "time_started" => "04:45",
+        "time_started_am_pm" => "PM"
+      }
+    )
+
+    assert %{
+             interview_status: "started",
+             interview_started_at: ~U[2020-09-07 20:45:00Z],
+             interview_proxy_name: nil
+           } = Cases.get_exposure(exposure.id)
+  end
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, exposure: exposure} do

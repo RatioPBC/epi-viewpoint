@@ -88,38 +88,10 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       )
       |> Pages.Profile.assert_here(exposure.exposed_person)
 
-    assert %{
-             interview_status: "started",
-             interview_started_at: ~U[2020-09-06 19:45:00Z],
-             interview_proxy_name: "Alice's guardian"
-           } = Cases.get_exposure(exposure.id)
-
     assert [
              %{
                interview_buttons: ["Discontinue"],
                interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
-               status: "Ongoing"
-             }
-           ] = Pages.Profile.contact_investigations(view)
-
-    view =
-      Pages.Profile.click_edit_interview_start_details(view, exposure.tid)
-      |> Pages.follow_live_view_redirect(conn)
-      |> Pages.ContactInvestigationStartInterview.assert_here()
-      |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
-        start_interview_form: %{
-          "person_interviewed" => "~~self~~",
-          "date_started" => "09/07/2020",
-          "time_started" => "04:45",
-          "time_started_am_pm" => "PM"
-        }
-      )
-      |> Pages.Profile.assert_here(exposure.exposed_person)
-
-    assert [
-             %{
-               interview_buttons: ["Discontinue"],
-               interview_history_items: ["Started interview with Caroline Testuser on 09/07/2020 at 04:45pm EDT"],
                status: "Ongoing"
              }
            ] = Pages.Profile.contact_investigations(view)
