@@ -232,21 +232,6 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
-  def handle_info({:submitted_note_form, note_attrs}, socket) do
-    {reason_action, reason_event} = audit_log_event_names(note_attrs)
-
-    Cases.create_investigation_note(
-      {note_attrs,
-       %AuditLog.Meta{
-         author_id: socket.assigns.current_user.id,
-         reason_action: reason_action,
-         reason_event: reason_event
-       }}
-    )
-
-    handle_info(:reload_investigations, socket)
-  end
-
   def handle_info(:reload_investigations, socket) do
     socket
     |> assign_case_investigations(socket.assigns.person)
@@ -254,23 +239,18 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
-  defp audit_log_event_names(note_attrs) do
-    case note_attrs do
-      %{case_investigation_id: _} ->
-        {
-          AuditLog.Revision.create_case_investigation_note_action(),
-          AuditLog.Revision.profile_case_investigation_note_submission_event()
-        }
+  defp audit_log_event_names(%{case_investigation_id: case_investigation_id}) when is_binary(case_investigation_id) do
+    {
+      AuditLog.Revision.create_case_investigation_note_action(),
+      AuditLog.Revision.profile_case_investigation_note_submission_event()
+    }
+  end
 
-      %{exposure_id: _} ->
-        {
-          AuditLog.Revision.create_exposure_note_action(),
-          AuditLog.Revision.profile_exposure_note_submission_event()
-        }
-
-      _ ->
-        :error
-    end
+  defp audit_log_event_names(%{exposure_id: exposure_id}) when is_binary(exposure_id) do
+    {
+      AuditLog.Revision.create_exposure_note_action(),
+      AuditLog.Revision.profile_exposure_note_submission_event()
+    }
   end
 
   def assign_current_date(socket) do
@@ -280,7 +260,19 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def on_note_added(note_attrs, foreign_key_map) do
-    send(self(), {:submitted_note_form, Map.merge(note_attrs, foreign_key_map)})
+    note_attrs = Map.merge(note_attrs, foreign_key_map)
+    {reason_action, reason_event} = audit_log_event_names(note_attrs)
+
+    Cases.create_investigation_note(
+      {note_attrs,
+       %AuditLog.Meta{
+         author_id: note_attrs.author_id,
+         reason_action: reason_action,
+         reason_event: reason_event
+       }}
+    )
+
+    send(self(), :reload_investigations)
   end
 
   def handle_event("remove-contact", %{"exposure-id" => exposure_id}, socket) do
