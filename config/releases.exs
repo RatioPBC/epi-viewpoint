@@ -27,6 +27,7 @@ config :epicenter, Epicenter.Repo,
   url: CFG.database_url()
 
 config :epicenter, EpicenterWeb.Endpoint,
+  force_ssl: [hsts: true, rewrite_on: [:x_forwarded_proto]],
   live_view: [signing_salt: CFG.live_view_signing_salt()],
   secret_key_base: CFG.secret_key_base(),
   server: true,
