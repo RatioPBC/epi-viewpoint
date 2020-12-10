@@ -14,9 +14,9 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
         InvestigationNoteForm,
         @case_investigation.id <> "note form",
         current_user_id: @current_user_id,
-        on_add: @on_note_added )
+        on_add: @on_add_note )
       = for note <- @case_investigation.notes |> Enum.reverse() do
-        = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_note_deleted)
+        = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_delete_note)
     """
   end
 end
@@ -58,9 +58,9 @@ defmodule EpicenterWeb.ContactInvestigation do
           InvestigationNoteForm,
           @exposure.id <> "note form",
           current_user_id: @current_user_id,
-          on_add: @on_note_added)
+          on_add: @on_add_note)
         = for note <- @exposure.notes |> Enum.reverse() do
-          = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_note_deleted)
+          = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_delete_note)
       div
         .contact-investigation-status-row
           h3

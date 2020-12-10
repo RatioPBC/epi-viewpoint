@@ -157,8 +157,8 @@
                   case_investigation.id <> "note section",
                   case_investigation: case_investigation,
                   current_user_id: @current_user.id,
-                  on_note_added: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
-                  on_note_deleted: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
+                  on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
+                  on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
 
   a#contact-investigations
   = for exposure <- @exposures do
@@ -167,8 +167,8 @@
                 exposure.id <> "contact investigation",
                 exposure: exposure,
                 current_user_id: @current_user.id,
-                on_note_added: fn note_attrs -> on_note_added(note_attrs, exposure) end,
-                on_note_deleted: fn deleted_note -> on_note_deleted(deleted_note, exposure) end
+                on_add_note: fn note_attrs -> on_note_added(note_attrs, exposure) end,
+                on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, exposure) end
 
   section#lab-results data-role="lab-results"
     header
