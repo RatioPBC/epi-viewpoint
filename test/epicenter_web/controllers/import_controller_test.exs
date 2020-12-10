@@ -15,7 +15,7 @@ defmodule EpicenterWeb.ImportControllerTest do
         Alice              , Testuser          , 01/01/1970    , 06/02/2020       , 06/01/2020    , 06/03/2020           , positive  , 393   , alice
         Billy              , Testuser          , 03/01/1990    , 06/05/2020       , 06/06/2020    , 06/07/2020           , negative  , sn3   , billy
         """
-        |> Tempfile.write!("csv")
+        |> Tempfile.write_csv!()
 
       on_exit(fn -> File.rm!(temp_file_path) end)
 
@@ -38,7 +38,7 @@ defmodule EpicenterWeb.ImportControllerTest do
         search_firstname_2 , search_lastname_1 , datecollected_36 , resultdate_42 , datereportedtolhd_44 , result_39 , glorp , person_tid
         Alice              , Testuser          , 06/02/2020       , 06/01/2020    , 06/03/2020           , positive  , 393   , alice
         """
-        |> Tempfile.write!("csv")
+        |> Tempfile.write_csv!()
 
       on_exit(fn -> File.rm!(temp_file_path) end)
 
@@ -55,7 +55,7 @@ defmodule EpicenterWeb.ImportControllerTest do
         search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , datereportedtolhd_44 , result_39 , glorp , person_tid
         Alice              , Testuser          , 01/01/1970    , 06/02/bb         , 06/01/2020    , 06/03/2020           , positive  , 393   , alice
         """
-        |> Tempfile.write!("csv")
+        |> Tempfile.write_csv!()
 
       on_exit(fn -> File.rm!(temp_file_path) end)
 

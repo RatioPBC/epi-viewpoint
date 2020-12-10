@@ -1,7 +1,7 @@
 defmodule Epicenter.Tempfile do
-  def write!(contents, extension) do
-    name = Ecto.UUID.generate() <> "." <> extension
-    path = Path.join(System.tmp_dir!(), name)
+  # sobelow_skip ["Traversal.FileModule"]
+  def write_csv!(contents) do
+    path = System.tmp_dir!() |> Path.join(Ecto.UUID.generate() <> ".csv")
     File.write!(path, contents)
     path
   end

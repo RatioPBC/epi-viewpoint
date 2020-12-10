@@ -21,7 +21,7 @@ defmodule Epicenter.Extra.StringTest do
   describe "is_existing_atom?" do
     test "returns true if the given string matches an existing atom" do
       string = Euclid.Extra.Random.string()
-      _atom = String.to_atom(string)
+      _ = String.to_atom(string)
       assert Extra.String.is_existing_atom?(string)
     end
 
