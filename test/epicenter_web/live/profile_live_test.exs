@@ -788,6 +788,22 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.click_edit_interview_discontinuation_details("exposure")
       |> assert_redirects_to("/contact-investigations/#{exposure.id}/discontinue")
     end
+
+    test "looking at a started contact investigation interview", %{conn: conn, user: user, person: sick_person} do
+      exposure = create_exposure(user, sick_person, %{}, %{}, %{tid: "exposure", interview_started_at: ~U[2020-12-08 11:00:00Z]})
+      view = Pages.Profile.visit(conn, exposure.exposed_person)
+
+      assert [
+               %{
+                 interview_buttons: ["Discontinue"],
+                 interview_history_items: ["Started interview with Caroline Testuser on 12/08/2020 at 06:00am EST"]
+               }
+             ] = Pages.Profile.contact_investigations(view)
+
+      view
+      |> Pages.Profile.click_edit_interview_start_details("exposure")
+      |> assert_redirects_to("/contact-investigations/#{exposure.id}/start-interview")
+    end
   end
 
   describe "assigning and unassigning user to a person" do
