@@ -61,7 +61,17 @@ defmodule EpicenterWeb.Test.Pages do
     view
   end
 
-  def assert_validation_messages(html_string, expected_messages) when is_binary(html_string) do
+  def assert_validation_messages(view_or_html_string, expected_messages) do
+    view_or_html_string
+    |> validation_messages()
+    |> assert_eq(expected_messages)
+  end
+
+  def validation_messages(%View{} = view) do
+    view |> render() |> validation_messages()
+  end
+
+  def validation_messages(html_string) when is_binary(html_string) do
     document = html_string |> Test.Html.parse()
 
     document
@@ -71,7 +81,6 @@ defmodule EpicenterWeb.Test.Pages do
       {name, Test.Html.text(validation_message)}
     end)
     |> Enum.into(%{})
-    |> assert_eq(expected_messages)
   end
 
   def assert_save_error(%View{} = view, expected_message) do

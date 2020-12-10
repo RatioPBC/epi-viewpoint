@@ -97,4 +97,23 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     |> Pages.ContactInvestigationStartInterview.go_back()
     |> assert_redirects_to("/people/#{exposure.exposed_person_id}")
   end
+
+  test "date_started, time_started, and person interviewed are required", %{conn: conn, exposure: exposure} do
+    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+    |> Pages.submit_live("#contact-investigation-interview-start-form",
+      start_interview_form: %{
+        "person_interviewed" => "",
+        "date_started" => "",
+        "time_started" => "",
+        "time_started_am_pm" => "PM"
+      }
+    )
+    |> Epicenter.Extra.tap(fn view ->
+      assert Pages.validation_messages(view) == %{
+               "start_interview_form[person_interviewed]" => "can't be blank",
+               "start_interview_form[date_started]" => "can't be blank",
+               "start_interview_form[time_started]" => "can't be blank"
+             }
+    end)
+  end
 end
