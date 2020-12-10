@@ -1,0 +1,12 @@
+[
+  verbose: false,
+  private: false,
+  skip: true,
+  router: "",
+  exit: "low",
+  format: "compact",
+  out: "",
+  threshold: "low",
+  ignore: ["Config.CSP"],
+  ignore_files: [""]
+]

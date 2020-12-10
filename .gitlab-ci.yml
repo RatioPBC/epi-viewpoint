@@ -33,7 +33,7 @@ test:
     - mix deps.unlock --check-unused
     - mix deps.audit
     - npm audit --audit-level=moderate --prefix assets
-    #    - mix sobelow --compact --exit low --skip
+    - mix sobelow --config
   stage: test
   script:
     - bin/dev/test
