@@ -27,10 +27,26 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     [exposure: exposure]
   end
 
-  @tag :skip
-  test "saving a start interview contact investigation"
+  test "saving a start interview contact investigation", %{conn: conn, exposure: exposure} do
+    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+    |> Pages.ContactInvestigationStartInterview.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
+      start_interview_form: %{
+        "person_interviewed" => "Jason Bourne",
+        "date_started" => "09/07/2020",
+        "time_started" => "04:45",
+        "time_started_am_pm" => "PM"
+      }
+    )
 
-  test "prefills with existing data when existing data is available", %{conn: conn, exposure: exposure} do
+    assert %{
+             interview_status: "started",
+             interview_started_at: ~U[2020-09-07 20:45:00Z],
+             interview_proxy_name: "Jason Bourne"
+           } = Cases.get_exposure(exposure.id)
+  end
+
+  test "prefills with existing data when existing data is available, and can edit existing data", %{conn: conn, exposure: exposure} do
     {:ok, _} =
       Cases.update_exposure(
         exposure,
