@@ -16,7 +16,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
     alias EpicenterWeb.InvestigationNoteForm
 
     def mount(_params, _session, socket) do
-      {:ok, socket |> assign(subject_id: nil, on_add: &Function.identity/1)}
+      {:ok, socket |> assign(on_add: &Function.identity/1)}
     end
 
     def render(assigns) do
@@ -24,7 +24,6 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
       = component(@socket,
             InvestigationNoteForm,
             "renders-a-form",
-            subject_id: @subject_id,
             current_user_id: "test-user",
             on_add: @on_add)
       """
@@ -69,19 +68,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
 
       view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
 
-      assert_receive {:received_on_add, %{author_id: "test-user", subject_id: nil, text: "A new note"}}
-    end
-
-    test "includes the subject_id when provided", %{conn: conn} do
-      pid = self()
-      on_add = fn note_attrs -> send(pid, {:received_on_add, note_attrs}) end
-      {:ok, view, _html} = live_isolated(conn, TestLiveView)
-
-      send(view.pid, {:assigns, on_add: on_add, subject_id: "test-subject-id", subject_id_attr_name: "exposure_id"})
-
-      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
-
-      assert_receive {:received_on_add, %{author_id: "test-user", subject_id: "test-subject-id", text: "A new note"}}
+      assert_receive {:received_on_add, %{author_id: "test-user", text: "A new note"}}
     end
 
     test "clears the form", %{conn: conn} do

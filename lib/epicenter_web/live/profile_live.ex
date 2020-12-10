@@ -13,7 +13,6 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
       = component(@socket,
         InvestigationNoteForm,
         @case_investigation.id <> "note form",
-        subject_id: @case_investigation.id,
         current_user_id: @current_user_id,
         on_add: @on_note_added )
       = for note <- @case_investigation.notes |> Enum.reverse() do
@@ -104,7 +103,6 @@ defmodule EpicenterWeb.ContactInvestigation do
         = component(@socket,
           InvestigationNoteForm,
           @exposure.id <> "note form",
-          subject_id: @exposure.id,
           current_user_id: @current_user_id,
           on_add: @on_note_added)
         = for note <- @exposure.notes |> Enum.reverse() do
@@ -184,7 +182,6 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
-  import Euclid.Extra.Map, only: [rename_key: 3]
 
   import EpicenterWeb.Presenters.CaseInvestigationPresenter,
     only: [
@@ -280,6 +277,10 @@ defmodule EpicenterWeb.ProfileLive do
     timezone = EpicenterWeb.PresentationConstants.presented_time_zone()
     current_date = @clock.utc_now() |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
     socket |> assign(current_date: current_date)
+  end
+
+  def on_note_added(note_attrs, foreign_key_map) do
+    send(self(), {:submitted_note_form, Map.merge(note_attrs, foreign_key_map)})
   end
 
   def handle_event("remove-contact", %{"exposure-id" => exposure_id}, socket) do

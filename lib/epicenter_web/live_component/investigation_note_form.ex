@@ -13,16 +13,14 @@ defmodule EpicenterWeb.InvestigationNoteForm do
 
     @primary_key false
     embedded_schema do
-      field :subject_id, :binary_id
       field :text, :string
     end
 
-    @optional_attrs ~w{subject_id}a
     @required_attrs ~w{text}a
 
     def changeset(params) do
       %__MODULE__{}
-      |> cast(params, @optional_attrs ++ @required_attrs)
+      |> cast(params, @required_attrs)
       |> validate_required(@required_attrs)
     end
 
@@ -31,7 +29,6 @@ defmodule EpicenterWeb.InvestigationNoteForm do
         {:ok,
          %{
            author_id: author_id,
-           subject_id: form_field_data.subject_id,
            text: form_field_data.text
          }}
       else
@@ -57,12 +54,12 @@ defmodule EpicenterWeb.InvestigationNoteForm do
 
   def handle_event("change_note", %{"form_field_data" => params}, socket) do
     socket
-    |> assign(changeset: FormFieldData.changeset(Map.merge(%{"subject_id" => socket.assigns.subject_id}, params)))
+    |> assign(changeset: FormFieldData.changeset(params))
     |> noreply()
   end
 
   def handle_event("save_note", %{"form_field_data" => params}, socket) do
-    changeset = FormFieldData.changeset(Map.merge(%{"subject_id" => socket.assigns.subject_id}, params))
+    changeset = FormFieldData.changeset(params)
 
     case FormFieldData.investigation_note_attrs(changeset, socket.assigns.current_user_id) do
       {:ok, note_attrs} ->
