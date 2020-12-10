@@ -54,16 +54,22 @@ defmodule Epicenter.Extra.MapTest do
   end
 
   describe "has_key? with :coerce_key_to_existing_atom" do
-    test "returns true if the map has the given atom as a key" do
+    test "looks for the key when the map has a key of type atom, and the parameter is an atom" do
       map = %{key: "value"}
       assert Extra.Map.has_key?(map, :key, :coerce_key_to_existing_atom)
       refute Extra.Map.has_key?(map, :not_key, :coerce_key_to_existing_atom)
     end
 
-    test "returns true if the map has an atom key that matches the given string key" do
+    test "coerces to atom and looks for the key when the map has a key of type atom, and the parameter is a string" do
       map = %{key: "value"}
       assert Extra.Map.has_key?(map, "key", :coerce_key_to_existing_atom)
       refute Extra.Map.has_key?(map, "not_key", :coerce_key_to_existing_atom)
+    end
+
+    test "returns false when the map has key of type string, no matter the parameter type" do
+      map = %{"key" => "value"}
+      refute Extra.Map.has_key?(map, :key, :coerce_key_to_existing_atom)
+      refute Extra.Map.has_key?(map, "key", :coerce_key_to_existing_atom)
     end
   end
 
