@@ -130,15 +130,16 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   defp status_class(%Exposure{} = %{interview_status: status}) do
     case status do
-      "discontinued" -> "DiscontinuedStatus"
-      _ -> "PendingStatus"
+      "discontinued" -> "discontinued-status"
+      "started" -> "started-status"
+      _ -> "pending-status"
     end
   end
 
   defp status_text(%Exposure{} = %{interview_status: status}) do
     case status do
       "discontinued" -> "Discontinued"
-      "started" -> "Started"
+      "started" -> "Ongoing"
       _ -> "Pending"
     end
   end

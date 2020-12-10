@@ -98,7 +98,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
              %{
                interview_buttons: ["Discontinue"],
                interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
-               status: "Started"
+               status: "Ongoing"
              }
            ] = Pages.Profile.contact_investigations(view)
 
@@ -120,7 +120,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
              %{
                interview_buttons: ["Discontinue"],
                interview_history_items: ["Started interview with Caroline Testuser on 09/07/2020 at 04:45pm EDT"],
-               status: "Started"
+               status: "Ongoing"
              }
            ] = Pages.Profile.contact_investigations(view)
   end
