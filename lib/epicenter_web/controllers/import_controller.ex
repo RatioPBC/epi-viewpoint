@@ -8,12 +8,13 @@ defmodule EpicenterWeb.ImportController do
 
   alias Epicenter.Cases
   alias EpicenterWeb.Session
+  alias EpicenterWeb.UploadedFile
   alias Epicenter.DateParsingError
 
   @common_assigns [page_title: "Import labs"]
 
-  def create(conn, %{"file" => %Plug.Upload{path: path, filename: file_name}}) do
-    result = %{file_name: file_name, contents: File.read!(path)} |> Cases.import_lab_results(conn.assigns.current_user)
+  def create(conn, %{"file" => plug_upload}) do
+    result = UploadedFile.from_plug_upload(plug_upload) |> Cases.import_lab_results(conn.assigns.current_user)
 
     case result do
       {:ok, import_info} ->

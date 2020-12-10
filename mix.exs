@@ -74,7 +74,8 @@ defmodule Epicenter.MixProject do
       {:table_rex, "~> 3.0"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
-      {:timex, "~> 3.6"}
+      {:timex, "~> 3.6"},
+      {:zarex, "~> 1.0"}
     ]
   end
 
