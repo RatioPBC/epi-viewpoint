@@ -39,8 +39,10 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
 
     Pages.ContactInvestigationStartInterview.visit(conn, exposure)
     |> Pages.ContactInvestigationStartInterview.assert_here()
-    |> Pages.ContactInvestigationStartInterview.assert_time_started("06:03", "PM")
-    |> Pages.ContactInvestigationStartInterview.assert_date_started("01/01/2020")
+    |> Epicenter.Extra.tap(fn view ->
+      assert Pages.ContactInvestigationStartInterview.time_started(view) == "06:03PM"
+      assert Pages.ContactInvestigationStartInterview.date_started(view) == "01/01/2020"
+    end)
     |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
       start_interview_form: %{
         "person_interviewed" => "~~self~~",
