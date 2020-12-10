@@ -88,4 +88,10 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              |> Pages.navigation_confirmation_prompt() == "Your updates have not been saved. Discard updates?"
     end
   end
+
+  test "the back button is there, and can take you back", %{conn: conn, exposure: exposure} do
+    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+    |> Pages.ContactInvestigationStartInterview.go_back()
+    |> assert_redirects_to("/people/#{exposure.exposed_person_id}")
+  end
 end

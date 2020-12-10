@@ -2,12 +2,15 @@
 
   section
     header#subnav
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @exposure.exposed_person), data: [role: "back-link"] do
+        = back_icon()
+        span Back
 
-    section#contact-investigation-start-interview
-      h2 Start interview
+  section#contact-investigation-start-interview
+    h2 Start interview
 
-      = form_for @form_changeset,
-                  "#",
-                  [id: "contact-investigation-interview-start-form", phx_change: "change", phx_submit: "save", data: [role: "start-interview-form"]],
-                  fn f ->
-        = start_interview_form_builder(f, @person)
+    = form_for @form_changeset,
+                "#",
+                [id: "contact-investigation-interview-start-form", phx_change: "change", phx_submit: "save", data: [role: "start-interview-form"]],
+                fn f ->
+      = start_interview_form_builder(f, @person)

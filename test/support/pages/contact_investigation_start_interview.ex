@@ -33,4 +33,8 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationStartInterview do
     view |> form("[data-role=start-interview-form]", params) |> render_change()
     view
   end
+
+  def go_back(%View{} = view) do
+    view |> element("[data-role=back-link]") |> render_click()
+  end
 end
