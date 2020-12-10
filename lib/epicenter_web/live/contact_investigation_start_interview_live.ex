@@ -26,7 +26,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   def handle_event("change", %{"start_interview_form" => params}, socket) do
     new_changeset = StartInterviewForm.changeset(socket.assigns.exposure, params)
-    socket |> assign(:confirmation_prompt, confirmation_prompt(new_changeset)) |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"start_interview_form" => params}, socket) do

@@ -83,9 +83,12 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     end
 
     test "when the user changes something", %{conn: conn, exposure: exposure} do
-      assert Pages.ContactInvestigationStartInterview.visit(conn, exposure)
-             |> Pages.ContactInvestigationStartInterview.change_form(start_interview_form: %{"date_started" => "09/06/2020"})
-             |> Pages.navigation_confirmation_prompt() == "Your updates have not been saved. Discard updates?"
+      view =
+        Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+        |> Pages.ContactInvestigationStartInterview.change_form(start_interview_form: %{"date_started" => "09/06/2020"})
+
+      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+      assert %{"start_interview_form[date_started]" => "09/06/2020"} = Pages.form_state(view)
     end
   end
 
