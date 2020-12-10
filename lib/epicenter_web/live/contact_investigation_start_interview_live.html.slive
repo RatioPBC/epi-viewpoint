@@ -7,7 +7,7 @@
         span Back
 
   section#contact-investigation-start-interview
-    h2 Start interview
+    h2 data-role="form-title" = if(@exposure.interview_started_at, do: "Edit start interview", else: "Start interview")
 
     = form_for @form_changeset,
                 "#",

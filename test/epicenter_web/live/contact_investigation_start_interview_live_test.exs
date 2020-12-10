@@ -30,6 +30,11 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
   test "saving a start interview contact investigation", %{conn: conn, exposure: exposure} do
     Pages.ContactInvestigationStartInterview.visit(conn, exposure)
     |> Pages.ContactInvestigationStartInterview.assert_here()
+    |> Epicenter.Extra.tap(fn view ->
+      assert Pages.ContactInvestigationStartInterview.time_started(view) =~ ~r[^\d\d:\d\d((AM)|(PM))$]
+      assert Pages.ContactInvestigationStartInterview.date_started(view) =~ ~r[^\d\d\/\d\d/\d\d\d\d$]
+      assert Pages.ContactInvestigationStartInterview.form_title(view) == "Start interview"
+    end)
     |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
       start_interview_form: %{
         "person_interviewed" => "Jason Bourne",
@@ -56,6 +61,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     Pages.ContactInvestigationStartInterview.visit(conn, exposure)
     |> Pages.ContactInvestigationStartInterview.assert_here()
     |> Epicenter.Extra.tap(fn view ->
+      assert Pages.ContactInvestigationStartInterview.form_title(view) == "Edit start interview"
       assert Pages.ContactInvestigationStartInterview.time_started(view) == "06:03PM"
       assert Pages.ContactInvestigationStartInterview.date_started(view) == "01/01/2020"
     end)

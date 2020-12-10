@@ -2,6 +2,7 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationStartInterview do
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.Exposure
+  alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
@@ -36,5 +37,13 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationStartInterview do
 
   def go_back(%View{} = view) do
     view |> element("[data-role=back-link]") |> render_click()
+  end
+
+  def form_title(%View{} = view) do
+    view
+    |> render()
+    |> Pages.parse()
+    |> Test.Html.find!("[data-role=form-title]")
+    |> Test.Html.text()
   end
 end
