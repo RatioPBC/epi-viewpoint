@@ -24,6 +24,7 @@ check_for_committed_changes() {
 step "Checking for unused elixir deps" 'mix deps.unlock --check-unused'
 step "Auditing elixir deps" "mix deps.audit"
 step "Auditing javascript deps" "npm audit --audit-level=moderate --prefix assets"
+step "Running Phoenix static analysis" "mix sobelow --compact --exit low --skip"
 step "Formatting elixir code" "mix format"
 step "Extracting and merging gettext translations" "mix gettext.extract --merge"
 check_for_committed_changes
