@@ -24,11 +24,10 @@ defmodule EpicenterWeb.InvestigationNoteForm do
       |> validate_required(@required_attrs)
     end
 
-    def investigation_note_attrs(%Ecto.Changeset{} = form_changeset, author_id) do
+    def investigation_note_attrs(%Ecto.Changeset{} = form_changeset) do
       with {:ok, form_field_data} <- apply_action(form_changeset, :create) do
         {:ok,
          %{
-           author_id: author_id,
            text: form_field_data.text
          }}
       else
@@ -61,7 +60,7 @@ defmodule EpicenterWeb.InvestigationNoteForm do
   def handle_event("save_note", %{"form_field_data" => params}, socket) do
     changeset = FormFieldData.changeset(params)
 
-    case FormFieldData.investigation_note_attrs(changeset, socket.assigns.current_user_id) do
+    case FormFieldData.investigation_note_attrs(changeset) do
       {:ok, note_attrs} ->
         socket.assigns.on_add.(note_attrs)
         socket |> assign(changeset: empty_note(socket.assigns)) |> noreply()

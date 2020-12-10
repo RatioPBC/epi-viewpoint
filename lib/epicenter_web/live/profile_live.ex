@@ -188,6 +188,35 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
+  def handle_info({:add_note, note_attrs, {foreign_key_name, subject}}, socket) do
+    note_attrs = Map.merge(note_attrs, %{foreign_key_name => subject.id, author_id: socket.assigns.current_user.id})
+    {reason_action, reason_event} = audit_log_data_for_adding_note(subject)
+
+    Cases.create_investigation_note(
+      {note_attrs,
+       %AuditLog.Meta{
+         author_id: socket.assigns.current_user.id,
+         reason_action: reason_action,
+         reason_event: reason_event
+       }}
+    )
+
+    handle_info(:reload_investigations, socket)
+  end
+
+  def handle_info({:delete_note, note, subject}, socket) do
+    {reason_action, reason_event} = audit_log_data_for_deleting_note(subject)
+
+    {:ok, _} =
+      Cases.delete_investigation_note(note, %AuditLog.Meta{
+        author_id: socket.assigns.current_user.id,
+        reason_action: reason_action,
+        reason_event: reason_event
+      })
+
+    handle_info(:reload_investigations, socket)
+  end
+
   def handle_info(:reload_investigations, socket) do
     socket
     |> assign_case_investigations(socket.assigns.person)
@@ -216,26 +245,11 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def on_note_added(note_attrs, %CaseInvestigation{} = subject) do
-    on_note_added(note_attrs, {:case_investigation_id, subject})
+    send(self(), {:add_note, note_attrs, {:case_investigation_id, subject}})
   end
 
   def on_note_added(note_attrs, %Exposure{} = subject) do
-    on_note_added(note_attrs, {:exposure_id, subject})
-  end
-
-  def on_note_added(note_attrs, {foreign_key_name, subject}) do
-    note_attrs = Map.merge(note_attrs, %{foreign_key_name => subject.id})
-    {reason_action, reason_event} = audit_log_data_for_adding_note(subject)
-
-    Cases.create_investigation_note({note_attrs,
-     %AuditLog.Meta{
-       # TODO: make sure this is the current user id
-       author_id: note_attrs.author_id,
-       reason_action: reason_action,
-       reason_event: reason_event
-     }})
-
-    send(self(), :reload_investigations)
+    send(self(), {:add_note, note_attrs, {:exposure_id, subject}})
   end
 
   defp audit_log_data_for_deleting_note(%CaseInvestigation{}) do
@@ -252,18 +266,8 @@ defmodule EpicenterWeb.ProfileLive do
     }
   end
 
-  def on_note_deleted(deleted_note, subject) do
-    {reason_action, reason_event} = audit_log_data_for_deleting_note(subject)
-
-    {:ok, _} =
-      Cases.delete_investigation_note(deleted_note, %AuditLog.Meta{
-        # TODO: make sure this is the current user id - should this function be async so we have the socket?
-        author_id: deleted_note.author_id,
-        reason_action: reason_action,
-        reason_event: reason_event
-      })
-
-    send(self(), :reload_investigations)
+  def on_note_deleted(note, subject) do
+    send(self(), {:delete_note, note, subject})
   end
 
   def handle_event("remove-contact", %{"exposure-id" => exposure_id}, socket) do

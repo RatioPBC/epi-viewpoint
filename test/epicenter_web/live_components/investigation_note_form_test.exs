@@ -24,7 +24,6 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
       = component(@socket,
             InvestigationNoteForm,
             "renders-a-form",
-            current_user_id: "test-user",
             on_add: @on_add)
       """
     end
@@ -68,7 +67,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
 
       view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
 
-      assert_receive {:received_on_add, %{author_id: "test-user", text: "A new note"}}
+      assert_receive {:received_on_add, %{text: "A new note"}}
     end
 
     test "clears the form", %{conn: conn} do
