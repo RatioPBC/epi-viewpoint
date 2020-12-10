@@ -156,6 +156,8 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
   alias EpicenterWeb.CaseInvestigationNoteSection
   alias EpicenterWeb.ContactInvestigation
@@ -193,14 +195,14 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
-  defp audit_log_event_names(%{case_investigation_id: case_investigation_id}) when is_binary(case_investigation_id) do
+  defp audit_log_data_for_adding_note(%CaseInvestigation{}) do
     {
       AuditLog.Revision.create_case_investigation_note_action(),
       AuditLog.Revision.profile_case_investigation_note_submission_event()
     }
   end
 
-  defp audit_log_event_names(%{exposure_id: exposure_id}) when is_binary(exposure_id) do
+  defp audit_log_data_for_adding_note(%Exposure{}) do
     {
       AuditLog.Revision.create_exposure_note_action(),
       AuditLog.Revision.profile_exposure_note_submission_event()
@@ -213,18 +215,53 @@ defmodule EpicenterWeb.ProfileLive do
     socket |> assign(current_date: current_date)
   end
 
-  def on_note_added(note_attrs, foreign_key_map) do
-    note_attrs = Map.merge(note_attrs, foreign_key_map)
-    {reason_action, reason_event} = audit_log_event_names(note_attrs)
+  def on_note_added(note_attrs, %CaseInvestigation{} = subject) do
+    on_note_added(note_attrs, {:case_investigation_id, subject})
+  end
 
-    Cases.create_investigation_note(
-      {note_attrs,
-       %AuditLog.Meta{
-         author_id: note_attrs.author_id,
-         reason_action: reason_action,
-         reason_event: reason_event
-       }}
-    )
+  def on_note_added(note_attrs, %Exposure{} = subject) do
+    on_note_added(note_attrs, {:exposure_id, subject})
+  end
+
+  def on_note_added(note_attrs, {foreign_key_name, subject}) do
+    note_attrs = Map.merge(note_attrs, %{foreign_key_name => subject.id})
+    {reason_action, reason_event} = audit_log_data_for_adding_note(subject)
+
+    Cases.create_investigation_note({note_attrs,
+     %AuditLog.Meta{
+       # TODO: make sure this is the current user id
+       author_id: note_attrs.author_id,
+       reason_action: reason_action,
+       reason_event: reason_event
+     }})
+
+    send(self(), :reload_investigations)
+  end
+
+  defp audit_log_data_for_deleting_note(%CaseInvestigation{}) do
+    {
+      AuditLog.Revision.delete_case_investigation_note_action(),
+      AuditLog.Revision.profile_case_investigation_note_deletion_event()
+    }
+  end
+
+  defp audit_log_data_for_deleting_note(%Exposure{}) do
+    {
+      AuditLog.Revision.delete_exposure_note_action(),
+      AuditLog.Revision.profile_exposure_note_deletion_event()
+    }
+  end
+
+  def on_note_deleted(deleted_note, subject) do
+    {reason_action, reason_event} = audit_log_data_for_deleting_note(subject)
+
+    {:ok, _} =
+      Cases.delete_investigation_note(deleted_note, %AuditLog.Meta{
+        # TODO: make sure this is the current user id - should this function be async so we have the socket?
+        author_id: deleted_note.author_id,
+        reason_action: reason_action,
+        reason_event: reason_event
+      })
 
     send(self(), :reload_investigations)
   end

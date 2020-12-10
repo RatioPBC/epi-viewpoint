@@ -4,8 +4,21 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
   import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
+  alias Epicenter.Accounts.User
+  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Test
   alias EpicenterWeb.InvestigationNoteComponent
+  alias EpicenterWeb.Test.Pages
+
+  @note %InvestigationNote{
+    id: "test-note-id",
+    text: "Hello, this is a note",
+    author_id: "test-author-id",
+    author: %User{id: "test-author-id", name: "Alice Testuser"},
+    inserted_at: ~U[2020-10-31 10:30:00Z]
+  }
+
+  def default_note, do: @note
 
   defmodule TestLiveView do
     use EpicenterWeb, :live_view
@@ -13,20 +26,11 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
     import EpicenterWeb.LiveComponent.Helpers
     import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
-    alias Epicenter.Accounts.User
-    alias Epicenter.Cases.InvestigationNote
     alias EpicenterWeb.InvestigationNoteComponent
+    alias EpicenterWeb.InvestigationNoteComponentTest
 
     def mount(_params, _session, socket) do
-      note = %InvestigationNote{
-        id: "test-note-id",
-        text: "Hello, this is a note",
-        author_id: "test-author-id",
-        author: %User{id: "test-author-id", name: "Alice Testuser"},
-        inserted_at: ~U[2020-10-31 10:30:00Z]
-      }
-
-      {:ok, socket |> assign(note: note, on_delete: &Function.identity/1)}
+      {:ok, socket |> assign(current_user_id: "test-user-id", note: InvestigationNoteComponentTest.default_note(), on_delete: &Function.identity/1)}
     end
 
     def render(assigns) do
@@ -35,7 +39,7 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
             InvestigationNoteComponent,
             "renders-a-note",
             note: @note,
-            current_user_id: "test-user",
+            current_user_id: @current_user_id,
             on_delete: @on_delete)
       """
     end
@@ -72,61 +76,32 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
                date: "10/31/2020"
              } = note_details
     end
+
+    test "does not show a delete link if the current user is not the author of the note", %{conn: conn} do
+      {:ok, view, _html} = live_isolated(conn, TestLiveView)
+      send(view.pid, {:assigns, current_user_id: "not-the-author-id"})
+
+      assert :delete_button_not_found = Pages.Profile.remove_note(view, "test-note-id")
+    end
+
+    test "allows the current user to click a delete link if they are the author of the note", %{conn: conn} do
+      {:ok, view, _html} = live_isolated(conn, TestLiveView)
+      send(view.pid, {:assigns, current_user_id: @note.author_id})
+
+      assert :ok = Pages.Profile.remove_note(view, "test-note-id")
+    end
   end
 
-  #  describe "typing text into the text area" do
-  #    test "shows the save button", %{conn: conn} do
-  #      {:ok, view, _html} = live_isolated(conn, TestLiveView)
-  #
-  #      view |> element("form") |> render_change(%{"form_field_data" => %{"text" => "A new note"}})
-  #
-  #      assert has_element?(view, "button[data-role='save-button']")
-  #    end
-  #  end
-  #
-  #  describe "submitting the form" do
-  #    test "calls the on_add callback, passing the note attrs", %{conn: conn} do
-  #      pid = self()
-  #      on_add = fn note_attrs -> send(pid, {:received_on_add, note_attrs}) end
-  #      {:ok, view, _html} = live_isolated(conn, TestLiveView)
-  #
-  #      send(view.pid, {:assigns, on_add: on_add})
-  #
-  #      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
-  #
-  #      assert_receive {:received_on_add, %{author_id: "test-user", text: "A new note"}}
-  #    end
-  #
-  #    test "clears the form", %{conn: conn} do
-  #      {:ok, view, _html} = live_isolated(conn, TestLiveView)
-  #
-  #      view |> element("form") |> render_change(%{"form_field_data" => %{"text" => "A new note"}})
-  #      %{"form_field_data[text]" => text} = Pages.form_state(view)
-  #      assert text |> Euclid.Exists.present?()
-  #
-  #      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
-  #      %{"form_field_data[text]" => text} = Pages.form_state(view)
-  #      assert text |> Euclid.Exists.blank?()
-  #    end
-  #  end
-  #
-  #  describe "validation" do
-  #    test "shows an error when there is no text", %{conn: conn} do
-  #      {:ok, view, _html} = live_isolated(conn, TestLiveView)
-  #      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => ""}})
-  #
-  #      assert has_element?(view, ".invalid-feedback[phx-feedback-for='form_field_data_text']")
-  #    end
-  #
-  #    test "does not call on_add when there is no text", %{conn: conn} do
-  #      pid = self()
-  #      on_add = fn note_attrs -> send(pid, {:received_on_add, note_attrs}) end
-  #
-  #      {:ok, view, _html} = live_isolated(conn, TestLiveView)
-  #      send(view.pid, {:assigns, on_add: on_add})
-  #      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => ""}})
-  #
-  #      refute_receive {:received_on_add, _}
-  #    end
-  #  end
+  describe "deleting a note" do
+    test "calls the on_delete callback with the note to delete", %{conn: conn} do
+      {:ok, view, _html} = live_isolated(conn, TestLiveView)
+
+      pid = self()
+      on_delete = fn note -> send(pid, {:received_on_delete, note}) end
+      send(view.pid, {:assigns, on_delete: on_delete, current_user_id: @note.author_id})
+
+      assert :ok = Pages.Profile.remove_note(view, "test-note-id")
+      assert_receive {:received_on_delete, @note}
+    end
+  end
 end

@@ -603,6 +603,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert Pages.Profile.remove_note(view, note.id) == :ok
 
       assert [] = Pages.Profile.case_investigation_notes(view, "001")
+
+      assert_recent_audit_log(note, user, action: "delete-case-investigation-note", event: "profile-case-investigation-note-deletion")
     end
 
     test "doesn't let you remove someone else's note", %{person: person, user: user, conn: conn} do
@@ -753,6 +755,24 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert {:ok, _} = Epicenter.DateParser.parse_mm_dd_yyyy(note.date)
       %{"form_field_data[text]" => text} = Pages.form_state(view)
       assert text |> Euclid.Exists.blank?()
+    end
+
+    test "lets you remove your note", %{person: sick_person, user: user, conn: conn} do
+      exposure = create_exposure(user, sick_person, %{}, %{}, %{tid: "exposure"})
+
+      view =
+        Pages.Profile.visit(conn, exposure.exposed_person)
+        |> Pages.Profile.add_contact_investigation_note(exposure.tid, "A new note")
+
+      view |> render()
+
+      [note] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
+
+      assert :ok = Pages.Profile.remove_note(view, note.id)
+
+      assert [] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
+
+      assert_recent_audit_log(note, user, action: "delete-exposure-note", event: "profile-exposure-note-deletion")
     end
 
     test "warns you that there are changes if you try to navigate away", %{person: sick_person, user: user, conn: conn} do

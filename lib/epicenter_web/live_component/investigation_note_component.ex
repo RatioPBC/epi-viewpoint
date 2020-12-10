@@ -3,7 +3,6 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
 
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
-  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias EpicenterWeb.Format
 
@@ -32,13 +31,6 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
   end
 
   def handle_event("remove-note", _params, socket) do
-    {:ok, _} =
-      Cases.delete_investigation_note(socket.assigns.note, %AuditLog.Meta{
-        author_id: socket.assigns.current_user_id,
-        reason_action: AuditLog.Revision.remove_case_investigation_note_action(),
-        reason_event: AuditLog.Revision.remove_case_investigation_note_event()
-      })
-
     socket.assigns.on_delete.(socket.assigns.note)
     socket |> noreply()
   end
