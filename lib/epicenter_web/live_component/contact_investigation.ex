@@ -29,14 +29,13 @@ defmodule EpicenterWeb.ContactInvestigation do
           li data-role="detail" #{@exposure.relationship_to_case}
           li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
       .contact-investigation-notes
-        = component @socket,
+        = component(@socket,
                     InvestigationNotesSection,
                     @exposure.id <> "note section",
-                    subject: @exposure,
                     notes: @exposure.notes,
                     current_user_id: @current_user_id,
                     on_add_note: @on_add_note,
-                    on_delete_note: @on_delete_note
+                    on_delete_note: @on_delete_note)
       div
         .contact-investigation-status-row
           h3

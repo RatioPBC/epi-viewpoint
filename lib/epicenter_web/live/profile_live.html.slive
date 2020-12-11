@@ -155,7 +155,6 @@
       = component @socket,
                   InvestigationNotesSection,
                   case_investigation.id <> "note section",
-                  subject: case_investigation,
                   notes: case_investigation.notes,
                   current_user_id: @current_user.id,
                   on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
