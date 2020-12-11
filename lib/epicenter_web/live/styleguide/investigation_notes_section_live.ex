@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Styleguide.FormNoteLive do
+defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, ok: 1, noreply: 1]

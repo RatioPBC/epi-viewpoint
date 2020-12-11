@@ -320,7 +320,6 @@
     div= live_redirect "Form example", to: Routes.styleguide_form_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormLive)
     div= live_redirect "Form builder example", to: Routes.styleguide_form_builder_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormBuilderLive)
     div= live_redirect "Form multiselect example", to: Routes.styleguide_form_multiselect_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormMultiselectLive)
-    div= live_redirect "Form note example", to: Routes.styleguide_form_note_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormNoteLive)
 
     .styleguide-example-title Select
     .styleguide-example
@@ -365,6 +364,16 @@
       #shadow-dialog
         ' Shadow for dialogs
       code @include shadow($style: dialog)
+
+  //
+  // components
+  //
+
+  .styleguide-section
+    .styleguide-section-title#components Components
+    .styleguide-example-title Component examples
+
+    div= live_redirect "InvestigationNotesSection example", to: Routes.styleguide_investigation_notes_section_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.InvestigationNotesSectionLive)
 
   //
   // icebox
