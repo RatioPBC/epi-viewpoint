@@ -119,6 +119,7 @@
         a.button href="#" List
         a.button href="#" data-active="true" Active
         a.button href="#" data-disabled="true" Disabled
+        a.button href="#" Button
       code @include button-list
 
     .styleguide-example

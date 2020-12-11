@@ -53,10 +53,14 @@
   .button
     @include button-secondary
 
+    &[data-disabled]
+      border-color: $disabled-button-color
+
     &:not(:last-of-type)
       border-right-color: $button-list-divider-color
 
     &[data-active=true]
+      font-weight: bold
       text-decoration: underline
 
     &:first-of-type
