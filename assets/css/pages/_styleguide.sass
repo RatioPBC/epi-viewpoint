@@ -184,8 +184,12 @@
   //
   // Containers
   //
-  #section-container, #card-container, #subnav-container
+  #section-container, #card-container, #subnav-container, #divider-list
     border: 1px dashed purple
+
+  #divider-list
+    @include dividers
+    padding: 1rem
 
   #card-container
     @include vertical-flow

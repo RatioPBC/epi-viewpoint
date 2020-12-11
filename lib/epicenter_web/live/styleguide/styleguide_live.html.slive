@@ -270,6 +270,21 @@
           ' Here is some text in a section
       code section
 
+    .styleguide-example-title Dividers
+    .styleguide-example
+      #divider-list
+        div
+          ' Here is some text in a div with no border top
+        div
+          ' Here is some text in a div with a border
+        div
+          ' Here is some text in a div with a border
+        div
+          ' Here is some text in a div with no border bottom
+      code
+        ' @include dividers
+        small Add border dividers between its children, excluding the first child
+
     .styleguide-example-title Card
     .styleguide-example
       #card-container
