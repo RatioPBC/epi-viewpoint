@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.CaseInvestigationNoteSection do
+defmodule EpicenterWeb.InvestigationNoteSection do
   use EpicenterWeb, :live_component
 
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
@@ -8,14 +8,14 @@ defmodule EpicenterWeb.CaseInvestigationNoteSection do
 
   def render(assigns) do
     ~H"""
-    .case-investigation-notes
+    .investigation-notes-section
       h3.additional_notes Additional Notes
       = component(@socket,
         InvestigationNoteForm,
-        @case_investigation.id <> "note form",
+        @subject.id <> "note form",
         current_user_id: @current_user_id,
         on_add: @on_add_note )
-      = for note <- @case_investigation.notes |> Enum.reverse() do
+      = for note <- @notes |> Enum.reverse() do
         = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_delete_note)
     """
   end
@@ -29,8 +29,7 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
-  alias EpicenterWeb.InvestigationNoteComponent
-  alias EpicenterWeb.InvestigationNoteForm
+  alias EpicenterWeb.InvestigationNoteSection
 
   def render(assigns) do
     ~H"""
@@ -53,14 +52,14 @@ defmodule EpicenterWeb.ContactInvestigation do
           li data-role="detail" #{@exposure.relationship_to_case}
           li data-role="detail" Last together on #{Format.date(@exposure.most_recent_date_together)}
       .contact-investigation-notes
-        h3.additional_notes Additional Notes
-        = component(@socket,
-          InvestigationNoteForm,
-          @exposure.id <> "note form",
-          current_user_id: @current_user_id,
-          on_add: @on_add_note)
-        = for note <- @exposure.notes |> Enum.reverse() do
-          = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: @current_user_id, on_delete: @on_delete_note)
+        = component @socket,
+                    InvestigationNoteSection,
+                    @exposure.id <> "note section",
+                    subject: @exposure,
+                    notes: @exposure.notes,
+                    current_user_id: @current_user_id,
+                    on_add_note: @on_add_note,
+                    on_delete_note: @on_delete_note
       div
         .contact-investigation-status-row
           h3
@@ -159,7 +158,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
-  alias EpicenterWeb.CaseInvestigationNoteSection
+  alias EpicenterWeb.InvestigationNoteSection
   alias EpicenterWeb.ContactInvestigation
 
   @clock Application.get_env(:epicenter, :clock)

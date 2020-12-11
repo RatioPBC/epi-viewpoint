@@ -46,7 +46,7 @@ defmodule EpicenterWeb.InvestigationNoteForm do
 
   def render(assigns) do
     ~H"""
-    = form_for @changeset, "#", [data: [role: "note-form", "confirm-navigation": confirmation_prompt(@changeset)], phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f ->
+    = form_for @changeset, "#", [class: "investigation-note-form", data: [role: "note-form", "confirm-navigation": confirmation_prompt(@changeset)], phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f ->
       = add_note_form_builder(f)
     """
   end

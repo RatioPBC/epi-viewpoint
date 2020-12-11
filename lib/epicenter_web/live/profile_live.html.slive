@@ -153,9 +153,10 @@
                   = Format.date(case_investigation.isolation_clearance_order_sent_on, "Not sent")
 
       = component @socket,
-                  CaseInvestigationNoteSection,
+                  InvestigationNoteSection,
                   case_investigation.id <> "note section",
-                  case_investigation: case_investigation,
+                  subject: case_investigation,
+                  notes: case_investigation.notes,
                   current_user_id: @current_user.id,
                   on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
                   on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end

@@ -5,30 +5,29 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
   import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts.User
+  alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.InvestigationNote
-  alias EpicenterWeb.InvestigationNoteComponent
-  alias EpicenterWeb.InvestigationNoteForm
+  alias EpicenterWeb.InvestigationNoteSection
 
   def mount(_params, _session, socket) do
     socket
     |> assign_page_title("Styleguide: note")
-    |> assign(notes: example_notes(), on_add: fn note -> send(self(), {:on_add, note}) end)
+    |> assign(notes: example_notes(), on_add: fn note_attrs -> send(self(), {:on_add, note_attrs}) end)
     |> ok()
   end
 
   def render(assigns) do
+    exposure = %Exposure{id: "styleguide-exposure"}
+
     ~H"""
-    <div id="styleguide-note-example">
     = component(@socket,
-          InvestigationNoteForm,
-          "styleguide-note-form",
-          handler: "#styleguide-note-example",
-          subject_id: nil,
+          InvestigationNoteSection,
+          "styleguide-note-section",
           current_user_id: "author-1",
-          on_add: @on_add)
-        = for note <- @notes do
-          = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, current_user_id: "author-1", on_delete: fn _ -> nil end)
-    </div>
+          subject: exposure,
+          notes: @notes,
+          on_add_note: @on_add,
+          on_delete_note: &Function.identity/1)
     """
   end
 
@@ -54,10 +53,10 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
   end
 
   def build_note(note_attrs) do
-    note_attrs
-    |> Map.put(:inserted_at, ~U[2020-10-31 10:30:00Z])
-    |> Map.put(:author, %User{name: "Billy"})
-    |> Map.put(:id, "fake-note-#{:os.system_time(:millisecond)}")
-    |> Map.put(:__struct__, InvestigationNote)
+    note_attrs = note_attrs
+      |> Map.put(:inserted_at, ~U[2020-10-31 10:30:00Z])
+      |> Map.put(:author, %User{name: "Billy"})
+      |> Map.put(:id, "fake-note-#{:os.system_time(:millisecond)}")
+    struct(InvestigationNote, note_attrs)
   end
 end
