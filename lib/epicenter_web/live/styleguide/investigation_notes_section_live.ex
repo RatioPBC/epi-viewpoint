@@ -65,11 +65,13 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   end
 
   def build_note(note_attrs) do
-    note_attrs = note_attrs
+    note_attrs =
+      note_attrs
       |> Map.put(:inserted_at, ~U[2020-10-31 10:30:00Z])
       |> Map.put(:author, %User{name: "Billy"})
       |> Map.put(:author_id, "author-1")
       |> Map.put(:id, "fake-note-#{:os.system_time(:millisecond)}")
+
     struct(InvestigationNote, note_attrs)
   end
 end
