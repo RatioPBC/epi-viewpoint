@@ -7,7 +7,7 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.Exposure
   alias Epicenter.Cases.InvestigationNote
-  alias EpicenterWeb.InvestigationNoteSection
+  alias EpicenterWeb.InvestigationNotesSection
 
   def mount(_params, _session, socket) do
     socket
@@ -21,7 +21,7 @@ defmodule EpicenterWeb.Styleguide.FormNoteLive do
 
     ~H"""
     = component(@socket,
-          InvestigationNoteSection,
+          InvestigationNotesSection,
           "styleguide-note-section",
           current_user_id: "author-1",
           subject: exposure,

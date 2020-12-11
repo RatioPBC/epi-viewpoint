@@ -153,7 +153,7 @@
                   = Format.date(case_investigation.isolation_clearance_order_sent_on, "Not sent")
 
       = component @socket,
-                  InvestigationNoteSection,
+                  InvestigationNotesSection,
                   case_investigation.id <> "note section",
                   subject: case_investigation,
                   notes: case_investigation.notes,
