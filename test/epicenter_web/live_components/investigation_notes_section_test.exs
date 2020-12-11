@@ -6,9 +6,8 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
 
   alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Accounts.User
-  alias Epicenter.Test
   alias EpicenterWeb.InvestigationNotesSection
-  alias EpicenterWeb.Test.Pages
+  alias EpicenterWeb.Test.Components
 
   @notes [
     %InvestigationNote{
@@ -70,19 +69,7 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
     test "renders notes", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      rendered_notes =
-        view
-        |> render()
-        |> Test.Html.parse()
-        |> Test.Html.all("[data-role=investigation-note]", fn note_el ->
-          id = Test.Html.attr(note_el, "data-note-id") |> List.first()
-          text = Test.Html.find(note_el, "[data-role=investigation-note-text]") |> Test.Html.text()
-          author = Test.Html.find(note_el, "[data-role=investigation-note-author]") |> Test.Html.text()
-          date = Test.Html.find(note_el, "[data-role=investigation-note-date]") |> Test.Html.text()
-          %{id: id, text: text, author: author, date: date}
-        end)
-
-      assert [%{text: "first note"}, %{text: "second note"}] = rendered_notes
+      assert [%{text: "first note"}, %{text: "second note"}] = Components.InvestigationNote.note_content(view)
     end
   end
 
@@ -109,7 +96,7 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
       on_delete_note = fn note -> send(pid, {:received_on_delete, note}) end
       send(view.pid, {:assigns, on_delete_note: on_delete_note, current_user_id: note_to_delete.author_id})
 
-      assert :ok = Pages.Profile.remove_note(view, note_to_delete.id)
+      assert :ok = Components.InvestigationNote.delete_note(view, note_to_delete.id)
       assert_receive {:received_on_delete, ^note_to_delete}
     end
   end

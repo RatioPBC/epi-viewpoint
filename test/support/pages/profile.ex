@@ -9,6 +9,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   alias Epicenter.Test
   alias Epicenter.Test.HtmlAssertions
   alias EpicenterWeb.Test.LiveViewAssertions
+  alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
@@ -315,36 +316,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.all("#case-investigation-#{number} [data-role=investigation-note]", fn note_el ->
-      id = Test.Html.attr(note_el, "data-note-id") |> List.first()
-      text = Test.Html.find(note_el, "[data-role=investigation-note-text]") |> Test.Html.text()
-      author = Test.Html.find(note_el, "[data-role=investigation-note-author]") |> Test.Html.text()
-      date = Test.Html.find(note_el, "[data-role=investigation-note-date]") |> Test.Html.text()
-      %{id: id, text: text, author: author, date: date}
-    end)
-  end
-
-  @spec remove_note(%View{}, String.t()) :: :ok | :note_not_found | :delete_button_not_found
-  def remove_note(%View{} = view, note_id) do
-    view
-    |> render()
-    |> Test.Html.parse()
-    |> Test.Html.find("[data-note-id=#{note_id}] [data-role=remove-note]")
-    |> length()
-    |> case do
-      1 ->
-        view
-        |> element("[data-note-id=#{note_id}] [data-role=remove-note]")
-        |> render_click()
-
-        :ok
-
-      0 ->
-        :delete_button_not_found
-
-      _ ->
-        flunk("too many delete buttons")
-    end
+    |> Test.Html.find("#case-investigation-#{number}")
+    |> Components.InvestigationNote.note_content()
   end
 
   def assert_case_investigation_note_validation_messages(%View{} = view, number, messages) do
@@ -607,13 +580,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.all("[data-role=contact-investigation][data-tid=#{exposure_tid}] [data-role=investigation-note]", fn note_el ->
-      id = Test.Html.attr(note_el, "data-note-id") |> List.first()
-      text = Test.Html.find(note_el, "[data-role=investigation-note-text]") |> Test.Html.text()
-      author = Test.Html.find(note_el, "[data-role=investigation-note-author]") |> Test.Html.text()
-      date = Test.Html.find(note_el, "[data-role=investigation-note-date]") |> Test.Html.text()
-      %{id: id, text: text, author: author, date: date}
-    end)
+    |> Test.Html.find("[data-role=contact-investigation][data-tid=#{exposure_tid}]")
+    |> Components.InvestigationNote.note_content()
   end
 
   def click_discontinue_contact_investigation(%View{} = view, tid) do

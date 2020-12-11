@@ -5,6 +5,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
   import Phoenix.LiveViewTest
 
   alias EpicenterWeb.InvestigationNoteForm
+  alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
 
   defmodule TestLiveView do
@@ -51,7 +52,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
     test "shows the save button", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      view |> element("form") |> render_change(%{"form_field_data" => %{"text" => "A new note"}})
+      Components.InvestigationNoteForm.change_note(view, "A new note")
 
       assert has_element?(view, "button[data-role='save-button']")
     end
@@ -65,7 +66,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
 
       send(view.pid, {:assigns, on_add: on_add})
 
-      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
+      Components.InvestigationNoteForm.submit_new_note(view, "A new note")
 
       assert_receive {:received_on_add, %{text: "A new note"}}
     end
@@ -73,11 +74,11 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
     test "clears the form", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      view |> element("form") |> render_change(%{"form_field_data" => %{"text" => "A new note"}})
+      Components.InvestigationNoteForm.change_note(view, "A new note")
       %{"form_field_data[text]" => text} = Pages.form_state(view)
       assert text |> Euclid.Exists.present?()
 
-      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
+      Components.InvestigationNoteForm.submit_new_note(view, "A new note")
       %{"form_field_data[text]" => text} = Pages.form_state(view)
       assert text |> Euclid.Exists.blank?()
     end
@@ -86,7 +87,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
   describe "validation" do
     test "shows an error when there is no text", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
-      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => ""}})
+      Components.InvestigationNoteForm.submit_new_note(view, "")
 
       assert has_element?(view, ".invalid-feedback[phx-feedback-for='form_field_data_text']")
     end
@@ -97,7 +98,8 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
 
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
       send(view.pid, {:assigns, on_add: on_add})
-      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => ""}})
+
+      Components.InvestigationNoteForm.submit_new_note(view, "")
 
       refute_receive {:received_on_add, _}
     end

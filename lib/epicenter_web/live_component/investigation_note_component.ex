@@ -26,11 +26,11 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
       .investigation-note-text data-role="investigation-note-text" = @note.text
       = if @note.author_id == @current_user_id do
         div
-          a.investigation-note-delete-link href="#" data-confirm="Remove your note?" phx-click="remove-note" data-role="remove-note" phx-target=@myself Delete
+          a.investigation-note-delete-link href="#" data-confirm="Remove your note?" phx-click="delete-note" data-role="delete-note" phx-target=@myself Delete
     """
   end
 
-  def handle_event("remove-note", _params, socket) do
+  def handle_event("delete-note", _params, socket) do
     socket.assigns.on_delete.(socket.assigns.note)
     socket |> noreply()
   end

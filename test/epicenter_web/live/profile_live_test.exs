@@ -9,6 +9,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   alias Epicenter.Test
   alias EpicenterWeb.Format
   alias EpicenterWeb.ProfileLive
+  alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
@@ -600,7 +601,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       [note] = Pages.Profile.case_investigation_notes(view, "001")
 
-      assert Pages.Profile.remove_note(view, note.id) == :ok
+      assert Components.InvestigationNote.delete_note(view, note.id) == :ok
 
       assert [] = Pages.Profile.case_investigation_notes(view, "001")
 
@@ -618,7 +619,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       view = Pages.Profile.visit(conn, person)
 
-      assert Pages.Profile.remove_note(view, someone_elses_note.id) == :delete_button_not_found
+      assert :delete_button_not_found = Components.InvestigationNote.delete_note(view, someone_elses_note.id)
     end
 
     test "warns you that there are changes if you try to navigate away", %{person: person, user: user, conn: conn} do
@@ -768,7 +769,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       [note] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
 
-      assert :ok = Pages.Profile.remove_note(view, note.id)
+      assert :ok = Components.InvestigationNote.delete_note(view, note.id)
 
       assert [] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
 

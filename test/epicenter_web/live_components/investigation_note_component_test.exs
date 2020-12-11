@@ -6,9 +6,8 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
 
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.InvestigationNote
-  alias Epicenter.Test
   alias EpicenterWeb.InvestigationNoteComponent
-  alias EpicenterWeb.Test.Pages
+  alias EpicenterWeb.Test.Components
 
   @note %InvestigationNote{
     id: "test-note-id",
@@ -53,42 +52,28 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
     test "renders a note", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
 
-      [note_details] =
-        view
-        |> render()
-        |> Test.Html.parse()
-        |> Test.Html.all("[data-role=investigation-note]", fn note_el ->
-          id = Test.Html.attr(note_el, "data-note-id") |> List.first()
-          text = Test.Html.find(note_el, "[data-role=investigation-note-text]") |> Test.Html.text()
-          author = Test.Html.find(note_el, "[data-role=investigation-note-author]") |> Test.Html.text()
-          date = Test.Html.find(note_el, "[data-role=investigation-note-date]") |> Test.Html.text()
-          %{id: id, text: text, author: author, date: date}
-        end)
-
-      # TODO: something like this?
-      #        |> Test.Html.find("[data-role=investigation-note]")
-      #        |> note_attributes()
-
-      assert %{
-               id: "test-note-id",
-               text: "Hello, this is a note",
-               author: "Alice Testuser",
-               date: "10/31/2020"
-             } = note_details
+      assert [
+               %{
+                 id: "test-note-id",
+                 text: "Hello, this is a note",
+                 author: "Alice Testuser",
+                 date: "10/31/2020"
+               }
+             ] = Components.InvestigationNote.note_content(view)
     end
 
     test "does not show a delete link if the current user is not the author of the note", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
       send(view.pid, {:assigns, current_user_id: "not-the-author-id"})
 
-      assert :delete_button_not_found = Pages.Profile.remove_note(view, "test-note-id")
+      assert :delete_button_not_found = Components.InvestigationNote.delete_note(view, "test-note-id")
     end
 
     test "allows the current user to click a delete link if they are the author of the note", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
       send(view.pid, {:assigns, current_user_id: @note.author_id})
 
-      assert :ok = Pages.Profile.remove_note(view, "test-note-id")
+      assert :ok = Components.InvestigationNote.delete_note(view, "test-note-id")
     end
   end
 
@@ -100,7 +85,7 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
       on_delete = fn note -> send(pid, {:received_on_delete, note}) end
       send(view.pid, {:assigns, on_delete: on_delete, current_user_id: @note.author_id})
 
-      assert :ok = Pages.Profile.remove_note(view, "test-note-id")
+      assert :ok = Components.InvestigationNote.delete_note(view, "test-note-id")
       assert_receive {:received_on_delete, @note}
     end
   end
