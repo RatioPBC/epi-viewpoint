@@ -7,6 +7,6 @@
   format: "compact",
   out: "",
   threshold: "low",
-  ignore: [],
+  ignore: ["Config.CSP"],
   ignore_files: [""]
 ]
