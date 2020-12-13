@@ -139,6 +139,15 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   end
 
   #
+  # external id
+  #
+
+  def assert_external_id(%View{} = view, expected_external_id) do
+    assert view |> Pages.parse() |> Test.Html.text("[data-role=external-id]") == expected_external_id
+    view
+  end
+
+  #
   # full name
   #
 

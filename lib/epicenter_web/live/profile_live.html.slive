@@ -9,7 +9,7 @@
   section#heading
     div
       h1 data-role="full-name"= string_or_unknown(Format.person(@person))
-      h3#external-id data-role="external-id"= demographic_field(@person, :external_id)
+      h3#external-id data-role="external-id"= demographic_field(@person, :external_id) |> Format.demographic(:external_id)
 
     form id="assignment-form" phx-change="form-change"
       #user-list

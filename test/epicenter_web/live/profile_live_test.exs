@@ -17,7 +17,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   setup %{user: user} do
     person =
       Test.Fixtures.person_attrs(user, "alice")
-      |> Test.Fixtures.add_demographic_attrs(%{external_id: "alice-external-id"})
+      |> Test.Fixtures.add_demographic_attrs(%{external_id: "987650"})
       |> Cases.create_person!()
 
     [person: load(person), user: user]
@@ -47,6 +47,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_full_name("Alice Testuser")
+      |> Pages.Profile.assert_external_id("ODRS ID: 987650")
       |> Pages.Profile.assert_date_of_birth("01/01/2000")
       |> Pages.Profile.assert_preferred_language("Unknown")
       |> Pages.Profile.assert_phone_numbers(["Unknown"])
@@ -654,7 +655,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
                %{
                  id: ^exposure_id,
                  title: "Contact investigation 08/06/2020",
-                 initiating_case_text: "Initiated by index case #alice-external-id",
+                 initiating_case_text: "Initiated by index case #987650",
                  minor_details: [],
                  exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"],
                  interview_buttons: ["Start interview", "Discontinue"]
@@ -698,25 +699,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "use the viewpoint id if external id is missing", %{conn: conn, user: user} do
-      sick_person =
-        Test.Fixtures.person_attrs(user, "sick_person ")
-        |> Cases.create_person!()
-
-      exposure =
-        create_exposure(user, sick_person, %{}, %{}, %{
-          tid: "exposure"
-        })
+      sick_person = Test.Fixtures.person_attrs(user, "sick_person ") |> Cases.create_person!()
+      exposure = create_exposure(user, sick_person, %{}, %{}, %{tid: "exposure"})
 
       exposure_id = exposure.id
       view = Pages.Profile.visit(conn, exposure.exposed_person)
       initiating_case_text = "Initiated by index case \##{sick_person.id}"
 
-      assert [
-               %{
-                 id: ^exposure_id,
-                 initiating_case_text: ^initiating_case_text
-               }
-             ] = Pages.Profile.contact_investigations(view)
+      assert [%{id: ^exposure_id, initiating_case_text: ^initiating_case_text}] = Pages.Profile.contact_investigations(view)
     end
 
     test "the exposed person is a minor", %{conn: conn, user: user, person: sick_person} do
