@@ -54,6 +54,7 @@ defmodule EpicenterWeb do
 
   def live_component do
     quote do
+      use PhoenixSlime.LiveView.CollocatedTemplate, extension: :slive
       use Phoenix.LiveComponent
 
       unquote(view_helpers())
