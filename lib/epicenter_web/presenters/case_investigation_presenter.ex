@@ -4,7 +4,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
 
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Cases.Person
   alias EpicenterWeb.Format
   alias EpicenterWeb.PresentationConstants
@@ -28,9 +28,9 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     "vomiting" => "Vomiting"
   }
 
-  def contact_details_as_list(%Exposure{} = exposure) do
+  def contact_details_as_list(%ContactInvestigation{} = contact_investigation) do
     content_tag :ul do
-      build_details_list(exposure) |> Enum.map(&content_tag(:li, &1))
+      build_details_list(contact_investigation) |> Enum.map(&content_tag(:li, &1))
     end
   end
 

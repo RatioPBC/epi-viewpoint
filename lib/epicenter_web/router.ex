@@ -67,8 +67,10 @@ defmodule EpicenterWeb.Router do
     live "/case-investigations/:case_investigation_id/contact", CaseInvestigationContactLive, as: :create_case_investigation_contact
     live "/case-investigations/:case_investigation_id/contact/:id", CaseInvestigationContactLive, as: :edit_case_investigation_contact
 
-    live "/contact-investigations/:exposure_id/start-interview", ContactInvestigationStartInterviewLive, as: :contact_investigation_start_interview
-    live "/contact-investigations/:exposure_id/discontinue", ContactInvestigationDiscontinueLive, as: :contact_investigation_discontinue
+    live "/contact-investigations/:contact_investigation_id/start-interview", ContactInvestigationStartInterviewLive,
+      as: :contact_investigation_start_interview
+
+    live "/contact-investigations/:contact_investigation_id/discontinue", ContactInvestigationDiscontinueLive, as: :contact_investigation_discontinue
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
     get "/users/settings", UserSettingsController, :edit

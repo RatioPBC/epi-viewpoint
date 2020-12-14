@@ -1,4 +1,4 @@
-defmodule Epicenter.Cases.Exposure do
+defmodule Epicenter.Cases.ContactInvestigation do
   use Ecto.Schema
 
   import Ecto.Changeset
@@ -49,14 +49,14 @@ defmodule Epicenter.Cases.Exposure do
     has_many :notes, InvestigationNote, foreign_key: :exposure_id, where: [deleted_at: nil]
   end
 
-  def changeset(exposure, attrs) do
-    exposure
+  def changeset(contact_investigation, attrs) do
+    contact_investigation
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
     |> cast_assoc(:exposed_person, with: &Person.changeset/2)
     |> validate_guardian_fields()
     |> strip_non_digits_from_guardian_phone()
-    |> validate_phi(:exposure)
+    |> validate_phi(:contact_investigation)
   end
 
   def validate_guardian_fields(changeset) do

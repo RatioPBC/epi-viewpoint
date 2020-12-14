@@ -5,7 +5,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts.User
-  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Cases.InvestigationNote
   alias EpicenterWeb.InvestigationNotesSection
 
@@ -17,14 +17,14 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   end
 
   def render(assigns) do
-    exposure = %Exposure{id: "styleguide-exposure"}
+    contact_investigation = %ContactInvestigation{id: "styleguide-contact-investigation"}
 
     ~H"""
     = component(@socket,
           InvestigationNotesSection,
           "styleguide-note-section",
           current_user_id: "author-1",
-          subject: exposure,
+          subject: contact_investigation,
           notes: @notes,
           on_add_note: &on_add/1,
           on_delete_note: &on_delete/1)

@@ -4,11 +4,11 @@ defmodule EpicenterWeb.ContactInvestigation do
   import EpicenterWeb.LiveComponent.Helpers
   import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1]
 
-  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.ContactInvestigation
   alias EpicenterWeb.Format
   alias EpicenterWeb.InvestigationNotesSection
 
-  defp status_class(%Exposure{} = %{interview_status: status}) do
+  defp status_class(%ContactInvestigation{} = %{interview_status: status}) do
     case status do
       "discontinued" -> "discontinued-status"
       "started" -> "started-status"
@@ -16,7 +16,7 @@ defmodule EpicenterWeb.ContactInvestigation do
     end
   end
 
-  defp status_text(%Exposure{} = %{interview_status: status}) do
+  defp status_text(%ContactInvestigation{} = %{interview_status: status}) do
     case status do
       "discontinued" -> "Discontinued"
       "started" -> "Ongoing"

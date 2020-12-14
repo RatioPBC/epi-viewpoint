@@ -307,7 +307,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       case_investigation =
         create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
-      {:ok, complete_exposure} =
+      {:ok, completed_contact_investigation} =
         Cases.create_contact_investigation(
           {%{
              exposing_case_id: case_investigation.id,
@@ -396,7 +396,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
                |> Pages.Profile.assert_contacts_showing("001")
                |> Pages.Profile.case_investigation_contact_details("001")
 
-      exposed_person = Cases.get_person(complete_exposure.exposed_person_id)
+      exposed_person = Cases.get_person(completed_contact_investigation.exposed_person_id)
 
       view
       |> Pages.Profile.click_on_contact("001", "Complete Testuser")
@@ -408,7 +408,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       case_investigation =
         create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
-      {:ok, exposure} =
+      {:ok, contact_investigation} =
         Cases.create_contact_investigation(
           {%{
              exposing_case_id: case_investigation.id,
@@ -436,15 +436,15 @@ defmodule EpicenterWeb.ProfileLiveTest do
         )
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.click_edit_contact_link(exposure)
-      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/contact/#{exposure.id}")
+      |> Pages.Profile.click_edit_contact_link(contact_investigation)
+      |> assert_redirects_to("/case-investigations/#{case_investigation.id}/contact/#{contact_investigation.id}")
     end
 
     test "a contact can be removed", %{conn: conn, person: person, user: user} do
       case_investigation =
         create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
-      {:ok, exposure} =
+      {:ok, contact_investigation} =
         Cases.create_contact_investigation(
           {%{
              exposing_case_id: case_investigation.id,
@@ -472,7 +472,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         )
 
       view = Pages.Profile.visit(conn, person)
-      view |> Pages.Profile.click_remove_contact_link(exposure)
+      view |> Pages.Profile.click_remove_contact_link(contact_investigation)
 
       case_investigation = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
       assert case_investigation.exposures == []
@@ -638,22 +638,22 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "contact investigations" do
     test "show up", %{conn: conn, user: user, person: sick_person} do
-      exposure =
+      contact_investigation =
         create_contact_investigation(user, sick_person, %{}, %{}, %{
-          tid: "exposure",
+          tid: "contact_investigation",
           household_member: true,
           relationship_to_case: "Partner or roommate",
           most_recent_date_together: ~D{2020-08-06}
         })
 
-      exposure_id = exposure.id
-      exposed_person = exposure.exposed_person
+      contact_investigation_id = contact_investigation.id
+      exposed_person = contact_investigation.exposed_person
 
       view = Pages.Profile.visit(conn, exposed_person)
 
       assert [
                %{
-                 id: ^exposure_id,
+                 id: ^contact_investigation_id,
                  title: "Contact investigation 08/06/2020",
                  initiating_case_text: "Initiated by index case #987650",
                  minor_details: [],
@@ -664,32 +664,32 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       actual = Pages.Profile.contact_investigations(view) |> hd()
 
-      expected_creation_timestamp = "Created on #{Format.date(exposure.inserted_at)}"
+      expected_creation_timestamp = "Created on #{Format.date(contact_investigation.inserted_at)}"
       assert ^expected_creation_timestamp = actual.creation_timestamp
     end
 
     test "navigating to the exposing case", %{conn: conn, user: user, person: sick_person} do
-      exposure =
+      contact_investigation =
         create_contact_investigation(user, sick_person, %{}, %{}, %{
-          tid: "exposure"
+          tid: "contact_investigation"
         })
 
-      Pages.Profile.visit(conn, exposure.exposed_person)
-      |> Pages.Profile.click_on_exposing_case(exposure.tid)
+      Pages.Profile.visit(conn, contact_investigation.exposed_person)
+      |> Pages.Profile.click_on_exposing_case(contact_investigation.tid)
       |> Pages.follow_live_view_redirect(conn)
       |> Pages.Profile.assert_here(sick_person)
     end
 
-    test "the exposure is not from the same household", %{conn: conn, user: user, person: sick_person} do
-      exposure =
+    test "the contact investigation is not from the same household", %{conn: conn, user: user, person: sick_person} do
+      contact_investigation =
         create_contact_investigation(user, sick_person, %{}, %{}, %{
-          tid: "exposure",
+          tid: "contact_investigation",
           household_member: false,
           relationship_to_case: "Healthcare worker",
           most_recent_date_together: ~D{2020-08-06}
         })
 
-      view = Pages.Profile.visit(conn, exposure.exposed_person)
+      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
       assert [
                %{
@@ -700,17 +700,17 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "use the viewpoint id if external id is missing", %{conn: conn, user: user} do
       sick_person = Test.Fixtures.person_attrs(user, "sick_person ") |> Cases.create_person!()
-      exposure = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "exposure"})
+      contact_investigation = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "contact_investigation"})
 
-      exposure_id = exposure.id
-      view = Pages.Profile.visit(conn, exposure.exposed_person)
+      contact_investigation_id = contact_investigation.id
+      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
       initiating_case_text = "Initiated by index case \##{sick_person.id}"
 
-      assert [%{id: ^exposure_id, initiating_case_text: ^initiating_case_text}] = Pages.Profile.contact_investigations(view)
+      assert [%{id: ^contact_investigation_id, initiating_case_text: ^initiating_case_text}] = Pages.Profile.contact_investigations(view)
     end
 
     test "the exposed person is a minor", %{conn: conn, user: user, person: sick_person} do
-      exposure =
+      contact_investigation =
         create_contact_investigation(
           user,
           sick_person,
@@ -719,7 +719,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
           %{guardian_name: "Alex Testuser", guardian_phone: "1111111222", under_18: true}
         )
 
-      view = Pages.Profile.visit(conn, exposure.exposed_person)
+      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
       assert [
                %{
@@ -729,19 +729,19 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "can add a new note", %{person: sick_person, user: user, conn: conn} do
-      exposure = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "exposure"})
+      contact_investigation = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "contact_investigation"})
       username = user.name
 
       view =
-        Pages.Profile.visit(conn, exposure.exposed_person)
-        |> Pages.Profile.add_contact_investigation_note(exposure.tid, "A new note")
+        Pages.Profile.visit(conn, contact_investigation.exposed_person)
+        |> Pages.Profile.add_contact_investigation_note(contact_investigation.tid, "A new note")
 
       view |> render()
 
-      assert [note] = exposure |> Cases.preload_investigation_notes() |> Map.get(:notes)
-      assert_recent_audit_log(note, user, action: "create-exposure-note", event: "profile-exposure-note-submission")
+      assert [note] = contact_investigation |> Cases.preload_investigation_notes() |> Map.get(:notes)
+      assert_recent_audit_log(note, user, action: "create-contact-investigation-note", event: "profile-contact-investigation-note-submission")
 
-      [note] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
+      [note] = Pages.Profile.contact_investigation_notes(view, contact_investigation.tid)
       assert %{text: "A new note", author: ^username} = note
       assert {:ok, _} = Epicenter.DateParser.parse_mm_dd_yyyy(note.date)
       %{"form_field_data[text]" => text} = Pages.form_state(view)
@@ -749,44 +749,48 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "lets you remove your note", %{person: sick_person, user: user, conn: conn} do
-      exposure = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "exposure"})
+      contact_investigation = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "contact_investigation"})
 
       view =
-        Pages.Profile.visit(conn, exposure.exposed_person)
-        |> Pages.Profile.add_contact_investigation_note(exposure.tid, "A new note")
+        Pages.Profile.visit(conn, contact_investigation.exposed_person)
+        |> Pages.Profile.add_contact_investigation_note(contact_investigation.tid, "A new note")
 
       view |> render()
 
-      [note] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
+      [note] = Pages.Profile.contact_investigation_notes(view, contact_investigation.tid)
 
       assert :ok = Components.InvestigationNote.delete_note(view, note.id)
 
-      assert [] = Pages.Profile.contact_investigation_notes(view, exposure.tid)
+      assert [] = Pages.Profile.contact_investigation_notes(view, contact_investigation.tid)
 
-      assert_recent_audit_log(note, user, action: "delete-exposure-note", event: "profile-exposure-note-deletion")
+      assert_recent_audit_log(note, user, action: "delete-contact-investigation-note", event: "profile-contact-investigation-note-deletion")
     end
 
     test "warns you that there are changes if you try to navigate away", %{person: sick_person, user: user, conn: conn} do
-      exposure = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "exposure"})
+      contact_investigation = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "contact_investigation"})
 
-      view = Pages.Profile.visit(conn, exposure.exposed_person)
+      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
       assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
 
-      view |> Pages.Profile.change_contact_investigation_note_form(exposure.tid, %{"text" => "something present"})
+      view |> Pages.Profile.change_contact_investigation_note_form(contact_investigation.tid, %{"text" => "something present"})
       assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
     end
 
     test "looking at a discontinued contact investigation", %{conn: conn, user: user, person: sick_person} do
-      exposure =
+      contact_investigation =
         create_contact_investigation(
           user,
           sick_person,
           %{},
           %{},
-          %{tid: "exposure", interview_discontinued_at: ~U[2020-12-08 11:00:00Z], interview_discontinue_reason: "Transferred to another jurisdiction"}
+          %{
+            tid: "contact_investigation",
+            interview_discontinued_at: ~U[2020-12-08 11:00:00Z],
+            interview_discontinue_reason: "Transferred to another jurisdiction"
+          }
         )
 
-      view = Pages.Profile.visit(conn, exposure.exposed_person)
+      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
       assert [
                %{
@@ -796,13 +800,15 @@ defmodule EpicenterWeb.ProfileLiveTest do
              ] = Pages.Profile.contact_investigations(view)
 
       view
-      |> Pages.Profile.click_edit_interview_discontinuation_details("exposure")
-      |> assert_redirects_to("/contact-investigations/#{exposure.id}/discontinue")
+      |> Pages.Profile.click_edit_interview_discontinuation_details("contact_investigation")
+      |> assert_redirects_to("/contact-investigations/#{contact_investigation.id}/discontinue")
     end
 
     test "looking at a started contact investigation interview", %{conn: conn, user: user, person: sick_person} do
-      exposure = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "exposure", interview_started_at: ~U[2020-12-08 11:00:00Z]})
-      view = Pages.Profile.visit(conn, exposure.exposed_person)
+      contact_investigation =
+        create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "contact_investigation", interview_started_at: ~U[2020-12-08 11:00:00Z]})
+
+      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
       assert [
                %{
@@ -812,8 +818,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
              ] = Pages.Profile.contact_investigations(view)
 
       view
-      |> Pages.Profile.click_edit_interview_start_details("exposure")
-      |> assert_redirects_to("/contact-investigations/#{exposure.id}/start-interview")
+      |> Pages.Profile.click_edit_interview_start_details("contact_investigation")
+      |> assert_redirects_to("/contact-investigations/#{contact_investigation.id}/start-interview")
     end
   end
 
@@ -1016,7 +1022,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     |> Cases.create_case_investigation!()
   end
 
-  defp create_contact_investigation(user, sick_person, lab_result_attrs, case_investigation_attrs, exposure_attrs) do
+  defp create_contact_investigation(user, sick_person, lab_result_attrs, case_investigation_attrs, contact_investigation_attrs) do
     lab_result =
       Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], lab_result_attrs)
       |> Cases.create_lab_result!()
@@ -1025,10 +1031,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation", case_investigation_attrs)
       |> Cases.create_case_investigation!()
 
-    {:ok, exposure} =
-      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure", exposure_attrs), Test.Fixtures.admin_audit_meta()}
+    {:ok, contact_investigation} =
+      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation", contact_investigation_attrs),
+       Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    exposure
+    contact_investigation
   end
 end

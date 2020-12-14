@@ -269,7 +269,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
 
   describe "updating" do
     setup %{case_investigation: case_investigation} do
-      {:ok, exposure} =
+      {:ok, contact_investigation} =
         Cases.create_contact_investigation(
           {%{
              exposing_case_id: case_investigation.id,
@@ -299,12 +299,12 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
            }, Test.Fixtures.admin_audit_meta()}
         )
 
-      [exposure: exposure]
+      [contact_investigation: contact_investigation]
     end
 
-    test "prepopulates the form correctly", %{conn: conn, case_investigation: case_investigation, exposure: exposure} do
+    test "prepopulates the form correctly", %{conn: conn, case_investigation: case_investigation, contact_investigation: contact_investigation} do
       view =
-        Pages.CaseInvestigationContact.visit(conn, case_investigation, exposure)
+        Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation)
         |> Pages.CaseInvestigationContact.assert_here()
 
       assert %{
@@ -318,9 +318,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                "contact_form[relationship_to_case]" => "Family"
              } = Pages.form_state(view)
 
-      {:ok, exposure} =
+      {:ok, contact_investigation} =
         Cases.update_contact_investigation(
-          exposure,
+          contact_investigation,
           {%{
              under_18: true,
              guardian_name: "Someone",
@@ -329,7 +329,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         )
 
       view =
-        Pages.CaseInvestigationContact.visit(conn, case_investigation, exposure)
+        Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation)
         |> Pages.CaseInvestigationContact.assert_here()
 
       assert %{
@@ -345,8 +345,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              } = Pages.form_state(view)
     end
 
-    test "works", %{conn: conn, case_investigation: case_investigation, exposure: exposure} do
-      Pages.CaseInvestigationContact.visit(conn, case_investigation, exposure)
+    test "works", %{conn: conn, case_investigation: case_investigation, contact_investigation: contact_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation)
       |> Pages.CaseInvestigationContact.assert_here()
       |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
         contact_form: %{

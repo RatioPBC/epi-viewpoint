@@ -20,11 +20,11 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
       |> Cases.create_case_investigation!()
 
-    {:ok, exposure} =
-      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
+    {:ok, contact_investigation} =
+      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation"), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    exposed_person = Cases.get_person(exposure.exposed_person_id)
+    exposed_person = Cases.get_person(contact_investigation.exposed_person_id)
 
     view =
       conn
@@ -35,13 +35,13 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
     contact_investigations =
       view
-      |> Pages.Profile.click_discontinue_contact_investigation(exposure.tid)
+      |> Pages.Profile.click_discontinue_contact_investigation(contact_investigation.tid)
       |> Pages.follow_live_view_redirect(conn)
-      |> Pages.ContactInvestigationDiscontinue.assert_here(exposure)
+      |> Pages.ContactInvestigationDiscontinue.assert_here(contact_investigation)
       |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-discontinue-form",
-        exposure: %{"interview_discontinue_reason" => "Unable to reach"}
+        contact_investigation: %{"interview_discontinue_reason" => "Unable to reach"}
       )
-      |> Pages.Profile.assert_here(exposure.exposed_person)
+      |> Pages.Profile.assert_here(contact_investigation.exposed_person)
       |> Pages.Profile.contact_investigations()
 
     assert [%{status: "Discontinued"}] = contact_investigations
@@ -60,11 +60,11 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
       |> Cases.create_case_investigation!()
 
-    {:ok, exposure} =
-      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
+    {:ok, contact_investigation} =
+      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation"), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    exposed_person = Cases.get_person(exposure.exposed_person_id)
+    exposed_person = Cases.get_person(contact_investigation.exposed_person_id)
 
     view =
       conn
@@ -75,7 +75,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
     view =
       view
-      |> Pages.Profile.click_start_contact_investigation(exposure.tid)
+      |> Pages.Profile.click_start_contact_investigation(contact_investigation.tid)
       |> Pages.follow_live_view_redirect(conn)
       |> Pages.ContactInvestigationStartInterview.assert_here()
       |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
@@ -86,7 +86,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
           "time_started_am_pm" => "PM"
         }
       )
-      |> Pages.Profile.assert_here(exposure.exposed_person)
+      |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
     assert [
              %{
@@ -97,7 +97,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
            ] = Pages.Profile.contact_investigations(view)
 
     #    view
-    #    |> Pages.Profile.click_edit_contact_clinical_details_link(exposure.tid)
+    #    |> Pages.Profile.click_edit_contact_clinical_details_link(contact_investigation.tid)
     #    |> Pages.follow_live_view_redirect(conn)
     #    |> Pages.ContactInvestigationClinicalDetails.assert_here()
   end

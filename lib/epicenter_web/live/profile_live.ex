@@ -26,7 +26,6 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.Exposure
   alias EpicenterWeb.Format
   alias EpicenterWeb.InvestigationNotesSection
   alias EpicenterWeb.ContactInvestigation
@@ -100,10 +99,10 @@ defmodule EpicenterWeb.ProfileLive do
     }
   end
 
-  defp audit_log_data_for_adding_note(%Exposure{}) do
+  defp audit_log_data_for_adding_note(%Cases.ContactInvestigation{}) do
     {
       AuditLog.Revision.create_contact_investigation_note_action(),
-      AuditLog.Revision.profile_exposure_note_submission_event()
+      AuditLog.Revision.profile_contact_investigation_note_submission_event()
     }
   end
 
@@ -117,7 +116,7 @@ defmodule EpicenterWeb.ProfileLive do
     send(self(), {:add_note, note_attrs, {:case_investigation_id, subject}})
   end
 
-  def on_note_added(note_attrs, %Exposure{} = subject) do
+  def on_note_added(note_attrs, %Cases.ContactInvestigation{} = subject) do
     send(self(), {:add_note, note_attrs, {:exposure_id, subject}})
   end
 
@@ -128,10 +127,10 @@ defmodule EpicenterWeb.ProfileLive do
     }
   end
 
-  defp audit_log_data_for_deleting_note(%Exposure{}) do
+  defp audit_log_data_for_deleting_note(%Cases.ContactInvestigation{}) do
     {
-      AuditLog.Revision.delete_exposure_note_action(),
-      AuditLog.Revision.profile_exposure_note_deletion_event()
+      AuditLog.Revision.delete_contact_investigation_note_action(),
+      AuditLog.Revision.profile_contact_investigation_note_deletion_event()
     }
   end
 
@@ -139,15 +138,15 @@ defmodule EpicenterWeb.ProfileLive do
     send(self(), {:delete_note, note, subject})
   end
 
-  def handle_event("remove-contact", %{"exposure-id" => exposure_id}, socket) do
-    with exposure when not is_nil(exposure) <- Cases.get_contact_investigation(exposure_id) do
+  def handle_event("remove-contact", %{"contact-investigation-id" => contact_investigation_id}, socket) do
+    with contact_investigation when not is_nil(contact_investigation) <- Cases.get_contact_investigation(contact_investigation_id) do
       Cases.update_contact_investigation(
-        exposure,
+        contact_investigation,
         {
           %{deleted_at: NaiveDateTime.utc_now()},
           %AuditLog.Meta{
             author_id: socket.assigns.current_user.id,
-            reason_action: AuditLog.Revision.remove_exposure_action(),
+            reason_action: AuditLog.Revision.remove_contact_investigation_action(),
             reason_event: AuditLog.Revision.remove_contact_event()
           }
         }

@@ -20,15 +20,15 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
       Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
       |> Cases.create_case_investigation!()
 
-    {:ok, exposure} =
-      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
+    {:ok, contact_investigation} =
+      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation"), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    [exposure: exposure]
+    [contact_investigation: contact_investigation]
   end
 
-  test "saving a start interview contact investigation", %{conn: conn, exposure: exposure} do
-    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+  test "saving a start interview contact investigation", %{conn: conn, contact_investigation: contact_investigation} do
+    Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationStartInterview.assert_here()
     |> Epicenter.Extra.tap(fn view ->
       assert Pages.ContactInvestigationStartInterview.time_started(view) =~ ~r[^\d\d:\d\d((AM)|(PM))$]
@@ -48,17 +48,20 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: "Jason Bourne"
-           } = Cases.get_contact_investigation(exposure.id)
+           } = Cases.get_contact_investigation(contact_investigation.id)
   end
 
-  test "prefills with existing data when existing data is available, and can edit existing data", %{conn: conn, exposure: exposure} do
+  test "prefills with existing data when existing data is available, and can edit existing data", %{
+    conn: conn,
+    contact_investigation: contact_investigation
+  } do
     {:ok, _} =
       Cases.update_contact_investigation(
-        exposure,
+        contact_investigation,
         {%{interview_started_at: ~N[2020-01-01 23:03:07], interview_proxy_name: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
       )
 
-    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+    Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationStartInterview.assert_here()
     |> Epicenter.Extra.tap(fn view ->
       assert Pages.ContactInvestigationStartInterview.form_title(view) == "Edit start interview"
@@ -78,19 +81,19 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: nil
-           } = Cases.get_contact_investigation(exposure.id)
+           } = Cases.get_contact_investigation(contact_investigation.id)
   end
 
   describe "warning the user when navigation will erase their changes" do
-    test "before the user changes anything", %{conn: conn, exposure: exposure} do
-      assert Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+    test "before the user changes anything", %{conn: conn, contact_investigation: contact_investigation} do
+      assert Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
              |> Pages.navigation_confirmation_prompt()
              |> Euclid.Exists.blank?()
     end
 
-    test "when the user changes something", %{conn: conn, exposure: exposure} do
+    test "when the user changes something", %{conn: conn, contact_investigation: contact_investigation} do
       view =
-        Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+        Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
         |> Pages.ContactInvestigationStartInterview.change_form(start_interview_form: %{"date_started" => "09/06/2020"})
 
       assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
@@ -98,14 +101,14 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     end
   end
 
-  test "the back button is there, and can take you back", %{conn: conn, exposure: exposure} do
-    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+  test "the back button is there, and can take you back", %{conn: conn, contact_investigation: contact_investigation} do
+    Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationStartInterview.go_back()
-    |> assert_redirects_to("/people/#{exposure.exposed_person_id}")
+    |> assert_redirects_to("/people/#{contact_investigation.exposed_person_id}")
   end
 
-  test "date_started, time_started, and person interviewed are required", %{conn: conn, exposure: exposure} do
-    Pages.ContactInvestigationStartInterview.visit(conn, exposure)
+  test "date_started, time_started, and person interviewed are required", %{conn: conn, contact_investigation: contact_investigation} do
+    Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
     |> Pages.submit_live("#contact-investigation-interview-start-form",
       start_interview_form: %{
         "person_interviewed" => "",

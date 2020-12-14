@@ -11,25 +11,25 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
   setup :register_and_log_in_user
 
   setup %{user: user} do
-    [exposure: create_contact_investigation(user)]
+    [contact_investigation: create_contact_investigation(user)]
   end
 
-  test "has a working initial render", %{conn: conn, exposure: exposure} do
-    {:ok, page_live, disconnected_html} = live(conn, "/contact-investigations/#{exposure.id}/discontinue")
+  test "has a working initial render", %{conn: conn, contact_investigation: contact_investigation} do
+    {:ok, page_live, disconnected_html} = live(conn, "/contact-investigations/#{contact_investigation.id}/discontinue")
 
     assert_has_role(disconnected_html, "contact-investigation-discontinue-page")
     assert_has_role(page_live, "contact-investigation-discontinue-page")
   end
 
-  test "initial values", %{conn: conn, exposure: exposure} do
-    view = Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
+  test "initial values", %{conn: conn, contact_investigation: contact_investigation} do
+    view = Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
 
     assert %{
-             "exposure[interview_discontinue_reason]" => ""
+             "contact_investigation[interview_discontinue_reason]" => ""
            } = Pages.form_state(view)
 
     assert Pages.form_labels(view) == %{
-             "exposure[interview_discontinue_reason]" => [
+             "contact_investigation[interview_discontinue_reason]" => [
                "Other",
                "Deceased",
                "Transferred to another jurisdiction",
@@ -41,14 +41,18 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
     assert Pages.ContactInvestigationDiscontinue.form_title(view) == "Discontinue interview"
   end
 
-  test "allows the user to set a discontinuation reason and saves a timestamp of when that happened", %{conn: conn, exposure: exposure, user: user} do
-    Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
+  test "allows the user to set a discontinuation reason and saves a timestamp of when that happened", %{
+    conn: conn,
+    contact_investigation: contact_investigation,
+    user: user
+  } do
+    Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-discontinue-form",
-      exposure: %{"interview_discontinue_reason" => "Unable to reach"}
+      contact_investigation: %{"interview_discontinue_reason" => "Unable to reach"}
     )
-    |> Pages.Profile.assert_here(exposure.exposed_person)
+    |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-    updated_contact_investigation = Cases.get_contact_investigation(exposure.id)
+    updated_contact_investigation = Cases.get_contact_investigation(contact_investigation.id)
     assert "Unable to reach" = updated_contact_investigation.interview_discontinue_reason
     assert_datetime_approximate(updated_contact_investigation.interview_discontinued_at, DateTime.utc_now(), 2)
 
@@ -60,38 +64,41 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
              author_id: ^user_id,
              reason_action: ^expected_action,
              reason_event: ^expected_event
-           } = recent_audit_log(exposure)
+           } = recent_audit_log(contact_investigation)
   end
 
-  test "discontinuing an interview requires a reason", %{conn: conn, exposure: exposure} do
+  test "discontinuing an interview requires a reason", %{conn: conn, contact_investigation: contact_investigation} do
     view =
-      Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
-      |> Pages.submit_live("#contact-investigation-discontinue-form", exposure: %{"interview_discontinue_reason" => ""})
-      |> Pages.ContactInvestigationDiscontinue.assert_here(exposure)
+      Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
+      |> Pages.submit_live("#contact-investigation-discontinue-form", contact_investigation: %{"interview_discontinue_reason" => ""})
+      |> Pages.ContactInvestigationDiscontinue.assert_here(contact_investigation)
 
-    view |> Pages.assert_validation_messages(%{"exposure[interview_discontinue_reason]" => "can't be blank"})
+    view |> Pages.assert_validation_messages(%{"contact_investigation[interview_discontinue_reason]" => "can't be blank"})
   end
 
-  test "warns you that there are changes if you try to navigate away", %{conn: conn, exposure: exposure} do
-    view = Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
+  test "warns you that there are changes if you try to navigate away", %{conn: conn, contact_investigation: contact_investigation} do
+    view = Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
 
     assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
 
     view
-    |> Pages.ContactInvestigationDiscontinue.change_form(exposure: %{"interview_discontinue_reason" => "Transferred to another jurisdiction"})
+    |> Pages.ContactInvestigationDiscontinue.change_form(
+      contact_investigation: %{"interview_discontinue_reason" => "Transferred to another jurisdiction"}
+    )
 
     assert %{
-             "exposure[interview_discontinue_reason]" => "Transferred to another jurisdiction"
+             "contact_investigation[interview_discontinue_reason]" => "Transferred to another jurisdiction"
            } = Pages.form_state(view)
 
     assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
   end
 
-  test "editing discontinuation reason has a different title", %{conn: conn, exposure: exposure, user: user} do
+  test "editing discontinuation reason has a different title", %{conn: conn, contact_investigation: contact_investigation, user: user} do
     {:ok, _} =
-      exposure |> Cases.update_contact_investigation({%{interview_discontinued_at: ~U[2020-01-01 12:00:00Z]}, Test.Fixtures.audit_meta(user)})
+      contact_investigation
+      |> Cases.update_contact_investigation({%{interview_discontinued_at: ~U[2020-01-01 12:00:00Z]}, Test.Fixtures.audit_meta(user)})
 
-    view = Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
+    view = Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
 
     assert Pages.ContactInvestigationDiscontinue.form_title(view) == "Edit discontinue interview"
   end
@@ -109,10 +116,10 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
       Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
       |> Cases.create_case_investigation!()
 
-    {:ok, exposure} =
-      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
+    {:ok, contact_investigation} =
+      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation"), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    exposure
+    contact_investigation
   end
 end

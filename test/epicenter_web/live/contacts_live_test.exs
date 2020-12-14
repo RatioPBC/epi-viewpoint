@@ -86,22 +86,23 @@ defmodule EpicenterWeb.ContactsLiveTest do
     lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
     case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
-    {:ok, caroline_exposure} =
-      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "caroline_exposure"), Test.Fixtures.admin_audit_meta()}
+    {:ok, caroline_contact_investigation} =
+      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "caroline_contact_investigation"),
+       Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    {:ok, donald_exposure} =
-      {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "donald_exposure", %{
+    {:ok, donald_contact_investigation} =
+      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "donald_contact_investigation", %{
          interview_discontinued_at: ~U[2020-01-01 12:00:00Z],
          exposed_person: %{tid: "donald", demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
        }), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    caroline_exposure = Cases.get_contact_investigation(caroline_exposure.id) |> Cases.preload_exposed_person()
-    donald_exposure = Cases.get_contact_investigation(donald_exposure.id) |> Cases.preload_exposed_person()
+    caroline_contact_investigation = Cases.get_contact_investigation(caroline_contact_investigation.id) |> Cases.preload_exposed_person()
+    donald_contact_investigation = Cases.get_contact_investigation(donald_contact_investigation.id) |> Cases.preload_exposed_person()
 
-    caroline = caroline_exposure.exposed_person
-    donald = donald_exposure.exposed_person
+    caroline = caroline_contact_investigation.exposed_person
+    donald = donald_contact_investigation.exposed_person
 
     Cases.assign_user_to_people(user_id: assignee.id, people_ids: [caroline.id], audit_meta: Test.Fixtures.admin_audit_meta())
 

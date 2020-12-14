@@ -7,7 +7,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Cases.Person
   alias EpicenterWeb.Format
   alias EpicenterWeb.Form
@@ -17,7 +17,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     import Ecto.Changeset
 
-    alias Epicenter.Cases.Exposure
+    # TODO: can we remove these nested aliases?
+    alias Epicenter.Cases.ContactInvestigation
     alias Epicenter.Cases.Person
     alias Epicenter.DateParser
     alias Epicenter.Validation
@@ -39,26 +40,26 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       field :most_recent_date_together, :string
     end
 
-    def changeset(%Exposure{} = exposure, attrs) do
-      person = exposure.exposed_person || %Person{demographics: [], phones: []}
+    def changeset(%ContactInvestigation{} = contact_investigation, attrs) do
+      person = contact_investigation.exposed_person || %Person{demographics: [], phones: []}
       demographic = Person.coalesce_demographics(person)
       phone = List.first(person.phones) || %{id: nil, number: ""}
 
       %__MODULE__{
-        exposure_id: exposure.id,
-        guardian_name: exposure.guardian_name,
-        guardian_phone: exposure.guardian_phone,
+        exposure_id: contact_investigation.id,
+        guardian_name: contact_investigation.guardian_name,
+        guardian_phone: contact_investigation.guardian_phone,
         person_id: person.id,
         demographic_id: demographic.id,
         phone_id: phone.id,
         first_name: demographic.first_name || "",
         last_name: demographic.last_name || "",
         phone: phone.number,
-        under_18: exposure.under_18 || false,
-        same_household: exposure.household_member || false,
-        relationship_to_case: exposure.relationship_to_case,
+        under_18: contact_investigation.under_18 || false,
+        same_household: contact_investigation.household_member || false,
+        relationship_to_case: contact_investigation.relationship_to_case,
         preferred_language: demographic.preferred_language,
-        most_recent_date_together: Format.date(exposure.most_recent_date_together)
+        most_recent_date_together: Format.date(contact_investigation.most_recent_date_together)
       }
       |> cast(attrs, [
         :first_name,
@@ -80,7 +81,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         :under_18,
         :most_recent_date_together
       ])
-      |> Exposure.validate_guardian_fields()
+      |> ContactInvestigation.validate_guardian_fields()
       |> Validation.validate_date(:most_recent_date_together)
     end
 
@@ -121,34 +122,34 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   def mount(%{"case_investigation_id" => case_investigation_id} = params, session, socket) do
     case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person() |> Cases.preload_initiating_lab_result()
 
-    exposure =
+    contact_investigation =
       if id = params["id"] do
         Cases.get_contact_investigation(id) |> Cases.preload_exposed_person()
       else
-        %Exposure{exposed_person: %Person{demographics: [], phones: []}}
+        %ContactInvestigation{exposed_person: %Person{demographics: [], phones: []}}
       end
 
     socket
     |> authenticate_user(session)
     |> assign_page_title("Case Investigation Contact")
-    |> assign_form_changeset(ContactForm.changeset(exposure, %{}))
-    |> assign(:exposure, exposure)
+    |> assign_form_changeset(ContactForm.changeset(contact_investigation, %{}))
+    |> assign(:contact_investigation, contact_investigation)
     |> assign(:case_investigation, case_investigation)
     |> ok()
   end
 
   def handle_event("change", %{"contact_form" => params}, socket) do
     socket
-    |> assign_form_changeset(ContactForm.changeset(socket.assigns.exposure, params))
+    |> assign_form_changeset(ContactForm.changeset(socket.assigns.contact_investigation, params))
     |> noreply()
   end
 
   def handle_event("save", %{"contact_form" => params}, socket) do
-    exposure = socket.assigns.exposure
+    contact_investigation = socket.assigns.contact_investigation
 
-    with {:form, {:ok, data}} <- {:form, ContactForm.changeset(exposure, params) |> ContactForm.contact_params()},
+    with {:form, {:ok, data}} <- {:form, ContactForm.changeset(contact_investigation, params) |> ContactForm.contact_params()},
          data = data |> Map.put(:exposing_case_id, socket.assigns.case_investigation.id),
-         {:ok, _} <- create_or_update_contact_investigation(exposure, data, socket.assigns.current_user) do
+         {:ok, _} <- create_or_update_contact_investigation(contact_investigation, data, socket.assigns.current_user) do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
@@ -160,10 +161,10 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     end
   end
 
-  defp create_or_update_contact_investigation(exposure, data, author) do
+  defp create_or_update_contact_investigation(contact_investigation, data, author) do
     if data.id do
       Cases.update_contact_investigation(
-        exposure,
+        contact_investigation,
         {data,
          %Epicenter.AuditLog.Meta{
            author_id: author.id,

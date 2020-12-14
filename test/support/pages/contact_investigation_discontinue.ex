@@ -5,15 +5,15 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationDiscontinue do
 
   import Phoenix.LiveViewTest
 
-  def visit(conn, exposure) do
-    conn |> Pages.visit("/contact-investigations/#{exposure.id}/discontinue")
+  def visit(conn, contact_investigation) do
+    conn |> Pages.visit("/contact-investigations/#{contact_investigation.id}/discontinue")
   end
 
-  def assert_here(%View{} = view, exposure) do
+  def assert_here(%View{} = view, contact_investigation) do
     view
     |> render()
     |> Pages.parse()
-    |> Test.Html.find!("[data-role=contact-investigation-discontinue-page][data-exposure-id=#{exposure.id}]")
+    |> Test.Html.find!("[data-role=contact-investigation-discontinue-page][data-contact-investigation-id=#{contact_investigation.id}]")
 
     view
   end

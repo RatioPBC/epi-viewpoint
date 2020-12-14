@@ -1,13 +1,13 @@
 defmodule EpicenterWeb.Test.Pages.ContactInvestigationStartInterview do
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  def visit(%Plug.Conn{} = conn, %Exposure{id: exposure_id}) do
-    conn |> Pages.visit("/contact-investigations/#{exposure_id}/start-interview")
+  def visit(%Plug.Conn{} = conn, %ContactInvestigation{id: id}) do
+    conn |> Pages.visit("/contact-investigations/#{id}/start-interview")
   end
 
   def assert_here(view_or_conn_or_html) do

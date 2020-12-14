@@ -53,9 +53,9 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
       lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-29]) |> Cases.create_lab_result!()
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "case_investigation") |> Cases.create_case_investigation!()
 
-      {:ok, exposure} =
+      {:ok, contact_investigation} =
         {
-          Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "contact_investigation"),
+          Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation"),
           Test.Fixtures.admin_audit_meta()
         }
         |> Cases.create_contact_investigation()
@@ -63,7 +63,7 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
       note =
         InvestigationNote.changeset(%InvestigationNote{}, %{
           author_id: user.id,
-          exposure_id: exposure.id,
+          exposure_id: contact_investigation.id,
           text: "foo",
           tid: "case_investigation_note"
         })

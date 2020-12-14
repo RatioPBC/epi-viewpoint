@@ -117,7 +117,7 @@
               div
                 = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, contact_investigation) , data: [role: "edit-contact", contact_investigation: contact_investigation.id]
                 span=" "
-                a href="#" data-confirm="Remove #{Format.person(contact_investigation.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-exposure-id=contact_investigation.id data-role="remove-contact" Remove
+                a href="#" data-confirm="Remove #{Format.person(contact_investigation.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-contact-investigation-id=contact_investigation.id data-role="remove-contact" Remove
 
       = if case_investigation.interview_status == "completed" do
         .case-investigation-isolation-monitoring-status id="isolation-monitoring-#{case_investigation.name}"

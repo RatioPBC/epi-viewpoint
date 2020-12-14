@@ -11,29 +11,29 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
   alias Epicenter.Cases
   alias EpicenterWeb.Form
 
-  def mount(%{"exposure_id" => exposure_id}, session, socket) do
+  def mount(%{"contact_investigation_id" => contact_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    exposure = Cases.get_contact_investigation(exposure_id) |> Cases.preload_exposed_person()
+    contact_investigation = Cases.get_contact_investigation(contact_investigation_id) |> Cases.preload_exposed_person()
 
-    person = exposure.exposed_person
+    person = contact_investigation.exposed_person
 
     socket
     |> assign_page_title("Discontinue Contact Investigation")
-    |> assign(exposure: exposure)
-    |> assign(changeset: Cases.change_contact_investigation(exposure, %{}))
+    |> assign(contact_investigation: contact_investigation)
+    |> assign(changeset: Cases.change_contact_investigation(contact_investigation, %{}))
     |> assign(person: person)
     |> ok()
   end
 
-  def handle_event("change", %{"exposure" => params}, socket) do
-    changeset = Cases.change_contact_investigation(socket.assigns.exposure, params)
+  def handle_event("change", %{"contact_investigation" => params}, socket) do
+    changeset = Cases.change_contact_investigation(socket.assigns.contact_investigation, params)
 
     socket
     |> assign(:changeset, changeset)
     |> noreply()
   end
 
-  def handle_event("save", %{"exposure" => params}, socket) do
+  def handle_event("save", %{"contact_investigation" => params}, socket) do
     params = Map.put(params, "interview_discontinued_at", DateTime.utc_now())
 
     with {:ok, _} <-
@@ -42,7 +42,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
            |> Changeset.validate_required([:interview_discontinue_reason])
            |> Changeset.apply_action(:update) do
       Cases.update_contact_investigation(
-        socket.assigns.exposure,
+        socket.assigns.contact_investigation,
         {params,
          %AuditLog.Meta{
            author_id: socket.assigns.current_user.id,

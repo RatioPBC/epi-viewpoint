@@ -4,7 +4,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.InvestigationNote
-  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
@@ -171,12 +171,16 @@ defmodule Epicenter.Cases do
   #
   # contact investigations
   #
-  def change_contact_investigation(%Exposure{} = exposure, attrs), do: Exposure.changeset(exposure, attrs)
-  def create_contact_investigation({attrs, audit_meta}), do: %Exposure{} |> change_contact_investigation(attrs) |> AuditLog.insert(audit_meta)
-  def get_contact_investigation(id), do: Exposure |> Repo.get(id)
+  def change_contact_investigation(%ContactInvestigation{} = contact_investigation, attrs),
+    do: ContactInvestigation.changeset(contact_investigation, attrs)
 
-  def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
-  def preload_exposing_case(exposures), do: exposures |> Repo.preload(exposing_case: [person: [:demographics]])
+  def create_contact_investigation({attrs, audit_meta}),
+    do: %ContactInvestigation{} |> change_contact_investigation(attrs) |> AuditLog.insert(audit_meta)
+
+  def get_contact_investigation(id), do: ContactInvestigation |> Repo.get(id)
+
+  def preload_exposed_person(contact_investigations), do: contact_investigations |> Repo.preload(exposed_person: [:demographics, :phones])
+  def preload_exposing_case(contact_investigations), do: contact_investigations |> Repo.preload(exposing_case: [person: [:demographics]])
 
   def preload_contact_investigations(case_investigations_or_nil),
     do:
@@ -187,5 +191,6 @@ defmodule Epicenter.Cases do
         ]
       )
 
-  def update_contact_investigation(exposure, {attrs, audit_meta}), do: exposure |> change_contact_investigation(attrs) |> AuditLog.update(audit_meta)
+  def update_contact_investigation(contact_investigation, {attrs, audit_meta}),
+    do: contact_investigation |> change_contact_investigation(attrs) |> AuditLog.update(audit_meta)
 end

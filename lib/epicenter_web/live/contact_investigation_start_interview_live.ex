@@ -10,37 +10,39 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   alias Epicenter.Cases
   alias EpicenterWeb.Forms.StartInterviewForm
 
-  def mount(%{"exposure_id" => exposure_id}, session, socket) do
+  def mount(%{"contact_investigation_id" => contact_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    exposure = exposure_id |> Cases.get_contact_investigation() |> Cases.preload_exposed_person()
-    person = exposure.exposed_person |> Cases.preload_demographics()
+    contact_investigation = contact_investigation_id |> Cases.get_contact_investigation() |> Cases.preload_exposed_person()
+    person = contact_investigation.exposed_person |> Cases.preload_demographics()
 
     socket
     |> assign_page_title("Start Contact Investigation")
     |> assign(:confirmation_prompt, nil)
-    |> assign_form_changeset(StartInterviewForm.changeset(exposure, %{}))
-    |> assign(exposure: exposure)
+    |> assign_form_changeset(StartInterviewForm.changeset(contact_investigation, %{}))
+    |> assign(contact_investigation: contact_investigation)
     |> assign(person: person)
     |> ok()
   end
 
   def handle_event("change", %{"start_interview_form" => params}, socket) do
-    new_changeset = StartInterviewForm.changeset(socket.assigns.exposure, params)
+    new_changeset = StartInterviewForm.changeset(socket.assigns.contact_investigation, params)
     socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"start_interview_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.exposure, params),
+    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.contact_investigation, params),
          {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
-         {:exposure, {:ok, _exposure}} <-
-           {:exposure, update_contact_investigation(socket, cast_investigation_attrs)} do
+         {:contact_investigation, {:ok, _contact_investigation}} <-
+           {:contact_investigation, update_contact_investigation(socket, cast_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset) |> noreply()
 
       {:case_investigation, {:error, _}} ->
-        socket |> assign_form_changeset(StartInterviewForm.changeset(socket.assigns.exposure, params), "An unexpected error occurred") |> noreply()
+        socket
+        |> assign_form_changeset(StartInterviewForm.changeset(socket.assigns.contact_investigation, params), "An unexpected error occurred")
+        |> noreply()
     end
   end
 
@@ -54,7 +56,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   defp update_contact_investigation(socket, params) do
     Cases.update_contact_investigation(
-      socket.assigns.exposure,
+      socket.assigns.contact_investigation,
       {params,
        %AuditLog.Meta{
          author_id: socket.assigns.current_user.id,

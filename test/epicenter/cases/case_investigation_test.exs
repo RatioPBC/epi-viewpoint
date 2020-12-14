@@ -75,17 +75,19 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
-      {:ok, exposure} =
-        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
-        |> Cases.create_contact_investigation()
-
-      {:ok, _} =
-        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure", %{deleted_at: NaiveDateTime.utc_now()}),
+      {:ok, contact_investigation} =
+        {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation_a"),
          Test.Fixtures.admin_audit_meta()}
         |> Cases.create_contact_investigation()
 
+      {:ok, _} =
+        {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation_b", %{
+           deleted_at: NaiveDateTime.utc_now()
+         }), Test.Fixtures.admin_audit_meta()}
+        |> Cases.create_contact_investigation()
+
       case_investigation = case_investigation.id |> Cases.get_case_investigation() |> Cases.preload_contact_investigations()
-      assert case_investigation.exposures |> Enum.map(& &1.id) == [exposure.id]
+      assert case_investigation.exposures |> Enum.map(& &1.id) == [contact_investigation.id]
     end
   end
 

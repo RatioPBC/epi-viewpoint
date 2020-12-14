@@ -486,15 +486,15 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
-  def click_edit_contact_link(%View{} = view, exposure) do
+  def click_edit_contact_link(%View{} = view, contact_investigation) do
     view
-    |> element("[data-role=edit-contact][data-contact-investigation=#{exposure.id}]")
+    |> element("[data-role=edit-contact][data-contact-investigation=#{contact_investigation.id}]")
     |> render_click()
   end
 
-  def click_remove_contact_link(%View{} = view, exposure) do
+  def click_remove_contact_link(%View{} = view, contact_investigation) do
     view
-    |> element("[data-role=remove-contact][phx-value-exposure-id=#{exposure.id}]")
+    |> element("[data-role=remove-contact][phx-value-contact-investigation-id=#{contact_investigation.id}]")
     |> render_click()
   end
 
@@ -508,9 +508,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # contact investigations
   #
 
-  def add_contact_investigation_note(view, exposure_tid, note_text) do
+  def add_contact_investigation_note(view, contact_investigation_tid, note_text) do
     view
-    |> form("[data-tid=#{exposure_tid}][data-role=contact-investigation] [data-role=note-form]", %{"form_field_data" => %{"text" => note_text}})
+    |> form("[data-tid=#{contact_investigation_tid}][data-role=contact-investigation] [data-role=note-form]", %{
+      "form_field_data" => %{"text" => note_text}
+    })
     |> render_submit()
 
     view
@@ -522,21 +524,21 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
-  def click_edit_interview_discontinuation_details(%View{} = view, exposure_tid) do
+  def click_edit_interview_discontinuation_details(%View{} = view, contact_investigation_tid) do
     view
-    |> element("[data-tid=#{exposure_tid}] [data-role=edit-discontinue-contact-investigation-interview-link]")
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=edit-discontinue-contact-investigation-interview-link]")
     |> render_click()
   end
 
-  def click_edit_contact_clinical_details_link(%View{} = view, exposure_tid) do
+  def click_edit_contact_clinical_details_link(%View{} = view, contact_investigation_tid) do
     view
-    |> element("[data-tid=#{exposure_tid}] [data-role=edit-contact-clinical-details-link]")
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=edit-contact-clinical-details-link]")
     |> render_click()
   end
 
-  def click_edit_interview_start_details(%View{} = view, exposure_tid) do
+  def click_edit_interview_start_details(%View{} = view, contact_investigation_tid) do
     view
-    |> element("[data-tid=#{exposure_tid}] [data-role=edit-start-contact-investigation-interview-link]")
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=edit-start-contact-investigation-interview-link]")
     |> render_click()
   end
 
@@ -561,7 +563,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
         end)
 
       exposure_details =
-        Test.Html.all(contact_investigation, "[data-role=contact-investigation-exposure-details] [data-role=detail]", fn detail ->
+        Test.Html.all(contact_investigation, "[data-role=contact-investigation-contact-investigation-details] [data-role=detail]", fn detail ->
           Test.Html.text(detail)
         end)
 
@@ -591,11 +593,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     end)
   end
 
-  def contact_investigation_notes(%View{} = view, exposure_tid) do
+  def contact_investigation_notes(%View{} = view, contact_investigation_tid) do
     view
     |> render()
     |> Test.Html.parse()
-    |> Test.Html.find("[data-role=contact-investigation][data-tid=#{exposure_tid}]")
+    |> Test.Html.find("[data-role=contact-investigation][data-tid=#{contact_investigation_tid}]")
     |> Components.InvestigationNote.note_content()
   end
 

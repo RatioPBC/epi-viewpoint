@@ -1,4 +1,4 @@
-div#contact-investigation-discontinue-page data-role="contact-investigation-discontinue-page" data-exposure-id=@exposure.id data-confirm-navigation=confirmation_prompt(@changeset)
+div#contact-investigation-discontinue-page data-role="contact-investigation-discontinue-page" data-contact-investigation-id=@contact_investigation.id data-confirm-navigation=confirmation_prompt(@changeset)
 
   section
     header#subnav
@@ -8,7 +8,7 @@ div#contact-investigation-discontinue-page data-role="contact-investigation-disc
 
   .InvestigationDiscontinueForm
     header
-      h2 data-role="form-title" = if(@exposure.interview_discontinued_at, do: "Edit discontinue interview", else: "Discontinue interview")
+      h2 data-role="form-title" = if(@contact_investigation.interview_discontinued_at, do: "Edit discontinue interview", else: "Discontinue interview")
       h3.InvestigationDiscontinueForm__Subtitle before interview start
     = form_for @changeset, "#", [id: "contact-investigation-discontinue-form", class: "InvestigationDiscontinueForm__Form", phx_change: "change", phx_submit: "save"], fn f ->
       = discontinue_form_builder(f)

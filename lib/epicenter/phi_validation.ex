@@ -34,7 +34,7 @@ defmodule Epicenter.PhiValidation do
     |> validate_change(:address, &email_address_validator/2)
   end
 
-  defp validate(changeset, :exposure) do
+  defp validate(changeset, :contact_investigation) do
     changeset
     |> validate_change(:guardian_phone, &phone_number_validator/2)
   end

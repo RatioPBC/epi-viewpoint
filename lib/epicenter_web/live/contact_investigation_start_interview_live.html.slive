@@ -2,12 +2,12 @@
 
   section
     header#subnav
-      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @exposure.exposed_person), data: [role: "back-link"] do
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @contact_investigation.exposed_person), data: [role: "back-link"] do
         = back_icon()
         span Back
 
   section#contact-investigation-start-interview
-    h2 data-role="form-title" = if(@exposure.interview_started_at, do: "Edit start interview", else: "Start interview")
+    h2 data-role="form-title" = if(@contact_investigation.interview_started_at, do: "Edit start interview", else: "Start interview")
 
     = form_for @form_changeset,
                 "#",

@@ -6,7 +6,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Email
-  alias Epicenter.Cases.Exposure
+  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Demographic
@@ -28,7 +28,7 @@ defmodule Epicenter.Cases.Person do
     has_many :addresses, Address
     has_many :case_investigations, CaseInvestigation
     has_many :emails, Email, on_replace: :delete
-    has_many :exposures, Exposure, on_replace: :delete, foreign_key: :exposed_person_id
+    has_many :exposures, ContactInvestigation, on_replace: :delete, foreign_key: :exposed_person_id
     has_many :lab_results, LabResult
     has_many :phones, Phone, on_replace: :delete
   end
