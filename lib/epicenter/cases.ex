@@ -120,7 +120,7 @@ defmodule Epicenter.Cases do
   def list_people(filter, assigned_to_id: user_id), do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all()
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
-  def preload_exposures_for_people(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:exposures])
+  def preload_contact_investigations_for_people(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:exposures])
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
 
   #
@@ -169,16 +169,16 @@ defmodule Epicenter.Cases do
   def update_demographic(%Demographic{} = demo, {attrs, audit_meta}), do: demo |> change_demographic(attrs) |> AuditLog.update(audit_meta)
 
   #
-  # exposures
+  # contact investigations
   #
-  def change_exposure(%Exposure{} = exposure, attrs), do: Exposure.changeset(exposure, attrs)
-  def create_exposure({attrs, audit_meta}), do: %Exposure{} |> change_exposure(attrs) |> AuditLog.insert(audit_meta)
-  def get_exposure(id), do: Exposure |> Repo.get(id)
+  def change_contact_investigation(%Exposure{} = exposure, attrs), do: Exposure.changeset(exposure, attrs)
+  def create_contact_investigation({attrs, audit_meta}), do: %Exposure{} |> change_contact_investigation(attrs) |> AuditLog.insert(audit_meta)
+  def get_contact_investigation(id), do: Exposure |> Repo.get(id)
 
   def preload_exposed_person(exposures), do: exposures |> Repo.preload(exposed_person: [:demographics, :phones])
   def preload_exposing_case(exposures), do: exposures |> Repo.preload(exposing_case: [person: [:demographics]])
 
-  def preload_exposures(case_investigations_or_nil),
+  def preload_contact_investigations(case_investigations_or_nil),
     do:
       case_investigations_or_nil
       |> Repo.preload(
@@ -187,5 +187,5 @@ defmodule Epicenter.Cases do
         ]
       )
 
-  def update_exposure(exposure, {attrs, audit_meta}), do: exposure |> change_exposure(attrs) |> AuditLog.update(audit_meta)
+  def update_contact_investigation(exposure, {attrs, audit_meta}), do: exposure |> change_contact_investigation(attrs) |> AuditLog.update(audit_meta)
 end

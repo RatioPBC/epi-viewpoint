@@ -88,17 +88,17 @@ defmodule EpicenterWeb.ContactsLiveTest do
 
     {:ok, caroline_exposure} =
       {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "caroline_exposure"), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_exposure()
+      |> Cases.create_contact_investigation()
 
     {:ok, donald_exposure} =
       {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "donald_exposure", %{
          interview_discontinued_at: ~U[2020-01-01 12:00:00Z],
          exposed_person: %{tid: "donald", demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
        }), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_exposure()
+      |> Cases.create_contact_investigation()
 
-    caroline_exposure = Cases.get_exposure(caroline_exposure.id) |> Cases.preload_exposed_person()
-    donald_exposure = Cases.get_exposure(donald_exposure.id) |> Cases.preload_exposed_person()
+    caroline_exposure = Cases.get_contact_investigation(caroline_exposure.id) |> Cases.preload_exposed_person()
+    donald_exposure = Cases.get_contact_investigation(donald_exposure.id) |> Cases.preload_exposed_person()
 
     caroline = caroline_exposure.exposed_person
     donald = donald_exposure.exposed_person

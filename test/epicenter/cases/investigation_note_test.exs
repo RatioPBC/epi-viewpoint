@@ -58,7 +58,7 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
           Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "contact_investigation"),
           Test.Fixtures.admin_audit_meta()
         }
-        |> Cases.create_exposure()
+        |> Cases.create_contact_investigation()
 
       note =
         InvestigationNote.changeset(%InvestigationNote{}, %{

@@ -248,7 +248,8 @@ defmodule Epicenter.CasesTest do
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
       {:ok, _exposure} =
-        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()} |> Cases.create_exposure()
+        {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
+        |> Cases.create_contact_investigation()
 
       :ok
     end
@@ -798,12 +799,12 @@ defmodule Epicenter.CasesTest do
     end
   end
 
-  describe "create_exposure" do
+  describe "create_contact_investigation" do
     test "makes an exposure and a revision" do
       case_investigation = setup_case_investigation!()
 
       {:ok, exposure} =
-        Cases.create_exposure({
+        Cases.create_contact_investigation({
           Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure", %{under_18: true, guardian_name: "Jacob"})
           |> Map.put(:exposed_person, %{}),
           Test.Fixtures.admin_audit_meta()
@@ -812,42 +813,42 @@ defmodule Epicenter.CasesTest do
       case_investigation_id = case_investigation.id
       author_id = @admin.id
 
-      assert %{exposing_case_id: ^case_investigation_id, under_18: true, guardian_name: "Jacob"} = Cases.get_exposure(exposure.id)
+      assert %{exposing_case_id: ^case_investigation_id, under_18: true, guardian_name: "Jacob"} = Cases.get_contact_investigation(exposure.id)
 
       assert %{author_id: ^author_id, change: %{"exposing_case_id" => ^case_investigation_id, "under_18" => true, "guardian_name" => "Jacob"}} =
                recent_audit_log(exposure)
     end
   end
 
-  describe "update_exposure" do
+  describe "update_contact_investigation" do
     test "updates an exposure end creates a revision" do
       case_investigation = setup_case_investigation!()
 
       {:ok, exposure} =
-        Cases.create_exposure({
+        Cases.create_contact_investigation({
           Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure")
           |> Map.put(:exposed_person, %{}),
           Test.Fixtures.admin_audit_meta()
         })
 
       {:ok, exposure} =
-        Cases.update_exposure(exposure, {
+        Cases.update_contact_investigation(exposure, {
           %{household_member: true},
           Test.Fixtures.admin_audit_meta()
         })
 
       author_id = @admin.id
-      assert %{household_member: true} = Cases.get_exposure(exposure.id)
+      assert %{household_member: true} = Cases.get_contact_investigation(exposure.id)
       assert %{author_id: ^author_id, change: %{"household_member" => true}} = recent_audit_log(exposure)
     end
   end
 
-  describe "preload_exposures" do
+  describe "preload_contact_investigations" do
     test "hydrates exactly into an exposure's exposed_person's demographics and phones" do
       case_investigation = setup_case_investigation!()
 
       {:ok, _exposure} =
-        Cases.create_exposure({
+        Cases.create_contact_investigation({
           Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure")
           |> Map.put(:exposed_person, %{
             demographics: [
@@ -873,7 +874,7 @@ defmodule Epicenter.CasesTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
     end
   end
 
@@ -882,7 +883,7 @@ defmodule Epicenter.CasesTest do
       case_investigation = setup_case_investigation!()
 
       {:ok, exposure} =
-        Cases.create_exposure({
+        Cases.create_contact_investigation({
           Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure")
           |> Map.put(:exposed_person, %{
             demographics: [
@@ -904,7 +905,7 @@ defmodule Epicenter.CasesTest do
                    %{number: "1111111987"}
                  ]
                }
-             } = Cases.get_exposure(exposure.id) |> Cases.preload_exposed_person()
+             } = Cases.get_contact_investigation(exposure.id) |> Cases.preload_exposed_person()
     end
   end
 

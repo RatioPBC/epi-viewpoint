@@ -22,7 +22,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
     {:ok, exposure} =
       {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_exposure()
+      |> Cases.create_contact_investigation()
 
     exposed_person = Cases.get_person(exposure.exposed_person_id)
 
@@ -62,7 +62,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
     {:ok, exposure} =
       {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_exposure()
+      |> Cases.create_contact_investigation()
 
     exposed_person = Cases.get_person(exposure.exposed_person_id)
 

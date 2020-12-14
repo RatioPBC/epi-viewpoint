@@ -12,7 +12,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   def mount(%{"exposure_id" => exposure_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    exposure = exposure_id |> Cases.get_exposure() |> Cases.preload_exposed_person()
+    exposure = exposure_id |> Cases.get_contact_investigation() |> Cases.preload_exposed_person()
     person = exposure.exposed_person |> Cases.preload_demographics()
 
     socket
@@ -33,7 +33,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
     with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.exposure, params),
          {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
          {:exposure, {:ok, _exposure}} <-
-           {:exposure, update_exposure(socket, cast_investigation_attrs)} do
+           {:exposure, update_contact_investigation(socket, cast_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
@@ -52,13 +52,13 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   defp redirect_to_profile_page(socket),
     do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
 
-  defp update_exposure(socket, params) do
-    Cases.update_exposure(
+  defp update_contact_investigation(socket, params) do
+    Cases.update_contact_investigation(
       socket.assigns.exposure,
       {params,
        %AuditLog.Meta{
          author_id: socket.assigns.current_user.id,
-         reason_action: AuditLog.Revision.update_exposure_action(),
+         reason_action: AuditLog.Revision.update_contact_investigation_action(),
          reason_event: AuditLog.Revision.start_interview_event()
        }}
     )

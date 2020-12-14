@@ -22,7 +22,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
 
     {:ok, exposure} =
       {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_exposure()
+      |> Cases.create_contact_investigation()
 
     [exposure: exposure]
   end
@@ -48,12 +48,12 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: "Jason Bourne"
-           } = Cases.get_exposure(exposure.id)
+           } = Cases.get_contact_investigation(exposure.id)
   end
 
   test "prefills with existing data when existing data is available, and can edit existing data", %{conn: conn, exposure: exposure} do
     {:ok, _} =
-      Cases.update_exposure(
+      Cases.update_contact_investigation(
         exposure,
         {%{interview_started_at: ~N[2020-01-01 23:03:07], interview_proxy_name: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
       )
@@ -78,7 +78,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: nil
-           } = Cases.get_exposure(exposure.id)
+           } = Cases.get_contact_investigation(exposure.id)
   end
 
   describe "warning the user when navigation will erase their changes" do

@@ -76,7 +76,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
     end
 
     test "when the symptom onset date is available, contains value and uses it for the infectious period", %{
@@ -263,14 +263,14 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
     end
   end
 
   describe "updating" do
     setup %{case_investigation: case_investigation} do
       {:ok, exposure} =
-        Cases.create_exposure(
+        Cases.create_contact_investigation(
           {%{
              exposing_case_id: case_investigation.id,
              relationship_to_case: "Family",
@@ -319,7 +319,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              } = Pages.form_state(view)
 
       {:ok, exposure} =
-        Cases.update_exposure(
+        Cases.update_contact_investigation(
           exposure,
           {%{
              under_18: true,
@@ -393,7 +393,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_exposures()
+             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
     end
   end
 

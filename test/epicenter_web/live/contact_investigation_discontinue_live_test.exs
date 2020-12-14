@@ -11,7 +11,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
   setup :register_and_log_in_user
 
   setup %{user: user} do
-    [exposure: create_exposure(user)]
+    [exposure: create_contact_investigation(user)]
   end
 
   test "has a working initial render", %{conn: conn, exposure: exposure} do
@@ -48,12 +48,12 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
     )
     |> Pages.Profile.assert_here(exposure.exposed_person)
 
-    updated_contact_investigation = Cases.get_exposure(exposure.id)
+    updated_contact_investigation = Cases.get_contact_investigation(exposure.id)
     assert "Unable to reach" = updated_contact_investigation.interview_discontinue_reason
     assert_datetime_approximate(updated_contact_investigation.interview_discontinued_at, DateTime.utc_now(), 2)
 
     user_id = user.id
-    expected_action = Revision.update_exposure_action()
+    expected_action = Revision.update_contact_investigation_action()
     expected_event = Revision.discontinue_contact_investigation_event()
 
     assert %{
@@ -88,13 +88,15 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
   end
 
   test "editing discontinuation reason has a different title", %{conn: conn, exposure: exposure, user: user} do
-    {:ok, _} = exposure |> Cases.update_exposure({%{interview_discontinued_at: ~U[2020-01-01 12:00:00Z]}, Test.Fixtures.audit_meta(user)})
+    {:ok, _} =
+      exposure |> Cases.update_contact_investigation({%{interview_discontinued_at: ~U[2020-01-01 12:00:00Z]}, Test.Fixtures.audit_meta(user)})
+
     view = Pages.ContactInvestigationDiscontinue.visit(conn, exposure)
 
     assert Pages.ContactInvestigationDiscontinue.form_title(view) == "Edit discontinue interview"
   end
 
-  defp create_exposure(user) do
+  defp create_contact_investigation(user) do
     sick_person =
       Test.Fixtures.person_attrs(user, "alice")
       |> Cases.create_person!()
@@ -109,7 +111,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
 
     {:ok, exposure} =
       {Test.Fixtures.case_investigation_exposure_attrs(case_investigation, "exposure"), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_exposure()
+      |> Cases.create_contact_investigation()
 
     exposure
   end

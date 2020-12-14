@@ -123,7 +123,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     exposure =
       if id = params["id"] do
-        Cases.get_exposure(id) |> Cases.preload_exposed_person()
+        Cases.get_contact_investigation(id) |> Cases.preload_exposed_person()
       else
         %Exposure{exposed_person: %Person{demographics: [], phones: []}}
       end
@@ -148,7 +148,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     with {:form, {:ok, data}} <- {:form, ContactForm.changeset(exposure, params) |> ContactForm.contact_params()},
          data = data |> Map.put(:exposing_case_id, socket.assigns.case_investigation.id),
-         {:ok, _} <- create_or_update_exposure(exposure, data, socket.assigns.current_user) do
+         {:ok, _} <- create_or_update_contact_investigation(exposure, data, socket.assigns.current_user) do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
@@ -160,9 +160,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     end
   end
 
-  defp create_or_update_exposure(exposure, data, author) do
+  defp create_or_update_contact_investigation(exposure, data, author) do
     if data.id do
-      Cases.update_exposure(
+      Cases.update_contact_investigation(
         exposure,
         {data,
          %Epicenter.AuditLog.Meta{
@@ -172,11 +172,11 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
          }}
       )
     else
-      Cases.create_exposure(
+      Cases.create_contact_investigation(
         {data,
          %Epicenter.AuditLog.Meta{
            author_id: author.id,
-           reason_action: AuditLog.Revision.update_exposure_action(),
+           reason_action: AuditLog.Revision.update_contact_investigation_action(),
            reason_event: AuditLog.Revision.update_contact_event()
          }}
       )

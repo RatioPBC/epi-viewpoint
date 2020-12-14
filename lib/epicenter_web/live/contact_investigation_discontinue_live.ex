@@ -13,20 +13,20 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
 
   def mount(%{"exposure_id" => exposure_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    exposure = Cases.get_exposure(exposure_id) |> Cases.preload_exposed_person()
+    exposure = Cases.get_contact_investigation(exposure_id) |> Cases.preload_exposed_person()
 
     person = exposure.exposed_person
 
     socket
     |> assign_page_title("Discontinue Contact Investigation")
     |> assign(exposure: exposure)
-    |> assign(changeset: Cases.change_exposure(exposure, %{}))
+    |> assign(changeset: Cases.change_contact_investigation(exposure, %{}))
     |> assign(person: person)
     |> ok()
   end
 
   def handle_event("change", %{"exposure" => params}, socket) do
-    changeset = Cases.change_exposure(socket.assigns.exposure, params)
+    changeset = Cases.change_contact_investigation(socket.assigns.exposure, params)
 
     socket
     |> assign(:changeset, changeset)
@@ -41,12 +41,12 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
            |> Changeset.cast(params, [:interview_discontinue_reason])
            |> Changeset.validate_required([:interview_discontinue_reason])
            |> Changeset.apply_action(:update) do
-      Cases.update_exposure(
+      Cases.update_contact_investigation(
         socket.assigns.exposure,
         {params,
          %AuditLog.Meta{
            author_id: socket.assigns.current_user.id,
-           reason_action: Revision.update_exposure_action(),
+           reason_action: Revision.update_contact_investigation_action(),
            reason_event: Revision.discontinue_contact_investigation_event()
          }}
       )

@@ -213,6 +213,6 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
              ]
            } =
              Cases.get_case_investigation(case_investigation_id)
-             |> Cases.preload_exposures()
+             |> Cases.preload_contact_investigations()
   end
 end

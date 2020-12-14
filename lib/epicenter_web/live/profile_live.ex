@@ -102,7 +102,7 @@ defmodule EpicenterWeb.ProfileLive do
 
   defp audit_log_data_for_adding_note(%Exposure{}) do
     {
-      AuditLog.Revision.create_exposure_note_action(),
+      AuditLog.Revision.create_contact_investigation_note_action(),
       AuditLog.Revision.profile_exposure_note_submission_event()
     }
   end
@@ -140,8 +140,8 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def handle_event("remove-contact", %{"exposure-id" => exposure_id}, socket) do
-    with exposure when not is_nil(exposure) <- Cases.get_exposure(exposure_id) do
-      Cases.update_exposure(
+    with exposure when not is_nil(exposure) <- Cases.get_contact_investigation(exposure_id) do
+      Cases.update_contact_investigation(
         exposure,
         {
           %{deleted_at: NaiveDateTime.utc_now()},
@@ -196,14 +196,14 @@ defmodule EpicenterWeb.ProfileLive do
     case_investigations =
       person.case_investigations
       |> Cases.preload_initiating_lab_result()
-      |> Cases.preload_exposures()
+      |> Cases.preload_contact_investigations()
       |> Cases.preload_investigation_notes()
 
     assign(socket, case_investigations: case_investigations)
   end
 
   defp assign_contact_investigations(socket, person) do
-    person = Cases.preload_exposures(person)
+    person = Cases.preload_contact_investigations(person)
 
     contact_investigations =
       person.exposures
