@@ -105,19 +105,19 @@
                 | Contacts
             div
               = live_redirect "+ Contact", to: Routes.create_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation) , id: "add-contact-case-investigation-link-001", class: "add-contact-case-investigation-link"
-          = for exposure <- case_investigation.exposures do
+          = for contact_investigation <- case_investigation.exposures do
             .contact
               .contact-details
                 div
-                  = live_redirect Format.person(exposure.exposed_person),
-                                  to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, exposure.exposed_person),
+                  = live_redirect Format.person(contact_investigation.exposed_person),
+                                  to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, contact_investigation.exposed_person),
                                   data: [role: "visit-contact-link"],
                                   class: "contact-name"
-                = contact_details_as_list(exposure)
+                = contact_details_as_list(contact_investigation)
               div
-                = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, exposure) , data: [role: "edit-contact", exposure: exposure.id]
+                = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, contact_investigation) , data: [role: "edit-contact", contact_investigation: contact_investigation.id]
                 span=" "
-                a href="#" data-confirm="Remove #{Format.person(exposure.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-exposure-id=exposure.id data-role="remove-contact" Remove
+                a href="#" data-confirm="Remove #{Format.person(contact_investigation.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-exposure-id=contact_investigation.id data-role="remove-contact" Remove
 
       = if case_investigation.interview_status == "completed" do
         .case-investigation-isolation-monitoring-status id="isolation-monitoring-#{case_investigation.name}"
@@ -161,14 +161,14 @@
                   on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
 
   a#contact-investigations
-  = for exposure <- @exposures do
+  = for contact_investigation <- @contact_investigations do
     = component @socket,
                 ContactInvestigation,
-                exposure.id <> "contact investigation",
-                exposure: exposure,
+                contact_investigation.id <> "contact investigation",
+                contact_investigation: contact_investigation,
                 current_user_id: @current_user.id,
-                on_add_note: fn note_attrs -> on_note_added(note_attrs, exposure) end,
-                on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, exposure) end
+                on_add_note: fn note_attrs -> on_note_added(note_attrs, contact_investigation) end,
+                on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end
 
   section#lab-results data-role="lab-results"
     header

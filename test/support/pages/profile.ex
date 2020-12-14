@@ -488,7 +488,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def click_edit_contact_link(%View{} = view, exposure) do
     view
-    |> element("[data-role=edit-contact][data-exposure=#{exposure.id}]")
+    |> element("[data-role=edit-contact][data-contact-investigation=#{exposure.id}]")
     |> render_click()
   end
 
@@ -550,7 +550,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render()
     |> Test.Html.parse()
     |> Test.Html.all("[data-role=contact-investigation]", fn contact_investigation ->
-      id = Test.Html.attr(contact_investigation, "data-exposure-id") |> List.first()
+      id = Test.Html.attr(contact_investigation, "data-contact-investigation-id") |> List.first()
       title = Test.Html.find(contact_investigation, "[data-role=contact-investigation-title]") |> Test.Html.text()
       creation_timestamp = Test.Html.find(contact_investigation, "[data-role=contact-investigation-timestamp]") |> Test.Html.text()
       initiating_case_text = Test.Html.find(contact_investigation, "[data-role=initiating-case]") |> Test.Html.text()
@@ -561,7 +561,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
         end)
 
       exposure_details =
-        Test.Html.all(contact_investigation, "[data-role=exposure-details] [data-role=detail]", fn detail ->
+        Test.Html.all(contact_investigation, "[data-role=contact-investigation-exposure-details] [data-role=detail]", fn detail ->
           Test.Html.text(detail)
         end)
 

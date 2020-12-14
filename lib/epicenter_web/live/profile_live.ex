@@ -41,7 +41,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> assign_page_title(Format.person(person))
     |> assign_person(person)
     |> assign_case_investigations(person)
-    |> assign_exposures(person)
+    |> assign_contact_investigations(person)
     |> assign_users()
     |> assign_current_date()
     |> ok()
@@ -89,7 +89,7 @@ defmodule EpicenterWeb.ProfileLive do
   def handle_info(:reload_investigations, socket) do
     socket
     |> assign_case_investigations(socket.assigns.person)
-    |> assign_exposures(socket.assigns.person)
+    |> assign_contact_investigations(socket.assigns.person)
     |> noreply()
   end
 
@@ -202,15 +202,15 @@ defmodule EpicenterWeb.ProfileLive do
     assign(socket, case_investigations: case_investigations)
   end
 
-  defp assign_exposures(socket, person) do
+  defp assign_contact_investigations(socket, person) do
     person = Cases.preload_exposures(person)
 
-    exposures =
+    contact_investigations =
       person.exposures
       |> Cases.preload_exposing_case()
       |> Cases.preload_investigation_notes()
 
-    assign(socket, exposures: exposures)
+    assign(socket, contact_investigations: contact_investigations)
   end
 
   defp assign_users(socket),
