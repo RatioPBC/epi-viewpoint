@@ -283,18 +283,20 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, person: person} do
-      assert Pages.DemographicsEdit.visit(conn, person)
-             |> Pages.navigation_confirmation_prompt()
-             |> Euclid.Exists.blank?()
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.refute_confirmation_prompt_active()
     end
 
-    # temporarily skipped until form change event issue is resolved
-    @tag :skip
     test "when the user changes the notes", %{conn: conn, person: person} do
-      assert "Your updates have not been saved. Discard updates?" =
-               Pages.DemographicsEdit.visit(conn, person)
-               |> Pages.DemographicsEdit.change_form(%{"notes" => "New notes"})
-               |> Pages.navigation_confirmation_prompt()
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.change_form(%{"notes" => "New notes"})
+      |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
+    end
+
+    test "when the user changes a demographic value", %{conn: conn, person: person} do
+      Pages.DemographicsEdit.visit(conn, person)
+      |> Pages.DemographicsEdit.change_form(%{"employment" => "full_time"})
+      |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
     end
   end
 

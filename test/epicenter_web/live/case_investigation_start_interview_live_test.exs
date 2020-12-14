@@ -168,17 +168,16 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
-      assert Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
-             |> Pages.navigation_confirmation_prompt()
-             |> Euclid.Exists.blank?()
+      Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
+      |> Pages.refute_confirmation_prompt_active()
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
       view =
         Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
         |> Pages.CaseInvestigationStartInterview.change_form(start_interview_form: %{"person_interviewed" => "james"})
+        |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
 
-      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
       assert %{"start_interview_form[person_interviewed]" => "james"} = Pages.form_state(view)
     end
   end

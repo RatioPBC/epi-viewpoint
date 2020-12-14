@@ -4,7 +4,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   import EpicenterWeb.IconView, only: [plus_icon: 0, arrow_down_icon: 0, back_icon: 0, trash_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
-  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -344,12 +344,6 @@ defmodule EpicenterWeb.ProfileEditLive do
     do: person_params
 
   # # #
-
-  def confirmation_prompt(nil), do: nil
-
-  def confirmation_prompt(changeset) do
-    if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
-  end
 
   defp update_if_present(map, field, func) do
     if Map.has_key?(map, field) do

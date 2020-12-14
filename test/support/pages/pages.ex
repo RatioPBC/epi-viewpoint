@@ -26,8 +26,25 @@ defmodule EpicenterWeb.Test.Pages do
     |> Map.new()
   end
 
-  def navigation_confirmation_prompt(%View{} = view) do
-    view |> parse() |> Test.Html.find("[data-confirm-navigation]") |> Test.Html.attr("data-confirm-navigation") |> List.first()
+  def refute_confirmation_prompt_active(%View{} = view) do
+    refute has_element?(view, "[data-confirm-navigation]")
+    view
+  end
+
+  def assert_confirmation_prompt_active(%View{} = view, expected_text) do
+    confirmation_prompts =
+      view
+      |> parse()
+      |> Test.Html.find("[data-confirm-navigation]")
+      |> Test.Html.attr("data-confirm-navigation")
+      |> Enum.map(fn confirmation_text ->
+        assert Euclid.Exists.present?(confirmation_text)
+        assert expected_text == confirmation_text
+      end)
+
+    assert length(confirmation_prompts) > 0
+
+    view
   end
 
   def assert_current_user(conn_or_view_or_html, user_name) do

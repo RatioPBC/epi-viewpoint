@@ -141,24 +141,21 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, person: person} do
-      assert Pages.ProfileEdit.visit(conn, person)
-             |> Pages.navigation_confirmation_prompt()
-             |> Euclid.Exists.blank?()
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.refute_confirmation_prompt_active()
     end
 
     test "when the user changes the name", %{conn: conn, person: person} do
-      assert "Your updates have not been saved. Discard updates?" =
-               Pages.ProfileEdit.visit(conn, person)
-               |> Pages.ProfileEdit.change_form(%{"first_name" => "New Name"})
-               |> Pages.navigation_confirmation_prompt()
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.change_form(%{"first_name" => "New Name"})
+      |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
     end
 
     test "when the user changes the dob", %{conn: conn, person: person} do
       # this case is special because the rendered dob is different than the db formatted dob
-      assert "Your updates have not been saved. Discard updates?" =
-               Pages.ProfileEdit.visit(conn, person)
-               |> Pages.ProfileEdit.change_form(%{"dob" => "07/01/2001"})
-               |> Pages.navigation_confirmation_prompt()
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.change_form(%{"dob" => "07/01/2001"})
+      |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
     end
 
     test "when the preferred language is other", %{conn: conn, person: person} do
@@ -176,7 +173,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         }
       )
 
-      assert "Your updates have not been saved. Discard updates?" = view |> Pages.navigation_confirmation_prompt()
+      view |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
     end
   end
 

@@ -120,17 +120,16 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
-      assert Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
-             |> Pages.navigation_confirmation_prompt()
-             |> Euclid.Exists.blank?()
+      Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
+      |> Pages.refute_confirmation_prompt_active()
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
       view =
         Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
         |> Pages.CaseInvestigationConcludeIsolationMonitoring.change_form(conclude_isolation_monitoring_form: %{"reason" => "deceased"})
+        |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
 
-      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
       assert %{"conclude_isolation_monitoring_form[reason]" => "deceased"} = Pages.form_state(view)
     end
   end

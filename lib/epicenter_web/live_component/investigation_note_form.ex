@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.InvestigationNoteForm do
   use EpicenterWeb, :live_component
 
-  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
   alias EpicenterWeb.Form
@@ -46,7 +46,7 @@ defmodule EpicenterWeb.InvestigationNoteForm do
 
   def render(assigns) do
     ~H"""
-    = form_for @changeset, "#", [class: "investigation-note-form", data: [role: "note-form", "confirm-navigation": confirmation_prompt(@changeset)], phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f ->
+    = form_for @changeset, "#", [class: "investigation-note-form", "data-role": "note-form", "data-confirm-navigation": confirmation_prompt(@changeset), phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f ->
       = add_note_form_builder(f)
     """
   end
@@ -68,10 +68,6 @@ defmodule EpicenterWeb.InvestigationNoteForm do
       {:error, error_changeset} ->
         socket |> assign(changeset: error_changeset) |> noreply()
     end
-  end
-
-  def confirmation_prompt(changeset) do
-    if changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text()
   end
 
   # # #

@@ -87,17 +87,16 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, contact_investigation: contact_investigation} do
-      assert Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
-             |> Pages.navigation_confirmation_prompt()
-             |> Euclid.Exists.blank?()
+      Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
+      |> Pages.refute_confirmation_prompt_active()
     end
 
     test "when the user changes something", %{conn: conn, contact_investigation: contact_investigation} do
       view =
         Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
         |> Pages.ContactInvestigationStartInterview.change_form(start_interview_form: %{"date_started" => "09/06/2020"})
+        |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
 
-      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
       assert %{"start_interview_form[date_started]" => "09/06/2020"} = Pages.form_state(view)
     end
   end

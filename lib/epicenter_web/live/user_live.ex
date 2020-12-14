@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.UserLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
+  import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.LiveHelpers, only: [authenticate_admin_user!: 2, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
@@ -170,7 +170,4 @@ defmodule EpicenterWeb.UserLive do
   defp assign_form_changeset(socket, form_changeset, form_error \\ nil) do
     socket |> assign(form_changeset: form_changeset, form_error: form_error)
   end
-
-  defp confirmation_prompt(changeset),
-    do: if(changeset.changes == %{}, do: nil, else: abandon_changes_confirmation_text())
 end

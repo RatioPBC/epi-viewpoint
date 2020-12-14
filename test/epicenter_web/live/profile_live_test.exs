@@ -625,14 +625,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "warns you that there are changes if you try to navigate away", %{person: person, user: user, conn: conn} do
       create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
-      view = Pages.Profile.visit(conn, person)
 
-      assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
-
-      view
+      Pages.Profile.visit(conn, person)
+      |> Pages.refute_confirmation_prompt_active()
       |> Pages.Profile.change_case_investigation_note_form("001", %{"text" => "something present"})
-
-      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+      |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
     end
   end
 
@@ -769,11 +766,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "warns you that there are changes if you try to navigate away", %{person: sick_person, user: user, conn: conn} do
       contact_investigation = create_contact_investigation(user, sick_person, %{}, %{}, %{tid: "contact_investigation"})
 
-      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
-      assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
-
-      view |> Pages.Profile.change_contact_investigation_note_form(contact_investigation.tid, %{"text" => "something present"})
-      assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+      Pages.Profile.visit(conn, contact_investigation.exposed_person)
+      |> Pages.refute_confirmation_prompt_active()
+      |> Pages.Profile.change_contact_investigation_note_form(contact_investigation.tid, %{"text" => "something present"})
+      |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
     end
 
     test "looking at a discontinued contact investigation", %{conn: conn, user: user, person: sick_person} do

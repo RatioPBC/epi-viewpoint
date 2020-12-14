@@ -77,20 +77,18 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
   end
 
   test "warns you that there are changes if you try to navigate away", %{conn: conn, contact_investigation: contact_investigation} do
-    view = Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
-
-    assert Pages.navigation_confirmation_prompt(view) |> Euclid.Exists.blank?()
-
-    view
-    |> Pages.ContactInvestigationDiscontinue.change_form(
-      contact_investigation: %{"interview_discontinue_reason" => "Transferred to another jurisdiction"}
-    )
+    view =
+      Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
+      |> Pages.refute_confirmation_prompt_active()
+      |> Pages.ContactInvestigationDiscontinue.change_form(
+        contact_investigation: %{"interview_discontinue_reason" => "Transferred to another jurisdiction"}
+      )
 
     assert %{
              "contact_investigation[interview_discontinue_reason]" => "Transferred to another jurisdiction"
            } = Pages.form_state(view)
 
-    assert Pages.navigation_confirmation_prompt(view) == "Your updates have not been saved. Discard updates?"
+    view |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
   end
 
   test "editing discontinuation reason has a different title", %{conn: conn, contact_investigation: contact_investigation, user: user} do

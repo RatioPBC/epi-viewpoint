@@ -168,17 +168,15 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
-      assert Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
-             |> Pages.navigation_confirmation_prompt()
-             |> Euclid.Exists.blank?()
+      Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+      |> Pages.refute_confirmation_prompt_active()
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
       view =
         Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
         |> Pages.CaseInvestigationClinicalDetails.change_form(clinical_details_form: %{"clinical_status" => "symptomatic"})
-
-      assert view |> Pages.navigation_confirmation_prompt() == "Your updates have not been saved. Discard updates?"
+        |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
 
       assert %{
                "clinical_details_form[clinical_status]" => "symptomatic"
