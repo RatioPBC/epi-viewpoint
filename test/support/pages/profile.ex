@@ -528,6 +528,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_edit_contact_clinical_details_link(%View{} = view, exposure_tid) do
+    view
+    |> element("[data-tid=#{exposure_tid}] [data-role=edit-contact-clinical-details-link]")
+    |> render_click()
+  end
+
   def click_edit_interview_start_details(%View{} = view, exposure_tid) do
     view
     |> element("[data-tid=#{exposure_tid}] [data-role=edit-start-contact-investigation-interview-link]")
