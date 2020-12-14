@@ -4,7 +4,8 @@
 
 * Repo: https://gitlab.com/geometerio/resolve/epicenter
 * CI: https://gitlab.com/geometerio/resolve/epicenter/-/pipelines
-* Staging: https://viewpoint-staging.network.geometer.dev/ (basic auth username and password are in the Epicenter vault in 1Password)
+* Staging: https://viewpoint-staging.network.geometer.dev/
+  * Must be invited to gain access
 
 ## Terminology (work-in-progress)
 * case - a person with confirmed or suspected covid
@@ -39,4 +40,4 @@ There are some scripts to make local docker development easier:
   * build the docker image
   * start the docker container
 * `bin/dev/docker-bash` will open a bash shell inside the running container
-* `bin/dev/dcoker-iex` will open an iex session inside the running container
+* `bin/dev/docker-iex` will open an iex session inside the running container
