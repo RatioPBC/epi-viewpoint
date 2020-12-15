@@ -154,13 +154,13 @@
                   td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
                     = Format.date(case_investigation.isolation_clearance_order_sent_on, "Not sent")
 
-      = component @socket,
-                  InvestigationNotesSection,
-                  case_investigation.id <> "note section",
-                  notes: case_investigation.notes,
-                  current_user_id: @current_user.id,
-                  on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
-                  on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
+        = component @socket,
+                    InvestigationNotesSection,
+                    case_investigation.id <> "note section",
+                    notes: case_investigation.notes,
+                    current_user_id: @current_user.id,
+                    on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
+                    on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
 
   a#contact-investigations
   = for contact_investigation <- @contact_investigations do
