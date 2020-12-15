@@ -53,6 +53,7 @@ defmodule EpicenterWeb.PeopleLive do
     |> assign_current_date()
     |> assign_reload_message(nil)
     |> assign(:display_people_assigned_to_me, false)
+    |> assign_display_import_button()
     |> assign_filter(:with_positive_lab_results)
     |> load_and_assign_people()
     |> load_and_assign_users()
@@ -192,4 +193,7 @@ defmodule EpicenterWeb.PeopleLive do
 
   defp assign_selected_to_empty(socket),
     do: socket |> assign(selected_people: %{})
+
+  defp assign_display_import_button(socket),
+    do: socket |> assign(display_import_button: socket.assigns.current_user.admin)
 end

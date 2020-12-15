@@ -18,7 +18,7 @@ section#people-page data-page="people"
 
     #toolbar-right
       = component(@socket, PeopleFilter, "people filter", display_people_assigned_to_me: @display_people_assigned_to_me, filter: @filter, on_toggle_assigned_to_me: &on_toggle_assigned_to_me/0)
-      = live_redirect "Import labs", to: "/import/start", id: "import-labs"
+      = if @display_import_button, do: live_redirect "Import labs", to: "/import/start", id: "import-labs", data_role: "import-labs"
 
   table data-role="people"
     thead

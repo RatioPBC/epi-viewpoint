@@ -39,6 +39,7 @@ defmodule Epicenter.Accounts.User do
     user
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+    |> unique_constraint(:id, name: :users_pkey)
   end
 
   def mfa_changeset(user, attrs) do

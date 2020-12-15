@@ -13,6 +13,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias EpicenterWeb.Test.Pages
 
   setup [:register_and_log_in_user, :create_people_and_lab_results]
+  @admin Test.Fixtures.admin()
 
   describe "rendering" do
     test "shows people with positive lab tests", %{conn: conn} do
@@ -111,6 +112,22 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ],
         columns: ["Name", "Investigation status"]
       )
+    end
+
+    test "displays the import button if an admin", %{conn: conn, user: user} do
+      Accounts.update_user(user, %{admin: true}, Test.Fixtures.audit_meta(@admin))
+
+      Pages.People.visit(conn)
+      |> Pages.People.import_button_visible?()
+      |> assert()
+    end
+
+    test "does not display the import button if non-admin", %{conn: conn, user: user} do
+      Accounts.update_user(user, %{admin: false}, Test.Fixtures.audit_meta(@admin))
+
+      Pages.People.visit(conn)
+      |> Pages.People.import_button_visible?()
+      |> refute()
     end
   end
 

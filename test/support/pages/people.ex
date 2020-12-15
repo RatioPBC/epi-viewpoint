@@ -80,6 +80,8 @@ defmodule EpicenterWeb.Test.Pages.People do
     view
   end
 
+  def import_button_visible?(%View{} = view), do: view |> element("[data-role=import-labs]") |> has_element?()
+
   defp table_contents(index_live, opts),
     do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))
 end
