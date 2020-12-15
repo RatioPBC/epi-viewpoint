@@ -87,12 +87,13 @@ defmodule EpicenterWeb.ContactsLiveTest do
     case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
     {:ok, caroline_contact_investigation} =
-      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "caroline_contact_investigation"),
+      {Test.Fixtures.contact_investigation_attrs("caroline_contact_investigation", %{exposing_case_id: case_investigation.id}),
        Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
     {:ok, donald_contact_investigation} =
-      {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "donald_contact_investigation", %{
+      {Test.Fixtures.contact_investigation_attrs("donald_contact_investigation", %{
+         exposing_case_id: case_investigation.id,
          interview_discontinued_at: ~U[2020-01-01 12:00:00Z],
          exposed_person: %{tid: "donald", demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
        }), Test.Fixtures.admin_audit_meta()}

@@ -70,10 +70,6 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(author)}
   end
 
-  def case_investigation_contact_investigation_attrs(%CaseInvestigation{id: case_investigation_id}, tid, attrs \\ %{}) do
-    contact_investigation_attrs(tid, attrs |> Map.put(:exposing_case_id, case_investigation_id))
-  end
-
   def contact_investigation_attrs(tid, attrs \\ %{}) do
     %{
       tid: tid,

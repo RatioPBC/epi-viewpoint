@@ -76,12 +76,13 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
       {:ok, contact_investigation} =
-        {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation_a"),
+        {Test.Fixtures.contact_investigation_attrs("contact_investigation_a", %{exposing_case_id: case_investigation.id}),
          Test.Fixtures.admin_audit_meta()}
         |> Cases.create_contact_investigation()
 
       {:ok, _} =
-        {Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation_b", %{
+        {Test.Fixtures.contact_investigation_attrs("contact_investigation_b", %{
+           exposing_case_id: case_investigation.id,
            deleted_at: NaiveDateTime.utc_now()
          }), Test.Fixtures.admin_audit_meta()}
         |> Cases.create_contact_investigation()

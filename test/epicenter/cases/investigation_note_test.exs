@@ -55,7 +55,7 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
 
       {:ok, contact_investigation} =
         {
-          Test.Fixtures.case_investigation_contact_investigation_attrs(case_investigation, "contact_investigation"),
+          Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
           Test.Fixtures.admin_audit_meta()
         }
         |> Cases.create_contact_investigation()

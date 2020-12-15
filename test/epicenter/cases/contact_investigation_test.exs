@@ -42,7 +42,7 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
     lab_result = Test.Fixtures.lab_result_attrs(person, @admin, "lab_result1", ~D[2020-10-27]) |> Cases.create_lab_result!()
     exposing_case = Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case_investigation") |> Cases.create_case_investigation!()
 
-    default_attrs = Test.Fixtures.case_investigation_contact_investigation_attrs(exposing_case, "validation example")
+    default_attrs = Test.Fixtures.contact_investigation_attrs("validation example", %{exposing_case_id: exposing_case.id})
     ContactInvestigation.changeset(%ContactInvestigation{}, Map.merge(default_attrs, attr_updates |> Enum.into(%{})))
   end
 
