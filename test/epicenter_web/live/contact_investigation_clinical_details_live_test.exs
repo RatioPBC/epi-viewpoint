@@ -66,6 +66,52 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
     |> Pages.ContactInvestigationClinicalDetails.assert_save_button_visible()
   end
 
+  test "changed symptoms are rendered correctly", %{conn: conn, contact_investigation: contact_investigation} do
+    Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationClinicalDetails.change_form(clinical_details_form: %{"symptoms" => ["cough"]})
+    |> Pages.ContactInvestigationClinicalDetails.assert_symptoms_selection(%{
+      "Fever > 100.4F" => false,
+      "Subjective fever (felt feverish)" => false,
+      "Cough" => true,
+      "Shortness of breath" => false,
+      "Diarrhea/GI" => false,
+      "Headache" => false,
+      "Muscle ache" => false,
+      "Chills" => false,
+      "Sore throat" => false,
+      "Vomiting" => false,
+      "Abdominal pain" => false,
+      "Nasal congestion" => false,
+      "Loss of sense of smell" => false,
+      "Loss of sense of taste" => false,
+      "Fatigue" => false,
+      "Other" => false
+    })
+  end
+
+  test "removing the last symptom doesn't clear the rendered changeset", %{conn: conn, contact_investigation: contact_investigation} do
+    Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationClinicalDetails.change_form(clinical_details_form: %{"symptoms" => []})
+    |> Pages.ContactInvestigationClinicalDetails.assert_symptoms_selection(%{
+      "Fever > 100.4F" => false,
+      "Subjective fever (felt feverish)" => false,
+      "Cough" => false,
+      "Shortness of breath" => false,
+      "Diarrhea/GI" => false,
+      "Headache" => false,
+      "Muscle ache" => false,
+      "Chills" => false,
+      "Sore throat" => false,
+      "Vomiting" => false,
+      "Abdominal pain" => false,
+      "Nasal congestion" => false,
+      "Loss of sense of smell" => false,
+      "Loss of sense of taste" => false,
+      "Fatigue" => false,
+      "Other" => false
+    })
+  end
+
   test "saving clinical details", %{conn: conn, contact_investigation: contact_investigation, user: user} do
     Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-clinical-details-form",

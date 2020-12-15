@@ -122,7 +122,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
 
   def handle_event("change", %{"clinical_details_form" => params}, socket) do
     params =
-      if Map.has_key?(params, :symptoms) do
+      if Map.has_key?(params, "symptoms") do
         params
       else
         Map.put(params, "symptoms", [])

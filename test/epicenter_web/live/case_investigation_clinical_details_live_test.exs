@@ -106,7 +106,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     })
   end
 
-  test "removing the last symptom doesn't clear the rendered changeset", %{conn: conn, case_investigation: case_investigation, user: user} do
+  test "removing the last symptom doesn't clear the rendered changeset", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.CaseInvestigationClinicalDetails.change_form(clinical_details_form: %{"symptoms" => []})
     |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
