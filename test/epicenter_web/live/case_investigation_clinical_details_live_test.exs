@@ -82,6 +82,53 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     })
   end
 
+  # Fixes #176181002 - we had misnamed the key to check for in the params passed to handle_event("change", ...)
+  test "changed symptoms are rendered correctly", %{conn: conn, case_investigation: case_investigation} do
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationClinicalDetails.change_form(clinical_details_form: %{"symptoms" => ["cough"]})
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
+      "Fever > 100.4F" => false,
+      "Subjective fever (felt feverish)" => false,
+      "Cough" => true,
+      "Shortness of breath" => false,
+      "Diarrhea/GI" => false,
+      "Headache" => false,
+      "Muscle ache" => false,
+      "Chills" => false,
+      "Sore throat" => false,
+      "Vomiting" => false,
+      "Abdominal pain" => false,
+      "Nasal congestion" => false,
+      "Loss of sense of smell" => false,
+      "Loss of sense of taste" => false,
+      "Fatigue" => false,
+      "Other" => false
+    })
+  end
+
+  test "removing the last symptom doesn't clear the rendered changeset", %{conn: conn, case_investigation: case_investigation, user: user} do
+    Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
+    |> Pages.CaseInvestigationClinicalDetails.change_form(clinical_details_form: %{"symptoms" => []})
+    |> Pages.CaseInvestigationClinicalDetails.assert_symptoms_selection(%{
+      "Fever > 100.4F" => false,
+      "Subjective fever (felt feverish)" => false,
+      "Cough" => false,
+      "Shortness of breath" => false,
+      "Diarrhea/GI" => false,
+      "Headache" => false,
+      "Muscle ache" => false,
+      "Chills" => false,
+      "Sore throat" => false,
+      "Vomiting" => false,
+      "Abdominal pain" => false,
+      "Nasal congestion" => false,
+      "Loss of sense of smell" => false,
+      "Loss of sense of taste" => false,
+      "Fatigue" => false,
+      "Other" => false
+    })
+  end
+
   test "saving clinical details", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
