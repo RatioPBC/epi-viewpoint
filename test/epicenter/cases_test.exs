@@ -19,8 +19,6 @@ defmodule Epicenter.CasesTest do
     end
 
     test "import_lab_results imports lab results and creates lab_result and person records" do
-      originator = Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()
-
       {:ok,
        %ImportInfo{
          imported_people: people,
@@ -37,7 +35,7 @@ defmodule Epicenter.CasesTest do
           Billy              , Testuser          , 03/01/1990    , 06/06/2020       , 06/07/2020    , negative  , billy
           """
         }
-        |> Cases.import_lab_results(originator)
+        |> Cases.import_lab_results(@admin)
 
       assert people |> tids() == ["alice", "billy"]
 
@@ -431,8 +429,6 @@ defmodule Epicenter.CasesTest do
   end
 
   test "update_person accepts form_demographic" do
-    originator = Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()
-
     {:ok, _} =
       %{
         file_name: "test.csv",
@@ -441,7 +437,7 @@ defmodule Epicenter.CasesTest do
         Alice              , Testuser          , 01/01/1970    , 06/01/2020       , 06/03/2020    , positive  , alice
         """
       }
-      |> Cases.import_lab_results(originator)
+      |> Cases.import_lab_results(@admin)
 
     [alice] = Cases.list_people(:all) |> Cases.preload_demographics()
 

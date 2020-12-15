@@ -15,7 +15,7 @@ defmodule Epicenter.Cases.ImportTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
   setup do
-    [originator: Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()]
+    [originator: Test.Fixtures.user_attrs(@admin, "originator", admin: true) |> Accounts.register_user!()]
   end
 
   describe "happy path" do
@@ -256,6 +256,22 @@ defmodule Epicenter.Cases.ImportTest do
 
       assert_revision_count(alice, 1)
     end
+  end
+
+  test "prevents non-admin users from importing" do
+    non_admin_user = Test.Fixtures.user_attrs(@admin, "non-admin") |> Accounts.register_user!()
+    refute non_admin_user.admin
+
+    assert {:error, "Originator must be an admin"} =
+             %{
+               file_name: "test.csv",
+               contents: """
+               search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37 , person_tid , lab_result_tid , diagaddress_street1_3 , diagaddress_city_4 , diagaddress_state_5 , diagaddress_zip_6 , datereportedtolhd_44 , testname_38 , person_tid, sex_11, ethnicity_13, occupation_18   , race_12
+               Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
+               Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
+               """
+             }
+             |> Import.import_csv(non_admin_user)
   end
 
   describe "de-duplication" do

@@ -59,6 +59,8 @@ defmodule Epicenter.Cases.Import do
     ]
   end
 
+  def import_csv(_file, %{admin: false}), do: {:error, "Originator must be an admin"}
+
   def import_csv(file, %Accounts.User{} = originator) do
     Repo.transaction(fn ->
       try do

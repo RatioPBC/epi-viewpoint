@@ -2,9 +2,11 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
+  alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
+  @admin Test.Fixtures.admin()
 
   @tag :skip
   test "user can edit the details of a case investigation with 'Other' symptom", %{conn: conn, user: user} do
@@ -59,7 +61,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
            } = Cases.get_person(person.id) |> Cases.preload_demographics() |> Cases.preload_case_investigations()
   end
 
-  test "user can edit the details of a case investigation", %{conn: conn, user: user} do
+  test "user can edit the details of a case investigation", %{conn: conn} do
     # import a person
 
     assert {:ok, _} =
@@ -70,7 +72,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
                Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
                """
              }
-             |> Cases.Import.import_csv(user)
+             |> Cases.Import.import_csv(@admin)
 
     [person] = Cases.list_people(:with_positive_lab_results)
 
