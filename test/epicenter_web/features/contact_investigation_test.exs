@@ -98,9 +98,9 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
              }
            ] = Pages.Profile.contact_investigations(view)
 
-    #    view
-    #    |> Pages.Profile.click_edit_contact_clinical_details_link(contact_investigation.tid)
-    #    |> Pages.follow_live_view_redirect(conn)
-    #    |> Pages.ContactInvestigationClinicalDetails.assert_here()
+    view
+    |> Pages.Profile.click_edit_contact_clinical_details_link(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationClinicalDetails.assert_here()
   end
 end

@@ -1,0 +1,10 @@
+.clinical-details
+  table.clinical-data
+    @include detail-table
+
+  .clinical-details-header-row
+    border-top: 2px solid $divider-color
+    padding: 2rem 0
+    @include level($justify: space-between)
+    a
+      @include button-outline(wide)

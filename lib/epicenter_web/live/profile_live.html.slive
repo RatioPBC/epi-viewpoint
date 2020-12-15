@@ -75,7 +75,7 @@
             span class="history-item-link" = history_item.link
 
       = if case_investigation.interview_started_at != nil do
-        .case-investigation-clinical
+        .clinical-details
           .clinical-details-header-row
             h4
               span id="clinical-details-#{case_investigation.name}"

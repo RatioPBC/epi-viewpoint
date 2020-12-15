@@ -33,6 +33,15 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
         span data-role="contact-investigation-history-item-text" = history_item.text
         span class="history-item-link" = history_item.link
 
+  = if @contact_investigation.interview_status in ["started"] do
+    .clinical-details
+      .clinical-details-header-row
+        h4
+          span
+            | Clinical
+        .links
+          span= live_redirect "Edit", to: Routes.contact_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationClinicalDetailsLive, @contact_investigation), class: "contact-investigation-clinical-details-link", data: [role: "edit-contact-clinical-details-link"]
+
   .contact-investigation-notes
     = component(@socket,
             InvestigationNotesSection,
