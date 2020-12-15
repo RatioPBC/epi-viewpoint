@@ -120,4 +120,22 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
     )
     |> Pages.assert_validation_messages(%{"clinical_details_form[exposed_on]" => "must be a valid MM/DD/YYYY date"})
   end
+
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation)
+      |> Pages.refute_confirmation_prompt_active()
+    end
+
+    test "when the user changes something", %{conn: conn, contact_investigation: contact_investigation} do
+      view =
+        Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation)
+        |> Pages.ContactInvestigationClinicalDetails.change_form(clinical_details_form: %{"clinical_status" => "symptomatic"})
+        |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
+
+      assert %{
+               "clinical_details_form[clinical_status]" => "symptomatic"
+             } = Pages.form_state(view)
+    end
+  end
 end

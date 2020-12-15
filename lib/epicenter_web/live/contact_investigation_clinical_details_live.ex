@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
   import EpicenterWeb.Presenters.CaseInvestigationPresenter, only: [symptoms_options: 0]
 
@@ -68,6 +70,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
     |> authenticate_user(session)
     |> assign_page_title(" Contact Investigation Clinical Details")
     |> assign(:form_changeset, ClinicalDetailsForm.changeset(contact_investigation))
+    |> assign(:confirmation_prompt, nil)
     |> assign(:contact_investigation, contact_investigation)
     |> ok()
   end
@@ -115,6 +118,19 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
       {:form, {:error, form_changeset}} ->
         socket |> assign(:form_changeset, form_changeset) |> noreply()
     end
+  end
+
+  def handle_event("change", %{"clinical_details_form" => params}, socket) do
+    params =
+      if Map.has_key?(params, :symptoms) do
+        params
+      else
+        Map.put(params, "symptoms", [])
+      end
+
+    new_changeset = ClinicalDetailsForm.changeset(socket.assigns.contact_investigation, params)
+
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   defp update_contact_investigation(socket, params) do
