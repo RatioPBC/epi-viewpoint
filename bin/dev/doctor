@@ -56,7 +56,7 @@ check "asdf: installed" \
 EUCLID_PATH="${EUCLID_PATH:-../euclid}"
 check "repo: euclid is installed locally" \
   "ls $EUCLID_PATH" \
-  "git clone git@github.com:geometerio/euclid.git $EUCLID_PATH"
+  "git clone git@github.com:geometerio/euclid.git $EUCLID_PATH # you can define \$EUCLID_PATH to be somewhere else if you like"
 
 check "asdf: erlang plugin installed" \
   "asdf plugin-list | grep erlang" \
