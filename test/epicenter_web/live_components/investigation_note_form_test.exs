@@ -9,16 +9,8 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
   alias EpicenterWeb.Test.Pages
 
   defmodule TestLiveView do
-    use EpicenterWeb, :live_view
-
-    import EpicenterWeb.LiveComponent.Helpers
-    import EpicenterWeb.LiveHelpers, only: [noreply: 1]
-
+    use EpicenterWeb.Test.ComponentEmbeddingLiveView, default_assigns: [on_add: &Function.identity/1]
     alias EpicenterWeb.InvestigationNoteForm
-
-    def mount(_params, _session, socket) do
-      {:ok, socket |> assign(on_add: &Function.identity/1)}
-    end
 
     def render(assigns) do
       ~H"""
@@ -28,12 +20,9 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
             on_add: @on_add)
       """
     end
-
-    def handle_info({:assigns, new_assigns}, socket) do
-      socket |> assign(new_assigns) |> noreply()
-    end
   end
 
+  # @tag :focus
   describe "initial render" do
     test "renders a form", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)

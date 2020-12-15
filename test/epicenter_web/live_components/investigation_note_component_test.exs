@@ -9,28 +9,20 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
   alias EpicenterWeb.InvestigationNoteComponent
   alias EpicenterWeb.Test.Components
 
-  @note %InvestigationNote{
-    id: "test-note-id",
-    text: "Hello, this is a note",
-    author_id: "test-author-id",
-    author: %User{id: "test-author-id", name: "Alice Testuser"},
-    inserted_at: ~U[2020-10-31 10:30:00Z]
-  }
-
-  def default_note, do: @note
-
   defmodule TestLiveView do
-    use EpicenterWeb, :live_view
-
-    import EpicenterWeb.LiveComponent.Helpers
-    import EpicenterWeb.LiveHelpers, only: [noreply: 1]
-
     alias EpicenterWeb.InvestigationNoteComponent
-    alias EpicenterWeb.InvestigationNoteComponentTest
 
-    def mount(_params, _session, socket) do
-      {:ok, socket |> assign(current_user_id: "test-user-id", note: InvestigationNoteComponentTest.default_note(), on_delete: &Function.identity/1)}
-    end
+    @note %InvestigationNote{
+      id: "test-note-id",
+      text: "Hello, this is a note",
+      author_id: "test-author-id",
+      author: %User{id: "test-author-id", name: "Alice Testuser"},
+      inserted_at: ~U[2020-10-31 10:30:00Z]
+    }
+
+    use EpicenterWeb.Test.ComponentEmbeddingLiveView, default_assigns: [current_user_id: "test-user-id", note: @note, on_delete: &Function.identity/1]
+
+    def default_note, do: @note
 
     def render(assigns) do
       ~H"""
@@ -41,10 +33,6 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
             current_user_id: @current_user_id,
             on_delete: @on_delete)
       """
-    end
-
-    def handle_info({:assigns, new_assigns}, socket) do
-      socket |> assign(new_assigns) |> noreply()
     end
   end
 
@@ -71,7 +59,7 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
 
     test "allows the current user to click a delete link if they are the author of the note", %{conn: conn} do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
-      send(view.pid, {:assigns, current_user_id: @note.author_id})
+      send(view.pid, {:assigns, current_user_id: TestLiveView.default_note().author_id})
 
       assert :ok = Components.InvestigationNote.delete_note(view, "test-note-id")
     end
@@ -83,10 +71,11 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
 
       pid = self()
       on_delete = fn note -> send(pid, {:received_on_delete, note}) end
-      send(view.pid, {:assigns, on_delete: on_delete, current_user_id: @note.author_id})
+      send(view.pid, {:assigns, on_delete: on_delete, current_user_id: TestLiveView.default_note().author_id})
 
       assert :ok = Components.InvestigationNote.delete_note(view, "test-note-id")
-      assert_receive {:received_on_delete, @note}
+      default_note = TestLiveView.default_note()
+      assert_receive {:received_on_delete, ^default_note}
     end
   end
 end
