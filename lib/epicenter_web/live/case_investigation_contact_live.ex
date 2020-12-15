@@ -17,9 +17,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     import Ecto.Changeset
 
-    # TODO: can we remove these nested aliases?
-    alias Epicenter.Cases.ContactInvestigation
-    alias Epicenter.Cases.Person
     alias Epicenter.DateParser
     alias Epicenter.Validation
 
