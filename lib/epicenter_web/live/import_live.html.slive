@@ -9,4 +9,4 @@ section#import-page
 
   = form_tag("/import/upload", multipart: true, method: :post)
     input type="file" name="file"
-    input#upload-button type="submit" value="Upload"
+    input#upload-button type="submit" value="Upload" data-role="upload-labs"
