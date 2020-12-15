@@ -20,7 +20,7 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
           {:inserted_at, :utc_datetime},
           {:case_investigation_id, :binary_id},
           {:deleted_at, :utc_datetime},
-          {:exposure_id, :binary_id},
+          {:contact_investigation_id, :binary_id},
           {:seq, :integer},
           {:tid, :string},
           {:text, :string},
@@ -47,7 +47,7 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
       assert note |> Repo.preload(:case_investigation) |> Map.get(:case_investigation) |> Map.get(:tid) == "investigation"
     end
 
-    test "belongs to exposure" do
+    test "belongs to contact investigation" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-29]) |> Cases.create_lab_result!()
@@ -63,13 +63,13 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
       note =
         InvestigationNote.changeset(%InvestigationNote{}, %{
           author_id: user.id,
-          exposure_id: contact_investigation.id,
+          contact_investigation_id: contact_investigation.id,
           text: "foo",
           tid: "case_investigation_note"
         })
         |> Repo.insert!()
 
-      assert note |> Repo.preload(:exposure) |> Map.get(:exposure) |> Map.get(:tid) == "contact_investigation"
+      assert note |> Repo.preload(:contact_investigation) |> Map.get(:contact_investigation) |> Map.get(:tid) == "contact_investigation"
     end
   end
 end

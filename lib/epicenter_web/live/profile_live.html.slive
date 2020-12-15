@@ -105,7 +105,7 @@
                 | Contacts
             div
               = live_redirect "+ Contact", to: Routes.create_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation) , id: "add-contact-case-investigation-link-001", class: "add-contact-case-investigation-link"
-          = for contact_investigation <- case_investigation.exposures do
+          = for contact_investigation <- case_investigation.contact_investigations do
             .contact
               .contact-details
                 div

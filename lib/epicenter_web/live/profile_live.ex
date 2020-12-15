@@ -117,7 +117,7 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def on_note_added(note_attrs, %Cases.ContactInvestigation{} = subject) do
-    send(self(), {:add_note, note_attrs, {:exposure_id, subject}})
+    send(self(), {:add_note, note_attrs, {:contact_investigation_id, subject}})
   end
 
   defp audit_log_data_for_deleting_note(%CaseInvestigation{}) do
@@ -205,7 +205,7 @@ defmodule EpicenterWeb.ProfileLive do
     person = Cases.preload_contact_investigations(person)
 
     contact_investigations =
-      person.exposures
+      person.contact_investigations
       |> Cases.preload_exposing_case()
       |> Cases.preload_investigation_notes()
 

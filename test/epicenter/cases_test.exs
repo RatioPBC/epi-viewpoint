@@ -866,7 +866,7 @@ defmodule Epicenter.CasesTest do
         })
 
       assert %{
-               exposures: [
+               contact_investigations: [
                  %{
                    exposed_person: %{
                      demographics: [

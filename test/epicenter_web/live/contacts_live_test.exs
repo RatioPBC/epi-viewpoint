@@ -14,7 +14,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_here()
     end
 
-    test "People with exposures are listed", %{conn: conn, caroline: caroline, donald: donald} do
+    test "People with contact investigations are listed", %{conn: conn, caroline: caroline, donald: donald} do
       Pages.Contacts.visit(conn)
       |> Pages.Contacts.assert_table_contents([
         ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],

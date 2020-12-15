@@ -193,7 +193,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
            } = Cases.get_person(person.id) |> Cases.preload_demographics() |> Cases.preload_case_investigations()
 
     assert %{
-             exposures: [
+             contact_investigations: [
                %{
                  exposed_person: %{
                    demographics: [

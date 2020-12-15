@@ -8,8 +8,6 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
 
-  # Skipping until we introduce the new table
-  @tag :skip
   describe "schema" do
     test "fields" do
       assert_schema(

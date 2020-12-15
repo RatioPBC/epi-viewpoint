@@ -13,7 +13,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
     do: selected_people == %{}
 
   def exposure_date(person) do
-    person.exposures |> hd() |> Map.get(:most_recent_date_together) |> Format.date()
+    person.contact_investigations |> hd() |> Map.get(:most_recent_date_together) |> Format.date()
   end
 
   def external_id(person),

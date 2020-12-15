@@ -24,7 +24,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     alias Epicenter.Validation
 
     embedded_schema do
-      field :exposure_id, :string
+      field :contact_investigation_id, :string
       field :person_id, :string
       field :phone_id, :string
       field :demographic_id, :string
@@ -46,7 +46,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       phone = List.first(person.phones) || %{id: nil, number: ""}
 
       %__MODULE__{
-        exposure_id: contact_investigation.id,
+        contact_investigation_id: contact_investigation.id,
         guardian_name: contact_investigation.guardian_name,
         guardian_phone: contact_investigation.guardian_phone,
         person_id: person.id,
@@ -96,7 +96,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
         {:ok,
          %{
-           id: data.exposure_id,
+           id: data.contact_investigation_id,
            guardian_name: data.guardian_name,
            guardian_phone: data.guardian_phone,
            most_recent_date_together: DateParser.parse_mm_dd_yyyy!(data.most_recent_date_together),

@@ -52,7 +52,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       |> Pages.Profile.assert_here(person)
 
       assert %{
-               exposures: [
+               contact_investigations: [
                  %{
                    relationship_to_case: "Family",
                    most_recent_date_together: ~D[2020-10-31],
@@ -242,7 +242,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       )
 
       assert %{
-               exposures: [
+               contact_investigations: [
                  %{
                    relationship_to_case: "Friend",
                    most_recent_date_together: ~D[2020-10-30],
@@ -362,7 +362,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       )
 
       assert %{
-               exposures: [
+               contact_investigations: [
                  %{
                    relationship_to_case: "Friend",
                    most_recent_date_together: ~D[2020-11-02],

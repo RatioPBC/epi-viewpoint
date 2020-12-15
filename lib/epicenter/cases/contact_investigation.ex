@@ -26,7 +26,7 @@ defmodule Epicenter.Cases.ContactInvestigation do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "exposures" do
+  schema "contact_investigations" do
     field :deleted_at, :utc_datetime
     field :guardian_name, :string
     field :guardian_phone, :string
@@ -46,7 +46,7 @@ defmodule Epicenter.Cases.ContactInvestigation do
 
     belongs_to :exposed_person, Person
     belongs_to :exposing_case, CaseInvestigation
-    has_many :notes, InvestigationNote, foreign_key: :exposure_id, where: [deleted_at: nil]
+    has_many :notes, InvestigationNote, foreign_key: :contact_investigation_id, where: [deleted_at: nil]
   end
 
   def changeset(contact_investigation, attrs) do

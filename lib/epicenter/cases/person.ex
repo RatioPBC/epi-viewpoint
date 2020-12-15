@@ -28,7 +28,7 @@ defmodule Epicenter.Cases.Person do
     has_many :addresses, Address
     has_many :case_investigations, CaseInvestigation
     has_many :emails, Email, on_replace: :delete
-    has_many :exposures, ContactInvestigation, on_replace: :delete, foreign_key: :exposed_person_id
+    has_many :contact_investigations, ContactInvestigation, on_replace: :delete, foreign_key: :exposed_person_id
     has_many :lab_results, LabResult
     has_many :phones, Phone, on_replace: :delete
   end
@@ -185,8 +185,8 @@ defmodule Epicenter.Cases.Person do
 
     def all_exposed() do
       from person in Person,
-        join: exposure in assoc(person, :exposures),
-        on: person.id == exposure.exposed_person_id,
+        join: contact_investigation in assoc(person, :contact_investigations),
+        on: person.id == contact_investigation.exposed_person_id,
         order_by: [asc: person.seq]
     end
 
