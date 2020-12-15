@@ -123,8 +123,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
              socket.assigns.case_investigation,
              params
            ),
-         {:form, {:ok, cast_investigation_attrs}} <- {:form, ClinicalDetailsForm.case_investigation_attrs(form_changeset)},
-         {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, cast_investigation_attrs)} do
+         {:form, {:ok, case_investigation_attrs}} <- {:form, ClinicalDetailsForm.case_investigation_attrs(form_changeset)},
+         {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, case_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
     else
       {:form, {:error, form_changeset}} ->
