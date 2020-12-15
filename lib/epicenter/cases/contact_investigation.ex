@@ -10,7 +10,9 @@ defmodule Epicenter.Cases.ContactInvestigation do
 
   @required_attrs ~w{exposing_case_id most_recent_date_together relationship_to_case}a
   @optional_attrs ~w{
+    clinical_status
     deleted_at
+    exposed_on
     guardian_name
     guardian_phone
     household_member
@@ -18,6 +20,7 @@ defmodule Epicenter.Cases.ContactInvestigation do
     interview_discontinued_at
     interview_proxy_name
     interview_started_at
+    symptoms
     tid
     under_18
   }a
@@ -27,7 +30,9 @@ defmodule Epicenter.Cases.ContactInvestigation do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "contact_investigations" do
+    field :clinical_status, :string
     field :deleted_at, :utc_datetime
+    field :exposed_on, :date
     field :guardian_name, :string
     field :guardian_phone, :string
     field :household_member, :boolean
@@ -39,6 +44,7 @@ defmodule Epicenter.Cases.ContactInvestigation do
     field :most_recent_date_together, :date
     field :relationship_to_case, :string
     field :seq, :integer, read_after_writes: true
+    field :symptoms, {:array, :string}
     field :tid, :string
     field :under_18, :boolean
 

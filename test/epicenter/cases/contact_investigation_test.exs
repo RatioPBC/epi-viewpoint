@@ -13,7 +13,9 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
       assert_schema(
         ContactInvestigation,
         [
+          {:clinical_status, :string},
           {:deleted_at, :utc_datetime},
+          {:exposed_on, :date},
           {:exposed_person_id, :binary_id},
           {:exposing_case_id, :binary_id},
           {:guardian_name, :string},
@@ -29,6 +31,7 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
           {:most_recent_date_together, :date},
           {:relationship_to_case, :string},
           {:seq, :integer},
+          {:symptoms, {:array, :string}},
           {:tid, :string},
           {:under_18, :boolean},
           {:updated_at, :utc_datetime}
