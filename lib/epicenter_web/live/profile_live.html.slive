@@ -61,96 +61,98 @@
           = "Initiated by positive lab result reported on "
           = string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))
 
-      .case-investigation-interview-status
-        h3.status data-role="status"
-          = displayable_interview_status(case_investigation)
-        .links
-          = for link <- interview_buttons(case_investigation) do
-            span= link
-
-      .case-investigation-history
-        = for history_item <- history_items(case_investigation) do
-          div
-            span data-role="case-investigation-history-item-text" = history_item.text
-            span class="history-item-link" = history_item.link
-
-      = if case_investigation.interview_started_at != nil do
-        .clinical-details
-          .clinical-details-header-row
-            h4
-              span id="clinical-details-#{case_investigation.name}"
-                | Clinical
+      .case-investigation-sections
+        div
+          .case-investigation-interview-status
+            h3.status data-role="status"
+              = displayable_interview_status(case_investigation)
             .links
-              span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation) , id: "case-investigation-clinical-details-link-001", class: "case-investigation-clinical-details-link"
+              = for link <- interview_buttons(case_investigation) do
+                span= link
 
-          table.clinical-data data-role="clinical-data-table"
-            thead
-              tr data-role="table-column-names"
-                th Clinical status
-                th Onset date
-                th Symptoms
-
-            tbody
-              tr data-tid=case_investigation.tid
-                td data-role="case-investigation-clinical-status-text"
-                  = displayable_clinical_status(case_investigation)
-                td data-role="case-investigation-symptom-onset-date-text"
-                  = Format.date(case_investigation.symptom_onset_on, "None")
-                td data-role="case-investigation-symptoms-text"
-                  = displayable_symptoms(case_investigation)
-        .case-investigation-contacts id="contacts-#{case_investigation.name}"
-          .contacts-header-row
-            h4
-              span
-                | Contacts
-            div
-              = live_redirect "+ Contact", to: Routes.create_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation) , id: "add-contact-case-investigation-link-001", class: "add-contact-case-investigation-link"
-          = for contact_investigation <- case_investigation.contact_investigations do
-            .contact
-              .contact-details
-                div
-                  = live_redirect Format.person(contact_investigation.exposed_person),
-                                  to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, contact_investigation.exposed_person),
-                                  data: [role: "visit-contact-link"],
-                                  class: "contact-name"
-                = contact_details_as_list(contact_investigation)
+          .case-investigation-history
+            = for history_item <- history_items(case_investigation) do
               div
-                = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, contact_investigation) , data: [role: "edit-contact", contact_investigation: contact_investigation.id]
-                span=" "
-                a href="#" data-confirm="Remove #{Format.person(contact_investigation.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-contact-investigation-id=contact_investigation.id data-role="remove-contact" Remove
+                span data-role="case-investigation-history-item-text" = history_item.text
+                span class="history-item-link" = history_item.link
 
-      = if case_investigation.interview_status == "completed" do
-        .case-investigation-isolation-monitoring-status id="isolation-monitoring-#{case_investigation.name}"
-          h3.status data-role="status"
-            = displayable_isolation_monitoring_status(case_investigation, @current_date)
+        = if case_investigation.interview_started_at != nil do
+          .clinical-details
+            .clinical-details-header-row
+              h4
+                span id="clinical-details-#{case_investigation.name}"
+                  | Clinical
+              .links
+                span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation) , id: "case-investigation-clinical-details-link-001", class: "case-investigation-clinical-details-link"
+
+            table.clinical-data data-role="clinical-data-table"
+              thead
+                tr data-role="table-column-names"
+                  th Clinical status
+                  th Onset date
+                  th Symptoms
+
+              tbody
+                tr data-tid=case_investigation.tid
+                  td data-role="case-investigation-clinical-status-text"
+                    = displayable_clinical_status(case_investigation)
+                  td data-role="case-investigation-symptom-onset-date-text"
+                    = Format.date(case_investigation.symptom_onset_on, "None")
+                  td data-role="case-investigation-symptoms-text"
+                    = displayable_symptoms(case_investigation)
+          .case-investigation-contacts id="contacts-#{case_investigation.name}"
+            .contacts-header-row
+              h4
+                span
+                  | Contacts
+              div
+                = live_redirect "+ Contact", to: Routes.create_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation) , id: "add-contact-case-investigation-link-001", class: "add-contact-case-investigation-link"
+            = for contact_investigation <- case_investigation.contact_investigations do
+              .contact
+                .contact-details
+                  div
+                    = live_redirect Format.person(contact_investigation.exposed_person),
+                                    to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, contact_investigation.exposed_person),
+                                    data: [role: "visit-contact-link"],
+                                    class: "contact-name"
+                  = contact_details_as_list(contact_investigation)
+                .contact-edit-remove
+                  = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, contact_investigation), data: [role: "edit-contact", contact_investigation: contact_investigation.id]
+                  a href="#" data-confirm="Remove #{Format.person(contact_investigation.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-contact-investigation-id=contact_investigation.id data-role="remove-contact" Remove
+
+        = if case_investigation.interview_status == "completed" do
           div
-            = isolation_monitoring_button(case_investigation)
-        .case-investigation-history
-          = for item <- isolation_monitoring_history_items(case_investigation) do
-            div
-              span data-role="isolation-monitoring-history-item-text" = item.text
-              span class="history-item-link" = item.link
+            .case-investigation-isolation-monitoring-status id="isolation-monitoring-#{case_investigation.name}"
+              h3.status data-role="status"
+                = displayable_isolation_monitoring_status(case_investigation, @current_date)
+              div
+                = isolation_monitoring_button(case_investigation)
+            .case-investigation-history
+              = for item <- isolation_monitoring_history_items(case_investigation) do
+                div
+                  span data-role="isolation-monitoring-history-item-text" = item.text
+                  span class="history-item-link" = item.link
 
-      = if case_investigation.isolation_monitoring_status == "ongoing" do
-        .case-investigation-clinical
-          .clinical-details-header-row data-tid="isolation-order-details-001"
-            h4
-              span Isolation Order Details
-            .links
-              span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "edit-isolation-order-case-investigation-link"
+        = if case_investigation.isolation_monitoring_status == "ongoing" do
+          .case-investigation-clinical
+            .clinical-details-header-row data-tid="isolation-order-details-001"
+              h4
+                span Isolation Order Details
+              .links
+                span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "edit-isolation-order-case-investigation-link"
 
-          table.clinical-data
-            thead
-              tr data-role="table-column-names"
-                th Date isolation order sent
-                th Date isolation clearance order sent
+            table.clinical-data
+              thead
+                tr data-role="table-column-names"
+                  th Date isolation order sent
+                  th Date isolation clearance order sent
 
-            tbody
-              tr
-                td data-tid="case-investigation-001-isolation-order-sent-date"
-                  = Format.date(case_investigation.isolation_order_sent_on, "Not sent")
-                td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
-                  = Format.date(case_investigation.isolation_clearance_order_sent_on, "Not sent")
+              tbody
+                tr
+                  td data-tid="case-investigation-001-isolation-order-sent-date"
+                    = Format.date(case_investigation.isolation_order_sent_on, "Not sent")
+                  td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
+                    = Format.date(case_investigation.isolation_clearance_order_sent_on, "Not sent")
 
       = component @socket,
                   InvestigationNotesSection,

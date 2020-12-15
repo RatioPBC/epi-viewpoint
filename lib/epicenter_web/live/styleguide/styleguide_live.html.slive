@@ -275,6 +275,10 @@
       #divider-list
         div
           ' Here is some text in a div with no border top
+          #first-grandchild
+            ' Here is a grandchild having no top border
+          #second-grandchild
+            ' Here is a second grandchild also having no top border
         div
           ' Here is some text in a div with a border
         div

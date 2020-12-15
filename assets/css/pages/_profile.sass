@@ -49,6 +49,9 @@
       color: $secondary-text-color
       margin-top: 0
 
+    .case-investigation-sections
+      @include dividers
+
     .case-investigation-interview-status
       @include level($justify: space-between)
       margin-top: 0
@@ -76,7 +79,6 @@
 
     .case-investigation-isolation-monitoring-status
       @include level($justify: space-between)
-      border-top: 2px solid $divider-color
       padding-top: 2rem
 
       .pending
@@ -92,7 +94,6 @@
         @include button-primary
 
     .case-investigation-history
-      border-top: 2px solid $divider-color
       padding-top: 2rem
       color: $secondary-text-color
 
@@ -105,7 +106,6 @@
         @include detail-table
 
       .clinical-details-header-row
-        border-top: 2px solid $divider-color
         padding: 2rem 0
         @include level($justify: space-between)
         a
@@ -113,7 +113,6 @@
 
     .case-investigation-contacts
       .contacts-header-row
-        border-top: 2px solid $divider-color
         padding: 2rem 0
         @include level($justify: space-between)
 
