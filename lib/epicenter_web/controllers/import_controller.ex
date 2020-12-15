@@ -13,6 +13,10 @@ defmodule EpicenterWeb.ImportController do
 
   @common_assigns [page_title: "Import labs"]
 
+  def create(%{assigns: %{current_user: %{admin: false}}} = conn, _file) do
+    redirect(conn, to: "/")
+  end
+
   def create(conn, %{"file" => plug_upload}) do
     result = UploadedFile.from_plug_upload(plug_upload) |> Cases.import_lab_results(conn.assigns.current_user)
 

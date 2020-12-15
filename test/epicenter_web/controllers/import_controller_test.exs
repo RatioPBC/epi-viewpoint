@@ -1,13 +1,36 @@
 defmodule EpicenterWeb.ImportControllerTest do
   use EpicenterWeb.ConnCase, async: true
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases.Import.ImportInfo
   alias Epicenter.Tempfile
+  alias Epicenter.Test
   alias EpicenterWeb.Session
 
-  setup :register_and_log_in_user
+  setup :log_in_admin
+  @admin Test.Fixtures.admin()
 
   describe "create" do
+    test "prevents non-admins from uploading", %{conn: conn, user: user} do
+      Accounts.update_user(user, %{admin: false}, Test.Fixtures.audit_meta(@admin))
+
+      temp_file_path =
+        """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , datecollected_36 , resultdate_42 , datereportedtolhd_44 , result_39 , glorp , person_tid
+        Alice              , Testuser          , 01/01/1970    , 06/02/2020       , 06/01/2020    , 06/03/2020           , positive  , 393   , alice
+        Billy              , Testuser          , 03/01/1990    , 06/05/2020       , 06/06/2020    , 06/07/2020           , negative  , sn3   , billy
+        """
+        |> Tempfile.write_csv!()
+
+      on_exit(fn -> File.rm!(temp_file_path) end)
+
+      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
+
+      assert conn |> redirected_to() == "/"
+
+      refute Session.get_last_csv_import_info(conn)
+    end
+
     test "accepts file upload", %{conn: conn} do
       temp_file_path =
         """
