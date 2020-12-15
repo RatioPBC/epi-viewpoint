@@ -105,6 +105,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
       )
 
     socket
+    # TODO: Use ConfirmationModal.confirmation_prompt instead
     |> assign(confirmation_prompt: abandon_changes_confirmation_text())
     |> assign_form_changeset(form_changeset)
     |> noreply()
