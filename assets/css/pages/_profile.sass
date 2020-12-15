@@ -112,17 +112,16 @@
           @include button-outline(wide)
 
     .case-investigation-contacts
+      @include vertical-flow()
+
       .contacts-header-row
-        padding: 2rem 0
         @include level($justify: space-between)
+        padding-top: 2rem
 
         .add-contact-case-investigation-link
           @include button-outline(wide)
 
       .contact
-        &:not(:first-child)
-          margin-top: 2rem
-
         .contact-details
           .contact-name
             font-weight: bold
