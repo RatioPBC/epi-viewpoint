@@ -402,9 +402,10 @@
   & > *:not(:first-child)
     margin-left: $spacing
 
-@mixin dividers
+@mixin dividers($padding: 2rem)
   > *:not(:first-child):not(:empty)
     border-top: 1px solid $divider-color
+    padding-top: $padding
 
 @mixin dotted-details()
   align-items: flex-start
