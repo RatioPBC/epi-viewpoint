@@ -70,7 +70,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
 
       Components.ContactInvestigation.assert_clinical_details(view, %{
         clinical_status: "Asymptomatic",
-        exposed_on: "14/12/2020",
+        exposed_on: "12/14/2020",
         symptoms: "Cough, Headache"
       })
     end

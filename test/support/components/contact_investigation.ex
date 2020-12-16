@@ -20,11 +20,11 @@ defmodule EpicenterWeb.Test.Components.ContactInvestigation do
       |> assert_eq(clinical_status)
     end
 
-    with symptom_onset_on when not is_nil(symptom_onset_on) <- Map.get(expected_values, :symptom_onset_on) do
+    with exposed_on when not is_nil(exposed_on) <- Map.get(expected_values, :exposed_on) do
       parsed_html
       |> Test.Html.find("[data-role=contact-investigation-exposed-on-date-text]")
       |> Test.Html.text()
-      |> assert_eq(symptom_onset_on)
+      |> assert_eq(exposed_on)
     end
 
     with symptoms when not is_nil(symptoms) <- Map.get(expected_values, :symptoms) do

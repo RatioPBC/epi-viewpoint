@@ -3,6 +3,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
@@ -86,5 +87,18 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Pages.Profile.click_edit_contact_clinical_details_link(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.ContactInvestigationClinicalDetails.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-clinical-details-form",
+      clinical_details_form: %{
+        "clinical_status" => "symptomatic",
+        "exposed_on" => "09/06/2020",
+        "symptoms" => ["fever", "chills"]
+      }
+    )
+    |> Pages.Profile.assert_here(contact_investigation.exposed_person)
+    |> Components.ContactInvestigation.assert_clinical_details(%{
+      clinical_status: "Symptomatic",
+      exposed_on: "09/06/2020",
+      symptoms: "Fever > 100.4F, Chills"
+    })
   end
 end
