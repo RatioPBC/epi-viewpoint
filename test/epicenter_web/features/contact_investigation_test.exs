@@ -77,7 +77,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
     assert [
              %{
-               interview_buttons: ["Discontinue"],
+               interview_buttons: ["Complete interview", "Discontinue"],
                interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
                status: "Ongoing"
              }
@@ -100,5 +100,6 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       exposed_on: "09/06/2020",
       symptoms: "Fever > 100.4F, Chills"
     })
+    |> Pages.Profile.click_complete_contact_investigation(contact_investigation.tid)
   end
 end

@@ -35,12 +35,26 @@ defmodule EpicenterWeb.ContactInvestigation do
 
       "started" ->
         [
+          redirect_to(contact_investigation, :complete_interview),
           redirect_to(contact_investigation, :discontinue_interview)
         ]
 
       "discontinued" ->
         []
     end
+  end
+
+  defp redirect_to(contact_investigation, :complete_interview) do
+    live_redirect("Complete interview",
+      to:
+        Routes.contact_investigation_complete_interview_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.ContactInvestigationCompleteInterviewLive,
+          contact_investigation
+        ),
+      class: "complete-interview-link",
+      data: [role: "contact-investigation-complete-interview-link"]
+    )
   end
 
   defp redirect_to(contact_investigation, :discontinue_interview) do
