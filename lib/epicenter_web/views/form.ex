@@ -55,11 +55,12 @@ defmodule EpicenterWeb.Form do
 
     content_tag :footer, data: grid_data(1, line, opts) ++ [sticky: Keyword.get(opts, :sticky, false)] do
       [
-        submit("Save"),
-        content_tag(:div, error_message,
-          class: "form-error-message",
-          data: [form_error_message: error_message]
-        )
+        content_tag(:div, id: "form-footer-content") do
+          [
+            submit("Save"),
+            content_tag(:div, error_message, class: "form-error-message", data: [form_error_message: error_message])
+          ]
+        end
       ]
     end
     |> add_to_line(line, Keyword.put_new(opts, :span, 8))
