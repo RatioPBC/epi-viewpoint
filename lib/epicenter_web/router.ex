@@ -52,30 +52,29 @@ defmodule EpicenterWeb.Router do
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
 
-    live "/people", PeopleLive, as: :people
-    live "/people/:id", ProfileLive, as: :profile
-    live "/case-investigations/:id/start-interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
+    live "/case-investigations/:case_investigation_id/contact", CaseInvestigationContactLive, as: :create_case_investigation_contact
+    live "/case-investigations/:case_investigation_id/contact/:id", CaseInvestigationContactLive, as: :edit_case_investigation_contact
     live "/case-investigations/:id/clinical-details", CaseInvestigationClinicalDetailsLive, as: :case_investigation_clinical_details
     live "/case-investigations/:id/complete-interview", CaseInvestigationCompleteInterviewLive, as: :case_investigation_complete_interview
-    live "/case-investigations/:id/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue
-    live "/case-investigations/:id/isolation-monitoring", CaseInvestigationIsolationMonitoringLive, as: :case_investigation_isolation_monitoring
-    live "/case-investigations/:id/isolation-order", CaseInvestigationIsolationOrderLive, as: :case_investigation_isolation_order
 
     live "/case-investigations/:id/conclude-isolation-monitoring", CaseInvestigationConcludeIsolationMonitoringLive,
       as: :case_investigation_conclude_isolation_monitoring
 
-    live "/case-investigations/:case_investigation_id/contact", CaseInvestigationContactLive, as: :create_case_investigation_contact
-    live "/case-investigations/:case_investigation_id/contact/:id", CaseInvestigationContactLive, as: :edit_case_investigation_contact
-
-    live "/contact-investigations/:contact_investigation_id/discontinue", ContactInvestigationDiscontinueLive, as: :contact_investigation_discontinue
-
-    live "/contact-investigations/:contact_investigation_id/start-interview", ContactInvestigationStartInterviewLive,
-      as: :contact_investigation_start_interview
+    live "/case-investigations/:id/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue
+    live "/case-investigations/:id/isolation-monitoring", CaseInvestigationIsolationMonitoringLive, as: :case_investigation_isolation_monitoring
+    live "/case-investigations/:id/isolation-order", CaseInvestigationIsolationOrderLive, as: :case_investigation_isolation_order
+    live "/case-investigations/:id/start-interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
 
     live "/contact-investigations/:id/clinical-details", ContactInvestigationClinicalDetailsLive, as: :contact_investigation_clinical_details
     live "/contact-investigations/:id/complete-interview", ContactInvestigationCompleteInterviewLive, as: :contact_investigation_complete_interview
+    live "/contact-investigations/:id/discontinue", ContactInvestigationDiscontinueLive, as: :contact_investigation_discontinue
+    live "/contact-investigations/:id/start-interview", ContactInvestigationStartInterviewLive, as: :contact_investigation_start_interview
+
+    live "/people", PeopleLive, as: :people
+    live "/people/:id", ProfileLive, as: :profile
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
+
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update-password", UserSettingsController, :update_password
     put "/users/settings/update-email", UserSettingsController, :update_email

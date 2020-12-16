@@ -808,7 +808,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       assert [
                %{
-                 interview_buttons: ["Discontinue"],
+                 interview_buttons: ["Complete interview", "Discontinue"],
                  interview_history_items: ["Started interview with Caroline Testuser on 12/08/2020 at 06:00am EST"]
                }
              ] = Pages.Profile.contact_investigations(view)
