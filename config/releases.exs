@@ -27,7 +27,7 @@ config :epicenter, Epicenter.Repo,
   url: CFG.database_url()
 
 config :epicenter, EpicenterWeb.Endpoint,
-  http: [port: CFG.application_port()],
+  force_ssl: [hsts: true, rewrite_on: [:x_forwarded_proto]],
   live_view: [signing_salt: CFG.live_view_signing_salt()],
   secret_key_base: CFG.secret_key_base(),
   server: true,
@@ -35,6 +35,14 @@ config :epicenter, EpicenterWeb.Endpoint,
     host: CFG.canonical_host(),
     port: 443,
     scheme: "https"
+  ],
+  https: [
+    port: CFG.application_port(),
+    cipher_suite: :strong,
+    otp_app: :epicenter,
+    keyfile: "/opt/ssl/STAR_network_geometer_dev.key",
+    certfile: "/opt/ssl/STAR_network_geometer_dev.pem",
+    cacertfile: "/opt/ssl/STAR_network_geometer_dev_bundle.pem"
   ]
 
 config :logger_json, :google_error_reporter,
