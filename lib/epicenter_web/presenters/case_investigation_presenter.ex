@@ -10,24 +10,6 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  @symptoms_map %{
-    "abdominal_pain" => "Abdominal pain",
-    "chills" => "Chills",
-    "cough" => "Cough",
-    "diarrhea_gi" => "Diarrhea/GI",
-    "fatigue" => "Fatigue",
-    "fever" => "Fever > 100.4F",
-    "headache" => "Headache",
-    "loss_of_sense_of_smell" => "Loss of sense of smell",
-    "loss_of_sense_of_taste" => "Loss of sense of taste",
-    "muscle_ache" => "Muscle ache",
-    "nasal_congestion" => "Nasal congestion",
-    "shortness_of_breath" => "Shortness of breath",
-    "sore_throat" => "Sore throat",
-    "subjective_fever" => "Subjective fever (felt feverish)",
-    "vomiting" => "Vomiting"
-  }
-
   def contact_details_as_list(%ContactInvestigation{} = contact_investigation) do
     content_tag :ul do
       build_details_list(contact_investigation) |> Enum.map(&content_tag(:li, &1))
@@ -56,20 +38,6 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
       _ -> [content_tag(:span, "Discontinued", class: :discontinued)]
     end
   end
-
-  def displayable_clinical_status(%{clinical_status: nil}), do: "None"
-
-  def displayable_clinical_status(%{clinical_status: clinical_status}),
-    do: Gettext.gettext(Epicenter.Gettext, clinical_status)
-
-  def displayable_symptoms(%{symptoms: nil}),
-    do: "None"
-
-  def displayable_symptoms(%{symptoms: []}),
-    do: "None"
-
-  def displayable_symptoms(%{symptoms: symptoms}),
-    do: Enum.map(symptoms, &Map.get(@symptoms_map(), &1, &1)) |> Enum.join(", ")
 
   def history_items(case_investigation) do
     items = []

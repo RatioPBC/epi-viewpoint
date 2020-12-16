@@ -41,6 +41,21 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
             | Clinical
         .links
           span= live_redirect "Edit", to: Routes.contact_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationClinicalDetailsLive, @contact_investigation), class: "contact-investigation-clinical-details-link", data: [role: "edit-contact-clinical-details-link"]
+      table.clinical-data data-role="clinical-data-table"
+        thead
+          tr data-role="table-column-names"
+            th Clinical status
+            th Onset date
+            th Symptoms
+
+        tbody
+          tr data-tid=@contact_investigation.tid
+            td data-role="contact-investigation-clinical-status-text"
+              = displayable_clinical_status(@contact_investigation)
+            td data-role="contact-investigation-symptom-onset-date-text"
+              = Format.date(@contact_investigation.exposed_on, "None")
+            td data-role="contact-investigation-symptoms-text"
+              = displayable_symptoms(@contact_investigation)
 
   .contact-investigation-notes
     = component(@socket,

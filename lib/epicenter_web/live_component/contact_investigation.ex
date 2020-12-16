@@ -3,6 +3,7 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   import EpicenterWeb.LiveComponent.Helpers
   import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1]
+  import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
 
   alias Epicenter.Cases.ContactInvestigation
   alias EpicenterWeb.Format

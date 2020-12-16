@@ -253,4 +253,8 @@ defmodule Epicenter.Test.Fixtures do
   defp merge_attrs(defaults, attrs) do
     Map.merge(defaults, Enum.into(attrs, %{}))
   end
+
+  def wrap_with_audit_meta(thing) do
+    {thing, admin_audit_meta()}
+  end
 end
