@@ -6,10 +6,10 @@ defmodule EpicenterWeb.Test.ComponentEmbeddingLiveView do
       use EpicenterWeb, :live_view
 
       import EpicenterWeb.LiveComponent.Helpers
-      import EpicenterWeb.LiveHelpers, only: [noreply: 1]
+      import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1]
 
       def mount(_params, _session, socket) do
-        {:ok, socket |> assign(unquote(default_assigns))}
+        {:ok, socket |> assign_defaults(unquote(default_assigns))}
       end
 
       def handle_info({:assigns, new_assigns}, socket) do

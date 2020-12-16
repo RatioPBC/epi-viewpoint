@@ -11,7 +11,7 @@ defmodule EpicenterWeb.ImportController do
   alias EpicenterWeb.UploadedFile
   alias Epicenter.DateParsingError
 
-  @common_assigns [page_title: "Import labs"]
+  @common_assigns [body_class: "body-background-none", show_nav: true, page_title: "Import labs"]
 
   def create(%{assigns: %{current_user: %{admin: false}}} = conn, _file) do
     redirect(conn, to: "/")

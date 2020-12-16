@@ -1,1 +1,4 @@
-= @inner_content
+body class="#{@body_class}"
+  = if @show_nav do
+    = render "nav.html", current_user: @current_user
+  = @inner_content

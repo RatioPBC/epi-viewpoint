@@ -2,7 +2,7 @@ defmodule EpicenterWeb.UserLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
-  import EpicenterWeb.LiveHelpers, only: [authenticate_admin_user!: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_admin_user!: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
@@ -72,6 +72,7 @@ defmodule EpicenterWeb.UserLive do
       end
 
     socket
+    |> assign_defaults()
     |> authenticate_admin_user!(session)
     |> assign_page_title("User")
     |> assign(user: user)

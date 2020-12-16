@@ -20,7 +20,8 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
       inserted_at: ~U[2020-10-31 10:30:00Z]
     }
 
-    use EpicenterWeb.Test.ComponentEmbeddingLiveView, default_assigns: [current_user_id: "test-user-id", note: @note, on_delete: &Function.identity/1]
+    use EpicenterWeb.Test.ComponentEmbeddingLiveView,
+      default_assigns: [current_user: %User{}, current_user_id: "test-user-id", note: @note, on_delete: &Function.identity/1]
 
     def default_note, do: @note
 

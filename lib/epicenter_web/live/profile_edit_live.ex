@@ -2,7 +2,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [plus_icon: 0, arrow_down_icon: 0, back_icon: 0, trash_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
 
@@ -53,6 +53,7 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> update(%{})
 
     socket
+    |> assign_defaults()
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign(changeset: changeset)
     |> assign(person: person)

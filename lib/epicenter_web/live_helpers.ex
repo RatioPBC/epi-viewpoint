@@ -5,6 +5,16 @@ defmodule EpicenterWeb.LiveHelpers do
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
 
+  @default_assigns [body_class: "body-background-none", show_nav: true]
+
+  def assign_defaults(socket, overrides \\ []) do
+    new_assigns = Keyword.merge(@default_assigns, overrides)
+    Enum.reduce(new_assigns, socket, fn {key, value}, socket_acc -> assign_new(socket_acc, key, fn -> value end) end)
+  end
+
+  def assign_page_title(socket, page_title),
+    do: socket |> assign(page_title: page_title)
+
   def authenticate_user(socket, %{"user_token" => user_token} = _session),
     do: socket |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end) |> check_user()
 
@@ -13,9 +23,6 @@ defmodule EpicenterWeb.LiveHelpers do
 
   def authenticate_admin_user!(socket, %{"user_token" => user_token} = _session),
     do: socket |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end) |> check_admin()
-
-  def assign_page_title(socket, page_title),
-    do: socket |> assign(page_title: page_title)
 
   def ok(socket),
     do: {:ok, socket}

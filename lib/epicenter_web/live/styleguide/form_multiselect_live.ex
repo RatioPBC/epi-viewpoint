@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias EpicenterWeb.Form
 
@@ -138,6 +138,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     example = Examples.get_example()
 
     socket
+    |> assign_defaults()
     |> assign_page_title("Styleguide: multiselect")
     |> assign(show_nav: false)
     |> assign_form_changeset(ExampleForm.changeset(example))

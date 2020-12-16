@@ -32,15 +32,18 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
     use EpicenterWeb, :live_view
 
     import EpicenterWeb.LiveComponent.Helpers
-    import EpicenterWeb.LiveHelpers, only: [noreply: 1]
+    import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, noreply: 1]
 
+    alias Epicenter.Accounts
     alias EpicenterWeb.InvestigationNotesSection
     alias EpicenterWeb.InvestigationNotesSectionTest
 
     def mount(_params, _session, socket) do
       {:ok,
        socket
+       |> assign_defaults()
        |> assign(
+         current_user: %Accounts.User{},
          current_user_id: "test-current-user-id",
          notes: InvestigationNotesSectionTest.default_notes(),
          on_add_note: &Function.identity/1,

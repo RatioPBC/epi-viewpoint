@@ -6,7 +6,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupController do
   alias Epicenter.AuditLog
   alias EpicenterWeb.Session
 
-  @common_assigns [page_title: "Multi-factor authentication"]
+  @common_assigns [body_class: "body-background-none", show_nav: true, page_title: "Multi-factor authentication"]
 
   def new(conn, _params) do
     render_with_common_assigns(conn, "new.html", error_message: nil)

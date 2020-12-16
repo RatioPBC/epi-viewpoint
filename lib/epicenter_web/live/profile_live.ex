@@ -3,7 +3,7 @@ defmodule EpicenterWeb.ProfileLive do
 
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
-  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
 
   import EpicenterWeb.Presenters.CaseInvestigationPresenter,
@@ -36,6 +36,7 @@ defmodule EpicenterWeb.ProfileLive do
     person = Cases.get_person(person_id) |> Cases.preload_demographics()
 
     socket
+    |> assign_defaults(body_class: "body-background-color")
     |> authenticate_user(session)
     |> assign_page_title(Format.person(person))
     |> assign_person(person)

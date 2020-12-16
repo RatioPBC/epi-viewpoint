@@ -3,7 +3,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -44,6 +44,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     case_investigation = Cases.get_case_investigation(case_investigation_id) |> Cases.preload_person()
 
     socket
+    |> assign_defaults()
     |> assign(:case_investigation, case_investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign(:form_changeset, ConcludeIsolationMonitoringForm.changeset(case_investigation, %{}))

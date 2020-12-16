@@ -4,7 +4,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.Forms.StartInterviewForm, only: [start_interview_form_builder: 2]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -16,6 +16,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
     person = contact_investigation.exposed_person |> Cases.preload_demographics()
 
     socket
+    |> assign_defaults()
     |> assign_page_title("Start Contact Investigation")
     |> assign(:confirmation_prompt, nil)
     |> assign_form_changeset(StartInterviewForm.changeset(contact_investigation, %{}))

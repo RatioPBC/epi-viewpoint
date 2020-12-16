@@ -27,7 +27,18 @@ import { LiveSocket, Browser } from "phoenix_live_view";
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
-  hooks: {},
+  hooks: {
+    BodyClass: {
+      mounted() {
+        document.getElementsByTagName("body")[0].className = this.el.dataset.bodyClass;
+      }
+    },
+    UserMenuHook: {
+      mounted() {
+        UserMenu.setup();
+      }
+    }
+  },
   params: { _csrf_token: csrfToken }
 });
 

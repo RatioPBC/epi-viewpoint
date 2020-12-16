@@ -1,1 +1,6 @@
-= @inner_content
+body
+  = if @show_nav do
+    = render "nav.html", current_user: @current_user
+
+  main#main role="main" phx-hook="BodyClass" data-body-class=@body_class
+    = @inner_content

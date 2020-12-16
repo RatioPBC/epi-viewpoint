@@ -25,7 +25,7 @@ end
 defmodule EpicenterWeb.PeopleLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   import EpicenterWeb.Presenters.PeoplePresenter,
     only: [
@@ -48,6 +48,7 @@ defmodule EpicenterWeb.PeopleLive do
 
   def mount(_params, session, socket) do
     socket
+    |> assign_defaults()
     |> authenticate_user(session)
     |> assign_page_title("People")
     |> assign_current_date()

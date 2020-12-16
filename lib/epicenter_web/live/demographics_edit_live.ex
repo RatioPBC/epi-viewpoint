@@ -3,7 +3,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -87,6 +87,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     demographic = Cases.Person.coalesce_demographics(person) |> Map.put(:__struct__, Cases.Demographic)
 
     socket
+    |> assign_defaults()
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign_form_changeset(DemographicForm.model_to_form_changeset(demographic))
     |> assign(person: person)

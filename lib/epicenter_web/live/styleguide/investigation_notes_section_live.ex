@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, ok: 1, noreply: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, ok: 1, noreply: 1]
   import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts.User
@@ -11,6 +11,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
 
   def mount(_params, _session, socket) do
     socket
+    |> assign_defaults()
     |> assign_page_title("Styleguide: note")
     |> assign(notes: example_notes())
     |> ok()

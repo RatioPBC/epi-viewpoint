@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.Styleguide.FormBuilderLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias EpicenterWeb.Form
 
@@ -35,6 +35,7 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
 
   def mount(_params, _session, socket) do
     socket
+    |> assign_defaults()
     |> assign_page_title("Styleguide: form builder")
     |> assign(show_nav: false)
     |> assign(

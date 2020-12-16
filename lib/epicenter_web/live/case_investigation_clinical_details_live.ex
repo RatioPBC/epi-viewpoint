@@ -3,7 +3,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [authenticate_user: 2, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.Presenters.CaseInvestigationPresenter, only: [symptoms_options: 0]
 
   alias Epicenter.AuditLog
@@ -66,6 +66,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     case_investigation = id |> Cases.get_case_investigation() |> Cases.preload_initiating_lab_result() |> Cases.preload_person()
 
     socket
+    |> assign_defaults()
     |> authenticate_user(session)
     |> assign_page_title(" Case Investigation Clinical Details")
     |> assign(:form_changeset, ClinicalDetailsForm.changeset(case_investigation))

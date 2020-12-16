@@ -4,6 +4,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
   import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
+  alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.Test.Components
@@ -43,6 +44,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
 
     use EpicenterWeb.Test.ComponentEmbeddingLiveView,
       default_assigns: [
+        current_user: %Accounts.User{},
         current_user_id: "test-user-id",
         contact_investigation: default_contact_investigation(),
         on_add_note: &Function.identity/1,

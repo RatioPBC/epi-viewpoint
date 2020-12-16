@@ -4,12 +4,13 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
   import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
+  alias Epicenter.Accounts
   alias EpicenterWeb.InvestigationNoteForm
   alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
 
   defmodule TestLiveView do
-    use EpicenterWeb.Test.ComponentEmbeddingLiveView, default_assigns: [on_add: &Function.identity/1]
+    use EpicenterWeb.Test.ComponentEmbeddingLiveView, default_assigns: [current_user: %Accounts.User{}, on_add: &Function.identity/1]
     alias EpicenterWeb.InvestigationNoteForm
 
     def render(assigns) do

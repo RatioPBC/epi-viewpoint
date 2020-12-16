@@ -4,7 +4,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
   import Epicenter.Validation, only: [validate_date: 2]
   import EpicenterWeb.FormHelpers, only: [checkbox_list: 4, radio_button_list: 5]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, noreply: 1, ok: 1]
 
   # fake schema (would be a database-backed schema in real code)
   defmodule Movie do
@@ -131,6 +131,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
     movie = Movies.get_movie()
 
     socket
+    |> assign_defaults()
     |> assign_page_title("Styleguide: form")
     |> assign(show_nav: false)
     |> assign_form_changeset(MovieForm.changeset(movie))

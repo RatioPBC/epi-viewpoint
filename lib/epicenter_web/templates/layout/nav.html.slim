@@ -1,0 +1,23 @@
+header#nav phx-hook="UserMenuHook"
+  #nav-inner
+    #nav-items
+      #nav-left
+        = link to: "/", id: "logo" do
+          = logo_icon()
+
+        = link "Index cases", to: "/people"
+        = link "Contacts", to: "/contacts"
+
+      #nav-right
+        #user-menu
+          #user-menu-title
+            = person_icon()
+            div data-role="current-user-name" = @current_user.name
+            = arrow_down_icon()
+
+          ul#user-menu-list role="menu"
+            = if @current_user.admin do
+              li
+                = live_redirect "Admin", to: Routes.users_path(EpicenterWeb.Endpoint, EpicenterWeb.UsersLive)
+            li = link "Settings", to: Routes.user_settings_path(EpicenterWeb.Endpoint, :edit)
+            li = link "Log out", to: Routes.user_session_path(EpicenterWeb.Endpoint, :delete), method: :delete

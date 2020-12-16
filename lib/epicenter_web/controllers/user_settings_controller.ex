@@ -8,7 +8,7 @@ defmodule EpicenterWeb.UserSettingsController do
 
   plug :assign_email_and_password_changesets
 
-  @common_assigns [page_title: "Settings"]
+  @common_assigns [body_class: "body-background-none", show_nav: true, page_title: "Settings"]
 
   def edit(conn, _params) do
     render_with_common_assigns(conn, "edit.html")

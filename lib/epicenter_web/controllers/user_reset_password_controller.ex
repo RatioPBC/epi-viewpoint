@@ -7,7 +7,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
 
   plug :get_user_by_reset_password_token when action in [:edit, :update]
 
-  @common_assigns [body_background: "color", page_title: "Reset Password"]
+  @common_assigns [show_nav: false, body_class: "body-background-color", page_title: "Reset Password"]
 
   def new(conn, _params) do
     render_with_common_assigns(conn, "new.html")

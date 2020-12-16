@@ -15,32 +15,4 @@ html lang="en"
 
     link phx-track-static=true rel="stylesheet" href="#{ Routes.static_path(@conn, "/css/app.css") }"
     script defer=true phx-track-static=true type="text/javascript" src="#{ Routes.static_path(@conn, "/js/app.js") }"
-  body class="body-background-#{Map.get(assigns, :body_background, "none")}"
-    = if @current_user && Map.get(assigns, :show_nav, true) do
-      header#nav
-        #nav-inner
-          #nav-items
-            #nav-left
-              = link to: "/", id: "logo" do
-                = logo_icon()
-
-              = link "Index cases", to: "/people"
-              = link "Contacts", to: "/contacts"
-
-            #nav-right
-              #user-menu
-                #user-menu-title
-                  = person_icon()
-                  div data-role="current-user-name" = @current_user.name
-                  = arrow_down_icon()
-
-                ul#user-menu-list role="menu"
-                  = if @current_user.admin do
-                    li
-                      = live_redirect "Admin", to: Routes.users_path(EpicenterWeb.Endpoint, EpicenterWeb.UsersLive)
-                  li = link "Settings", to: Routes.user_settings_path(@conn, :edit)
-                  li = link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete
-      main role="main"
-        = @inner_content
-    - else
-      = @inner_content
+  = @inner_content
