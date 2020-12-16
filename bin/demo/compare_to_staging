@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 source "bin/_support/cecho.sh"
+source "bin/_support/deployments.sh"
 source "bin/_support/git.sh"
 
-LATEST_STAGING_SHA=$(curl -s https://viewpoint-staging.network.geometer.dev/version.txt)
-LATEST_DEMO_SHA=$(curl -s https://viewpoint-demo.network.geometer.dev/version.txt)
+LATEST_STAGING_SHA=$(curl -s ${STAGING_BASE_URL}/version.txt)
+LATEST_DEMO_SHA=$(curl -s ${DEMO_BASE_URL}/version.txt)
 
 if ! sha_exists_locally ${LATEST_STAGING_SHA}; then
   cecho --bright-bold-red "Could not find deployed sha '${LATEST_STAGING_SHA}' from staging in local git history - do you need to pull?"

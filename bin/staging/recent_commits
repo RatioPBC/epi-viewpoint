@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 source "bin/_support/cecho.sh"
+source "bin/_support/deployments.sh"
 source "bin/_support/git.sh"
 
-LATEST_SHA=$(curl -s https://viewpoint-staging.network.geometer.dev/version.txt)
+LATEST_SHA=$(curl -s ${STAGING_BASE_URL}/version.txt)
 
 if sha_exists_locally ${LATEST_SHA}; then
   git log -10 --pretty=format:"%h: %s (%an/%cn)" "${LATEST_SHA}"
