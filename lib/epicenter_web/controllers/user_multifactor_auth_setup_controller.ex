@@ -1,16 +1,17 @@
 defmodule EpicenterWeb.UserMultifactorAuthSetupController do
   use EpicenterWeb, :controller
 
+  import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 1]
+
   alias Epicenter.Accounts
   alias Epicenter.Accounts.MultifactorAuth
   alias Epicenter.AuditLog
   alias EpicenterWeb.Session
 
-  @common_assigns [body_class: "body-background-none", show_nav: true, page_title: "Multi-factor authentication"]
+  @common_assigns [page_title: "Multi-factor authentication"]
 
-  def new(conn, _params) do
-    render_with_common_assigns(conn, "new.html", error_message: nil)
-  end
+  def new(conn, _params),
+    do: render_with_common_assigns(conn, "new.html", error_message: nil)
 
   def create(conn, %{"mfa" => %{"passcode" => passcode}}) do
     secret = Session.get_multifactor_auth_secret(conn)
@@ -40,6 +41,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupController do
 
   defp render_with_common_assigns(conn, template, assigns) do
     conn
+    |> assign_defaults()
     |> Session.ensure_multifactor_auth_secret(if_nil: &MultifactorAuth.generate_secret/0)
     |> assign_multifactor_auth_key()
     |> assign_multifactor_qr_code_svg()

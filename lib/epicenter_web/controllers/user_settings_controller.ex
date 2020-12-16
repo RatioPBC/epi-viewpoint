@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.UserSettingsController do
   use EpicenterWeb, :controller
 
+  import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
+
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias EpicenterWeb.Session
@@ -8,11 +10,10 @@ defmodule EpicenterWeb.UserSettingsController do
 
   plug :assign_email_and_password_changesets
 
-  @common_assigns [body_class: "body-background-none", show_nav: true, page_title: "Settings"]
+  @common_assigns [page_title: "Settings"]
 
-  def edit(conn, _params) do
-    render_with_common_assigns(conn, "edit.html")
-  end
+  def edit(conn, _params),
+    do: conn |> assign_defaults(@common_assigns) |> render("edit.html")
 
   def update_email(conn, %{"current_password" => password, "user" => user_params}) do
     user = conn.assigns.current_user
@@ -33,7 +34,7 @@ defmodule EpicenterWeb.UserSettingsController do
         |> redirect(to: Routes.user_settings_path(conn, :edit))
 
       {:error, changeset} ->
-        render_with_common_assigns(conn, "edit.html", email_changeset: changeset)
+        conn |> assign_defaults(@common_assigns) |> render("edit.html", email_changeset: changeset)
     end
   end
 
@@ -81,7 +82,7 @@ defmodule EpicenterWeb.UserSettingsController do
         |> UserAuth.log_in_user(user)
 
       {:error, changeset} ->
-        render_with_common_assigns(conn, "edit.html", password_changeset: changeset)
+        conn |> assign_defaults(@common_assigns) |> render("edit.html", password_changeset: changeset)
     end
   end
 
@@ -92,7 +93,4 @@ defmodule EpicenterWeb.UserSettingsController do
     |> assign(:email_changeset, Accounts.change_user_email(user))
     |> assign(:password_changeset, Accounts.change_user_password(user))
   end
-
-  defp render_with_common_assigns(conn, template, assigns \\ []),
-    do: render(conn, template, Keyword.merge(@common_assigns, assigns))
 end

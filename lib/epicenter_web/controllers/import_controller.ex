@@ -6,12 +6,14 @@ defmodule EpicenterWeb.ImportController do
 
   use EpicenterWeb, :controller
 
+  import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
+
   alias Epicenter.Cases
   alias EpicenterWeb.Session
   alias EpicenterWeb.UploadedFile
   alias Epicenter.DateParsingError
 
-  @common_assigns [body_class: "body-background-none", show_nav: true, page_title: "Import labs"]
+  @common_assigns [page_title: "Import labs"]
 
   def create(%{assigns: %{current_user: %{admin: false}}} = conn, _file) do
     redirect(conn, to: "/")
@@ -41,9 +43,8 @@ defmodule EpicenterWeb.ImportController do
   end
 
   def show(conn, _params) do
-    conn |> render_with_common_assigns("show.html", last_csv_import_info: Session.get_last_csv_import_info(conn))
+    conn
+    |> assign_defaults(@common_assigns)
+    |> render("show.html", last_csv_import_info: Session.get_last_csv_import_info(conn))
   end
-
-  defp render_with_common_assigns(conn, template, assigns),
-    do: render(conn, template, Keyword.merge(@common_assigns, assigns))
 end

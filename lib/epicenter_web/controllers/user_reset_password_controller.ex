@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.UserResetPasswordController do
   use EpicenterWeb, :controller
 
+  import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
+
   alias Epicenter.Accounts
   alias EpicenterWeb.Session
   alias Epicenter.AuditLog
@@ -9,9 +11,8 @@ defmodule EpicenterWeb.UserResetPasswordController do
 
   @common_assigns [show_nav: false, body_class: "body-background-color", page_title: "Reset Password"]
 
-  def new(conn, _params) do
-    render_with_common_assigns(conn, "new.html")
-  end
+  def new(conn, _params),
+    do: conn |> assign_defaults(@common_assigns) |> render("new.html")
 
   def create(conn, %{"user" => %{"email" => email}}) do
     # Regardless of the outcome, show an impartial success/error message.
@@ -34,9 +35,8 @@ defmodule EpicenterWeb.UserResetPasswordController do
     |> redirect(to: "/")
   end
 
-  def edit(conn, _params) do
-    render_with_common_assigns(conn, "edit.html", changeset: Accounts.change_user_password(conn.assigns.user))
-  end
+  def edit(conn, _params),
+    do: conn |> assign_defaults(@common_assigns) |> render("edit.html", changeset: Accounts.change_user_password(conn.assigns.user))
 
   # Do not log in the user after reset password to avoid a
   # leaked token giving the user access to the account.
@@ -58,7 +58,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
         |> redirect(to: Routes.user_session_path(conn, :new))
 
       {:error, changeset} ->
-        render_with_common_assigns(conn, "edit.html", changeset: changeset)
+        conn |> assign_defaults(@common_assigns) |> render("edit.html", changeset: changeset)
     end
   end
 
@@ -73,9 +73,5 @@ defmodule EpicenterWeb.UserResetPasswordController do
       |> redirect(to: "/")
       |> halt()
     end
-  end
-
-  defp render_with_common_assigns(conn, template, assigns \\ []) do
-    render(conn, template, Keyword.merge(@common_assigns, assigns))
   end
 end
