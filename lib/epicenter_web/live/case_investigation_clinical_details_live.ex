@@ -80,7 +80,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
     Form.new(form)
     |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", CaseInvestigation.text_field_values(:clinical_status), span: 5))
-    |> Form.line(&Form.date_field(&1, :symptom_onset_on, "Symptom onset date*", explanation_text: symptom_onset_on_explanation_text, span: 5))
+    |> Form.line(&Form.date_field(&1, :symptom_onset_on, "Symptom onset date", explanation_text: symptom_onset_on_explanation_text, span: 5))
     |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
