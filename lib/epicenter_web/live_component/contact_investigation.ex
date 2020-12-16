@@ -62,7 +62,7 @@ defmodule EpicenterWeb.ContactInvestigation do
       to:
         Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, contact_investigation),
       class: "discontinue-link",
-      data: [role: "discontinue-contact-investigation"]
+      data: [role: "contact-investigation-discontinue-interview"]
     )
   end
 
@@ -75,7 +75,7 @@ defmodule EpicenterWeb.ContactInvestigation do
           contact_investigation
         ),
       class: "start-link",
-      data: [role: "start-contact-investigation"]
+      data: [role: "contact-investigation-start-interview"]
     )
   end
 end

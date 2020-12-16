@@ -47,7 +47,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
                     contact_investigation
                   ),
                 class: "contact-investigation-link",
-                data: [role: "edit-start-contact-investigation-interview-link"]
+                data: [role: "contact-investigation-start-interview-edit-link"]
               )
           }
           | items
@@ -74,7 +74,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
                     contact_investigation
                   ),
                 class: "contact-investigation-link",
-                data: [role: "edit-discontinue-contact-investigation-interview-link"]
+                data: [role: "contact-investigation-discontinue-interview-edit-link"]
               )
           }
           | items

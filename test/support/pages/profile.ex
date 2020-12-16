@@ -526,7 +526,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def click_edit_interview_discontinuation_details(%View{} = view, contact_investigation_tid) do
     view
-    |> element("[data-tid=#{contact_investigation_tid}] [data-role=edit-discontinue-contact-investigation-interview-link]")
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=contact-investigation-discontinue-interview-edit-link]")
     |> render_click()
   end
 
@@ -544,7 +544,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def click_edit_interview_start_details(%View{} = view, contact_investigation_tid) do
     view
-    |> element("[data-tid=#{contact_investigation_tid}] [data-role=edit-start-contact-investigation-interview-link]")
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=contact-investigation-start-interview-edit-link]")
     |> render_click()
   end
 
@@ -609,13 +609,13 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
   def click_discontinue_contact_investigation(%View{} = view, tid) do
     view
-    |> element("[data-role=contact-investigation][data-tid=#{tid}] [data-role=discontinue-contact-investigation]")
+    |> element("[data-role=contact-investigation][data-tid=#{tid}] [data-role=contact-investigation-discontinue-interview]")
     |> render_click()
   end
 
   def click_start_contact_investigation(%View{} = view, tid) do
     view
-    |> element("[data-role=contact-investigation][data-tid=#{tid}] [data-role=start-contact-investigation]")
+    |> element("[data-role=contact-investigation][data-tid=#{tid}] [data-role=contact-investigation-start-interview]")
     |> render_click()
   end
 
