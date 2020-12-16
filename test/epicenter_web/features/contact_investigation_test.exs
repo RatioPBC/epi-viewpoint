@@ -7,7 +7,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
 
   setup :register_and_log_in_user
 
-  test "user can discontinue a contact investigation", %{conn: conn, user: user} do
+  setup %{user: user} do
     sick_person =
       Test.Fixtures.person_attrs(user, "alice")
       |> Cases.create_person!()
@@ -26,7 +26,10 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       |> Cases.create_contact_investigation()
 
     exposed_person = Cases.get_person(contact_investigation.exposed_person_id)
+    [contact_investigation: contact_investigation, exposed_person: exposed_person]
+  end
 
+  test "user can discontinue a contact investigation", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person} do
     view =
       conn
       |> Pages.Profile.visit(exposed_person)
@@ -48,26 +51,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     assert [%{status: "Discontinued"}] = contact_investigations
   end
 
-  test "user can conduct a contact investigation", %{conn: conn, user: user} do
-    sick_person =
-      Test.Fixtures.person_attrs(user, "alice")
-      |> Cases.create_person!()
-
-    lab_result =
-      Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07])
-      |> Cases.create_lab_result!()
-
-    case_investigation =
-      Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
-      |> Cases.create_case_investigation!()
-
-    {:ok, contact_investigation} =
-      {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
-       Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
-
-    exposed_person = Cases.get_person(contact_investigation.exposed_person_id)
-
+  test "user can conduct a contact investigation", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person} do
     view =
       conn
       |> Pages.Profile.visit(exposed_person)
