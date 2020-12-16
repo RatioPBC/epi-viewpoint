@@ -1,6 +1,12 @@
 @import "../mixins"
 
 #case-investigation-discontinue-page
+  #subnav
+    @include subnav
+
+    a
+      @include has-icon($link-color)
+
   @include centered-page
 
   h3

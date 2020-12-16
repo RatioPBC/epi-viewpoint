@@ -1,5 +1,11 @@
 @import "../mixins"
 
 #contact-investigation-clinical-details-page
+  #subnav
+    @include subnav
+
+    a
+      @include has-icon($link-color)
+
   form
     @include form-grid

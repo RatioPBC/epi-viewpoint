@@ -2,8 +2,8 @@
   section
     header#subnav
       = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "back-link"] do
-          = back_icon()
-          span Back
+        = back_icon()
+        span Back
 
   section#case-investigation-isolation-monitoring
     h2 Add isolation dates
