@@ -20,13 +20,13 @@ if [[ $env_list =~ (^|[[:space:]])"$env"($|[[:space:]]) ]]; then
     bin/docker/build # gitlab has a separate build_image stage
   fi
 
-  docker tag epicenter:latest "gcr.io/epikubes/viewpoint-$env:latest"
-  repo="gcr.io/epikubes/viewpoint-$env"
+  repo="gcr.io/viewpoint-fcoh-$env/viewpoint"
+  docker tag epicenter:latest "$repo:latest"
   echo "starting push"
   docker push "$repo"
 
   echo "push complete"
-  curl -f -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://viewpoint-rollout-$env.network.geometer.dev
+  curl -f -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://viewpoint-rollout.$env.gsi.dev
   echo "restart ping complete"
 else
   echo "Environment '$env' not found in allowed set: '$env_list'"

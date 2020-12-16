@@ -62,7 +62,7 @@ deploy_staging:
   resource_group: staging
   environment:
     name: staging
-    url: https://viewpoint-staging.network.geometer.dev
+    url: https://viewpoint.staging.gsi.dev
 deploy_construction:
   only:
     - main
@@ -77,7 +77,7 @@ deploy_construction:
   resource_group: construction
   environment:
     name: construction
-    url: https://viewpoint-construction.network.geometer.dev
+    url: https://viewpoint.construction.gsi.dev
   when: manual
 deploy_demo:
   only:
@@ -93,5 +93,5 @@ deploy_demo:
   resource_group: demo
   environment:
     name: demo
-    url: https://viewpoint-demo.network.geometer.dev
+    url: https://viewpoint.demo.gsi.dev
   when: manual

@@ -4,7 +4,8 @@
 
 * Repo: https://gitlab.com/geometerio/resolve/epicenter
 * CI: https://gitlab.com/geometerio/resolve/epicenter/-/pipelines
-* Staging: https://viewpoint-staging.network.geometer.dev/
+* Staging: https://viewpoint.staging.gsi.dev/
+* Demo: https://viewpoint.demo.gsi.dev/
   * Must be invited to gain access
 
 ## Terminology (work-in-progress)
