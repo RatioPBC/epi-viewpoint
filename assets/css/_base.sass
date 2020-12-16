@@ -58,8 +58,9 @@ html
   font-size: $em-base
   -webkit-font-smoothing: antialiased
 
-main
-  @include pancake-stack
+main > *
+  max-width: $max-width
+  margin: 0 auto
 
 section
   @include slab

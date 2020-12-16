@@ -246,16 +246,6 @@
             span The end
       code @include vertical-flow, @include horizontal-flow
 
-    .styleguide-example-title Pancake Stack
-    .styleguide-example
-      #pancake-stack
-        div Top
-        div Middle
-        div Bottom
-      code
-        ' @include pancake-stack
-        small The middle child is stretched vertically to take up all remaining space
-
   //
   // containers
   //

@@ -152,9 +152,9 @@
   & > *
     place-self: center
 
-@mixin centered-page
-  max-width: $max-width
-  margin: 0 auto
+@mixin full-width-page
+  max-width: initial
+  margin: initial
 
 @mixin checkbox-list
   @include -input-vertical-list
@@ -431,11 +431,6 @@
 @mixin level($justify: left, $spacing: 1rem)
   @include horizontal-flow($justify: $justify, $spacing: $spacing)
   align-items: center
-
-// https://1linelayouts.glitch.me
-@mixin pancake-stack
-  display: grid
-  grid-template-rows: auto 1fr auto
 
 @mixin radio-button-list
   // Radio button list items are in reverse order in the markup so that the "other" text field is overridden by
