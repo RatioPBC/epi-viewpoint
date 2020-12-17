@@ -12,7 +12,7 @@ defmodule EpicenterWeb.Router do
 
     plug :put_secure_browser_headers, %{
       "content-security-policy" =>
-        "default-src 'self'; style-src 'self' 'unsafe-inline' 'unsafe-eval' fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src fonts.gstatic.com; connect-src 'self' ws:;"
+        "default-src 'self'; style-src 'self' 'unsafe-inline' 'unsafe-eval' fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src fonts.gstatic.com; connect-src 'self' ws: wss:;"
     }
 
     plug :fetch_current_user
