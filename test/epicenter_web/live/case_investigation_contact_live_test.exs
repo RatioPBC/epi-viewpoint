@@ -136,50 +136,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       assert text =~ "Infectious period: Unavailable"
     end
 
-    test "validates the fields", %{conn: conn, case_investigation: case_investigation} do
-      view =
-        Pages.CaseInvestigationContact.visit(conn, case_investigation)
-        |> Pages.CaseInvestigationContact.assert_here()
-
-      assert %{
-               "contact_form[first_name]" => "",
-               "contact_form[last_name]" => "",
-               "contact_form[phone]" => ""
-             } = Pages.form_state(view)
-
-      view
-      |> Pages.submit_live("#case-investigation-contact-form",
-        contact_form: %{
-          "first_name" => "",
-          "last_name" => "",
-          "most_recent_date_together" => "",
-          "under_18" => "false",
-          "same_household" => "false",
-          "phone" => ""
-        }
-      )
-      |> Pages.assert_validation_messages(%{
-        "contact_form[first_name]" => "can't be blank",
-        "contact_form[last_name]" => "can't be blank",
-        "contact_form[most_recent_date_together]" => "can't be blank",
-        "contact_form[relationship_to_case]" => "can't be blank"
-      })
-      |> Pages.submit_live("#case-investigation-contact-form",
-        contact_form: %{
-          "first_name" => "Alice",
-          "last_name" => "Testuser",
-          "relationship_to_case" => "Family",
-          "most_recent_date_together" => "10/32/2020",
-          "under_18" => "false",
-          "same_household" => "false",
-          "phone" => ""
-        }
-      )
-      |> Pages.assert_validation_messages(%{
-        "contact_form[most_recent_date_together]" => "must be a valid MM/DD/YYYY date"
-      })
-    end
-
     test "marking a contact as under_18 collects the phone number for the guardian", %{
       conn: conn,
       case_investigation: case_investigation
@@ -398,6 +354,50 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
   end
 
   describe "validations" do
+    test "validates the fields when creating a contact investigation", %{conn: conn, case_investigation: case_investigation} do
+      view =
+        Pages.CaseInvestigationContact.visit(conn, case_investigation)
+        |> Pages.CaseInvestigationContact.assert_here()
+
+      assert %{
+               "contact_form[first_name]" => "",
+               "contact_form[last_name]" => "",
+               "contact_form[phone]" => ""
+             } = Pages.form_state(view)
+
+      view
+      |> Pages.submit_live("#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "",
+          "last_name" => "",
+          "most_recent_date_together" => "",
+          "under_18" => "false",
+          "same_household" => "false",
+          "phone" => ""
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "contact_form[first_name]" => "can't be blank",
+        "contact_form[last_name]" => "can't be blank",
+        "contact_form[most_recent_date_together]" => "can't be blank",
+        "contact_form[relationship_to_case]" => "can't be blank"
+      })
+      |> Pages.submit_live("#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "relationship_to_case" => "Family",
+          "most_recent_date_together" => "10/32/2020",
+          "under_18" => "false",
+          "same_household" => "false",
+          "phone" => ""
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "contact_form[most_recent_date_together]" => "must be a valid MM/DD/YYYY date"
+      })
+    end
+
     test "shows validation errors on submit", %{conn: conn, case_investigation: case_investigation} do
       Pages.CaseInvestigationContact.visit(conn, case_investigation)
       |> Pages.assert_validation_messages(%{})
@@ -410,6 +410,52 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         "contact_form[relationship_to_case]" => "can't be blank"
       })
       |> Pages.assert_save_error("Check errors above")
+    end
+
+    test "it doesn't crash when there are last name validation errors", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationContact.assert_here()
+      |> Pages.submit_live("#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "harry",
+          "last_name" => "potter",
+          "most_recent_date_together" => "12/16/2020",
+          "under_18" => "false",
+          "same_household" => "false",
+          "relationship_to_case" => "Family"
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "contact_form[last_name]" => "In non-PHI environment, must start with 'Testuser'"
+      })
+    end
+
+    test "it doesn't crash when there are guardian phone validation errors", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationContact.assert_here()
+      |> Pages.CaseInvestigationContact.change_form(
+        contact_form: %{
+          "under_18" => "true",
+          "same_household" => "true",
+          "first_name" => "Jared"
+        }
+      )
+      |> Pages.submit_live("#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "relationship_to_case" => "Family",
+          "most_recent_date_together" => "10/15/2020",
+          "under_18" => "true",
+          "guardian_name" => "Cuthbert Testuser",
+          "same_household" => "false",
+          "guardian_phone" => "3031231234"
+        }
+      )
+      |> render()
+      |> Pages.assert_validation_messages(%{
+        "contact_form[guardian_phone]" => "In non-PHI environment, must match '111-111-1xxx'"
+      })
     end
   end
 

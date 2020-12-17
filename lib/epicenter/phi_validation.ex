@@ -39,6 +39,12 @@ defmodule Epicenter.PhiValidation do
     |> validate_change(:guardian_phone, &phone_number_validator/2)
   end
 
+  defp validate(changeset, :contact_investigation_form) do
+    changeset
+    |> validate_change(:last_name, &last_name_validator/2)
+    |> validate_change(:guardian_phone, &phone_number_validator/2)
+  end
+
   # # #
 
   @four_digits_followed_by_fake_street ~r|\A\d{4} Test St\z|

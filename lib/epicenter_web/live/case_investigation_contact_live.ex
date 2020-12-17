@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.CaseInvestigationContactLive do
   use EpicenterWeb, :live_view
 
+  import Epicenter.PhiValidation, only: [validate_phi: 2]
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
@@ -78,6 +79,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         :under_18,
         :most_recent_date_together
       ])
+      |> validate_phi(:contact_investigation_form)
       |> ContactInvestigation.validate_guardian_fields()
       |> Validation.validate_date(:most_recent_date_together)
     end
@@ -147,7 +149,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     with {:form, {:ok, data}} <- {:form, ContactForm.changeset(contact_investigation, params) |> ContactForm.contact_params()},
          data = data |> Map.put(:exposing_case_id, socket.assigns.case_investigation.id),
-         {:ok, _} <- create_or_update_contact_investigation(contact_investigation, data, socket.assigns.current_user) do
+         {:created, {:ok, _}} <- {:created, create_or_update_contact_investigation(contact_investigation, data, socket.assigns.current_user)} do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
@@ -155,6 +157,12 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       {:form, {:error, changeset}} ->
         socket
         |> assign_form_changeset(changeset, "Check errors above")
+        |> noreply()
+
+      {:created, {:error, _changeset}} ->
+        socket
+        # This case should be unreachable as long as UI validation is more strict than db validation
+        |> assign(:form_error, "Validation failed and your contact form changes could not be saved")
         |> noreply()
     end
   end
