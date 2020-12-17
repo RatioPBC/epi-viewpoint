@@ -10,12 +10,10 @@ defmodule EpicenterWeb.StyleguideLiveTest do
       conn |> Pages.visit("/styleguide") |> render()
     end
 
-    @tag :skip
     test "form styleguide page", %{conn: conn} do
       conn |> Pages.visit("/styleguide/form") |> render()
     end
 
-    @tag :skip
     test "form-builder styleguide page", %{conn: conn} do
       conn |> Pages.visit("/styleguide/form-builder") |> render()
     end

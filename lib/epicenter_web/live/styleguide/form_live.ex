@@ -156,10 +156,10 @@ defmodule EpicenterWeb.Styleguide.FormLive do
   # # #
 
   def genres(),
-    do: ["Comedy", "Drama", "Musical", "Science Fiction"]
+    do: [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}, {"Science Fiction", "scifi"}]
 
   def languages(),
-    do: ["English", "German", "Italian"]
+    do: [{"English", "english"}, {"German", "german"}, {"Italian", "italian"}]
 
   def statuses(),
     do: [{"In Stock", "in-stock"}, {"Out Of Stock", "out-of-stock"}]

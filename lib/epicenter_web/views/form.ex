@@ -76,20 +76,23 @@ defmodule EpicenterWeb.Form do
 
   `type` can be: `:checkbox`, `:radio`, `:other_checkbox`, or `:other_radio`
 
-  The form field ecto type can be: `:string`, `{:array, :string}`, or `:map`. When it's a map, it should be
-  in the shape returned by `MajorDetailed.for_form`.
+  The form field ecto type can be: `:string` (for radios), `{:array, :string}` (for checkboxes),
+  or `:map` (for fields with children or with an "other" field). When it's a map, it should be
+  in the shape returned by `MajorDetailed.for_form`. When putting the resulting data into a model,
+  use `MajorDetailed.for_model(:map)` if the model's ecto type is `:map`, or `MajorDetailed.for_model(:list)`
+  if the model's ecto type is `{:array, :string}`.
 
   ## Options
 
     * `:span` - the number of grid columns the field should span
   """
-  def multiselect(%Form.Line{f: f} = line, field, label_text, values, opts \\ []) do
+  def multiselect(%Form.Line{f: f} = line, field, label_text, specs, opts \\ []) do
     [
       label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
       content_tag(
         :div,
-        Multiselect.multiselect_inputs(f, field, values, nil),
+        Multiselect.multiselect_inputs(f, field, specs, nil),
         data: grid_data(3, line, opts) ++ [multiselect: "container"]
       )
     ]
