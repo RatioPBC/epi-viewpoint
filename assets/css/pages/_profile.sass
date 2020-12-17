@@ -47,6 +47,10 @@
     table#lab-results-data
       @include data-table
 
+  .complete-interview-case-investigation-link, .complete-interview-link
+    @include button-primary
+    margin-right: 1.4rem
+
   section.case-investigation
     @include card
 
@@ -73,10 +77,6 @@
           color: $completed-color
 
       .start-interview-case-investigation-link
-        @include button-primary
-        margin-right: 1.4rem
-
-      .complete-interview-case-investigation-link
         @include button-primary
         margin-right: 1.4rem
 
