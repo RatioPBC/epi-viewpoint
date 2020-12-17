@@ -12,6 +12,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   def mount(_params, _session, socket) do
     socket
     |> assign_defaults()
+    |> assign(current_user: %User{})
     |> assign_page_title("Styleguide: note")
     |> assign(notes: example_notes())
     |> ok()

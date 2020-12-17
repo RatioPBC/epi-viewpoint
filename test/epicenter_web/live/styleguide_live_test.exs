@@ -25,7 +25,6 @@ defmodule EpicenterWeb.StyleguideLiveTest do
       conn |> Pages.visit("/styleguide/form-multiselect") |> render()
     end
 
-    @tag :skip
     test "investigation notes styleguide page", %{conn: conn} do
       conn |> Pages.visit("/styleguide/investigation-notes-section") |> render()
     end
