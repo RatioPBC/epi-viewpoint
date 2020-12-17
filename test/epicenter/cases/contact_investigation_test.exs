@@ -30,6 +30,8 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
           {:interview_started_at, :utc_datetime},
           {:interview_status, :string},
           {:most_recent_date_together, :date},
+          {:quarantine_monitoring_ends_on, :date},
+          {:quarantine_monitoring_starts_on, :date},
           {:relationship_to_case, :string},
           {:seq, :integer},
           {:symptoms, {:array, :string}},

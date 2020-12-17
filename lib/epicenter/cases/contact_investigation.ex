@@ -44,6 +44,8 @@ defmodule Epicenter.Cases.ContactInvestigation do
     field :interview_started_at, :utc_datetime
     field :interview_status, :string, read_after_writes: true
     field :most_recent_date_together, :date
+    field :quarantine_monitoring_ends_on, :date
+    field :quarantine_monitoring_starts_on, :date
     field :relationship_to_case, :string
     field :seq, :integer, read_after_writes: true
     field :symptoms, {:array, :string}
