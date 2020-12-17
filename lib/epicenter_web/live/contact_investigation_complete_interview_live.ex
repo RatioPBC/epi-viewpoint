@@ -18,7 +18,7 @@ defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLive do
     |> assign_page_title("Complete interview")
     |> authenticate_user(session)
     |> assign(:contact_investigation, contact_investigation)
-    |> assign_form_changeset(CompleteInterviewForm.changeset(%{interview_completed_at: nil}, %{}))
+    |> assign_form_changeset(CompleteInterviewForm.changeset(contact_investigation, %{}))
     |> assign(:person, person)
     |> ok()
   end
@@ -56,6 +56,9 @@ defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLive do
   end
 
   # # #
+
+  def header_text(%{interview_completed_at: nil}), do: "Complete interview"
+  def header_text(%{interview_completed_at: _}), do: "Edit interview"
 
   def assign_form_changeset(socket, form_changeset, form_error \\ nil),
     do: socket |> assign(form_changeset: form_changeset, form_error: form_error)

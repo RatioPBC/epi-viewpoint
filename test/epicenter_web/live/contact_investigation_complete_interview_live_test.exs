@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
@@ -27,6 +28,7 @@ defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLiveTest do
     refute contact_investigation.interview_completed_at
 
     Pages.ContactInvestigationCompleteInterview.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationCompleteInterview.assert_header("Complete interview")
     |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-complete-interview-form",
       complete_interview_form: %{
         "date_completed" => "09/06/2020",
@@ -40,5 +42,22 @@ defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLiveTest do
     assert contact_investigation.interview_completed_at
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == contact_investigation.interview_completed_at
     assert_recent_audit_log(contact_investigation, user, action: "update-contact-investigation", event: "complete-contact-investigation-interview")
+  end
+
+  test "editing complete contact investigation", %{conn: conn, contact_investigation: contact_investigation, user: user} do
+    {:ok, contact_investigation} =
+      Cases.update_contact_investigation(contact_investigation, {
+        %{interview_completed_at: ~U[2020-01-02 16:18:42Z]},
+        %AuditLog.Meta{
+          author_id: user.id,
+          reason_action: AuditLog.Revision.update_contact_investigation_action(),
+          reason_event: AuditLog.Revision.complete_contact_investigation_interview_event()
+        }
+      })
+
+    Pages.ContactInvestigationCompleteInterview.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationCompleteInterview.assert_header("Edit interview")
+    |> Pages.ContactInvestigationCompleteInterview.assert_time_completed("11:18", "AM")
+    |> Pages.ContactInvestigationCompleteInterview.assert_date_completed("01/02/2020")
   end
 end

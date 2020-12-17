@@ -1,7 +1,7 @@
 #contact-investigation-complete-interview-page data-page="contact-investigation-complete-interview"
 
   section#contact-investigation-complete-interview
-    h2 Complete interview
+    h2 data-role="complete-interview-title"= header_text(@contact_investigation)
 
     = form_for @form_changeset, "#", [id: "contact-investigation-complete-interview-form", phx_submit: "save"], fn f ->
       = complete_interview_form_builder(f)
