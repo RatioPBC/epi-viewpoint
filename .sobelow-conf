@@ -7,6 +7,6 @@
   format: "compact",
   out: "",
   threshold: "low",
-  ignore: ["Config.CSP", "Config.HTTPS"],
+  ignore: ["Config.HTTPS"],
   ignore_files: [""]
 ]

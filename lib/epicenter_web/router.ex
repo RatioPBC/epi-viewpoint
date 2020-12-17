@@ -9,7 +9,12 @@ defmodule EpicenterWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, {EpicenterWeb.LayoutView, :root}
     plug :protect_from_forgery
-    plug :put_secure_browser_headers
+
+    plug :put_secure_browser_headers, %{
+      "content-security-policy" =>
+        "default-src 'self'; style-src 'self' 'unsafe-inline' 'unsafe-eval' fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src fonts.gstatic.com; connect-src 'self' ws:;"
+    }
+
     plug :fetch_current_user
     plug :protected_via_basic_auth
   end
