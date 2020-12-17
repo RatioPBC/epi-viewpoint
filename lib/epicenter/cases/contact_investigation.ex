@@ -16,6 +16,7 @@ defmodule Epicenter.Cases.ContactInvestigation do
     guardian_name
     guardian_phone
     household_member
+    interview_completed_at
     interview_discontinue_reason
     interview_discontinued_at
     interview_proxy_name
@@ -36,6 +37,7 @@ defmodule Epicenter.Cases.ContactInvestigation do
     field :guardian_name, :string
     field :guardian_phone, :string
     field :household_member, :boolean
+    field :interview_completed_at, :utc_datetime
     field :interview_discontinue_reason, :string
     field :interview_discontinued_at, :utc_datetime
     field :interview_proxy_name, :string

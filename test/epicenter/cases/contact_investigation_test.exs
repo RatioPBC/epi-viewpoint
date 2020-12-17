@@ -23,6 +23,7 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
           {:household_member, :boolean},
           {:id, :binary_id},
           {:inserted_at, :utc_datetime},
+          {:interview_completed_at, :utc_datetime},
           {:interview_discontinue_reason, :string},
           {:interview_discontinued_at, :utc_datetime},
           {:interview_proxy_name, :string},
@@ -71,6 +72,20 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
     test "discontinued when interview_discontinued_at is not null" do
       {:ok, contact_investigation} = new_changeset(interview_discontinued_at: DateTime.utc_now()) |> Repo.insert()
       assert contact_investigation.interview_status == "discontinued"
+    end
+
+    test "started when interview_started_at is not null" do
+      {:ok, contact_investigation} = new_changeset(%{interview_started_at: DateTime.utc_now()}) |> Repo.insert()
+      assert contact_investigation.interview_status == "started"
+    end
+
+    test "completed when interview_completed_interview is not null and interview_started_at is not null" do
+      {:ok, contact_investigation} =
+        %{interview_completed_at: DateTime.utc_now(), interview_started_at: DateTime.utc_now()}
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert contact_investigation.interview_status == "completed"
     end
   end
 end
