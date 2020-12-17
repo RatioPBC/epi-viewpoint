@@ -4,7 +4,6 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
   import Ecto.Changeset
   import EpicenterWeb.Views.DateExtraction, only: [convert_time: 3, extract_and_validate_date: 4]
 
-  alias Epicenter.Cases.CaseInvestigation
   alias EpicenterWeb.Format
 
   @primary_key false
@@ -16,17 +15,15 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
 
   @required_attrs ~w{date_completed time_completed time_completed_am_pm}a
 
-  def changeset(%CaseInvestigation{} = case_investigation, attrs) do
-    case_investigation
-    |> case_investigation_complete_investigation_form_attrs()
+  def changeset(%{interview_completed_at: _interview_completed_at} = investigation, attrs) do
+    investigation
+    |> investigation_complete_interview_form_attrs()
     |> cast(attrs, @required_attrs)
     |> validate_required(@required_attrs)
     |> extract_and_validate_date(:date_completed, :time_completed, :time_completed_am_pm)
   end
 
-  defp case_investigation_complete_investigation_form_attrs(%CaseInvestigation{} = case_investigation) do
-    %{interview_completed_at: interview_completed_at} = case_investigation
-
+  defp investigation_complete_interview_form_attrs(%{interview_completed_at: interview_completed_at}) do
     if interview_completed_at == nil do
       Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
       |> form_attrs_from_date_time()
@@ -37,7 +34,7 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
     end
   end
 
-  def case_investigation_attrs(%Ecto.Changeset{} = changeset) do
+  def investigation_attrs(%Ecto.Changeset{} = changeset) do
     with {:ok, complete_interview_form} <- apply_action(changeset, :create) do
       {:ok, interview_completed_at} = convert_time_completed_and_date_completed(complete_interview_form)
       {:ok, %{interview_completed_at: interview_completed_at}}

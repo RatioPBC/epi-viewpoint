@@ -261,6 +261,17 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_contact_investigation_has_history(%View{} = view, history_texts) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find!("[data-role=contact-investigation-history-item-text]")
+    |> Test.Html.text()
+    |> assert_eq(history_texts)
+
+    view
+  end
+
   def click_start_interview_case_investigation(%View{} = view, number) do
     view
     |> element("#start-interview-case-investigation-link-#{number}")
@@ -545,6 +556,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   def click_edit_interview_start_details(%View{} = view, contact_investigation_tid) do
     view
     |> element("[data-tid=#{contact_investigation_tid}] [data-role=contact-investigation-start-interview-edit-link]")
+    |> render_click()
+  end
+
+  def click_edit_interview_completion_details(%View{} = view, contact_investigation_tid) do
+    view
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=contact-investigation-complete-interview-edit-link]")
     |> render_click()
   end
 

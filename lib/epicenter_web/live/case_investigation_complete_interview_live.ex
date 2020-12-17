@@ -49,7 +49,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
 
   def handle_event("save", %{"complete_interview_form" => params}, socket) do
     with %Ecto.Changeset{} = form_changeset <- CompleteInterviewForm.changeset(socket.assigns.case_investigation, params),
-         {:form, {:ok, case_investigation_attrs}} <- {:form, CompleteInterviewForm.case_investigation_attrs(form_changeset)},
+         {:form, {:ok, case_investigation_attrs}} <- {:form, CompleteInterviewForm.investigation_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, case_investigation_attrs)} do
       socket |> redirect_to_profile_page() |> noreply()
     else

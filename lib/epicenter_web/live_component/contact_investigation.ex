@@ -39,6 +39,9 @@ defmodule EpicenterWeb.ContactInvestigation do
           redirect_to(contact_investigation, :discontinue_interview)
         ]
 
+      "completed" ->
+        []
+
       "discontinued" ->
         []
     end

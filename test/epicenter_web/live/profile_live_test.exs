@@ -817,6 +817,31 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.click_edit_interview_start_details("contact_investigation")
       |> assert_redirects_to("/contact-investigations/#{contact_investigation.id}/start-interview")
     end
+
+    test "looking at a complete contact investigation interview", %{conn: conn, user: user, person: sick_person} do
+      contact_investigation =
+        create_contact_investigation(user, sick_person, %{}, %{}, %{
+          tid: "contact_investigation",
+          interview_started_at: ~U[2020-12-08 11:00:00Z],
+          interview_completed_at: ~U[2020-12-08 11:30:00Z]
+        })
+
+      view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
+
+      assert [
+               %{
+                 interview_buttons: [],
+                 interview_history_items: [
+                   "Started interview with Caroline Testuser on 12/08/2020 at 06:00am EST",
+                   "Completed interview on 12/08/2020 at 06:30am EST"
+                 ]
+               }
+             ] = Pages.Profile.contact_investigations(view)
+
+      view
+      |> Pages.Profile.click_edit_interview_completion_details("contact_investigation")
+      |> assert_redirects_to("/contact-investigations/#{contact_investigation.id}/complete-interview")
+    end
   end
 
   describe "assigning and unassigning user to a person" do

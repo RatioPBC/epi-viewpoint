@@ -2,3 +2,6 @@
 
   section#contact-investigation-complete-interview
     h2 Complete interview
+
+    = form_for @form_changeset, "#", [id: "contact-investigation-complete-interview-form", phx_submit: "save"], fn f ->
+      = complete_interview_form_builder(f)
