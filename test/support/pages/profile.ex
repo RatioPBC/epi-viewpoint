@@ -530,7 +530,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
-  def click_complete_contact_investigation(%View{} = view, contact_investigation_tid) do
+  def click_contact_investigation_complete_interview(%View{} = view, contact_investigation_tid) do
     view
     |> element("[data-tid=#{contact_investigation_tid}] [data-role=contact-investigation-complete-interview-link]")
     |> render_click()

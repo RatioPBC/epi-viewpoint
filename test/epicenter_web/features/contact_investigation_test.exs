@@ -9,13 +9,8 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
   setup :register_and_log_in_user
 
   setup %{user: user} do
-    sick_person =
-      Test.Fixtures.person_attrs(user, "alice")
-      |> Cases.create_person!()
-
-    lab_result =
-      Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07])
-      |> Cases.create_lab_result!()
+    sick_person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+    lab_result = Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07]) |> Cases.create_lab_result!()
 
     case_investigation =
       Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation")
@@ -27,63 +22,57 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       |> Cases.create_contact_investigation()
 
     exposed_person = Cases.get_person(contact_investigation.exposed_person_id)
+
     [contact_investigation: contact_investigation, exposed_person: exposed_person]
   end
 
   test "user can discontinue a contact investigation", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person} do
-    view =
-      conn
-      |> Pages.Profile.visit(exposed_person)
-      |> Pages.Profile.assert_here(exposed_person)
-
-    assert [%{status: "Pending"}] = Pages.Profile.contact_investigations(view)
-
-    contact_investigations =
-      view
-      |> Pages.Profile.click_discontinue_contact_investigation(contact_investigation.tid)
-      |> Pages.follow_live_view_redirect(conn)
-      |> Pages.ContactInvestigationDiscontinue.assert_here(contact_investigation)
-      |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-discontinue-form",
-        contact_investigation: %{"interview_discontinue_reason" => "Unable to reach"}
-      )
-      |> Pages.Profile.assert_here(contact_investigation.exposed_person)
-      |> Pages.Profile.contact_investigations()
-
-    assert [%{status: "Discontinued"}] = contact_investigations
+    conn
+    |> Pages.Profile.visit(exposed_person)
+    |> Pages.Profile.assert_here(exposed_person)
+    |> Epicenter.Extra.tap(fn view ->
+      assert [%{status: "Pending"}] = Pages.Profile.contact_investigations(view)
+    end)
+    |> Pages.Profile.click_discontinue_contact_investigation(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationDiscontinue.assert_here(contact_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-discontinue-form",
+      contact_investigation: %{"interview_discontinue_reason" => "Unable to reach"}
+    )
+    |> Pages.Profile.assert_here(contact_investigation.exposed_person)
+    |> Epicenter.Extra.tap(fn view ->
+      assert [%{status: "Discontinued"}] = Pages.Profile.contact_investigations(view)
+    end)
   end
 
   test "user can conduct a contact investigation", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person} do
-    view =
-      conn
-      |> Pages.Profile.visit(exposed_person)
-      |> Pages.Profile.assert_here(exposed_person)
-
-    assert [%{status: "Pending"}] = Pages.Profile.contact_investigations(view)
-
-    view =
-      view
-      |> Pages.Profile.click_start_contact_investigation(contact_investigation.tid)
-      |> Pages.follow_live_view_redirect(conn)
-      |> Pages.ContactInvestigationStartInterview.assert_here()
-      |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
-        start_interview_form: %{
-          "person_interviewed" => "Alice's guardian",
-          "date_started" => "09/06/2020",
-          "time_started" => "03:45",
-          "time_started_am_pm" => "PM"
-        }
-      )
-      |> Pages.Profile.assert_here(contact_investigation.exposed_person)
-
-    assert [
-             %{
-               interview_buttons: ["Complete interview", "Discontinue"],
-               interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
-               status: "Ongoing"
-             }
-           ] = Pages.Profile.contact_investigations(view)
-
-    view
+    conn
+    |> Pages.Profile.visit(exposed_person)
+    |> Pages.Profile.assert_here(exposed_person)
+    |> Epicenter.Extra.tap(fn view ->
+      assert [%{status: "Pending"}] = Pages.Profile.contact_investigations(view)
+    end)
+    |> Pages.Profile.click_start_contact_investigation(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationStartInterview.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-interview-start-form",
+      start_interview_form: %{
+        "person_interviewed" => "Alice's guardian",
+        "date_started" => "09/06/2020",
+        "time_started" => "03:45",
+        "time_started_am_pm" => "PM"
+      }
+    )
+    |> Pages.Profile.assert_here(contact_investigation.exposed_person)
+    |> Epicenter.Extra.tap(fn view ->
+      assert [
+               %{
+                 interview_buttons: ["Complete interview", "Discontinue"],
+                 interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
+                 status: "Ongoing"
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end)
     |> Pages.Profile.click_edit_contact_clinical_details_link(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.ContactInvestigationClinicalDetails.assert_here()
@@ -100,6 +89,8 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       exposed_on: "09/06/2020",
       symptoms: "Fever > 100.4F, Chills"
     })
-    |> Pages.Profile.click_complete_contact_investigation(contact_investigation.tid)
+    |> Pages.Profile.click_contact_investigation_complete_interview(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationCompleteInterview.assert_here()
   end
 end
