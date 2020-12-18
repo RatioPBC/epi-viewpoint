@@ -11,6 +11,7 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   defp status_class(%ContactInvestigation{} = %{interview_status: status}) do
     case status do
+      "completed" -> "completed-status"
       "discontinued" -> "discontinued-status"
       "started" -> "started-status"
       _ -> "pending-status"
@@ -19,6 +20,7 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   defp status_text(%ContactInvestigation{} = %{interview_status: status}) do
     case status do
+      "completed" -> "Completed"
       "discontinued" -> "Discontinued"
       "started" -> "Ongoing"
       _ -> "Pending"
