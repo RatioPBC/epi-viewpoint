@@ -99,6 +99,11 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
         "time_completed_am_pm" => "PM"
       }
     )
+    |> Components.ContactInvestigation.assert_clinical_details(%{
+      clinical_status: "Symptomatic",
+      exposed_on: "09/06/2020",
+      symptoms: "Fever > 100.4F, Chills"
+    })
     |> Pages.Profile.assert_here(exposed_person)
     |> Epicenter.Extra.tap(fn view ->
       assert [%{status: "Completed"}] = Pages.Profile.contact_investigations(view)

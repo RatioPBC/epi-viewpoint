@@ -34,7 +34,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
             span data-role="contact-investigation-history-item-text" = history_item.text
             span class="history-item-link" = history_item.link
 
-    = if @contact_investigation.interview_status in ["started"] do
+    = if @contact_investigation.interview_status in ["started", "completed"] do
       .clinical-details
         .clinical-details-header-row
           h4
