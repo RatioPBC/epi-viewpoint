@@ -146,6 +146,10 @@
     .dotted-details
       @include dotted-details
 
+    .contact-investigation-sections
+      @include vertical-flow
+      @include dividers
+
     .contact-investigation-status-row
       @include level($justify: space-between)
 
@@ -162,8 +166,6 @@
         color: $completed-color
 
       .contact-investigation-interview-buttons
-        @include level($justify: space-between)
-
         .discontinue-link
           @include button-secondary
 
