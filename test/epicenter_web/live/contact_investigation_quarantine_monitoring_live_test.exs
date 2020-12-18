@@ -29,7 +29,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
   end
 
-  test "prefills start date with exposure date if present", %{conn: conn, contact_investigation: contact_investigation} do
+  test "prefills start date with exposure date", %{conn: conn, contact_investigation: contact_investigation} do
     Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("12/31/2019", "Exposure date: 12/31/2019")

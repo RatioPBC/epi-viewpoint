@@ -53,12 +53,8 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
       suggested_isolation_dates(contact_investigation)
     end
 
-    defp isolation_dates(%ContactInvestigation{quarantine_monitoring_starts_on: start_date, quarantine_monitoring_ends_on: end_date}) do
-      {Format.date(start_date), Format.date(end_date)}
-    end
-
     defp suggested_isolation_dates(%ContactInvestigation{exposed_on: exposed_on}) do
-      {exposed_on |> Format.date(), exposed_on |> Date.add(10) |> Format.date()}
+      {Format.date(exposed_on), nil}
     end
   end
 
