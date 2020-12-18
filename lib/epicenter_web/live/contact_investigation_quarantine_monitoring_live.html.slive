@@ -1,3 +1,6 @@
 #contact-investigation-quarantine-monitoring-page data-page="contact-investigation-quarantine-monitoring"
   section#contact-investigation-quarantine-monitoring
     h2 Add isolation dates
+
+    = form_for @form_changeset, "#", [id: "contact-investigation-quarantine-monitoring-form"], fn f ->
+      = quarantine_monitoring_form_builder(f, @contact_investigation)

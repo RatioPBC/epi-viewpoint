@@ -15,6 +15,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     {:ok, contact_investigation} =
       {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{
          exposing_case_id: case_investigation.id,
+         exposed_on: ~D[2019-12-31],
          interview_completed_at: ~U[2020-01-01 23:03:07Z],
          interview_started_at: ~U[2020-01-01 22:03:07Z]
        }), Test.Fixtures.admin_audit_meta()}
@@ -23,8 +24,15 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     [contact_investigation: contact_investigation, user: user]
   end
 
-  test "shows Quarantine monitoring form", %{conn: conn, contact_investigation: contact_investigation} do
+  test "shows quarantine monitoring page", %{conn: conn, contact_investigation: contact_investigation} do
     Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+  end
+
+  test "prefills start date with exposure date if present", %{conn: conn, contact_investigation: contact_investigation} do
+    Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("12/31/2019", "Exposure date: 12/31/2019")
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_recommended_length("Recommended length: 14 days")
   end
 end
