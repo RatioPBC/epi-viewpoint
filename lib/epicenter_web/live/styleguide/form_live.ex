@@ -4,7 +4,9 @@ defmodule EpicenterWeb.Styleguide.FormLive do
   import Epicenter.Validation, only: [validate_date: 2]
   import EpicenterWeb.FormHelpers, only: [checkbox_list: 4, radio_button_list: 5]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, noreply: 1, ok: 1]
 
   # fake schema (would be a database-backed schema in real code)
   defmodule Movie do
@@ -146,7 +148,7 @@ defmodule EpicenterWeb.Styleguide.FormLive do
       socket |> assign_form_changeset(form_changeset) |> assign_movie(movie) |> noreply()
     else
       {:movie_form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
-        socket |> assign_form_changeset(form_changeset) |> noreply()
+        socket |> assign_form_changeset(form_changeset, "Check the errors above") |> noreply()
 
       {:movie, {:error, _}} ->
         socket |> assign_form_changeset(MovieForm.changeset(params), "An unexpected error occurred") |> noreply()
@@ -168,10 +170,4 @@ defmodule EpicenterWeb.Styleguide.FormLive do
 
   defp assign_movie(socket, movie),
     do: socket |> assign(movie: movie, form_error: nil)
-
-  defp assign_form_changeset(socket, %Ecto.Changeset{valid?: false} = changeset),
-    do: socket |> assign_form_changeset(changeset, "Check the errors above")
-
-  defp assign_form_changeset(socket, %Ecto.Changeset{} = changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: changeset, form_error: form_error)
 end

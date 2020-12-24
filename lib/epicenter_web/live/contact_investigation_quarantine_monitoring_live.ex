@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, authenticate_user: 2, ok: 1]
 
   alias Epicenter.Cases
   alias EpicenterWeb.Form
@@ -89,7 +89,4 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end
-
-  defp assign_form_changeset(socket, form_changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
 end

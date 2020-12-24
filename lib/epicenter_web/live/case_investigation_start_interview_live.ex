@@ -4,7 +4,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.Forms.StartInterviewForm, only: [start_interview_form_builder: 2]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -46,9 +48,6 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   end
 
   # # #
-
-  def assign_form_changeset(socket, form_changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
 
   defp redirect_to_profile_page(socket),
     do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")

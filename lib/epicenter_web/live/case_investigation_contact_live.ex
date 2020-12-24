@@ -4,7 +4,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   import Epicenter.PhiValidation, only: [validate_phi: 2]
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -280,9 +282,5 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     )
     |> Form.line(&Form.footer(&1, form_error, span: 4))
     |> Form.safe()
-  end
-
-  defp assign_form_changeset(socket, changeset, form_error \\ nil) do
-    socket |> assign(changeset: changeset, form_error: form_error)
   end
 end

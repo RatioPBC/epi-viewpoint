@@ -3,7 +3,9 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   import EpicenterWeb.ConfirmationModal, only: [abandon_changes_confirmation_text: 0]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -123,7 +125,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
       socket |> redirect_to_profile_page() |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
-        socket |> assign_form_changeset(form_changeset) |> noreply()
+        socket |> assign_form_changeset(form_changeset, "Check the errors above") |> noreply()
 
       {:model, {:error, _}} ->
         socket |> assign_form_changeset(DemographicForm.attrs_to_form_changeset(params), "An unexpected error occurred") |> noreply()
@@ -147,13 +149,6 @@ defmodule EpicenterWeb.DemographicsEditLive do
         audit_meta = %{audit_meta | reason_action: AuditLog.Revision.update_demographics_action()}
         {:ok, _demographic} = Cases.update_demographic(demographic, {attrs, audit_meta})
     end
-  end
-
-  defp assign_form_changeset(socket, %Ecto.Changeset{valid?: false} = changeset),
-    do: socket |> assign_form_changeset(changeset, "Check the errors above")
-
-  defp assign_form_changeset(socket, %Ecto.Changeset{} = changeset, form_error \\ nil) do
-    socket |> assign(form_changeset: changeset, form_error: form_error)
   end
 
   defp redirect_to_profile_page(socket) do

@@ -12,6 +12,9 @@ defmodule EpicenterWeb.LiveHelpers do
     Enum.reduce(new_assigns, socket, fn {key, value}, socket_acc -> assign_new(socket_acc, key, fn -> value end) end)
   end
 
+  def assign_form_changeset(socket, form_changeset, form_error \\ nil),
+    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
+
   def assign_page_title(socket, page_title),
     do: socket |> assign(page_title: page_title)
 

@@ -3,7 +3,9 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -120,9 +122,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
 
   # # #
 
-  defp assign_form_changeset(socket, form_changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
-
   defp assign_person(socket, %Person{} = person),
     do: socket |> assign(person: person)
 
@@ -136,6 +135,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
       socket |> redirect_to_profile_page() |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        # TODO: Better error message
         socket |> assign_form_changeset(form_changeset, "Form error message") |> noreply()
     end
   end

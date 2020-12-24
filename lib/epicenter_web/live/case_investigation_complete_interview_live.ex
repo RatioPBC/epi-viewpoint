@@ -3,7 +3,9 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -21,7 +23,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     |> assign_page_title("Complete interview")
     |> assign(:case_investigation, case_investigation)
     |> assign(:confirmation_prompt, nil)
-    |> assign(:form_changeset, CompleteInterviewForm.changeset(case_investigation, %{}))
+    |> assign_form_changeset(CompleteInterviewForm.changeset(case_investigation, %{}))
     |> assign(:person, person)
     |> ok()
   end
@@ -44,7 +46,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
   def handle_event("change", %{"complete_interview_form" => params}, socket) do
     new_changeset = CompleteInterviewForm.changeset(socket.assigns.case_investigation, params)
 
-    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset)) |> assign_form_changeset(new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"complete_interview_form" => params}, socket) do
@@ -64,9 +66,6 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
   end
 
   # # #
-
-  def assign_form_changeset(socket, form_changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
 
   defp update_case_investigation(socket, params) do
     Cases.update_case_investigation(

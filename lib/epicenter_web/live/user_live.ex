@@ -2,7 +2,17 @@ defmodule EpicenterWeb.UserLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_admin_user!: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [
+      assign_defaults: 1,
+      assign_form_changeset: 2,
+      assign_form_changeset: 3,
+      assign_page_title: 2,
+      authenticate_admin_user!: 2,
+      noreply: 1,
+      ok: 1
+    ]
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
@@ -164,11 +174,5 @@ defmodule EpicenterWeb.UserLive do
     |> Form.line(&Form.select(&1, :status, "Status", [{"Active", "active"}, {"Inactive", "inactive"}]))
     |> Form.line(&Form.footer(&1, form_error, span: 4))
     |> Form.safe()
-  end
-
-  # # #
-
-  defp assign_form_changeset(socket, form_changeset, form_error \\ nil) do
-    socket |> assign(form_changeset: form_changeset, form_error: form_error)
   end
 end

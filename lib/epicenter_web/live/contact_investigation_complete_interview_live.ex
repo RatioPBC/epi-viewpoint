@@ -2,7 +2,9 @@ defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -13,13 +15,14 @@ defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLive do
   def mount(%{"id" => contact_investigation_id}, session, socket) do
     contact_investigation = Cases.get_contact_investigation(contact_investigation_id)
     person = contact_investigation |> Cases.preload_exposed_person() |> Map.get(:exposed_person)
+    form_changeset = CompleteInterviewForm.changeset(contact_investigation, %{})
 
     socket
     |> assign_defaults()
     |> assign_page_title("Complete interview")
     |> authenticate_user(session)
     |> assign(:contact_investigation, contact_investigation)
-    |> assign_form_changeset(CompleteInterviewForm.changeset(contact_investigation, %{}))
+    |> assign_form_changeset(form_changeset)
     |> assign(:person, person)
     |> ok()
   end
@@ -60,9 +63,6 @@ defmodule EpicenterWeb.ContactInvestigationCompleteInterviewLive do
 
   def header_text(%{interview_completed_at: nil}), do: "Complete interview"
   def header_text(%{interview_completed_at: _}), do: "Edit interview"
-
-  def assign_form_changeset(socket, form_changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: form_changeset, form_error: form_error)
 
   defp update_contact_investigation(socket, params) do
     Cases.update_contact_investigation(

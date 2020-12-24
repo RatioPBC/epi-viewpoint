@@ -3,7 +3,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Ecto.Changeset
   alias Epicenter.AuditLog
@@ -19,21 +19,21 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     |> assign_defaults()
     |> assign_page_title("Discontinue Case Investigation")
     |> assign(case_investigation: case_investigation)
-    |> assign(changeset: Cases.change_case_investigation(case_investigation, %{}))
+    |> assign_form_changeset(Cases.change_case_investigation(case_investigation, %{}))
     |> assign(person: person)
     |> ok()
   end
 
   def handle_event("change", %{"case_investigation" => params}, socket) do
     changeset = socket.assigns.case_investigation |> Cases.change_case_investigation(params)
-    socket |> assign(changeset: changeset) |> noreply()
+    socket |> assign_form_changeset(changeset) |> noreply()
   end
 
   def handle_event("save", %{"case_investigation" => params}, socket) do
     params = Map.put(params, "interview_discontinued_at", DateTime.utc_now())
 
     with {:ok, _} <-
-           socket.assigns.changeset
+           socket.assigns.form_changeset
            |> Changeset.cast(params, [:interview_discontinue_reason])
            |> Changeset.validate_required([:interview_discontinue_reason])
            |> Changeset.apply_action(:update),
@@ -52,7 +52,8 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
       |> noreply()
     else
       {:error, changeset} ->
-        socket |> assign(changeset: changeset) |> noreply()
+        # TODO: Error message maybe?
+        socket |> assign_form_changeset(changeset) |> noreply()
     end
   end
 

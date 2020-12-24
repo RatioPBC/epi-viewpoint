@@ -1,7 +1,8 @@
 defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias EpicenterWeb.Form
 
@@ -153,7 +154,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
       socket |> assign_form_changeset(form_changeset) |> assign_example(example) |> noreply()
     else
       {:example_form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
-        socket |> assign_form_changeset(form_changeset) |> noreply()
+        socket |> assign_form_changeset(form_changeset, "Check the errors above") |> noreply()
 
       {:example, {:error, _}} ->
         socket |> assign_form_changeset(ExampleForm.changeset(params), "An unexpected error occurred") |> noreply()
@@ -236,10 +237,4 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
 
   defp assign_example(socket, example),
     do: socket |> assign(example: example, form_error: nil)
-
-  defp assign_form_changeset(socket, %Ecto.Changeset{valid?: false} = changeset),
-    do: socket |> assign_form_changeset(changeset, "Check the errors above")
-
-  defp assign_form_changeset(socket, %Ecto.Changeset{} = changeset, form_error \\ nil),
-    do: socket |> assign(form_changeset: changeset, form_error: form_error)
 end
