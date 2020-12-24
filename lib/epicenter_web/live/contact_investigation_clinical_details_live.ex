@@ -114,7 +114,11 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
          {:form, {:ok, contact_investigation_attrs}} <- {:form, ClinicalDetailsForm.contact_investigation_attrs(form_changeset)},
          {:contact_investigation, {:ok, _contact_investigation}} <-
            {:contact_investigation, update_contact_investigation(socket, contact_investigation_attrs)} do
-      socket |> redirect_to_profile_page() |> noreply()
+      person = socket.assigns.contact_investigation.exposed_person
+
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, person)}#contact-investigations")
+      |> noreply()
     else
       {:form, {:error, form_changeset}} ->
         socket |> assign(:form_changeset, form_changeset) |> noreply()
@@ -144,10 +148,5 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
          reason_event: AuditLog.Revision.edit_contact_investigation_clinical_details_event()
        }}
     )
-  end
-
-  defp redirect_to_profile_page(socket) do
-    person = socket.assigns.contact_investigation.exposed_person
-    socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, person)}#contact-investigations")
   end
 end

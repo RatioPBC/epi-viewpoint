@@ -37,7 +37,9 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
          {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
          {:contact_investigation, {:ok, _contact_investigation}} <-
            {:contact_investigation, update_contact_investigation(socket, cast_investigation_attrs)} do
-      socket |> redirect_to_profile_page() |> noreply()
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
+      |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset) |> noreply()
@@ -50,9 +52,6 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   end
 
   # # #
-
-  defp redirect_to_profile_page(socket),
-    do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
 
   defp update_contact_investigation(socket, params) do
     Cases.update_contact_investigation(

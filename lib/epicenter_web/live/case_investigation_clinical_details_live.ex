@@ -126,7 +126,9 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
            ),
          {:form, {:ok, case_investigation_attrs}} <- {:form, ClinicalDetailsForm.case_investigation_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, case_investigation_attrs)} do
-      socket |> redirect_to_profile_page() |> noreply()
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
+      |> noreply()
     else
       {:form, {:error, form_changeset}} ->
         socket |> assign(:form_changeset, form_changeset) |> noreply()
@@ -143,10 +145,5 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
          reason_event: AuditLog.Revision.edit_case_interview_clinical_details_event()
        }}
     )
-  end
-
-  defp redirect_to_profile_page(socket) do
-    person = socket.assigns.case_investigation.person
-    socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, person)}#case-investigations")
   end
 end

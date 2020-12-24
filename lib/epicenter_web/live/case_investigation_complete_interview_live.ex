@@ -53,7 +53,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     with %Ecto.Changeset{} = form_changeset <- CompleteInterviewForm.changeset(socket.assigns.case_investigation, params),
          {:form, {:ok, case_investigation_attrs}} <- {:form, CompleteInterviewForm.investigation_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, case_investigation_attrs)} do
-      socket |> redirect_to_profile_page() |> noreply()
+      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset) |> noreply()
@@ -78,7 +78,4 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
        }}
     )
   end
-
-  defp redirect_to_profile_page(socket),
-    do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
 end

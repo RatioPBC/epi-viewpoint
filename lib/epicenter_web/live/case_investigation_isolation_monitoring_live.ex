@@ -76,7 +76,15 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   end
 
   def handle_event("save", %{"isolation_monitoring_form" => params}, socket) do
-    save_and_redirect(socket, params)
+    with %Ecto.Changeset{} = form_changeset <- IsolationMonitoringForm.changeset(socket.assigns.case_investigation, params),
+         {:form, {:ok, model_attrs}} <- {:form, IsolationMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
+         {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, model_attrs)} do
+      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
+    else
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        # TODO: Better error message
+        socket |> assign_form_changeset(form_changeset, "Form error message") |> noreply()
+    end
   end
 
   def isolation_monitoring_form_builder(form, case_investigation) do
@@ -124,21 +132,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
 
   defp assign_person(socket, %Person{} = person),
     do: socket |> assign(person: person)
-
-  defp redirect_to_profile_page(socket),
-    do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
-
-  defp save_and_redirect(socket, params) do
-    with %Ecto.Changeset{} = form_changeset <- IsolationMonitoringForm.changeset(socket.assigns.case_investigation, params),
-         {:form, {:ok, model_attrs}} <- {:form, IsolationMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
-         {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, model_attrs)} do
-      socket |> redirect_to_profile_page() |> noreply()
-    else
-      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
-        # TODO: Better error message
-        socket |> assign_form_changeset(form_changeset, "Form error message") |> noreply()
-    end
-  end
 
   defp update_case_investigation(socket, params) do
     Cases.update_case_investigation(

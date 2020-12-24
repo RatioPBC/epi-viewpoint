@@ -77,7 +77,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
                  reason_event: AuditLog.Revision.conclude_case_investigation_isolation_monitoring_event()
                }}
             )} do
-      socket |> redirect_to_profile_page() |> noreply()
+      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign(:form_changeset, form_changeset) |> noreply()
@@ -99,7 +99,4 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
       _ -> "Conclude isolation monitoring"
     end
   end
-
-  defp redirect_to_profile_page(socket),
-    do: socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
 end
