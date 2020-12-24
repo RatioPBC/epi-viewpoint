@@ -52,7 +52,6 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
       |> noreply()
     else
       {:error, changeset} ->
-        # TODO: Error message maybe?
         socket |> assign_form_changeset(changeset) |> noreply()
     end
   end
