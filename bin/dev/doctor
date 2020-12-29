@@ -117,3 +117,7 @@ check "postgres: role exists" \
 check "postgres: dev database exists" \
   "psql -c '\l' epicenter_dev" \
   "mix ecto.setup # or if you have per-project postgres versions, perhaps: bin/dev/postgres-restart"
+
+check "phoenix: digested assets do not exist in dev env" \
+  "test $(find priv/static -type f -name '*.gz' | wc -l) -eq 0" \
+  "find priv/static -type f -name '*.gz' -delete"
