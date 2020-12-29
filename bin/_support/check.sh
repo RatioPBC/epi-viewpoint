@@ -10,19 +10,24 @@ check() {
 
   cecho -n --cyan "[checking] ${description}" --white "... "
 
-  eval "${command} > .doctor.out 2>&1"
-
-  if [ $? -eq 0 ]; then
-    cecho --green "OK"
+  if grep -x "${description}" .doctor.skip >/dev/null; then
+    cecho --yellow "SKIPPED" --white "via .doctor.skip file"
     return 0
   else
-    cecho --red "FAILED"
-    cat .doctor.out
-    echo
-    cecho --cyan "Possible remedy: " --yellow "${remedy}"
-    cecho --cyan "(it's in the clipboard)"
-    localcopy "$remedy"
-    exit 1
+    eval "${command} > .doctor.out 2>&1"
+
+    if [ $? -eq 0 ]; then
+      cecho --green "OK"
+      return 0
+    else
+      cecho --red "FAILED"
+      cat .doctor.out
+      echo
+      cecho --cyan "Possible remedy: " --yellow "${remedy}"
+      cecho --cyan "(it's in the clipboard)"
+      localcopy "$remedy"
+      exit 1
+    fi
   fi
 }
 

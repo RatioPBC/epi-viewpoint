@@ -2,6 +2,7 @@
 *.iml
 *.private.env.json
 .doctor.out
+.doctor.skip
 .envrc
 .idea
 .iex-history
