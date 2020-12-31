@@ -1,8 +1,10 @@
 defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias EpicenterWeb.Form
   alias EpicenterWeb.Format
@@ -59,15 +61,27 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
   end
 
   def mount(%{"id" => id}, session, socket) do
-    contact_investigation = Cases.get_contact_investigation(id)
+    contact_investigation = Cases.get_contact_investigation(id) |> Cases.preload_exposed_person()
 
     socket
     |> assign_defaults()
     |> assign_page_title(" Contact Investigation Quarantine Monitoring")
     |> authenticate_user(session)
     |> assign(:contact_investigation, contact_investigation)
+    |> assign(:person, contact_investigation.exposed_person)
     |> assign_form_changeset(QuarantineMonitoringForm.changeset(contact_investigation, %{}))
     |> ok()
+  end
+
+  def handle_event("save", %{"quarantine_monitoring_form" => params}, socket) do
+    with %Ecto.Changeset{} = form_changeset <- QuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params),
+         {:form, {:ok, model_attrs}} <- {:form, QuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
+         {:contact_investigation, {:ok, _contact_investigation}} <- {:contact_investigation, update_contact_investigation(socket, model_attrs)} do
+      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
+    else
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        socket |> assign_form_changeset(form_changeset, "Form error message") |> noreply()
+    end
   end
 
   def quarantine_monitoring_form_builder(form, contact_investigation) do
@@ -88,5 +102,19 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
     )
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
+  end
+
+  # # #
+
+  defp update_contact_investigation(socket, params) do
+    Cases.update_contact_investigation(
+      socket.assigns.contact_investigation,
+      {params,
+       %AuditLog.Meta{
+         author_id: socket.assigns.current_user.id,
+         reason_action: AuditLog.Revision.update_case_investigation_action(),
+         reason_event: AuditLog.Revision.edit_case_investigation_isolation_monitoring_event()
+       }}
+    )
   end
 end

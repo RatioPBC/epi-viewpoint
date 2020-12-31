@@ -21,7 +21,9 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
        }), Test.Fixtures.admin_audit_meta()}
       |> Cases.create_contact_investigation()
 
-    [contact_investigation: contact_investigation, user: user]
+    exposed_person = Cases.preload_exposed_person(contact_investigation) |> Map.get(:exposed_person)
+
+    [contact_investigation: contact_investigation, exposed_person: exposed_person, user: user]
   end
 
   test "shows quarantine monitoring page", %{conn: conn, contact_investigation: contact_investigation} do
@@ -47,5 +49,25 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("11/01/2020", "Exposure date: 12/31/2019")
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_ended("11/15/2020")
+  end
+
+  test "saving quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person} do
+    Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-quarantine-monitoring-form",
+      quarantine_monitoring_form: %{
+        "date_started" => "11/01/2020",
+        "date_ended" => "11/15/2020"
+      }
+    )
+    |> Pages.Profile.assert_here(exposed_person)
+
+    %{
+      quarantine_monitoring_starts_on: quarantine_monitoring_starts_on,
+      quarantine_monitoring_ends_on: quarantine_monitoring_ends_on
+    } = Cases.get_contact_investigation(contact_investigation.id)
+
+    assert ~D[2020-11-01] == quarantine_monitoring_starts_on
+    assert ~D[2020-11-15] == quarantine_monitoring_ends_on
   end
 end
