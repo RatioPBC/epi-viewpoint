@@ -35,4 +35,17 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("12/31/2019", "Exposure date: 12/31/2019")
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_recommended_length("Recommended length: 14 days")
   end
+
+  test "prefills with saved quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation} do
+    {:ok, _} =
+      Cases.update_contact_investigation(
+        contact_investigation,
+        {%{quarantine_monitoring_starts_on: ~D[2020-11-01], quarantine_monitoring_ends_on: ~D[2020-11-15]}, Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("11/01/2020", "Exposure date: 12/31/2019")
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_ended("11/15/2020")
+  end
 end

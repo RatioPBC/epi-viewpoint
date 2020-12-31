@@ -27,6 +27,15 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationQuarantineMonitoring do
     view
   end
 
+  def assert_quarantine_date_ended(%View{} = view, expected_date) do
+    assert view
+           |> Pages.parse()
+           |> Test.Html.find!("input#contact-investigation-quarantine-monitoring-form_date_ended")
+           |> Test.Html.attr("value") == [expected_date]
+
+    view
+  end
+
   def assert_quarantine_recommended_length(%View{} = view, expected_text) do
     assert view
            |> Pages.parse()

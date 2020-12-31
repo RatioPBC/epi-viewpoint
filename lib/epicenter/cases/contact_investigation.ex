@@ -21,6 +21,8 @@ defmodule Epicenter.Cases.ContactInvestigation do
     interview_discontinued_at
     interview_proxy_name
     interview_started_at
+    quarantine_monitoring_ends_on
+    quarantine_monitoring_starts_on
     symptoms
     tid
     under_18
