@@ -51,7 +51,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_ended("11/15/2020")
   end
 
-  test "saving quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person} do
+  test "saving quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person, user: user} do
     Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
     |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-quarantine-monitoring-form",
@@ -69,5 +69,10 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
 
     assert ~D[2020-11-01] == quarantine_monitoring_starts_on
     assert ~D[2020-11-15] == quarantine_monitoring_ends_on
+
+    assert_recent_audit_log(contact_investigation, user,
+      action: "update-contact-investigation",
+      event: "edit-contact-investigation-quarantine-monitoring"
+    )
   end
 end

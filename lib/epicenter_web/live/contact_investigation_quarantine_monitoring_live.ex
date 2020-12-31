@@ -112,8 +112,8 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
       {params,
        %AuditLog.Meta{
          author_id: socket.assigns.current_user.id,
-         reason_action: AuditLog.Revision.update_case_investigation_action(),
-         reason_event: AuditLog.Revision.edit_case_investigation_isolation_monitoring_event()
+         reason_action: AuditLog.Revision.update_contact_investigation_action(),
+         reason_event: AuditLog.Revision.edit_contact_investigation_quarantine_monitoring_event()
        }}
     )
   end
