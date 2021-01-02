@@ -68,6 +68,9 @@ defmodule Epicenter.Test.Html do
   def tid(html),
     do: html |> Floki.attribute("data-tid")
 
+  def to_string(html) when not is_binary(html),
+    do: html |> Floki.raw_html()
+
   # # #
 
   defp assert_found([], html, css_query),

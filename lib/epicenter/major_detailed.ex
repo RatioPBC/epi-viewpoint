@@ -28,6 +28,9 @@ defmodule Epicenter.MajorDetailed do
     end
   end
 
+  def for_form(scalar, standard_values),
+    do: for_form([scalar], standard_values)
+
   def for_model(map, :map = _model_data_structure) do
     cleaned = map |> clean()
 

@@ -3,6 +3,7 @@ defmodule EpicenterWeb.Form do
 
   import EpicenterWeb.ErrorHelpers
 
+  alias Epicenter.Extra
   alias EpicenterWeb.Form
   alias EpicenterWeb.FormHelpers
   alias EpicenterWeb.Multiselect
@@ -93,7 +94,7 @@ defmodule EpicenterWeb.Form do
       content_tag(
         :div,
         Multiselect.multiselect_inputs(f, field, specs, nil),
-        data: grid_data(3, line, opts) ++ [multiselect: "container"]
+        data: grid_data(3, line, opts) ++ [multiselect: "container", role: "multiselect-" <> Extra.String.dasherize([f.name, field])]
       )
     ]
     |> add_to_line(line, opts)

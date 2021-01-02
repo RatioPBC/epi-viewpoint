@@ -49,7 +49,7 @@ defmodule Epicenter.MajorDetailedTest do
       })
     end
 
-    test "handles nil and scalar values" do
+    test "handles nil" do
       %{major: ["blue"], detailed: nil}
       |> MajorDetailed.for_form(["blue"])
       |> assert_eq(%{"major" => %{"values" => ["blue"]}, "detailed" => %{}})
@@ -77,6 +77,16 @@ defmodule Epicenter.MajorDetailedTest do
       ["ant", "bat", "car"]
       |> MajorDetailed.for_form(["ant", "bat"])
       |> assert_eq(%{"major" => %{"values" => ["ant", "bat"], "other" => "car"}, "detailed" => %{}})
+    end
+
+    test "when given a scalar, wraps it in a list" do
+      "ant"
+      |> MajorDetailed.for_form(["ant", "bat"])
+      |> assert_eq(%{"major" => %{"values" => ["ant"]}, "detailed" => %{}})
+
+      "cat"
+      |> MajorDetailed.for_form(["ant", "bat"])
+      |> assert_eq(%{"major" => %{"other" => "cat"}, "detailed" => %{}})
     end
 
     test "empty state" do

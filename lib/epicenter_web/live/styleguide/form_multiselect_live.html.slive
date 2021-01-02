@@ -3,7 +3,7 @@
     h2 Multiselect
     i Demo of multiselects
 
-    = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f ->
+    = form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save", phx_change: "form-change"], fn f ->
       = example_form_builder(f, @form_error)
 
     .debug

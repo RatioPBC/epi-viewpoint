@@ -263,6 +263,7 @@ defmodule EpicenterWeb.MultiselectTest do
           Other\v
           <div data-multiselect="text-wrapper">
             <input
+              data-role="other-text"
               id="movie_genres_other"
               name="movie[genres][major][other]"
               placeholder="Please specify"
@@ -337,6 +338,7 @@ defmodule EpicenterWeb.MultiselectTest do
       Other\v
       <div data-multiselect="text-wrapper">
         <input
+          data-role="other-text"
           id="movie_genres_other"
           name="movie[genres][major][other]"
           placeholder="Please specify"

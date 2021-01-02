@@ -61,6 +61,7 @@ defmodule EpicenterWeb.Multiselect do
       Form.text_input(
         f,
         field,
+        data: [role: "other-text"],
         id: input_id(f, field, "other"),
         name: input_name(f, field, keypath, :single),
         placeholder: "Please specify",
