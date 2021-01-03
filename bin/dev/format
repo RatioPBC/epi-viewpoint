@@ -46,13 +46,13 @@ case $file in
   ;;
 
 *.js | *.json)
-  if command -v prettier >/dev/null; then
+  prettier_path="assets/node_modules/.bin/prettier"
+  if command -v $prettier_path >/dev/null; then
     output=$(mktemp)
-    assets/node_modules/.bin/prettier --config assets/.prettierrc "$file" >"$output"
+    $prettier_path --config assets/.prettierrc "$file" >"$output"
     mv "$output" "$file"
   else
-    echo "install prettier by running 'npm install --global prettier'"
-    echo "(and maybe run 'asdf reshim' afterwards)"
+    echo "add prettier to package.json via: npm install prettier --save-dev --prefix assets"
     exit 1
   fi
   ;;
