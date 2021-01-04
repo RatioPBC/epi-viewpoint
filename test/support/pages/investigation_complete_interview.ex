@@ -1,8 +1,10 @@
 defmodule EpicenterWeb.Test.Pages.InvestigationCompleteInterview do
+  import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
@@ -11,6 +13,15 @@ defmodule EpicenterWeb.Test.Pages.InvestigationCompleteInterview do
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
     conn |> Pages.visit("/case-investigations/#{case_investigation_id}/complete-interview")
+  end
+
+  def visit(%Plug.Conn{} = conn, %ContactInvestigation{id: id}) do
+    conn |> Pages.visit("/contact-investigations/#{id}/complete-interview")
+  end
+
+  def assert_header(view, header_text) do
+    view |> render() |> Test.Html.parse() |> Test.Html.role_text("complete-interview-title") |> assert_eq(header_text)
+    view
   end
 
   def assert_here(view_or_conn_or_html) do

@@ -164,8 +164,8 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
     test "saving complete contact investigation", %{conn: conn, contact_investigation: contact_investigation, user: user} do
       refute contact_investigation.interview_completed_at
 
-      Pages.ContactInvestigationCompleteInterview.visit(conn, contact_investigation)
-      |> Pages.ContactInvestigationCompleteInterview.assert_header("Complete interview")
+      Pages.InvestigationCompleteInterview.visit(conn, contact_investigation)
+      |> Pages.InvestigationCompleteInterview.assert_header("Complete interview")
       |> Pages.submit_and_follow_redirect(conn, "#investigation-interview-complete-form",
         complete_interview_form: %{
           "date_completed" => "09/06/2020",
@@ -192,10 +192,10 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
           }
         })
 
-      Pages.ContactInvestigationCompleteInterview.visit(conn, contact_investigation)
-      |> Pages.ContactInvestigationCompleteInterview.assert_header("Edit interview")
-      |> Pages.ContactInvestigationCompleteInterview.assert_time_completed("11:18", "AM")
-      |> Pages.ContactInvestigationCompleteInterview.assert_date_completed("01/02/2020")
+      Pages.InvestigationCompleteInterview.visit(conn, contact_investigation)
+      |> Pages.InvestigationCompleteInterview.assert_header("Edit interview")
+      |> Pages.InvestigationCompleteInterview.assert_time_completed("11:18", "AM")
+      |> Pages.InvestigationCompleteInterview.assert_date_completed("01/02/2020")
     end
   end
 end
