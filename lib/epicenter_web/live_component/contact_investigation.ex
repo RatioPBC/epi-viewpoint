@@ -54,7 +54,7 @@ defmodule EpicenterWeb.ContactInvestigation do
       to:
         Routes.contact_investigation_complete_interview_path(
           EpicenterWeb.Endpoint,
-          EpicenterWeb.ContactInvestigationCompleteInterviewLive,
+          :complete_contact_investigation,
           contact_investigation
         ),
       class: "complete-interview-link",

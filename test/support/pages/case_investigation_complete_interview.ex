@@ -14,7 +14,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   end
 
   def assert_here(view_or_conn_or_html) do
-    view_or_conn_or_html |> Pages.assert_on_page("case-investigation-complete")
+    view_or_conn_or_html |> Pages.assert_on_page("case-investigation-complete-interview")
   end
 
   def assert_date_completed(%View{} = view, :today) do

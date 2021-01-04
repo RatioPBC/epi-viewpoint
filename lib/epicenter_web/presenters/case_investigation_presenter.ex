@@ -103,7 +103,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
                 to:
                   Routes.case_investigation_complete_interview_path(
                     EpicenterWeb.Endpoint,
-                    EpicenterWeb.CaseInvestigationCompleteInterviewLive,
+                    :complete_case_investigation,
                     case_investigation
                   ),
                 id: "edit-complete-interview-link-001",
@@ -301,7 +301,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
       to:
         Routes.case_investigation_complete_interview_path(
           EpicenterWeb.Endpoint,
-          EpicenterWeb.CaseInvestigationCompleteInterviewLive,
+          :complete_case_investigation,
           case_investigation
         ),
       id: "complete-interview-case-investigation-link-001",

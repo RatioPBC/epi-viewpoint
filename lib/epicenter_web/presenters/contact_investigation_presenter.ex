@@ -69,7 +69,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
           to:
             Routes.contact_investigation_complete_interview_path(
               EpicenterWeb.Endpoint,
-              EpicenterWeb.ContactInvestigationCompleteInterviewLive,
+              :complete_contact_investigation,
               contact_investigation
             ),
           class: "contact-investigation-link",

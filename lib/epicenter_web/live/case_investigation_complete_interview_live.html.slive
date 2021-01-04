@@ -1,4 +1,4 @@
-#case-investigation-complete-interview-page data-page="case-investigation-complete" data-confirm-navigation=@confirmation_prompt
+#case-investigation-complete-interview-page data-page="case-investigation-complete-interview" data-confirm-navigation=@confirmation_prompt
 
   section
     header#subnav
@@ -7,7 +7,7 @@
         span Back
 
   section#case-investigation-complete-interview
-    h2 Complete interview
+    h2 data-role="complete-interview-title"= header_text(@case_investigation)
 
     = form_for @form_changeset, "#", [id: "case-investigation-interview-complete-form", phx_change: "change", phx_submit: "save"], fn f ->
       = complete_interview_form_builder(f)
