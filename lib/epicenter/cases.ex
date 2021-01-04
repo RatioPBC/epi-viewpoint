@@ -36,6 +36,17 @@ defmodule Epicenter.Cases do
   # case investigations
   #
   def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
+  def complete_case_investigation_interview(case_investigation, author_id, params) do
+    update_case_investigation(
+    case_investigation,
+    {params,
+    %AuditLog.Meta{
+      author_id: author_id,
+      reason_action: AuditLog.Revision.update_case_investigation_action(),
+      reason_event: AuditLog.Revision.complete_case_investigation_interview_event()
+      }}
+      )
+    end
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
 
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
@@ -173,6 +184,18 @@ defmodule Epicenter.Cases do
   #
   def change_contact_investigation(%ContactInvestigation{} = contact_investigation, attrs),
     do: ContactInvestigation.changeset(contact_investigation, attrs)
+
+  def complete_contact_investigation_interview(contact_investigation, author_id, params) do
+    update_contact_investigation(
+      contact_investigation,
+      {params,
+       %AuditLog.Meta{
+         author_id: author_id,
+         reason_action: AuditLog.Revision.update_contact_investigation_action(),
+         reason_event: AuditLog.Revision.complete_contact_investigation_interview_event()
+       }}
+    )
+  end
 
   def create_contact_investigation({attrs, audit_meta}),
     do: %ContactInvestigation{} |> change_contact_investigation(attrs) |> AuditLog.insert(audit_meta)
