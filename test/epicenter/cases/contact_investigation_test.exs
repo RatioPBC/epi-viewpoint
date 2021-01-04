@@ -32,6 +32,7 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
           {:most_recent_date_together, :date},
           {:quarantine_monitoring_ends_on, :date},
           {:quarantine_monitoring_starts_on, :date},
+          {:quarantine_monitoring_status, :string},
           {:relationship_to_case, :string},
           {:seq, :integer},
           {:symptoms, {:array, :string}},
@@ -88,6 +89,32 @@ defmodule Epicenter.Cases.ContactInvestigationTest do
         |> Repo.insert()
 
       assert contact_investigation.interview_status == "completed"
+    end
+  end
+
+  describe "contact investigation quarantine monitoring status using generated column" do
+    test "pending by default" do
+      {:ok, contact_investigation} = new_changeset() |> Repo.insert()
+      assert contact_investigation.quarantine_monitoring_status == "pending"
+    end
+
+    test "pending when interview status is completed" do
+      {:ok, contact_investigation} =
+        %{interview_completed_at: DateTime.utc_now(), interview_started_at: DateTime.utc_now()}
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert contact_investigation.interview_status == "completed"
+      assert contact_investigation.quarantine_monitoring_status == "pending"
+    end
+
+    test "ongoing when quarantine monitoring starts on is not null" do
+      {:ok, contact_investigation} =
+        %{quarantine_monitoring_starts_on: DateTime.utc_now()}
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert contact_investigation.quarantine_monitoring_status == "ongoing"
     end
   end
 end

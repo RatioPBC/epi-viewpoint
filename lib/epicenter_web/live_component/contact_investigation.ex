@@ -27,6 +27,13 @@ defmodule EpicenterWeb.ContactInvestigation do
     end
   end
 
+  defp quarantine_monitoring_status_text(%ContactInvestigation{} = %{quarantine_monitoring_status: status}) do
+    case status do
+      "started" -> "Ongoing"
+      _ -> "Pending"
+    end
+  end
+
   defp interview_buttons(contact_investigation) do
     case contact_investigation.interview_status do
       "pending" ->

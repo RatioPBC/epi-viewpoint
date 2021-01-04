@@ -20,7 +20,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
 
   .contact-investigation-sections
     div
-      .contact-investigation-interview-status-row
+      .contact-investigation-status-row
         h3
           span data-role="contact-investigation-interview-status" class=status_class(@contact_investigation) = status_text(@contact_investigation)
           |  interview
@@ -57,6 +57,12 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
                 = Format.date(@contact_investigation.exposed_on, "None")
               td data-role="contact-investigation-symptoms-text"
                 = displayable_symptoms(@contact_investigation)
+
+    div
+      .contact-investigation-status-row
+        h3
+          span data-role="contact-investigation-quarantine-status" = quarantine_monitoring_status_text(@contact_investigation)
+          |  quarantine monitoring
 
     .contact-investigation-notes
       = component(@socket,

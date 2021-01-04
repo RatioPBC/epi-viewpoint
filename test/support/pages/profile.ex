@@ -596,7 +596,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
           Test.Html.text(detail)
         end)
 
-      status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-interview-status]") |> Test.Html.text()
+      interview_status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-interview-status]") |> Test.Html.text()
 
       interview_buttons =
         Test.Html.all(contact_investigation, "[data-role=contact-investigation-interview-button]", fn detail ->
@@ -608,6 +608,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
           Test.Html.text(detail)
         end)
 
+      quarantine_status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-quarantine-status]") |> Test.Html.text()
+
       %{
         id: id,
         title: title,
@@ -615,9 +617,10 @@ defmodule EpicenterWeb.Test.Pages.Profile do
         initiating_case_text: initiating_case_text,
         minor_details: minor_details,
         exposure_details: exposure_details,
-        status: status,
+        interview_status: interview_status,
         interview_buttons: interview_buttons,
-        interview_history_items: interview_history_items
+        interview_history_items: interview_history_items,
+        quarantine_status: quarantine_status
       }
     end)
   end

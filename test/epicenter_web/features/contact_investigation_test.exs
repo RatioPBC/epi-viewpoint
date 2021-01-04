@@ -31,7 +31,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Pages.Profile.visit(exposed_person)
     |> Pages.Profile.assert_here(exposed_person)
     |> Epicenter.Extra.tap(fn view ->
-      assert [%{status: "Pending"}] = Pages.Profile.contact_investigations(view)
+      assert [%{interview_status: "Pending"}] = Pages.Profile.contact_investigations(view)
     end)
     |> Pages.Profile.click_discontinue_contact_investigation(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
@@ -41,7 +41,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     )
     |> Pages.Profile.assert_here(contact_investigation.exposed_person)
     |> Epicenter.Extra.tap(fn view ->
-      assert [%{status: "Discontinued"}] = Pages.Profile.contact_investigations(view)
+      assert [%{interview_status: "Discontinued"}] = Pages.Profile.contact_investigations(view)
     end)
   end
 
@@ -50,7 +50,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Pages.Profile.visit(exposed_person)
     |> Pages.Profile.assert_here(exposed_person)
     |> Epicenter.Extra.tap(fn view ->
-      assert [%{status: "Pending"}] = Pages.Profile.contact_investigations(view)
+      assert [%{interview_status: "Pending"}] = Pages.Profile.contact_investigations(view)
     end)
     |> Pages.Profile.click_start_contact_investigation(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
@@ -69,7 +69,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
                %{
                  interview_buttons: ["Complete interview", "Discontinue"],
                  interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
-                 status: "Ongoing"
+                 interview_status: "Ongoing"
                }
              ] = Pages.Profile.contact_investigations(view)
     end)
@@ -106,7 +106,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       symptoms: "Fever > 100.4F, Chills"
     })
     |> Epicenter.Extra.tap(fn view ->
-      assert [%{status: "Completed"}] = Pages.Profile.contact_investigations(view)
+      assert [%{quarantine_status: "Pending"}] = Pages.Profile.contact_investigations(view)
     end)
   end
 end
