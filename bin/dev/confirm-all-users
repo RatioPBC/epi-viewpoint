@@ -4,6 +4,6 @@ source "bin/_support/cecho.sh"
 
 set -e
 
-cecho -n --white "updating" --yellow "confirmed_at" --white "on all unconfirmed users..."
+cecho -n --yellow "updating" --bold-bright-yellow "confirmed_at" --yellow "on all unconfirmed users..."
 psql -c "update users set confirmed_at = now() where confirmed_at is null" epicenter_dev
 cecho --green "OK"

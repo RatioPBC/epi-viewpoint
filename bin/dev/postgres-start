@@ -8,6 +8,7 @@
 # This may not be the script for you if you like to run postgres some other way.
 
 source "bin/_support/cecho.sh"
+source "bin/_support/step.sh"
 
 set -e
 
@@ -23,14 +24,9 @@ else
 fi
 
 if [[ -f ${datadir}/PG_VERSION ]]; then
-  cecho --yellow "${0}:" --bold-bright-yellow "Starting postgres..."
-  cecho --white "postgres:" --bold-bright-white "${postgres_path}"
-  cecho --white "data dir:" --bold-bright-white "${datadir}"
-  cecho --white "log file:" --bold-bright-white "${log_path}"
-  echo ""
-  "${postgres_path}/bin/pg_ctl" -D ${datadir} -l "${log_path}" start
+  step "Starting postgres" "${postgres_path}/bin/pg_ctl -D ${datadir} -l ${log_path} start"
   echo ""
 else
   cecho --yellow "${0}:" --bright-bold-red "${datadir}" --red "does not seem to be a postgres data directory"
-  cecho --yellow "Try running" --bright-bold-white "pg_ctl -D ${datadir} initdb"
+  cecho --yellow "Try running" --bright-bold-yellow "pg_ctl -D ${datadir} initdb"
 fi

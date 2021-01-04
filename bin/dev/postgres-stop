@@ -5,12 +5,12 @@
 # Pass '-q' option if you don't want it to complain when it thinks postgres is not running.
 
 source "bin/_support/cecho.sh"
+source "bin/_support/step.sh"
 
 set -e
 
 if ps -x -o command | grep '[/]bin/postgres -D' >/dev/null; then
-  cecho --yellow "${0}:" --bright-bold-yellow "Stopping postgres..."
-  eval "$(ps -x -o command | grep '[/]bin/postgres -D' | sed 's/bin\/postgres/bin\/pg_ctl/') stop"
+  step "Stopping postgres" "$(ps -x -o command | grep '[/]bin/postgres -D' | sed 's/bin\/postgres/bin\/pg_ctl/') stop"
   echo ""
 else
   if [[ $1 != "-q" ]]; then

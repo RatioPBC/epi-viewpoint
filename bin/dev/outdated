@@ -10,5 +10,5 @@ step_header "JS" "npm outdated --prefix assets"
 npm outdated --prefix assets
 
 echo ""
-cecho --bright-bold-yellow "Update Elixir deps with" --bright-white "mix deps.update [<package-name>...]"
-cecho --bright-bold-yellow "Update JS deps with" --bright-white "npm update --dev --prefix assets [<package-name>...]"
+cecho --yellow "Update Elixir deps with" --bold-bright-yellow "mix deps.update [<package-name>...]"
+cecho --yellow "Update JS deps with" --bold-bright-yellow "npm update --dev --prefix assets [<package-name>...]"

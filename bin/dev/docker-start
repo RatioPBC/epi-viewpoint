@@ -19,7 +19,7 @@ check "hostname in /etc/hosts" \
 step "Stopping local postgres" "bin/dev/postgres-stop -q"
 step "Building docker image" "bin/docker/build"
 
-cecho --white "after docker starts, go to" --bold-bright-yellow "https://viewpoint-dev.network.geometer.dev:4001"
+cecho --yellow "after docker starts, go to" --bold-bright-yellow "https://viewpoint-dev.network.geometer.dev:4001"
 
 step_header "Starting docker" "docker-compose up"
 docker-compose up
