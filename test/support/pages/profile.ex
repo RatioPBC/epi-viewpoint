@@ -547,6 +547,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_contact_investigation_quarantine_monitoring(%View{} = view, contact_investigation_tid) do
+    view
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=contact-investigation-quarantine-monitoring-link]")
+    |> render_click()
+  end
+
   def click_edit_contact_clinical_details_link(%View{} = view, contact_investigation_tid) do
     view
     |> element("[data-tid=#{contact_investigation_tid}] [data-role=edit-contact-clinical-details-link]")
@@ -590,7 +596,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
           Test.Html.text(detail)
         end)
 
-      status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-status]") |> Test.Html.text()
+      status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-interview-status]") |> Test.Html.text()
 
       interview_buttons =
         Test.Html.all(contact_investigation, "[data-role=contact-investigation-interview-button]", fn detail ->

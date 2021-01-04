@@ -20,9 +20,9 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
 
   .contact-investigation-sections
     div
-      .contact-investigation-status-row
+      .contact-investigation-interview-status-row
         h3
-          span data-role="contact-investigation-status" class=status_class(@contact_investigation) = status_text(@contact_investigation)
+          span data-role="contact-investigation-interview-status" class=status_class(@contact_investigation) = status_text(@contact_investigation)
           |  interview
         .contact-investigation-interview-buttons
           = for button <- interview_buttons(@contact_investigation) do
