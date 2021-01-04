@@ -117,5 +117,17 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       assert [%{quarantine_status: "Pending"}] = Pages.Profile.contact_investigations(view)
     end)
     |> Pages.Profile.click_contact_investigation_quarantine_monitoring(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-quarantine-monitoring-form",
+      quarantine_monitoring_form: %{
+        "date_started" => "11/01/2020",
+        "date_ended" => "11/15/2020"
+      }
+    )
+    |> Pages.Profile.assert_here(exposed_person)
+    |> Epicenter.Extra.tap(fn view ->
+      assert [%{quarantine_status: "Ongoing"}] = Pages.Profile.contact_investigations(view)
+    end)
   end
 end

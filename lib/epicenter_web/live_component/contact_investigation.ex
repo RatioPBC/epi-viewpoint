@@ -14,6 +14,7 @@ defmodule EpicenterWeb.ContactInvestigation do
       "completed" -> "completed-status"
       "discontinued" -> "discontinued-status"
       "started" -> "started-status"
+      "ongoing" -> "started-status"
       _ -> "pending-status"
     end
   end
@@ -29,7 +30,7 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   defp quarantine_monitoring_status_text(%ContactInvestigation{} = %{quarantine_monitoring_status: status}) do
     case status do
-      "started" -> "Ongoing"
+      "ongoing" -> "Ongoing"
       _ -> "Pending"
     end
   end
