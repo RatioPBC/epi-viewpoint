@@ -22,7 +22,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
     div
       .contact-investigation-status-row
         h3
-          span data-role="contact-investigation-interview-status" class=status_class(@contact_investigation) = status_text(@contact_investigation)
+          span data-role="contact-investigation-interview-status" class=status_class(@contact_investigation.interview_status) = status_text(@contact_investigation)
           |  interview
         .contact-investigation-interview-buttons
           = for button <- interview_buttons(@contact_investigation) do
@@ -61,7 +61,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
     div
       .contact-investigation-status-row
         h3
-          span data-role="contact-investigation-quarantine-status" = quarantine_monitoring_status_text(@contact_investigation)
+          span data-role="contact-investigation-quarantine-status" class=status_class(@contact_investigation.quarantine_monitoring_status) = quarantine_monitoring_status_text(@contact_investigation)
           |  quarantine monitoring
 
     .contact-investigation-notes

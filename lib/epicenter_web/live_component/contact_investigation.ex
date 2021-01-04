@@ -9,7 +9,7 @@ defmodule EpicenterWeb.ContactInvestigation do
   alias EpicenterWeb.Format
   alias EpicenterWeb.InvestigationNotesSection
 
-  defp status_class(%ContactInvestigation{} = %{interview_status: status}) do
+  defp status_class(status) do
     case status do
       "completed" -> "completed-status"
       "discontinued" -> "discontinued-status"
