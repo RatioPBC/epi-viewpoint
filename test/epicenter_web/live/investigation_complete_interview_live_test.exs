@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
+defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
@@ -21,10 +21,10 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
   end
 
   test "shows complete case investigation form", %{conn: conn, case_investigation: case_investigation} do
-    Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-    |> Pages.CaseInvestigationCompleteInterview.assert_here()
-    |> Pages.CaseInvestigationCompleteInterview.assert_date_completed(:today)
-    |> Pages.CaseInvestigationCompleteInterview.assert_time_completed(:now)
+    Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+    |> Pages.InvestigationCompleteInterview.assert_here()
+    |> Pages.InvestigationCompleteInterview.assert_date_completed(:today)
+    |> Pages.InvestigationCompleteInterview.assert_time_completed(:now)
   end
 
   test "prefills with existing data when existing data is available and can be edited", %{conn: conn, case_investigation: case_investigation} do
@@ -34,11 +34,11 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
         {%{interview_completed_at: ~N[2020-01-01 23:03:07]}, Test.Fixtures.admin_audit_meta()}
       )
 
-    Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-    |> Pages.CaseInvestigationCompleteInterview.assert_here()
-    |> Pages.CaseInvestigationCompleteInterview.assert_time_completed("06:03", "PM")
-    |> Pages.CaseInvestigationCompleteInterview.assert_date_completed("01/01/2020")
-    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
+    Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+    |> Pages.InvestigationCompleteInterview.assert_here()
+    |> Pages.InvestigationCompleteInterview.assert_time_completed("06:03", "PM")
+    |> Pages.InvestigationCompleteInterview.assert_date_completed("01/01/2020")
+    |> Pages.submit_and_follow_redirect(conn, "#investigation-interview-complete-form",
       complete_interview_form: %{
         "date_completed" => "09/06/2020",
         "time_completed" => "03:45",
@@ -51,8 +51,8 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
   end
 
   test "saving complete case investigation", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
-    Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
+    Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#investigation-interview-complete-form",
       complete_interview_form: %{
         "date_completed" => "09/06/2020",
         "time_completed" => "03:45",
@@ -71,14 +71,14 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
 
   describe "warning the user when navigation will erase their changes" do
     test "before the user changes anything", %{conn: conn, case_investigation: case_investigation} do
-      Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
+      Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
       |> Pages.refute_confirmation_prompt_active()
     end
 
     test "when the user changes something", %{conn: conn, case_investigation: case_investigation} do
       view =
-        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-        |> Pages.CaseInvestigationCompleteInterview.change_form(complete_interview_form: %{"date_completed" => "09/06/2020"})
+        Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.InvestigationCompleteInterview.change_form(complete_interview_form: %{"date_completed" => "09/06/2020"})
         |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
 
       assert %{"complete_interview_form[date_completed]" => "09/06/2020"} = Pages.form_state(view)
@@ -88,8 +88,8 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
   describe "validation" do
     test "invalid times become errors", %{conn: conn, case_investigation: case_investigation} do
       view =
-        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-        |> Pages.submit_live("#case-investigation-interview-complete-form",
+        Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#investigation-interview-complete-form",
           complete_interview_form: %{
             "date_completed" => "09/06/2020",
             "time_completed" => "13:45",
@@ -102,8 +102,8 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
 
     test "invalid dates become errors", %{conn: conn, case_investigation: case_investigation} do
       view =
-        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-        |> Pages.submit_live("#case-investigation-interview-complete-form",
+        Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#investigation-interview-complete-form",
           complete_interview_form: %{
             "date_completed" => "09/32/2020",
             "time_completed" => "12:45",
@@ -116,8 +116,8 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
 
     test "daylight savings hour that doesn't exist becomes an error", %{conn: conn, case_investigation: case_investigation} do
       view =
-        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-        |> Pages.submit_live("#case-investigation-interview-complete-form",
+        Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#investigation-interview-complete-form",
           complete_interview_form: %{
             "date_completed" => "03/08/2020",
             "time_completed" => "02:10",
@@ -130,8 +130,8 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLiveTest do
 
     test "validates presence of all fields", %{conn: conn, case_investigation: case_investigation} do
       view =
-        Pages.CaseInvestigationCompleteInterview.visit(conn, case_investigation)
-        |> Pages.submit_live("#case-investigation-interview-complete-form",
+        Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
+        |> Pages.submit_live("#investigation-interview-complete-form",
           complete_interview_form: %{
             "date_completed" => "",
             "time_completed" => "",

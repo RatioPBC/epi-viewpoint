@@ -92,7 +92,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Pages.Profile.click_contact_investigation_complete_interview(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.ContactInvestigationCompleteInterview.assert_here()
-    |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-complete-form",
+    |> Pages.submit_and_follow_redirect(conn, "#investigation-interview-complete-form",
       complete_interview_form: %{
         "date_completed" => "09/06/2020",
         "time_completed" => "03:45",

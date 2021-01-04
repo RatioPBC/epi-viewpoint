@@ -7,14 +7,14 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationCompleteInterview do
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
-  @form_id "case-investigation-interview-complete-form"
+  @form_id "investigation-interview-complete-form"
 
   def visit(%Plug.Conn{} = conn, %ContactInvestigation{id: id}) do
     conn |> Pages.visit("/contact-investigations/#{id}/complete-interview")
   end
 
   def assert_here(view_or_conn_or_html) do
-    view_or_conn_or_html |> Pages.assert_on_page("case-investigation-complete-interview")
+    view_or_conn_or_html |> Pages.assert_on_page("investigation-complete-interview")
   end
 
   def assert_header(view, header_text) do

@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
+defmodule EpicenterWeb.Test.Pages.InvestigationCompleteInterview do
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
@@ -7,14 +7,14 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
-  @form_id "case-investigation-interview-complete-form"
+  @form_id "investigation-interview-complete-form"
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do
     conn |> Pages.visit("/case-investigations/#{case_investigation_id}/complete-interview")
   end
 
   def assert_here(view_or_conn_or_html) do
-    view_or_conn_or_html |> Pages.assert_on_page("case-investigation-complete-interview")
+    view_or_conn_or_html |> Pages.assert_on_page("investigation-complete-interview")
   end
 
   def assert_date_completed(%View{} = view, :today) do
@@ -71,7 +71,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationCompleteInterview do
   end
 
   def change_form(view, attrs) do
-    view |> element("#case-investigation-interview-complete-form") |> render_change(attrs)
+    view |> element("#investigation-interview-complete-form") |> render_change(attrs)
 
     view
   end

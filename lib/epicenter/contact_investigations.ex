@@ -1,4 +1,4 @@
-defmodule Epicenter.Contacts do
+defmodule Epicenter.ContactInvestigations do
   alias Epicenter.AuditLog
   alias Epicenter.Cases.ContactInvestigation
 

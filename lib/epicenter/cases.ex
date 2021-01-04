@@ -12,7 +12,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
-  alias Epicenter.Contacts
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Repo
 
   import Ecto.Query, only: [distinct: 3, first: 1]
@@ -186,7 +186,7 @@ defmodule Epicenter.Cases do
   # contact investigations
   #
   def change_contact_investigation(%ContactInvestigation{} = contact_investigation, attrs),
-    do: Contacts.change(contact_investigation, attrs)
+    do: ContactInvestigations.change(contact_investigation, attrs)
 
   def create_contact_investigation({attrs, audit_meta}),
     do: %ContactInvestigation{} |> change_contact_investigation(attrs) |> AuditLog.insert(audit_meta)
@@ -206,5 +206,5 @@ defmodule Epicenter.Cases do
       )
 
   def update_contact_investigation(contact_investigation, {attrs, audit_meta}),
-    do: Contacts.update(contact_investigation, {attrs, audit_meta})
+    do: ContactInvestigations.update(contact_investigation, {attrs, audit_meta})
 end
