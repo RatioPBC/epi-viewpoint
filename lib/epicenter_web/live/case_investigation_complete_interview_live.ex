@@ -8,6 +8,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
     only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Cases
+  alias Epicenter.Contacts
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.CompleteInterviewForm
   alias EpicenterWeb.PresentationConstants
@@ -28,6 +29,7 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
 
   defp mount(investigation, person, session, socket) do
     form_changeset = CompleteInterviewForm.changeset(investigation, %{})
+
     socket
     |> assign_defaults()
     |> authenticate_user(session)
@@ -86,6 +88,6 @@ defmodule EpicenterWeb.CaseInvestigationCompleteInterviewLive do
   end
 
   defp update_case_investigation(%{assigns: %{case_investigation: %Cases.ContactInvestigation{} = contact_investigation}} = socket, params) do
-    Cases.complete_contact_investigation_interview(contact_investigation, socket.assigns.current_user.id, params)
+    Contacts.complete_interview(contact_investigation, socket.assigns.current_user.id, params)
   end
 end

@@ -12,6 +12,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
+  alias Epicenter.Contacts
   alias Epicenter.Repo
 
   import Ecto.Query, only: [distinct: 3, first: 1]
@@ -36,17 +37,19 @@ defmodule Epicenter.Cases do
   # case investigations
   #
   def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
+
   def complete_case_investigation_interview(case_investigation, author_id, params) do
     update_case_investigation(
-    case_investigation,
-    {params,
-    %AuditLog.Meta{
-      author_id: author_id,
-      reason_action: AuditLog.Revision.update_case_investigation_action(),
-      reason_event: AuditLog.Revision.complete_case_investigation_interview_event()
-      }}
-      )
-    end
+      case_investigation,
+      {params,
+       %AuditLog.Meta{
+         author_id: author_id,
+         reason_action: AuditLog.Revision.update_case_investigation_action(),
+         reason_event: AuditLog.Revision.complete_case_investigation_interview_event()
+       }}
+    )
+  end
+
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
 
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
@@ -183,19 +186,7 @@ defmodule Epicenter.Cases do
   # contact investigations
   #
   def change_contact_investigation(%ContactInvestigation{} = contact_investigation, attrs),
-    do: ContactInvestigation.changeset(contact_investigation, attrs)
-
-  def complete_contact_investigation_interview(contact_investigation, author_id, params) do
-    update_contact_investigation(
-      contact_investigation,
-      {params,
-       %AuditLog.Meta{
-         author_id: author_id,
-         reason_action: AuditLog.Revision.update_contact_investigation_action(),
-         reason_event: AuditLog.Revision.complete_contact_investigation_interview_event()
-       }}
-    )
-  end
+    do: Contacts.change(contact_investigation, attrs)
 
   def create_contact_investigation({attrs, audit_meta}),
     do: %ContactInvestigation{} |> change_contact_investigation(attrs) |> AuditLog.insert(audit_meta)
@@ -215,5 +206,5 @@ defmodule Epicenter.Cases do
       )
 
   def update_contact_investigation(contact_investigation, {attrs, audit_meta}),
-    do: contact_investigation |> change_contact_investigation(attrs) |> AuditLog.update(audit_meta)
+    do: Contacts.update(contact_investigation, {attrs, audit_meta})
 end
