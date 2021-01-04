@@ -1,11 +1,13 @@
 defmodule Epicenter.Accounts do
   alias Epicenter.Accounts.Admin
+  alias Epicenter.Accounts.Login
   alias Epicenter.Accounts.User
   alias Epicenter.Accounts.UserToken
   alias Epicenter.Accounts.UserNotifier
   alias Epicenter.AuditLog
   alias Epicenter.Repo
 
+  def change_login(attrs), do: Login.changeset(%Login{}, attrs)
   def change_user(%User{} = user, attrs), do: User.changeset(user, Enum.into(attrs, %{}))
   def change_user_email(user, attrs \\ %{}), do: User.email_changeset(user, attrs)
   def change_user_mfa(user, mfa_secret), do: User.mfa_changeset(user, %{mfa_secret: mfa_secret})
@@ -15,8 +17,10 @@ defmodule Epicenter.Accounts do
   def get_user(id) when is_binary(id), do: User |> Repo.get(id)
   def get_user(email: email) when is_binary(email), do: User |> Repo.get_by(email: email)
   def get_user(email: email, password: password), do: get_user(email: email) |> User.filter_by_valid_password(password)
+  def list_logins(user_id), do: Login.Query.for_user_id(user_id) |> Repo.all()
   def list_users(), do: User.Query.all() |> Repo.all()
   def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
+  def record_login(attrs), do: change_login(attrs) |> Repo.insert()
   def register_user({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> Admin.insert_by_admin(audit_meta)
   def register_user!({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> Admin.insert_by_admin!(audit_meta)
   def update_user(%User{} = user, attrs, audit_meta), do: user |> change_user(attrs) |> Admin.update_by_admin(audit_meta)

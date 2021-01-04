@@ -698,4 +698,59 @@ defmodule Epicenter.AccountsTest do
       refute inspect(%User{password: "123456"}) =~ "password: \"123456\""
     end
   end
+
+  describe "record_login" do
+    test "adding a single row for the audit trail when a user logs in" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      session_id = Ecto.UUID.generate()
+      assert [] == Accounts.list_logins(user.id)
+
+      Accounts.record_login(%{
+        session_id: session_id,
+        tid: "login",
+        user_agent: "something complicated",
+        user_id: user.id
+      })
+
+      assert 1 == length(Accounts.list_logins(user.id))
+      [login] = Accounts.list_logins(user.id)
+
+      assert session_id == login.session_id
+      assert "something complicated" == login.user_agent
+
+      assert Euclid.Exists.present?(login.inserted_at)
+    end
+  end
+
+  describe "list_logins" do
+    test "only fetches the logins for the requested user_id" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      user2 = Test.Fixtures.user_attrs(@admin, "user2", email: "blah@example.com") |> Accounts.register_user!()
+
+      session_id = Ecto.UUID.generate()
+      session_id2 = Ecto.UUID.generate()
+
+      Accounts.record_login(%{
+        session_id: session_id,
+        tid: "login",
+        user_agent: "something complicated",
+        user_id: user.id
+      })
+
+      Accounts.record_login(%{
+        session_id: session_id2,
+        tid: "login2",
+        user_agent: "something complicated2",
+        user_id: user2.id
+      })
+
+      assert 1 = length(Accounts.list_logins(user.id))
+      [login] = Accounts.list_logins(user.id)
+      assert "login" == login.tid
+
+      assert 1 = length(Accounts.list_logins(user2.id))
+      [login2] = Accounts.list_logins(user2.id)
+      assert "login2" == login2.tid
+    end
+  end
 end
