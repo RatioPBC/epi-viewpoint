@@ -12,6 +12,10 @@ testcomm() {
   test -z "$result"
 }
 
+if [[ ! -f .doctor.skip ]]; then
+  touch .doctor.skip
+fi
+
 # run doctor in home directory if present
 if [[ -f "${HOME}/bin/dev/doctor" ]]; then
   if step "Found a doctor script in home directory; running..." "pushd ${HOME} > /dev/null && ./bin/dev/doctor && popd > /dev/null"; then
