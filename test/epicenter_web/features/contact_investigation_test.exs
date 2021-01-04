@@ -89,6 +89,14 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       exposed_on: "09/06/2020",
       symptoms: "Fever > 100.4F, Chills"
     })
+    |> Epicenter.Extra.tap(fn view ->
+      assert [
+               %{
+                 interview_buttons: ["Complete interview", "Discontinue"],
+                 quarantine_monitoring_buttons: []
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end)
     |> Pages.Profile.click_contact_investigation_complete_interview(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.ContactInvestigationCompleteInterview.assert_here()

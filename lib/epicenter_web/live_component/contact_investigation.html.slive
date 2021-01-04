@@ -58,13 +58,14 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
               td data-role="contact-investigation-symptoms-text"
                 = displayable_symptoms(@contact_investigation)
 
-    div
-      .contact-investigation-status-row
-        h3
-          span data-role="contact-investigation-quarantine-status" class=status_class(@contact_investigation.quarantine_monitoring_status) = quarantine_monitoring_status_text(@contact_investigation)
-          |  quarantine monitoring
-        .contact-investigation-interview-buttons
-          = quarantine_monitoring_button(@contact_investigation)
+    = if @contact_investigation.interview_status == "completed" do
+      div
+        .contact-investigation-status-row
+          h3
+            span data-role="contact-investigation-quarantine-status" class=status_class(@contact_investigation.quarantine_monitoring_status) = quarantine_monitoring_status_text(@contact_investigation)
+            |  quarantine monitoring
+          .contact-investigation-interview-buttons
+            = quarantine_monitoring_button(@contact_investigation)
 
     .contact-investigation-notes
       = component(@socket,

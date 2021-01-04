@@ -603,6 +603,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
           Test.Html.text(detail)
         end)
 
+      quarantine_monitoring_buttons =
+        Test.Html.all(contact_investigation, "[data-role=contact-investigation-quarantine-monitoring-start-link]", fn detail ->
+          Test.Html.text(detail)
+        end)
+
       interview_history_items =
         Test.Html.all(contact_investigation, "[data-role=contact-investigation-history-item-text]", fn detail ->
           Test.Html.text(detail)
@@ -620,7 +625,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
         interview_status: interview_status,
         interview_buttons: interview_buttons,
         interview_history_items: interview_history_items,
-        quarantine_status: quarantine_status
+        quarantine_status: quarantine_status,
+        quarantine_monitoring_buttons: quarantine_monitoring_buttons
       }
     end)
   end
