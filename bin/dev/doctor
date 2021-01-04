@@ -118,6 +118,10 @@ check "postgres: role exists" \
   "psql -A -c '\du' postgres | grep 'postgres|'" \
   "createuser -s postgres -U \$USER"
 
+check "postgres: using the right data directory" \
+  "psql -U postgres -tA -c 'SHOW data_directory;' | grep -q $(pwd)/tmp/postgres/data" \
+  "bin/dev/postgres-restart"
+
 check "postgres: dev database exists" \
   "psql -c '\l' epicenter_dev" \
   "mix ecto.setup # or if you have per-project postgres versions, perhaps: bin/dev/postgres-restart"
