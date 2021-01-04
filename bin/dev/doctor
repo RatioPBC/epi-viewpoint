@@ -119,7 +119,7 @@ check "postgres: role exists" \
   "createuser -s postgres -U \$USER"
 
 check "postgres: using the right data directory" \
-  "psql -U postgres -tA -c 'SHOW data_directory;' | grep -q $(pwd)/tmp/postgres/data" \
+  "psql -U postgres -tA -c 'SHOW data_directory;' | grep -q $(pwd)/priv/postgres/data" \
   "bin/dev/postgres-restart"
 
 check "postgres: dev database exists" \
