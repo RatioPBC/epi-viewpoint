@@ -47,7 +47,7 @@
     table#lab-results-data
       @include data-table
 
-  .complete-interview-case-investigation-link, .complete-interview-link
+  .primary
     @include button-primary
 
   section.case-investigation
@@ -75,12 +75,8 @@
         .completed-interview
           color: $completed-color
 
-
       .case-investigation-interview-buttons
         @include level($justify: space-between)
-
-      .start-interview-case-investigation-link
-        @include button-primary
 
       .discontinue-case-investigation-link
         @include button-secondary
@@ -94,11 +90,6 @@
         color: $started-color
       .concluded
         color: $completed-color
-
-      .add-isolation-dates-case-investigation-link,
-      .conclude-isolation-monitoring-case-investigation-link,
-      .edit-isolation-order-case-investigation-link
-        @include button-primary
 
     .case-investigation-history
       color: $secondary-text-color
@@ -171,9 +162,6 @@
         @include level($justify: space-between)
         .discontinue-link
           @include button-secondary
-
-        .start-link
-          @include button-primary
 
     .contact-investigation-history
       color: $secondary-text-color

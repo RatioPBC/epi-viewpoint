@@ -152,7 +152,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
               case_investigation
             ),
           id: "add-isolation-dates-case-investigation-link-001",
-          class: "add-isolation-dates-case-investigation-link"
+          class: "primary"
         )
 
       "ongoing" ->
@@ -164,7 +164,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
               case_investigation
             ),
           id: "conclude-isolation-monitoring-case-investigation-link-001",
-          class: "conclude-isolation-monitoring-case-investigation-link"
+          class: "primary"
         )
 
       "concluded" ->
@@ -305,7 +305,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
           case_investigation
         ),
       id: "complete-interview-case-investigation-link-001",
-      class: "complete-interview-case-investigation-link"
+      class: "primary"
     )
   end
 
@@ -313,7 +313,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     live_redirect("Start interview",
       to: Routes.case_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartInterviewLive, case_investigation),
       id: "start-interview-case-investigation-link-001",
-      class: "start-interview-case-investigation-link"
+      class: "primary"
     )
   end
 

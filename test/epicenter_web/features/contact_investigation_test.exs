@@ -108,5 +108,6 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Epicenter.Extra.tap(fn view ->
       assert [%{quarantine_status: "Pending"}] = Pages.Profile.contact_investigations(view)
     end)
+    |> Pages.Profile.click_contact_investigation_quarantine_monitoring(contact_investigation.tid)
   end
 end

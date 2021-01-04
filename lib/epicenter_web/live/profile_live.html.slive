@@ -139,7 +139,7 @@
               h4
                 span Isolation Order Details
               .links
-                span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "edit-isolation-order-case-investigation-link"
+                span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "primary"
 
             table.clinical-data
               thead

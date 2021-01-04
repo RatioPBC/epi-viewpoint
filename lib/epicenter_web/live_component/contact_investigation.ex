@@ -64,7 +64,7 @@ defmodule EpicenterWeb.ContactInvestigation do
           :complete_contact_investigation,
           contact_investigation
         ),
-      class: "complete-interview-link",
+      class: "primary",
       data: [role: "contact-investigation-complete-interview-link"]
     )
   end
@@ -86,8 +86,30 @@ defmodule EpicenterWeb.ContactInvestigation do
           EpicenterWeb.ContactInvestigationStartInterviewLive,
           contact_investigation
         ),
-      class: "start-link",
+      class: "primary",
       data: [role: "contact-investigation-start-interview"]
     )
+  end
+
+  def quarantine_monitoring_button(contact_investigation) do
+    case contact_investigation.quarantine_monitoring_status do
+      "pending" ->
+        live_redirect("Add quarantine dates",
+          to:
+            Routes.contact_investigation_quarantine_monitoring_path(
+              EpicenterWeb.Endpoint,
+              EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
+              contact_investigation
+            ),
+          class: "primary",
+          data: [role: "contact-investigation-quarantine-monitoring-start-link"]
+        )
+
+      "ongoing" ->
+        nil
+
+      "concluded" ->
+        nil
+    end
   end
 end
