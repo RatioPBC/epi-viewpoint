@@ -46,7 +46,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
           thead
             tr data-role="table-column-names"
               th Clinical status
-              th Onset date
+              th Exposure date
               th Symptoms
 
           tbody
