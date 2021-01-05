@@ -36,7 +36,8 @@ defmodule Epicenter.Cases do
   #
   def change_case_investigation(%CaseInvestigation{} = case_investigation, attrs), do: CaseInvestigation.changeset(case_investigation, attrs)
 
-  def complete_case_investigation_interview(case_investigation, author_id, params) do
+  def complete_case_investigation_interview(case_investigation, author_id, %{interview_completed_at: interview_completed_at} = params)
+      when not is_nil(interview_completed_at) do
     update_case_investigation(
       case_investigation,
       {params,

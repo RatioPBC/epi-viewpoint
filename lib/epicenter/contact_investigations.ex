@@ -6,7 +6,8 @@ defmodule Epicenter.ContactInvestigations do
   def change(%ContactInvestigation{} = investigation, attrs),
     do: ContactInvestigation.changeset(investigation, attrs)
 
-  def complete_interview(contact_investigation, author_id, params) do
+  def complete_interview(contact_investigation, author_id, %{interview_completed_at: interview_completed_at} = params)
+      when not is_nil(interview_completed_at) do
     update(
       contact_investigation,
       {params,
