@@ -2,6 +2,7 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
   use Ecto.Schema
 
   import Ecto.Changeset
+  import Epicenter.Gettext
   import Epicenter.PhiValidation, only: [validate_phi: 2]
 
   alias Epicenter.Cases.CaseInvestigation
@@ -91,5 +92,18 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
     |> String.graphemes()
     |> Enum.filter(fn element -> element =~ ~r{\d} end)
     |> Enum.join()
+  end
+
+  def text_field_values(field_name) do
+    %{
+      quarantine_conclusion_reason: [
+        gettext_noop("successfully_completed_quarantine"),
+        gettext_noop("unable_to_quarantine"),
+        gettext_noop("refused_to_cooperate"),
+        gettext_noop("lost_to_follow_up"),
+        gettext_noop("transferred"),
+        gettext_noop("deceased")
+      ]
+    }[field_name]
   end
 end

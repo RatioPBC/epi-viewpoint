@@ -23,21 +23,25 @@ msgstr "Person unable to isolate"
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:88
+#: lib/epicenter/contact_investigations/contact_investigation.ex:105
 msgid "deceased"
 msgstr "Deceased"
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:86
+#: lib/epicenter/contact_investigations/contact_investigation.ex:103
 msgid "lost_to_follow_up"
 msgstr "Lost to follow up"
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:85
+#: lib/epicenter/contact_investigations/contact_investigation.ex:102
 msgid "refused_to_cooperate"
 msgstr "Refused to cooperate"
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:87
+#: lib/epicenter/contact_investigations/contact_investigation.ex:104
 msgid "transferred"
 msgstr "Transferred to another jurisdiction"
 
@@ -55,3 +59,13 @@ msgstr "Symptomatic"
 #: lib/epicenter/cases/case_investigation.ex:78
 msgid "unknown"
 msgstr "Unknown"
+
+#, elixir-format, fuzzy
+#: lib/epicenter/contact_investigations/contact_investigation.ex:100
+msgid "successfully_completed_quarantine"
+msgstr "Successfully completed quarantine period"
+
+#, elixir-format, fuzzy
+#: lib/epicenter/contact_investigations/contact_investigation.ex:101
+msgid "unable_to_quarantine"
+msgstr "Person unable to quarantine"

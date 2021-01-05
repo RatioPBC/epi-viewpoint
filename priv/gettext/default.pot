@@ -22,21 +22,25 @@ msgstr ""
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:88
+#: lib/epicenter/contact_investigations/contact_investigation.ex:105
 msgid "deceased"
 msgstr ""
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:86
+#: lib/epicenter/contact_investigations/contact_investigation.ex:103
 msgid "lost_to_follow_up"
 msgstr ""
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:85
+#: lib/epicenter/contact_investigations/contact_investigation.ex:102
 msgid "refused_to_cooperate"
 msgstr ""
 
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:87
+#: lib/epicenter/contact_investigations/contact_investigation.ex:104
 msgid "transferred"
 msgstr ""
 
@@ -53,4 +57,14 @@ msgstr ""
 #, elixir-format
 #: lib/epicenter/cases/case_investigation.ex:78
 msgid "unknown"
+msgstr ""
+
+#, elixir-format
+#: lib/epicenter/contact_investigations/contact_investigation.ex:100
+msgid "successfully_completed_quarantine"
+msgstr ""
+
+#, elixir-format
+#: lib/epicenter/contact_investigations/contact_investigation.ex:101
+msgid "unable_to_quarantine"
 msgstr ""
