@@ -43,7 +43,10 @@ defmodule EpicenterWeb.ContactInvestigation do
           ]
 
         _ ->
-          [content_tag(:span, "Pending", class: "pending-status"), "quarantine monitoring"]
+          [
+            content_tag(:span, "Pending", class: "pending-status"),
+            content_tag(:span, "quarantine monitoring")
+          ]
       end
     end
   end
