@@ -1,6 +1,6 @@
 image: circleci/elixir:1.11-node-browsers
 services:
-  - postgres:12.2-alpine
+  - postgres:12.5-alpine
 variables:
   GIT_DEPTH: 0
   GIT_STRATEGY: clone
