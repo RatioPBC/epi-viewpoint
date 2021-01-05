@@ -33,6 +33,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
 
       %QuarantineMonitoringForm{date_ended: end_date, date_started: start_date}
       |> cast(attrs, @required_attrs ++ @optional_attrs)
+      |> validate_required(@required_attrs)
       |> Validation.validate_date(:date_started)
       |> Validation.validate_date(:date_ended)
     end

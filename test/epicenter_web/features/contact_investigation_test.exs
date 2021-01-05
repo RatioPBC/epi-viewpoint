@@ -93,6 +93,8 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       assert [
                %{
                  interview_buttons: ["Complete interview", "Discontinue"],
+                 interview_history_items: ["Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT"],
+                 interview_status: "Ongoing",
                  quarantine_monitoring_buttons: []
                }
              ] = Pages.Profile.contact_investigations(view)
@@ -114,7 +116,18 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
       symptoms: "Fever > 100.4F, Chills"
     })
     |> Epicenter.Extra.tap(fn view ->
-      assert [%{quarantine_status: "Pending"}] = Pages.Profile.contact_investigations(view)
+      assert [
+               %{
+                 interview_buttons: [],
+                 interview_history_items: [
+                   "Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT",
+                   "Completed interview on 09/06/2020 at 03:45pm EDT"
+                 ],
+                 interview_status: "Completed",
+                 quarantine_monitoring_buttons: ["Add quarantine dates"],
+                 quarantine_status: "Pending"
+               }
+             ] = Pages.Profile.contact_investigations(view)
     end)
     |> Pages.Profile.click_contact_investigation_quarantine_monitoring(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
@@ -127,7 +140,18 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     )
     |> Pages.Profile.assert_here(exposed_person)
     |> Epicenter.Extra.tap(fn view ->
-      assert [%{quarantine_status: "Ongoing"}] = Pages.Profile.contact_investigations(view)
+      assert [
+               %{
+                 interview_buttons: [],
+                 interview_history_items: [
+                   "Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT",
+                   "Completed interview on 09/06/2020 at 03:45pm EDT"
+                 ],
+                 interview_status: "Completed",
+                 quarantine_monitoring_buttons: [],
+                 quarantine_status: "Ongoing"
+               }
+             ] = Pages.Profile.contact_investigations(view)
     end)
   end
 end

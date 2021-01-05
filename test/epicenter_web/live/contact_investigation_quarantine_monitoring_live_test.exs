@@ -75,4 +75,34 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
       event: "edit-contact-investigation-quarantine-monitoring"
     )
   end
+
+  describe "validations" do
+    test "shows the errors for missing dates", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.submit_live("#contact-investigation-quarantine-monitoring-form",
+        quarantine_monitoring_form: %{
+          "date_started" => "",
+          "date_ended" => ""
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "quarantine_monitoring_form[date_started]" => "can't be blank",
+        "quarantine_monitoring_form[date_ended]" => "can't be blank"
+      })
+    end
+
+    test "shows the errors for invalid dates", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.submit_live("#contact-investigation-quarantine-monitoring-form",
+        quarantine_monitoring_form: %{
+          "date_started" => "08/32/2020",
+          "date_ended" => "09/31/2020"
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "quarantine_monitoring_form[date_started]" => "must be a valid MM/DD/YYYY date",
+        "quarantine_monitoring_form[date_ended]" => "must be a valid MM/DD/YYYY date"
+      })
+    end
+  end
 end
