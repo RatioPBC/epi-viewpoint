@@ -2,9 +2,9 @@
   #nav
     a href="#text" Text
     a href="#buttons-and-links" Buttons & links
-    a href="#messaging" Messaging
     a href="#layout" Layout
     a href="#containers" Containers
+    a href="#elements" Elements & controls
     a href="#data" Data
     a href="#form" Form
     a href="#effects" Effects
@@ -126,24 +126,6 @@
     .styleguide-example
       a#link href="#" Link
       code a
-
-  //
-  // messaging
-  //
-  .styleguide-section
-    .styleguide-section-title#messaging Messaging
-
-    .styleguide-example-title Tooltip
-    .styleguide-example
-      #tooltip-when-disabled
-        #button-1-container data-disabled=false
-          a#button-1 Button 1's container is not disabled
-          div#button-1-tooltip Tooltip for button 1
-        #button-2-container data-disabled=true
-          a#button-2 data-disabled=true Button 2's container is disabled
-          div#button-2-tooltip Tooltip for button 2
-      code @include has-tooltip-when-disabled(#button-2-tooltip)
-
 
   //
   // layout
@@ -304,6 +286,82 @@
 
 
   //
+  // elements
+  //
+  .styleguide-section
+    .styleguide-section-title#elements Elements & controls
+
+    .styleguide-example-title Tooltip
+    .styleguide-example
+      #tooltip-when-disabled
+        #button-1-container data-disabled=false
+          a#button-1 Button 1's container is not disabled
+          div#button-1-tooltip Tooltip for button 1
+        #button-2-container data-disabled=true
+          a#button-2 data-disabled=true Button 2's container is disabled
+          div#button-2-tooltip Tooltip for button 2
+      code @include has-tooltip-when-disabled(#button-2-tooltip)
+
+    .styleguide-example-title Select
+    .styleguide-example
+      #select
+        #select-enabled
+          = arrow_down_icon()
+          select
+            option Option 1
+            option Option 2
+            option Option 3
+
+        #select-disabled data-disabled=true
+          = arrow_down_icon()
+          select disabled=true
+            option Disabled 1
+            option Disabled 2
+            option Disabled 3
+
+        #select-unset data-unset=true
+          = arrow_down_icon()
+          select
+            option Unset option
+            option Option 2
+            option Option 3
+
+      code @include select
+
+    .styleguide-example-title Dropdown
+    .styleguide-example
+      #dropdowns
+        #dropdown-button-style data-transient-control=true
+          button
+            span Dropdown (button style)
+            = arrow_down_icon()
+          ul
+            li
+              a href="#" Item 1
+            li
+              a href="#" Item 2
+            li
+              a href="#" Item 3
+            li
+              a href="#" Item 4
+            li
+              a href="#" Item 5
+
+        #dropdown-link-style data-transient-control=true
+          button
+            span Dropdown (link style)
+            = arrow_down_icon()
+          ul
+            li
+              a href="#" Item 1
+            li
+              a href="#" Item 2
+
+      code
+        div @include dropdown($style: button)
+        div @include dropdown($style: link)
+
+  //
   // data
   //
 
@@ -331,32 +389,6 @@
     div= live_redirect "Form example", to: Routes.styleguide_form_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormLive)
     div= live_redirect "Form builder example", to: Routes.styleguide_form_builder_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormBuilderLive)
     div= live_redirect "Form multiselect example", to: Routes.styleguide_form_multiselect_path(EpicenterWeb.Endpoint, EpicenterWeb.Styleguide.FormMultiselectLive)
-
-    .styleguide-example-title Select
-    .styleguide-example
-      #select
-        #select-enabled
-          = arrow_down_icon()
-          select
-            option Option 1
-            option Option 2
-            option Option 3
-
-        #select-disabled data-disabled=true
-          = arrow_down_icon()
-          select disabled=true
-            option Disabled 1
-            option Disabled 2
-            option Disabled 3
-
-        #select-unset data-unset=true
-          = arrow_down_icon()
-          select
-            option Unset option
-            option Option 2
-            option Option 3
-
-      code @include select
 
   //
   // effects

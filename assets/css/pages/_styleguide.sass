@@ -108,7 +108,7 @@
     @include button-list
 
   //
-  // messaging
+  // elements and controls
   //
   #tooltip-when-disabled
     @include vertical-flow
@@ -124,6 +124,21 @@
 
     #button-2-container
       @include has-tooltip-when-disabled(#button-2-tooltip)
+
+  #select
+    @include horizontal-flow
+
+  #select-enabled, #select-disabled, #select-unset
+    @include select
+
+  #dropdowns
+    @include vertical-flow
+
+    #dropdown-button-style
+      @include dropdown($style: button)
+
+    #dropdown-link-style
+      @include dropdown($style: link)
 
   //
   // layout
@@ -193,16 +208,6 @@
 
   #subnav
     @include subnav
-
-  //
-  // Form
-  //
-
-  #select
-    @include horizontal-flow
-
-  #select-enabled, #select-disabled, #select-unset
-    @include select
 
   //
   // Effects

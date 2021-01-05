@@ -26,31 +26,4 @@
         @include level
 
       #user-menu
-        position: relative
-
-        #user-menu-title
-          @include has-icon
-          user-select: none
-
-          &:hover
-            @include svg-color($link-color)
-            color: $link-color
-            cursor: pointer
-
-        & > ul
-          display: none
-          margin-top: 0.25rem
-          position: absolute
-          background-color: white
-          width: 100%
-          box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
-
-          li
-            a
-              padding: 0.5rem 1rem
-              display: inline-block
-
-            &:hover
-              background-color: $background-color
-
-
+        @include dropdown($style: link)

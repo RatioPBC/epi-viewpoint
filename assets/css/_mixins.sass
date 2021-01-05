@@ -117,12 +117,11 @@
   background-color: inherit
 
 @mixin button-link($size: regular)
-  @include -button($size: $size)
-  background-color: inherit
+  @include -button($size: $size, $hover-bg-color: white)
+  background-color: white
   border: 1px solid transparent
 
   &:hover
-    background-color: white
     text-decoration: underline
 
 @mixin card($width: regular)
@@ -432,6 +431,46 @@
     height: 0.5rem
     border-radius: 50%
     background-color: currentColor
+
+@mixin dropdown($style)
+  position: relative
+
+  button
+    @if $style == button
+      @include button-secondary()
+    @else if $style == link
+      @include button-link()
+
+    @include has-icon
+
+    &:focus
+      box-shadow: 0 0 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
+      outline: 0
+
+  & > ul
+    background-color: white
+    box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
+    display: none
+    margin-top: 1px
+    padding-bottom: 0.5rem
+    position: absolute
+    width: 100%
+    z-index: 2
+
+    li
+      a
+        display: block
+        padding: 0.5rem 2rem
+
+      &:hover
+        background-color: $background-color
+
+  &[data-active]
+    & > button
+      background-color: white
+
+    & > ul
+      display: block
 
 @mixin level($justify: left, $spacing: 1rem)
   @include horizontal-flow($justify: $justify, $spacing: $spacing)

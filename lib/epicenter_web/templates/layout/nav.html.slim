@@ -1,4 +1,4 @@
-header#nav phx-hook="UserMenuHook"
+header#nav
   #nav-inner
     #nav-items
       #nav-left
@@ -9,13 +9,13 @@ header#nav phx-hook="UserMenuHook"
         = link "Contacts", to: "/contacts"
 
       #nav-right
-        #user-menu
-          #user-menu-title
+        #user-menu data-transient-control=true
+          button
             = person_icon()
-            div data-role="current-user-name" = @current_user.name
+            span data-role="current-user-name" = @current_user.name
             = arrow_down_icon()
 
-          ul#user-menu-list role="menu"
+          ul
             = if @current_user.admin do
               li
                 = live_redirect "Admin", to: Routes.users_path(EpicenterWeb.Endpoint, EpicenterWeb.UsersLive)

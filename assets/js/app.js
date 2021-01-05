@@ -15,8 +15,8 @@ import "../css/app.sass";
 //
 // User menu
 //
-import { UserMenu } from "./user_menu";
-document.addEventListener("DOMContentLoaded", UserMenu.setup);
+import { TransientControl } from "./transient_control";
+document.addEventListener("DOMContentLoaded", TransientControl.setup);
 
 //
 // LiveView
@@ -33,9 +33,9 @@ let liveSocket = new LiveSocket("/live", Socket, {
         document.getElementsByTagName("body")[0].className = this.el.dataset.bodyClass;
       }
     },
-    UserMenuHook: {
+    TransientControlHook: {
       mounted() {
-        UserMenu.setup();
+        TransientControl.setup();
       }
     }
   },
