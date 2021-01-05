@@ -13,10 +13,6 @@ defmodule EpicenterWeb.StyleguideLiveTest do
       conn |> Pages.visit("/styleguide") |> render()
     end
 
-    test "form styleguide page", %{conn: conn} do
-      conn |> Pages.visit("/styleguide/form") |> render()
-    end
-
     test "form-builder styleguide page", %{conn: conn} do
       conn |> Pages.visit("/styleguide/form-builder") |> render()
     end
