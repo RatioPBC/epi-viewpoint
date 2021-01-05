@@ -2,6 +2,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -19,9 +20,9 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
          interview_completed_at: ~U[2020-01-01 23:03:07Z],
          interview_started_at: ~U[2020-01-01 22:03:07Z]
        }), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
-    exposed_person = Cases.preload_exposed_person(contact_investigation) |> Map.get(:exposed_person)
+    exposed_person = ContactInvestigations.preload_exposed_person(contact_investigation) |> Map.get(:exposed_person)
 
     [contact_investigation: contact_investigation, exposed_person: exposed_person, user: user]
   end
@@ -40,7 +41,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
 
   test "prefills with saved quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation} do
     {:ok, _} =
-      Cases.update_contact_investigation(
+      ContactInvestigations.update(
         contact_investigation,
         {%{quarantine_monitoring_starts_on: ~D[2020-11-01], quarantine_monitoring_ends_on: ~D[2020-11-15]}, Test.Fixtures.admin_audit_meta()}
       )
@@ -65,7 +66,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     %{
       quarantine_monitoring_starts_on: quarantine_monitoring_starts_on,
       quarantine_monitoring_ends_on: quarantine_monitoring_ends_on
-    } = Cases.get_contact_investigation(contact_investigation.id)
+    } = ContactInvestigations.get(contact_investigation.id)
 
     assert ~D[2020-11-01] == quarantine_monitoring_starts_on
     assert ~D[2020-11-15] == quarantine_monitoring_ends_on

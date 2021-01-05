@@ -2,6 +2,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -226,7 +227,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
   describe "updating" do
     setup %{case_investigation: case_investigation} do
       {:ok, contact_investigation} =
-        Cases.create_contact_investigation(
+        ContactInvestigations.create(
           {%{
              exposing_case_id: case_investigation.id,
              relationship_to_case: "Family",
@@ -275,7 +276,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              } = Pages.form_state(view)
 
       {:ok, contact_investigation} =
-        Cases.update_contact_investigation(
+        ContactInvestigations.update(
           contact_investigation,
           {%{
              under_18: true,

@@ -5,6 +5,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
 
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -52,7 +53,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
     )
     |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-    updated_contact_investigation = Cases.get_contact_investigation(contact_investigation.id)
+    updated_contact_investigation = ContactInvestigations.get(contact_investigation.id)
     assert "Unable to reach" = updated_contact_investigation.interview_discontinue_reason
     assert_datetime_approximate(updated_contact_investigation.interview_discontinued_at, DateTime.utc_now(), 2)
 
@@ -94,7 +95,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
   test "editing discontinuation reason has a different title", %{conn: conn, contact_investigation: contact_investigation, user: user} do
     {:ok, _} =
       contact_investigation
-      |> Cases.update_contact_investigation({%{interview_discontinued_at: ~U[2020-01-01 12:00:00Z]}, Test.Fixtures.audit_meta(user)})
+      |> ContactInvestigations.update({%{interview_discontinued_at: ~U[2020-01-01 12:00:00Z]}, Test.Fixtures.audit_meta(user)})
 
     view = Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
 
@@ -117,7 +118,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
     {:ok, contact_investigation} =
       {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
        Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
     contact_investigation
   end

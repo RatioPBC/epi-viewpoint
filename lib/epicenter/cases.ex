@@ -4,7 +4,6 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.InvestigationNote
-  alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
@@ -12,7 +11,6 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
-  alias Epicenter.ContactInvestigations
   alias Epicenter.Repo
 
   import Ecto.Query, only: [distinct: 3, first: 1]
@@ -53,6 +51,16 @@ defmodule Epicenter.Cases do
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
 
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
+
+  def preload_contact_investigations(case_investigations_or_nil),
+    do:
+      case_investigations_or_nil
+      |> Repo.preload(
+        contact_investigations: [
+          exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
+        ]
+      )
+
   def preload_person(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:person)
 
   def preload_case_investigations(person_or_people_or_nil),
@@ -181,30 +189,4 @@ defmodule Epicenter.Cases do
   def get_demographic(%Person{} = person, source: :form), do: Demographic.Query.latest_form_demographic(person) |> Repo.one()
   def preload_demographics(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(demographics: Demographic.Query.display_order())
   def update_demographic(%Demographic{} = demo, {attrs, audit_meta}), do: demo |> change_demographic(attrs) |> AuditLog.update(audit_meta)
-
-  #
-  # contact investigations
-  #
-  def change_contact_investigation(%ContactInvestigation{} = contact_investigation, attrs),
-    do: ContactInvestigations.change(contact_investigation, attrs)
-
-  def create_contact_investigation({attrs, audit_meta}),
-    do: %ContactInvestigation{} |> change_contact_investigation(attrs) |> AuditLog.insert(audit_meta)
-
-  def get_contact_investigation(id), do: ContactInvestigation |> Repo.get(id)
-
-  def preload_exposed_person(contact_investigations), do: contact_investigations |> Repo.preload(exposed_person: [:demographics, :phones])
-  def preload_exposing_case(contact_investigations), do: contact_investigations |> Repo.preload(exposing_case: [person: [:demographics]])
-
-  def preload_contact_investigations(case_investigations_or_nil),
-    do:
-      case_investigations_or_nil
-      |> Repo.preload(
-        contact_investigations: [
-          exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
-        ]
-      )
-
-  def update_contact_investigation(contact_investigation, {attrs, audit_meta}),
-    do: ContactInvestigations.update(contact_investigation, {attrs, audit_meta})
 end

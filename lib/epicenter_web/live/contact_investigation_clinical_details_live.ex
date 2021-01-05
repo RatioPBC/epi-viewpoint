@@ -7,9 +7,9 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
   import EpicenterWeb.Presenters.CaseInvestigationPresenter, only: [symptoms_options: 0]
 
   alias Epicenter.AuditLog
-  alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations
   alias Epicenter.DateParser
   alias EpicenterWeb.Format
   alias Epicenter.Validation
@@ -64,7 +64,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
   end
 
   def mount(%{"id" => id}, session, socket) do
-    contact_investigation = id |> Cases.get_contact_investigation() |> Cases.preload_exposed_person()
+    contact_investigation = id |> ContactInvestigations.get() |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
@@ -139,7 +139,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
   end
 
   defp update_contact_investigation(socket, params) do
-    Cases.update_contact_investigation(
+    ContactInvestigations.update(
       socket.assigns.contact_investigation,
       {params,
        %AuditLog.Meta{

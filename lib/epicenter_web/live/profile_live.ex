@@ -26,6 +26,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Format
   alias EpicenterWeb.InvestigationNotesSection
   alias EpicenterWeb.ContactInvestigation
@@ -140,8 +141,8 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def handle_event("remove-contact", %{"contact-investigation-id" => contact_investigation_id}, socket) do
-    with contact_investigation when not is_nil(contact_investigation) <- Cases.get_contact_investigation(contact_investigation_id) do
-      Cases.update_contact_investigation(
+    with contact_investigation when not is_nil(contact_investigation) <- ContactInvestigations.get(contact_investigation_id) do
+      ContactInvestigations.update(
         contact_investigation,
         {
           %{deleted_at: NaiveDateTime.utc_now()},
@@ -207,7 +208,7 @@ defmodule EpicenterWeb.ProfileLive do
 
     contact_investigations =
       person.contact_investigations
-      |> Cases.preload_exposing_case()
+      |> ContactInvestigations.preload_exposing_case()
       |> Cases.preload_investigation_notes()
 
     assign(socket, contact_investigations: contact_investigations)

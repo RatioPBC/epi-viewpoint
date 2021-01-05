@@ -6,6 +6,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Format
   alias EpicenterWeb.ProfileLive
@@ -308,7 +309,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, completed_contact_investigation} =
-        Cases.create_contact_investigation(
+        ContactInvestigations.create(
           {%{
              exposing_case_id: case_investigation.id,
              relationship_to_case: "Family",
@@ -337,7 +338,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         )
 
       {:ok, _} =
-        Cases.create_contact_investigation(
+        ContactInvestigations.create(
           {%{
              exposing_case_id: case_investigation.id,
              relationship_to_case: "Friend",
@@ -365,7 +366,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         )
 
       {:ok, _} =
-        Cases.create_contact_investigation(
+        ContactInvestigations.create(
           {%{
              exposing_case_id: case_investigation.id,
              relationship_to_case: "Friend",
@@ -409,7 +410,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, contact_investigation} =
-        Cases.create_contact_investigation(
+        ContactInvestigations.create(
           {%{
              exposing_case_id: case_investigation.id,
              relationship_to_case: "Family",
@@ -445,7 +446,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{interview_started_at: NaiveDateTime.utc_now()})
 
       {:ok, contact_investigation} =
-        Cases.create_contact_investigation(
+        ContactInvestigations.create(
           {%{
              exposing_case_id: case_investigation.id,
              relationship_to_case: "Family",
@@ -1057,7 +1058,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
          "contact_investigation",
          Map.put(contact_investigation_attrs, :exposing_case_id, case_investigation.id)
        ), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
     contact_investigation
   end

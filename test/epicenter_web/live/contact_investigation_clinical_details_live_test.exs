@@ -2,6 +2,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -30,7 +31,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
          clinical_status: "asymptomatic",
          symptoms: ["cough", "headache"]
        }), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
     [contact_investigation: contact_investigation, user: user]
   end
@@ -149,7 +150,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
     )
     |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-    contact_investigation = Cases.get_contact_investigation(contact_investigation.id)
+    contact_investigation = ContactInvestigations.get(contact_investigation.id)
     assert Euclid.Exists.blank?(contact_investigation.symptoms)
     assert contact_investigation.exposed_on == nil
     assert contact_investigation.clinical_status == "asymptomatic"

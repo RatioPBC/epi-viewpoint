@@ -12,6 +12,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   alias Epicenter.Cases
   alias Epicenter.Cases.ContactInvestigation
   alias Epicenter.Cases.Person
+  alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Format
   alias EpicenterWeb.Form
 
@@ -125,7 +126,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     contact_investigation =
       if id = params["id"] do
-        Cases.get_contact_investigation(id) |> Cases.preload_exposed_person()
+        ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
       else
         %ContactInvestigation{exposed_person: %Person{demographics: [], phones: []}}
       end
@@ -171,7 +172,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
   defp create_or_update_contact_investigation(contact_investigation, data, author) do
     if data.id do
-      Cases.update_contact_investigation(
+      ContactInvestigations.update(
         contact_investigation,
         {data,
          %Epicenter.AuditLog.Meta{
@@ -181,7 +182,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
          }}
       )
     else
-      Cases.create_contact_investigation(
+      ContactInvestigations.create(
         {data,
          %Epicenter.AuditLog.Meta{
            author_id: author.id,

@@ -2,6 +2,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
@@ -19,7 +20,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     {:ok, contact_investigation} =
       {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
        Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
     exposed_person = Cases.get_person(contact_investigation.exposed_person_id)
 

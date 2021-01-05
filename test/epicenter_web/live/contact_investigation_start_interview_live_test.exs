@@ -2,6 +2,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -23,7 +24,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     {:ok, contact_investigation} =
       {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
        Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
     [contact_investigation: contact_investigation]
   end
@@ -49,7 +50,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: "Jason Bourne"
-           } = Cases.get_contact_investigation(contact_investigation.id)
+           } = ContactInvestigations.get(contact_investigation.id)
   end
 
   test "prefills with existing data when existing data is available, and can edit existing data", %{
@@ -57,7 +58,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     contact_investigation: contact_investigation
   } do
     {:ok, _} =
-      Cases.update_contact_investigation(
+      ContactInvestigations.update(
         contact_investigation,
         {%{interview_started_at: ~N[2020-01-01 23:03:07], interview_proxy_name: "Jackson Publick"}, Test.Fixtures.admin_audit_meta()}
       )
@@ -82,7 +83,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: nil
-           } = Cases.get_contact_investigation(contact_investigation.id)
+           } = ContactInvestigations.get(contact_investigation.id)
   end
 
   describe "warning the user when navigation will erase their changes" do

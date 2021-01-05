@@ -6,6 +6,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
 
   setup :persist_admin
@@ -78,14 +79,14 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       {:ok, contact_investigation} =
         {Test.Fixtures.contact_investigation_attrs("contact_investigation_a", %{exposing_case_id: case_investigation.id}),
          Test.Fixtures.admin_audit_meta()}
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
       {:ok, _} =
         {Test.Fixtures.contact_investigation_attrs("contact_investigation_b", %{
            exposing_case_id: case_investigation.id,
            deleted_at: NaiveDateTime.utc_now()
          }), Test.Fixtures.admin_audit_meta()}
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
       case_investigation = case_investigation.id |> Cases.get_case_investigation() |> Cases.preload_contact_investigations()
       assert case_investigation.contact_investigations |> Enum.map(& &1.id) == [contact_investigation.id]

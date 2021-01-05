@@ -10,11 +10,12 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Forms.StartInterviewForm
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    contact_investigation = Cases.get_contact_investigation(id) |> Cases.preload_exposed_person()
+    contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
     person = contact_investigation.exposed_person |> Cases.preload_demographics()
 
     socket
@@ -54,7 +55,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   # # #
 
   defp update_contact_investigation(socket, params) do
-    Cases.update_contact_investigation(
+    ContactInvestigations.update(
       socket.assigns.contact_investigation,
       {params,
        %AuditLog.Meta{

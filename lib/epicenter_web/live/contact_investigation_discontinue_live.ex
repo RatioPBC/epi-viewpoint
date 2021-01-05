@@ -8,12 +8,12 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
   alias Ecto.Changeset
   alias Epicenter.AuditLog
   alias Epicenter.AuditLog.Revision
-  alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Form
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    contact_investigation = Cases.get_contact_investigation(id) |> Cases.preload_exposed_person()
+    contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
 
     person = contact_investigation.exposed_person
 
@@ -21,13 +21,13 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
     |> assign_defaults()
     |> assign_page_title("Discontinue Contact Investigation")
     |> assign(contact_investigation: contact_investigation)
-    |> assign(changeset: Cases.change_contact_investigation(contact_investigation, %{}))
+    |> assign(changeset: ContactInvestigations.change(contact_investigation, %{}))
     |> assign(person: person)
     |> ok()
   end
 
   def handle_event("change", %{"contact_investigation" => params}, socket) do
-    changeset = Cases.change_contact_investigation(socket.assigns.contact_investigation, params)
+    changeset = ContactInvestigations.change(socket.assigns.contact_investigation, params)
 
     socket
     |> assign(:changeset, changeset)
@@ -42,7 +42,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
            |> Changeset.cast(params, [:interview_discontinue_reason])
            |> Changeset.validate_required([:interview_discontinue_reason])
            |> Changeset.apply_action(:update) do
-      Cases.update_contact_investigation(
+      ContactInvestigations.update(
         socket.assigns.contact_investigation,
         {params,
          %AuditLog.Meta{

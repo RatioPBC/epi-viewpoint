@@ -3,6 +3,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -89,7 +90,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
     {:ok, caroline_contact_investigation} =
       {Test.Fixtures.contact_investigation_attrs("caroline_contact_investigation", %{exposing_case_id: case_investigation.id}),
        Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
     {:ok, donald_contact_investigation} =
       {Test.Fixtures.contact_investigation_attrs("donald_contact_investigation", %{
@@ -97,10 +98,11 @@ defmodule EpicenterWeb.ContactsLiveTest do
          interview_discontinued_at: ~U[2020-01-01 12:00:00Z],
          exposed_person: %{tid: "donald", demographics: [%{first_name: "Donald", last_name: "Testuser"}]}
        }), Test.Fixtures.admin_audit_meta()}
-      |> Cases.create_contact_investigation()
+      |> ContactInvestigations.create()
 
-    caroline_contact_investigation = Cases.get_contact_investigation(caroline_contact_investigation.id) |> Cases.preload_exposed_person()
-    donald_contact_investigation = Cases.get_contact_investigation(donald_contact_investigation.id) |> Cases.preload_exposed_person()
+    caroline_contact_investigation = ContactInvestigations.get(caroline_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
+
+    donald_contact_investigation = ContactInvestigations.get(donald_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
 
     caroline = caroline_contact_investigation.exposed_person
     donald = donald_contact_investigation.exposed_person

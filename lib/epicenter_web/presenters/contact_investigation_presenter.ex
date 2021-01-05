@@ -4,6 +4,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
 
   alias Epicenter.Cases
   alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Format
   alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
@@ -105,7 +106,12 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     do: date |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
 
   defp with_interviewee_name(%ContactInvestigation{interview_proxy_name: nil} = contact_investigation),
-    do: contact_investigation |> Cases.preload_exposed_person() |> Map.get(:exposed_person) |> Cases.preload_demographics() |> Format.person()
+    do:
+      contact_investigation
+      |> ContactInvestigations.preload_exposed_person()
+      |> Map.get(:exposed_person)
+      |> Cases.preload_demographics()
+      |> Format.person()
 
   defp with_interviewee_name(%ContactInvestigation{interview_proxy_name: interview_proxy_name}),
     do: "proxy #{interview_proxy_name}"

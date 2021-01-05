@@ -6,6 +6,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
@@ -37,9 +38,9 @@ defmodule EpicenterWeb.ContactInvestigationTest do
            most_recent_date_together: ~D[2020-12-15],
            symptoms: ["cough", "headache"]
          }), Test.Fixtures.admin_audit_meta()}
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
-      contact_investigation |> Cases.preload_exposing_case() |> Cases.preload_investigation_notes()
+      contact_investigation |> ContactInvestigations.preload_exposing_case() |> Cases.preload_investigation_notes()
     end
 
     use EpicenterWeb.Test.ComponentEmbeddingLiveView,
@@ -109,9 +110,9 @@ defmodule EpicenterWeb.ContactInvestigationTest do
           }
         )
         |> Test.Fixtures.wrap_with_audit_meta()
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
-      contact_investigation = contact_investigation |> Cases.preload_exposed_person()
+      contact_investigation = contact_investigation |> ContactInvestigations.preload_exposed_person()
 
       person = contact_investigation.exposed_person
 
@@ -134,9 +135,9 @@ defmodule EpicenterWeb.ContactInvestigationTest do
           }
         )
         |> Test.Fixtures.wrap_with_audit_meta()
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
-      contact_investigation = contact_investigation |> Cases.preload_exposed_person()
+      contact_investigation = contact_investigation |> ContactInvestigations.preload_exposed_person()
       person = contact_investigation.exposed_person
 
       Pages.Profile.visit(conn, person)
@@ -156,9 +157,9 @@ defmodule EpicenterWeb.ContactInvestigationTest do
           }
         )
         |> Test.Fixtures.wrap_with_audit_meta()
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
-      contact_investigation = contact_investigation |> Cases.preload_exposed_person()
+      contact_investigation = contact_investigation |> ContactInvestigations.preload_exposed_person()
       person = contact_investigation.exposed_person
 
       Pages.Profile.visit(conn, person)

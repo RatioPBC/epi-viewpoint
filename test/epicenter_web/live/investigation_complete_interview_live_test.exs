@@ -5,6 +5,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -156,7 +157,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
       {:ok, contact_investigation} =
         {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
          Test.Fixtures.admin_audit_meta()}
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
       [contact_investigation: contact_investigation, user: user]
     end
@@ -175,7 +176,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
       )
       |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-      contact_investigation = Cases.get_contact_investigation(contact_investigation.id)
+      contact_investigation = ContactInvestigations.get(contact_investigation.id)
       assert contact_investigation.interview_completed_at
       assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == contact_investigation.interview_completed_at
       assert_recent_audit_log(contact_investigation, user, action: "update-contact-investigation", event: "complete-contact-investigation-interview")
@@ -183,7 +184,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
 
     test "editing complete contact investigation", %{conn: conn, contact_investigation: contact_investigation, user: user} do
       {:ok, contact_investigation} =
-        Cases.update_contact_investigation(contact_investigation, {
+        ContactInvestigations.update(contact_investigation, {
           %{interview_completed_at: ~U[2020-01-02 16:18:42Z]},
           %AuditLog.Meta{
             author_id: user.id,

@@ -4,6 +4,7 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.InvestigationNote
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Repo
   alias Epicenter.Test
 
@@ -58,7 +59,7 @@ defmodule Epicenter.Cases.InvestigationNoteTest do
           Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
           Test.Fixtures.admin_audit_meta()
         }
-        |> Cases.create_contact_investigation()
+        |> ContactInvestigations.create()
 
       note =
         InvestigationNote.changeset(%InvestigationNote{}, %{

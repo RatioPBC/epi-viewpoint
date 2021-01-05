@@ -14,8 +14,8 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   alias EpicenterWeb.PresentationConstants
 
   def mount(%{"id" => contact_investigation_id}, session, %{assigns: %{live_action: :complete_contact_investigation}} = socket) do
-    contact_investigation = Cases.get_contact_investigation(contact_investigation_id)
-    person = contact_investigation |> Cases.preload_exposed_person() |> Map.get(:exposed_person)
+    contact_investigation = ContactInvestigations.get(contact_investigation_id)
+    person = contact_investigation |> ContactInvestigations.preload_exposed_person() |> Map.get(:exposed_person)
 
     mount(contact_investigation, person, session, socket)
   end
