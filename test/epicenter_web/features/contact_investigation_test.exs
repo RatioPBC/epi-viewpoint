@@ -144,13 +144,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Epicenter.Extra.tap(fn view ->
       assert [
                %{
-                 interview_buttons: [],
-                 interview_history_items: [
-                   "Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT",
-                   "Completed interview on 09/06/2020 at 03:45pm EDT"
-                 ],
-                 interview_status: "Completed",
-                 quarantine_monitoring_buttons: [],
+                 quarantine_monitoring_buttons: ["Conclude monitoring"],
                  quarantine_status: "Ongoing quarantine monitoring (15 days remaining)",
                  quarantine_history_items: ["Quarantine dates: 11/01/2020 - 11/15/2020"]
                }
@@ -159,5 +153,22 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Pages.Profile.click_edit_contact_investigation_quarantine_monitoring(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-quarantine-monitoring-form",
+      quarantine_monitoring_form: %{
+        "date_started" => "12/01/2020",
+        "date_ended" => "12/15/2020"
+      }
+    )
+    |> Pages.Profile.assert_here(exposed_person)
+    |> Epicenter.Extra.tap(fn view ->
+      assert [
+               %{
+                 quarantine_history_items: ["Quarantine dates: 12/01/2020 - 12/15/2020"]
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end)
+    |> Pages.Profile.click_conclude_contact_investigation_quarantine_monitoring(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationConcludeQuarantineMonitoring.assert_here()
   end
 end

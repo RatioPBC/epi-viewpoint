@@ -123,7 +123,16 @@ defmodule EpicenterWeb.ContactInvestigation do
         )
 
       "ongoing" ->
-        nil
+        live_redirect("Conclude monitoring",
+          to:
+            Routes.contact_investigation_conclude_quarantine_monitoring_path(
+              EpicenterWeb.Endpoint,
+              EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
+              contact_investigation
+            ),
+          class: "primary",
+          data: [role: "conclude-contact-investigation-quarantine-monitoring-link"]
+        )
 
       "concluded" ->
         nil

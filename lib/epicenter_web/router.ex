@@ -79,6 +79,9 @@ defmodule EpicenterWeb.Router do
 
     live "/contact-investigations/:id/discontinue", ContactInvestigationDiscontinueLive, as: :contact_investigation_discontinue
 
+    live "/contact-investigations/:id/conclude-quarantine-monitoring", ContactInvestigationConcludeQuarantineMonitoringLive,
+      as: :contact_investigation_conclude_quarantine_monitoring
+
     live "/contact-investigations/:id/quarantine-monitoring", ContactInvestigationQuarantineMonitoringLive,
       as: :contact_investigation_quarantine_monitoring
 
