@@ -1,8 +1,6 @@
 defmodule Epicenter.Repo.Migrations.AddQuarantineMonitoringStatusToContactInvestigations do
   use Ecto.Migration
 
-  use Ecto.Migration
-
   def up() do
     execute("""
     ALTER TABLE contact_investigations
