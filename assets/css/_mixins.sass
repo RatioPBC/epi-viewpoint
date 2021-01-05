@@ -49,26 +49,6 @@
       & + li
         border-top: 1px dotted white
 
-@mixin button-list
-  .button
-    @include button-secondary
-
-    &[data-disabled]
-      border-color: $disabled-button-color
-
-    &:not(:last-of-type)
-      border-right-color: $button-list-divider-color
-
-    &[data-active=true]
-      font-weight: bold
-      text-decoration: underline
-
-    &:first-of-type
-      border-radius: 2px 0 0 2px
-
-    &:last-of-type
-      border-radius: 0 2px 2px 0
-
 @mixin -button($size: regular, $hover-bg-color: $button-hover-color, $disabled-bg-color: $disabled-button-color)
   background-color: $button-color
   border: 1px solid $button-color
@@ -102,6 +82,38 @@
     text-decoration: none
     background-color: $hover-bg-color
 
+@mixin button-link($size: regular)
+  @include -button($size: $size, $hover-bg-color: white)
+  background-color: white
+  border: 1px solid transparent
+
+  &:hover
+    text-decoration: underline
+
+@mixin button-list
+  .button
+    @include button-secondary
+
+    &[data-disabled]
+      border-color: $disabled-button-color
+
+    &:not(:last-of-type)
+      border-right-color: $button-list-divider-color
+
+    &[data-active=true]
+      font-weight: bold
+      text-decoration: underline
+
+    &:first-of-type
+      border-radius: 2px 0 0 2px
+
+    &:last-of-type
+      border-radius: 0 2px 2px 0
+
+@mixin button-outline($size: regular)
+  @include -button($size: $size, $hover-bg-color: white, $disabled-bg-color: white)
+  background-color: inherit
+
 @mixin button-primary($size: regular)
   @include -button($size: $size)
   color: white
@@ -111,18 +123,6 @@
   background-color: $secondary-button-color
   border-color: $secondary-button-color
   color: $primary-text-color
-
-@mixin button-outline($size: regular)
-  @include -button($size: $size, $hover-bg-color: white, $disabled-bg-color: white)
-  background-color: inherit
-
-@mixin button-link($size: regular)
-  @include -button($size: $size, $hover-bg-color: white)
-  background-color: white
-  border: 1px solid transparent
-
-  &:hover
-    text-decoration: underline
 
 @mixin card($width: regular)
   @include vertical-flow
@@ -150,10 +150,6 @@
 
   & > *
     place-self: center
-
-@mixin full-width-page
-  max-width: initial
-  margin: initial
 
 @mixin checkbox-list
   @include -input-vertical-list
@@ -200,6 +196,67 @@
     tr:first-of-type
       th, td
         padding-top: 2rem
+
+@mixin dividers($padding: 2rem)
+  > *:not(:first-child):not(:empty)
+    border-top: 1px solid $divider-color
+    padding-top: $padding
+
+@mixin dotted-details()
+  align-items: flex-start
+
+  & > *
+    display: inline-block
+
+  li + li::before
+    content: ''
+    display: inline-block
+    vertical-align: middle
+    margin: 0 0.75rem
+    width: 0.5rem
+    height: 0.5rem
+    border-radius: 50%
+    background-color: currentColor
+
+@mixin dropdown($style)
+  position: relative
+
+  button
+    @if $style == button
+      @include button-secondary()
+    @else if $style == link
+      @include button-link()
+
+    @include has-icon
+
+    &:focus
+      box-shadow: 0 0 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
+      outline: 0
+
+  & > ul
+    background-color: white
+    box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
+    display: none
+    margin-top: 1px
+    padding-bottom: 0.5rem
+    position: absolute
+    width: 100%
+    z-index: 2
+
+    li
+      a
+        display: block
+        padding: 0.5rem 2rem
+
+      &:hover
+        background-color: $background-color
+
+  &[data-active]
+    & > button
+      background-color: white
+
+    & > ul
+      display: block
 
 @mixin form
   margin-top: 1rem
@@ -331,6 +388,10 @@
     .form-error-message
       color: $error-color
 
+@mixin full-width-page
+  max-width: initial
+  margin: initial
+
 @mixin grid($column-size)
   align-items: center
   column-gap: 2rem
@@ -411,85 +472,6 @@
   & > *:not(:first-child)
     margin-left: $spacing
 
-@mixin dividers($padding: 2rem)
-  > *:not(:first-child):not(:empty)
-    border-top: 1px solid $divider-color
-    padding-top: $padding
-
-@mixin dotted-details()
-  align-items: flex-start
-
-  & > *
-    display: inline-block
-
-  li + li::before
-    content: ''
-    display: inline-block
-    vertical-align: middle
-    margin: 0 0.75rem
-    width: 0.5rem
-    height: 0.5rem
-    border-radius: 50%
-    background-color: currentColor
-
-@mixin dropdown($style)
-  position: relative
-
-  button
-    @if $style == button
-      @include button-secondary()
-    @else if $style == link
-      @include button-link()
-
-    @include has-icon
-
-    &:focus
-      box-shadow: 0 0 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
-      outline: 0
-
-  & > ul
-    background-color: white
-    box-shadow: 0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
-    display: none
-    margin-top: 1px
-    padding-bottom: 0.5rem
-    position: absolute
-    width: 100%
-    z-index: 2
-
-    li
-      a
-        display: block
-        padding: 0.5rem 2rem
-
-      &:hover
-        background-color: $background-color
-
-  &[data-active]
-    & > button
-      background-color: white
-
-    & > ul
-      display: block
-
-@mixin level($justify: left, $spacing: 1rem)
-  @include horizontal-flow($justify: $justify, $spacing: $spacing)
-  align-items: center
-
-@mixin radio-button-list
-  // Radio button list items are in reverse order in the markup so that the "other" text field is overridden by
-  // any radio button, so the CSS here reverses the reverse order. HOWEVER, this breaks keyboard tab order, so
-  // we should implement this a different way sometime.
-  @include -input-vertical-list
-  display: flex
-  flex-direction: column-reverse
-
-  > *:not(:last-child)
-    margin-top: 0.5rem
-
-  > *:last-child
-    margin-top: 0
-
 @mixin -input-vertical-list
   font-weight: bold
   margin-top: 0.5rem
@@ -508,6 +490,24 @@
     display: initial
     margin-left: 1.8rem
     margin-top: 0.5rem
+
+@mixin level($justify: left, $spacing: 1rem)
+  @include horizontal-flow($justify: $justify, $spacing: $spacing)
+  align-items: center
+
+@mixin radio-button-list
+  // Radio button list items are in reverse order in the markup so that the "other" text field is overridden by
+  // any radio button, so the CSS here reverses the reverse order. HOWEVER, this breaks keyboard tab order, so
+  // we should implement this a different way sometime.
+  @include -input-vertical-list
+  display: flex
+  flex-direction: column-reverse
+
+  > *:not(:last-child)
+    margin-top: 0.5rem
+
+  > *:last-child
+    margin-top: 0
 
 @mixin select
   align-items: center
