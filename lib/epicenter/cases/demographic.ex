@@ -61,40 +61,6 @@ defmodule Epicenter.Cases.Demographic do
     |> validate_phi(:demographic)
   end
 
-  def major(demographic, field, other: other?) do
-    case Map.get(demographic, field) do
-      nil -> nil
-      map when is_map(map) -> map |> Map.keys() |> reject_nonstandard_values(:race, !other?) |> Enum.sort()
-    end
-  end
-
-  def detailed(demographic, field, major, other: other?) do
-    case demographic |> Map.get(field) do
-      nil ->
-        nil
-
-      map when is_map(map) ->
-        case Map.get(map, Euclid.Extra.Atom.to_string(major)) do
-          nil -> []
-          values -> List.wrap(values) |> reject_nonstandard_values(:race, !other?) |> Enum.sort()
-        end
-    end
-  end
-
-  def other(demographic, field) do
-    case major(demographic, field, other: true) do
-      nil -> nil
-      major -> major |> List.wrap() |> reject_standard_values(field) |> List.first()
-    end
-  end
-
-  def other(demographic, field, major) do
-    case detailed(demographic, field, major, other: true) do
-      nil -> nil
-      detailed -> detailed |> List.wrap() |> reject_standard_values(field) |> List.first()
-    end
-  end
-
   def build_attrs(nil, _field),
     do: nil
 

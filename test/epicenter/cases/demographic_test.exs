@@ -106,47 +106,6 @@ defmodule Epicenter.Cases.DemographicTest do
     end
   end
 
-  describe "major/detailed/other" do
-    setup do
-      demographic = %{
-        race: %{
-          "black_or_african_american" => nil,
-          "asian" => ["filipino", "korean", "Some other asian"],
-          "Some other race" => nil
-        }
-      }
-
-      [demographic: demographic]
-    end
-
-    test "major", %{demographic: demographic} do
-      assert Demographic.major(%{}, :race, other: true) == nil
-      assert Demographic.major(%{race: nil}, :race, other: true) == nil
-      assert Demographic.major(%{race: %{}}, :race, other: true) == []
-      assert Demographic.major(demographic, :race, other: true) == ["Some other race", "asian", "black_or_african_american"]
-      assert Demographic.major(demographic, :race, other: false) == ["asian", "black_or_african_american"]
-    end
-
-    test "detailed", %{demographic: demographic} do
-      assert Demographic.detailed(%{}, :race, :asian, other: true) == nil
-      assert Demographic.detailed(%{race: nil}, :race, :asian, other: true) == nil
-      assert Demographic.detailed(%{race: %{}}, :race, :asian, other: true) == []
-      assert Demographic.detailed(%{race: %{"asian" => nil}}, :race, :asian, other: true) == []
-      assert Demographic.detailed(%{race: %{"asian" => []}}, :race, :asian, other: true) == []
-      assert Demographic.detailed(demographic, :race, :asian, other: true) == ["Some other asian", "filipino", "korean"]
-      assert Demographic.detailed(demographic, :race, :asian, other: false) == ["filipino", "korean"]
-    end
-
-    test "other", %{demographic: demographic} do
-      assert Demographic.other(%{}, :race) == nil
-      assert Demographic.other(%{race: nil}, :race) == nil
-      assert Demographic.other(%{race: %{}}, :race) == nil
-      assert Demographic.other(%{race: %{}}, :race, :asian) == nil
-      assert Demographic.other(demographic, :race) == "Some other race"
-      assert Demographic.other(demographic, :race, :asian) == "Some other asian"
-    end
-  end
-
   describe "Query.display_order" do
     test "sorts by insertion order" do
       author = Test.Fixtures.admin()
