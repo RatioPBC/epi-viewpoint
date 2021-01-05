@@ -2,7 +2,7 @@ defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
 
   import EpicenterWeb.LiveComponent.Helpers
-  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1]
+  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1, quarantine_history_items: 1]
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
 
   alias Epicenter.ContactInvestigations.ContactInvestigation

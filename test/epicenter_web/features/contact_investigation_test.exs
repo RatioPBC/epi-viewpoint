@@ -126,7 +126,8 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
                  ],
                  interview_status: "Completed",
                  quarantine_monitoring_buttons: ["Add quarantine dates"],
-                 quarantine_status: "Pending quarantine monitoring"
+                 quarantine_status: "Pending quarantine monitoring",
+                 quarantine_history_items: []
                }
              ] = Pages.Profile.contact_investigations(view)
     end)
@@ -150,9 +151,13 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
                  ],
                  interview_status: "Completed",
                  quarantine_monitoring_buttons: [],
-                 quarantine_status: "Ongoing quarantine monitoring (15 days remaining)"
+                 quarantine_status: "Ongoing quarantine monitoring (15 days remaining)",
+                 quarantine_history_items: ["Quarantine dates: 11/01/2020 - 11/15/2020"]
                }
              ] = Pages.Profile.contact_investigations(view)
     end)
+    |> Pages.Profile.click_edit_contact_investigation_quarantine_monitoring(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
   end
 end

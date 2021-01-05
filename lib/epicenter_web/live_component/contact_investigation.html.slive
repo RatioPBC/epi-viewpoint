@@ -64,6 +64,11 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
           = quarantine_monitoring_status_text(@contact_investigation, @current_date)
           .contact-investigation-interview-buttons
             = quarantine_monitoring_button(@contact_investigation)
+        .contact-investigation-history
+                = for history_item <- quarantine_history_items(@contact_investigation) do
+                  div
+                    span data-role="contact-investigation-quarantine-history-item-text" = history_item.text
+                    span class="history-item-link" = history_item.link
 
     .contact-investigation-notes
       = component(@socket,

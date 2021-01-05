@@ -102,6 +102,37 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     }
   end
 
+  def quarantine_history_items(contact_investigation) do
+    [
+      quarantine_dates_history(contact_investigation)
+    ]
+    |> Enum.filter(&Function.identity/1)
+  end
+
+  defp quarantine_dates_history(%{quarantine_monitoring_ends_on: nil, quarantine_monitoring_starts_on: nil}),
+    do: nil
+
+  defp quarantine_dates_history(contact_investigation) do
+    %{
+      text:
+        "Quarantine dates: #{Format.date(contact_investigation.quarantine_monitoring_starts_on)} - #{
+          Format.date(contact_investigation.quarantine_monitoring_ends_on)
+        }",
+      link:
+        live_redirect(
+          "Edit",
+          to:
+            Routes.contact_investigation_quarantine_monitoring_path(
+              EpicenterWeb.Endpoint,
+              EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
+              contact_investigation
+            ),
+          class: "contact-investigation-link",
+          data: [role: "edit-contact-investigation-quarantine-monitoring-link"]
+        )
+    }
+  end
+
   defp format_date(date),
     do: date |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
 
