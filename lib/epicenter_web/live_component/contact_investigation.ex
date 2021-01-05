@@ -28,10 +28,23 @@ defmodule EpicenterWeb.ContactInvestigation do
     end
   end
 
-  defp quarantine_monitoring_status_text(%ContactInvestigation{} = %{quarantine_monitoring_status: status}) do
-    case status do
-      "ongoing" -> "Ongoing"
-      _ -> "Pending"
+  defp quarantine_monitoring_status_text(
+         %{quarantine_monitoring_status: status, quarantine_monitoring_ends_on: quarantine_monitoring_ends_on},
+         current_date
+       ) do
+    content_tag :h3, class: "contact-investigation-quarantine-monitoring-status", data_role: "contact-investigation-quarantine-monitoring-status" do
+      case status do
+        "ongoing" ->
+          diff = Date.diff(quarantine_monitoring_ends_on, current_date)
+
+          [
+            content_tag(:span, "Ongoing", class: "started-status"),
+            content_tag(:span, "quarantine monitoring (#{diff} days remaining)")
+          ]
+
+        _ ->
+          [content_tag(:span, "Pending", class: "pending-status"), "quarantine monitoring"]
+      end
     end
   end
 

@@ -61,9 +61,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
     = if @contact_investigation.interview_status == "completed" do
       div
         .contact-investigation-status-row
-          h3
-            span data-role="contact-investigation-quarantine-status" class=status_class(@contact_investigation.quarantine_monitoring_status) = quarantine_monitoring_status_text(@contact_investigation)
-            |  quarantine monitoring
+          = quarantine_monitoring_status_text(@contact_investigation, @current_date)
           .contact-investigation-interview-buttons
             = quarantine_monitoring_button(@contact_investigation)
 

@@ -169,6 +169,7 @@
                 contact_investigation.id <> "contact investigation",
                 contact_investigation: contact_investigation,
                 current_user_id: @current_user.id,
+                current_date: @current_date,
                 on_add_note: fn note_attrs -> on_note_added(note_attrs, contact_investigation) end,
                 on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end
 

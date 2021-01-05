@@ -613,7 +613,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
           Test.Html.text(detail)
         end)
 
-      quarantine_status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-quarantine-status]") |> Test.Html.text()
+      quarantine_status = Test.Html.find(contact_investigation, "[data-role=contact-investigation-quarantine-monitoring-status]") |> Test.Html.text()
 
       %{
         id: id,
