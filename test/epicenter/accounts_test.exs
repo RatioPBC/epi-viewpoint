@@ -703,16 +703,12 @@ defmodule Epicenter.AccountsTest do
     test "adding a single row for the audit trail when a user logs in" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       session_id = Ecto.UUID.generate()
-      assert [] == Accounts.list_logins(user.id)
 
-      Accounts.record_login(%{
-        session_id: session_id,
-        tid: "login",
-        user_agent: "something complicated",
-        user_id: user.id
-      })
+      assert_that Accounts.record_login(%{session_id: session_id, tid: "login", user_agent: "something complicated", user_id: user.id}),
+        changes: length(Accounts.list_logins(user.id)),
+        from: 0,
+        to: 1
 
-      assert 1 == length(Accounts.list_logins(user.id))
       [login] = Accounts.list_logins(user.id)
 
       assert session_id == login.session_id
@@ -744,11 +740,9 @@ defmodule Epicenter.AccountsTest do
         user_id: user2.id
       })
 
-      assert 1 = length(Accounts.list_logins(user.id))
       [login] = Accounts.list_logins(user.id)
       assert "login" == login.tid
 
-      assert 1 = length(Accounts.list_logins(user2.id))
       [login2] = Accounts.list_logins(user2.id)
       assert "login2" == login2.tid
     end
