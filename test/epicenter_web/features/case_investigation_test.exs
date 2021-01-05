@@ -129,6 +129,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
       }
     )
     |> Pages.Profile.assert_here(person)
+    |> Pages.Profile.refute_complete_interview_button("001")
     |> Pages.Profile.assert_isolation_monitoring_visible(%{status: "Pending isolation monitoring", number: "001"})
     |> Pages.Profile.click_add_isolation_dates("001")
     |> Pages.follow_live_view_redirect(conn)
