@@ -107,6 +107,9 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
 
   # # #
 
+  defp page_title(%{quarantine_monitoring_starts_on: nil, quarantine_monitoring_ends_on: nil}), do: "Add quarantine dates"
+  defp page_title(_), do: "Edit quarantine dates"
+
   defp update_contact_investigation(socket, params) do
     ContactInvestigations.update(
       socket.assigns.contact_investigation,

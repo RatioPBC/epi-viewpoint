@@ -32,24 +32,42 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
   end
 
-  test "prefills start date with exposure date", %{conn: conn, contact_investigation: contact_investigation} do
-    Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
-    |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
-    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("12/31/2019", "Exposure date: 12/31/2019")
-    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_recommended_length("Recommended length: 14 days")
+  describe "without saved quarantine monitoring dates" do
+    test "has add title", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_page_title("Add quarantine dates")
+    end
+
+    test "prefills start date with exposure date", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("12/31/2019", "Exposure date: 12/31/2019")
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_recommended_length("Recommended length: 14 days")
+    end
   end
 
-  test "prefills with saved quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation} do
-    {:ok, _} =
-      ContactInvestigations.update(
-        contact_investigation,
-        {%{quarantine_monitoring_starts_on: ~D[2020-11-01], quarantine_monitoring_ends_on: ~D[2020-11-15]}, Test.Fixtures.admin_audit_meta()}
-      )
+  describe "with saved quarantine monitoring dates" do
+    setup %{contact_investigation: contact_investigation} do
+      {:ok, _} =
+        ContactInvestigations.update(
+          contact_investigation,
+          {%{quarantine_monitoring_starts_on: ~D[2020-11-01], quarantine_monitoring_ends_on: ~D[2020-11-15]}, Test.Fixtures.admin_audit_meta()}
+        )
 
-    Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
-    |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
-    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("11/01/2020", "Exposure date: 12/31/2019")
-    |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_ended("11/15/2020")
+      :ok
+    end
+
+    test "has edit title", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_page_title("Edit quarantine dates")
+    end
+
+    test "prefills with saved quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_here()
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_started("11/01/2020", "Exposure date: 12/31/2019")
+      |> Pages.ContactInvestigationQuarantineMonitoring.assert_quarantine_date_ended("11/15/2020")
+    end
   end
 
   test "saving quarantine monitoring dates", %{conn: conn, contact_investigation: contact_investigation, exposed_person: exposed_person, user: user} do
