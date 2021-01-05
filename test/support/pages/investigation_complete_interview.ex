@@ -4,7 +4,7 @@ defmodule EpicenterWeb.Test.Pages.InvestigationCompleteInterview do
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View

@@ -10,7 +10,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.Person
   alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Format

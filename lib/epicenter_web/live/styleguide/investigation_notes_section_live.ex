@@ -5,7 +5,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts.User
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.InvestigationNote
   alias EpicenterWeb.InvestigationNotesSection
 

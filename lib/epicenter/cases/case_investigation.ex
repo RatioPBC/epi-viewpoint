@@ -7,7 +7,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.InvestigationNote
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
 

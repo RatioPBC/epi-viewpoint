@@ -101,7 +101,7 @@ defmodule EpicenterWeb.ProfileLive do
     }
   end
 
-  defp audit_log_data_for_adding_note(%Cases.ContactInvestigation{}) do
+  defp audit_log_data_for_adding_note(%ContactInvestigations.ContactInvestigation{}) do
     {
       AuditLog.Revision.create_contact_investigation_note_action(),
       AuditLog.Revision.profile_contact_investigation_note_submission_event()
@@ -118,7 +118,7 @@ defmodule EpicenterWeb.ProfileLive do
     send(self(), {:add_note, note_attrs, {:case_investigation_id, subject}})
   end
 
-  def on_note_added(note_attrs, %Cases.ContactInvestigation{} = subject) do
+  def on_note_added(note_attrs, %ContactInvestigations.ContactInvestigation{} = subject) do
     send(self(), {:add_note, note_attrs, {:contact_investigation_id, subject}})
   end
 
@@ -129,7 +129,7 @@ defmodule EpicenterWeb.ProfileLive do
     }
   end
 
-  defp audit_log_data_for_deleting_note(%Cases.ContactInvestigation{}) do
+  defp audit_log_data_for_deleting_note(%ContactInvestigations.ContactInvestigation{}) do
     {
       AuditLog.Revision.delete_contact_investigation_note_action(),
       AuditLog.Revision.profile_contact_investigation_note_deletion_event()

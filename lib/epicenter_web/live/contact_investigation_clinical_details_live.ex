@@ -8,7 +8,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.ContactInvestigations
   alias Epicenter.DateParser
   alias EpicenterWeb.Format

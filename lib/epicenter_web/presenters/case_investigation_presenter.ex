@@ -4,7 +4,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
 
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.Person
   alias EpicenterWeb.Format
   alias EpicenterWeb.PresentationConstants

@@ -3,7 +3,7 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationClinicalDetails do
   import Euclid.Test.Extra.Assertions, only: [assert_eq: 2]
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 

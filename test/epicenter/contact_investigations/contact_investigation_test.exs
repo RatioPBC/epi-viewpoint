@@ -1,8 +1,8 @@
-defmodule Epicenter.Cases.ContactInvestigationTest do
+defmodule Epicenter.ContactInvestigations.ContactInvestigationTest do
   use Epicenter.DataCase, async: true
 
   alias Epicenter.Cases
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Test
 
   setup :persist_admin

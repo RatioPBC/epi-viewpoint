@@ -2,7 +2,7 @@ defmodule EpicenterWeb.Test.Pages.CaseInvestigationContact do
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias EpicenterWeb.Test.Pages
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: id}) do

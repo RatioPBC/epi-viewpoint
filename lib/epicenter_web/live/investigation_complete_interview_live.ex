@@ -87,7 +87,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
     Cases.complete_case_investigation_interview(investigation, socket.assigns.current_user.id, params)
   end
 
-  defp update_case_investigation(%{assigns: %{investigation: %Cases.ContactInvestigation{} = contact_investigation}} = socket, params) do
+  defp update_case_investigation(%{assigns: %{investigation: %ContactInvestigations.ContactInvestigation{} = contact_investigation}} = socket, params) do
     ContactInvestigations.complete_interview(contact_investigation, socket.assigns.current_user.id, params)
   end
 end

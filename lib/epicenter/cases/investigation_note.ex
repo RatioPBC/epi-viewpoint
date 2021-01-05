@@ -18,7 +18,7 @@ defmodule Epicenter.Cases.InvestigationNote do
 
     belongs_to :author, Epicenter.Accounts.User
     belongs_to :case_investigation, Epicenter.Cases.CaseInvestigation
-    belongs_to :contact_investigation, Epicenter.Cases.ContactInvestigation
+    belongs_to :contact_investigation, Epicenter.ContactInvestigations.ContactInvestigation
 
     timestamps(type: :utc_datetime)
   end

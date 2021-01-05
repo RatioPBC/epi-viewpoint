@@ -15,7 +15,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
 
     import Ecto.Changeset
 
-    alias Epicenter.Cases.ContactInvestigation
+    alias Epicenter.ContactInvestigations.ContactInvestigation
     alias Epicenter.DateParser
     alias Epicenter.Validation
     alias EpicenterWeb.Format

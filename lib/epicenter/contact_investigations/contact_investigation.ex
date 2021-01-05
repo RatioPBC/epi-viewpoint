@@ -1,4 +1,4 @@
-defmodule Epicenter.Cases.ContactInvestigation do
+defmodule Epicenter.ContactInvestigations.ContactInvestigation do
   use Ecto.Schema
 
   import Ecto.Changeset

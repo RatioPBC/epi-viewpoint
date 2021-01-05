@@ -3,7 +3,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
 
   alias Epicenter.Cases
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Format
   alias EpicenterWeb.PresentationConstants

@@ -1,6 +1,6 @@
 defmodule Epicenter.ContactInvestigations do
   alias Epicenter.AuditLog
-  alias Epicenter.Cases.ContactInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Repo
 
   def change(%ContactInvestigation{} = investigation, attrs),
