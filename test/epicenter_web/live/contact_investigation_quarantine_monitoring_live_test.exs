@@ -124,4 +124,25 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
       })
     end
   end
+
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.refute_confirmation_prompt_active()
+    end
+
+    test "when the user changes something", %{conn: conn, contact_investigation: contact_investigation} do
+      view =
+        Pages.ContactInvestigationQuarantineMonitoring.visit(conn, contact_investigation)
+        |> Pages.ContactInvestigationQuarantineMonitoring.change_form(
+          quarantine_monitoring_form: %{
+            "date_started" => "08/30/2020",
+            "date_ended" => "09/31/2020"
+          }
+        )
+        |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
+
+      assert %{"quarantine_monitoring_form[date_started]" => "08/30/2020"} = Pages.form_state(view)
+    end
+  end
 end

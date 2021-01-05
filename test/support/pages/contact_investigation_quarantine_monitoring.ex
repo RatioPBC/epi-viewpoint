@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Test.Pages.ContactInvestigationQuarantineMonitoring do
   import ExUnit.Assertions
+  import Phoenix.LiveViewTest
 
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Test
@@ -46,6 +47,12 @@ defmodule EpicenterWeb.Test.Pages.ContactInvestigationQuarantineMonitoring do
     assert view
            |> Pages.parse()
            |> Test.Html.text(role: "recommended-length") == expected_text
+
+    view
+  end
+
+  def change_form(view, attrs) do
+    view |> element("#contact-investigation-quarantine-monitoring-form") |> render_change(attrs)
 
     view
   end

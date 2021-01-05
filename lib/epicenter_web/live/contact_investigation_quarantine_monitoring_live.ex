@@ -1,6 +1,9 @@
 defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
+
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
@@ -68,10 +71,17 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
     |> assign_defaults()
     |> assign_page_title(" Contact Investigation Quarantine Monitoring")
     |> authenticate_user(session)
+    |> assign(:confirmation_prompt, nil)
     |> assign(:contact_investigation, contact_investigation)
     |> assign(:person, contact_investigation.exposed_person)
     |> assign_form_changeset(QuarantineMonitoringForm.changeset(contact_investigation, %{}))
     |> ok()
+  end
+
+  def handle_event("change", %{"quarantine_monitoring_form" => params}, socket) do
+    new_changeset = QuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params)
+
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset)) |> assign_form_changeset(new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"quarantine_monitoring_form" => params}, socket) do
