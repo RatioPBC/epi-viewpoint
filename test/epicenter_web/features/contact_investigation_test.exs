@@ -170,5 +170,20 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
     |> Pages.Profile.click_conclude_contact_investigation_quarantine_monitoring(contact_investigation.tid)
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.ContactInvestigationConcludeQuarantineMonitoring.assert_here()
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-conclude-quarantine-monitoring-form",
+      conclude_quarantine_monitoring_form: %{
+        "reason" => "successfully_completed_quarantine"
+      }
+    )
+    |> Pages.Profile.assert_here(exposed_person)
+    |> Epicenter.Extra.tap(fn view ->
+      assert [
+               %{
+                 quarantine_monitoring_buttons: [],
+                 quarantine_status: "Concluded quarantine monitoring",
+                 quarantine_history_items: ["Quarantine dates: 12/01/2020 - 12/15/2020"]
+               }
+             ] = Pages.Profile.contact_investigations(view)
+    end)
   end
 end

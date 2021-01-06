@@ -112,11 +112,24 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigationTest do
 
     test "ongoing when quarantine monitoring starts on is not null" do
       {:ok, contact_investigation} =
-        %{quarantine_monitoring_starts_on: DateTime.utc_now()}
+        %{quarantine_monitoring_starts_on: DateTime.utc_now(), interview_discontinued_at: DateTime.utc_now()}
         |> new_changeset()
         |> Repo.insert()
 
       assert contact_investigation.quarantine_monitoring_status == "ongoing"
+    end
+
+    test "concluded when quarantine monitoring has been completed" do
+      {:ok, contact_investigation} =
+        %{
+          interview_completed_at: DateTime.utc_now(),
+          quarantine_monitoring_starts_on: DateTime.utc_now(),
+          quarantine_concluded_at: DateTime.utc_now()
+        }
+        |> new_changeset()
+        |> Repo.insert()
+
+      assert contact_investigation.quarantine_monitoring_status == "concluded"
     end
   end
 end

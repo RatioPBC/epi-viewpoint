@@ -58,7 +58,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
     })
   end
 
-  test "saving quarantine conclusion reason for a case investigation", %{
+  test "saving quarantine conclusion reason for a contact investigation", %{
     conn: conn,
     contact_investigation: contact_investigation,
     user: user

@@ -42,6 +42,12 @@ defmodule EpicenterWeb.ContactInvestigation do
             content_tag(:span, "quarantine monitoring (#{diff} days remaining)")
           ]
 
+        "concluded" ->
+          [
+            content_tag(:span, "Concluded", class: "completed-status"),
+            content_tag(:span, "quarantine monitoring")
+          ]
+
         _ ->
           [
             content_tag(:span, "Pending", class: "pending-status"),
