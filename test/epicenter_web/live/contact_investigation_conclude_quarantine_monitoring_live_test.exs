@@ -38,6 +38,26 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
     })
   end
 
+  test "prefills the form if there is already a reason on the contact investigation", %{conn: conn, contact_investigation: contact_investigation} do
+    {:ok, _} =
+      ContactInvestigations.update(
+        contact_investigation,
+        {%{quarantine_conclusion_reason: "successfully_completed_quarantine", quarantine_concluded_at: ~U[2020-10-31 10:30:00Z]},
+         Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation)
+    |> Pages.ContactInvestigationConcludeQuarantineMonitoring.assert_page_heading("Edit conclude quarantine monitoring")
+    |> Pages.ContactInvestigationConcludeQuarantineMonitoring.assert_reasons_selection(%{
+      "Successfully completed quarantine period" => true,
+      "Person unable to quarantine" => false,
+      "Refused to cooperate" => false,
+      "Lost to follow up" => false,
+      "Transferred to another jurisdiction" => false,
+      "Deceased" => false
+    })
+  end
+
   test "saving quarantine conclusion reason for a case investigation", %{
     conn: conn,
     contact_investigation: contact_investigation,

@@ -21,9 +21,8 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
       field :reason, :string
     end
 
-    def changeset(_contact_investigation, attrs) do
-      #      %ConcludeQuarantineMonitoringForm{reason: contact_investigation.quarantine_conclusion_reason}
-      %ConcludeQuarantineMonitoringForm{reason: nil}
+    def changeset(contact_investigation, attrs) do
+      %ConcludeQuarantineMonitoringForm{reason: contact_investigation.quarantine_conclusion_reason}
       |> cast(attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
     end
@@ -45,7 +44,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
 
     socket
     |> assign_defaults()
-    |> assign(:page_heading, "Conclude quarantine monitoring")
+    |> assign_page_heading(contact_investigation)
     |> assign(:form_changeset, ConcludeQuarantineMonitoringForm.changeset(contact_investigation, %{}))
     |> assign(:contact_investigation, contact_investigation)
     |> assign(:person, contact_investigation.exposed_person)
@@ -83,4 +82,11 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end
+
+  # # #
+
+  defp assign_page_heading(socket, %ContactInvestigation{quarantine_concluded_at: nil}),
+    do: assign(socket, page_heading: "Conclude quarantine monitoring")
+
+  defp assign_page_heading(socket, %ContactInvestigation{}), do: assign(socket, page_heading: "Edit conclude quarantine monitoring")
 end
