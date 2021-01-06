@@ -547,6 +547,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_edit_conclude_contact_investigation_quarantine_monitoring(%View{} = view, contact_investigation_tid) do
+    view
+    |> element("[data-tid=#{contact_investigation_tid}] [data-role=conclude-contact-investigation-quarantine-monitoring-edit-link]")
+    |> render_click()
+  end
+
   def click_contact_investigation_complete_interview(%View{} = view, contact_investigation_tid) do
     view
     |> element("[data-tid=#{contact_investigation_tid}] [data-role=contact-investigation-complete-interview-link]")

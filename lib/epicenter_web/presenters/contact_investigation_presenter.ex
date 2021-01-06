@@ -104,7 +104,8 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
 
   def quarantine_history_items(contact_investigation) do
     [
-      quarantine_dates_history(contact_investigation)
+      quarantine_dates_history(contact_investigation),
+      quarantine_conclusion(contact_investigation)
     ]
     |> Enum.filter(&Function.identity/1)
   end
@@ -129,6 +130,29 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
             ),
           class: "contact-investigation-link",
           data: [role: "edit-contact-investigation-quarantine-monitoring-link"]
+        )
+    }
+  end
+
+  defp quarantine_conclusion(%{quarantine_concluded_at: nil}), do: nil
+
+  defp quarantine_conclusion(contact_investigation) do
+    %{
+      text:
+        "Concluded quarantine monitoring on #{Format.date(contact_investigation.quarantine_concluded_at)}: #{
+          Gettext.gettext(Epicenter.Gettext, contact_investigation.quarantine_conclusion_reason)
+        }",
+      link:
+        live_redirect(
+          "Edit",
+          to:
+            Routes.contact_investigation_conclude_quarantine_monitoring_path(
+              EpicenterWeb.Endpoint,
+              EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
+              contact_investigation
+            ),
+          class: "contact-investigation-link",
+          data: [role: "conclude-contact-investigation-quarantine-monitoring-edit-link"]
         )
     }
   end

@@ -181,9 +181,15 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
                %{
                  quarantine_monitoring_buttons: [],
                  quarantine_status: "Concluded quarantine monitoring",
-                 quarantine_history_items: ["Quarantine dates: 12/01/2020 - 12/15/2020"]
+                 quarantine_history_items: [
+                   "Quarantine dates: 12/01/2020 - 12/15/2020",
+                   "Concluded quarantine monitoring on 10/31/2020: Successfully completed quarantine period"
+                 ]
                }
              ] = Pages.Profile.contact_investigations(view)
     end)
+    |> Pages.Profile.click_edit_conclude_contact_investigation_quarantine_monitoring(contact_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.ContactInvestigationConcludeQuarantineMonitoring.assert_here()
   end
 end
