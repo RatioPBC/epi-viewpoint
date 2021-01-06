@@ -133,9 +133,8 @@ defmodule Epicenter.Accounts do
   Generates a session token.
   """
   def generate_user_session_token(user) do
-    {token, user_token} = UserToken.build_session_token(user)
+    {_token, user_token} = UserToken.build_session_token(user)
     Repo.insert!(user_token)
-    token
   end
 
   def session_token_status(token) do

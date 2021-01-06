@@ -6,8 +6,8 @@ defmodule Epicenter.Accounts.Login do
 
   alias Epicenter.Accounts.Login
 
-  @required_attrs ~w{session_id user_id}a
-  @optional_attrs ~w{tid user_agent}a
+  @required_attrs ~w{session_id user_agent user_id}a
+  @optional_attrs ~w{tid}a
 
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "logins" do

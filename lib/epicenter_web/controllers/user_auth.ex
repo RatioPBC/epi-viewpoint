@@ -19,15 +19,18 @@ defmodule EpicenterWeb.UserAuth do
   if you are not using LiveView.
   """
   def log_in_user(conn, user, _params \\ %{}) do
-    token = Accounts.generate_user_session_token(user)
+    user_token = Accounts.generate_user_session_token(user)
 
     user_return_to = get_session(conn, :user_return_to)
     mfa_path = user.mfa_secret == nil && Routes.user_multifactor_auth_setup_path(conn, :new)
+    user_agent = get_req_header(conn, "user-agent") |> Euclid.Extra.List.first("user_agent_not_found")
+
+    {:ok, _} = Accounts.create_login(%{session_id: user_token.id, user_agent: user_agent, user_id: user.id})
 
     conn
     |> renew_session()
-    |> put_session(:user_token, token)
-    |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(token)}")
+    |> put_session(:user_token, user_token.token)
+    |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(user_token.token)}")
     |> redirect(to: mfa_path || user_return_to || signed_in_path(conn))
   end
 

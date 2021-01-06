@@ -394,7 +394,7 @@ defmodule Epicenter.AccountsTest do
   describe "generate_user_session_token/1" do
     setup do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      token = Accounts.generate_user_session_token(user)
+      token = Accounts.generate_user_session_token(user) |> Map.get(:token)
       user_token = Repo.get_by(UserToken, token: token)
       [token: user_token]
     end
@@ -452,7 +452,7 @@ defmodule Epicenter.AccountsTest do
   describe "get_user_by_session_token/1" do
     setup do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      token = Accounts.generate_user_session_token(user)
+      token = Accounts.generate_user_session_token(user) |> Map.get(:token)
       %{user: user, token: token}
     end
 
@@ -474,7 +474,7 @@ defmodule Epicenter.AccountsTest do
   describe "delete_session_token/1" do
     test "deletes the token" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      token = Accounts.generate_user_session_token(user)
+      token = Accounts.generate_user_session_token(user) |> Map.get(:token)
       assert Accounts.delete_session_token(token) == :ok
       refute Accounts.get_user_by_session_token(token)
     end

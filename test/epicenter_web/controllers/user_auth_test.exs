@@ -38,21 +38,33 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> put_session(:user_return_to, "/hello") |> UserAuth.log_in_user(user)
       assert redirected_to(conn) == "/hello"
     end
+
+    test "creates login record", %{conn: conn, user: user} do
+      conn = Plug.Conn.put_req_header(conn, "user-agent", "foobar")
+
+      assert_that UserAuth.log_in_user(conn, user),
+        changes: length(Accounts.list_logins(user.id)),
+        from: 0,
+        to: 1
+
+      [login] = Accounts.list_logins(user.id)
+      assert login.user_agent == "foobar"
+    end
   end
 
   describe "logout_user/1" do
     test "erases session and cookies", %{conn: conn, user: user} do
-      user_token = Accounts.generate_user_session_token(user)
+      token = Accounts.generate_user_session_token(user) |> Map.get(:token)
 
       conn =
         conn
-        |> put_session(:user_token, user_token)
+        |> put_session(:user_token, token)
         |> fetch_cookies()
         |> UserAuth.log_out_user()
 
       refute get_session(conn, :user_token)
       assert redirected_to(conn) == "/"
-      refute Accounts.get_user_by_session_token(user_token)
+      refute Accounts.get_user_by_session_token(token)
     end
 
     test "broadcasts to the given live_socket_id", %{conn: conn} do
@@ -78,8 +90,8 @@ defmodule EpicenterWeb.UserAuthTest do
 
   describe "fetch_current_user/2" do
     test "authenticates user from session", %{conn: conn, user: user} do
-      user_token = Accounts.generate_user_session_token(user)
-      conn = conn |> put_session(:user_token, user_token) |> UserAuth.fetch_current_user([])
+      token = Accounts.generate_user_session_token(user) |> Map.get(:token)
+      conn = conn |> put_session(:user_token, token) |> UserAuth.fetch_current_user([])
       assert conn.assigns.current_user.id == user.id
     end
 
@@ -251,7 +263,7 @@ defmodule EpicenterWeb.UserAuthTest do
   end
 
   defp setup_user_token(conn, user, expires_at) do
-    token_string = Accounts.generate_user_session_token(user)
+    token_string = Accounts.generate_user_session_token(user) |> Map.get(:token)
     user_token = UserToken.fetch_user_token_query(token_string) |> Repo.one() |> UserToken.changeset(%{expires_at: expires_at}) |> Repo.update!()
     conn |> Conn.merge_private(plug_session: %{"user_token" => user_token.token})
   end

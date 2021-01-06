@@ -42,7 +42,7 @@ defmodule EpicenterWeb.ConnCase do
       Ecto.Adapters.SQL.Sandbox.mode(Epicenter.Repo, {:shared, self()})
     end
 
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    {:ok, conn: Phoenix.ConnTest.build_conn() |> Plug.Conn.put_req_header("user-agent", "browser")}
   end
 
   setup do
@@ -75,7 +75,7 @@ defmodule EpicenterWeb.ConnCase do
   It returns an updated `conn`.
   """
   def log_in_user(conn, user, opts \\ []) do
-    token = Epicenter.Accounts.generate_user_session_token(user)
+    token = Epicenter.Accounts.generate_user_session_token(user) |> Map.get(:token)
 
     conn
     |> Phoenix.ConnTest.init_test_session(%{})

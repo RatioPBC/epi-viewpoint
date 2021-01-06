@@ -26,6 +26,7 @@ defmodule Epicenter.Accounts.LoginTest do
     defp new_changeset(attr_updates \\ []) do
       default_attrs = %{
         session_id: "session_id",
+        user_agent: "best-browser",
         user_id: "user_id"
       }
 

@@ -10,7 +10,7 @@ defmodule EpicenterWeb.AdminAuthorizationTest do
   alias EpicenterWeb.UsersLive
 
   defp visit_isolated(user_fixture, live_view, conn),
-    do: live_isolated(conn, live_view, session: %{"user_token" => user_fixture |> Accounts.generate_user_session_token()})
+    do: live_isolated(conn, live_view, session: %{"user_token" => user_fixture |> Accounts.generate_user_session_token() |> Map.get(:token)})
 
   def assert_on_page({:ok, _view, html}, page),
     do: html |> Test.Html.parse() |> Test.Html.all("[data-page]", attr: "data-page") |> assert_eq([page])
