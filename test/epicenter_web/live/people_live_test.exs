@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.PeopleLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
+  import ExUnit.CaptureLog
   import Phoenix.LiveViewTest
 
   alias Epicenter.Accounts
@@ -9,6 +10,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Extra
   alias Epicenter.Repo
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.PeopleLive
   alias EpicenterWeb.Test.Pages
 
@@ -26,6 +28,15 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ],
         columns: ["Name", "Latest test result"]
       )
+    end
+
+    test "records an audit log entry for each person on the page", %{conn: conn, user: user, people: people} do
+      [alice, billy, _nancy] = people
+
+      capture_log(fn ->
+        Pages.People.visit(conn)
+      end)
+      |> AuditLogAssertions.assert_viewed_people(user, [alice, billy])
     end
 
     test "only shows positive lab results, ordered by most recent positive result", %{conn: conn} do

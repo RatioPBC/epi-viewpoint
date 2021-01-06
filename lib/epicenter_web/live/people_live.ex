@@ -3,6 +3,8 @@ defmodule EpicenterWeb.PeopleFilter do
 
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
+  alias Epicenter.AuditLog
+
   def render(assigns) do
     ~H"""
     #status-filter
@@ -133,8 +135,10 @@ defmodule EpicenterWeb.PeopleLive do
     socket |> assign(current_date: current_date)
   end
 
-  defp assign_people(socket, people),
-    do: assign(socket, people: people, person_count: length(people))
+  defp assign_people(socket, people) do
+    Enum.each(people, &AuditLog.view(socket.assigns[:current_user], &1))
+    assign(socket, people: people, person_count: length(people))
+  end
 
   defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.delete(selected_people, person_id))
