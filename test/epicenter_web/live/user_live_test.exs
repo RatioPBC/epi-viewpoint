@@ -125,9 +125,9 @@ defmodule EpicenterWeb.UserLiveTest do
         )
         |> Pages.Users.assert_here()
         |> Pages.Users.assert_users([
-          ["Name", "Email", "Type", "Status"],
-          ["fixture admin", "admin@example.com", "Admin", "Active"],
-          ["new name", "newemail@example.com", "Member", "Inactive"]
+          ["Name", "Email", "Type", "Status", "Audit trail"],
+          ["fixture admin", "admin@example.com", "Admin", "Active", "View"],
+          ["new name", "newemail@example.com", "Member", "Inactive", "View"]
         ])
 
       assert %{
