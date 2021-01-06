@@ -15,6 +15,7 @@ section#users-page data-page="users"
         th Email
         th Type
         th Status
+        th Audit trail
     tbody
       = for user <- @users do
         tr
@@ -22,3 +23,4 @@ section#users-page data-page="users"
           td= user.email
           td= type(user)
           td= active_status(user)
+          td= live_redirect "View", to: Routes.user_logins_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLoginsLive, user), data: [tid: "view-audit-trail-#{user.tid}"]

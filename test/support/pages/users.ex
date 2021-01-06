@@ -36,4 +36,11 @@ defmodule EpicenterWeb.Test.Pages.Users do
     |> render_click()
     |> Pages.follow_live_view_redirect(conn)
   end
+
+  def click_view_audit_trail(%View{} = view, conn, tid) do
+    view
+    |> element("[data-tid=view-audit-trail-#{tid}]")
+    |> render_click()
+    |> Pages.follow_live_view_redirect(conn)
+  end
 end

@@ -34,10 +34,10 @@ defmodule EpicenterWeb.Features.AdminTest do
     |> Pages.Users.visit()
     |> Pages.Users.assert_here()
     |> Pages.Users.assert_users([
-      ["Name", "Email", "Type", "Status"],
-      ["billy", "billy@example.com", "Member", "Inactive"],
-      ["fixture admin", "admin@example.com", "Admin", "Active"],
-      ["user", "user@example.com", "Admin", "Active"]
+      ["Name", "Email", "Type", "Status", "Audit trail"],
+      ["billy", "billy@example.com", "Member", "Inactive", "View"],
+      ["fixture admin", "admin@example.com", "Admin", "Active", "View"],
+      ["user", "user@example.com", "Admin", "Active", "View"]
     ])
     |> Pages.Users.click_add_user(conn)
     |> Pages.User.assert_here()
@@ -46,12 +46,15 @@ defmodule EpicenterWeb.Features.AdminTest do
     )
     |> Pages.Users.assert_here()
     |> Pages.Users.assert_users([
-      ["Name", "Email", "Type", "Status"],
-      ["billy", "billy@example.com", "Member", "Inactive"],
-      ["fixture admin", "admin@example.com", "Admin", "Active"],
-      ["New User", "new@example.com", "Member", "Active"],
-      ["user", "user@example.com", "Admin", "Active"]
+      ["Name", "Email", "Type", "Status", "Audit trail"],
+      ["billy", "billy@example.com", "Member", "Inactive", "View"],
+      ["fixture admin", "admin@example.com", "Admin", "Active", "View"],
+      ["New User", "new@example.com", "Member", "Active", "View"],
+      ["user", "user@example.com", "Admin", "Active", "View"]
     ])
+    |> Pages.Users.click_view_audit_trail(conn, "user")
+    |> Pages.UserLogins.assert_here()
+    |> Pages.UserLogins.assert_page_header("Audit trail for user")
   end
 
   test "non-admins cannot administer users", %{conn: conn} do

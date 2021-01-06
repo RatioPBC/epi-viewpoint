@@ -47,6 +47,7 @@ defmodule EpicenterWeb.Router do
       pipe_through [:require_admin]
       live "/user", UserLive, as: :new_user
       live "/user/:id", UserLive, as: :user
+      live "/user/:id/logins", UserLoginsLive, as: :user_logins
       live "/users", UsersLive, as: :users
     end
 
