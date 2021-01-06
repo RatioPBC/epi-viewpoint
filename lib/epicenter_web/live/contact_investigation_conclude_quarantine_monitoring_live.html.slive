@@ -3,5 +3,5 @@
   section#contact-investigation-conclude-quarantine-monitoring
     h2 data-role="conclude-quarantine-monitoring-heading" = @page_heading
 
-  = form_for @form_changeset, "#", [id: "contact-investigation-conclude-quarantine-monitoring-form", phx_change: "change", phx_submit: "save"], fn f ->
-        = conclude_quarantine_monitoring_form_builder(f)
+    = form_for @form_changeset, "#", [id: "contact-investigation-conclude-quarantine-monitoring-form", phx_submit: "save"], fn f ->
+      = conclude_quarantine_monitoring_form_builder(f)

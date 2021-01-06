@@ -1,7 +1,8 @@
 defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
   use EpicenterWeb, :live_view
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, authenticate_user: 2, noreply: 1, ok: 1]
 
+  alias Epicenter.AuditLog
   alias Epicenter.ContactInvestigations
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias EpicenterWeb.Form
@@ -10,6 +11,8 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
     use Ecto.Schema
 
     import Ecto.Changeset
+
+    @clock Application.get_env(:epicenter, :clock)
 
     @required_attrs ~w{reason}a
     @optional_attrs ~w{}a
@@ -24,17 +27,54 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
       |> cast(attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
     end
+
+    def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset, %{quarantine_concluded_at: quarantine_concluded_at}) do
+      quarantine_concluded_at = quarantine_concluded_at || @clock.utc_now()
+
+      case apply_action(form_changeset, :create) do
+        {:ok, form} -> {:ok, %{quarantine_conclusion_reason: form.reason, quarantine_concluded_at: quarantine_concluded_at}}
+        other -> other
+      end
+    end
   end
 
   def mount(%{"id" => contact_investigation_id}, session, socket) do
-    contact_investigation = ContactInvestigations.get(contact_investigation_id)
+    contact_investigation =
+      ContactInvestigations.get(contact_investigation_id)
+      |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
     |> assign(:page_heading, "Conclude quarantine monitoring")
     |> assign(:form_changeset, ConcludeQuarantineMonitoringForm.changeset(contact_investigation, %{}))
+    |> assign(:contact_investigation, contact_investigation)
+    |> assign(:person, contact_investigation.exposed_person)
     |> authenticate_user(session)
     |> ok()
+  end
+
+  def handle_event("save", %{"conclude_quarantine_monitoring_form" => params}, socket) do
+    with %Ecto.Changeset{} = form_changeset <- ConcludeQuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params),
+         {:form, {:ok, model_attrs}} <-
+           {:form, ConcludeQuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset, socket.assigns.contact_investigation)},
+         {:contact_investigation, {:ok, _contact_investigation}} <-
+           {:contact_investigation,
+            ContactInvestigations.update(
+              socket.assigns.contact_investigation,
+              {model_attrs,
+               %AuditLog.Meta{
+                 author_id: socket.assigns.current_user.id,
+                 reason_action: AuditLog.Revision.update_contact_investigation_action(),
+                 reason_event: AuditLog.Revision.conclude_contact_investigation_quarantine_monitoring_event()
+               }}
+            )} do
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
+      |> noreply()
+    else
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        socket |> assign(:form_changeset, form_changeset) |> noreply()
+    end
   end
 
   def conclude_quarantine_monitoring_form_builder(form) do

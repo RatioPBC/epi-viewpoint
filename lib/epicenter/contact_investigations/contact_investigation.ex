@@ -22,6 +22,8 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
     interview_discontinued_at
     interview_proxy_name
     interview_started_at
+    quarantine_conclusion_reason
+    quarantine_concluded_at
     quarantine_monitoring_ends_on
     quarantine_monitoring_starts_on
     symptoms
@@ -47,6 +49,8 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
     field :interview_started_at, :utc_datetime
     field :interview_status, :string, read_after_writes: true
     field :most_recent_date_together, :date
+    field :quarantine_conclusion_reason, :string
+    field :quarantine_concluded_at, :utc_datetime
     field :quarantine_monitoring_ends_on, :date
     field :quarantine_monitoring_starts_on, :date
     field :quarantine_monitoring_status, :string, read_after_writes: true

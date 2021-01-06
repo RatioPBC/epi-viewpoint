@@ -70,6 +70,7 @@ defmodule Epicenter.AuditLog.Revision do
   def admin_create_user_event, do: "admin-create-user"
   def admin_update_user_event, do: "admin-update-user"
   def conclude_case_investigation_isolation_monitoring_event, do: "conclude-case-investigation-isolation-monitoring"
+  def conclude_contact_investigation_quarantine_monitoring_event(), do: "conclude-contact-investigation-quarantine-monitoring"
   def complete_case_investigation_interview_event(), do: "complete-case-investigation-interview"
   def complete_contact_investigation_interview_event(), do: "complete-contact-investigation-interview"
   def create_contact_event(), do: "create-contact"

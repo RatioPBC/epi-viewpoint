@@ -37,4 +37,27 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
       "Deceased" => false
     })
   end
+
+  test "saving quarantine conclusion reason for a case investigation", %{
+    conn: conn,
+    contact_investigation: contact_investigation,
+    user: user
+  } do
+    Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-conclude-quarantine-monitoring-form",
+      conclude_quarantine_monitoring_form: %{
+        "reason" => "successfully_completed_quarantine"
+      }
+    )
+    |> Pages.Profile.assert_here(contact_investigation.exposed_person)
+
+    contact_investigation = ContactInvestigations.get(contact_investigation.id)
+    assert "successfully_completed_quarantine" == contact_investigation.quarantine_conclusion_reason
+    assert ~U[2020-10-31 10:30:00Z] == contact_investigation.quarantine_concluded_at
+
+    assert_recent_audit_log(contact_investigation, user,
+      action: "update-contact-investigation",
+      event: "conclude-contact-investigation-quarantine-monitoring"
+    )
+  end
 end
