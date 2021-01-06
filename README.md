@@ -42,3 +42,26 @@ There are some scripts to make local docker development easier:
   * start the docker container
 * `bin/dev/docker-bash` will open a bash shell inside the running container
 * `bin/dev/docker-iex` will open an iex session inside the running container
+
+## Adding translations
+
+When adding strings to be translated in the domain layer (`Epicenter`), you'll want to use `gettext_noop` to provide a hook for `gettext` to be able to extract the keys without translating them in the code at runtime. For example:
+
+```elixir
+gettext("some_string_to_be_translated")
+```
+
+Once you have added the strings, run the following command to update the po/pot files:
+
+```shell
+mix gettext.extract --merge
+```
+
+You will then want to update the corresponding key in the `po` file. For example, you'll want to add a `msgstr` value such as:
+
+```gettext
+msgid "unable_to_quarantine"
+msgstr "Person unable to quarantine"
+```
+
+Note that `mix gettext.extract --merge` is run as part of `shipit`, and `shipit` will fail if there are any changes as a result. 
