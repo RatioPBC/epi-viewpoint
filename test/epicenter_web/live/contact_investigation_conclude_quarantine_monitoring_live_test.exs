@@ -127,4 +127,20 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
       assert_revision_count(contact_investigation, 1)
     end
   end
+
+  describe "warning the user when navigation will erase their changes" do
+    test "before the user changes anything", %{conn: conn, contact_investigation: contact_investigation} do
+      Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.refute_confirmation_prompt_active()
+    end
+
+    test "when the user changes something", %{conn: conn, contact_investigation: contact_investigation} do
+      view =
+        Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation)
+        |> Pages.ContactInvestigationConcludeQuarantineMonitoring.change_form(conclude_quarantine_monitoring_form: %{"reason" => "deceased"})
+        |> Pages.assert_confirmation_prompt_active("Your updates have not been saved. Discard updates?")
+
+      assert %{"conclude_quarantine_monitoring_form[reason]" => "deceased"} = Pages.form_state(view)
+    end
+  end
 end
