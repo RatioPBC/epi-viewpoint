@@ -29,7 +29,7 @@ config :epicenter,
   totp: Epicenter.Test.TOTPMock
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :info, metadata: :all
 
 config :phoenix_integration,
   endpoint: EpicenterWeb.Endpoint

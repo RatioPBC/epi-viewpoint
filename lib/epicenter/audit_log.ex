@@ -3,8 +3,12 @@ defmodule Epicenter.AuditLog do
     defstruct ~w{author_id reason_action reason_event}a
   end
 
+  require Logger
+
+  alias Epicenter.Accounts.User
   alias Epicenter.AuditLog.Meta
   alias Epicenter.AuditLog.Revision
+  alias Epicenter.Cases.Person
   alias Epicenter.Repo
 
   def insert(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do
@@ -138,5 +142,17 @@ defmodule Epicenter.AuditLog do
 
   def entries_for(model_id) do
     Revision.Query.with_changed_id(model_id) |> Repo.all()
+  end
+
+  def view(%User{id: user_id}, %Person{id: subject_id}) do
+    subject_type = "Person"
+
+    Logger.info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
+      audit_log: true,
+      audit_user_id: user_id,
+      audit_action: "view",
+      audit_subject_id: subject_id,
+      audit_subject_type: subject_type
+    )
   end
 end

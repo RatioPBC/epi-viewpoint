@@ -1,6 +1,8 @@
 defmodule Epicenter.AuditLogTest do
   use Epicenter.DataCase, async: true
 
+  import ExUnit.CaptureLog
+
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.AuditLog.Revision
@@ -382,6 +384,66 @@ defmodule Epicenter.AuditLogTest do
 
     test "with a module" do
       assert AuditLog.module_name(Revision) == "AuditLog.Revision"
+    end
+  end
+
+  describe "view(user, subject)" do
+    setup do
+      original_metadata = Logger.metadata()
+      {:ok, original_logger_config} = Application.fetch_env(:logger, :console)
+
+      on_exit(fn ->
+        Logger.metadata(original_metadata)
+        Application.put_env(:logger, :console, original_logger_config)
+      end)
+
+      [
+        user: %Accounts.User{id: "testuser"},
+        subject: %Person{id: "testperson"}
+      ]
+    end
+
+    test "formats the log message and uses info level", %{user: user, subject: subject} do
+      Application.put_env(:logger, :console, format: "$level - $message")
+
+      assert capture_log(fn ->
+               AuditLog.view(user, subject)
+             end) =~ "info - User(testuser) viewed Person(testperson)"
+    end
+
+    test "sets `audit_log: true` metadata", %{user: user, subject: subject} do
+      Application.put_env(:logger, :console, format: "$metadata[audit_log]", metadata: [:audit_log])
+
+      assert capture_log(fn ->
+               AuditLog.view(user, subject)
+             end) =~ "audit_log=true"
+    end
+
+    test "sets audit_user_id metadata", %{user: user, subject: subject} do
+      Application.put_env(:logger, :console, format: "$metadata[audit_user_id]", metadata: [:audit_user_id])
+
+      assert capture_log(fn ->
+               AuditLog.view(user, subject)
+             end) =~ "audit_user_id=testuser"
+    end
+
+    test "sets `audit_action: 'view'` metadata", %{user: user, subject: subject} do
+      Application.put_env(:logger, :console, format: "$metadata[audit_action]", metadata: [:audit_action])
+
+      assert capture_log(fn ->
+               AuditLog.view(user, subject)
+             end) =~ "audit_action=view"
+    end
+
+    test "sets audit_subject_id and audit_subject_type metadata", %{user: user, subject: subject} do
+      Application.put_env(:logger, :console,
+        format: "$metadata[audit_subject_type] $metadata[audit_subject_id]",
+        metadata: [:audit_subject_type, :audit_subject_id]
+      )
+
+      assert capture_log(fn ->
+               AuditLog.view(user, subject)
+             end) =~ "audit_subject_type=Person audit_subject_id=testperson"
     end
   end
 end

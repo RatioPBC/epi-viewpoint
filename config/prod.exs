@@ -22,6 +22,7 @@ config :logger,
   backends: [LoggerJSON]
 
 config :logger_json, :backend,
+  # don't change this! ensures we get all the metadata, including audit logs
   metadata: :all,
   formatter: LoggerJSON.Formatters.GoogleCloudLogger
 
