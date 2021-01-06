@@ -52,7 +52,9 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
     |> ok()
   end
 
-  def handle_event("save", %{"conclude_quarantine_monitoring_form" => params}, socket) do
+  def handle_event("save", full_params, socket) do
+    params = full_params |> Map.get("conclude_quarantine_monitoring_form", %{})
+
     with %Ecto.Changeset{} = form_changeset <- ConcludeQuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params),
          {:form, {:ok, model_attrs}} <-
            {:form, ConcludeQuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset, socket.assigns.contact_investigation)},

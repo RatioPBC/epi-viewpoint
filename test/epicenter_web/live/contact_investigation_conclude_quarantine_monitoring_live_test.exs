@@ -80,4 +80,51 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
       event: "conclude-contact-investigation-quarantine-monitoring"
     )
   end
+
+  test "editing a quarantine conclusion reason does not change the existing quarantine_concluded_at timestamp", %{
+    conn: conn,
+    contact_investigation: contact_investigation,
+    user: user
+  } do
+    {:ok, _} =
+      ContactInvestigations.update(
+        contact_investigation,
+        {%{quarantine_conclusion_reason: "successfully_completed_quarantine", quarantine_concluded_at: ~U[2020-10-05 19:57:00Z]},
+         Test.Fixtures.admin_audit_meta()}
+      )
+
+    Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation)
+    |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-conclude-quarantine-monitoring-form",
+      conclude_quarantine_monitoring_form: %{
+        "reason" => "deceased"
+      }
+    )
+    |> Pages.Profile.assert_here(contact_investigation.exposed_person)
+
+    assert_recent_audit_log(contact_investigation, user,
+      action: "update-contact-investigation",
+      event: "conclude-contact-investigation-quarantine-monitoring"
+    )
+
+    contact_investigation = ContactInvestigations.get(contact_investigation.id)
+    assert "deceased" == contact_investigation.quarantine_conclusion_reason
+    assert ~U[2020-10-05 19:57:00Z] == contact_investigation.quarantine_concluded_at
+  end
+
+  describe "validations" do
+    test "saving without a selected reason shows an error", %{
+      conn: conn,
+      contact_investigation: contact_investigation
+    } do
+      Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation)
+      |> Pages.submit_live("#contact-investigation-conclude-quarantine-monitoring-form",
+        conclude_quarantine_monitoring_form: %{}
+      )
+      |> Pages.assert_validation_messages(%{
+        "conclude_quarantine_monitoring_form[reason]" => "can't be blank"
+      })
+
+      assert_revision_count(contact_investigation, 1)
+    end
+  end
 end
