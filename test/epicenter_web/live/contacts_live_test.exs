@@ -15,11 +15,12 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_here()
     end
 
-    test "People with contact investigations are listed", %{conn: conn, caroline: caroline, donald: donald} do
+    test "People with contact investigations are listed", %{conn: conn, bob: bob, caroline: caroline, donald: donald} do
       Pages.Contacts.visit(conn)
       |> Pages.Contacts.assert_table_contents([
         ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],
-        ["", "Caroline Testuser", caroline.id, "10/31/2020", "Pending", "assignee"],
+        ["", "Bob Testuser", bob.id, "10/31/2020", "Ongoing monitoring (11 days remaining)", ""],
+        ["", "Caroline Testuser", caroline.id, "10/31/2020", "Pending interview", "assignee"],
         ["", "Donald Testuser", donald.id, "10/31/2020", "Discontinued", ""]
       ])
     end
@@ -40,6 +41,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_table_contents(
         [
           ["Name", "Assignee"],
+          ["Bob Testuser", ""],
           ["Caroline Testuser", "assignee"],
           ["Donald Testuser", ""]
         ],
@@ -54,6 +56,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_table_contents(
         [
           ["Name", "Assignee"],
+          ["Bob Testuser", ""],
           ["Caroline Testuser", ""],
           ["Donald Testuser", ""]
         ],
@@ -73,6 +76,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_table_contents(
         [
           ["Name", "Assignee"],
+          ["Bob Testuser", ""],
           ["Caroline Testuser", ""],
           ["Donald Testuser", "assignee"]
         ],
@@ -87,6 +91,16 @@ defmodule EpicenterWeb.ContactsLiveTest do
     lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
     case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
+    {:ok, bob_contact_investigation} =
+      {Test.Fixtures.contact_investigation_attrs("bob_contact_investigation", %{
+         exposing_case_id: case_investigation.id,
+         interview_completed_at: ~U[2020-10-31 23:03:07Z],
+         quarantine_monitoring_starts_on: ~D[2020-10-29],
+         quarantine_monitoring_ends_on: ~D[2020-11-11],
+         exposed_person: %{tid: "bob", demographics: [%{first_name: "Bob", last_name: "Testuser"}]}
+       }), Test.Fixtures.admin_audit_meta()}
+      |> ContactInvestigations.create()
+
     {:ok, caroline_contact_investigation} =
       {Test.Fixtures.contact_investigation_attrs("caroline_contact_investigation", %{exposing_case_id: case_investigation.id}),
        Test.Fixtures.admin_audit_meta()}
@@ -100,15 +114,16 @@ defmodule EpicenterWeb.ContactsLiveTest do
        }), Test.Fixtures.admin_audit_meta()}
       |> ContactInvestigations.create()
 
+    bob_contact_investigation = ContactInvestigations.get(bob_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
     caroline_contact_investigation = ContactInvestigations.get(caroline_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
-
     donald_contact_investigation = ContactInvestigations.get(donald_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
 
+    bob = bob_contact_investigation.exposed_person
     caroline = caroline_contact_investigation.exposed_person
     donald = donald_contact_investigation.exposed_person
 
     Cases.assign_user_to_people(user_id: assignee.id, people_ids: [caroline.id], audit_meta: Test.Fixtures.admin_audit_meta())
 
-    [assignee: assignee, caroline: caroline, donald: donald, user: user]
+    [assignee: assignee, bob: bob, caroline: caroline, donald: donald, user: user]
   end
 end

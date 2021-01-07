@@ -30,6 +30,34 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   def selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)
 
+  def latest_contact_investigation_status(person, current_date) do
+    contact_investigation = person.contact_investigations |> List.first()
+
+    case contact_investigation.interview_status do
+      "pending" ->
+        "Pending interview"
+
+      "started" ->
+        "Ongoing interview"
+
+      "completed" ->
+        case contact_investigation.quarantine_monitoring_status do
+          "pending" ->
+            "Pending monitoring"
+
+          "ongoing" ->
+            diff = Date.diff(contact_investigation.quarantine_monitoring_ends_on, current_date)
+            "Ongoing monitoring (#{diff} days remaining)"
+
+          "concluded" ->
+            "Concluded monitoring"
+        end
+
+      "discontinued" ->
+        "Discontinued"
+    end
+  end
+
   # # # Private
 
   defp displayable_status(nil, _),

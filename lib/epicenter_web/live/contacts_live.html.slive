@@ -25,5 +25,5 @@ section#contacts-page data-page="contacts"
           td= live_redirect full_name(person), to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person), data: [role: "profile-link-#{person.id}"]
           td= person.id
           td= exposure_date(person)
-          td= person.contact_investigations |> List.first() |> Map.get(:interview_status) |> String.capitalize()
+          td= latest_contact_investigation_status(person, @current_date)
           td= assigned_to_name(person)

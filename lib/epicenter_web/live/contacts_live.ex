@@ -9,12 +9,15 @@ defmodule EpicenterWeb.ContactsLive do
       disabled?: 1,
       exposure_date: 1,
       full_name: 1,
+      latest_contact_investigation_status: 2,
       selected?: 2
     ]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.Cases
+
+  @clock Application.get_env(:epicenter, :clock)
 
   def mount(_params, session, socket) do
     socket
@@ -24,6 +27,7 @@ defmodule EpicenterWeb.ContactsLive do
     |> load_and_assign_exposed_people()
     |> load_and_assign_users()
     |> assign_selected_to_empty()
+    |> assign_current_date()
     |> ok()
   end
 
@@ -68,6 +72,13 @@ defmodule EpicenterWeb.ContactsLive do
   end
 
   # # # Private
+
+  # TODO: ensure this is tested (also for cases - do we consider the timezone?)
+  defp assign_current_date(socket) do
+    timezone = EpicenterWeb.PresentationConstants.presented_time_zone()
+    current_date = @clock.utc_now() |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
+    socket |> assign(current_date: current_date)
+  end
 
   defp assign_selected_to_empty(socket),
     do: socket |> assign(selected_people: %{})
