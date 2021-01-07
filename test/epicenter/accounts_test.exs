@@ -705,11 +705,11 @@ defmodule Epicenter.AccountsTest do
       session_id = Ecto.UUID.generate()
 
       assert_that Accounts.create_login(%{session_id: session_id, tid: "login", user_agent: "something complicated", user_id: user.id}),
-        changes: length(Accounts.list_logins(user.id)),
+        changes: length(Accounts.list_recent_logins(user.id)),
         from: 0,
         to: 1
 
-      [login] = Accounts.list_logins(user.id)
+      [login] = Accounts.list_recent_logins(user.id)
 
       assert session_id == login.session_id
       assert "something complicated" == login.user_agent
@@ -718,7 +718,7 @@ defmodule Epicenter.AccountsTest do
     end
   end
 
-  describe "list_logins" do
+  describe "list_recent_logins" do
     test "only fetches the logins for the requested user_id" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       user2 = Test.Fixtures.user_attrs(@admin, "user2", email: "blah@example.com") |> Accounts.register_user!()
@@ -740,11 +740,37 @@ defmodule Epicenter.AccountsTest do
         user_id: user2.id
       })
 
-      [login] = Accounts.list_logins(user.id)
+      [login] = Accounts.list_recent_logins(user.id)
       assert "login" == login.tid
 
-      [login2] = Accounts.list_logins(user2.id)
+      [login2] = Accounts.list_recent_logins(user2.id)
       assert "login2" == login2.tid
     end
+  end
+
+  test "it limits to 5 most recent in desc order" do
+    user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+
+    Accounts.create_login(%{
+      session_id: Ecto.UUID.generate(),
+      tid: "login",
+      user_agent: "user agent",
+      user_id: user.id
+    })
+
+    most_recent =
+      for _n <- 1..5 do
+        {:ok, login} =
+          Accounts.create_login(%{
+            session_id: Ecto.UUID.generate(),
+            user_agent: "user agent",
+            user_id: user.id
+          })
+
+        login
+      end
+      |> Enum.reverse()
+
+    assert Accounts.list_recent_logins(user.id) == most_recent
   end
 end

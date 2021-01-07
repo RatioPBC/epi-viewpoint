@@ -17,7 +17,7 @@ defmodule EpicenterWeb.UserLoginsLiveTest do
 
     {:ok, _} = Accounts.create_login(%{session_id: user_token.id, user_agent: user_agent, user_id: surveilled_user.id})
 
-    [login] = Accounts.list_logins(surveilled_user.id)
+    [login] = Accounts.list_recent_logins(surveilled_user.id)
 
     Pages.UserLogins.visit(conn, surveilled_user)
     |> Pages.UserLogins.assert_here()

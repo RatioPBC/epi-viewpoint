@@ -9,7 +9,7 @@ defmodule EpicenterWeb.UserLoginsLive do
 
   def mount(%{"id" => id}, session, socket) do
     user = Accounts.get_user(id)
-    logins = Accounts.list_logins(user.id)
+    logins = Accounts.list_recent_logins(user.id)
 
     socket
     |> assign_defaults()

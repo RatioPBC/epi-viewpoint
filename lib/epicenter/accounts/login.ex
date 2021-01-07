@@ -29,10 +29,11 @@ defmodule Epicenter.Accounts.Login do
   defmodule Query do
     import Ecto.Query
 
-    def for_user_id(user_id) do
+    def most_recent_for_user_id(user_id) do
       from login in Login,
         where: login.user_id == ^user_id,
-        order_by: [asc: login.inserted_at, asc: login.seq]
+        order_by: [desc: login.seq],
+        limit: 5
     end
   end
 end

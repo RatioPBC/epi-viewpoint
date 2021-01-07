@@ -18,7 +18,7 @@ defmodule Epicenter.Accounts do
   def get_user(email: email) when is_binary(email), do: User |> Repo.get_by(email: email)
   def get_user(email: email, password: password), do: get_user(email: email) |> User.filter_by_valid_password(password)
   def get_user(id) when is_binary(id), do: User |> Repo.get(id)
-  def list_logins(user_id), do: Login.Query.for_user_id(user_id) |> Repo.all()
+  def list_recent_logins(user_id), do: Login.Query.most_recent_for_user_id(user_id) |> Repo.all()
   def list_users(), do: User.Query.all() |> Repo.all()
   def preload_assignments(user_or_users_or_nil), do: user_or_users_or_nil |> Repo.preload([:assignments])
   def register_user!({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> Admin.insert_by_admin!(audit_meta)

@@ -43,11 +43,11 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = Plug.Conn.put_req_header(conn, "user-agent", "foobar")
 
       assert_that UserAuth.log_in_user(conn, user),
-        changes: length(Accounts.list_logins(user.id)),
+        changes: length(Accounts.list_recent_logins(user.id)),
         from: 0,
         to: 1
 
-      [login] = Accounts.list_logins(user.id)
+      [login] = Accounts.list_recent_logins(user.id)
       assert login.user_agent == "foobar"
     end
   end
