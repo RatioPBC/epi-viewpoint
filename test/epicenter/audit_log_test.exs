@@ -387,7 +387,7 @@ defmodule Epicenter.AuditLogTest do
     end
   end
 
-  describe "view(user, subject)" do
+  describe "view" do
     setup do
       original_metadata = Logger.metadata()
       {:ok, original_logger_config} = Application.fetch_env(:logger, :console)
@@ -444,6 +444,14 @@ defmodule Epicenter.AuditLogTest do
       assert capture_log(fn ->
                AuditLog.view(user, subject)
              end) =~ "audit_subject_type=Person audit_subject_id=testperson"
+    end
+
+    test "a list of people", %{user: user, subject: subject} do
+      Application.put_env(:logger, :console, format: "$message")
+      audit_log = capture_log(fn -> AuditLog.view(user, [subject, %Person{id: "testperson2"}]) end)
+
+      assert audit_log =~ "User(testuser) viewed Person(testperson)"
+      assert audit_log =~ "User(testuser) viewed Person(testperson2)"
     end
   end
 end

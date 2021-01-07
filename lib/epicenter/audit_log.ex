@@ -144,6 +144,10 @@ defmodule Epicenter.AuditLog do
     Revision.Query.with_changed_id(model_id) |> Repo.all()
   end
 
+  def view(user, items) when is_list(items) do
+    Enum.each(items, &view(user, &1))
+  end
+
   def view(%User{id: user_id}, %Person{id: subject_id}) do
     subject_type = "Person"
 
