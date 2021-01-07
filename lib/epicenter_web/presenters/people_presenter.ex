@@ -30,7 +30,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
     do: person |> Person.latest_case_investigation() |> displayable_status(current_date)
 
   def latest_contact_investigation_status(person, current_date),
-    do: person.contact_investigations |> List.first() |> displayable_status(current_date)
+    do: person |> Person.latest_contact_investigation() |> displayable_status(current_date)
 
   def selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)

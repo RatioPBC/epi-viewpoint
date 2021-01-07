@@ -8,6 +8,7 @@ defmodule Epicenter.Cases.PersonTest do
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
 
   setup :persist_admin
@@ -215,6 +216,42 @@ defmodule Epicenter.Cases.PersonTest do
       alice = alice |> Cases.preload_case_investigations()
 
       assert Person.latest_case_investigation(alice).tid == "newest"
+    end
+  end
+
+  describe "latest_contact_investigation" do
+    setup %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+      case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
+
+      {:ok, contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
+         Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
+      contact_investigation = ContactInvestigations.get(contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
+      exposed_person = contact_investigation.exposed_person |> Cases.preload_contact_investigations()
+
+      {:ok, second_contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs("second_contact_investigation", %{
+           exposing_case_id: exposed_person.contact_investigations |> List.first() |> Map.get(:exposing_case_id),
+           interview_started_at: ~U[2020-10-31 23:03:07Z]
+         }), Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
+      second_contact_investigation
+      |> Ecto.Changeset.change(exposed_person_id: exposed_person.id)
+      |> Repo.update!()
+
+      [exposed_person: Cases.get_person(exposed_person.id)]
+    end
+
+    test "returns the contact investigation with the most recent created at date", %{exposed_person: exposed_person} do
+      assert exposed_person
+             |> Cases.preload_contact_investigations()
+             |> Person.latest_contact_investigation()
+             |> Map.get(:tid) == "second_contact_investigation"
     end
   end
 

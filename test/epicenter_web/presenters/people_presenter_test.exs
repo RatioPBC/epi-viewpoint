@@ -30,24 +30,6 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
   end
 
   describe("latest_contact_investigation_status") do
-    defp person_with_contact_investigation(contact_investigation_attrs \\ %{}) do
-      #      {:ok, person} = Test.Fixtures.person_attrs(@admin, "test") |> Test.Fixtures.add_demographic_attrs(demo_attrs) |> Cases.create_person()
-      #      person
-
-      alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
-      lab_result = Test.Fixtures.lab_result_attrs(alice, @admin, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
-      case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, @admin, "investigation") |> Cases.create_case_investigation!()
-
-      contact_investigation_attrs = Map.merge(%{exposing_case_id: case_investigation.id}, contact_investigation_attrs)
-
-      {:ok, contact_investigation} =
-        {Test.Fixtures.contact_investigation_attrs("contact_investigation", contact_investigation_attrs), Test.Fixtures.admin_audit_meta()}
-        |> ContactInvestigations.create()
-
-      contact_investigation = ContactInvestigations.get(contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
-      contact_investigation.exposed_person |> Cases.preload_contact_investigations()
-    end
-
     test "when interview status is pending" do
       assert(PeoplePresenter.latest_contact_investigation_status(person_with_contact_investigation(), ~D[2020-10-25]) == "Pending interview")
     end
@@ -100,5 +82,39 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
         ) == "Concluded monitoring"
       )
     end
+
+    test "when there are more than one contact investigations, returns the most recently inserted one" do
+      exposed_person = person_with_contact_investigation()
+
+      {:ok, second_contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs("second_contact_investigation", %{
+           exposing_case_id: exposed_person.contact_investigations |> List.first() |> Map.get(:exposing_case_id),
+           interview_started_at: ~U[2020-10-31 23:03:07Z]
+         }), Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
+      second_contact_investigation
+      |> Ecto.Changeset.change(exposed_person_id: exposed_person.id)
+      |> Repo.update!()
+
+      assert Cases.get_person(exposed_person.id)
+             |> Cases.preload_contact_investigations()
+             |> PeoplePresenter.latest_contact_investigation_status(~D[2020-10-25]) == "Ongoing interview"
+    end
+  end
+
+  defp person_with_contact_investigation(contact_investigation_attrs \\ %{}) do
+    alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+    lab_result = Test.Fixtures.lab_result_attrs(alice, @admin, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+    case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, @admin, "investigation") |> Cases.create_case_investigation!()
+
+    contact_investigation_attrs = Map.merge(%{exposing_case_id: case_investigation.id}, contact_investigation_attrs)
+
+    {:ok, contact_investigation} =
+      {Test.Fixtures.contact_investigation_attrs("contact_investigation", contact_investigation_attrs), Test.Fixtures.admin_audit_meta()}
+      |> ContactInvestigations.create()
+
+    contact_investigation = ContactInvestigations.get(contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
+    contact_investigation.exposed_person |> Cases.preload_contact_investigations()
   end
 end
