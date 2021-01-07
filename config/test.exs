@@ -13,6 +13,7 @@ config :epicenter, Epicenter.Repo,
   hostname: System.get_env("POSTGRES_HOST", "localhost"),
   password: "postgres",
   pool: Ecto.Adapters.SQL.Sandbox,
+  pool_size: 16,
   queue_target: 300,
   queue_interval: 5000,
   username: "postgres"
