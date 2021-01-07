@@ -14,7 +14,7 @@ section#user-logins-page data-page="user-logins"
     tbody
       = for login <- @logins do
         tr
-          td *
-          td *
-          td *
+          td= format_date(login.inserted_at)
+          td= operating_system(login)
+          td= browser(login)
           td= login.session_id
