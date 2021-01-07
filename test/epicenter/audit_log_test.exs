@@ -453,5 +453,17 @@ defmodule Epicenter.AuditLogTest do
       assert audit_log =~ "User(testuser) viewed Person(testperson)"
       assert audit_log =~ "User(testuser) viewed Person(testperson2)"
     end
+
+    test "it doesn't log a person if the person is nil", %{user: user} do
+      assert capture_log(fn ->
+               AuditLog.view(user, nil)
+             end) == ""
+    end
+
+    test "it doesn't log a person when the id is missing", %{user: user} do
+      assert capture_log(fn ->
+               AuditLog.view(user, %Person{})
+             end) == ""
+    end
   end
 end

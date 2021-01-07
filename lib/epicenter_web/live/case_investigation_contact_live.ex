@@ -136,9 +136,23 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> authenticate_user(session)
     |> assign_page_title("Case Investigation Contact")
     |> assign_form_changeset(ContactForm.changeset(contact_investigation, %{}))
-    |> assign(:contact_investigation, contact_investigation)
-    |> assign(:case_investigation, case_investigation)
+    |> assign_contact_investigation(contact_investigation)
+    |> assign_case_investigation(case_investigation)
     |> ok()
+  end
+
+  defp assign_case_investigation(socket, case_investigation) do
+    AuditLog.view(socket.assigns.current_user, case_investigation.person)
+
+    socket
+    |> assign(:case_investigation, case_investigation)
+  end
+
+  defp assign_contact_investigation(socket, contact_investigation) do
+    AuditLog.view(socket.assigns.current_user, contact_investigation.exposed_person)
+
+    socket
+    |> assign(:contact_investigation, contact_investigation)
   end
 
   def handle_event("change", %{"contact_form" => params}, socket) do

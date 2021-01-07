@@ -6,6 +6,7 @@ defmodule Epicenter.Test.AuditLogAssertions do
 
   def assert_viewed_person(log_output, %User{} = user, %Person{} = person) do
     assert log_output =~ "User(#{user.id}) viewed Person(#{person.id})"
+    log_output
   end
 
   def assert_viewed_people(log_output, user, people) when length(people) > 0 do

@@ -4,6 +4,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   import Phoenix.LiveViewTest
@@ -26,6 +27,16 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
   end
 
   describe "creating" do
+    test "records an audit log entry for the person associated with the case investigation", %{
+      conn: conn,
+      case_investigation: case_investigation,
+      person: person,
+      user: user
+    } do
+      capture_log(fn -> Pages.CaseInvestigationContact.visit(conn, case_investigation) end)
+      |> AuditLogAssertions.assert_viewed_person(user, person)
+    end
+
     test "has a case investigation view", %{conn: conn, case_investigation: case_investigation, person: person} do
       view =
         Pages.CaseInvestigationContact.visit(conn, case_investigation)
@@ -257,6 +268,21 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         )
 
       [contact_investigation: contact_investigation]
+    end
+
+    test "records multiple audit log entries", %{
+      conn: conn,
+      case_investigation: case_investigation,
+      contact_investigation: contact_investigation,
+      user: user
+    } do
+      case_investigation = case_investigation |> Cases.preload_person()
+      case_person = case_investigation.person
+      exposed_person = contact_investigation.exposed_person
+
+      capture_log(fn -> Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation) end)
+      |> AuditLogAssertions.assert_viewed_person(user, case_person)
+      |> AuditLogAssertions.assert_viewed_person(user, exposed_person)
     end
 
     test "prepopulates the form correctly", %{conn: conn, case_investigation: case_investigation, contact_investigation: contact_investigation} do
