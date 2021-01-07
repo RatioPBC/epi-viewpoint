@@ -5,12 +5,20 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [
+      assign_case_investigation: 2,
+      assign_defaults: 1,
+      assign_form_changeset: 2,
+      assign_form_changeset: 3,
+      assign_page_title: 2,
+      authenticate_user: 2,
+      noreply: 1,
+      ok: 1
+    ]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Cases.Person
   alias Epicenter.DateParser
   alias EpicenterWeb.Format
   alias Epicenter.Validation
@@ -79,7 +87,9 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
     with %Ecto.Changeset{} = form_changeset <- IsolationMonitoringForm.changeset(socket.assigns.case_investigation, params),
          {:form, {:ok, model_attrs}} <- {:form, IsolationMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, model_attrs)} do
-      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
+      |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         # TODO: Better error message
@@ -114,24 +124,23 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   end
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
-    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_initiating_lab_result()
-    person = case_investigation |> Cases.preload_person() |> Map.get(:person)
+    case_investigation =
+      case_investigation_id
+      |> Cases.get_case_investigation()
+      |> Cases.preload_initiating_lab_result()
+      |> Cases.preload_person()
 
     socket
     |> assign_defaults()
     |> assign_page_title(" Case Investigation Isolation Monitoring")
     |> authenticate_user(session)
-    |> assign(:case_investigation, case_investigation)
+    |> assign_case_investigation(case_investigation)
     |> assign(:confirmation_prompt, nil)
-    |> assign_person(person)
     |> assign_form_changeset(IsolationMonitoringForm.changeset(case_investigation, %{}))
     |> ok()
   end
 
   # # #
-
-  defp assign_person(socket, %Person{} = person),
-    do: socket |> assign(person: person)
 
   defp update_case_investigation(socket, params) do
     Cases.update_case_investigation(
