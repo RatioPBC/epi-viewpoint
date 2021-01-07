@@ -3,6 +3,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
@@ -22,6 +23,13 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
       |> Cases.create_case_investigation!()
 
     [case_investigation: case_investigation, person: person, user: user]
+  end
+
+  test "records an audit log entry", %{conn: conn, case_investigation: case_investigation, user: user} do
+    case_investigation = case_investigation |> Cases.preload_person()
+
+    capture_log(fn -> Pages.CaseInvestigationIsolationOrder.visit(conn, case_investigation) end)
+    |> AuditLogAssertions.assert_viewed_person(user, case_investigation.person)
   end
 
   test "shows isolation order form", %{conn: conn, case_investigation: case_investigation} do

@@ -3,7 +3,9 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_case_investigation: 2, assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -60,7 +62,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
          {:form, {:ok, model_attrs}} <- {:form, IsolationOrderForm.form_changeset_to_model_attrs(form_changeset)},
          {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, model_attrs)} do
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
@@ -80,13 +82,12 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
     case_investigation = Cases.get_case_investigation(case_investigation_id) |> Cases.preload_person()
 
     socket
+    |> authenticate_user(session)
     |> assign_defaults()
-    |> assign(:case_investigation, case_investigation)
+    |> assign_case_investigation(case_investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign(:form_changeset, IsolationOrderForm.changeset(case_investigation, %{}))
-    |> assign(:person, case_investigation.person)
     |> assign_page_title(" Case Investigation Isolation Order")
-    |> authenticate_user(session)
     |> ok()
   end
 
