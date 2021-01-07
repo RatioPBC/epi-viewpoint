@@ -1,7 +1,9 @@
 defmodule EpicenterWeb.Test.Pages.UserLogins do
   import Euclid.Test.Extra.Assertions
+  import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
+  alias Epicenter.Accounts.User
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
@@ -20,4 +22,16 @@ defmodule EpicenterWeb.Test.Pages.UserLogins do
 
     view
   end
+
+  def visit(%Plug.Conn{} = conn, %User{id: user_id}) do
+    conn |> Pages.visit("/admin/user/#{user_id}/logins")
+  end
+
+  def assert_table_contents(%View{} = view, expected_table_content, opts \\ []) do
+    assert table_contents(view, opts) == expected_table_content
+    view
+  end
+
+  defp table_contents(index_live, opts),
+    do: index_live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "logins-table"))
 end

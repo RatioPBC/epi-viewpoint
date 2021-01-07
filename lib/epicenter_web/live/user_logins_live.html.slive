@@ -4,19 +4,17 @@ section#user-logins-page data-page="user-logins"
       span data-role="title"
         = "Audit trail for #{@user.name}"
 
-  / table data-role="users-table"
-  /   thead
-  /     tr data-role="table-column-names"
-  /       th Name
-  /       th Email
-  /       th Type
-  /       th Status
-  /       th Audit trail
-  /   tbody
-  /     = for user <- @users do
-  /       tr
-  /         td= live_redirect user.name, to: Routes.user_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLive, user)
-  /         td= user.email
-  /         td= type(user)
-  /         td= active_status(user)
-  /         td= live_redirect "View", to: Routes.user_logins_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLoginsLive, user), data: [tid: "view-audit-trail-#{user.tid}"]
+  table data-role="logins-table"
+    thead
+      tr data-role="table-column-names"
+        th Timestamp
+        th OS
+        th Browser
+        th Session ID
+    tbody
+      = for login <- @logins do
+        tr
+          td *
+          td *
+          td *
+          td= login.session_id
