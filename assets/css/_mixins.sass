@@ -229,6 +229,12 @@
 
     @include has-icon
 
+    &[data-active]
+      background-color: white
+
+      & + ul
+        display: block
+
     &:focus
       box-shadow: 0 0 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02)
       outline: 0
@@ -250,13 +256,6 @@
 
       &:hover
         background-color: $background-color
-
-  &[data-active]
-    & > button
-      background-color: white
-
-    & > ul
-      display: block
 
 @mixin form
   margin-top: 1rem

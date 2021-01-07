@@ -1,6 +1,6 @@
 export let TransientControl = {
   setup() {
-    const elements = document.querySelectorAll("[data-transient-control]");
+    const elements = document.querySelectorAll("[data-transient-control] button");
 
     if (elements.length > 0) {
       elements.forEach(function (element) {
