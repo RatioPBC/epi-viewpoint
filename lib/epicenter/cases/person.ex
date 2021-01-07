@@ -176,13 +176,6 @@ defmodule Epicenter.Cases.Person do
     |> Enum.max_by(& &1.inserted_at, Extra.Date.NilFirst, fn -> nil end)
   end
 
-  def latest_contact_investigation(person) do
-    person
-    |> Map.get(:contact_investigations)
-    |> Enum.sort_by(& &1.seq, :desc)
-    |> Enum.max_by(& &1.inserted_at, Extra.Date.NilFirst, fn -> nil end)
-  end
-
   def optional_attrs(), do: @optional_attrs
 
   defmodule Query do
