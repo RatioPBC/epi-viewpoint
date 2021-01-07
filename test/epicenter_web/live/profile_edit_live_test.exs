@@ -6,6 +6,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
   alias EpicenterWeb.ProfileEditLive
 
@@ -13,7 +14,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
   setup %{user: user} do
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-    [person: person]
+    [person: person, user: user]
   end
 
   describe "render" do
@@ -23,6 +24,11 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_has_role(disconnected_html, "profile-edit-page")
       assert_has_role(view, "profile-edit-page")
       assert_role_attribute_value(view, "dob", "01/01/2000")
+    end
+
+    test "records an audit log entry", %{conn: conn, person: person, user: user} do
+      capture_log(fn -> Pages.ProfileEdit.visit(conn, person) end)
+      |> AuditLogAssertions.assert_viewed_person(user, person)
     end
 
     @tag :skip

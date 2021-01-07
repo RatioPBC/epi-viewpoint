@@ -56,7 +56,7 @@ defmodule EpicenterWeb.ProfileEditLive do
     |> assign_defaults()
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign(changeset: changeset)
-    |> assign(person: person)
+    |> assign_person(person)
     |> assign(preferred_language_is_other: false)
     |> ok()
   end
@@ -153,6 +153,11 @@ defmodule EpicenterWeb.ProfileEditLive do
       {:error, %Ecto.Changeset{}} ->
         {:noreply, assign(socket, :changeset, changeset)}
     end
+  end
+
+  defp assign_person(socket, person) do
+    AuditLog.view(socket.assigns.current_user, person)
+    socket |> assign(person: person)
   end
 
   defp upsert_only_form_demographics(demographics, changeset) do

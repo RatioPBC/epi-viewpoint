@@ -188,7 +188,7 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_emails()
       |> Cases.preload_phones()
 
-    AuditLog.view(socket.assigns[:current_user], updated_person)
+    AuditLog.view(socket.assigns.current_user, updated_person)
     assign(socket, person: updated_person)
   end
 
