@@ -8,6 +8,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Format
   alias EpicenterWeb.ProfileLive
   alias EpicenterWeb.Test.Components
@@ -36,6 +37,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     assert_has_role(disconnected_html, "profile-page")
     assert_has_role(page_live, "profile-page")
+  end
+
+  test "records an audit log entry", %{conn: conn, person: person, user: user} do
+    capture_log(fn -> Pages.Profile.visit(conn, person) end)
+    |> AuditLogAssertions.assert_viewed_person(user, person)
   end
 
   describe "when the person has no identifying information" do
@@ -864,7 +870,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
           audit_meta: Test.Fixtures.audit_meta(user)
         )
 
-      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}} |> ProfileLive.assign_person(alice)
+      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}} |> ProfileLive.assign_person(alice)
       assert updated_socket.assigns.person.addresses |> tids() == ["address1"]
       assert updated_socket.assigns.person.assigned_to.tid == "assignee"
       assert updated_socket.assigns.person.lab_results |> tids() == ["lab1"]
@@ -903,9 +909,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
     end
 
-    test "handles assign_users message when the changed people include the current person", %{person: alice, assignee: assignee} do
+    test "handles assign_users message when the changed people include the current person", %{person: alice, assignee: assignee, user: user} do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
-      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}}
 
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}, billy]}, socket)
       assert updated_socket.assigns.person.tid == "updated-alice"
@@ -920,7 +926,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice, user: user} do
-      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}}
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
       assert_role_text(show_page_live, "addresses", "1000 Test St, City, OH 00000")
 

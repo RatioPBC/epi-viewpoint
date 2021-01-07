@@ -25,6 +25,7 @@ defmodule EpicenterWeb.ConnCase do
       import EpicenterWeb.ConnCase
       import EpicenterWeb.Test.LiveViewAssertions
       import Euclid.Test.Extra.Assertions
+      import ExUnit.CaptureLog
       import Phoenix.ConnTest
       import Plug.Conn
 
