@@ -3,6 +3,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   import Epicenter.Test.RevisionAssertions
@@ -24,7 +25,14 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     [person: person, user: user, case_investigation: case_investigation]
   end
 
-  test "has a case investigation view", %{conn: conn, case_investigation: case_investigation} do
+  test "records an audit log entry", %{conn: conn, case_investigation: case_investigation, user: user} do
+    case_investigation = case_investigation |> Cases.preload_person()
+
+    capture_log(fn -> Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation) end)
+    |> AuditLogAssertions.assert_viewed_person(user, case_investigation.person)
+  end
+
+  test "has a clinical details form", %{conn: conn, case_investigation: case_investigation} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.CaseInvestigationClinicalDetails.assert_here()
     |> Pages.CaseInvestigationClinicalDetails.assert_clinical_status_selection(%{

@@ -6,7 +6,16 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [
+      assign_defaults: 1,
+      assign_form_changeset: 2,
+      assign_form_changeset: 3,
+      assign_page_title: 2,
+      assign_case_investigation: 2,
+      authenticate_user: 2,
+      noreply: 1,
+      ok: 1
+    ]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -139,13 +148,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> assign_contact_investigation(contact_investigation)
     |> assign_case_investigation(case_investigation)
     |> ok()
-  end
-
-  defp assign_case_investigation(socket, case_investigation) do
-    AuditLog.view(socket.assigns.current_user, case_investigation.person)
-
-    socket
-    |> assign(:case_investigation, case_investigation)
   end
 
   defp assign_contact_investigation(socket, contact_investigation) do
