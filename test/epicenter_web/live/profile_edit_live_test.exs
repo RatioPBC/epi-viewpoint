@@ -32,8 +32,8 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     @tag :skip
-    test "validates changes when the form is saved (not merely changed)", %{conn: conn, person: %Cases.Person{id: id}} do
-      {:ok, view, _} = live(conn, "/people/#{id}/edit")
+    test "validates changes when the form is saved (not merely changed)", %{conn: conn, person: person} do
+      view = Pages.ProfileEdit.visit(conn, person)
 
       changes = %{"form_data" => %{"dob" => "01/01/197", "emails" => %{"0" => %{"address" => ""}}}}
 
@@ -55,7 +55,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
           {%{demographics: person.demographics |> Enum.map(fn demo -> %{id: demo.id, source: "import"} end)}, Test.Fixtures.admin_audit_meta()}
         )
 
-      {:ok, view, _} = live(conn, "/people/#{person.id}/edit")
+      view = Pages.ProfileEdit.visit(conn, person)
 
       changes = %{"form_data" => %{"dob" => "01/01/1970"}}
 
@@ -76,7 +76,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
           {%{demographics: person.demographics |> Enum.map(fn demo -> %{id: demo.id, source: "form"} end)}, Test.Fixtures.admin_audit_meta()}
         )
 
-      {:ok, view, _} = live(conn, "/people/#{person.id}/edit")
+      view = Pages.ProfileEdit.visit(conn, person)
 
       changes = %{"form_data" => %{"dob" => "01/01/1970"}}
 
@@ -91,7 +91,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "dob field retains invalid date after failed validation, rather than resetting to the value from the database", %{conn: conn, person: person} do
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+      view = Pages.ProfileEdit.visit(conn, person)
 
       assert_attribute(view, "input[data-role=dob]", "value", ["01/01/2000"])
 
@@ -102,7 +102,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+      view = Pages.ProfileEdit.visit(conn, person)
 
       {:ok, redirected_view, _} =
         view
@@ -118,7 +118,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "editing preferred language with other option", %{conn: conn, person: person} do
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+      view = Pages.ProfileEdit.visit(conn, person)
 
       {:ok, redirected_live, _} =
         view
@@ -139,7 +139,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       assert_role_text(redirected_live, "preferred-language", "Welsh")
 
       # the custom option appears in the dropdown if you edit it again after saving
-      {:ok, view, _html} = live(conn, "/people/#{person.id}/edit")
+      view = Pages.ProfileEdit.visit(conn, person)
       assert_selected_dropdown_option(view: view, data_role: "preferred-language", expected: ["Welsh"])
       assert_attribute(view, "[data-role=other-preferred-language]", "data-disabled", ["data-disabled"])
     end
