@@ -6,6 +6,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
@@ -25,6 +26,13 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
 
     assert_has_role(disconnected_html, "case-investigation-discontinue-page")
     assert_has_role(page_live, "case-investigation-discontinue-page")
+  end
+
+  test "records an audit log entry", %{conn: conn, case_investigation: case_investigation, user: user} do
+    case_investigation = case_investigation |> Cases.preload_person()
+
+    capture_log(fn -> Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation) end)
+    |> AuditLogAssertions.assert_viewed_person(user, case_investigation.person)
   end
 
   test "has a reason select radio", %{conn: conn, case_investigation: case_investigation} do

@@ -3,7 +3,9 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, assign_person: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Ecto.Changeset
   alias Epicenter.AuditLog
@@ -20,7 +22,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     |> assign_page_title("Discontinue Case Investigation")
     |> assign(case_investigation: case_investigation)
     |> assign_form_changeset(Cases.change_case_investigation(case_investigation, %{}))
-    |> assign(person: person)
+    |> assign_person(person)
     |> ok()
   end
 
