@@ -5,7 +5,16 @@ defmodule EpicenterWeb.DemographicsEditLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [
+      assign_defaults: 1,
+      assign_form_changeset: 2,
+      assign_form_changeset: 3,
+      assign_page_title: 2,
+      assign_person: 2,
+      authenticate_user: 2,
+      noreply: 1,
+      ok: 1
+    ]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -92,7 +101,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     |> assign_defaults()
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign_form_changeset(DemographicForm.model_to_form_changeset(demographic))
-    |> assign(person: person)
+    |> assign_person(person)
     |> assign(confirmation_prompt: nil)
     |> ok()
   end

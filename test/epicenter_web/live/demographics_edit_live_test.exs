@@ -5,6 +5,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
@@ -33,6 +34,11 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   end
 
   describe "render" do
+    test "records an audit log entry", %{conn: conn, person: person, user: user} do
+      capture_log(fn -> Pages.DemographicsEdit.visit(conn, person) end)
+      |> AuditLogAssertions.assert_viewed_person(user, person)
+    end
+
     test "initially shows current demographics values", %{conn: conn, person: person, user: user} do
       {:ok, person_with_demographics} =
         update_demographics(
