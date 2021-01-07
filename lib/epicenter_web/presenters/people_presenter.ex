@@ -1,5 +1,7 @@
 defmodule EpicenterWeb.Presenters.PeoplePresenter do
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Person
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias EpicenterWeb.Format
   alias EpicenterWeb.Unknown
 
@@ -27,44 +29,37 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   def latest_case_investigation_status(person, current_date),
     do: person |> Person.latest_case_investigation() |> displayable_status(current_date)
 
+  def latest_contact_investigation_status(person, current_date),
+    do: person.contact_investigations |> List.first() |> displayable_status(current_date)
+
   def selected?(selected_people, %Person{id: person_id}),
     do: Map.has_key?(selected_people, person_id)
-
-  def latest_contact_investigation_status(person, current_date) do
-    contact_investigation = person.contact_investigations |> List.first()
-
-    case contact_investigation.interview_status do
-      "pending" ->
-        "Pending interview"
-
-      "started" ->
-        "Ongoing interview"
-
-      "completed" ->
-        case contact_investigation.quarantine_monitoring_status do
-          "pending" ->
-            "Pending monitoring"
-
-          "ongoing" ->
-            diff = Date.diff(contact_investigation.quarantine_monitoring_ends_on, current_date)
-            "Ongoing monitoring (#{diff} days remaining)"
-
-          "concluded" ->
-            "Concluded monitoring"
-        end
-
-      "discontinued" ->
-        "Discontinued"
-    end
-  end
 
   # # # Private
 
   defp displayable_status(nil, _),
     do: ""
 
-  defp displayable_status(case_investigation, current_date) do
-    case case_investigation.interview_status do
+  defp displayable_status(%CaseInvestigation{} = investigation, current_date) do
+    displayable_status(
+      investigation.interview_status,
+      investigation.isolation_monitoring_status,
+      investigation.isolation_monitoring_ends_on,
+      current_date
+    )
+  end
+
+  defp displayable_status(%ContactInvestigation{} = investigation, current_date) do
+    displayable_status(
+      investigation.interview_status,
+      investigation.quarantine_monitoring_status,
+      investigation.quarantine_monitoring_ends_on,
+      current_date
+    )
+  end
+
+  defp displayable_status(interview_status, monitoring_status, monitoring_ends_on, current_date) do
+    case interview_status do
       "pending" ->
         "Pending interview"
 
@@ -72,12 +67,12 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
         "Ongoing interview"
 
       "completed" ->
-        case case_investigation.isolation_monitoring_status do
+        case monitoring_status do
           "pending" ->
             "Pending monitoring"
 
           "ongoing" ->
-            diff = Date.diff(case_investigation.isolation_monitoring_ends_on, current_date)
+            diff = Date.diff(monitoring_ends_on, current_date)
             "Ongoing monitoring (#{diff} days remaining)"
 
           "concluded" ->
