@@ -73,7 +73,6 @@ defmodule EpicenterWeb.ContactsLive do
 
   # # # Private
 
-  # TODO: ensure this is tested (also for cases - do we consider the timezone?)
   defp assign_current_date(socket) do
     timezone = EpicenterWeb.PresentationConstants.presented_time_zone()
     current_date = @clock.utc_now() |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
