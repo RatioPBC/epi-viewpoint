@@ -9,6 +9,7 @@ defmodule Epicenter.AuditLog.Revision do
   @foreign_key_type :binary_id
   schema "revisions" do
     field :after_change, :map
+    field :application_version_sha, :string
     field :author_id, :binary_id
     field :before_change, :map
     field :change, :map
@@ -22,7 +23,7 @@ defmodule Epicenter.AuditLog.Revision do
     timestamps(updated_at: false)
   end
 
-  @required_attrs ~w{after_change author_id before_change change changed_id changed_type reason_action reason_event}a
+  @required_attrs ~w{after_change application_version_sha author_id before_change change changed_id changed_type reason_action reason_event}a
   @optional_attrs ~w{tid}a
 
   def changeset(revision, attrs) do

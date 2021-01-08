@@ -25,6 +25,7 @@ config :epicenter, EpicenterWeb.Endpoint,
   server: false
 
 config :epicenter,
+  application_version_sha: "test-version-sha",
   clock: FakeDateTime,
   health_check: Epicenter.Test.HealthCheckMock,
   totp: Epicenter.Test.TOTPMock

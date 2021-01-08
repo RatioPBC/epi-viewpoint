@@ -11,6 +11,8 @@ defmodule Epicenter.AuditLog do
   alias Epicenter.Cases.Person
   alias Epicenter.Repo
 
+  @application_version_sha Application.get_env(:epicenter, :application_version_sha)
+
   def insert(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do
     create_revision(changeset, %Meta{} = meta, &Repo.insert/2, ecto_options, changeset_flattening_function)
   end
@@ -77,6 +79,7 @@ defmodule Epicenter.AuditLog do
 
           attrs = %{
             "after_change" => after_change,
+            "application_version_sha" => @application_version_sha,
             "author_id" => meta.author_id,
             "before_change" => data,
             "change" => changeset_flattening_function.(changeset),

@@ -19,6 +19,7 @@ defmodule CFG do
 end
 
 config :epicenter,
+  application_version_sha: :code.priv_dir(:epicenter) |> Path.join("static/version.txt") |> File.read!() |> String.trim(),
   mfa_issuer: CFG.canonical_host()
 
 config :epicenter, Epicenter.Repo,

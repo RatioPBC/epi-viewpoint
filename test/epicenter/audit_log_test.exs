@@ -53,11 +53,13 @@ defmodule Epicenter.AuditLogTest do
       assert revision_1.before_change["tid"] == nil
       assert revision_1.change["tid"] == "alice"
       assert revision_1.after_change["tid"] == "alice"
+      assert revision_1.application_version_sha == "test-version-sha"
       assert revision_2.changed_id == inserted_person_2.id
       assert revision_2.changed_type == "Cases.Person"
       assert revision_2.before_change["tid"] == nil
       assert revision_2.change["tid"] == "billy"
       assert revision_2.after_change["tid"] == "billy"
+      assert revision_2.application_version_sha == "test-version-sha"
     end
 
     test "omits passwords from the revision" do

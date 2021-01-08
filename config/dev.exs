@@ -1,6 +1,7 @@
 use Mix.Config
 
 config :epicenter,
+  application_version_sha: System.cmd("git", ["rev-parse", "HEAD"]) |> elem(0) |> String.trim(),
   seeds_enabled?: true
 
 # Configure your database
