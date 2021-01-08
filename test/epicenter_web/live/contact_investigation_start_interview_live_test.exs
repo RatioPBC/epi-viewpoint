@@ -29,6 +29,11 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     [contact_investigation: contact_investigation]
   end
 
+  test "records an audit log entry", %{conn: conn, contact_investigation: contact_investigation, user: user} do
+    capture_log(fn -> Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation) end)
+    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation.exposed_person)
+  end
+
   test "saving a start interview contact investigation", %{conn: conn, contact_investigation: contact_investigation} do
     Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationStartInterview.assert_here()

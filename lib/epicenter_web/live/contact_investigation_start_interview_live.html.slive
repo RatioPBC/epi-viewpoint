@@ -13,4 +13,4 @@
                 "#",
                 [id: "contact-investigation-interview-start-form", phx_change: "change", phx_submit: "save", data: [role: "start-interview-form"]],
                 fn f ->
-      = start_interview_form_builder(f, @person)
+      = start_interview_form_builder(f, @contact_investigation.exposed_person)

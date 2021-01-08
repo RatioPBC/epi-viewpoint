@@ -6,25 +6,31 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [
+      assign_contact_investigation: 2,
+      assign_defaults: 1,
+      assign_form_changeset: 2,
+      assign_form_changeset: 3,
+      assign_page_title: 2,
+      authenticate_user: 2,
+      noreply: 1,
+      ok: 1
+    ]
 
   alias Epicenter.AuditLog
-  alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Forms.StartInterviewForm
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
     contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
-    person = contact_investigation.exposed_person |> Cases.preload_demographics()
 
     socket
     |> assign_defaults()
     |> assign_page_title("Start Contact Investigation")
     |> assign(:confirmation_prompt, nil)
     |> assign_form_changeset(StartInterviewForm.changeset(contact_investigation, %{}))
-    |> assign(contact_investigation: contact_investigation)
-    |> assign(person: person)
+    |> assign_contact_investigation(contact_investigation)
     |> ok()
   end
 
@@ -39,7 +45,9 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
          {:contact_investigation, {:ok, _contact_investigation}} <-
            {:contact_investigation, update_contact_investigation(socket, cast_investigation_attrs)} do
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
+      |> push_redirect(
+        to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#contact-investigations"
+      )
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
