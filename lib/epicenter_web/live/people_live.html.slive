@@ -26,7 +26,7 @@ section#people-page data-page="people"
         th width="1%"
         th width="20%" Name
         th width="15%" ID
-        th width="25%" Latest test result
+        th width="25%" Latest positive result
         th width="20%" Investigation status
         th width="25%" Assignee
 
