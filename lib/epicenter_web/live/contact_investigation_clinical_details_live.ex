@@ -67,13 +67,18 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
     contact_investigation = id |> ContactInvestigations.get() |> ContactInvestigations.preload_exposed_person()
 
     socket
-    |> assign_defaults()
     |> authenticate_user(session)
+    |> assign_defaults()
     |> assign_page_title(" Contact Investigation Clinical Details")
     |> assign(:form_changeset, ClinicalDetailsForm.changeset(contact_investigation))
     |> assign(:confirmation_prompt, nil)
-    |> assign(:contact_investigation, contact_investigation)
+    |> assign_contact_investigation(contact_investigation)
     |> ok()
+  end
+
+  defp assign_contact_investigation(socket, contact_investigation) do
+    AuditLog.view(socket.assigns.current_user, contact_investigation.exposed_person)
+    socket |> assign(:contact_investigation, contact_investigation)
   end
 
   def clinical_details_form_builder(form, contact_investigation) do

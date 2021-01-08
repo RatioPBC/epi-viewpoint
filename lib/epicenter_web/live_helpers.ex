@@ -21,9 +21,7 @@ defmodule EpicenterWeb.LiveHelpers do
 
   def assign_case_investigation(socket, case_investigation) do
     AuditLog.view(socket.assigns.current_user, case_investigation.person)
-
-    socket
-    |> assign(:case_investigation, case_investigation)
+    socket |> assign(:case_investigation, case_investigation)
   end
 
   def assign_person(socket, person) do
