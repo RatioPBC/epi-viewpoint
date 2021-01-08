@@ -3,7 +3,9 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_case_investigation: 2, assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -44,14 +46,13 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
     case_investigation = Cases.get_case_investigation(case_investigation_id) |> Cases.preload_person()
 
     socket
+    |> authenticate_user(session)
     |> assign_defaults()
-    |> assign(:case_investigation, case_investigation)
+    |> assign_case_investigation(case_investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign(:form_changeset, ConcludeIsolationMonitoringForm.changeset(case_investigation, %{}))
     |> assign(:page_heading, page_heading(case_investigation))
-    |> assign(:person, case_investigation.person)
     |> assign_page_title(" Case Investigation Conclude Isolation Monitoring")
-    |> authenticate_user(session)
     |> ok()
   end
 
@@ -77,7 +78,9 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
                  reason_event: AuditLog.Revision.conclude_case_investigation_isolation_monitoring_event()
                }}
             )} do
-      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
+      |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign(:form_changeset, form_changeset) |> noreply()
