@@ -5,7 +5,16 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [
+      assign_contact_investigation: 2,
+      assign_defaults: 1,
+      assign_form_changeset: 2,
+      assign_form_changeset: 3,
+      assign_page_title: 2,
+      authenticate_user: 2,
+      noreply: 1,
+      ok: 1
+    ]
 
   alias Epicenter.AuditLog
   alias Epicenter.ContactInvestigations
@@ -68,11 +77,11 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
     contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
 
     socket
+    |> authenticate_user(session)
     |> assign_defaults()
     |> assign_page_title(" Contact Investigation Quarantine Monitoring")
-    |> authenticate_user(session)
     |> assign(:confirmation_prompt, nil)
-    |> assign(:contact_investigation, contact_investigation)
+    |> assign_contact_investigation(contact_investigation)
     |> assign(:person, contact_investigation.exposed_person)
     |> assign_form_changeset(QuarantineMonitoringForm.changeset(contact_investigation, %{}))
     |> ok()

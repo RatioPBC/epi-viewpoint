@@ -3,7 +3,10 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_contact_investigation: 2, assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
   import EpicenterWeb.Presenters.CaseInvestigationPresenter, only: [symptoms_options: 0]
 
   alias Epicenter.AuditLog
@@ -74,11 +77,6 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
     |> assign(:confirmation_prompt, nil)
     |> assign_contact_investigation(contact_investigation)
     |> ok()
-  end
-
-  defp assign_contact_investigation(socket, contact_investigation) do
-    AuditLog.view(socket.assigns.current_user, contact_investigation.exposed_person)
-    socket |> assign(:contact_investigation, contact_investigation)
   end
 
   def clinical_details_form_builder(form, contact_investigation) do
