@@ -5,7 +5,6 @@ defmodule EpicenterWeb.UserLiveTest do
 
   alias Epicenter.Test
   alias Epicenter.Accounts
-  alias Epicenter.Accounts.UserToken
   alias EpicenterWeb.Test.Pages
 
   @admin Test.Fixtures.admin()
@@ -29,25 +28,6 @@ defmodule EpicenterWeb.UserLiveTest do
       )
 
       assert %{name: "New User", email: "newadmin@example.com", disabled: true} = Accounts.get_user(email: "newadmin@example.com")
-    end
-
-    test "includes the password reset link in the flash for a newly created user", %{conn: conn} do
-      flash_content =
-        Pages.User.visit(conn)
-        |> Pages.submit_and_follow_redirect(conn, "#user-form",
-          user_form: %{"name" => "New User", "email" => "newadmin@example.com", "type" => "admin", "status" => "active"}
-        )
-        |> Pages.Users.assert_here()
-        |> Pages.Users.password_reset_text()
-
-      captures =
-        Regex.named_captures(~r[Reset link for newadmin@example.com: http://\w+:\d+/users/reset-password/(?<encoded_token>.+)], flash_content)
-
-      {:ok, token} = Base.url_decode64(captures["encoded_token"], padding: false)
-
-      assert user_token = Epicenter.Repo.get_by(UserToken, token: :crypto.hash(:sha256, token))
-      assert user_token.sent_to == "newadmin@example.com"
-      assert user_token.context == "reset_password"
     end
 
     test "disallows users to create users with invalid email addresses", %{conn: conn} do
@@ -125,9 +105,9 @@ defmodule EpicenterWeb.UserLiveTest do
         )
         |> Pages.Users.assert_here()
         |> Pages.Users.assert_users([
-          ["Name", "Email", "Type", "Status", "Audit trail"],
-          ["fixture admin", "admin@example.com", "Admin", "Active", "View"],
-          ["new name", "newemail@example.com", "Member", "Inactive", "View"]
+          ["Name", "Email", "Type", "Status", "Audit trail", ""],
+          ["fixture admin", "admin@example.com", "Admin", "Active", "View", "Set/reset password"],
+          ["new name", "newemail@example.com", "Member", "Inactive", "View", "Set/reset password"]
         ])
 
       assert %{

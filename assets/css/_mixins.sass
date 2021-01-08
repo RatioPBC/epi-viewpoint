@@ -124,6 +124,10 @@
   border-color: $secondary-button-color
   color: $primary-text-color
 
+@mixin callout
+  border-left: 1rem solid $background-color
+  padding: 0 1rem
+
 @mixin card($width: regular)
   @include vertical-flow
   background-color: white
@@ -168,10 +172,17 @@
       padding-bottom: 1rem
 
   tr
-    border-bottom: 1px solid $divider-color
+    border-top: 1px solid $divider-color
 
-  tr:last-child
-    border-bottom: none
+  tr:first-child
+    border-top: none
+
+  tr.sub-row
+    border-top: none
+    font-size: $small-body-text-size
+
+    th, td
+      padding: 0.25rem 0
 
   th, td
     min-width: 3rem

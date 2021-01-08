@@ -34,10 +34,10 @@ defmodule EpicenterWeb.Features.AdminTest do
     |> Pages.Users.visit()
     |> Pages.Users.assert_here()
     |> Pages.Users.assert_users([
-      ["Name", "Email", "Type", "Status", "Audit trail"],
-      ["billy", "billy@example.com", "Member", "Inactive", "View"],
-      ["fixture admin", "admin@example.com", "Admin", "Active", "View"],
-      ["user", "user@example.com", "Admin", "Active", "View"]
+      ["Name", "Email", "Type", "Status", "Audit trail", ""],
+      ["billy", "billy@example.com", "Member", "Inactive", "View", "Set/reset password"],
+      ["fixture admin", "admin@example.com", "Admin", "Active", "View", "Set/reset password"],
+      ["user", "user@example.com", "Admin", "Active", "View", "Set/reset password"]
     ])
     |> Pages.Users.click_add_user(conn)
     |> Pages.User.assert_here()
@@ -46,11 +46,11 @@ defmodule EpicenterWeb.Features.AdminTest do
     )
     |> Pages.Users.assert_here()
     |> Pages.Users.assert_users([
-      ["Name", "Email", "Type", "Status", "Audit trail"],
-      ["billy", "billy@example.com", "Member", "Inactive", "View"],
-      ["fixture admin", "admin@example.com", "Admin", "Active", "View"],
-      ["New User", "new@example.com", "Member", "Active", "View"],
-      ["user", "user@example.com", "Admin", "Active", "View"]
+      ["Name", "Email", "Type", "Status", "Audit trail", ""],
+      ["billy", "billy@example.com", "Member", "Inactive", "View", "Set/reset password"],
+      ["fixture admin", "admin@example.com", "Admin", "Active", "View", "Set/reset password"],
+      ["New User", "new@example.com", "Member", "Active", "View", "Set/reset password"],
+      ["user", "user@example.com", "Admin", "Active", "View", "Set/reset password"]
     ])
     |> Pages.Users.click_view_audit_trail(conn, "user")
     |> Pages.UserLogins.assert_here()

@@ -24,6 +24,14 @@ defmodule EpicenterWeb.Test.Pages.Users do
     view
   end
 
+  def click_set_reset_password(%View{} = view, tid) do
+    view |> element("[data-role=reset-password][data-tid=#{tid}]") |> render_click()
+    view
+  end
+
+  def get_password_reset_link(%View{} = view, tid),
+    do: view |> render() |> Test.Html.parse() |> Test.Html.attr("[data-role=reset-password-link][data-tid=#{tid}]", "value") |> List.first()
+
   def password_reset_text(conn_or_view_or_html) do
     conn_or_view_or_html
     |> Pages.parse()

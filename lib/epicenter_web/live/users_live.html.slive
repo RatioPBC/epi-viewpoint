@@ -3,9 +3,6 @@ section#users-page data-page="users"
     #title
       span Users
 
-  = if live_flash(@flash, :password_reset) do
-    #password-reset data-role="password-reset" = live_flash(@flash, :password_reset)
-
   = live_redirect "Add user", to: Routes.new_user_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLive), data: [role: :"add-user"], id: "add-user"
 
   table data-role="users-table"
@@ -16,11 +13,22 @@ section#users-page data-page="users"
         th Type
         th Status
         th Audit trail
+        th
     tbody
       = for user <- @users do
         tr
           td= live_redirect user.name, to: Routes.user_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLive, user)
           td= user.email
-          td= type(user)
-          td= active_status(user)
+          td= user.type
+          td= user.active_status
           td= live_redirect "View", to: Routes.user_logins_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLoginsLive, user), data: [tid: "view-audit-trail-#{user.tid}"]
+          td
+            button data-role="reset-password" data-tid=user.tid phx-click="reset-password" phx-value-user-id=user.id Set/reset password
+
+        = if user.password_reset_url do
+          tr.sub-row
+            td colspan=4
+              form
+                fieldset
+                  ' Securely send this link to the user to allow them to set or reset their password:
+                  input data-role="reset-password-link" data-tid=user.tid readonly="true" type="text" value=user.password_reset_url

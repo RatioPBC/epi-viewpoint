@@ -18,7 +18,6 @@ defmodule EpicenterWeb.UserLive do
   alias Epicenter.Accounts.User
   alias Epicenter.AuditLog
   alias Epicenter.Validation
-  alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Form
 
   defmodule UserForm do
@@ -100,17 +99,7 @@ defmodule EpicenterWeb.UserLive do
     user = socket.assigns.user
 
     with {:form, {:ok, user_attrs}} <- {:form, UserForm.user_attrs(form_changeset)},
-         {:user, {:ok, user}} <- {:user, if(user, do: update_user(socket, user, user_attrs), else: register_user(socket, user_attrs))} do
-      socket =
-        if socket.assigns.user do
-          socket
-        else
-          {:ok, encoded_token} = Accounts.generate_user_reset_password_token(user)
-
-          socket
-          |> put_flash(:password_reset, "Reset link for #{user.email}: #{Routes.user_reset_password_url(Endpoint, :edit, encoded_token)}")
-        end
-
+         {:user, {:ok, _user}} <- {:user, if(user, do: update_user(socket, user, user_attrs), else: register_user(socket, user_attrs))} do
       socket
       |> push_redirect(to: Routes.users_path(socket, EpicenterWeb.UsersLive))
       |> noreply()
