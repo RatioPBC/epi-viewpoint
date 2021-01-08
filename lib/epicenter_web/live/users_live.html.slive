@@ -22,12 +22,15 @@ section#users-page data-page="users"
           td= user.type
           td= user.active_status
           td= live_redirect "View", to: Routes.user_logins_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLoginsLive, user), data: [tid: "view-audit-trail-#{user.tid}"]
-          td
-            button data-role="reset-password" data-tid=user.tid phx-click="reset-password" phx-value-user-id=user.id Set/reset password
+          td style="text-align: right"
+            = if user.password_reset_url do
+              button data-role="close-reset-password" data-tid=user.tid phx-click="close-reset-password" phx-value-user-id=user.id Done
+            - else
+              button data-role="reset-password" data-tid=user.tid phx-click="reset-password" phx-value-user-id=user.id Set/reset password
 
         = if user.password_reset_url do
           tr.sub-row
-            td colspan=4
+            td colspan=6
               form
                 fieldset
                   div.reset-password-message
