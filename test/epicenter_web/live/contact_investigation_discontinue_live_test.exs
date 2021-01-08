@@ -22,6 +22,11 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
     assert_has_role(page_live, "contact-investigation-discontinue-page")
   end
 
+  test "records an audit log entry", %{conn: conn, contact_investigation: contact_investigation, user: user} do
+    capture_log(fn -> Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation) end)
+    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation.exposed_person)
+  end
+
   test "initial values", %{conn: conn, contact_investigation: contact_investigation} do
     view = Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
 

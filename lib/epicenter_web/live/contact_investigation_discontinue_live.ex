@@ -3,7 +3,9 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
 
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_contact_investigation: 2, assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Ecto.Changeset
   alias Epicenter.AuditLog
@@ -15,14 +17,11 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
     socket = socket |> authenticate_user(session)
     contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
 
-    person = contact_investigation.exposed_person
-
     socket
     |> assign_defaults()
     |> assign_page_title("Discontinue Contact Investigation")
-    |> assign(contact_investigation: contact_investigation)
+    |> assign_contact_investigation(contact_investigation)
     |> assign(changeset: ContactInvestigations.change(contact_investigation, %{}))
-    |> assign(person: person)
     |> ok()
   end
 
@@ -53,7 +52,9 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
       )
 
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
+      |> push_redirect(
+        to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#contact-investigations"
+      )
       |> noreply()
     else
       {:error, changeset} ->
