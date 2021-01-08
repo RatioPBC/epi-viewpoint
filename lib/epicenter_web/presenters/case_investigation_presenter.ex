@@ -7,7 +7,6 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.Person
   alias EpicenterWeb.Format
-  alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 
   def contact_details_as_list(%ContactInvestigation{} = contact_investigation) do
@@ -70,9 +69,9 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Discontinued interview on #{
-                case_investigation.interview_discontinued_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
-              }: #{case_investigation.interview_discontinue_reason}",
+              "Discontinued interview on #{case_investigation.interview_discontinued_at |> Format.date_time_with_presented_time_zone()}: #{
+                case_investigation.interview_discontinue_reason
+              }",
             link:
               live_redirect(
                 "Edit",
@@ -285,16 +284,13 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   end
 
   defp completed_interview_date(case_investigation),
-    do: case_investigation.interview_completed_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+    do: case_investigation.interview_completed_at |> Format.date_time_with_presented_time_zone()
 
   defp concluded_isolation_monitoring_date(case_investigation),
-    do: case_investigation.isolation_concluded_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
-
-  defp convert_to_presented_time_zone(datetime),
-    do: DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
+    do: case_investigation.isolation_concluded_at |> Format.date_time_with_presented_time_zone()
 
   defp interview_start_date(case_investigation),
-    do: case_investigation.interview_started_at |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+    do: case_investigation.interview_started_at |> Format.date_time_with_presented_time_zone()
 
   defp redirect_to(case_investigation, :complete_interview) do
     live_redirect("Complete interview",

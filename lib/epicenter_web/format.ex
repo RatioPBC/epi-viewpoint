@@ -3,6 +3,7 @@ defmodule EpicenterWeb.Format do
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
+  alias EpicenterWeb.PresentationConstants
 
   def address(nil), do: ""
 
@@ -22,6 +23,11 @@ defmodule EpicenterWeb.Format do
 
   def date_time_with_zone(nil), do: ""
   def date_time_with_zone(%DateTime{} = date_time), do: Calendar.strftime(date_time, "%m/%d/%Y at %I:%M%P %Z")
+
+  def date_time_with_presented_time_zone(nil), do: ""
+
+  def date_time_with_presented_time_zone(%DateTime{} = date_time),
+    do: date_time |> DateTime.shift_zone!(PresentationConstants.presented_time_zone()) |> date_time_with_zone()
 
   def demographic(%{"major" => major, "detailed" => detailed}, field), do: demographic(%{major: major, detailed: detailed}, field)
   def demographic(%{major: major, detailed: detailed}, field), do: demographic(Extra.List.sorted_flat_compact([major, detailed]), field)

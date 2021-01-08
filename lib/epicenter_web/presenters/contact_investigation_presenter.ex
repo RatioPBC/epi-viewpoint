@@ -6,7 +6,6 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Format
-  alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Router.Helpers, as: Routes
 
   def exposing_case_link(contact_investigation) do
@@ -158,7 +157,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   end
 
   defp format_date(date),
-    do: date |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
+    do: date |> Format.date_time_with_presented_time_zone()
 
   defp with_interviewee_name(%ContactInvestigation{interview_proxy_name: nil} = contact_investigation),
     do:
@@ -170,7 +169,4 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
 
   defp with_interviewee_name(%ContactInvestigation{interview_proxy_name: interview_proxy_name}),
     do: "proxy #{interview_proxy_name}"
-
-  defp convert_to_presented_time_zone(datetime),
-    do: DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
 end

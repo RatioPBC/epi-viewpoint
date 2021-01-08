@@ -5,7 +5,6 @@ defmodule EpicenterWeb.UserLoginsLive do
 
   alias Epicenter.Accounts
   alias EpicenterWeb.Format
-  alias EpicenterWeb.PresentationConstants
 
   def mount(%{"id" => id}, session, socket) do
     user = Accounts.get_user(id)
@@ -30,9 +29,5 @@ defmodule EpicenterWeb.UserLoginsLive do
     to_string(ua)
   end
 
-  def format_date(date),
-    do: date |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
-
-  defp convert_to_presented_time_zone(datetime),
-    do: DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
+  def format_date(date), do: date |> Format.date_time_with_presented_time_zone()
 end

@@ -88,6 +88,21 @@ defmodule EpicenterWeb.FormatTest do
     end
   end
 
+  describe "date_time_with_presented_time_zone" do
+    import EpicenterWeb.Format, only: [date_time_with_presented_time_zone: 1, date_time_with_zone: 1]
+    alias EpicenterWeb.PresentationConstants
+
+    test "it formats it as a date with the time in the presented time zone" do
+      utc_datetime = ~U[2020-01-02 01:00:07Z]
+      {:ok, localized_datetime} = DateTime.shift_zone(utc_datetime, PresentationConstants.presented_time_zone())
+      assert date_time_with_presented_time_zone(utc_datetime) == date_time_with_zone(localized_datetime)
+    end
+
+    test "when given a nil, quietly renders an empty string" do
+      assert date_time_with_presented_time_zone(nil) == ""
+    end
+  end
+
   describe "demographic" do
     import EpicenterWeb.Format, only: [demographic: 2]
 

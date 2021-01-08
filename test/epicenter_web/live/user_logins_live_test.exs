@@ -4,7 +4,6 @@ defmodule EpicenterWeb.UserLoginsLiveTest do
   alias Epicenter.Accounts
   alias Epicenter.Test
   alias EpicenterWeb.Format
-  alias EpicenterWeb.PresentationConstants
   alias EpicenterWeb.Test.Pages
 
   setup :log_in_admin
@@ -23,13 +22,7 @@ defmodule EpicenterWeb.UserLoginsLiveTest do
     |> Pages.UserLogins.assert_here()
     |> Pages.UserLogins.assert_table_contents([
       ["Timestamp", "OS", "Browser", "Session ID"],
-      [format_date(login.inserted_at), "Mac OS X 10.15.7", "Chrome 87.0.4280.88", login.session_id]
+      [Format.date_time_with_presented_time_zone(login.inserted_at), "Mac OS X 10.15.7", "Chrome 87.0.4280.88", login.session_id]
     ])
   end
-
-  def format_date(date),
-    do: date |> convert_to_presented_time_zone() |> Format.date_time_with_zone()
-
-  defp convert_to_presented_time_zone(datetime),
-    do: DateTime.shift_zone!(datetime, PresentationConstants.presented_time_zone())
 end
