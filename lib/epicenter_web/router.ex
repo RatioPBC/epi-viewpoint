@@ -95,8 +95,6 @@ defmodule EpicenterWeb.Router do
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update-password", UserSettingsController, :update_password
-    put "/users/settings/update-email", UserSettingsController, :update_email
-    get "/users/settings/confirm-email/:token", UserSettingsController, :confirm_email
   end
 
   scope "/", EpicenterWeb do

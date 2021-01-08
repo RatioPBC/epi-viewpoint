@@ -9,7 +9,6 @@ defmodule Epicenter.Accounts do
 
   def change_login(attrs), do: Login.changeset(%Login{}, attrs)
   def change_user(%User{} = user, attrs), do: User.changeset(user, Enum.into(attrs, %{}))
-  def change_user_email(user, attrs \\ %{}), do: User.email_changeset(user, attrs)
   def change_user_mfa(user, mfa_secret), do: User.mfa_changeset(user, %{mfa_secret: mfa_secret})
   def change_user_password(user, attrs \\ %{}), do: User.password_changeset(user, attrs)
   def change_user_registration(%User{} = user, attrs \\ %{}), do: User.registration_changeset(user, attrs)
@@ -75,23 +74,6 @@ defmodule Epicenter.Accounts do
       end
     )
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
-  end
-
-  @doc """
-  Delivers the update email instructions to the given user.
-
-  ## Examples
-
-      iex> deliver_update_email_instructions(user, current_email, &Routes.user_update_email_url(conn, :edit, &1))
-      {:ok, %{to: ..., body: ...}}
-
-  """
-  def deliver_update_email_instructions(%User{} = user, current_email, update_email_url_fun)
-      when is_function(update_email_url_fun, 1) do
-    {encoded_token, user_token} = UserToken.build_email_token(user, "change:#{current_email}")
-
-    Repo.insert!(user_token)
-    UserNotifier.deliver_update_email_instructions(user, update_email_url_fun.(encoded_token))
   end
 
   @doc """
