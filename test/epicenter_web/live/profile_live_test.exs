@@ -43,6 +43,28 @@ defmodule EpicenterWeb.ProfileLiveTest do
     |> AuditLogAssertions.assert_viewed_person(user, person)
   end
 
+  test "records an audit log entry for any contacts", %{conn: conn, user: user, person: sick_person} do
+    contact_investigation1 =
+      create_contact_investigation(user, sick_person, %{}, %{}, %{
+        tid: "contact_investigation",
+        household_member: true,
+        relationship_to_case: "Partner or roommate",
+        most_recent_date_together: ~D{2020-08-06}
+      })
+
+    contact_investigation2 =
+      create_contact_investigation(user, sick_person, %{sampled_on: ~D[2020-08-08]}, %{}, %{
+        tid: "contact_investigation",
+        household_member: true,
+        relationship_to_case: "Partner or roommate",
+        most_recent_date_together: ~D{2020-08-06}
+      })
+
+    capture_log(fn -> Pages.Profile.visit(conn, sick_person) end)
+    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation1.exposed_person)
+    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation2.exposed_person)
+  end
+
   describe "when the person has no identifying information" do
     test "showing person identifying information", %{conn: conn, person: person, user: user} do
       {:ok, _} =
