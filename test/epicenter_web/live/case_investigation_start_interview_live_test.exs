@@ -5,6 +5,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
@@ -14,6 +15,13 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     lab_result = Test.Fixtures.lab_result_attrs(person, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
     case_investigation = Test.Fixtures.case_investigation_attrs(person, lab_result, user, "investigation") |> Cases.create_case_investigation!()
     [case_investigation: case_investigation, person: person, user: user]
+  end
+
+  test "records an audit log entry", %{conn: conn, case_investigation: case_investigation, user: user} do
+    case_investigation = case_investigation |> Cases.preload_person()
+
+    capture_log(fn -> Pages.CaseInvestigationStartInterview.visit(conn, case_investigation) end)
+    |> AuditLogAssertions.assert_viewed_person(user, case_investigation.person)
   end
 
   test "shows start case investigation form", %{conn: conn, case_investigation: case_investigation} do

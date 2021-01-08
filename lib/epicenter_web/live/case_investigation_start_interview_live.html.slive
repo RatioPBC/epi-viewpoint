@@ -2,7 +2,7 @@
 
   section
     header#subnav
-      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "back-link"] do
+      = live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do
         = back_icon()
         span Back
 
@@ -10,4 +10,4 @@
     h2 Start interview
 
     = form_for @form_changeset, "#", [id: "case-investigation-interview-start-form", phx_change: "change", phx_submit: "save"], fn f ->
-      = start_interview_form_builder(f, @person)
+      = start_interview_form_builder(f, @case_investigation.person)
