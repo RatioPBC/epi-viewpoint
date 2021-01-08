@@ -2,7 +2,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_contact_investigation: 2, assign_defaults: 1, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
 
   alias Epicenter.AuditLog
@@ -46,13 +46,12 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
       |> ContactInvestigations.preload_exposed_person()
 
     socket
+    |> authenticate_user(session)
     |> assign_defaults()
     |> assign_page_heading(contact_investigation)
     |> assign(:confirmation_prompt, nil)
-    |> assign(:contact_investigation, contact_investigation)
+    |> assign_contact_investigation(contact_investigation)
     |> assign(:form_changeset, ConcludeQuarantineMonitoringForm.changeset(contact_investigation, %{}))
-    |> assign(:person, contact_investigation.exposed_person)
-    |> authenticate_user(session)
     |> ok()
   end
 
@@ -79,7 +78,9 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
                }}
             )} do
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#contact-investigations")
+      |> push_redirect(
+        to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#contact-investigations"
+      )
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->

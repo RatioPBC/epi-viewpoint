@@ -24,6 +24,11 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
     [contact_investigation: contact_investigation, case_investigation: case_investigation, person: person, user: user]
   end
 
+  test "records an audit log entry", %{conn: conn, contact_investigation: contact_investigation, user: user} do
+    capture_log(fn -> Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation) end)
+    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation.exposed_person)
+  end
+
   test "shows conclude quarantine monitoring form", %{conn: conn, contact_investigation: contact_investigation} do
     Pages.ContactInvestigationConcludeQuarantineMonitoring.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationConcludeQuarantineMonitoring.assert_here()
