@@ -33,6 +33,20 @@ let liveSocket = new LiveSocket("/live", Socket, {
         document.getElementsByTagName("body")[0].className = this.el.dataset.bodyClass;
       }
     },
+    CopyToClipboard: {
+      mounted() {
+        this.el.addEventListener("click", (event) => {
+          const input = document.querySelector(`input[value="${this.el.dataset.clipboardValue}"]`);
+          if (input) {
+            input.select();
+            input.setSelectionRange(0, input.value.length);
+            document.execCommand("copy");
+            document.activeElement.blur();
+            window.getSelection().removeAllRanges();
+          }
+        });
+      }
+    },
     TransientControlHook: {
       mounted() {
         TransientControl.setup();

@@ -30,5 +30,7 @@ section#users-page data-page="users"
             td colspan=4
               form
                 fieldset
-                  ' Securely send this link to the user to allow them to set or reset their password:
+                  div.reset-password-message
+                    ' Securely send this link to the user to allow them to set or reset their password:
+                    a href="javascript:void(0)" id="copy-to-clipboard-#{user.id}" phx-hook="CopyToClipboard" data-clipboard-value=user.password_reset_url Copy to clipboard
                   input data-role="reset-password-link" data-tid=user.tid readonly="true" type="text" value=user.password_reset_url
