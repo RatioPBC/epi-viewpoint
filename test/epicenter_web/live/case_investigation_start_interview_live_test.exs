@@ -5,7 +5,6 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
-  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user

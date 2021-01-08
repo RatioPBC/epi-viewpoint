@@ -4,7 +4,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias Epicenter.Test
-  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   import Phoenix.LiveViewTest

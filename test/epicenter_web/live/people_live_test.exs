@@ -10,7 +10,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Extra
   alias Epicenter.Repo
   alias Epicenter.Test
-  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.PeopleLive
   alias EpicenterWeb.Test.Pages
 

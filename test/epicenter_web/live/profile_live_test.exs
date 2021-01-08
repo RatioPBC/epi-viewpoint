@@ -8,7 +8,6 @@ defmodule EpicenterWeb.ProfileLiveTest do
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias Epicenter.Test
-  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Format
   alias EpicenterWeb.ProfileLive
   alias EpicenterWeb.Test.Components

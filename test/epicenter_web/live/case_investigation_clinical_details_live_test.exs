@@ -3,7 +3,6 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
-  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
 
   import Epicenter.Test.RevisionAssertions

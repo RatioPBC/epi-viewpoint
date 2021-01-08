@@ -6,7 +6,6 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
 
   alias Epicenter.Cases
   alias Epicenter.Test
-  alias Epicenter.Test.AuditLogAssertions
   alias EpicenterWeb.Test.Pages
   alias EpicenterWeb.ProfileEditLive
 
