@@ -202,14 +202,8 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_investigation_notes()
 
     case_investigations_contacts_persons =
-      Enum.reduce(case_investigations, [], fn case_investigation, all_contacts ->
-        case_contacts =
-          case_investigation.contact_investigations
-          |> ContactInvestigations.preload_exposed_person()
-
-        all_contacts ++ case_contacts
-      end)
-      |> Enum.map(fn contact_investigation -> contact_investigation.exposed_person end)
+      Enum.flat_map(case_investigations, & &1.contact_investigations)
+      |> Enum.map(& &1.exposed_person)
 
     AuditLog.view(socket.assigns.current_user, case_investigations_contacts_persons)
 
