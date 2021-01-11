@@ -15,6 +15,11 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_here()
     end
 
+    test "records an audit log entry for each person on the page", %{user: user, bob: bob, caroline: caroline, donald: donald, conn: conn} do
+      capture_log(fn -> Pages.Contacts.visit(conn) end)
+      |> AuditLogAssertions.assert_viewed_people(user, [bob, caroline, donald])
+    end
+
     test "People with contact investigations are listed", %{conn: conn, bob: bob, caroline: caroline, donald: donald} do
       Pages.Contacts.visit(conn)
       |> Pages.Contacts.assert_table_contents([

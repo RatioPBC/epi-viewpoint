@@ -68,6 +68,7 @@ defmodule EpicenterWeb.ContactsLive do
       |> Cases.preload_demographics()
       |> Cases.preload_assigned_to()
 
+    AuditLog.view(socket.assigns.current_user, exposed_people)
     assign(socket, exposed_people: exposed_people)
   end
 
