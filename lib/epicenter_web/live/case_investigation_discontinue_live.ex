@@ -5,7 +5,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, assign_person: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [assign_case_investigation: 2, assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Ecto.Changeset
   alias Epicenter.AuditLog
@@ -15,14 +15,12 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   def mount(%{"id" => case_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
     case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person()
-    person = case_investigation.person
 
     socket
     |> assign_defaults()
     |> assign_page_title("Discontinue Case Investigation")
-    |> assign(case_investigation: case_investigation)
+    |> assign_case_investigation(case_investigation)
     |> assign_form_changeset(Cases.change_case_investigation(case_investigation, %{}))
-    |> assign_person(person)
     |> ok()
   end
 
@@ -50,7 +48,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
               }}
            ) do
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations")
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
     else
       {:error, changeset} ->

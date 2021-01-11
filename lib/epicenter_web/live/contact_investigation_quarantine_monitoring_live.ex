@@ -82,7 +82,6 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
     |> assign_page_title(" Contact Investigation Quarantine Monitoring")
     |> assign(:confirmation_prompt, nil)
     |> assign_contact_investigation(contact_investigation)
-    |> assign(:person, contact_investigation.exposed_person)
     |> assign_form_changeset(QuarantineMonitoringForm.changeset(contact_investigation, %{}))
     |> ok()
   end
@@ -97,7 +96,11 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
     with %Ecto.Changeset{} = form_changeset <- QuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params),
          {:form, {:ok, model_attrs}} <- {:form, QuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
          {:contact_investigation, {:ok, _contact_investigation}} <- {:contact_investigation, update_contact_investigation(socket, model_attrs)} do
-      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
+      socket
+      |> push_redirect(
+        to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#case-investigations"
+      )
+      |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset, "Form error message") |> noreply()

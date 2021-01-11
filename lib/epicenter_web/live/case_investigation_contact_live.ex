@@ -7,11 +7,12 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
   import EpicenterWeb.LiveHelpers,
     only: [
+      assign_case_investigation: 2,
+      assign_contact_investigation: 2,
       assign_defaults: 1,
       assign_form_changeset: 2,
       assign_form_changeset: 3,
       assign_page_title: 2,
-      assign_case_investigation: 2,
       authenticate_user: 2,
       noreply: 1,
       ok: 1
@@ -148,13 +149,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> assign_contact_investigation(contact_investigation)
     |> assign_case_investigation(case_investigation)
     |> ok()
-  end
-
-  defp assign_contact_investigation(socket, contact_investigation) do
-    AuditLog.view(socket.assigns.current_user, contact_investigation.exposed_person)
-
-    socket
-    |> assign(:contact_investigation, contact_investigation)
   end
 
   def handle_event("change", %{"contact_form" => params}, socket) do
