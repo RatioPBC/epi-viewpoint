@@ -268,5 +268,13 @@ defmodule Epicenter.Cases.Person do
         on: lab_result.person_id == person.id,
         order_by: [asc: lab_result.max_sampled_on, asc: person.seq]
     end
+
+    def with_external_id(external_id) do
+      from person in Person,
+        join: demographic in Demographic,
+        on: person.id == demographic.person_id,
+        where: demographic.external_id == ^external_id,
+        select: person.id
+    end
   end
 end

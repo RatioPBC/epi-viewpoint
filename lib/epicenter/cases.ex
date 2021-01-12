@@ -133,7 +133,7 @@ defmodule Epicenter.Cases do
   end
 
   def find_matching_person(_), do: nil
-
+  def find_person_id_by_external_id(external_id), do: Person.Query.with_external_id(external_id) |> Repo.one()
   def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
   def get_person(id), do: Person |> Repo.get(id)
 
