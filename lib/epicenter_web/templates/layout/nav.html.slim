@@ -10,9 +10,11 @@ header#nav
 
 
       = if assigns[:search_changeset] do
-        #search-form
+        #nav-search
           = form_for @search_changeset, "#", [id: "search-form"], fn f ->
-            = text_input f, :term
+            = label f, :term do
+              = search_icon()
+              = text_input f, :term, [placeholder: "Search ..."]
 
       #nav-right
         #user-menu data-transient-control=true

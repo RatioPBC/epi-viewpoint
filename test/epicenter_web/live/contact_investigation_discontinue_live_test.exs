@@ -34,15 +34,14 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
              "contact_investigation[interview_discontinue_reason]" => ""
            } = Pages.form_state(view)
 
-    assert Pages.form_labels(view) == %{
-             "contact_investigation[interview_discontinue_reason]" => [
+    assert Pages.form_labels(view) |> Map.get("contact_investigation[interview_discontinue_reason]") ==
+             [
                "Other",
                "Deceased",
                "Transferred to another jurisdiction",
                "Another contact investigation already underway",
                "Unable to reach"
              ]
-           }
 
     assert Pages.ContactInvestigationDiscontinue.form_title(view) == "Discontinue interview"
   end
