@@ -109,6 +109,11 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
   end
 
   describe "case investigations" do
+    test "records an audit log entry for the person", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
+      capture_log(fn -> Pages.InvestigationCompleteInterview.visit(conn, case_investigation) end)
+      |> AuditLogAssertions.assert_viewed_person(user, person)
+    end
+
     test "prefills with existing data when existing data is available and can be edited", %{conn: conn, case_investigation: case_investigation} do
       {:ok, _} =
         Cases.update_case_investigation(
@@ -160,6 +165,11 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
         |> ContactInvestigations.create()
 
       [contact_investigation: contact_investigation, user: user]
+    end
+
+    test "records an audit log entry for the exposed person", %{conn: conn, contact_investigation: contact_investigation, user: user} do
+      capture_log(fn -> Pages.InvestigationCompleteInterview.visit(conn, contact_investigation) end)
+      |> AuditLogAssertions.assert_viewed_person(user, contact_investigation.exposed_person)
     end
 
     test "saving complete contact investigation", %{conn: conn, contact_investigation: contact_investigation, user: user} do

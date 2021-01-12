@@ -7,6 +7,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Form
@@ -14,30 +15,27 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   alias EpicenterWeb.PresentationConstants
 
   def mount(%{"id" => contact_investigation_id}, session, %{assigns: %{live_action: :complete_contact_investigation}} = socket) do
-    contact_investigation = ContactInvestigations.get(contact_investigation_id)
-    person = contact_investigation |> ContactInvestigations.preload_exposed_person() |> Map.get(:exposed_person)
-
-    mount(contact_investigation, person, session, socket)
+    ContactInvestigations.get(contact_investigation_id)
+    |> ContactInvestigations.preload_exposed_person()
+    |> mount(session, socket)
   end
 
   def mount(%{"id" => case_investigation_id}, session, %{assigns: %{live_action: :complete_case_investigation}} = socket) do
-    case_investigation = Cases.get_case_investigation(case_investigation_id)
-    person = case_investigation |> Cases.preload_person() |> Map.get(:person)
-
-    mount(case_investigation, person, session, socket)
+    Cases.get_case_investigation(case_investigation_id)
+    |> Cases.preload_person()
+    |> mount(session, socket)
   end
 
-  defp mount(investigation, person, session, socket) do
+  def mount(investigation, session, socket) do
     form_changeset = CompleteInterviewForm.changeset(investigation, %{})
 
     socket
     |> assign_defaults()
     |> authenticate_user(session)
     |> assign_page_title("Complete interview")
-    |> assign(:investigation, investigation)
+    |> assign_investigation(investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign_form_changeset(form_changeset)
-    |> assign(:person, person)
     |> ok()
   end
 
@@ -51,7 +49,9 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
     with %Ecto.Changeset{} = form_changeset <- CompleteInterviewForm.changeset(socket.assigns.investigation, params),
          {:form, {:ok, case_investigation_attrs}} <- {:form, CompleteInterviewForm.investigation_attrs(form_changeset)},
          {:investigation, {:ok, _investigation}} <- {:investigation, update_case_investigation(socket, case_investigation_attrs)} do
-      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#case-investigations") |> noreply()
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, get_person(socket.assigns.investigation))}#case-investigations")
+      |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset) |> noreply()
@@ -64,6 +64,16 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   end
 
   # # #
+
+  defp assign_investigation(socket, %Cases.CaseInvestigation{} = investigation) do
+    AuditLog.view(socket.assigns.current_user, investigation.person)
+    socket |> assign(:investigation, investigation)
+  end
+
+  defp assign_investigation(socket, %ContactInvestigations.ContactInvestigation{} = investigation) do
+    AuditLog.view(socket.assigns.current_user, investigation.exposed_person)
+    socket |> assign(:investigation, investigation)
+  end
 
   defp complete_interview_form_builder(form) do
     timezone = Timex.timezone(PresentationConstants.presented_time_zone(), Timex.now())
@@ -79,6 +89,9 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end
+
+  defp get_person(%Cases.CaseInvestigation{} = investigation), do: investigation.person
+  defp get_person(%ContactInvestigations.ContactInvestigation{} = investigation), do: investigation.exposed_person
 
   defp header_text(%{interview_completed_at: nil}), do: "Complete interview"
   defp header_text(%{interview_completed_at: _}), do: "Edit interview"
