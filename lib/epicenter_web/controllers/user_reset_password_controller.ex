@@ -4,7 +4,6 @@ defmodule EpicenterWeb.UserResetPasswordController do
   import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
 
   alias Epicenter.Accounts
-  alias EpicenterWeb.Session
   alias Epicenter.AuditLog
 
   plug :get_user_by_reset_password_token when action in [:edit, :update]
@@ -19,15 +18,11 @@ defmodule EpicenterWeb.UserResetPasswordController do
     message = "An email with instructions was sent"
 
     if user = Accounts.get_user(email: email) do
-      {:ok, %{to: to, body: body}} =
+      {:ok, _} =
         Accounts.deliver_user_reset_password_instructions(
           user,
           &Routes.user_reset_password_url(conn, :edit, &1)
         )
-
-      conn
-      |> Session.append_fake_mail(to, body)
-      |> put_flash(:extra, "(Check your mail in /fakemail)")
     else
       conn
     end

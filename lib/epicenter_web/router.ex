@@ -100,7 +100,6 @@ defmodule EpicenterWeb.Router do
   scope "/", EpicenterWeb do
     pipe_through [:browser]
 
-    get "/fakemail", FakeMailController, :show
     live "/styleguide", Styleguide.StyleguideLive, as: :styleguide
     live "/styleguide/form-builder", Styleguide.FormBuilderLive, as: :styleguide_form_builder
     live "/styleguide/form-multiselect", Styleguide.FormMultiselectLive, as: :styleguide_form_multiselect
