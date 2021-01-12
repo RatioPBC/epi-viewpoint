@@ -181,6 +181,25 @@ defmodule Epicenter.AuditLog do
     phi_loggable
   end
 
+  def get(record_module, id, %User{id: user_id}), do: Repo.get(record_module, id) |> log_phi(user_id)
+
+  defp log_phi(phi_loggable, _user_id) when is_nil(phi_loggable), do: phi_loggable
+
+  defp log_phi(phi_loggable, user_id) do
+    subject_type = "Person"
+    subject_id = PhiLoggable.phi_identifier(phi_loggable)
+
+    Logger.info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
+      audit_log: true,
+      audit_user_id: user_id,
+      audit_action: "view",
+      audit_subject_id: subject_id,
+      audit_subject_type: subject_type
+    )
+
+    phi_loggable
+  end
+
   defp application_version_sha do
     Application.get_env(:epicenter, :application_version_sha)
   end

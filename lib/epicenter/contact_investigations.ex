@@ -24,9 +24,7 @@ defmodule Epicenter.ContactInvestigations do
 
   def get(id), do: ContactInvestigation |> Repo.get(id)
 
-  def get(id, user) do
-    ContactInvestigation |> Repo.get(id) |> AuditLog.view(user)
-  end
+  def get(id, user), do: AuditLog.get(ContactInvestigation, id, user)
 
   def preload_exposed_person(contact_investigations), do: contact_investigations |> Repo.preload(exposed_person: [:demographics, :phones])
   def preload_exposing_case(contact_investigations), do: contact_investigations |> Repo.preload(exposing_case: [person: [:demographics]])

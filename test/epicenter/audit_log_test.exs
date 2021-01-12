@@ -8,6 +8,8 @@ defmodule Epicenter.AuditLogTest do
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
+  alias Epicenter.ContactInvestigations
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Test
 
   setup :persist_admin
@@ -465,6 +467,89 @@ defmodule Epicenter.AuditLogTest do
     test "it doesn't log a person when the id is missing", %{user: user} do
       assert capture_log(fn ->
                AuditLog.view(user, %Person{})
+             end) == ""
+    end
+  end
+
+  describe "getting" do
+    setup do
+      original_metadata = Logger.metadata()
+      {:ok, original_logger_config} = Application.fetch_env(:logger, :console)
+
+      on_exit(fn ->
+        Logger.metadata(original_metadata)
+        Application.put_env(:logger, :console, original_logger_config)
+      end)
+
+      person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(person, @admin, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "investigation", %{})
+        |> Cases.create_case_investigation!()
+
+      {:ok, contact_investigation} =
+        Test.Fixtures.contact_investigation_attrs("contact-investigation-tid", %{exposing_case_id: case_investigation.id})
+        |> Test.Fixtures.wrap_with_audit_meta()
+        |> ContactInvestigations.create()
+
+      [
+        user: %Accounts.User{id: "testuser"},
+        contact_investigation: contact_investigation
+      ]
+    end
+
+    test "it records the record", %{user: user, contact_investigation: contact_investigation} do
+      fetched_contact_investigation = AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+      assert fetched_contact_investigation.tid == "contact-investigation-tid"
+    end
+
+    test "formats the log message and uses info level", %{user: user, contact_investigation: contact_investigation} do
+      Application.put_env(:logger, :console, format: "$level - $message")
+
+      assert capture_log(fn ->
+               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+             end) =~ "info - User(testuser) viewed Person(#{contact_investigation.exposed_person_id})"
+    end
+
+    test "sets `audit_log: true` metadata", %{user: user, contact_investigation: contact_investigation} do
+      Application.put_env(:logger, :console, format: "$metadata[audit_log]", metadata: [:audit_log])
+
+      assert capture_log(fn ->
+               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+             end) =~ "audit_log=true"
+    end
+
+    test "sets audit_user_id metadata", %{user: user, contact_investigation: contact_investigation} do
+      Application.put_env(:logger, :console, format: "$metadata[audit_user_id]", metadata: [:audit_user_id])
+
+      assert capture_log(fn ->
+               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+             end) =~ "audit_user_id=testuser"
+    end
+
+    test "sets `audit_action: 'view'` metadata", %{user: user, contact_investigation: contact_investigation} do
+      Application.put_env(:logger, :console, format: "$metadata[audit_action]", metadata: [:audit_action])
+
+      assert capture_log(fn ->
+               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+             end) =~ "audit_action=view"
+    end
+
+    test "sets audit_subject_id and audit_subject_type metadata", %{user: user, contact_investigation: contact_investigation} do
+      Application.put_env(:logger, :console,
+        format: "$metadata[audit_subject_type] $metadata[audit_subject_id]",
+        metadata: [:audit_subject_type, :audit_subject_id]
+      )
+
+      assert capture_log(fn ->
+               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+             end) =~ "audit_subject_type=Person audit_subject_id=#{contact_investigation.exposed_person_id}"
+    end
+
+    test "it doesn't log a person if the person is not found", %{user: user} do
+      assert capture_log(fn ->
+               AuditLog.get(ContactInvestigation, Ecto.UUID.generate(), user)
              end) == ""
     end
   end
