@@ -5,7 +5,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_contact_investigation: 2, assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Ecto.Changeset
   alias Epicenter.AuditLog
@@ -15,12 +15,12 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
+    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
     |> assign_page_title("Discontinue Contact Investigation")
-    |> assign_contact_investigation(contact_investigation)
+    |> assign(contact_investigation: contact_investigation)
     |> assign(changeset: ContactInvestigations.change(contact_investigation, %{}))
     |> ok()
   end

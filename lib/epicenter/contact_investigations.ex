@@ -1,5 +1,6 @@
 defmodule Epicenter.ContactInvestigations do
   alias Epicenter.AuditLog
+  alias Epicenter.Cases.Person
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Repo
 
@@ -23,6 +24,12 @@ defmodule Epicenter.ContactInvestigations do
     do: %ContactInvestigation{} |> change(attrs) |> AuditLog.insert(audit_meta)
 
   def get(id), do: ContactInvestigation |> Repo.get(id)
+
+  def get(id, user) do
+    contact_investigation = ContactInvestigation |> Repo.get(id)
+    AuditLog.view(user, %Person{id: contact_investigation.exposed_person_id})
+    contact_investigation
+  end
 
   def preload_exposed_person(contact_investigations), do: contact_investigations |> Repo.preload(exposed_person: [:demographics, :phones])
   def preload_exposing_case(contact_investigations), do: contact_investigations |> Repo.preload(exposing_case: [person: [:demographics]])
