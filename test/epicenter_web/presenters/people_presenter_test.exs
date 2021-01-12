@@ -114,7 +114,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
       {Test.Fixtures.contact_investigation_attrs("contact_investigation", contact_investigation_attrs), Test.Fixtures.admin_audit_meta()}
       |> ContactInvestigations.create()
 
-    contact_investigation = ContactInvestigations.get(contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
+    contact_investigation = ContactInvestigations.get(contact_investigation.id, @admin) |> ContactInvestigations.preload_exposed_person()
     contact_investigation.exposed_person |> Cases.preload_contact_investigations()
   end
 end

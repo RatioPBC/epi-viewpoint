@@ -145,7 +145,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
     )
   end
 
-  test "saving empty clinical details", %{conn: conn, contact_investigation: contact_investigation} do
+  test "saving empty clinical details", %{conn: conn, contact_investigation: contact_investigation, user: user} do
     Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#contact-investigation-clinical-details-form",
       clinical_details_form: %{
@@ -155,7 +155,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
     )
     |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-    contact_investigation = ContactInvestigations.get(contact_investigation.id)
+    contact_investigation = ContactInvestigations.get(contact_investigation.id, user)
     assert Euclid.Exists.blank?(contact_investigation.symptoms)
     assert contact_investigation.exposed_on == nil
     assert contact_investigation.clinical_status == "asymptomatic"

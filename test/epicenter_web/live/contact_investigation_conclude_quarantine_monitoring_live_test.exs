@@ -76,7 +76,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
     )
     |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-    contact_investigation = ContactInvestigations.get(contact_investigation.id)
+    contact_investigation = ContactInvestigations.get(contact_investigation.id, user)
     assert "successfully_completed_quarantine" == contact_investigation.quarantine_conclusion_reason
     assert ~U[2020-10-31 10:30:00Z] == contact_investigation.quarantine_concluded_at
 
@@ -111,7 +111,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLiveTest 
       event: "conclude-contact-investigation-quarantine-monitoring"
     )
 
-    contact_investigation = ContactInvestigations.get(contact_investigation.id)
+    contact_investigation = ContactInvestigations.get(contact_investigation.id, user)
     assert "deceased" == contact_investigation.quarantine_conclusion_reason
     assert ~U[2020-10-05 19:57:00Z] == contact_investigation.quarantine_concluded_at
   end

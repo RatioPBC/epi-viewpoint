@@ -57,7 +57,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
     )
     |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-    updated_contact_investigation = ContactInvestigations.get(contact_investigation.id)
+    updated_contact_investigation = ContactInvestigations.get(contact_investigation.id, user)
     assert "Unable to reach" = updated_contact_investigation.interview_discontinue_reason
     assert_datetime_approximate(updated_contact_investigation.interview_discontinued_at, DateTime.utc_now(), 2)
 

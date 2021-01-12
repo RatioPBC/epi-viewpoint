@@ -34,7 +34,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
     |> AuditLogAssertions.assert_viewed_person(user, contact_investigation.exposed_person)
   end
 
-  test "saving a start interview contact investigation", %{conn: conn, contact_investigation: contact_investigation} do
+  test "saving a start interview contact investigation", %{conn: conn, contact_investigation: contact_investigation, user: user} do
     Pages.ContactInvestigationStartInterview.visit(conn, contact_investigation)
     |> Pages.ContactInvestigationStartInterview.assert_here()
     |> Epicenter.Extra.tap(fn view ->
@@ -55,12 +55,13 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: "Jason Bourne"
-           } = ContactInvestigations.get(contact_investigation.id)
+           } = ContactInvestigations.get(contact_investigation.id, user)
   end
 
   test "prefills with existing data when existing data is available, and can edit existing data", %{
     conn: conn,
-    contact_investigation: contact_investigation
+    contact_investigation: contact_investigation,
+    user: user
   } do
     {:ok, _} =
       ContactInvestigations.update(
@@ -88,7 +89,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLiveTest do
              interview_status: "started",
              interview_started_at: ~U[2020-09-07 20:45:00Z],
              interview_proxy_name: nil
-           } = ContactInvestigations.get(contact_investigation.id)
+           } = ContactInvestigations.get(contact_investigation.id, user)
   end
 
   describe "warning the user when navigation will erase their changes" do

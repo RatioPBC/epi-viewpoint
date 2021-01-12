@@ -230,7 +230,7 @@ defmodule Epicenter.Cases.PersonTest do
          Test.Fixtures.admin_audit_meta()}
         |> ContactInvestigations.create()
 
-      contact_investigation = ContactInvestigations.get(contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
+      contact_investigation = ContactInvestigations.get(contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
       exposed_person = contact_investigation.exposed_person |> Cases.preload_contact_investigations()
 
       {:ok, second_contact_investigation} =

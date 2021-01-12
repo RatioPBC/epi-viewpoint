@@ -824,7 +824,8 @@ defmodule Epicenter.CasesTest do
       case_investigation_id = case_investigation.id
       author_id = @admin.id
 
-      assert %{exposing_case_id: ^case_investigation_id, under_18: true, guardian_name: "Jacob"} = ContactInvestigations.get(contact_investigation.id)
+      assert %{exposing_case_id: ^case_investigation_id, under_18: true, guardian_name: "Jacob"} =
+               ContactInvestigations.get(contact_investigation.id, @admin)
 
       assert %{author_id: ^author_id, change: %{"exposing_case_id" => ^case_investigation_id, "under_18" => true, "guardian_name" => "Jacob"}} =
                recent_audit_log(contact_investigation)
@@ -849,7 +850,7 @@ defmodule Epicenter.CasesTest do
         })
 
       author_id = @admin.id
-      assert %{household_member: true} = ContactInvestigations.get(contact_investigation.id)
+      assert %{household_member: true} = ContactInvestigations.get(contact_investigation.id, Test.Fixtures.admin())
       assert %{author_id: ^author_id, change: %{"household_member" => true}} = recent_audit_log(contact_investigation)
     end
   end
@@ -916,7 +917,7 @@ defmodule Epicenter.CasesTest do
                    %{number: "1111111987"}
                  ]
                }
-             } = ContactInvestigations.get(contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
+             } = ContactInvestigations.get(contact_investigation.id, @admin) |> ContactInvestigations.preload_exposed_person()
     end
   end
 

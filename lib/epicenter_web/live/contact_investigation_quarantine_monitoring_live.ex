@@ -6,7 +6,6 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
 
   import EpicenterWeb.LiveHelpers,
     only: [
-      assign_contact_investigation: 2,
       assign_defaults: 1,
       assign_form_changeset: 2,
       assign_form_changeset: 3,
@@ -74,14 +73,14 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
   end
 
   def mount(%{"id" => id}, session, socket) do
-    contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
+    socket = socket |> authenticate_user(session)
+    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
 
     socket
-    |> authenticate_user(session)
     |> assign_defaults()
     |> assign_page_title(" Contact Investigation Quarantine Monitoring")
     |> assign(:confirmation_prompt, nil)
-    |> assign_contact_investigation(contact_investigation)
+    |> assign(:contact_investigation, contact_investigation)
     |> assign_form_changeset(QuarantineMonitoringForm.changeset(contact_investigation, %{}))
     |> ok()
   end

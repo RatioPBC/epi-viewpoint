@@ -15,23 +15,26 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   alias EpicenterWeb.PresentationConstants
 
   def mount(%{"id" => contact_investigation_id}, session, %{assigns: %{live_action: :complete_contact_investigation}} = socket) do
-    ContactInvestigations.get(contact_investigation_id)
+    socket = socket |> authenticate_user(session)
+
+    ContactInvestigations.get(contact_investigation_id, socket.assigns.current_user)
     |> ContactInvestigations.preload_exposed_person()
     |> mount(session, socket)
   end
 
   def mount(%{"id" => case_investigation_id}, session, %{assigns: %{live_action: :complete_case_investigation}} = socket) do
+    socket = socket |> authenticate_user(session)
+
     Cases.get_case_investigation(case_investigation_id)
     |> Cases.preload_person()
     |> mount(session, socket)
   end
 
-  def mount(investigation, session, socket) do
+  def mount(investigation, _session, socket) do
     form_changeset = CompleteInterviewForm.changeset(investigation, %{})
 
     socket
     |> assign_defaults()
-    |> authenticate_user(session)
     |> assign_page_title("Complete interview")
     |> assign_investigation(investigation)
     |> assign(:confirmation_prompt, nil)

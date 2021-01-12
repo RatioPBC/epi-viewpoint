@@ -7,7 +7,6 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   import EpicenterWeb.LiveHelpers,
     only: [
-      assign_contact_investigation: 2,
       assign_defaults: 1,
       assign_form_changeset: 2,
       assign_form_changeset: 3,
@@ -23,14 +22,14 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    contact_investigation = ContactInvestigations.get(id) |> ContactInvestigations.preload_exposed_person()
+    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
     |> assign_page_title("Start Contact Investigation")
     |> assign(:confirmation_prompt, nil)
     |> assign_form_changeset(StartInterviewForm.changeset(contact_investigation, %{}))
-    |> assign_contact_investigation(contact_investigation)
+    |> assign(:contact_investigation, contact_investigation)
     |> ok()
   end
 

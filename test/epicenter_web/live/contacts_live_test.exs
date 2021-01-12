@@ -119,9 +119,12 @@ defmodule EpicenterWeb.ContactsLiveTest do
        }), Test.Fixtures.admin_audit_meta()}
       |> ContactInvestigations.create()
 
-    bob_contact_investigation = ContactInvestigations.get(bob_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
-    caroline_contact_investigation = ContactInvestigations.get(caroline_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
-    donald_contact_investigation = ContactInvestigations.get(donald_contact_investigation.id) |> ContactInvestigations.preload_exposed_person()
+    bob_contact_investigation = ContactInvestigations.get(bob_contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
+
+    caroline_contact_investigation =
+      ContactInvestigations.get(caroline_contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
+
+    donald_contact_investigation = ContactInvestigations.get(donald_contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
 
     bob = bob_contact_investigation.exposed_person
     caroline = caroline_contact_investigation.exposed_person

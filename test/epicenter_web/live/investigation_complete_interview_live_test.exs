@@ -186,7 +186,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
       )
       |> Pages.Profile.assert_here(contact_investigation.exposed_person)
 
-      contact_investigation = ContactInvestigations.get(contact_investigation.id)
+      contact_investigation = ContactInvestigations.get(contact_investigation.id, user)
       assert contact_investigation.interview_completed_at
       assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == contact_investigation.interview_completed_at
       assert_recent_audit_log(contact_investigation, user, action: "update-contact-investigation", event: "complete-contact-investigation-interview")

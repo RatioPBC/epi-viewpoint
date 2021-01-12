@@ -141,7 +141,8 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def handle_event("remove-contact", %{"contact-investigation-id" => contact_investigation_id}, socket) do
-    with contact_investigation when not is_nil(contact_investigation) <- ContactInvestigations.get(contact_investigation_id) do
+    with contact_investigation when not is_nil(contact_investigation) <-
+           ContactInvestigations.get(contact_investigation_id, socket.assigns.current_user) do
       ContactInvestigations.update(
         contact_investigation,
         {

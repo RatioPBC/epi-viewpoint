@@ -89,7 +89,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
     %{
       quarantine_monitoring_starts_on: quarantine_monitoring_starts_on,
       quarantine_monitoring_ends_on: quarantine_monitoring_ends_on
-    } = ContactInvestigations.get(contact_investigation.id)
+    } = ContactInvestigations.get(contact_investigation.id, user)
 
     assert ~D[2020-11-01] == quarantine_monitoring_starts_on
     assert ~D[2020-11-15] == quarantine_monitoring_ends_on

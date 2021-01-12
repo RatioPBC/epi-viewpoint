@@ -5,7 +5,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_contact_investigation: 2, assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   import EpicenterWeb.Presenters.CaseInvestigationPresenter, only: [symptoms_options: 0]
 
@@ -67,15 +67,15 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
   end
 
   def mount(%{"id" => id}, session, socket) do
-    contact_investigation = id |> ContactInvestigations.get() |> ContactInvestigations.preload_exposed_person()
+    socket = socket |> authenticate_user(session)
+    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
 
     socket
-    |> authenticate_user(session)
     |> assign_defaults()
     |> assign_page_title(" Contact Investigation Clinical Details")
     |> assign(:form_changeset, ClinicalDetailsForm.changeset(contact_investigation))
     |> assign(:confirmation_prompt, nil)
-    |> assign_contact_investigation(contact_investigation)
+    |> assign(:contact_investigation, contact_investigation)
     |> ok()
   end
 
