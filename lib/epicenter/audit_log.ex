@@ -7,6 +7,7 @@ defmodule Epicenter.AuditLog do
 
   alias Epicenter.Accounts.User
   alias Epicenter.AuditLog.Meta
+  alias Epicenter.AuditLog.PhiLoggable
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases.Person
   alias Epicenter.Repo
@@ -163,6 +164,21 @@ defmodule Epicenter.AuditLog do
       audit_subject_id: subject_id,
       audit_subject_type: subject_type
     )
+  end
+
+  def view(phi_loggable, %User{id: user_id}) do
+    subject_type = "Person"
+    subject_id = PhiLoggable.phi_identifier(phi_loggable)
+
+    Logger.info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
+      audit_log: true,
+      audit_user_id: user_id,
+      audit_action: "view",
+      audit_subject_id: subject_id,
+      audit_subject_type: subject_type
+    )
+
+    phi_loggable
   end
 
   defp application_version_sha do
