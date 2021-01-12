@@ -3,7 +3,7 @@ defmodule EpicenterWeb.ProfileLive do
 
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0, arrow_right_icon: 2]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, assign_person: 2, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
 
   import EpicenterWeb.Presenters.CaseInvestigationPresenter,
@@ -40,7 +40,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> assign_defaults(body_class: "body-background-color")
     |> authenticate_user(session)
     |> assign_page_title(Format.person(person))
-    |> assign_person(person)
+    |> assign_updated_person(person)
     |> assign_case_investigations(person)
     |> assign_contact_investigations(person)
     |> assign_users()
@@ -53,7 +53,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> Enum.find(&(&1.id == socket.assigns.person.id))
     |> case do
       nil -> socket
-      updated_person -> assign_person(socket, updated_person)
+      updated_person -> assign_updated_person(socket, updated_person)
     end
     |> noreply()
   end
@@ -175,10 +175,10 @@ defmodule EpicenterWeb.ProfileLive do
         }
       )
 
-    {:noreply, assign_person(socket, updated_person)}
+    {:noreply, assign_updated_person(socket, updated_person)}
   end
 
-  def assign_person(socket, person) do
+  def assign_updated_person(socket, person) do
     updated_person =
       person
       |> Cases.preload_lab_results()
@@ -188,8 +188,7 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_emails()
       |> Cases.preload_phones()
 
-    AuditLog.view(socket.assigns.current_user, updated_person)
-    assign(socket, person: updated_person)
+    assign_person(socket, updated_person)
   end
 
   defp assign_case_investigations(socket, person) do

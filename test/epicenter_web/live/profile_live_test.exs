@@ -883,7 +883,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       [person: person, assignee: assignee]
     end
 
-    test "assign_person", %{assignee: assignee, person: alice, user: user} do
+    test "assign_updated_person", %{assignee: assignee, person: alice, user: user} do
       {:ok, [alice]} =
         Cases.assign_user_to_people(
           user_id: assignee.id,
@@ -891,7 +891,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
           audit_meta: Test.Fixtures.audit_meta(user)
         )
 
-      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}} |> ProfileLive.assign_person(alice)
+      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}} |> ProfileLive.assign_updated_person(alice)
       assert updated_socket.assigns.person.addresses |> tids() == ["address1"]
       assert updated_socket.assigns.person.assigned_to.tid == "assignee"
       assert updated_socket.assigns.person.lab_results |> tids() == ["lab1"]
