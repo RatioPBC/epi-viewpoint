@@ -9,6 +9,10 @@ defmodule EpicenterWeb.LiveHelpersTest do
       assert %{assigns: %{body_class: "body-background-none", show_nav: true}} = LiveHelpers.assign_defaults(%Socket{})
     end
 
+    test "assigns a search form changeset" do
+      assert %{assigns: %{search_changeset: %{}}} = LiveHelpers.assign_defaults(%Socket{})
+    end
+
     test "can be overriden" do
       assert %{assigns: %{body_class: "body-background-none", show_nav: false}} = LiveHelpers.assign_defaults(%Socket{}, show_nav: false)
     end

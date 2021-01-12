@@ -5,10 +5,13 @@ defmodule EpicenterWeb.LiveHelpers do
   alias Epicenter.AuditLog
   alias EpicenterWeb.Endpoint
   alias EpicenterWeb.Router.Helpers, as: Routes
+  alias EpicenterWeb.Forms.SearchForm
 
   @default_assigns [body_class: "body-background-none", show_nav: true]
 
   def assign_defaults(socket, overrides \\ []) do
+    changeset = SearchForm.changeset(%SearchForm{}, %{})
+    socket = assign(socket, search_changeset: changeset)
     new_assigns = Keyword.merge(@default_assigns, overrides)
     Enum.reduce(new_assigns, socket, fn {key, value}, socket_acc -> assign_new(socket_acc, key, fn -> value end) end)
   end

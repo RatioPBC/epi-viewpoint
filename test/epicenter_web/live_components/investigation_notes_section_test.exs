@@ -84,7 +84,7 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
 
       send(view.pid, {:assigns, on_add_note: on_add_note})
 
-      view |> element("form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
+      view |> element("form.investigation-note-form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
 
       assert_receive {:received_on_add, %{text: "A new note"}}
     end
