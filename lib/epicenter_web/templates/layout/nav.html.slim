@@ -8,14 +8,6 @@ header#nav
         = link "Index cases", to: "/people"
         = link "Contacts", to: "/contacts"
 
-
-      = if assigns[:search_changeset] do
-        #nav-search
-          = form_for @search_changeset, "#", [id: "search-form"], fn f ->
-            = label f, :term do
-              = search_icon()
-              = text_input f, :term, [placeholder: "Search ..."]
-
       #nav-right
         #user-menu data-transient-control=true
           button
