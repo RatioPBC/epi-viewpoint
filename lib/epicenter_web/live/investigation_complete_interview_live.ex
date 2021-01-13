@@ -7,7 +7,6 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
-  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Form
@@ -36,7 +35,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
     socket
     |> assign_defaults()
     |> assign_page_title("Complete interview")
-    |> assign_investigation(investigation)
+    |> assign(:investigation, investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign_form_changeset(form_changeset)
     |> ok()
@@ -67,16 +66,6 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   end
 
   # # #
-
-  defp assign_investigation(socket, %Cases.CaseInvestigation{} = investigation) do
-    AuditLog.view(socket.assigns.current_user, investigation.person)
-    socket |> assign(:investigation, investigation)
-  end
-
-  defp assign_investigation(socket, %ContactInvestigations.ContactInvestigation{} = investigation) do
-    AuditLog.view(socket.assigns.current_user, investigation.exposed_person)
-    socket |> assign(:investigation, investigation)
-  end
 
   defp complete_interview_form_builder(form) do
     timezone = Timex.timezone(PresentationConstants.presented_time_zone(), Timex.now())
