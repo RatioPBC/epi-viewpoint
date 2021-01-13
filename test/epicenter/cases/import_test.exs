@@ -357,7 +357,7 @@ defmodule Epicenter.Cases.ImportTest do
       }
       |> Import.import_csv(originator)
 
-      alice = Cases.get_person(alice.id) |> Cases.preload_phones()
+      alice = Cases.get_person(alice.id, @admin) |> Cases.preload_phones()
       assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000"]
     end
 
@@ -378,7 +378,7 @@ defmodule Epicenter.Cases.ImportTest do
       }
       |> Import.import_csv(originator)
 
-      alice = Cases.get_person(alice.id) |> Cases.preload_phones()
+      alice = Cases.get_person(alice.id, @admin) |> Cases.preload_phones()
       assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000", "1111111111"]
     end
 
@@ -390,7 +390,7 @@ defmodule Epicenter.Cases.ImportTest do
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
       Cases.create_address!(Test.Fixtures.address_attrs(originator, alice, "0", 4250, %{}))
-      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
+      alice = Cases.get_person(alice.id, @admin) |> Cases.preload_addresses()
 
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
@@ -406,7 +406,7 @@ defmodule Epicenter.Cases.ImportTest do
       }
       |> Import.import_csv(originator)
 
-      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
+      alice = Cases.get_person(alice.id, @admin) |> Cases.preload_addresses()
 
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
@@ -421,7 +421,7 @@ defmodule Epicenter.Cases.ImportTest do
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
       Cases.create_address!(Test.Fixtures.address_attrs(originator, alice, "0", 4250, %{}))
-      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
+      alice = Cases.get_person(alice.id, @admin) |> Cases.preload_addresses()
 
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City"]
@@ -437,7 +437,7 @@ defmodule Epicenter.Cases.ImportTest do
       }
       |> Import.import_csv(originator)
 
-      alice = Cases.get_person(alice.id) |> Cases.preload_addresses()
+      alice = Cases.get_person(alice.id, @admin) |> Cases.preload_addresses()
 
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:street) == ["4250 Test St", "4251 Test St"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City", "City"]
@@ -475,7 +475,7 @@ defmodule Epicenter.Cases.ImportTest do
         |> Import.import_csv(originator)
 
       assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
-      updated_alice = Cases.get_person(alice.id) |> Cases.preload_demographics()
+      updated_alice = Cases.get_person(alice.id, @admin) |> Cases.preload_demographics()
       [form_demographics, imported_demographics] = updated_alice.demographics |> Enum.sort_by(& &1.seq)
 
       assert form_demographics.occupation == "Rocket Scientist"
@@ -516,7 +516,7 @@ defmodule Epicenter.Cases.ImportTest do
         |> Import.import_csv(originator)
 
       assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
-      updated_alice = Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
+      updated_alice = Cases.get_person(alice.id, @admin) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
       [old_demographics, new_demographics] = updated_alice.demographics |> Enum.sort_by(& &1.seq)
 
       assert old_demographics.sex_at_birth == "AAA"
@@ -560,7 +560,7 @@ defmodule Epicenter.Cases.ImportTest do
         |> Import.import_csv(originator)
 
       assert {:ok, %Epicenter.Cases.Import.ImportInfo{}} = import_output
-      updated_alice = Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
+      updated_alice = Cases.get_person(alice.id, @admin) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
       [old_demographics, new_demographics] = updated_alice.demographics
 
       assert old_demographics.occupation == nil

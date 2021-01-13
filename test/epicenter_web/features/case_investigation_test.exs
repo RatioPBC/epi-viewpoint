@@ -58,7 +58,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
                  symptoms: ["fever", "chills", "groggy"]
                }
              ]
-           } = Cases.get_person(person.id) |> Cases.preload_demographics() |> Cases.preload_case_investigations()
+           } = Cases.get_person(person.id, @admin) |> Cases.preload_demographics() |> Cases.preload_case_investigations()
   end
 
   test "user can edit the details of a case investigation", %{conn: conn} do
@@ -193,7 +193,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
                  symptoms: ["fever", "chills"]
                }
              ]
-           } = Cases.get_person(person.id) |> Cases.preload_demographics() |> Cases.preload_case_investigations()
+           } = Cases.get_person(person.id, @admin) |> Cases.preload_demographics() |> Cases.preload_case_investigations()
 
     assert %{
              contact_investigations: [

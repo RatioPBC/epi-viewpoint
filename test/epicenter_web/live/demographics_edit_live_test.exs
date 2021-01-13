@@ -4,6 +4,7 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   alias Epicenter.Accounts.User
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
+  alias Epicenter.Repo
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -332,13 +333,13 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
   end
 
   defp all_demographics(person_id) do
-    Cases.get_person(person_id)
+    Repo.get(Person, person_id)
     |> Cases.preload_demographics()
     |> Map.get(:demographics)
   end
 
   defp demographics(person_id) do
-    Cases.get_person(person_id)
+    Repo.get(Person, person_id)
     |> Cases.preload_demographics()
     |> Cases.Person.coalesce_demographics()
   end

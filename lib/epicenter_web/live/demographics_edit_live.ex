@@ -10,7 +10,6 @@ defmodule EpicenterWeb.DemographicsEditLive do
       assign_form_changeset: 2,
       assign_form_changeset: 3,
       assign_page_title: 2,
-      assign_person: 2,
       authenticate_user: 2,
       noreply: 1,
       ok: 1
@@ -94,14 +93,14 @@ defmodule EpicenterWeb.DemographicsEditLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    person = Cases.get_person(id) |> Cases.preload_demographics()
+    person = Cases.get_person(id, socket.assigns.current_user) |> Cases.preload_demographics()
     demographic = Cases.Person.coalesce_demographics(person) |> Map.put(:__struct__, Cases.Demographic)
 
     socket
     |> assign_defaults()
     |> assign_page_title("#{Format.person(person)} (edit)")
     |> assign_form_changeset(DemographicForm.model_to_form_changeset(demographic))
-    |> assign_person(person)
+    |> assign(person: person)
     |> assign(confirmation_prompt: nil)
     |> ok()
   end

@@ -244,7 +244,7 @@ defmodule Epicenter.Cases.PersonTest do
       |> Ecto.Changeset.change(exposed_person_id: exposed_person.id)
       |> Repo.update!()
 
-      [exposed_person: Cases.get_person(exposed_person.id)]
+      [exposed_person: Cases.get_person(exposed_person.id, @admin)]
     end
 
     test "returns the contact investigation with the most recent created at date", %{exposed_person: exposed_person} do

@@ -97,7 +97,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
       |> Ecto.Changeset.change(exposed_person_id: exposed_person.id)
       |> Repo.update!()
 
-      assert Cases.get_person(exposed_person.id)
+      assert Cases.get_person(exposed_person.id, @admin)
              |> Cases.preload_contact_investigations()
              |> PeoplePresenter.latest_contact_investigation_status(~D[2020-10-25]) == "Ongoing interview"
     end

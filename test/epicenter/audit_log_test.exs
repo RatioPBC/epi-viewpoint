@@ -350,8 +350,7 @@ defmodule Epicenter.AuditLogTest do
     test "it doesn't save the update if the audit log entry fails" do
       [] = AuditLog.revisions(Cases.Person)
 
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_demographics()
+      person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!() |> Cases.preload_demographics()
 
       person_id = person.id
 
@@ -367,7 +366,7 @@ defmodule Epicenter.AuditLogTest do
                AuditLog.update(
                  changeset,
                  %AuditLog.Meta{
-                   author_id: user.id,
+                   author_id: @admin.id,
                    reason_event: Revision.edit_profile_demographics_event(),
                    reason_action: Revision.update_demographics_action()
                  },
@@ -376,7 +375,7 @@ defmodule Epicenter.AuditLogTest do
                )
              ) == "intentional"
 
-      refute List.first(Cases.preload_demographics(Cases.get_person(person_id)).demographics).preferred_language == "preferred_language"
+      refute List.first(Cases.preload_demographics(Cases.get_person(person_id, @admin)).demographics).preferred_language == "preferred_language"
       assert audit_log_count_before == AuditLog.entries_for(person_id) |> length()
     end
   end

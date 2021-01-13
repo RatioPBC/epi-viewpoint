@@ -178,7 +178,7 @@ defmodule Epicenter.CasesTest do
       {:ok, person} = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person()
 
       assert_revision_count(person, 1)
-      assert Cases.get_person(person.id)
+      assert Cases.get_person(person.id, @admin)
 
       assert %{
                "demographics" => [
@@ -209,7 +209,7 @@ defmodule Epicenter.CasesTest do
         })
         |> Cases.create_person()
 
-      assert Cases.get_person(person.id)
+      assert Cases.get_person(person.id, @admin)
 
       assert_revision_count(person, 1)
 
@@ -233,11 +233,19 @@ defmodule Epicenter.CasesTest do
       Cases.get_people([alice.id]) |> tids() |> assert_eq(["alice"])
     end
 
-    test "get_person" do
+    test "get_person fetches record" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      fetched = Cases.get_person(person.id)
+      fetched = Cases.get_person(person.id, @admin)
       assert fetched.tid == "alice"
+    end
+
+    test "get_person records an audit log entry" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+
+      capture_log(fn -> Cases.get_person(person.id, @admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, person)
     end
   end
 
@@ -462,7 +470,7 @@ defmodule Epicenter.CasesTest do
                %{source: "import", first_name: "Alice"},
                %{source: "form", first_name: "Ally"}
              ]
-           } = Cases.get_person(alice.id) |> Cases.preload_demographics()
+           } = Cases.get_person(alice.id, @admin) |> Cases.preload_demographics()
   end
 
   test "find_matching_person finds a person by their dob, first_name, and last_name" do
@@ -514,7 +522,10 @@ defmodule Epicenter.CasesTest do
     {:ok, demo2} =
       Cases.create_demographic({Test.Fixtures.add_demographic_attrs(%{tid: "third", person_id: person.id}), Test.Fixtures.audit_meta(@admin)})
 
-    assert demographics(person.id) |> length() == 3
+    assert Cases.get_person(person.id, @admin)
+           |> Cases.preload_demographics()
+           |> Map.get(:demographics)
+           |> length() == 3
 
     assert %{change: %{"tid" => "second"}} = recent_audit_log(demo1)
     assert %{change: %{"tid" => "third"}} = recent_audit_log(demo2)
@@ -957,9 +968,5 @@ defmodule Epicenter.CasesTest do
 
     Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
     |> Cases.create_case_investigation!()
-  end
-
-  defp demographics(person_id) do
-    Cases.get_person(person_id) |> Cases.preload_demographics() |> Map.get(:demographics)
   end
 end

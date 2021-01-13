@@ -47,7 +47,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.assert_validation_messages(%{"form_data[dob]" => "please enter dates as mm/dd/yyyy"})
     end
 
-    test "making a 'form' demographic", %{conn: conn, person: person} do
+    test "making a 'form' demographic", %{conn: conn, person: person, user: user} do
       {:ok, person} =
         Cases.update_person(
           person,
@@ -65,10 +65,12 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         |> follow_redirect(conn)
 
       assert_role_text(redirected_live, "date-of-birth", "01/01/1970")
-      assert [%{source: "import"}, %{source: "form", first_name: nil, dob: ~D[1970-01-01]}] = demographics(person.id)
+
+      assert [%{source: "import"}, %{source: "form", first_name: nil, dob: ~D[1970-01-01]}] =
+               Cases.get_person(person.id, user) |> Cases.preload_demographics() |> Map.get(:demographics)
     end
 
-    test "modifying the 'form' demographic", %{conn: conn, person: person} do
+    test "modifying the 'form' demographic", %{conn: conn, person: person, user: user} do
       {:ok, person} =
         Cases.update_person(
           person,
@@ -86,7 +88,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         |> follow_redirect(conn)
 
       assert_role_text(redirected_live, "date-of-birth", "01/01/1970")
-      assert [%{source: "form", dob: ~D[1970-01-01]}] = demographics(person.id)
+      assert [%{source: "form", dob: ~D[1970-01-01]}] = Cases.get_person(person.id, user) |> Cases.preload_demographics() |> Map.get(:demographics)
     end
 
     test "dob field retains invalid date after failed validation, rather than resetting to the value from the database", %{conn: conn, person: person} do
@@ -183,7 +185,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
   end
 
   describe "addresses" do
-    test "adding address to a person", %{conn: conn, person: person} do
+    test "adding address to a person", %{conn: conn, person: person, user: user} do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_address_form(%{})
       |> Pages.ProfileEdit.click_add_address_button()
@@ -194,7 +196,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       )
       |> Pages.Profile.assert_addresses(["1001 Test St, City, OH 00000"])
 
-      Cases.get_person(person.id)
+      Cases.get_person(person.id, user)
       |> Cases.preload_addresses()
       |> Map.get(:addresses)
       |> pluck([:street, :city, :state, :postal_code])
@@ -220,7 +222,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       )
       |> Pages.Profile.assert_addresses(["1001 Test St, City, OH 00000"])
 
-      Cases.get_person(person.id)
+      Cases.get_person(person.id, user)
       |> Cases.preload_addresses()
       |> Map.get(:addresses)
       |> pluck([:street, :city, :state, :postal_code])
@@ -246,7 +248,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       )
       |> Pages.Profile.assert_addresses(["5555 Test St, City, AK 00000"])
 
-      Cases.get_person(person.id)
+      Cases.get_person(person.id, user)
       |> Cases.preload_addresses()
       |> Map.get(:addresses)
       |> pluck([:street, :city, :state, :postal_code])
@@ -269,7 +271,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.assert_validation_messages(%{})
     end
 
-    test "it doesn't save empty addresses", %{conn: conn, person: person} do
+    test "it doesn't save empty addresses", %{conn: conn, person: person, user: user} do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_address_form(%{})
       |> Pages.ProfileEdit.click_add_address_button()
@@ -279,7 +281,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
         }
       )
 
-      Cases.get_person(person.id)
+      Cases.get_person(person.id, user)
       |> Cases.preload_addresses()
       |> Map.get(:addresses)
       |> assert_eq([])
@@ -287,14 +289,14 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
   end
 
   describe "email addresses" do
-    test "adding email address to a person", %{conn: conn, person: person} do
+    test "adding email address to a person", %{conn: conn, person: person, user: user} do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_email_form(%{})
       |> Pages.ProfileEdit.click_add_email_button()
       |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"emails" => %{"0" => %{"address" => "alice@example.com"}}})
       |> Pages.Profile.assert_email_addresses(["alice@example.com"])
 
-      Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> pluck(:address) |> assert_eq(["alice@example.com"])
+      Cases.get_person(person.id, user) |> Cases.preload_emails() |> Map.get(:emails) |> pluck(:address) |> assert_eq(["alice@example.com"])
     end
 
     @tag :skip
@@ -334,7 +336,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"emails" => %{}})
       |> Pages.Profile.assert_email_addresses(["Unknown"])
 
-      Cases.get_person(person.id) |> Cases.preload_emails() |> Map.get(:emails) |> assert_eq([])
+      Cases.get_person(person.id, user) |> Cases.preload_emails() |> Map.get(:emails) |> assert_eq([])
     end
 
     test "blank email addresses are ignored (rather than being validation errors)", %{conn: conn, person: person} do
@@ -373,7 +375,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
   end
 
   describe "phone numbers" do
-    test "adding phone number to a person", %{conn: conn, person: person} do
+    test "adding phone number to a person", %{conn: conn, person: person, user: user} do
       Pages.ProfileEdit.visit(conn, person)
       |> Pages.ProfileEdit.assert_phone_number_form(%{})
       |> Pages.ProfileEdit.click_add_phone_button()
@@ -381,7 +383,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"phones" => %{"0" => %{"number" => "1111111000", "type" => "cell"}}})
       |> Pages.Profile.assert_phone_numbers(["(111) 111-1000"])
 
-      phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
+      phones = Cases.get_person(person.id, user) |> Cases.preload_phones() |> Map.get(:phones)
       phones |> pluck(:number) |> assert_eq(["1111111000"])
       phones |> pluck(:type) |> assert_eq(["cell"])
     end
@@ -394,7 +396,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"phones" => %{"0" => %{"number" => "11111111009"}}})
       |> Pages.Profile.assert_phone_numbers(["+1 (111) 111-1009"])
 
-      phones = Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones)
+      phones = Cases.get_person(person.id, user) |> Cases.preload_phones() |> Map.get(:phones)
       phones |> pluck(:number) |> assert_eq(["11111111009"])
     end
 
@@ -408,7 +410,7 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"phones" => %{}})
       |> Pages.Profile.assert_phone_numbers(["Unknown"])
 
-      Cases.get_person(person.id) |> Cases.preload_phones() |> Map.get(:phones) |> assert_eq([])
+      Cases.get_person(person.id, user) |> Cases.preload_phones() |> Map.get(:phones) |> assert_eq([])
     end
 
     test "blank phone numbers are ignored (rather than being validation errors)", %{conn: conn, person: person} do
@@ -486,9 +488,5 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Enum.count(fn state_tuple -> {"OH", "OH"} == state_tuple end)
       |> assert_eq(1)
     end
-  end
-
-  defp demographics(person_id) do
-    Cases.get_person(person_id) |> Cases.preload_demographics() |> Map.get(:demographics)
   end
 end

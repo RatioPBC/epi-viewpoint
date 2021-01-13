@@ -14,6 +14,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
+  @admin Test.Fixtures.admin()
 
   setup %{user: user} do
     person =
@@ -25,7 +26,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   defp load(person) do
-    Cases.get_person(person.id)
+    Cases.get_person(person.id, @admin)
     |> Cases.preload_demographics()
     |> Cases.preload_emails()
     |> Cases.preload_phones()
@@ -424,7 +425,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
                |> Pages.Profile.assert_contacts_showing("001")
                |> Pages.Profile.case_investigation_contact_details("001")
 
-      exposed_person = Cases.get_person(completed_contact_investigation.exposed_person_id)
+      exposed_person = Cases.get_person(completed_contact_investigation.exposed_person_id, user)
 
       view
       |> Pages.Profile.click_on_contact("001", "Complete Testuser")
@@ -922,12 +923,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       assert_select_dropdown_options(view: show_page_live, data_role: "users", expected: ["Unassigned", "assignee", "fixture admin", "user"])
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => assignee.id})
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["assignee"])
-      assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
+      assert Cases.get_person(alice.id, user) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) |> Map.get(:tid) == "assignee"
 
       # unassign "assignee" via show page
       show_page_live |> element("#assignment-form") |> render_change(%{"user" => "-unassigned-"})
       assert_selected_dropdown_option(view: show_page_live, data_role: "users", expected: ["Unassigned"])
-      assert Cases.get_person(alice.id) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
+      assert Cases.get_person(alice.id, user) |> Cases.preload_assigned_to() |> Map.get(:assigned_to) == nil
     end
 
     test "handles assign_users message when the changed people include the current person", %{person: alice, assignee: assignee, user: user} do

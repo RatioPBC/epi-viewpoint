@@ -22,7 +22,7 @@ defmodule EpicenterWeb.Features.ContactInvestigationTest do
        Test.Fixtures.admin_audit_meta()}
       |> ContactInvestigations.create()
 
-    exposed_person = Cases.get_person(contact_investigation.exposed_person_id)
+    exposed_person = Cases.get_person(contact_investigation.exposed_person_id, user)
 
     [contact_investigation: contact_investigation, exposed_person: exposed_person]
   end

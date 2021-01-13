@@ -50,4 +50,14 @@ defmodule Epicenter.AuditLog.PhiLoggableTest do
       assert PhiLoggable.phi_identifier(case_investigation) == case_investigation.person_id
     end
   end
+
+  describe "Person" do
+    setup do
+      [person: Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()]
+    end
+
+    test "returns the person_id", %{person: person} do
+      assert PhiLoggable.phi_identifier(person) == person.id
+    end
+  end
 end
