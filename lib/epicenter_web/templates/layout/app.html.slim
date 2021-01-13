@@ -1,4 +1,9 @@
 body class="#{@body_class}"
   = if @show_nav do
-    = render "nav.html", current_user: @current_user
+    header#nav
+      #nav-inner
+        #nav-items
+          #nav-left
+            = link to: "/", id: "logo" do
+              = logo_icon()
   = @inner_content

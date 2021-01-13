@@ -35,5 +35,6 @@
         = error_tag f, :current_password
         = password_input f, :current_password, required: true, name: "current_password", id: "current_password_for_password"
 
-      fieldset
+      #password-actions
         = submit "Change password"
+        = link "Cancel", to: "/", id: "cancel-button"
