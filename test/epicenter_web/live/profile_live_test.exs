@@ -502,7 +502,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       view = Pages.Profile.visit(conn, person)
       view |> Pages.Profile.click_remove_contact_link(contact_investigation)
 
-      case_investigation = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
+      case_investigation = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations()
       assert case_investigation.contact_investigations == []
 
       assert [] =

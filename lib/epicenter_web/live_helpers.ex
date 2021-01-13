@@ -22,11 +22,6 @@ defmodule EpicenterWeb.LiveHelpers do
   def assign_page_title(socket, page_title),
     do: socket |> assign(page_title: page_title)
 
-  def assign_case_investigation(socket, case_investigation) do
-    AuditLog.view(socket.assigns.current_user, case_investigation.person)
-    socket |> assign(:case_investigation, case_investigation)
-  end
-
   def assign_person(socket, person) do
     AuditLog.view(socket.assigns.current_user, person)
     socket |> assign(person: person)

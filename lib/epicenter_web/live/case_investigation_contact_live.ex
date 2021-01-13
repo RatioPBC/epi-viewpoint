@@ -7,7 +7,6 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
   import EpicenterWeb.LiveHelpers,
     only: [
-      assign_case_investigation: 2,
       assign_defaults: 1,
       assign_form_changeset: 2,
       assign_form_changeset: 3,
@@ -133,7 +132,11 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   def mount(%{"case_investigation_id" => case_investigation_id} = params, session, socket) do
     socket = socket |> authenticate_user(session)
 
-    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person() |> Cases.preload_initiating_lab_result()
+    case_investigation =
+      case_investigation_id
+      |> Cases.get_case_investigation(socket.assigns.current_user)
+      |> Cases.preload_person()
+      |> Cases.preload_initiating_lab_result()
 
     contact_investigation =
       if id = params["id"] do
@@ -147,7 +150,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> assign_page_title("Case Investigation Contact")
     |> assign_form_changeset(ContactForm.changeset(contact_investigation, %{}))
     |> assign(:contact_investigation, contact_investigation)
-    |> assign_case_investigation(case_investigation)
+    |> assign(:case_investigation, case_investigation)
     |> ok()
   end
 

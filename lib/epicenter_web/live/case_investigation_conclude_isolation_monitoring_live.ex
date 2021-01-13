@@ -5,7 +5,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_case_investigation: 2, assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -43,12 +43,13 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
   end
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
-    case_investigation = Cases.get_case_investigation(case_investigation_id) |> Cases.preload_person()
+    socket = socket |> authenticate_user(session)
+
+    case_investigation = Cases.get_case_investigation(case_investigation_id, socket.assigns.current_user) |> Cases.preload_person()
 
     socket
-    |> authenticate_user(session)
     |> assign_defaults()
-    |> assign_case_investigation(case_investigation)
+    |> assign(:case_investigation, case_investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign(:form_changeset, ConcludeIsolationMonitoringForm.changeset(case_investigation, %{}))
     |> assign(:page_heading, page_heading(case_investigation))

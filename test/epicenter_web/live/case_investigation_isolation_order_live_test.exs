@@ -48,7 +48,7 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
     |> Pages.Profile.assert_here(person)
 
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "edit-case-investigation-isolation-order")
-    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    case_investigation = Cases.get_case_investigation(case_investigation.id, user)
     assert ~D[2020-08-01] == case_investigation.isolation_order_sent_on
     assert ~D[2020-08-11] == case_investigation.isolation_clearance_order_sent_on
   end

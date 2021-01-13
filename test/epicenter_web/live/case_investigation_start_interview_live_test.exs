@@ -46,7 +46,12 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     |> Pages.CaseInvestigationStartInterview.assert_date_started("01/01/2020")
   end
 
-  test "saving start case investigation form with proxy interviewee", %{conn: conn, person: person, case_investigation: case_investigation} do
+  test "saving start case investigation form with proxy interviewee", %{
+    conn: conn,
+    person: person,
+    case_investigation: case_investigation,
+    user: user
+  } do
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
       start_interview_form: %{
@@ -59,12 +64,12 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.assert_case_investigation_has_history("Started interview with proxy Alice's guardian on 09/06/2020 at 03:45pm EDT")
 
-    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    case_investigation = Cases.get_case_investigation(case_investigation.id, user)
     assert "Alice's guardian" = case_investigation.interview_proxy_name
     assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.interview_started_at
   end
 
-  test "saving start case investigation form with case interviewee", %{conn: conn, person: person, case_investigation: case_investigation} do
+  test "saving start case investigation form with case interviewee", %{conn: conn, person: person, case_investigation: case_investigation, user: user} do
     Pages.CaseInvestigationStartInterview.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-interview-start-form",
       start_interview_form: %{
@@ -77,7 +82,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     |> Pages.Profile.assert_here(person)
     |> Pages.Profile.assert_case_investigation_has_history("Started interview with Alice Testuser on 09/06/2020 at 03:45pm EDT")
 
-    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    case_investigation = Cases.get_case_investigation(case_investigation.id, user)
     assert case_investigation.interview_proxy_name == nil
   end
 
@@ -98,7 +103,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLiveTest do
     )
     |> Pages.Profile.assert_here(person)
 
-    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    case_investigation = Cases.get_case_investigation(case_investigation.id, user)
 
     assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "start-interview")
 

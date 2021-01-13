@@ -215,7 +215,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
                }
              ]
            } =
-             Cases.get_case_investigation(case_investigation_id)
+             Cases.get_case_investigation(case_investigation_id, @admin)
              |> Cases.preload_contact_investigations()
   end
 end

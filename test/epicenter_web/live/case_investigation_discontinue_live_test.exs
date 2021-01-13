@@ -48,7 +48,8 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
   test "marks the case_investigation as discontinued with the given reason at now", %{
     conn: conn,
     person: person,
-    case_investigation: case_investigation
+    case_investigation: case_investigation,
+    user: user
   } do
     Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-discontinue-form",
@@ -56,7 +57,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
     )
     |> Pages.Profile.assert_here(person)
 
-    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    case_investigation = Cases.get_case_investigation(case_investigation.id, user)
     assert "Unable to reach" = case_investigation.interview_discontinue_reason
     assert_datetime_approximate(case_investigation.interview_discontinued_at, DateTime.utc_now(), 2)
   end

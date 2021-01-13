@@ -6,7 +6,6 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
 
   import EpicenterWeb.LiveHelpers,
     only: [
-      assign_case_investigation: 2,
       assign_defaults: 1,
       assign_form_changeset: 2,
       assign_form_changeset: 3,
@@ -124,17 +123,18 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLive do
   end
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
+    socket = socket |> authenticate_user(session)
+
     case_investigation =
       case_investigation_id
-      |> Cases.get_case_investigation()
+      |> Cases.get_case_investigation(socket.assigns.current_user)
       |> Cases.preload_initiating_lab_result()
       |> Cases.preload_person()
 
     socket
     |> assign_defaults()
     |> assign_page_title(" Case Investigation Isolation Monitoring")
-    |> authenticate_user(session)
-    |> assign_case_investigation(case_investigation)
+    |> assign(:case_investigation, case_investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign_form_changeset(IsolationMonitoringForm.changeset(case_investigation, %{}))
     |> ok()

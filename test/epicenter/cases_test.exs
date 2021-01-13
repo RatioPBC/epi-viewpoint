@@ -915,7 +915,7 @@ defmodule Epicenter.CasesTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, @admin) |> Cases.preload_contact_investigations()
     end
   end
 

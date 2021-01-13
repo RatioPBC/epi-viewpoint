@@ -36,7 +36,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       |> AuditLogAssertions.assert_viewed_person(user, person)
     end
 
-    test "has a case investigation view", %{conn: conn, case_investigation: case_investigation, person: person} do
+    test "has a case investigation view", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
       view =
         Pages.CaseInvestigationContact.visit(conn, case_investigation)
         |> Pages.CaseInvestigationContact.assert_here()
@@ -87,7 +87,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations()
     end
 
     test "when the symptom onset date is available, contains value and uses it for the infectious period", %{
@@ -149,7 +149,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
 
     test "marking a contact as under_18 collects the phone number for the guardian", %{
       conn: conn,
-      case_investigation: case_investigation
+      case_investigation: case_investigation,
+      user: user
     } do
       view =
         Pages.CaseInvestigationContact.visit(conn, case_investigation)
@@ -230,7 +231,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations()
     end
   end
 
@@ -327,7 +328,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
              } = Pages.form_state(view)
     end
 
-    test "works", %{conn: conn, case_investigation: case_investigation, contact_investigation: contact_investigation} do
+    test "works", %{conn: conn, case_investigation: case_investigation, contact_investigation: contact_investigation, user: user} do
       Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation)
       |> Pages.CaseInvestigationContact.assert_here()
       |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
@@ -375,7 +376,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations()
     end
   end
 

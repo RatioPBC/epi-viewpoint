@@ -178,7 +178,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     })
   end
 
-  test "saving empty clinical details", %{conn: conn, case_investigation: case_investigation, person: person} do
+  test "saving empty clinical details", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
@@ -188,7 +188,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
     )
     |> Pages.Profile.assert_here(person)
 
-    case_investigation = Cases.get_case_investigation(case_investigation.id)
+    case_investigation = Cases.get_case_investigation(case_investigation.id, user)
     assert Euclid.Exists.blank?(case_investigation.symptoms)
     assert case_investigation.symptom_onset_on == nil
     assert case_investigation.clinical_status == "asymptomatic"
@@ -207,7 +207,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
   end
 
   @tag :skip
-  test "stripping out 'other' when submitting without other checked", %{conn: conn, case_investigation: case_investigation} do
+  test "stripping out 'other' when submitting without other checked", %{conn: conn, case_investigation: case_investigation, user: user} do
     Pages.CaseInvestigationClinicalDetails.visit(conn, case_investigation)
     |> Pages.submit_and_follow_redirect(conn, "#case-investigation-clinical-details-form",
       clinical_details_form: %{
@@ -217,7 +217,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLiveTest do
       }
     )
 
-    assert %{symptoms: ["fever"]} = Cases.get_case_investigation(case_investigation.id)
+    assert %{symptoms: ["fever"]} = Cases.get_case_investigation(case_investigation.id, user)
   end
 
   describe "warning the user when navigation will erase their changes" do

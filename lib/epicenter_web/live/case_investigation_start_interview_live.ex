@@ -7,7 +7,6 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
   import EpicenterWeb.LiveHelpers,
     only: [
-      assign_case_investigation: 2,
       assign_defaults: 1,
       assign_form_changeset: 2,
       assign_form_changeset: 3,
@@ -23,14 +22,14 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    case_investigation = case_investigation_id |> Cases.get_case_investigation() |> Cases.preload_person()
+    case_investigation = case_investigation_id |> Cases.get_case_investigation(socket.assigns.current_user) |> Cases.preload_person()
     case_investigation = case_investigation |> Map.replace(:person, case_investigation.person |> Cases.preload_demographics())
 
     socket
     |> assign_defaults()
     |> assign_page_title("Start Case Investigation")
     |> assign_form_changeset(StartInterviewForm.changeset(case_investigation, %{}))
-    |> assign_case_investigation(case_investigation)
+    |> assign(:case_investigation, case_investigation)
     |> ok()
   end
 

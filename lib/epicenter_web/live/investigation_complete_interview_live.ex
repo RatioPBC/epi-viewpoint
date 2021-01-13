@@ -25,7 +25,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLive do
   def mount(%{"id" => case_investigation_id}, session, %{assigns: %{live_action: :complete_case_investigation}} = socket) do
     socket = socket |> authenticate_user(session)
 
-    Cases.get_case_investigation(case_investigation_id)
+    Cases.get_case_investigation(case_investigation_id, socket.assigns.current_user)
     |> Cases.preload_person()
     |> mount(session, socket)
   end

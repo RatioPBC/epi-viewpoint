@@ -5,7 +5,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_page_title: 2, assign_case_investigation: 2, authenticate_user: 2, noreply: 1, ok: 1]
+    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   import EpicenterWeb.Presenters.CaseInvestigationPresenter, only: [symptoms_options: 0]
 
@@ -66,14 +66,16 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
   end
 
   def mount(%{"id" => id}, session, socket) do
-    case_investigation = id |> Cases.get_case_investigation() |> Cases.preload_initiating_lab_result() |> Cases.preload_person()
+    socket = socket |> authenticate_user(session)
+
+    case_investigation =
+      id |> Cases.get_case_investigation(socket.assigns.current_user) |> Cases.preload_initiating_lab_result() |> Cases.preload_person()
 
     socket
     |> assign_defaults()
-    |> authenticate_user(session)
     |> assign_page_title(" Case Investigation Clinical Details")
     |> assign(:form_changeset, ClinicalDetailsForm.changeset(case_investigation))
-    |> assign_case_investigation(case_investigation)
+    |> assign(:case_investigation, case_investigation)
     |> assign(:confirmation_prompt, nil)
     |> ok()
   end

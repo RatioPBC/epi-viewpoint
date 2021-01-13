@@ -114,7 +114,11 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
       |> AuditLogAssertions.assert_viewed_person(user, person)
     end
 
-    test "prefills with existing data when existing data is available and can be edited", %{conn: conn, case_investigation: case_investigation} do
+    test "prefills with existing data when existing data is available and can be edited", %{
+      conn: conn,
+      case_investigation: case_investigation,
+      user: user
+    } do
       {:ok, _} =
         Cases.update_case_investigation(
           case_investigation,
@@ -133,7 +137,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
         }
       )
 
-      case_investigation = Cases.get_case_investigation(case_investigation.id)
+      case_investigation = Cases.get_case_investigation(case_investigation.id, user)
       assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.interview_completed_at
     end
 
@@ -151,7 +155,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
         "Started interview with Alice Testuser on 01/01/2020 at 05:03pm EST Completed interview on 09/06/2020 at 03:45pm EDT"
       )
 
-      case_investigation = Cases.get_case_investigation(case_investigation.id)
+      case_investigation = Cases.get_case_investigation(case_investigation.id, user)
       assert Timex.to_datetime({{2020, 9, 6}, {19, 45, 0}}, "UTC") == case_investigation.interview_completed_at
       assert_recent_audit_log(case_investigation, user, action: "update-case-investigation", event: "complete-case-investigation-interview")
     end
