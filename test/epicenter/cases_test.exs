@@ -2,6 +2,7 @@ defmodule Epicenter.CasesTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [tids: 1, pluck: 2]
+  import ExUnit.CaptureLog
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
@@ -11,6 +12,7 @@ defmodule Epicenter.CasesTest do
   alias Epicenter.ContactInvestigations
   alias Epicenter.Extra
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
 
   setup :persist_admin
   @admin Test.Fixtures.admin()
@@ -753,6 +755,33 @@ defmodule Epicenter.CasesTest do
         "person_id" => person.id,
         "type" => "home"
       })
+    end
+  end
+
+  describe "get_case_investigation" do
+    setup do
+      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+      lab_result = Test.Fixtures.lab_result_attrs(person, creator, "person1_test_result", ~D[2020-10-04]) |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "fixture_case_investigation", %{name: "the name"})
+        |> Cases.create_case_investigation!()
+
+      [case_investigation: case_investigation]
+    end
+
+    test "returns the case investigation", %{case_investigation: case_investigation} do
+      fetched_case_investigation = Cases.get_case_investigation(case_investigation.id, @admin)
+
+      assert fetched_case_investigation.tid == case_investigation.tid
+    end
+
+    test "records an audit log entry", %{case_investigation: case_investigation} do
+      case_investigation = case_investigation |> Cases.preload_person()
+
+      capture_log(fn -> Cases.get_case_investigation(case_investigation.id, @admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, case_investigation.person)
     end
   end
 

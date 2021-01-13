@@ -52,6 +52,7 @@ defmodule Epicenter.Cases do
   def create_case_investigation!({attrs, audit_meta}), do: %CaseInvestigation{} |> change_case_investigation(attrs) |> AuditLog.insert!(audit_meta)
 
   def get_case_investigation(id), do: CaseInvestigation |> Repo.get(id)
+  def get_case_investigation(id, user), do: AuditLog.get(CaseInvestigation, id, user)
 
   def preload_contact_investigations(case_investigations_or_nil),
     do:
