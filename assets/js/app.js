@@ -30,16 +30,19 @@ let liveSocket = new LiveSocket("/live", Socket, {
   hooks: {
     CopyToClipboard: {
       mounted() {
-        this.el.addEventListener("click", (event) => {
-          const input = document.querySelector(`input[value="${this.el.dataset.clipboardValue}"]`);
-          if (input) {
-            input.select();
-            input.setSelectionRange(0, input.value.length);
-            document.execCommand("copy");
-            document.activeElement.blur();
-            window.getSelection().removeAllRanges();
-          }
-        });
+        this.el.addEventListener("click", this.copyToClipboard);
+      },
+
+      copyToClipboard(event) {
+        const input = document.querySelector(`input[value="${this.dataset.clipboardValue}"]`);
+
+        if (input) {
+          input.select();
+          input.setSelectionRange(0, input.value.length);
+          document.execCommand("copy");
+          document.activeElement.blur();
+          window.getSelection().removeAllRanges();
+        }
       }
     },
 
