@@ -28,11 +28,6 @@ import { LiveSocket, Browser } from "phoenix_live_view";
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
   hooks: {
-    BodyClass: {
-      mounted() {
-        document.getElementsByTagName("body")[0].className = this.el.dataset.bodyClass;
-      }
-    },
     CopyToClipboard: {
       mounted() {
         this.el.addEventListener("click", (event) => {
@@ -47,9 +42,15 @@ let liveSocket = new LiveSocket("/live", Socket, {
         });
       }
     },
-    TransientControlHook: {
+
+    MainHook: {
       mounted() {
         TransientControl.setup();
+        this.setBodyClass();
+      },
+
+      setBodyClass() {
+        document.getElementsByTagName("body")[0].className = this.el.dataset.bodyClass;
       }
     }
   },

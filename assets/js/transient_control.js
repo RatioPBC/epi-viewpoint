@@ -1,24 +1,34 @@
 export let TransientControl = {
   setup() {
-    const elements = document.querySelectorAll("[data-transient-control] button");
+    const elements = TransientControl.elements();
 
     if (elements.length > 0) {
       elements.forEach(function (element) {
-        element.addEventListener("click", function (event) {
-          event.stopPropagation();
-          if (element.dataset.active === "true") {
-            delete element.dataset.active;
-          } else {
-            element.dataset.active = "true";
-          }
-        });
+        element.addEventListener("click", TransientControl.toggleActivation)
       });
 
-      document.addEventListener("click", function (event) {
-        elements.forEach(function (element) {
-          delete element.dataset.active;
-        });
-      });
+      document.addEventListener("click", TransientControl.deactivate);
     }
+  },
+
+  toggleActivation(event) {
+    event.stopPropagation();
+    if (this.dataset.active === "true") {
+      delete this.dataset.active;
+    } else {
+      this.dataset.active = "true";
+    }
+  },
+
+  deactivate() {
+    TransientControl.elements().forEach(function (element) {
+      delete element.dataset.active;
+    });
+  },
+
+  elements() {
+    return document.querySelectorAll("[data-transient-control] button");
   }
 };
+
+

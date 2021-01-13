@@ -27,5 +27,5 @@ body
                 li = link "Log out", to: Routes.user_session_path(EpicenterWeb.Endpoint, :delete), method: :delete
 
 
-  main#main role="main" phx-hook="BodyClass" data-body-class=@body_class phx-hook="TransientControlHook"
+  main#main role="main" phx-hook="MainHook" data-body-class=@body_class
     = @inner_content
