@@ -53,8 +53,8 @@ defmodule Epicenter.Cases do
 
   def get_case_investigation(id, user), do: AuditLog.get(CaseInvestigation, id, user)
 
-  def preload_contact_investigations(case_investigations_or_nil, user) do
-    case_investigations_or_nil
+  def preload_contact_investigations(has_many_contacts_or_nil, user) do
+    has_many_contacts_or_nil
     |> Repo.preload(
       contact_investigations: [
         exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
@@ -63,14 +63,14 @@ defmodule Epicenter.Cases do
     |> log_contact_investigations(user)
   end
 
-  defp log_contact_investigations(case_investigations_or_nil, _user) when is_nil(case_investigations_or_nil), do: case_investigations_or_nil
+  defp log_contact_investigations(has_many_contacts_or_nil, _user) when is_nil(has_many_contacts_or_nil), do: has_many_contacts_or_nil
 
-  defp log_contact_investigations(case_investigations_or_nil, user) when is_list(case_investigations_or_nil),
-    do: case_investigations_or_nil |> Enum.map(&log_contact_investigations(&1, user))
+  defp log_contact_investigations(has_many_contacts_or_nil, user) when is_list(has_many_contacts_or_nil),
+    do: has_many_contacts_or_nil |> Enum.map(&log_contact_investigations(&1, user))
 
-  defp log_contact_investigations(case_investigations_or_nil, user) do
-    case_investigations_or_nil.contact_investigations |> Enum.each(&AuditLog.view(&1, user))
-    case_investigations_or_nil
+  defp log_contact_investigations(has_many_contacts_or_nil, user) do
+    has_many_contacts_or_nil.contact_investigations |> Enum.each(&AuditLog.view(&1, user))
+    has_many_contacts_or_nil
   end
 
   def preload_person(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:person)
@@ -154,7 +154,6 @@ defmodule Epicenter.Cases do
   def list_people(filter, assigned_to_id: user_id), do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all()
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
-  def preload_contact_investigations_for_people(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:contact_investigations])
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
 
   #

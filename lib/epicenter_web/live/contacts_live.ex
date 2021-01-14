@@ -64,7 +64,7 @@ defmodule EpicenterWeb.ContactsLive do
   defp assign_people(socket, exposed_people) do
     exposed_people =
       exposed_people
-      |> Cases.preload_contact_investigations_for_people()
+      |> Cases.preload_contact_investigations(socket.assigns.current_user)
       |> Cases.preload_demographics()
       |> Cases.preload_assigned_to()
 
