@@ -1,0 +1,9 @@
+section#search-results-page data-page="search-results"
+  h2
+    #title
+      span Search Results
+
+  div
+    img
+    div data-role="no-search-results"
+      span No results #{@search_term}

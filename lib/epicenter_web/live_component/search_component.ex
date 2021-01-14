@@ -13,7 +13,7 @@ defmodule EpicenterWeb.SearchComponent do
 
     socket =
       case Cases.find_person_id_by_external_id(term) do
-        nil -> socket
+        nil -> socket |> push_redirect(to: Routes.search_results_path(socket, EpicenterWeb.SearchResultsLive))
         person_id -> socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person_id))
       end
 
