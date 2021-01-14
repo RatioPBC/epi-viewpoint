@@ -847,42 +847,19 @@ defmodule Epicenter.CasesTest do
   end
 
   describe "create_contact_investigation" do
-    test "makes an contact_investigation and a revision" do
-      case_investigation = setup_case_investigation!()
+    setup :create_multiple_case_and_contact_investigations
 
-      {:ok, contact_investigation} =
-        ContactInvestigations.create({
-          Test.Fixtures.contact_investigation_attrs("contact_investigation", %{
-            exposing_case_id: case_investigation.id,
-            under_18: true,
-            guardian_name: "Jacob"
-          })
-          |> Map.put(:exposed_person, %{}),
-          Test.Fixtures.admin_audit_meta()
-        })
-
-      case_investigation_id = case_investigation.id
-      author_id = @admin.id
-
-      assert %{exposing_case_id: ^case_investigation_id, under_18: true, guardian_name: "Jacob"} =
-               ContactInvestigations.get(contact_investigation.id, @admin)
-
-      assert %{author_id: ^author_id, change: %{"exposing_case_id" => ^case_investigation_id, "under_18" => true, "guardian_name" => "Jacob"}} =
-               recent_audit_log(contact_investigation)
+    test "makes an contact_investigation and a revision", %{case_investigation: case_investigation, contact_investigation: contact_investigation} do
+      fetched_contact_investigation = ContactInvestigations.get(contact_investigation.id, @admin)
+      assert fetched_contact_investigation.exposing_case_id == case_investigation.id
+      assert_revision_count(contact_investigation, 1)
     end
   end
 
   describe "update_contact_investigation" do
-    test "updates an contact_investigation end creates a revision" do
-      case_investigation = setup_case_investigation!()
+    setup :create_multiple_case_and_contact_investigations
 
-      {:ok, contact_investigation} =
-        ContactInvestigations.create({
-          Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})
-          |> Map.put(:exposed_person, %{}),
-          Test.Fixtures.admin_audit_meta()
-        })
-
+    test "updates an contact_investigation end creates a revision", %{contact_investigation: contact_investigation} do
       {:ok, contact_investigation} =
         ContactInvestigations.update(contact_investigation, {
           %{household_member: true},
@@ -896,54 +873,7 @@ defmodule Epicenter.CasesTest do
   end
 
   describe "preload_contact_investigations" do
-    setup do
-      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
-      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
-      lab_result = Test.Fixtures.lab_result_attrs(person, creator, "person1_test_result", ~D[2020-10-04]) |> Cases.create_lab_result!()
-
-      case_investigation =
-        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
-        |> Cases.create_case_investigation!()
-
-      {:ok, contact_investigation} =
-        ContactInvestigations.create({
-          Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})
-          |> Map.put(:exposed_person, %{
-            demographics: [
-              %{first_name: "Cindy"}
-            ],
-            phones: [
-              %{number: "1111111987"}
-            ]
-          }),
-          Test.Fixtures.admin_audit_meta()
-        })
-
-      other_case_investigation =
-        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
-        |> Cases.create_case_investigation!()
-
-      {:ok, other_contact_investigation} =
-        ContactInvestigations.create({
-          Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: other_case_investigation.id})
-          |> Map.put(:exposed_person, %{
-            demographics: [
-              %{first_name: "Cindy"}
-            ],
-            phones: [
-              %{number: "1111111987"}
-            ]
-          }),
-          Test.Fixtures.admin_audit_meta()
-        })
-
-      [
-        case_investigation: case_investigation,
-        contact_investigation: contact_investigation,
-        other_case_investigation: other_case_investigation,
-        other_contact_investigation: other_contact_investigation
-      ]
-    end
+    setup :create_multiple_case_and_contact_investigations
 
     test "hydrates exactly into an contact_investigation's exposed_person's demographics and phones", %{case_investigation: case_investigation} do
       assert %{
@@ -989,23 +919,9 @@ defmodule Epicenter.CasesTest do
   end
 
   describe "preload_exposed_person" do
-    test "hydrates exactly into the exposed_person's demographics and phones" do
-      case_investigation = setup_case_investigation!()
+    setup :create_multiple_case_and_contact_investigations
 
-      {:ok, contact_investigation} =
-        ContactInvestigations.create({
-          Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})
-          |> Map.put(:exposed_person, %{
-            demographics: [
-              %{first_name: "Cindy"}
-            ],
-            phones: [
-              %{number: "1111111987"}
-            ]
-          }),
-          Test.Fixtures.admin_audit_meta()
-        })
-
+    test "hydrates exactly into the exposed_person's demographics and phones", %{contact_investigation: contact_investigation} do
       assert %{
                exposed_person: %{
                  demographics: [
@@ -1019,12 +935,52 @@ defmodule Epicenter.CasesTest do
     end
   end
 
-  defp setup_case_investigation!() do
+  defp create_multiple_case_and_contact_investigations(_context) do
     creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
     {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
     lab_result = Test.Fixtures.lab_result_attrs(person, creator, "person1_test_result", ~D[2020-10-04]) |> Cases.create_lab_result!()
 
-    Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
-    |> Cases.create_case_investigation!()
+    case_investigation =
+      Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
+      |> Cases.create_case_investigation!()
+
+    {:ok, contact_investigation} =
+      ContactInvestigations.create({
+        Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})
+        |> Map.put(:exposed_person, %{
+          demographics: [
+            %{first_name: "Cindy"}
+          ],
+          phones: [
+            %{number: "1111111987"}
+          ]
+        }),
+        Test.Fixtures.admin_audit_meta()
+      })
+
+    other_case_investigation =
+      Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
+      |> Cases.create_case_investigation!()
+
+    {:ok, other_contact_investigation} =
+      ContactInvestigations.create({
+        Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: other_case_investigation.id})
+        |> Map.put(:exposed_person, %{
+          demographics: [
+            %{first_name: "Cindy"}
+          ],
+          phones: [
+            %{number: "1111111987"}
+          ]
+        }),
+        Test.Fixtures.admin_audit_meta()
+      })
+
+    [
+      case_investigation: case_investigation,
+      contact_investigation: contact_investigation,
+      other_case_investigation: other_case_investigation,
+      other_contact_investigation: other_contact_investigation
+    ]
   end
 end
