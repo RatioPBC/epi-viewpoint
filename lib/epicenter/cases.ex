@@ -147,11 +147,7 @@ defmodule Epicenter.Cases do
   def find_matching_person(_), do: nil
   def find_person_id_by_external_id(external_id), do: Person.Query.with_external_id(external_id) |> Repo.one()
 
-  def get_people(ids, user) do
-    Person.Query.get_people(ids)
-    |> Repo.all()
-    |> Enum.map(&log_person(&1, user))
-  end
+  def get_people(ids, user), do: Person.Query.get_people(ids) |> Repo.all() |> Enum.map(&log_person(&1, user))
 
   defp log_person(%Person{} = person, %User{} = user) do
     AuditLog.view(person, user)
