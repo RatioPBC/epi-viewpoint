@@ -22,7 +22,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
              }
              |> Cases.Import.import_csv(user)
 
-    [person] = Cases.list_people(:with_lab_results)
+    [person] = Cases.list_people(:with_lab_results, user: @admin)
 
     conn
     |> Pages.Profile.visit(person)
@@ -74,7 +74,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
              }
              |> Cases.Import.import_csv(@admin)
 
-    [person] = Cases.list_people(:with_positive_lab_results)
+    [person] = Cases.list_people(:with_positive_lab_results, user: @admin)
 
     conn
     |> Pages.Profile.visit(person)

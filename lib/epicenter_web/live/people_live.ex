@@ -148,10 +148,10 @@ defmodule EpicenterWeb.PeopleLive do
     people =
       cond do
         socket.assigns.display_people_assigned_to_me ->
-          Cases.list_people(socket.assigns.filter, assigned_to_id: socket.assigns.current_user.id)
+          Cases.list_people(socket.assigns.filter, assigned_to_id: socket.assigns.current_user.id, user: socket.assigns.current_user)
 
         true ->
-          Cases.list_people(socket.assigns.filter)
+          Cases.list_people(socket.assigns.filter, user: socket.assigns.current_user)
       end
 
     socket

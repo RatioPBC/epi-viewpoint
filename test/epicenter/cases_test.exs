@@ -18,7 +18,7 @@ defmodule Epicenter.CasesTest do
   @admin Test.Fixtures.admin()
   describe "importing" do
     defp first_names() do
-      Cases.list_people(:all) |> Cases.preload_demographics() |> Enum.map(&(&1.demographics |> List.first() |> Map.get(:first_name)))
+      Cases.list_people(:all, user: @admin) |> Cases.preload_demographics() |> Enum.map(&(&1.demographics |> List.first() |> Map.get(:first_name)))
     end
 
     test "import_lab_results imports lab results and creates lab_result and person records" do
@@ -125,7 +125,7 @@ defmodule Epicenter.CasesTest do
       |> Cases.upsert_lab_result!()
 
       [person_1 = %{tid: "person-1"}, person_2 = %{tid: "person-2"}] =
-        Cases.list_people(:all)
+        Cases.list_people(:all, user: @admin)
         |> Enum.map(&Cases.preload_lab_results/1)
 
       assert person_1.lab_results |> tids() == ~w{person-1-result-1 person-1-result-2}
@@ -364,32 +364,53 @@ defmodule Epicenter.CasesTest do
           current_user: @admin
         )
 
-      [user: user]
+      [alice: alice, billy: billy, cindy: cindy, david: david, emily: emily, nancy: nancy, user: user]
     end
 
     test "all", %{user: user} do
-      Cases.list_people(:all) |> tids() |> assert_eq(~w{alice billy cindy david emily nancy})
-      Cases.list_people(:all, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy emily nancy})
+      Cases.list_people(:all, user: @admin) |> tids() |> assert_eq(~w{alice billy cindy david emily nancy})
+      Cases.list_people(:all, assigned_to_id: user.id, user: @admin) |> tids() |> assert_eq(~w{alice billy emily nancy})
     end
 
     test "with_isolation_monitoring", %{user: user} do
-      Cases.list_people(:with_isolation_monitoring) |> tids() |> assert_eq(~w{emily david})
-      Cases.list_people(:with_isolation_monitoring, assigned_to_id: user.id) |> tids() |> assert_eq(~w{emily})
+      Cases.list_people(:with_isolation_monitoring, user: @admin) |> tids() |> assert_eq(~w{emily david})
+      Cases.list_people(:with_isolation_monitoring, assigned_to_id: user.id, user: @admin) |> tids() |> assert_eq(~w{emily})
     end
 
     test "with_ongoing_interview", %{user: user} do
-      Cases.list_people(:with_ongoing_interview) |> tids() |> assert_eq(~w{billy})
-      Cases.list_people(:with_ongoing_interview, assigned_to_id: user.id) |> tids() |> assert_eq(~w{billy})
+      Cases.list_people(:with_ongoing_interview, user: @admin) |> tids() |> assert_eq(~w{billy})
+      Cases.list_people(:with_ongoing_interview, assigned_to_id: user.id, user: @admin) |> tids() |> assert_eq(~w{billy})
     end
 
     test "with_pending_interview", %{user: user} do
-      Cases.list_people(:with_pending_interview) |> tids() |> assert_eq(~w{alice})
-      Cases.list_people(:with_pending_interview, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice})
+      Cases.list_people(:with_pending_interview, user: @admin) |> tids() |> assert_eq(~w{alice})
+      Cases.list_people(:with_pending_interview, assigned_to_id: user.id, user: @admin) |> tids() |> assert_eq(~w{alice})
     end
 
     test "with_positive_lab_results", %{user: user} do
-      Cases.list_people(:with_positive_lab_results) |> tids() |> assert_eq(~w{alice billy cindy david emily})
-      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id) |> tids() |> assert_eq(~w{alice billy emily})
+      Cases.list_people(:with_positive_lab_results, user: @admin) |> tids() |> assert_eq(~w{alice billy cindy david emily})
+      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id, user: @admin) |> tids() |> assert_eq(~w{alice billy emily})
+    end
+
+    test "records audit log for viewed people", context do
+      capture_log(fn -> Cases.list_people(:all, user: @admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.alice)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.billy)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.cindy)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.david)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.emily)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.nancy)
+    end
+
+    test "records audit log for viewed people with filter", context do
+      capture_log(fn -> Cases.list_people(:with_isolation_monitoring, user: @admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.david)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.emily)
+    end
+
+    test "records audit log for viewed people with filter and assigned_to", context do
+      capture_log(fn -> Cases.list_people(:with_isolation_monitoring, assigned_to_id: context.user.id, user: @admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, context.emily)
     end
   end
 
@@ -460,7 +481,7 @@ defmodule Epicenter.CasesTest do
       }
       |> Cases.import_lab_results(@admin)
 
-    [alice] = Cases.list_people(:all) |> Cases.preload_demographics()
+    [alice] = Cases.list_people(:all, user: @admin) |> Cases.preload_demographics()
 
     {:ok, _} =
       Cases.update_person(

@@ -158,8 +158,10 @@ defmodule Epicenter.Cases do
 
   def list_exposed_people(), do: Person.Query.all_exposed() |> Repo.all()
 
-  def list_people(filter), do: Person.Query.filter(filter) |> Repo.all()
-  def list_people(filter, assigned_to_id: user_id), do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all()
+  def list_people(filter, user: %User{} = user), do: Person.Query.filter(filter) |> Repo.all() |> Enum.map(&log_person(&1, user))
+
+  def list_people(filter, assigned_to_id: user_id, user: %User{} = user),
+    do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all() |> Enum.map(&log_person(&1, user))
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
