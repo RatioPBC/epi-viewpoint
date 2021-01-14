@@ -170,7 +170,7 @@ defmodule Epicenter.Cases.Import do
     with %{people: people, lab_results: lab_results} <- result do
       {:ok,
        %ImportInfo{
-         imported_people: people |> MapSet.to_list() |> Cases.get_people(),
+         imported_people: people |> MapSet.to_list() |> Cases.get_people(originator),
          imported_person_count: MapSet.size(result.people),
          imported_lab_result_count: MapSet.size(lab_results),
          skipped_row_count: length(error_messages),

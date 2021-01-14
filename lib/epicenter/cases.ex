@@ -1,5 +1,6 @@
 defmodule Epicenter.Cases do
   alias Epicenter.Accounts
+  alias Epicenter.Accounts.User
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
@@ -104,16 +105,16 @@ defmodule Epicenter.Cases do
   # people
   #
 
-  def assign_user_to_people(user_id: nil, people_ids: people_ids, audit_meta: audit_meta),
-    do: assign_user_to_people(user: nil, people_ids: people_ids, audit_meta: audit_meta)
+  def assign_user_to_people(user_id: nil, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user),
+    do: assign_user_to_people(user: nil, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user)
 
-  def assign_user_to_people(user_id: user_id, people_ids: people_ids, audit_meta: audit_meta),
-    do: assign_user_to_people(user: Accounts.get_user(user_id), people_ids: people_ids, audit_meta: audit_meta)
+  def assign_user_to_people(user_id: user_id, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user),
+    do: assign_user_to_people(user: Accounts.get_user(user_id), people_ids: people_ids, audit_meta: audit_meta, current_user: current_user)
 
-  def assign_user_to_people(user: user, people_ids: people_ids, audit_meta: audit_meta) do
+  def assign_user_to_people(user: user, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user) do
     all_updated =
       people_ids
-      |> get_people()
+      |> get_people(current_user)
       |> preload_demographics()
       |> Enum.map(fn person ->
         {:ok, updated} =
@@ -145,7 +146,18 @@ defmodule Epicenter.Cases do
 
   def find_matching_person(_), do: nil
   def find_person_id_by_external_id(external_id), do: Person.Query.with_external_id(external_id) |> Repo.one()
-  def get_people(ids), do: Person.Query.get_people(ids) |> Repo.all()
+
+  def get_people(ids, user) do
+    Person.Query.get_people(ids)
+    |> Repo.all()
+    |> Enum.map(&log_person(&1, user))
+  end
+
+  defp log_person(%Person{} = person, %User{} = user) do
+    AuditLog.view(person, user)
+    person
+  end
+
   def get_person(id, user), do: AuditLog.get(Person, id, user)
 
   def list_exposed_people(), do: Person.Query.all_exposed() |> Repo.all()

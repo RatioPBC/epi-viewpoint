@@ -173,7 +173,8 @@ defmodule EpicenterWeb.ProfileLive do
           author_id: socket.assigns.current_user.id,
           reason_action: AuditLog.Revision.update_assignment_action(),
           reason_event: AuditLog.Revision.profile_selected_assignee_event()
-        }
+        },
+        current_user: socket.assigns.current_user
       )
 
     {:noreply, assign_updated_person(socket, updated_person)}

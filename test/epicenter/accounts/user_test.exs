@@ -39,7 +39,13 @@ defmodule Epicenter.Accounts.UserTest do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
-      Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.audit_meta(user))
+
+      Cases.assign_user_to_people(
+        user_id: user.id,
+        people_ids: [alice.id, billy.id],
+        audit_meta: Test.Fixtures.audit_meta(user),
+        current_user: @admin
+      )
 
       user
       |> Accounts.preload_assignments()

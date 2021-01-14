@@ -179,7 +179,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
 
     test "users can limit shown people to just those assigned to themselves", %{conn: conn, people: [alice | _], user: user} do
-      {:ok, _} = Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      {:ok, _} =
+        Cases.assign_user_to_people(user_id: user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta(), current_user: @admin)
 
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents([
@@ -206,7 +207,13 @@ defmodule EpicenterWeb.PeopleLiveTest do
       # I try to assign to someone
       # that shouldn't change the assignment of person 1
       # but should change the assignment of person 2
-      {:ok, _} = Cases.assign_user_to_people(user_id: context.user.id, people_ids: [alice.id], audit_meta: Test.Fixtures.admin_audit_meta())
+      {:ok, _} =
+        Cases.assign_user_to_people(
+          user_id: context.user.id,
+          people_ids: [alice.id],
+          audit_meta: Test.Fixtures.admin_audit_meta(),
+          current_user: @admin
+        )
 
       Pages.People.visit(conn)
       |> Pages.People.click_person_checkbox(person: alice, value: "on")
@@ -214,7 +221,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.click_assigned_to_me_checkbox()
       |> Pages.People.change_form(%{"user" => context.assignee.id})
 
-      Cases.get_people([alice.id, billy.id])
+      Cases.get_people([alice.id, billy.id], @admin)
       |> Euclid.Extra.Enum.pluck(:assigned_to_id)
       |> assert_eq([context.assignee.id, nil])
     end
@@ -313,14 +320,19 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
 
-      Cases.get_people([alice.id, billy.id])
+      Cases.get_people([alice.id, billy.id], @admin)
       |> Cases.preload_assigned_to()
       |> Euclid.Extra.Enum.pluck(:assigned_to)
       |> assert_eq([assignee, nil])
     end
 
     test "users can be unassigned from people", %{assignee: assignee, conn: conn, people: [alice, billy | _], user: user} do
-      Cases.assign_user_to_people(user_id: assignee.id, people_ids: [alice.id, billy.id], audit_meta: Test.Fixtures.audit_meta(user))
+      Cases.assign_user_to_people(
+        user_id: assignee.id,
+        people_ids: [alice.id, billy.id],
+        audit_meta: Test.Fixtures.audit_meta(user),
+        current_user: @admin
+      )
 
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents(
@@ -337,7 +349,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
       |> Pages.People.assert_unchecked("[data-tid=#{billy.tid}]")
 
-      Cases.get_people([alice.id, billy.id])
+      Cases.get_people([alice.id, billy.id], @admin)
       |> Cases.preload_assigned_to()
       |> Euclid.Extra.Enum.pluck(:assigned_to)
       |> assert_eq([nil, nil])

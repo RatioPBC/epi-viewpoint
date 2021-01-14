@@ -503,7 +503,13 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      {:ok, [alice]} = Cases.assign_user_to_people(user_id: originator.id, people_ids: [alice.id], audit_meta: Test.Fixtures.audit_meta(originator))
+      {:ok, [alice]} =
+        Cases.assign_user_to_people(
+          user_id: originator.id,
+          people_ids: [alice.id],
+          audit_meta: Test.Fixtures.audit_meta(originator),
+          current_user: @admin
+        )
 
       import_output =
         %{
@@ -547,7 +553,13 @@ defmodule Epicenter.Cases.ImportTest do
 
       {:ok, alice} = Cases.create_person(Test.Fixtures.person_attrs(originator, "alice", alice_attrs))
 
-      {:ok, [alice]} = Cases.assign_user_to_people(user_id: originator.id, people_ids: [alice.id], audit_meta: Test.Fixtures.audit_meta(originator))
+      {:ok, [alice]} =
+        Cases.assign_user_to_people(
+          user_id: originator.id,
+          people_ids: [alice.id],
+          audit_meta: Test.Fixtures.audit_meta(originator),
+          current_user: @admin
+        )
 
       import_output =
         %{

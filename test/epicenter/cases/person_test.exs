@@ -597,7 +597,7 @@ defmodule Epicenter.Cases.PersonTest do
 
     person_lab_result = Test.Fixtures.lab_result_attrs(person, user, "#{assign_tid}_2", sampled_on_2, result: result_2) |> Cases.create_lab_result!()
 
-    Cases.assign_user_to_people(user: assignee, people_ids: [person.id], audit_meta: Test.Fixtures.admin_audit_meta())
+    Cases.assign_user_to_people(user: assignee, people_ids: [person.id], audit_meta: Test.Fixtures.admin_audit_meta(), current_user: @admin)
 
     Test.Fixtures.case_investigation_attrs(person, person_lab_result, user, "#{assign_tid}_case_investigation", %{
       interview_started_at: interview_started_at

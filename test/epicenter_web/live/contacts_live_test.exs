@@ -41,7 +41,13 @@ defmodule EpicenterWeb.ContactsLiveTest do
   end
 
   describe "assigning case investigator to a contact" do
-    test "case investigator can be unassigned and assigned to contacts", %{assignee: assignee, caroline: caroline, donald: donald, conn: conn} do
+    test "case investigator can be unassigned and assigned to contacts", %{
+      assignee: assignee,
+      caroline: caroline,
+      donald: donald,
+      conn: conn,
+      user: user
+    } do
       Pages.Contacts.visit(conn)
       |> Pages.Contacts.assert_table_contents(
         [
@@ -68,7 +74,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
         columns: ["Name", "Assignee"]
       )
 
-      Cases.get_people([caroline.id])
+      Cases.get_people([caroline.id], user)
       |> Cases.preload_assigned_to()
       |> Euclid.Extra.Enum.pluck(:assigned_to)
       |> assert_eq([nil])
@@ -130,7 +136,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
     caroline = caroline_contact_investigation.exposed_person
     donald = donald_contact_investigation.exposed_person
 
-    Cases.assign_user_to_people(user_id: assignee.id, people_ids: [caroline.id], audit_meta: Test.Fixtures.admin_audit_meta())
+    Cases.assign_user_to_people(user_id: assignee.id, people_ids: [caroline.id], audit_meta: Test.Fixtures.admin_audit_meta(), current_user: user)
 
     [assignee: assignee, bob: bob, caroline: caroline, donald: donald, user: user]
   end

@@ -85,7 +85,8 @@ defmodule EpicenterWeb.PeopleLive do
           author_id: socket.assigns.current_user.id,
           reason_action: AuditLog.Revision.update_assignment_bulk_action(),
           reason_event: AuditLog.Revision.people_selected_assignee_event()
-        }
+        },
+        current_user: socket.assigns.current_user
       )
 
     socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> noreply()

@@ -226,11 +226,19 @@ defmodule Epicenter.CasesTest do
              } = recent_audit_log(person).change
     end
 
-    test "get_people" do
-      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
-      Cases.get_people([alice.id]) |> tids() |> assert_eq(["alice"])
+    test "get_people fetches all the people" do
+      alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+      Test.Fixtures.person_attrs(@admin, "billy") |> Cases.create_person!()
+      Cases.get_people([alice.id], @admin) |> tids() |> assert_eq(["alice"])
+    end
+
+    test "get_people records audit log for all the fetched people" do
+      alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+      billy = Test.Fixtures.person_attrs(@admin, "billy") |> Cases.create_person!()
+
+      capture_log(fn -> Cases.get_people([alice.id, billy.id], @admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, alice)
+      |> AuditLogAssertions.assert_viewed_person(@admin, billy)
     end
 
     test "get_person fetches record" do
@@ -352,7 +360,8 @@ defmodule Epicenter.CasesTest do
         Cases.assign_user_to_people(
           user_id: user.id,
           people_ids: [alice.id, billy.id, emily.id, nancy.id],
-          audit_meta: Test.Fixtures.admin_audit_meta()
+          audit_meta: Test.Fixtures.admin_audit_meta(),
+          current_user: @admin
         )
 
       [user: user]
@@ -396,7 +405,8 @@ defmodule Epicenter.CasesTest do
       Cases.assign_user_to_people(
         user_id: assigned_to_user.id,
         people_ids: [alice.id],
-        audit_meta: Test.Fixtures.audit_meta(updater)
+        audit_meta: Test.Fixtures.audit_meta(updater),
+        current_user: @admin
       )
 
     assert updated_alice |> Repo.preload(:assigned_to) |> Map.get(:assigned_to) |> Map.get(:tid) == "assigned-to"

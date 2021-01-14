@@ -889,7 +889,8 @@ defmodule EpicenterWeb.ProfileLiveTest do
         Cases.assign_user_to_people(
           user_id: assignee.id,
           people_ids: [alice.id],
-          audit_meta: Test.Fixtures.audit_meta(user)
+          audit_meta: Test.Fixtures.audit_meta(user),
+          current_user: @admin
         )
 
       updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}} |> ProfileLive.assign_updated_person(alice)
