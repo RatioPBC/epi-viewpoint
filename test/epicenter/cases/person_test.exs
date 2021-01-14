@@ -231,7 +231,7 @@ defmodule Epicenter.Cases.PersonTest do
         |> ContactInvestigations.create()
 
       contact_investigation = ContactInvestigations.get(contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
-      exposed_person = contact_investigation.exposed_person |> Cases.preload_contact_investigations()
+      exposed_person = contact_investigation.exposed_person |> Cases.preload_contact_investigations(user)
 
       {:ok, second_contact_investigation} =
         {Test.Fixtures.contact_investigation_attrs("second_contact_investigation", %{
@@ -247,9 +247,9 @@ defmodule Epicenter.Cases.PersonTest do
       [exposed_person: Cases.get_person(exposed_person.id, @admin)]
     end
 
-    test "returns the contact investigation with the most recent created at date", %{exposed_person: exposed_person} do
+    test "returns the contact investigation with the most recent created at date", %{exposed_person: exposed_person, user: user} do
       assert exposed_person
-             |> Cases.preload_contact_investigations()
+             |> Cases.preload_contact_investigations(user)
              |> Person.latest_contact_investigation()
              |> Map.get(:tid) == "second_contact_investigation"
     end

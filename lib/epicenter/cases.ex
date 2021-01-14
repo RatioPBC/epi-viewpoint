@@ -53,14 +53,25 @@ defmodule Epicenter.Cases do
 
   def get_case_investigation(id, user), do: AuditLog.get(CaseInvestigation, id, user)
 
-  def preload_contact_investigations(case_investigations_or_nil),
-    do:
-      case_investigations_or_nil
-      |> Repo.preload(
-        contact_investigations: [
-          exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
-        ]
-      )
+  def preload_contact_investigations(case_investigations_or_nil, user) do
+    case_investigations_or_nil
+    |> Repo.preload(
+      contact_investigations: [
+        exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
+      ]
+    )
+    |> log_contact_investigations(user)
+  end
+
+  defp log_contact_investigations(case_investigations_or_nil, _user) when is_nil(case_investigations_or_nil), do: case_investigations_or_nil
+
+  defp log_contact_investigations(case_investigations_or_nil, user) when is_list(case_investigations_or_nil),
+    do: case_investigations_or_nil |> Enum.map(&log_contact_investigations(&1, user))
+
+  defp log_contact_investigations(case_investigations_or_nil, user) do
+    case_investigations_or_nil.contact_investigations |> Enum.each(&AuditLog.view(&1, user))
+    case_investigations_or_nil
+  end
 
   def preload_person(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:person)
 

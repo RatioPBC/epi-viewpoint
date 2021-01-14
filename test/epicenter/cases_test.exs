@@ -896,10 +896,16 @@ defmodule Epicenter.CasesTest do
   end
 
   describe "preload_contact_investigations" do
-    test "hydrates exactly into an contact_investigation's exposed_person's demographics and phones" do
-      case_investigation = setup_case_investigation!()
+    setup do
+      creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
+      {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
+      lab_result = Test.Fixtures.lab_result_attrs(person, creator, "person1_test_result", ~D[2020-10-04]) |> Cases.create_lab_result!()
 
-      {:ok, _exposure} =
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
+        |> Cases.create_case_investigation!()
+
+      {:ok, contact_investigation} =
         ContactInvestigations.create({
           Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})
           |> Map.put(:exposed_person, %{
@@ -913,6 +919,33 @@ defmodule Epicenter.CasesTest do
           Test.Fixtures.admin_audit_meta()
         })
 
+      other_case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
+        |> Cases.create_case_investigation!()
+
+      {:ok, other_contact_investigation} =
+        ContactInvestigations.create({
+          Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: other_case_investigation.id})
+          |> Map.put(:exposed_person, %{
+            demographics: [
+              %{first_name: "Cindy"}
+            ],
+            phones: [
+              %{number: "1111111987"}
+            ]
+          }),
+          Test.Fixtures.admin_audit_meta()
+        })
+
+      [
+        case_investigation: case_investigation,
+        contact_investigation: contact_investigation,
+        other_case_investigation: other_case_investigation,
+        other_contact_investigation: other_contact_investigation
+      ]
+    end
+
+    test "hydrates exactly into an contact_investigation's exposed_person's demographics and phones", %{case_investigation: case_investigation} do
       assert %{
                contact_investigations: [
                  %{
@@ -926,7 +959,32 @@ defmodule Epicenter.CasesTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id, @admin) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, @admin) |> Cases.preload_contact_investigations(@admin)
+    end
+
+    test "records an audit log entry for each contact investigation", %{
+      case_investigation: case_investigation,
+      contact_investigation: contact_investigation
+    } do
+      case = Cases.get_case_investigation(case_investigation.id, @admin)
+
+      capture_log(fn -> case |> Cases.preload_contact_investigations(@admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, contact_investigation.exposed_person)
+    end
+
+    test "records an audit log entry for each contact investigation of each case investigation", %{
+      case_investigation: case_investigation,
+      contact_investigation: contact_investigation,
+      other_case_investigation: other_case_investigation,
+      other_contact_investigation: other_contact_investigation
+    } do
+      capture_log(fn -> [case_investigation, other_case_investigation] |> Cases.preload_contact_investigations(@admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, contact_investigation.exposed_person)
+      |> AuditLogAssertions.assert_viewed_person(@admin, other_contact_investigation.exposed_person)
+    end
+
+    test "does record an audit log entry when the case investigation is nil" do
+      assert capture_log(fn -> Cases.preload_contact_investigations(nil, @admin) end) == ""
     end
   end
 

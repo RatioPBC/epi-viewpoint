@@ -198,7 +198,7 @@ defmodule EpicenterWeb.ProfileLive do
     case_investigations =
       person.case_investigations
       |> Cases.preload_initiating_lab_result()
-      |> Cases.preload_contact_investigations()
+      |> Cases.preload_contact_investigations(socket.assigns.current_user)
       |> Cases.preload_investigation_notes()
 
     case_investigations_contacts_persons =
@@ -211,7 +211,7 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   defp assign_contact_investigations(socket, person) do
-    person = Cases.preload_contact_investigations(person)
+    person = Cases.preload_contact_investigations(person, socket.assigns.current_user)
 
     contact_investigations =
       person.contact_investigations

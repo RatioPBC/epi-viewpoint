@@ -98,7 +98,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
       |> Repo.update!()
 
       assert Cases.get_person(exposed_person.id, @admin)
-             |> Cases.preload_contact_investigations()
+             |> Cases.preload_contact_investigations(@admin)
              |> PeoplePresenter.latest_contact_investigation_status(~D[2020-10-25]) == "Ongoing interview"
     end
   end
@@ -115,6 +115,6 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
       |> ContactInvestigations.create()
 
     contact_investigation = ContactInvestigations.get(contact_investigation.id, @admin) |> ContactInvestigations.preload_exposed_person()
-    contact_investigation.exposed_person |> Cases.preload_contact_investigations()
+    contact_investigation.exposed_person |> Cases.preload_contact_investigations(@admin)
   end
 end

@@ -88,7 +88,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
          }), Test.Fixtures.admin_audit_meta()}
         |> ContactInvestigations.create()
 
-      case_investigation = Cases.get_case_investigation(case_investigation.id, @admin) |> Cases.preload_contact_investigations()
+      case_investigation = Cases.get_case_investigation(case_investigation.id, @admin) |> Cases.preload_contact_investigations(@admin)
 
       assert case_investigation.contact_investigations |> Enum.map(& &1.id) == [contact_investigation.id]
     end

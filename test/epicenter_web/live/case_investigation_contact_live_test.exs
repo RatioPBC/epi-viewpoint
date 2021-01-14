@@ -87,7 +87,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations(user)
     end
 
     test "when the symptom onset date is available, contains value and uses it for the infectious period", %{
@@ -231,7 +231,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations(user)
     end
   end
 
@@ -376,7 +376,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    }
                  }
                ]
-             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations()
+             } = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_contact_investigations(user)
     end
   end
 
