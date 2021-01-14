@@ -1,3 +1,4 @@
+@use "sass:color"
 @import "mixins"
 @import "variables"
 
@@ -16,6 +17,11 @@
         padding: $input-padding
         padding-left: 35px
         width: 227px
+
+        &:focus
+          border-color: $button-color
+          outline: none
+          box-shadow: 0 0 3px .125em color.change($button-color, $alpha: 0.35)
 
       label
           svg
