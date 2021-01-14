@@ -26,8 +26,23 @@ defmodule Epicenter.ContactInvestigations do
 
   def preload_exposed_person(contact_investigations), do: contact_investigations |> Repo.preload(exposed_person: [:demographics, :phones])
 
-  # Do we need to log a view here?
   def preload_exposing_case(contact_investigations), do: contact_investigations |> Repo.preload(exposing_case: [person: [:demographics]])
+
+  def preload_exposing_case(contact_investigations_or_nil, user) do
+    contact_investigations_or_nil
+    |> Repo.preload(exposing_case: [person: [:demographics]])
+    |> log_case_investigations(user)
+  end
+
+  defp log_case_investigations(nil, _user), do: nil
+
+  defp log_case_investigations(contact_investigations, user) when is_list(contact_investigations),
+    do: contact_investigations |> Enum.map(&log_case_investigations(&1, user))
+
+  defp log_case_investigations(contact_investigation, user) do
+    contact_investigation.exposing_case |> AuditLog.view(user)
+    contact_investigation
+  end
 
   def update(%ContactInvestigation{} = investigation, {attrs, audit_meta}),
     do: investigation |> change(attrs) |> AuditLog.update(audit_meta)
