@@ -137,7 +137,7 @@ defmodule EpicenterWeb.PeopleLive do
   end
 
   defp assign_people(socket, people) do
-    AuditLog.view(socket.assigns.current_user, people)
+    AuditLog.view(people, socket.assigns.current_user)
     assign(socket, people: people, person_count: length(people))
   end
 

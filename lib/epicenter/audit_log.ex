@@ -9,7 +9,6 @@ defmodule Epicenter.AuditLog do
   alias Epicenter.AuditLog.Meta
   alias Epicenter.AuditLog.PhiLoggable
   alias Epicenter.AuditLog.Revision
-  alias Epicenter.Cases.Person
   alias Epicenter.Repo
 
   def insert(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do
@@ -146,25 +145,9 @@ defmodule Epicenter.AuditLog do
     Revision.Query.with_changed_id(model_id) |> Repo.all()
   end
 
-  def view(_user, nil), do: nil
+  def view(nil, _user_id), do: nil
 
-  def view(user, items) when is_list(items) do
-    Enum.each(items, &view(user, &1))
-  end
-
-  def view(_user, %Person{id: nil}), do: nil
-
-  def view(%User{id: user_id}, %Person{id: subject_id}) do
-    subject_type = "Person"
-
-    Logger.info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
-      audit_log: true,
-      audit_user_id: user_id,
-      audit_action: "view",
-      audit_subject_id: subject_id,
-      audit_subject_type: subject_type
-    )
-  end
+  def view(phi_loggable, %User{} = user) when is_list(phi_loggable), do: Enum.map(phi_loggable, &view(&1, user))
 
   def view(phi_loggable, %User{id: user_id}) do
     subject_type = "Person"
@@ -181,24 +164,7 @@ defmodule Epicenter.AuditLog do
     phi_loggable
   end
 
-  def get(record_module, id, %User{id: user_id}), do: Repo.get(record_module, id) |> log_phi(user_id)
-
-  defp log_phi(phi_loggable, _user_id) when is_nil(phi_loggable), do: phi_loggable
-
-  defp log_phi(phi_loggable, user_id) do
-    subject_type = "Person"
-    subject_id = PhiLoggable.phi_identifier(phi_loggable)
-
-    Logger.info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
-      audit_log: true,
-      audit_user_id: user_id,
-      audit_action: "view",
-      audit_subject_id: subject_id,
-      audit_subject_type: subject_type
-    )
-
-    phi_loggable
-  end
+  def get(record_module, id, %User{id: _user_id} = user), do: Repo.get(record_module, id) |> view(user)
 
   defp application_version_sha do
     Application.get_env(:epicenter, :application_version_sha)

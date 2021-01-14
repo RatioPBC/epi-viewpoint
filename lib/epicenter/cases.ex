@@ -70,7 +70,7 @@ defmodule Epicenter.Cases do
     do: has_many_contacts_or_nil |> Enum.map(&log_contact_investigations(&1, user))
 
   defp log_contact_investigations(has_many_contacts_or_nil, user) do
-    has_many_contacts_or_nil.contact_investigations |> Enum.each(&AuditLog.view(&1, user))
+    has_many_contacts_or_nil.contact_investigations |> AuditLog.view(user)
     has_many_contacts_or_nil
   end
 
@@ -147,21 +147,15 @@ defmodule Epicenter.Cases do
   def find_matching_person(_), do: nil
   def find_person_id_by_external_id(external_id), do: Person.Query.with_external_id(external_id) |> Repo.one()
 
-  def get_people(ids, user), do: Person.Query.get_people(ids) |> Repo.all() |> Enum.map(&log_person(&1, user))
-
-  defp log_person(%Person{} = person, %User{} = user) do
-    AuditLog.view(person, user)
-    person
-  end
-
+  def get_people(ids, user), do: Person.Query.get_people(ids) |> Repo.all() |> AuditLog.view(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)
 
-  def list_exposed_people(user), do: Person.Query.all_exposed() |> Repo.all() |> Enum.map(&log_person(&1, user))
+  def list_exposed_people(user), do: Person.Query.all_exposed() |> Repo.all() |> AuditLog.view(user)
 
-  def list_people(filter, user: %User{} = user), do: Person.Query.filter(filter) |> Repo.all() |> Enum.map(&log_person(&1, user))
+  def list_people(filter, user: %User{} = user), do: Person.Query.filter(filter) |> Repo.all() |> AuditLog.view(user)
 
   def list_people(filter, assigned_to_id: user_id, user: %User{} = user),
-    do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all() |> Enum.map(&log_person(&1, user))
+    do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all() |> AuditLog.view(user)
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)

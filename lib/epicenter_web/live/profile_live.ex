@@ -206,7 +206,7 @@ defmodule EpicenterWeb.ProfileLive do
       Enum.flat_map(case_investigations, & &1.contact_investigations)
       |> Enum.map(& &1.exposed_person)
 
-    AuditLog.view(socket.assigns.current_user, case_investigations_contacts_persons)
+    AuditLog.view(case_investigations_contacts_persons, socket.assigns.current_user)
 
     assign(socket, case_investigations: case_investigations)
   end
