@@ -264,15 +264,22 @@ defmodule Epicenter.CasesTest do
       lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
 
-      {:ok, _exposure} =
+      {:ok, contact_investigation} =
         {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
          Test.Fixtures.admin_audit_meta()}
         |> ContactInvestigations.create()
 
-      :ok
+      [contact_investigation: contact_investigation]
     end
 
-    test "returns exposed people", do: Cases.list_exposed_people() |> tids() |> assert_eq(~w{exposed_person_contact_investigation})
+    test "returns exposed people", do: Cases.list_exposed_people(@admin) |> tids() |> assert_eq(~w{exposed_person_contact_investigation})
+
+    test "records audit log for viewed people", %{contact_investigation: contact_investigation} do
+      exposed_person = contact_investigation |> Repo.preload(:exposed_person) |> Map.get(:exposed_person)
+
+      capture_log(fn -> Cases.list_exposed_people(@admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, exposed_person)
+    end
   end
 
   describe "list_people" do

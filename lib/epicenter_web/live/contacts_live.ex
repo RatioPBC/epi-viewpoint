@@ -34,11 +34,12 @@ defmodule EpicenterWeb.ContactsLive do
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
     do: socket |> select_person(person_id) |> noreply()
 
+  # TODO: What is handling handle event with nil user params?
   def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
     do: handle_event("form-change", %{"user" => nil}, socket)
 
   def handle_info({:people, _people}, socket) do
-    socket |> assign_people(Cases.list_exposed_people()) |> noreply()
+    socket |> assign_people(Cases.list_exposed_people(socket.assigns.current_user)) |> noreply()
   end
 
   def handle_info({:assignee_selected, user_id}, socket) do
@@ -57,7 +58,7 @@ defmodule EpicenterWeb.ContactsLive do
         current_user: socket.assigns.current_user
       )
 
-    socket |> assign_selected_to_empty() |> assign_people(Cases.list_exposed_people()) |> noreply()
+    socket |> assign_selected_to_empty() |> assign_people(Cases.list_exposed_people(socket.assigns.current_user)) |> noreply()
   end
 
   # # # Helpers
@@ -85,7 +86,7 @@ defmodule EpicenterWeb.ContactsLive do
     do: socket |> assign(selected_people: %{})
 
   defp load_and_assign_exposed_people(socket),
-    do: assign_people(socket, Cases.list_exposed_people())
+    do: assign_people(socket, Cases.list_exposed_people(socket.assigns.current_user))
 
   defp load_and_assign_users(socket),
     do: socket |> assign(users: Accounts.list_users())
