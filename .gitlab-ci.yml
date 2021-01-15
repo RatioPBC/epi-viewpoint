@@ -1,4 +1,4 @@
-image: circleci/elixir:1.11-node-browsers
+image: circleci/elixir:1.11.3-node-browsers
 services:
   - postgres:12.5-alpine
 variables:
