@@ -50,8 +50,8 @@ defmodule EpicenterWeb.Features.SearchTest do
 
       conn
       |> Pages.People.visit()
-      |> Pages.submit_and_follow_redirect(conn, "[data-role=app-search] form", %{search_form: %{"term" => "id-that-does-not-exist"}})
-      |> Search.assert_no_results()
+      |> Pages.submit_live("[data-role=app-search] form", %{search_form: %{"term" => "id-that-does-not-exist"}})
+      |> Search.assert_no_results("id-that-does-not-exist")
     end
   end
 end

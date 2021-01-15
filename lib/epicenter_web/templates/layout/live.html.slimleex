@@ -10,7 +10,12 @@ body
             = link "Index cases", to: "/people"
             = link "Contacts", to: "/contacts"
 
-          = component(@socket, EpicenterWeb.SearchComponent, "search-thing", search_changeset: @search_changeset)
+          = if @search_changeset do
+            #nav-search data-role="app-search"
+             = form_for @search_changeset, "#", [id: "search-form", phx_submit: "search"], fn f ->
+               = label f, :term do
+                 = search_icon()
+                 = text_input f, :term, [placeholder: "Search ..."]
 
           #nav-right
             #user-menu data-transient-control=true
@@ -26,6 +31,9 @@ body
                 li = link "Settings", to: Routes.user_settings_path(EpicenterWeb.Endpoint, :edit)
                 li = link "Log out", to: Routes.user_session_path(EpicenterWeb.Endpoint, :delete), method: :delete
 
+  = if assigns[:search_results] != nil do
+    = render "_search_results.html", search_results: @search_results, search_term: assigns[:search_term]
 
-  main#main role="main" phx-hook="MainHook" data-body-class=@body_class
-    = @inner_content
+  - else
+    main#main role="main" phx-hook="MainHook" data-body-class=@body_class
+      = @inner_content

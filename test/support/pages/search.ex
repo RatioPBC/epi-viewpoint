@@ -3,14 +3,13 @@ defmodule EpicenterWeb.Test.Search do
 
   alias Epicenter.Test
   alias Epicenter.Test.HtmlAssertions
-  alias EpicenterWeb.Test.Pages
 
-  def assert_no_results(view) do
+  def assert_no_results(view, search_term) do
     view
-    |> Pages.assert_on_page("search-results")
     |> render()
     |> Test.Html.parse()
-    |> HtmlAssertions.assert_text("no-search-results", "No results ")
+    |> HtmlAssertions.assert_text("no-search-results", "No results found for")
+    |> HtmlAssertions.assert_text("no-search-results", search_term)
 
     view
   end

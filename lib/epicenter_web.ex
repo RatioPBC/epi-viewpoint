@@ -49,6 +49,24 @@ defmodule EpicenterWeb do
       use Phoenix.LiveView, layout: {EpicenterWeb.LayoutView, "live.html"}
 
       unquote(view_helpers())
+
+      def handle_event("search", %{"search_form" => %{"term" => term}}, socket) do
+        term = term |> String.trim()
+
+        socket =
+          case Epicenter.Cases.find_person_id_by_external_id(term) do
+            nil ->
+              socket
+              |> Phoenix.LiveView.assign(:search_results, [])
+              |> Phoenix.LiveView.assign(:search_term, term)
+
+            person_id ->
+              socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person_id))
+          end
+
+        socket
+        |> EpicenterWeb.LiveHelpers.noreply()
+      end
     end
   end
 

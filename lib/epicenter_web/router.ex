@@ -93,8 +93,6 @@ defmodule EpicenterWeb.Router do
     live "/people/:id/edit", ProfileEditLive, as: :profile_edit
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
 
-    live "/search-results", SearchResultsLive, as: :search_results
-
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update-password", UserSettingsController, :update_password
   end

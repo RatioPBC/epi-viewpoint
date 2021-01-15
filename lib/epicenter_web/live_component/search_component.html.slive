@@ -1,6 +1,0 @@
-= if @search_changeset do
-  #nav-search data-role="app-search"
-   = form_for @search_changeset, "#", [id: "search-form", phx_submit: "search", phx_target: @myself], fn f ->
-     = label f, :term do
-       = search_icon()
-       = text_input f, :term, [placeholder: "Search ..."]
