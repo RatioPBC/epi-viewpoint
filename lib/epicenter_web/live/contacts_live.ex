@@ -34,10 +34,6 @@ defmodule EpicenterWeb.ContactsLive do
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
     do: socket |> select_person(person_id) |> noreply()
 
-  # TODO: What is handling handle event with nil user params?
-  def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
-    do: handle_event("form-change", %{"user" => nil}, socket)
-
   def handle_info({:people, _people}, socket) do
     socket |> assign_people(Cases.list_exposed_people(socket.assigns.current_user)) |> noreply()
   end
