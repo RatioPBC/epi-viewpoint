@@ -147,15 +147,15 @@ defmodule Epicenter.Cases do
   def find_matching_person(_), do: nil
   def find_person_id_by_external_id(external_id), do: Person.Query.with_external_id(external_id) |> Repo.one()
 
-  def get_people(ids, user), do: Person.Query.get_people(ids) |> Repo.all() |> AuditLog.view(user)
+  def get_people(ids, user), do: Person.Query.get_people(ids) |> AuditLog.all(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)
 
-  def list_exposed_people(user), do: Person.Query.all_exposed() |> Repo.all() |> AuditLog.view(user)
+  def list_exposed_people(user), do: Person.Query.all_exposed() |> AuditLog.all(user)
 
-  def list_people(filter, user: %User{} = user), do: Person.Query.filter(filter) |> Repo.all() |> AuditLog.view(user)
+  def list_people(filter, user: %User{} = user), do: Person.Query.filter(filter) |> AuditLog.all(user)
 
   def list_people(filter, assigned_to_id: user_id, user: %User{} = user),
-    do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> Repo.all() |> AuditLog.view(user)
+    do: Person.Query.filter(filter) |> Person.Query.assigned_to_id(user_id) |> AuditLog.all(user)
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)

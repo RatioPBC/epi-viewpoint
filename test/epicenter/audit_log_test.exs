@@ -1,6 +1,7 @@
 defmodule Epicenter.AuditLogTest do
   use Epicenter.DataCase, async: true
 
+  import Euclid.Extra.Enum, only: [tids: 1]
   import ExUnit.CaptureLog
 
   alias Epicenter.Accounts
@@ -11,6 +12,7 @@ defmodule Epicenter.AuditLogTest do
   alias Epicenter.ContactInvestigations
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
 
   setup :persist_admin
   @admin Test.Fixtures.admin()
@@ -551,6 +553,25 @@ defmodule Epicenter.AuditLogTest do
       assert capture_log(fn ->
                AuditLog.get(ContactInvestigation, Ecto.UUID.generate(), user)
              end) == ""
+    end
+  end
+
+  describe "all'ing" do
+    setup do
+      alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+      billy = Test.Fixtures.person_attrs(@admin, "billy") |> Cases.create_person!()
+
+      [alice: alice, billy: billy]
+    end
+
+    test "returns all the records for a given query" do
+      assert Person.Query.filter(:all) |> AuditLog.all(@admin) |> tids() == ~w{alice billy}
+    end
+
+    test "records all the phi viewed for fetched records", %{alice: alice, billy: billy} do
+      capture_log(fn -> Person.Query.filter(:all) |> AuditLog.all(@admin) end)
+      |> AuditLogAssertions.assert_viewed_person(@admin, alice)
+      |> AuditLogAssertions.assert_viewed_person(@admin, billy)
     end
   end
 end
