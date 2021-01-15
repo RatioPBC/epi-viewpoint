@@ -274,7 +274,8 @@ defmodule Epicenter.Cases.Person do
         join: demographic in Demographic,
         on: person.id == demographic.person_id,
         where: demographic.external_id == ^external_id,
-        select: person.id
+        select: person.id,
+        distinct: true
     end
   end
 end

@@ -538,6 +538,7 @@ defmodule Epicenter.Cases.PersonTest do
       author = Test.Fixtures.admin()
       {:ok, person} = Test.Fixtures.person_attrs(author, "person") |> Cases.create_person()
       {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "first", %{external_id: external_id}) |> Cases.create_demographic()
+      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "second", %{external_id: external_id}) |> Cases.create_demographic()
 
       assert Person.Query.with_external_id(external_id) |> Repo.one() == person.id
     end
