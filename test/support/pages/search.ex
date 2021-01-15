@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Test.Search do
+defmodule EpicenterWeb.Test.Pages.Search do
   import Phoenix.LiveViewTest
 
   alias Epicenter.Test
@@ -10,6 +10,14 @@ defmodule EpicenterWeb.Test.Search do
     |> Test.Html.parse()
     |> HtmlAssertions.assert_text("no-search-results", "No results found for")
     |> HtmlAssertions.assert_text("no-search-results", search_term)
+
+    view
+  end
+
+  def close_search_results(view) do
+    view
+    |> element("[data-role=close-search-results]")
+    |> render_click()
 
     view
   end

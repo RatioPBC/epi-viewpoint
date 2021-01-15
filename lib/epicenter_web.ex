@@ -50,6 +50,13 @@ defmodule EpicenterWeb do
 
       unquote(view_helpers())
 
+      def handle_event("close-search-results", params, socket) do
+        socket
+        |> Phoenix.LiveView.assign(:search_results, nil)
+        |> Phoenix.LiveView.assign(:search_term, nil)
+        |> EpicenterWeb.LiveHelpers.noreply()
+      end
+
       def handle_event("search", %{"search_form" => %{"term" => term}}, socket) do
         term = term |> String.trim()
 

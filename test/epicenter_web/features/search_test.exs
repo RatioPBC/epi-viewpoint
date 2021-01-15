@@ -6,7 +6,6 @@ defmodule EpicenterWeb.Features.SearchTest do
   alias Epicenter.Test
   alias Epicenter.Cases
   alias EpicenterWeb.Test.Pages
-  alias EpicenterWeb.Test.Search
 
   setup :register_and_log_in_user
 
@@ -14,6 +13,14 @@ defmodule EpicenterWeb.Features.SearchTest do
     conn
     |> get("/people")
     |> Pages.Navigation.assert_has_search_field()
+  end
+
+  test "closing the search results", %{conn: conn} do
+    conn
+    |> Pages.People.visit()
+    |> Pages.submit_live("[data-role=app-search] form", %{search_form: %{"term" => "id-that-does-not-exist"}})
+    |> Pages.Search.close_search_results()
+    |> Pages.People.assert_here()
   end
 
   describe "searching by ODRS id" do
@@ -51,7 +58,7 @@ defmodule EpicenterWeb.Features.SearchTest do
       conn
       |> Pages.People.visit()
       |> Pages.submit_live("[data-role=app-search] form", %{search_form: %{"term" => "id-that-does-not-exist"}})
-      |> Search.assert_no_results("id-that-does-not-exist")
+      |> Pages.Search.assert_no_results("id-that-does-not-exist")
     end
   end
 end

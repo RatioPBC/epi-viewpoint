@@ -1,3 +1,6 @@
+button#close-search-results data-role="close-search-results" phx-click="close-search-results"
+  = back_icon()
+  span Back
 div#no-results
   img
   div#no-search-results data-role="no-search-results"
