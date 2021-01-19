@@ -269,13 +269,28 @@ defmodule Epicenter.Cases.Person do
         order_by: [asc: lab_result.max_sampled_on, asc: person.seq]
     end
 
-    def with_external_id(external_id) do
-      from person in Person,
-        join: demographic in Demographic,
-        on: person.id == demographic.person_id,
-        where: demographic.external_id == ^external_id,
-        select: person.id,
-        distinct: true
+    def with_search_term(term) do
+      case is_uuid?(term) do
+        true ->
+          from person in Person,
+            join: demographic in Demographic,
+            on: person.id == demographic.person_id,
+            where: person.id == ^term,
+            select: person.id,
+            distinct: true
+
+        _ ->
+          from person in Person,
+            join: demographic in Demographic,
+            on: person.id == demographic.person_id,
+            where: demographic.external_id == ^term,
+            select: person.id,
+            distinct: true
+      end
+    end
+
+    defp is_uuid?(term) do
+      String.match?(term, ~r/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/)
     end
   end
 end

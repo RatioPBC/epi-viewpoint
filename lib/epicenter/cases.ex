@@ -145,7 +145,7 @@ defmodule Epicenter.Cases do
   end
 
   def find_matching_person(_), do: nil
-  def find_person_id_by_external_id(external_id), do: Person.Query.with_external_id(external_id) |> Repo.one()
+  def find_person_id_by_search_term(term), do: Person.Query.with_search_term(term) |> Repo.one()
 
   def get_people(ids, user), do: Person.Query.get_people(ids) |> AuditLog.all(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)

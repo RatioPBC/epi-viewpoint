@@ -61,7 +61,7 @@ defmodule EpicenterWeb do
         term = term |> String.trim()
 
         socket =
-          case Epicenter.Cases.find_person_id_by_external_id(term) do
+          case Epicenter.Cases.find_person_id_by_search_term(term) do
             nil ->
               socket
               |> Phoenix.LiveView.assign(:search_results, [])
