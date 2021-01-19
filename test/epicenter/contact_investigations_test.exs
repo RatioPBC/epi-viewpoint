@@ -82,7 +82,8 @@ defmodule Epicenter.ContactInvestigationsTest do
     end
 
     test "does not record an audit log entry when passed nil" do
-      assert capture_log(fn -> ContactInvestigations.preload_exposing_case(nil, @admin) end) == ""
+      unique_user = @admin |> Map.put(:id, Ecto.UUID.generate())
+      refute capture_log(fn -> ContactInvestigations.preload_exposing_case(nil, unique_user) end) =~ unique_user.id
     end
   end
 end
