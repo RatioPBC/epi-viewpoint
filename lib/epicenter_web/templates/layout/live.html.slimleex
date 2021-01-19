@@ -32,7 +32,8 @@ body
                 li = link "Log out", to: Routes.user_session_path(EpicenterWeb.Endpoint, :delete), method: :delete
 
   = if assigns[:search_results] != nil do
-    = render "_search_results.html", search_results: @search_results, search_term: assigns[:search_term]
+    main#main role="main" phx-hook="MainHook" data-body-class="body-background-none"
+      = render "_search_results.html", search_results: @search_results, search_term: assigns[:search_term]
 
   - else
     main#main role="main" phx-hook="MainHook" data-body-class=@body_class

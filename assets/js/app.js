@@ -52,6 +52,11 @@ let liveSocket = new LiveSocket("/live", Socket, {
         this.setBodyClass();
       },
 
+      updated() {
+        console.log("updating");
+        this.setBodyClass();
+      },
+
       setBodyClass() {
         document.getElementsByTagName("body")[0].className = this.el.dataset.bodyClass;
       }
