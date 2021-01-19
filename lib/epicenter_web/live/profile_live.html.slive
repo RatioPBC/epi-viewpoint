@@ -1,11 +1,5 @@
 #profile-page data-page="profile" data-tid=@person.tid data-role="profile-page"
 
-  section
-    header#subnav
-      = live_redirect "Index cases", to: Routes.people_path(EpicenterWeb.Endpoint, EpicenterWeb.PeopleLive)
-      = arrow_right_icon(6, 9)
-      span data-role="name" = Format.person(@person)
-
   section#heading
     div
       h1 data-role="full-name"= string_or_unknown(Format.person(@person))
