@@ -44,6 +44,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       field :relationship_to_case, :string
       field :same_household, :boolean
       field :under_18, :boolean
+      field :dob, :string
       field :phone, :string
       field :preferred_language, :string
       field :most_recent_date_together, :string
@@ -65,6 +66,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         last_name: demographic.last_name || "",
         phone: phone.number,
         under_18: contact_investigation.under_18 || false,
+        dob: Format.date(demographic.dob),
         same_household: contact_investigation.household_member || false,
         relationship_to_case: contact_investigation.relationship_to_case,
         preferred_language: demographic.preferred_language,
@@ -78,6 +80,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
         :guardian_name,
         :guardian_phone,
         :under_18,
+        :dob,
         :phone,
         :preferred_language,
         :most_recent_date_together
@@ -93,6 +96,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       |> validate_phi(:contact_investigation_form)
       |> ContactInvestigation.validate_guardian_fields()
       |> Validation.validate_date(:most_recent_date_together)
+      |> Validation.validate_date(:dob)
     end
 
     def contact_params(%Ecto.Changeset{} = formdata) do
@@ -120,6 +124,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
                source: "form",
                first_name: data.first_name,
                last_name: data.last_name,
+               dob: data.dob |> DateParser.parse_mm_dd_yyyy!(),
                preferred_language: data.preferred_language
              },
              additive_phone: phone
@@ -276,6 +281,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     |> Form.line(&Form.checkbox_field(&1, :same_household, nil, "This person lives in the same household", span: 8))
     |> Form.line(&Form.checkbox_field(&1, :under_18, "Age", "This person is under 18 years old", span: 8))
     |> contact_information.(under_18)
+    |> Form.line(&Form.text_field(&1, :dob, "Date of birth", span: 4))
     |> Form.line(&Form.radio_button_list(&1, :preferred_language, "Preferred Language", @preferred_language_options, span: 4))
     |> Form.line(
       &Form.date_field(

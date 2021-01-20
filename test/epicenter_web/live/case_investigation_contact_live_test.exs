@@ -55,6 +55,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "relationship_to_case" => "Family",
           "most_recent_date_together" => "10/31/2020",
           "under_18" => "false",
+          "dob" => "01/01/1980",
           "same_household" => "true",
           "phone" => "1111111234",
           "preferred_language" => "Haitian Creole"
@@ -75,6 +76,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                          source: "form",
                          first_name: "Alice",
                          last_name: "Testuser",
+                         dob: ~D[1980-01-01],
                          preferred_language: "Haitian Creole"
                        }
                      ],
@@ -255,7 +257,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
                    source: "form",
                    first_name: "Billy",
                    last_name: "Testuser",
-                   preferred_language: "Haitian Creole"
+                   preferred_language: "Haitian Creole",
+                   dob: ~D[2020-02-01]
                  }
                ],
                phones: [
@@ -293,9 +296,10 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       assert %{
                "contact_form[first_name]" => "Billy",
                "contact_form[last_name]" => "Testuser",
-               "contact_form[phone]" => "1111111542",
-               "contact_form[under_18]" => "false",
                "contact_form[same_household]" => "true",
+               "contact_form[under_18]" => "false",
+               "contact_form[phone]" => "1111111542",
+               "contact_form[dob]" => "02/01/2020",
                "contact_form[most_recent_date_together]" => "10/31/2020",
                "contact_form[preferred_language]" => "Haitian Creole",
                "contact_form[relationship_to_case]" => "Family"
@@ -397,10 +401,11 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         contact_form: %{
           "first_name" => "",
           "last_name" => "",
-          "most_recent_date_together" => "",
-          "under_18" => "false",
           "same_household" => "false",
-          "phone" => ""
+          "under_18" => "false",
+          "phone" => "",
+          "dob" => "",
+          "most_recent_date_together" => ""
         }
       )
       |> Pages.assert_validation_messages(%{
@@ -414,13 +419,15 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "first_name" => "Alice",
           "last_name" => "Testuser",
           "relationship_to_case" => "Family",
-          "most_recent_date_together" => "10/32/2020",
-          "under_18" => "false",
           "same_household" => "false",
-          "phone" => ""
+          "under_18" => "false",
+          "phone" => "",
+          "dob" => "invalid-date-format",
+          "most_recent_date_together" => "10/32/2020"
         }
       )
       |> Pages.assert_validation_messages(%{
+        "contact_form[dob]" => "must be a valid MM/DD/YYYY date",
         "contact_form[most_recent_date_together]" => "must be a valid MM/DD/YYYY date"
       })
     end
