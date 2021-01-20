@@ -73,6 +73,12 @@ defmodule EpicenterWeb.Test.Pages do
     conn_or_view_or_html
   end
 
+  def assert_redirect_succeeded({:error, {:live_redirect, _opts}} = response), do: response
+
+  def assert_redirect_succeeded(conn_or_view_or_html) do
+    assert_form_errors(conn_or_view_or_html, []) || flunk("Expected a redirect")
+  end
+
   def assert_validation_messages(%View{} = view, expected_messages) do
     view |> render() |> assert_validation_messages(expected_messages)
     view
@@ -273,6 +279,7 @@ defmodule EpicenterWeb.Test.Pages do
     view
     |> form(form_selector, params_keyword_list)
     |> render_submit()
+    |> assert_redirect_succeeded()
     |> follow_live_view_redirect(conn)
   end
 
