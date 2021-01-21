@@ -1,0 +1,6 @@
+#potential-duplicates-page data-page="potential-duplicates" data-tid=@person.tid data-role="potential-duplicates-page"
+
+  section#heading
+    div
+      h1 data-role="full-name"= string_or_unknown(Format.person(@person))
+      h3#external-id data-role="external-id"= demographic_field(@person, :external_id) |> Format.demographic(:external_id)
