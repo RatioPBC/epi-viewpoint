@@ -122,7 +122,6 @@ defmodule EpicenterWeb.PeopleLive do
 
   # # # View helpers
 
-  def page_title(:contacts), do: "Contacts"
   def page_title(:with_isolation_monitoring), do: "Isolation monitoring"
   def page_title(:with_ongoing_interview), do: "Ongoing interviews"
   def page_title(:with_pending_interview), do: "Pending interviews"
