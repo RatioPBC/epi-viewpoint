@@ -40,6 +40,159 @@ defmodule EpicenterWeb.ContactsLiveTest do
     end
   end
 
+  describe "filtering" do
+    setup %{user: user, bob: bob, caroline: caroline, donald: donald} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+      case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
+
+      {:ok, ernst_contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs("ernst_contact_investigation", %{
+           exposing_case_id: case_investigation.id,
+           interview_completed_at: ~U[2020-10-31 23:03:07Z],
+           interview_started_at: ~U[2020-10-31 22:03:07Z],
+           exposed_person: %{tid: "ernst", demographics: [%{first_name: "Ernst", last_name: "Testuser"}]}
+         }), Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
+      {:ok, frank_contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs("ernst_contact_investigation", %{
+           exposing_case_id: case_investigation.id,
+           interview_completed_at: ~U[2020-10-31 23:03:07Z],
+           interview_started_at: ~U[2020-10-31 22:03:07Z],
+           quarantine_concluded_at: ~U[2020-10-31 10:30:00Z],
+           quarantine_monitoring_ends_on: ~D[2020-11-13],
+           quarantine_monitoring_starts_on: ~D[2020-11-03],
+           exposed_person: %{tid: "frank", demographics: [%{first_name: "Frank", last_name: "Testuser"}]}
+         }), Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
+      {:ok, george_contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs("george_contact_investigation", %{
+           exposing_case_id: case_investigation.id,
+           interview_started_at: ~U[2020-10-31 23:03:07Z],
+           exposed_person: %{tid: "george", demographics: [%{first_name: "George", last_name: "Testuser"}]}
+         }), Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
+      ernst_contact_investigation = ContactInvestigations.get(ernst_contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
+
+      frank_contact_investigation = ContactInvestigations.get(frank_contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
+
+      george_contact_investigation =
+        ContactInvestigations.get(george_contact_investigation.id, user) |> ContactInvestigations.preload_exposed_person()
+
+      ernst = ernst_contact_investigation.exposed_person
+      frank = frank_contact_investigation.exposed_person
+      george = george_contact_investigation.exposed_person
+
+      [bob: bob, caroline: caroline, donald: donald, ernst: ernst, frank: frank, george: george]
+    end
+
+    test "users can filter contacts by pending interview status", %{conn: conn} do
+      Pages.Contacts.visit(conn)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
+          ["Caroline Testuser", "Pending interview"],
+          ["Donald Testuser", "Discontinued"],
+          ["Ernst Testuser", "Pending monitoring"],
+          ["Frank Testuser", "Concluded monitoring"],
+          ["George Testuser", "Ongoing interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+      |> Pages.Contacts.assert_filter_selected(:all)
+      |> Pages.Contacts.select_filter(:with_pending_interview)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Caroline Testuser", "Pending interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+    end
+
+    test "users can filter contacts by ongoing interview status", %{conn: conn} do
+      Pages.Contacts.visit(conn)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
+          ["Caroline Testuser", "Pending interview"],
+          ["Donald Testuser", "Discontinued"],
+          ["Ernst Testuser", "Pending monitoring"],
+          ["Frank Testuser", "Concluded monitoring"],
+          ["George Testuser", "Ongoing interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+      |> Pages.Contacts.assert_filter_selected(:all)
+      |> Pages.Contacts.select_filter(:with_ongoing_interview)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["George Testuser", "Ongoing interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+    end
+
+    test "users can filter contacts by people who are pending or ongoing quarantine monitoring", %{conn: conn} do
+      Pages.Contacts.visit(conn)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
+          ["Caroline Testuser", "Pending interview"],
+          ["Donald Testuser", "Discontinued"],
+          ["Ernst Testuser", "Pending monitoring"],
+          ["Frank Testuser", "Concluded monitoring"],
+          ["George Testuser", "Ongoing interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+      |> Pages.Contacts.assert_filter_selected(:all)
+      |> Pages.Contacts.select_filter(:with_quarantine_monitoring)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
+          ["Ernst Testuser", "Pending monitoring"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+    end
+
+    test "users can unfilter contacts using the all button", %{conn: conn} do
+      Pages.Contacts.visit(conn)
+      |> Pages.Contacts.select_filter(:with_quarantine_monitoring)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
+          ["Ernst Testuser", "Pending monitoring"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+      |> Pages.Contacts.select_filter(:all)
+      |> Pages.Contacts.assert_table_contents(
+        [
+          ["Name", "Investigation status"],
+          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
+          ["Caroline Testuser", "Pending interview"],
+          ["Donald Testuser", "Discontinued"],
+          ["Ernst Testuser", "Pending monitoring"],
+          ["Frank Testuser", "Concluded monitoring"],
+          ["George Testuser", "Ongoing interview"]
+        ],
+        columns: ["Name", "Investigation status"]
+      )
+      |> Pages.Contacts.assert_filter_selected(:all)
+    end
+  end
+
   describe "assigning case investigator to a contact" do
     test "case investigator can be unassigned and assigned to contacts", %{
       assignee: assignee,

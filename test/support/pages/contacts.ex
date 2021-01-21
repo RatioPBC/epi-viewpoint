@@ -25,6 +25,11 @@ defmodule EpicenterWeb.Test.Pages.Contacts do
     view
   end
 
+  def assert_filter_selected(%View{} = view, filter_name) do
+    LiveViewAssertions.assert_attribute(view, "[data-role=contacts-filter][data-tid=#{filter_name}]", "data-active", ["true"])
+    view
+  end
+
   def assert_unchecked(%View{} = view, selector) do
     LiveViewAssertions.assert_attribute(view, selector, "checked", [])
     view
@@ -32,6 +37,11 @@ defmodule EpicenterWeb.Test.Pages.Contacts do
 
   def change_form(%View{} = view, params) do
     view |> element("#assignment-form") |> render_change(params)
+    view
+  end
+
+  def select_filter(%View{} = view, filter_name) do
+    view |> element("[data-tid=#{filter_name}]") |> render_click()
     view
   end
 

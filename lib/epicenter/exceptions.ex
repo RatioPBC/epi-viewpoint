@@ -23,3 +23,11 @@ defmodule Epicenter.CaseInvestigationFilterError do
   defexception [:user_readable]
   def message(%{user_readable: user_readable}), do: user_readable
 end
+
+defmodule Epicenter.ContactsFilterError do
+  @moduledoc """
+  Raised when we cannot match a given filter for case investigation status.
+  """
+  defexception [:user_readable]
+  def message(%{user_readable: user_readable}), do: user_readable
+end

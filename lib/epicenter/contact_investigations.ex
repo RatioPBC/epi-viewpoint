@@ -1,5 +1,6 @@
 defmodule Epicenter.ContactInvestigations do
   alias Epicenter.AuditLog
+  alias Epicenter.Cases.Person
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Repo
 
@@ -33,6 +34,8 @@ defmodule Epicenter.ContactInvestigations do
     |> Repo.preload(exposing_case: [person: [:demographics]])
     |> log_case_investigations(user)
   end
+
+  def list_exposed_people(filter, user), do: Person.Query.filter_with_contact_investigation(filter) |> AuditLog.all(user)
 
   defp log_case_investigations(nil, _user), do: nil
 

@@ -190,20 +190,18 @@ defmodule Epicenter.Cases.Person do
 
     def all(), do: from(person in Person, order_by: [asc: person.seq])
 
-    def all_exposed() do
-      from person in Person,
-        join: contact_investigation in assoc(person, :contact_investigations),
-        on: person.id == contact_investigation.exposed_person_id,
-        order_by: [asc: person.seq]
-    end
-
     def assigned_to_id(query, user_id), do: query |> where([p], p.assigned_to_id == ^user_id)
 
-    def filter(:all), do: Person.Query.all()
-    def filter(:with_isolation_monitoring), do: Person.Query.with_isolation_monitoring()
-    def filter(:with_ongoing_interview), do: Person.Query.with_ongoing_interview()
-    def filter(:with_pending_interview), do: Person.Query.with_pending_interview()
-    def filter(:with_positive_lab_results), do: Person.Query.with_positive_lab_results()
+    def filter_with_case_investigation(:all), do: Person.Query.all()
+    def filter_with_case_investigation(:with_isolation_monitoring), do: Person.Query.with_case_investigation_isolation_monitoring()
+    def filter_with_case_investigation(:with_ongoing_interview), do: Person.Query.with_case_investigation_ongoing_interview()
+    def filter_with_case_investigation(:with_pending_interview), do: Person.Query.with_case_investigation_pending_interview()
+    def filter_with_case_investigation(:with_positive_lab_results), do: Person.Query.with_case_investigation_positive_lab_results()
+
+    def filter_with_contact_investigation(:with_contact_investigation), do: Person.Query.with_contact_investigation()
+    def filter_with_contact_investigation(:with_quarantine_monitoring), do: Person.Query.with_contact_investigation_quarantine_monitoring()
+    def filter_with_contact_investigation(:with_ongoing_interview), do: Person.Query.with_contact_investigation_ongoing_interview()
+    def filter_with_contact_investigation(:with_pending_interview), do: Person.Query.with_contact_investigation_pending_interview()
 
     def get_people(ids), do: from(person in Person, where: person.id in ^ids, order_by: [asc: person.seq])
 
@@ -212,7 +210,7 @@ defmodule Epicenter.Cases.Person do
 
     def with_demographic_field(query, field, value), do: query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
 
-    def with_isolation_monitoring() do
+    def with_case_investigation_isolation_monitoring() do
       case_investigations_in_isolation_monitoring =
         from case_investigation in CaseInvestigation,
           distinct: [desc: parent_as(:person).id],
@@ -232,8 +230,8 @@ defmodule Epicenter.Cases.Person do
         ]
     end
 
-    def with_ongoing_interview(), do: sorted_people_with_case_investigation_interview_status("started")
-    def with_pending_interview(), do: sorted_people_with_case_investigation_interview_status("pending")
+    def with_case_investigation_ongoing_interview(), do: sorted_people_with_case_investigation_interview_status("started")
+    def with_case_investigation_pending_interview(), do: sorted_people_with_case_investigation_interview_status("pending")
 
     defp sorted_people_with_case_investigation_interview_status(interview_status) do
       person_latest_positive_lab_results_most_recently_sampled_on =
@@ -253,7 +251,7 @@ defmodule Epicenter.Cases.Person do
         order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
     end
 
-    def with_positive_lab_results() do
+    def with_case_investigation_positive_lab_results() do
       newest_positive_lab_result =
         from lab_result in LabResult,
           select: %{
@@ -267,6 +265,39 @@ defmodule Epicenter.Cases.Person do
         inner_join: lab_result in subquery(newest_positive_lab_result),
         on: lab_result.person_id == person.id,
         order_by: [asc: lab_result.max_sampled_on, asc: person.seq]
+    end
+
+    def with_contact_investigation do
+      from person in Person,
+        join: contact_investigation in assoc(person, :contact_investigations),
+        on: person.id == contact_investigation.exposed_person_id,
+        order_by: [asc: person.seq]
+    end
+
+    def with_contact_investigation_quarantine_monitoring() do
+      from person in Person,
+        join: contact_investigation in assoc(person, :contact_investigations),
+        on: person.id == contact_investigation.exposed_person_id,
+        where:
+          contact_investigation.interview_status == "completed" and
+            contact_investigation.quarantine_monitoring_status in ["pending", "ongoing"],
+        order_by: [asc: person.seq]
+    end
+
+    def with_contact_investigation_ongoing_interview() do
+      from person in Person,
+        join: contact_investigation in assoc(person, :contact_investigations),
+        on: person.id == contact_investigation.exposed_person_id,
+        where: contact_investigation.interview_status == "started",
+        order_by: [asc: person.seq]
+    end
+
+    def with_contact_investigation_pending_interview() do
+      from person in Person,
+        join: contact_investigation in assoc(person, :contact_investigations),
+        on: person.id == contact_investigation.exposed_person_id,
+        where: contact_investigation.interview_status == "pending",
+        order_by: [asc: person.seq]
     end
 
     def with_search_term(term) do

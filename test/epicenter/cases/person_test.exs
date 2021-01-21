@@ -374,7 +374,7 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "sorts by isolation_monitoring_status, then tie-breaks with monitoring-end-time" do
-      Person.Query.with_isolation_monitoring()
+      Person.Query.with_case_investigation_isolation_monitoring()
       |> Epicenter.Repo.all()
       |> tids()
       |> assert_eq(~w{pending_new pending_old ongoing_ends_soon ongoing_ends_later})
@@ -430,7 +430,7 @@ defmodule Epicenter.Cases.PersonTest do
     end
 
     test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
-      Person.Query.with_pending_interview()
+      Person.Query.with_case_investigation_pending_interview()
       |> Epicenter.Repo.all()
       |> tids()
       |> assert_eq(~w{unassigned_first unassigned_last assigned_first assigned_middle assigned_last})
@@ -492,7 +492,7 @@ defmodule Epicenter.Cases.PersonTest do
 
     test "sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
       # Subject action
-      Person.Query.with_ongoing_interview()
+      Person.Query.with_case_investigation_ongoing_interview()
       |> Epicenter.Repo.all()
       |> tids()
       |> assert_eq(~w{unassigned_first unassigned_last assigned_first assigned_middle assigned_last})
@@ -517,7 +517,7 @@ defmodule Epicenter.Cases.PersonTest do
 
       Test.Fixtures.lab_result_attrs(missing, user, "first-1", ~D[2020-06-02], result: "negative") |> Cases.create_lab_result!()
 
-      Person.Query.with_positive_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
+      Person.Query.with_case_investigation_positive_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{first middle last})
     end
 
     test "excludes people without lab results", %{user: user} do
@@ -528,7 +528,7 @@ defmodule Epicenter.Cases.PersonTest do
 
       Test.Fixtures.person_attrs(user, "without-lab-result") |> Cases.create_person!()
 
-      Person.Query.with_positive_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{with-lab-result})
+      Person.Query.with_case_investigation_positive_lab_results() |> Epicenter.Repo.all() |> tids() |> assert_eq(~w{with-lab-result})
     end
   end
 

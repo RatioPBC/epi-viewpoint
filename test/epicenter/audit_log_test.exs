@@ -565,11 +565,11 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "returns all the records for a given query" do
-      assert Person.Query.filter(:all) |> AuditLog.all(@admin) |> tids() == ~w{alice billy}
+      assert Person.Query.filter_with_case_investigation(:all) |> AuditLog.all(@admin) |> tids() == ~w{alice billy}
     end
 
     test "records all the phi viewed for fetched records", %{alice: alice, billy: billy} do
-      capture_log(fn -> Person.Query.filter(:all) |> AuditLog.all(@admin) end)
+      capture_log(fn -> Person.Query.filter_with_case_investigation(:all) |> AuditLog.all(@admin) end)
       |> AuditLogAssertions.assert_viewed_person(@admin, alice)
       |> AuditLogAssertions.assert_viewed_person(@admin, billy)
     end
