@@ -95,6 +95,8 @@ defmodule EpicenterWeb.Router do
 
     live "/people/:id/potential-duplicates", PotentialDuplicatesLive, as: :potential_duplicates
 
+    live "/resolve-conflicts", ResolveConflictsLive, as: :resolve_conflicts
+
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update-password", UserSettingsController, :update_password
   end
