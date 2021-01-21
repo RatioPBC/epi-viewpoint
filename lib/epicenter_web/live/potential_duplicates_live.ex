@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.PotentialDuplicatesLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
 
