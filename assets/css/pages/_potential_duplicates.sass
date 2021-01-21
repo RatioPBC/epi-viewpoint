@@ -1,0 +1,11 @@
+@import "../mixins"
+
+#potential-duplicates-page
+  #subnav
+    @include subnav
+
+    a
+      @include has-icon($link-color)
+
+  table
+    @include data-table
