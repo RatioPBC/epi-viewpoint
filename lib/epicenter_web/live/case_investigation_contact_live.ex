@@ -30,7 +30,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     import Ecto.Changeset
 
     alias Epicenter.DateParser
+    alias Epicenter.Extra
     alias Epicenter.Validation
+    alias Euclid.Exists
 
     embedded_schema do
       field :contact_investigation_id, :string
@@ -97,6 +99,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       |> ContactInvestigation.validate_guardian_fields()
       |> Validation.validate_date(:most_recent_date_together)
       |> Validation.validate_date(:dob)
+      |> validate_under_18_and_dob()
     end
 
     def contact_params(%Ecto.Changeset{} = formdata) do
@@ -131,6 +134,32 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
            }
          }}
       end
+    end
+
+    def validate_under_18_and_dob(changeset) do
+      under_18? = get_field(changeset, :under_18) || false
+
+      dob =
+        case Extra.Changeset.has_error_on_field(changeset, :dob) do
+          true -> nil
+          false -> get_field(changeset, :dob)
+        end
+
+      cond do
+        Exists.present?(dob) && under_18? && age(dob) >= 18 ->
+          changeset |> add_error(:dob, "Must be under 18 years if 'This person is under 18 years old' is checked")
+
+        Exists.present?(dob) && !under_18? && age(dob) < 18 ->
+          changeset |> add_error(:dob, "Must be over 18 years if 'This person is under 18 years old' is not checked")
+
+        true ->
+          changeset
+      end
+    end
+
+    defp age(dob) do
+      {:ok, date} = dob |> DateParser.parse_mm_dd_yyyy()
+      Extra.Date.years_ago(date)
     end
   end
 

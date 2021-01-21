@@ -28,6 +28,10 @@ defmodule Epicenter.Extra.Changeset do
   def get_field_from_changeset(%Ecto.Changeset{} = changeset, field),
     do: changeset |> Ecto.Changeset.fetch_field(field) |> elem(1)
 
+  def has_error_on_field(%Ecto.Changeset{} = changeset, field_name) do
+    Keyword.get(changeset.errors, field_name) != nil
+  end
+
   def maybe_mark_for_deletion(%{data: %{id: nil}} = changeset),
     do: changeset
 

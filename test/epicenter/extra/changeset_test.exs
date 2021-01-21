@@ -11,10 +11,13 @@ defmodule Epicenter.Extra.ChangesetTest do
       field :title, :string
       field :body, :string
     end
-  end
 
-  defp changeset(%Post{} = schema, params),
-    do: cast(schema, params, ~w(title body)a)
+    def changeset(post, attrs) do
+      post
+      |> cast(Enum.into(attrs, %{}), [:body, :title])
+      |> validate_required([:title])
+    end
+  end
 
   describe "clear_validation_errors" do
     test "drops errors from top level changes" do
@@ -54,10 +57,18 @@ defmodule Epicenter.Extra.ChangesetTest do
   end
 
   test "get_field_from_changeset" do
-    changeset = changeset(%Post{body: "bar"}, %{"title" => "foo"})
+    changeset = Post.changeset(%Post{body: "bar"}, %{"title" => "foo"})
 
     assert Changeset.get_field_from_changeset(changeset, :title) == "foo"
     assert Changeset.get_field_from_changeset(changeset, :body) == "bar"
+  end
+
+  test "has_error_on_field" do
+    changeset = Post.changeset(%Post{body: "bar"}, %{"title" => "foo"})
+    assert Changeset.has_error_on_field(changeset, :title) == false
+
+    changeset = Post.changeset(%Post{body: "bar"}, %{})
+    assert Changeset.has_error_on_field(changeset, :title) == true
   end
 
   test "rewrite_changeset_error_message" do

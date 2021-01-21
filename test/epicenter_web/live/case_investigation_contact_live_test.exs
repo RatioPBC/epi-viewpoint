@@ -342,6 +342,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
           "relationship_to_case" => "Friend",
           "most_recent_date_together" => "11/02/2020",
           "under_18" => "false",
+          "dob" => "",
           "same_household" => "false",
           "phone" => "1111111321",
           "preferred_language" => "English"
@@ -489,6 +490,77 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       |> render()
       |> Pages.assert_validation_messages(%{
         "contact_form[guardian_phone]" => "In non-PHI environment, must match '111-111-1xxx'"
+      })
+    end
+
+    test "is invalid if 'under 18' is checked and there's no dob specified, it redirects", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationContact.assert_here()
+      |> Pages.CaseInvestigationContact.change_form(
+        contact_form: %{
+          "under_18" => "true",
+          "same_household" => "true",
+          "first_name" => "Jared"
+        }
+      )
+      |> Pages.submit_and_follow_redirect(conn, "#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "relationship_to_case" => "Family",
+          "most_recent_date_together" => "10/15/2020",
+          "under_18" => "true",
+          "guardian_name" => "Cuthbert Testuser",
+          "same_household" => "false",
+          "guardian_phone" => "1111111234"
+        }
+      )
+      |> Pages.assert_redirect_succeeded()
+    end
+
+    test "is invalid if 'under 18' is checked and the dob suggests the person is over 18", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationContact.assert_here()
+      |> Pages.CaseInvestigationContact.change_form(
+        contact_form: %{
+          "under_18" => "true",
+          "same_household" => "true",
+          "first_name" => "Jared"
+        }
+      )
+      |> Pages.submit_live("#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "relationship_to_case" => "Family",
+          "most_recent_date_together" => "10/15/2020",
+          "under_18" => "true",
+          "dob" => "1/1/1980",
+          "guardian_name" => "Cuthbert Testuser",
+          "same_household" => "false",
+          "guardian_phone" => "1111111234"
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "contact_form[dob]" => "Must be under 18 years if 'This person is under 18 years old' is checked"
+      })
+    end
+
+    test "is invalid if 'under 18' is not checked and the dob suggests the person is under 18", %{conn: conn, case_investigation: case_investigation} do
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      |> Pages.CaseInvestigationContact.assert_here()
+      |> Pages.submit_live("#case-investigation-contact-form",
+        contact_form: %{
+          "first_name" => "Alice",
+          "last_name" => "Testuser",
+          "relationship_to_case" => "Family",
+          "most_recent_date_together" => "10/15/2020",
+          "under_18" => "false",
+          "dob" => "1/1/2020"
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "contact_form[dob]" => "Must be over 18 years if 'This person is under 18 years old' is not checked"
       })
     end
   end
