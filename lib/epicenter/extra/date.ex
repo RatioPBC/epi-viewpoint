@@ -21,4 +21,17 @@ defmodule Epicenter.Extra.Date do
 
   def days_ago_string(%Date{} = date, opts \\ []),
     do: days_ago(date, opts) |> Extra.String.pluralize("day ago", "days ago")
+
+  def years_ago(date_or_days, opts \\ [])
+
+  def years_ago(nil, _opts),
+    do: nil
+
+  def years_ago(years, opts) when is_integer(years) do
+    from = opts |> Keyword.get(:from, Date.utc_today())
+    from |> Map.put(:year, from.year - years)
+  end
+
+  def years_ago(%Date{} = date, opts),
+    do: opts |> Keyword.get(:from, Date.utc_today()) |> Timex.diff(date, :year)
 end
