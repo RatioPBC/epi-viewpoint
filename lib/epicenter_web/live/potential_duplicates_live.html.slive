@@ -6,7 +6,30 @@
         = back_icon()
         span Back
 
-  section#heading
+  section#potential-duplicates-details
     div
-      h1 data-role="full-name"= string_or_unknown(Format.person(@person))
-      h3#external-id data-role="external-id"= demographic_field(@person, :external_id) |> Format.demographic(:external_id)
+      h2 Step 1: View potential duplicates
+      p These records share the same (last name) and (first name, date of birth, phone number, or address).
+
+    div
+      p Select at least two records to merge
+
+    table data-role="duplicates"
+      thead
+        tr data-role="table-column-names"
+          th width="1%"
+          th width="15%" Name
+          th width="15%" Date of Birth
+          th width="15%" Phone
+          th width="30%" Address
+          th width="10%"
+      tbody
+        = for person <- @duplicate_people do
+          tr data-role="person"
+            td
+              input type="checkbox" checked=true phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
+            td= Format.person(person)
+            td= Format.date(Euclid.Extra.Enum.pluck(person.demographics, :dob), :sorted)
+            td= Format.phone(person.phones)
+            td= Format.address(person.addresses)
+            td= live_redirect "View", to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person.id)

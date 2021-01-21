@@ -40,6 +40,13 @@ defmodule EpicenterWeb.FormatTest do
 
       assert address(full_address) == "1001 Test St"
     end
+
+    test "formats multiple addresses" do
+      full_address1 = %Address{street: "1644 Platte St", city: "Denver", state: "CO", postal_code: "80202"}
+      full_address2 = %Address{street: "875 Howard St", city: "San Francisco", state: "CA", postal_code: "94103"}
+
+      assert address([full_address1, full_address2]) == "1644 Platte St, Denver, CO 80202; 875 Howard St, San Francisco, CA 94103"
+    end
   end
 
   describe "date (with default)" do
@@ -59,7 +66,7 @@ defmodule EpicenterWeb.FormatTest do
   end
 
   describe "date" do
-    import EpicenterWeb.Format, only: [date: 1]
+    import EpicenterWeb.Format, only: [date: 1, date: 2]
 
     test "when given a date, formats it as mm/dd/yyyy" do
       assert date(~D[2020-05-19]) == "05/19/2020"
@@ -71,6 +78,14 @@ defmodule EpicenterWeb.FormatTest do
 
     test "when given a datetime, formats it as mm/dd/yyyy in New_York" do
       assert date(~U[2020-01-02 01:00:07Z]) == "01/01/2020"
+    end
+
+    test "formats multiple dates" do
+      assert date([~D[2020-05-19], ~U[2020-01-02 01:00:07Z]]) == "05/19/2020, 01/01/2020"
+    end
+
+    test "sorts multiple dates" do
+      assert date([~D[2020-05-19], ~U[2020-01-02 01:00:07Z]], :sorted) == "01/01/2020, 05/19/2020"
     end
   end
 
@@ -151,6 +166,11 @@ defmodule EpicenterWeb.FormatTest do
       assert phone(%Phone{number: "911"}) == "911"
       assert phone(%Phone{number: "4155551212"}) == "(415) 555-1212"
       assert phone(%Phone{number: nil}) == ""
+    end
+
+    test "formats multiple phone numbers" do
+      assert phone([%Phone{number: "4155551212"}, %Phone{number: "3037971101"}, "5551231234"]) ==
+               "(415) 555-1212, (303) 797-1101, (555) 123-1234"
     end
   end
 

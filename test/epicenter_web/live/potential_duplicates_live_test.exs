@@ -15,6 +15,15 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
       |> Test.Fixtures.add_demographic_attrs(%{external_id: "987650"})
       |> Cases.create_person!()
 
+    Test.Fixtures.phone_attrs(user, person, "phone-1", number: "111-111-1000") |> Cases.create_phone!()
+    Test.Fixtures.phone_attrs(user, person, "phone-2", number: "111-111-1111") |> Cases.create_phone!()
+
+    Test.Fixtures.demographic_attrs(user, person, "demographic-1", dob: ~D[2001-05-01]) |> Cases.create_demographic()
+    Test.Fixtures.demographic_attrs(user, person, "demographic-2", dob: ~D[1999-05-01]) |> Cases.create_demographic()
+
+    Test.Fixtures.address_attrs(user, person, "address-1", 5555) |> Cases.create_address!()
+    Test.Fixtures.address_attrs(user, person, "address-2", 4444) |> Cases.create_address!()
+
     [person: person, user: user]
   end
 
@@ -28,5 +37,17 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
   test "showing the page", %{conn: conn, person: person} do
     Pages.PotentialDuplicates.visit(conn, person)
     |> Pages.PotentialDuplicates.assert_here(person)
+    |> Pages.PotentialDuplicates.assert_table_contents(
+      [
+        ["Name", "Date of Birth", "Phone", "Address"],
+        [
+          "Alice Testuser",
+          "05/01/1999, 01/01/2000, 05/01/2001",
+          "(111) 111-1000, (111) 111-1111",
+          "4444 Test St, City, OH 00000; 5555 Test St, City, OH 00000"
+        ]
+      ],
+      columns: ["Name", "Date of Birth", "Phone", "Address"]
+    )
   end
 end
