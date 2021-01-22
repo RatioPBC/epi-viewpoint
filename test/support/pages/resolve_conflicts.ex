@@ -1,4 +1,7 @@
 defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
+  import ExUnit.Assertions
+  import Phoenix.LiveViewTest
+
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -19,6 +22,12 @@ defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
     |> Pages.parse()
     |> Test.Html.find!("[data-tid=#{person.tid}]")
 
+    view
+  end
+
+  def assert_unique_values_present(view, field_name, values) do
+    role = "resolve-conflicts-form-#{String.replace(field_name, "_", "-")}"
+    assert view |> Pages.parse() |> Test.Html.role_texts(role) |> Enum.sort() == values |> Enum.sort()
     view
   end
 end

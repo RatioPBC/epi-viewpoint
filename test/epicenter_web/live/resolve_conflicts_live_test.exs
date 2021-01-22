@@ -30,11 +30,9 @@ defmodule EpicenterWeb.ResolveConflictsLiveTest do
     assert_has_role(page_live, "resolve-conflicts-page")
   end
 
-  test "showing the selected people", %{conn: conn, person1: person1, person2: person2} do
+  test "showing the merge conflicts", %{conn: conn, person1: person1, person2: person2} do
     Pages.ResolveConflicts.visit(conn, [person1.id, person2.id])
-    |> Pages.ResolveConflicts.assert_here()
-    |> Pages.ResolveConflicts.assert_person_present(person1)
-    |> Pages.ResolveConflicts.assert_person_present(person2)
+    |> Pages.ResolveConflicts.assert_unique_values_present("first_name", ["Alice", "Alicia"])
   end
 
   # TODO what if 0 or 1 person ids are sent to the page
