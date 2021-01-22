@@ -20,6 +20,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
 
     Test.Fixtures.demographic_attrs(user, person, "demographic-1", dob: ~D[2001-05-01]) |> Cases.create_demographic()
     Test.Fixtures.demographic_attrs(user, person, "demographic-2", dob: ~D[1999-05-01]) |> Cases.create_demographic()
+    Test.Fixtures.demographic_attrs(user, person, "demographic-3", dob: nil) |> Cases.create_demographic()
 
     Test.Fixtures.address_attrs(user, person, "address-1", 5555) |> Cases.create_address!()
     Test.Fixtures.address_attrs(user, person, "address-2", 4444) |> Cases.create_address!()
@@ -42,9 +43,9 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
         ["Name", "Date of Birth", "Phone", "Address"],
         [
           "Alice Testuser",
-          "05/01/1999, 01/01/2000, 05/01/2001",
-          "(111) 111-1000, (111) 111-1111",
-          "4444 Test St, City, OH 00000; 5555 Test St, City, OH 00000"
+          "05/01/1999 01/01/2000 05/01/2001",
+          "(111) 111-1000 (111) 111-1111",
+          "4444 Test St, City, OH 00000 5555 Test St, City, OH 00000"
         ]
       ],
       columns: ["Name", "Date of Birth", "Phone", "Address"]

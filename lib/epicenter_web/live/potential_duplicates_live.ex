@@ -3,8 +3,11 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.Unknown, only: [list_or_unknown: 2]
+  import Euclid.Extra.Enum, only: [pluck: 2]
 
   alias Epicenter.Cases
+  alias Epicenter.Extra
   alias EpicenterWeb.Format
 
   def mount(%{"id" => person_id}, session, socket) do

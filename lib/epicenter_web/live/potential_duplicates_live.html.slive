@@ -29,7 +29,7 @@
             td
               input type="checkbox" checked=true phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
             td= Format.person(person)
-            td= Format.date(Euclid.Extra.Enum.pluck(person.demographics, :dob), :sorted)
-            td= Format.phone(person.phones)
-            td= Format.address(person.addresses)
+            td= person.demographics |> pluck(:dob) |> list_or_unknown(transform: &Format.date/1, pre: &Extra.Enum.sort_uniq(&1, Date))
+            td= person.phones |> list_or_unknown(transform: &Format.phone/1, post: &Extra.Enum.sort_uniq/1)
+            td= person.addresses |> list_or_unknown(transform: &Format.address/1, post: &Extra.Enum.sort_uniq/1)
             td= live_redirect "View", to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person.id)
