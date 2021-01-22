@@ -14,17 +14,14 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   def disabled?(selected_people),
     do: selected_people == %{}
 
-  def exposure_date(person) do
-    person.contact_investigations |> hd() |> Map.get(:most_recent_date_together) |> Format.date()
-  end
+  def exposure_date(person),
+    do: person.contact_investigations |> hd() |> Map.get(:most_recent_date_together) |> Format.date()
 
   def external_id(person),
     do: Person.coalesce_demographics(person).external_id
 
-  def full_name(person) do
-    demographic = Person.coalesce_demographics(person)
-    [demographic.first_name, demographic.last_name] |> Euclid.Exists.filter() |> Enum.join(" ") |> Unknown.string_or_unknown()
-  end
+  def full_name(person),
+    do: person |> Person.coalesce_demographics() |> Format.person() |> Unknown.string_or_unknown()
 
   def latest_case_investigation_status(person, current_date),
     do: person |> Person.latest_case_investigation() |> displayable_status(current_date)
