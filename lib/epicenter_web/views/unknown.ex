@@ -7,12 +7,20 @@ defmodule EpicenterWeb.Unknown do
       else: unknown_value(text)
   end
 
-  def list_or_unknown(values) do
+  def list_or_unknown(values, opts \\ []) do
+    pre_fun = Keyword.get(opts, :pre, &Function.identity/1)
+    post_fun = Keyword.get(opts, :post, &Function.identity/1)
+    transform_fun = Keyword.get(opts, :transform, &Function.identity/1)
+
     with true <- Euclid.Exists.present?(values),
          values <- Enum.filter(values, &Euclid.Exists.present?/1),
          true <- Euclid.Exists.present?(values) do
       Phoenix.HTML.Tag.content_tag :ul do
-        Enum.map(values, &Phoenix.HTML.Tag.content_tag(:li, &1))
+        values
+        |> pre_fun.()
+        |> Enum.map(transform_fun)
+        |> post_fun.()
+        |> Enum.map(&Phoenix.HTML.Tag.content_tag(:li, &1))
       end
     else
       _ ->
