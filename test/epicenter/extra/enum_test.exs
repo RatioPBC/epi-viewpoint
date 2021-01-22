@@ -25,4 +25,12 @@ defmodule Epicenter.Extra.EnumTest do
       assert Extra.Enum.reject_blank([]) == []
     end
   end
+
+  describe "sort_uniq" do
+    test "sorts and uniqifies, optionally taking a sort function" do
+      assert Extra.Enum.sort_uniq([3, 2, 2, 3, 1]) == [1, 2, 3]
+      assert Extra.Enum.sort_uniq([3, 2, 2, 3, 1], &(&1 >= &2)) == [3, 2, 1]
+      assert Extra.Enum.sort_uniq([3, 2, 2, 3, 1], :desc) == [3, 2, 1]
+    end
+  end
 end

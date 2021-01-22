@@ -21,4 +21,10 @@ defmodule Epicenter.Extra.Enum do
 
   def reject_blank(enum),
     do: Enum.reject(enum, &Euclid.Exists.blank?/1)
+
+  def sort_uniq(enum),
+    do: enum |> Enum.sort() |> Enum.uniq()
+
+  def sort_uniq(enum, sort_fun),
+    do: enum |> Enum.sort(sort_fun) |> Enum.uniq()
 end
