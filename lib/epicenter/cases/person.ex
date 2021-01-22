@@ -192,6 +192,20 @@ defmodule Epicenter.Cases.Person do
 
     def assigned_to_id(query, user_id), do: query |> where([p], p.assigned_to_id == ^user_id)
 
+    def duplicates(%Person{id: person_id}) do
+      target_query =
+        from source in Demographic,
+          where: source.person_id == ^person_id,
+          join: target in Demographic,
+          on: fragment("lower(?)", source.last_name) == fragment("lower(?)", target.last_name),
+          where: target.person_id != ^person_id,
+          where: fragment("lower(?)", source.first_name) == fragment("lower(?)", target.first_name) or source.dob == target.dob,
+          select: target.person_id
+
+      from people in Person,
+        where: people.id in subquery(target_query)
+    end
+
     def filter_with_case_investigation(:all), do: Person.Query.all()
     def filter_with_case_investigation(:with_isolation_monitoring), do: Person.Query.with_case_investigation_isolation_monitoring()
     def filter_with_case_investigation(:with_ongoing_interview), do: Person.Query.with_case_investigation_ongoing_interview()

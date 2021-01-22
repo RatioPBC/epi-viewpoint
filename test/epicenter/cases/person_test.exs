@@ -360,6 +360,44 @@ defmodule Epicenter.Cases.PersonTest do
     end
   end
 
+  describe "duplicates" do
+    defp create_person(tid, attrs) do
+      Test.Fixtures.person_attrs(@admin, tid, %{}) |> Test.Fixtures.add_demographic_attrs(attrs) |> Cases.create_person!()
+    end
+
+    test "returns empty list if there are no duplicates" do
+      source = create_person("source", %{first_name: "Alice", last_name: "Testuser1", dob: ~D[2000-01-01]})
+      create_person("different", %{first_name: "Different", last_name: "Testuser2", dob: ~D[1900-01-01]})
+      Person.Query.duplicates(source) |> Repo.all() |> assert_eq([])
+    end
+
+    # todo: also consider phone number and address
+    # todo: also handle multiple demographics for a person
+    test "returns people with the same last name at least one of the same: first name, date of birth" do
+      first = "Alice"
+      last = "Testuser1"
+      dob = ~D[2000-01-01]
+      source = create_person("source", %{first_name: first, last_name: last, dob: dob})
+
+      # not duplicates
+      create_person("different", %{first_name: "Different", last_name: "Testuser-different", dob: ~D[1900-01-01]})
+      create_person("last-only", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]})
+      create_person("first-only", %{first_name: first, last_name: "Testuser-different", dob: ~D[1900-01-01]})
+      create_person("dob-only", %{first_name: "Different", last_name: "Testuser-different", dob: dob})
+
+      # duplicates
+      create_person("last-first", %{first_name: first, last_name: last, dob: ~D[1900-01-01]})
+      create_person("last-first-upcase", %{first_name: String.upcase(first), last_name: String.upcase(last), dob: ~D[1900-01-01]})
+      create_person("last-dob", %{first_name: "Different", last_name: last, dob: dob})
+      create_person("last-dob-first", %{first_name: first, last_name: last, dob: dob})
+
+      Person.Query.duplicates(source)
+      |> Repo.all()
+      |> tids()
+      |> assert_eq(~w{last-first last-first-upcase last-dob last-dob-first}, ignore_order: true)
+    end
+  end
+
   describe "with_isolation_monitoring" do
     setup %{user: user} do
       setup_person_with_case_investigation(user, "pending_new", {~U{2020-11-29 10:30:00Z}, nil, nil})

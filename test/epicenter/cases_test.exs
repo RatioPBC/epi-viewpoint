@@ -226,6 +226,18 @@ defmodule Epicenter.CasesTest do
              } = recent_audit_log(person).change
     end
 
+    test "find_duplicates finds similar people" do
+      [alice, _amy, _billy] =
+        [{"alice", "Alice", "Testuser1"}, {"amy", "Amy", "Testuser1"}, {"billy", "Billy", "Testuser2"}]
+        |> Enum.map(fn {tid, first, last} ->
+          Test.Fixtures.person_attrs(@admin, tid, %{})
+          |> Test.Fixtures.add_demographic_attrs(%{first_name: first, last_name: last})
+          |> Cases.create_person!()
+        end)
+
+      assert Cases.find_duplicates(alice) |> tids() == ["amy"]
+    end
+
     test "get_people fetches all the people" do
       alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
       Test.Fixtures.person_attrs(@admin, "billy") |> Cases.create_person!()

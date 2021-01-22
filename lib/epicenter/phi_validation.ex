@@ -59,7 +59,7 @@ defmodule Epicenter.PhiValidation do
   end
 
   defp last_name_validator(field, value) do
-    if value |> String.starts_with?("Testuser"),
+    if value |> String.downcase() |> String.starts_with?("testuser"),
       do: valid(),
       else: invalid(field, "must start with 'Testuser'")
   end

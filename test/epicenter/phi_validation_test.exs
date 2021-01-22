@@ -18,6 +18,12 @@ defmodule Epicenter.PhiValidationTest do
       |> assert_valid()
     end
 
+    test "changeset is valid if last_name starts with 'Testuser' ignoring case" do
+      Changeset.change(%Demographic{}, last_name: String.upcase(@valid_last_name))
+      |> PhiValidation.validate_phi(:demographic)
+      |> assert_valid()
+    end
+
     test "changeset is invalid if last_name does not start with 'Testuser'" do
       Changeset.change(%Demographic{}, last_name: @invalid_last_name)
       |> PhiValidation.validate_phi(:demographic)
