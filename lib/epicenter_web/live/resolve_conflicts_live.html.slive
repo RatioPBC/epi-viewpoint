@@ -8,4 +8,5 @@
 
   section#heading
     h3 Resolve Conflicts
-
+    = for person <- @people do
+      span data-tid=person.tid
