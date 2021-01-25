@@ -1,6 +1,5 @@
 defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
   import ExUnit.Assertions
-  import Phoenix.LiveViewTest
 
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
