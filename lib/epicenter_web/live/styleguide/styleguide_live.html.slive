@@ -108,11 +108,18 @@
         small Has the same display properties of a button, but without the border
 
     .styleguide-example
-      #disabled-buttons
-        a#primary-button-disabled href="#" data-disabled=true Primary
-        a#secondary-button-disabled href="#" data-disabled=true Secondary
-        a#outline-button-disabled href="#" data-disabled=true Outline
+      #disabled-link-buttons
+        a#primary-link-button-disabled href="#" data-disabled=true Primary
+        a#secondary-link-button-disabled href="#" data-disabled=true Secondary
+        a#outline-link-button-disabled href="#" data-disabled=true Outline
       code a data-disabled=true
+
+    .styleguide-example
+      #disabled-buttons
+        button#primary-button-disabled disabled=true Primary
+        button#secondary-button-disabled disabled=true Secondary
+        button#outline-button-disabled disabled=true Outline
+      code button disabled=true
 
     .styleguide-example
       span#button-list

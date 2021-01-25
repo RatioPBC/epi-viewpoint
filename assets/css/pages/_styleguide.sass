@@ -72,10 +72,10 @@
   //
   // buttons & links
   //
-  #disabled-buttons
+  #disabled-buttons, #disabled-link-buttons
     @include horizontal-flow
 
-  #primary-button, #primary-button-disabled
+  #primary-button, #primary-button-disabled, #primary-link-button-disabled
     @include button-primary
 
   #primary-button-with-icon
@@ -85,7 +85,7 @@
   #primary-button-small
     @include button-primary($size: small)
 
-  #secondary-button, #secondary-button-disabled
+  #secondary-button, #secondary-button-disabled, #secondary-link-button-disabled
     @include button-secondary
 
   #secondary-button-with-icon
@@ -95,7 +95,7 @@
   #secondary-button-small
     @include button-secondary($size: small)
 
-  #outline-button, #outline-button-disabled
+  #outline-button, #outline-button-disabled, #outline-link-button-disabled
     @include button-outline
 
   #outline-button-small
