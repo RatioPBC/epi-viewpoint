@@ -30,6 +30,14 @@ defmodule Epicenter.Cases.MergeTest do
     [user: user]
   end
 
+  describe "fields_with_conflicts" do
+    test "returns the list of fields that have conflicts" do
+      %{first_name: ["Catie", "catie", "Katie", "Katy"], preferred_language: ["English", "German"]}
+      |> Merge.fields_with_conflicts()
+      |> assert_eq(~w{first_name preferred_language}a, ignore_order: true)
+    end
+  end
+
   describe "merge_conflicts" do
     test "it identifies and returns the unique values for the 3 fields of interest", %{user: user} do
       people_attrs = [

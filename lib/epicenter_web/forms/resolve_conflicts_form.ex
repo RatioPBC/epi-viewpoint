@@ -3,27 +3,23 @@ defmodule EpicenterWeb.Forms.ResolveConflictsForm do
 
   import Ecto.Changeset
 
-  @primary_key false
+  alias Epicenter.Cases.Merge
+  alias Epicenter.Validation
+  alias EpicenterWeb.Forms.ResolveConflictsForm
 
+  @primary_key false
+  @required_attrs ~w{}a
+  @optional_attrs ~w{first_name dob preferred_language}a
   embedded_schema do
     field :first_name, :string
+    field :dob, :string
+    field :preferred_language, :string
   end
 
-  def model_to_form_changeset(_merge_conflicts) do
-    %__MODULE__{} |> cast(%{}, [:first_name])
+  def changeset(merge_conflicts, attrs) do
+    %ResolveConflictsForm{}
+    |> cast(attrs, @required_attrs ++ @optional_attrs)
+    |> Validation.validate_date(:dob)
+    |> validate_required(Merge.fields_with_conflicts(merge_conflicts))
   end
-
-  #  def attrs_to_form_changeset(attrs) do
-  #    attrs =
-  #      attrs
-  #      |> Euclid.Extra.Map.stringify_keys()
-  #      |> Euclid.Extra.Map.transform(
-  #           ~w{employment marital_status sex_at_birth},
-  #           &Coerce.to_string_or_nil/1
-  #         )
-  #
-  #    %ResolveConflictsForm{}
-  #    |> cast(attrs, @required_attrs ++ @optional_attrs)
-  #    |> validate_required(@required_attrs)
-  #  end
 end

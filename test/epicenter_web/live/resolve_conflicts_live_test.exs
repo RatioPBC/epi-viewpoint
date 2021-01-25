@@ -42,5 +42,12 @@ defmodule EpicenterWeb.ResolveConflictsLiveTest do
     |> Pages.ResolveConflicts.assert_no_conflicts_for_field("dob")
   end
 
+  test "save button is disabled until all conflicts are resolved", %{conn: conn, person1: person1, person2: person2} do
+    Pages.ResolveConflicts.visit(conn, [person1.id, person2.id])
+    |> Pages.ResolveConflicts.assert_save_button_enabled(false)
+    |> Pages.ResolveConflicts.click_first_name("Alicia")
+    |> Pages.ResolveConflicts.assert_save_button_enabled(true)
+  end
+
   # TODO what if 0 or 1 person ids are sent to the page
 end

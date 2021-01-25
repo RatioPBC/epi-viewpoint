@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.ResolveConflictsLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Cases
   alias EpicenterWeb.Form
@@ -19,9 +19,15 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> assign_defaults(body_class: "body-background-none")
     |> assign_page_title("Resolve Conflicts")
     |> assign(:merge_conflicts, merge_conflicts)
-    |> assign(:form_changeset, ResolveConflictsForm.model_to_form_changeset(merge_conflicts))
+    |> assign(:form_changeset, ResolveConflictsForm.changeset(merge_conflicts, %{}))
     |> assign_person_ids(comma_separated_person_ids)
     |> ok()
+  end
+
+  def handle_event("form-change", %{"resolve_conflicts_form" => form_params}, socket) do
+    socket
+    |> assign(:form_changeset, ResolveConflictsForm.changeset(socket.assigns.merge_conflicts, form_params))
+    |> noreply()
   end
 
   # # #
@@ -34,13 +40,14 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> assign(:people, people)
   end
 
-  def form_builder(form, merge_conflicts) do
+  def form_builder(form, merge_conflicts, valid_changeset?) do
     formatted_dates = merge_conflicts.dob |> Enum.map(&Format.date/1)
 
     Form.new(form)
     |> add_line(:first_name, "Choose the correct first name", merge_conflicts.first_name)
     |> add_line(:dob, "Choose the correct date of birth", formatted_dates)
     |> add_line(:preferred_language, "Choose the correct preferred language", merge_conflicts.preferred_language)
+    |> Form.line(&Form.save_button(&1, disabled: !valid_changeset?))
     |> Form.safe()
   end
 

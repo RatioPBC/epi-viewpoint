@@ -9,6 +9,5 @@
   section#heading
     h3 Resolve Conflicts
 
-    = form_for @form_changeset, "#", [id: "resolve-conflicts-form", phx_submit: "save", phx_change: "form-change"], fn f ->
-      = form_builder(f, @merge_conflicts)
-
+    = form_for @form_changeset, "#", [data: [role: "resolve-conflicts-form"], id: "resolve-conflicts-form", phx_submit: "save", phx_change: "form-change"], fn f ->
+      = form_builder(f, @merge_conflicts, @form_changeset.valid?)

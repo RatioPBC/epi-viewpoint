@@ -5,6 +5,13 @@ defmodule Epicenter.Cases.Merge do
 
   @sort_funs %{string: &Extra.String.case_insensitive_sort_fun/2, date: Date}
 
+  def fields_with_conflicts(merge_conflicts) do
+    Enum.reduce(merge_conflicts, [], fn
+      {k, v}, accumulated_fields when v != [] -> [k | accumulated_fields]
+      _, accumulated_fields -> accumulated_fields
+    end)
+  end
+
   def merge_conflicts(person_ids, user, field_names_and_types) when is_list(field_names_and_types) do
     people =
       Cases.get_people(person_ids, user)
