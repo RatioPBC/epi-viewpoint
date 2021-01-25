@@ -11,7 +11,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     socket = socket |> authenticate_user(session)
 
     person_ids = String.split(comma_separated_person_ids, ",")
-    merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, [:first_name])
+    merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, [{:first_name, :string}])
 
     socket
     |> assign_defaults(body_class: "body-background-none")
@@ -34,7 +34,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
 
   def form_builder(form, merge_conflicts) do
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :first_name, "Choose the correct first name", merge_conflicts.unique_first_names, span: 8))
+    |> Form.line(&Form.radio_button_list(&1, :first_name, "Choose the correct first name", merge_conflicts.first_name, span: 8))
     |> Form.safe()
   end
 end
