@@ -5,6 +5,8 @@ defmodule Epicenter.Extra.String do
   def remove_numeric_suffix(s), do: String.replace(s, ~r[(\w+)_\d+$], "\\1")
   def add_placeholder_suffix(s), do: "#{s}_xx"
 
+  def case_insensitive_sort_fun(a, b), do: String.downcase(a) <= String.downcase(b)
+
   def dasherize(list) when is_list(list), do: list |> Enum.map(&dasherize/1) |> Enum.join("-")
   def dasherize(item), do: item |> to_string() |> String.replace("_", "-")
 

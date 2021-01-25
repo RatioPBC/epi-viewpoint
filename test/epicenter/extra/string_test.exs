@@ -3,6 +3,12 @@ defmodule Epicenter.Extra.StringTest do
 
   alias Epicenter.Extra
 
+  describe "case_insensitive_sort_fun" do
+    test "when passed to `sort`, sorts strings case-insensitively" do
+      ~w[ant Dog bat CAT] |> Enum.sort(&Extra.String.case_insensitive_sort_fun/2) |> assert_eq(~w[ant bat CAT Dog])
+    end
+  end
+
   describe "dasherize" do
     test "stringifies and converts underscores to dashes" do
       assert Extra.String.dasherize("foo") == "foo"
