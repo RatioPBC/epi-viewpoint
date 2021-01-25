@@ -5,13 +5,15 @@ defmodule EpicenterWeb.ResolveConflictsLive do
 
   alias Epicenter.Cases
   alias EpicenterWeb.Form
+  alias EpicenterWeb.Format
   alias EpicenterWeb.Forms.ResolveConflictsForm
 
   def mount(%{"person_ids" => comma_separated_person_ids} = _params, session, socket) do
     socket = socket |> authenticate_user(session)
 
     person_ids = String.split(comma_separated_person_ids, ",")
-    merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, [{:first_name, :string}])
+    merge_fields = [{:first_name, :string}, {:dob, :date}, {:preferred_language, :string}]
+    merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, merge_fields)
 
     socket
     |> assign_defaults(body_class: "body-background-none")
@@ -33,8 +35,18 @@ defmodule EpicenterWeb.ResolveConflictsLive do
   end
 
   def form_builder(form, merge_conflicts) do
+    formatted_dates = merge_conflicts.dob |> Enum.map(&Format.date/1)
+
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :first_name, "Choose the correct first name", merge_conflicts.first_name, span: 8))
+    |> add_line(:first_name, "Choose the correct first name", merge_conflicts.first_name)
+    |> add_line(:dob, "Choose the correct date of birth", formatted_dates)
+    |> add_line(:preferred_language, "Choose the correct preferred language", merge_conflicts.preferred_language)
     |> Form.safe()
+  end
+
+  def add_line(form, _field, _label, conflicts) when conflicts == [], do: form
+
+  def add_line(form, field, label, conflicts) do
+    Form.line(form, &Form.radio_button_list(&1, field, label, conflicts, span: 8))
   end
 end

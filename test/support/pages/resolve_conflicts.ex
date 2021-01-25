@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
   import ExUnit.Assertions
 
+  alias Epicenter.Extra
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
@@ -25,8 +26,13 @@ defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
   end
 
   def assert_unique_values_present(view, field_name, values) do
-    role = "resolve-conflicts-form-#{String.replace(field_name, "_", "-")}"
+    role = ["resolve-conflicts-form", field_name] |> Extra.String.dasherize()
     assert view |> Pages.parse() |> Test.Html.role_texts(role) |> Enum.sort() == values |> Enum.sort()
     view
+  end
+
+  def assert_no_conflicts_for_field(view, field_name) do
+    role = ["resolve-conflicts-form", field_name] |> Extra.String.dasherize()
+    assert view |> Pages.parse() |> Test.Html.all("[data-role=#{role}]", as: :text) == []
   end
 end

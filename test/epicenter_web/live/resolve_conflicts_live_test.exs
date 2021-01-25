@@ -13,11 +13,13 @@ defmodule EpicenterWeb.ResolveConflictsLiveTest do
     person1 =
       Test.Fixtures.person_attrs(user, "alice")
       |> Test.Fixtures.add_demographic_attrs(%{external_id: "987650"})
+      |> Test.Fixtures.add_demographic_attrs(%{dob: ~D[1980-01-01]})
       |> Cases.create_person!()
 
     person2 =
       Test.Fixtures.person_attrs(user, "alicia")
       |> Test.Fixtures.add_demographic_attrs(%{external_id: "111222"})
+      |> Test.Fixtures.add_demographic_attrs(%{dob: ~D[1980-01-01]})
       |> Cases.create_person!()
 
     [user: user, person1: person1, person2: person2]
@@ -33,6 +35,11 @@ defmodule EpicenterWeb.ResolveConflictsLiveTest do
   test "showing the merge conflicts", %{conn: conn, person1: person1, person2: person2} do
     Pages.ResolveConflicts.visit(conn, [person1.id, person2.id])
     |> Pages.ResolveConflicts.assert_unique_values_present("first_name", ["Alice", "Alicia"])
+  end
+
+  test "when there are no conflicts, we do not render a form line", %{conn: conn, person1: person1, person2: person2} do
+    Pages.ResolveConflicts.visit(conn, [person1.id, person2.id])
+    |> Pages.ResolveConflicts.assert_no_conflicts_for_field("dob")
   end
 
   # TODO what if 0 or 1 person ids are sent to the page

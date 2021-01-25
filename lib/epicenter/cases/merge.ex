@@ -13,7 +13,15 @@ defmodule Epicenter.Cases.Merge do
 
     Enum.reduce(field_names_and_types, %{}, fn {field_name, field_type}, all_conflicts ->
       field_values = people |> Euclid.Extra.Enum.pluck(field_name) |> sort(@sort_funs[field_type])
-      all_conflicts |> Map.put(field_name, field_values)
+
+      conflicts =
+        case length(field_values) do
+          0 -> []
+          1 -> []
+          _ -> field_values
+        end
+
+      all_conflicts |> Map.put(field_name, conflicts)
     end)
   end
 
