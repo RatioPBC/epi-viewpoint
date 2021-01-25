@@ -140,8 +140,9 @@ defmodule EpicenterWeb.Form do
   @doc "opts: span, sticky"
   def save_button(%Form.Line{} = line, opts \\ []) do
     data_opts = grid_data(1, line, opts) |> Keyword.put(:role, "save-button")
+    disabled? = Keyword.get(opts, :disabled, false)
 
-    submit("Save", data: data_opts)
+    submit("Save", data: data_opts, disabled: disabled?)
     |> add_to_line(line, opts)
   end
 

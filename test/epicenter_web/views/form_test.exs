@@ -218,11 +218,11 @@ defmodule EpicenterWeb.FormTest do
   test "save_button" do
     phx_form()
     |> Form.new()
-    |> Form.line(&Form.save_button(&1))
+    |> Form.line(&Form.save_button(&1, disabled: true))
     |> render()
     |> assert_html_eq("""
     <fieldset>\v
-      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="save-button" type="submit">Save</button>\v
+      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="save-button" type="submit" disabled="disabled">Save</button>\v
     </fieldset>
     """)
   end
