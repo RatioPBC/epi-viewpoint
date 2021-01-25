@@ -11,7 +11,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     socket = socket |> authenticate_user(session)
 
     person_ids = String.split(comma_separated_person_ids, ",")
-    merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user)
+    merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, [:first_name])
 
     socket
     |> assign_defaults(body_class: "body-background-none")

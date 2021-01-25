@@ -9,21 +9,25 @@ defmodule Epicenter.Cases.MergeTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
 
+  defp create_person(user, tid, first_name) do
+    Test.Fixtures.person_attrs(user, tid, %{demographics: [%{first_name: first_name}]}, demographics: true) |> Cases.create_person!()
+  end
+
   setup do
     user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
 
-    catie = Test.Fixtures.person_attrs(user, "catie") |> Cases.create_person!()
-    katie = Test.Fixtures.person_attrs(user, "katie") |> Cases.create_person!()
-    katy = Test.Fixtures.person_attrs(user, "katy") |> Cases.create_person!()
+    person_ids =
+      [{"catie", "Catie"}, {"catie2", "catie"}, {"katie", "Katie"}, {"katie2", "Katie"}, {"katy", "Katy"}]
+      |> Enum.map(fn {tid, first_name} -> create_person(user, tid, first_name) end)
+      |> Enum.map(& &1.id)
 
-    [catie: catie, katie: katie, katy: katy, user: user]
+    [person_ids: person_ids, user: user]
   end
 
   describe "merge_conflicts" do
-    test "it identifies and returns the unique values for the 3 fields of interest",
-         %{catie: catie, katie: katie, katy: katy, user: user} do
-      conflicts = Merge.merge_conflicts([catie.id, katie.id, katy.id], user)
-      assert conflicts == %{unique_first_names: ["Catie", "Katie", "Katy"]}
+    test "it identifies and returns the unique values for the 3 fields of interest", %{person_ids: person_ids, user: user} do
+      conflicts = Merge.merge_conflicts(person_ids, user, [:first_name])
+      assert conflicts == %{first_name: ["Catie", "catie", "Katie", "Katy"]}
     end
   end
 end
