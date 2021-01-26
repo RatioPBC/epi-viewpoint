@@ -4,6 +4,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
@@ -57,9 +58,11 @@ defmodule Epicenter.Cases do
   def preload_contact_investigations(has_many_contacts_or_nil, user) do
     has_many_contacts_or_nil
     |> Repo.preload(
-      contact_investigations: [
-        exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
-      ]
+      contact_investigations:
+        {ContactInvestigation.Query.display_order(),
+         [
+           exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
+         ]}
     )
     |> log_contact_investigations(user)
   end

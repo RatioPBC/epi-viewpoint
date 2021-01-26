@@ -110,4 +110,15 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
       ]
     }[field_name]
   end
+
+  defmodule Query do
+    import Ecto.Query
+
+    alias Epicenter.ContactInvestigations.ContactInvestigation
+
+    def display_order() do
+      from contact_investigation in ContactInvestigation,
+        order_by: [asc: contact_investigation.seq]
+    end
+  end
 end
