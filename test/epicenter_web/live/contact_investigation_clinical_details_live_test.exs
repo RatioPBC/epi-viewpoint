@@ -170,7 +170,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
         "symptoms" => ["fever", "chills"]
       }
     )
-    |> Pages.assert_validation_messages(%{"clinical_details_form[exposed_on]" => "must be a valid MM/DD/YYYY date"})
+    |> Pages.assert_validation_messages(%{"clinical_details_form[exposed_on]" => "please enter dates as mm/dd/yyyy"})
   end
 
   describe "warning the user when navigation will erase their changes" do

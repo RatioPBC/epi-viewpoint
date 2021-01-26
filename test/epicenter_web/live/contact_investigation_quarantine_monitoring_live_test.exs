@@ -124,8 +124,8 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLiveTest do
         }
       )
       |> Pages.assert_validation_messages(%{
-        "quarantine_monitoring_form[date_started]" => "must be a valid MM/DD/YYYY date",
-        "quarantine_monitoring_form[date_ended]" => "must be a valid MM/DD/YYYY date"
+        "quarantine_monitoring_form[date_started]" => "please enter dates as mm/dd/yyyy",
+        "quarantine_monitoring_form[date_ended]" => "please enter dates as mm/dd/yyyy"
       })
     end
   end

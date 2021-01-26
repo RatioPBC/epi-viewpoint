@@ -102,6 +102,17 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       Pages.assert_validation_messages(rendered, %{"form_data[dob]" => "please enter dates as mm/dd/yyyy"})
     end
 
+    test "validation shows informative message when phi is entered in a non-phi environment", %{conn: conn, person: person} do
+      view = Pages.ProfileEdit.visit(conn, person)
+
+      assert_attribute(view, "input[data-role=dob]", "value", ["01/01/2000"])
+
+      rendered = view |> form("#profile-form", form_data: %{"dob" => "01/03/2000"}) |> render_submit()
+
+      assert_attribute(view, "input[data-role=dob]", "value", ["01/03/2000"])
+      Pages.assert_validation_messages(rendered, %{"form_data[dob]" => "In non-PHI environment, must be the first of the month"})
+    end
+
     test "editing person identifying information works, saves an audit trail, and redirects to the profile page", %{conn: conn, person: person} do
       view = Pages.ProfileEdit.visit(conn, person)
 

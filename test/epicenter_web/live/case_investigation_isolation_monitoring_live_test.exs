@@ -98,8 +98,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationMonitoringLiveTest do
         }
       )
       |> Pages.assert_validation_messages(%{
-        "isolation_monitoring_form[date_started]" => "must be a valid MM/DD/YYYY date",
-        "isolation_monitoring_form[date_ended]" => "must be a valid MM/DD/YYYY date"
+        "isolation_monitoring_form[date_started]" => "please enter dates as mm/dd/yyyy",
+        "isolation_monitoring_form[date_ended]" => "please enter dates as mm/dd/yyyy"
       })
     end
   end

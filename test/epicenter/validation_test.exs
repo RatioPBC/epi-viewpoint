@@ -33,9 +33,9 @@ defmodule Epicenter.ValidationTest do
     end
 
     test "doesn't allow other things" do
-      "Jan 2 2020" |> change_start_date() |> Validation.validate_date(:start_date) |> assert_invalid(start_date: ["must be a valid MM/DD/YYYY date"])
-      "2020-01-02" |> change_start_date() |> Validation.validate_date(:start_date) |> assert_invalid(start_date: ["must be a valid MM/DD/YYYY date"])
-      "mmm... pie" |> change_start_date() |> Validation.validate_date(:start_date) |> assert_invalid(start_date: ["must be a valid MM/DD/YYYY date"])
+      "Jan 2 2020" |> change_start_date() |> Validation.validate_date(:start_date) |> assert_invalid(start_date: ["please enter dates as mm/dd/yyyy"])
+      "2020-01-02" |> change_start_date() |> Validation.validate_date(:start_date) |> assert_invalid(start_date: ["please enter dates as mm/dd/yyyy"])
+      "mmm... pie" |> change_start_date() |> Validation.validate_date(:start_date) |> assert_invalid(start_date: ["please enter dates as mm/dd/yyyy"])
     end
   end
 

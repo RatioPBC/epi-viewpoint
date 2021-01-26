@@ -1,6 +1,9 @@
 defmodule Epicenter.PhiValidation do
   import Ecto.Changeset, only: [validate_change: 3]
 
+  alias Epicenter.DateParser
+  alias Epicenter.Validation
+
   @user_input_restrictions Application.compile_env(:epicenter, :user_input_restrictions, :testdata_only)
 
   def validate_phi(changeset, validation_set, user_input_restrictions \\ @user_input_restrictions)
@@ -51,6 +54,15 @@ defmodule Epicenter.PhiValidation do
   @city_followed_by_numbers ~r|\ACity\d*\z|
   @four_leading_zeroes_followed_by_one_digit ~r|\A0000\d\z|
   @seven_leading_ones_followed_by_three_digits ~r|1{7}\d+|
+
+  defp date_validator(field, date) when is_binary(date) do
+    date_parsing_result = DateParser.parse_mm_dd_yyyy(date)
+
+    case date_parsing_result do
+      {:ok, parsed_date} -> date_validator(field, parsed_date)
+      _ -> invalid(field, Validation.invalid_date_format_message())
+    end
+  end
 
   defp date_validator(field, date) do
     if date.day == 1,

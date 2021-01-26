@@ -76,8 +76,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLiveTest do
         }
       )
       |> Pages.assert_validation_messages(%{
-        "isolation_order_form[order_sent_on]" => "must be a valid MM/DD/YYYY date",
-        "isolation_order_form[clearance_order_sent_on]" => "must be a valid MM/DD/YYYY date"
+        "isolation_order_form[order_sent_on]" => "please enter dates as mm/dd/yyyy",
+        "isolation_order_form[clearance_order_sent_on]" => "please enter dates as mm/dd/yyyy"
       })
     end
   end

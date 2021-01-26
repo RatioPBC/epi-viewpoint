@@ -10,6 +10,7 @@ defmodule EpicenterWeb.ProfileEditLive do
   alias Epicenter.Cases
   alias Epicenter.DateParser
   alias Epicenter.Extra
+  alias Epicenter.Validation
   alias EpicenterWeb.Format
 
   defmodule FormData do
@@ -133,7 +134,7 @@ defmodule EpicenterWeb.ProfileEditLive do
       |> update(form_params)
       |> validate()
 
-    with {:valid, []} <- {:valid, changeset.errors},
+    with {:validation_step, []} <- {:validation_step, changeset.errors},
          person_params = translate_form_data_to_person_params(changeset, socket.assigns.person.demographics),
          {:ok, person} <-
            Cases.update_person(
@@ -147,10 +148,10 @@ defmodule EpicenterWeb.ProfileEditLive do
            ) do
       {:noreply, socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
     else
-      {:valid, _} ->
+      {:validation_step, _} ->
         {:noreply, assign(socket, :changeset, changeset)}
 
-      {:error, %Ecto.Changeset{}} ->
+      {:error, %Ecto.Changeset{} = _} ->
         {:noreply, assign(socket, :changeset, changeset)}
     end
   end
@@ -217,9 +218,10 @@ defmodule EpicenterWeb.ProfileEditLive do
       :dob, value ->
         case DateParser.parse_mm_dd_yyyy(value) do
           {:ok, _date} -> []
-          _ -> [dob: "please enter dates as mm/dd/yyyy"]
+          _ -> [dob: Validation.invalid_date_format_message()]
         end
     end)
+    |> Epicenter.PhiValidation.validate_phi(:demographic)
   end
 
   # # #

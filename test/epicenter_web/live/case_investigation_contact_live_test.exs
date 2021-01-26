@@ -428,8 +428,8 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
         }
       )
       |> Pages.assert_validation_messages(%{
-        "contact_form[dob]" => "must be a valid MM/DD/YYYY date",
-        "contact_form[most_recent_date_together]" => "must be a valid MM/DD/YYYY date"
+        "contact_form[dob]" => "please enter dates as mm/dd/yyyy",
+        "contact_form[most_recent_date_together]" => "please enter dates as mm/dd/yyyy"
       })
     end
 

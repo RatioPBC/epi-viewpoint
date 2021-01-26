@@ -6,7 +6,7 @@ defmodule Epicenter.Validation do
     Changeset.validate_change(changeset, field, fn field, date ->
       case DateParser.parse_mm_dd_yyyy(date) do
         {:ok, _} -> valid()
-        {:error, _} -> invalid(field, "must be a valid MM/DD/YYYY date")
+        {:error, _} -> invalid(field, invalid_date_format_message())
       end
     end)
   end
@@ -16,6 +16,8 @@ defmodule Epicenter.Validation do
     |> Changeset.validate_format(field, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     |> Changeset.validate_length(field, max: 160)
   end
+
+  def invalid_date_format_message(), do: "please enter dates as mm/dd/yyyy"
 
   defp valid(), do: []
   defp invalid(field, message), do: [{field, message}]
