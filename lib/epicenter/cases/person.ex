@@ -18,11 +18,13 @@ defmodule Epicenter.Cases.Person do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "people" do
+    field :archived_at, :utc_datetime
     field :seq, :integer, read_after_writes: true
     field :tid, :string
 
     timestamps(type: :utc_datetime)
 
+    belongs_to :archived_by, User
     belongs_to :assigned_to, User
     has_many :demographics, Demographic
     has_many :addresses, Address
@@ -62,6 +64,11 @@ defmodule Epicenter.Cases.Person do
     |> cast_assoc(:addresses, with: &Address.changeset/2)
     |> cast_assoc(:emails, with: &Email.changeset/2)
     |> cast_phones_assoc(attrs)
+  end
+
+  def changeset_for_archive(person, %User{id: archiving_user_id}) do
+    person
+    |> cast(%{archived_by_id: archiving_user_id, archived_at: DateTime.utc_now()}, ~w{archived_by_id archived_at}a)
   end
 
   defp cast_demographics_assoc(changeset, attrs) do

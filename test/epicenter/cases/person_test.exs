@@ -23,6 +23,8 @@ defmodule Epicenter.Cases.PersonTest do
       assert_schema(
         Person,
         [
+          {:archived_at, :utc_datetime},
+          {:archived_by_id, :binary_id},
           {:assigned_to_id, :binary_id},
           {:id, :binary_id},
           {:inserted_at, :utc_datetime},
@@ -190,6 +192,15 @@ defmodule Epicenter.Cases.PersonTest do
         |> Euclid.Extra.List.first()
 
       assert %{street: "1023 Test St", city: "City7", state: "ZB", postal_code: "00002"} = address_changeset.changes
+    end
+  end
+
+  describe "changeset_for_archive" do
+    test "creates a changeset that will archive the person", %{user: user} do
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      %Ecto.Changeset{} = changeset = Person.changeset_for_archive(person, user)
+      assert changeset.changes.archived_by_id == user.id
+      assert_recent(changeset.changes.archived_at)
     end
   end
 

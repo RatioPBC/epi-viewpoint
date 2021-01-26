@@ -108,6 +108,8 @@ defmodule Epicenter.Cases do
   # people
   #
 
+  def archive_person(%Person{} = person, user, audit_meta), do: person |> Person.changeset_for_archive(user) |> AuditLog.update(audit_meta)
+
   def assign_user_to_people(user_id: nil, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user),
     do: assign_user_to_people(user: nil, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user)
 

@@ -148,6 +148,22 @@ defmodule Epicenter.CasesTest do
   end
 
   describe "people" do
+    test "archive_person archives a person and writes to audit log" do
+      user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
+      person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+
+      {:ok, person} = Cases.archive_person(person, user, Test.Fixtures.admin_audit_meta())
+      assert person.archived_by_id == user.id
+      assert_recent(person.archived_at)
+      assert_revision_count(person, 2)
+
+      audit_log = recent_audit_log(person)
+      assert audit_log.author_id == @admin.id
+      {:ok, archived_at, _} = audit_log.change["archived_at"] |> DateTime.from_iso8601()
+      assert_recent(archived_at)
+      assert audit_log.change["archived_by_id"] == user.id
+    end
+
     test "create_person! creates a person" do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_demographics()
