@@ -20,7 +20,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
       |> Cases.preload_addresses()
 
     duplicate_people =
-      Cases.find_duplicate_people(person)
+      Cases.list_duplicate_people(person, socket.assigns.current_user)
       |> Cases.preload_demographics()
       |> Cases.preload_phones()
       |> Cases.preload_addresses()

@@ -143,8 +143,6 @@ defmodule Epicenter.Cases do
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)
   def create_person({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert(audit_meta)
 
-  def find_duplicate_people(%Person{} = person), do: person |> Person.Duplicates.Query.all() |> Repo.all()
-
   def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name})
       when not is_nil(dob) and not is_nil(first_name) and not is_nil(last_name) do
     Person
@@ -161,6 +159,8 @@ defmodule Epicenter.Cases do
 
   def get_people(ids, user), do: Person.Query.get_people(ids) |> AuditLog.all(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)
+
+  def list_duplicate_people(%Person{} = person, user), do: person |> Person.Duplicates.Query.all() |> AuditLog.all(user)
 
   def list_people(filter, user: %User{} = user, reject_archived_people: reject_archived_people),
     do: Person.Query.filter_with_case_investigation(filter) |> Person.Query.reject_archived_people(reject_archived_people) |> AuditLog.all(user)

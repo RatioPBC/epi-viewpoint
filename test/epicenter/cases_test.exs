@@ -245,7 +245,7 @@ defmodule Epicenter.CasesTest do
     end
 
     test "duplicates" do
-      [alice, _amy, _billy] =
+      [alice, amy, _billy] =
         [{"alice", "Alice", "Testuser1"}, {"amy", "Amy", "Testuser1"}, {"billy", "Billy", "Testuser2"}]
         |> Enum.map(fn {tid, first, last} ->
           Test.Fixtures.person_attrs(@admin, tid, %{})
@@ -253,7 +253,11 @@ defmodule Epicenter.CasesTest do
           |> Cases.create_person!()
         end)
 
-      assert Cases.find_duplicate_people(alice) |> tids() == ["amy"]
+      capture_log(fn ->
+        assert Cases.list_duplicate_people(alice, @admin) |> tids() == ["amy"]
+      end)
+      |> AuditLogAssertions.assert_viewed_people(@admin, [amy])
+
       assert Cases.count_duplicate_people(alice) == 1
     end
 

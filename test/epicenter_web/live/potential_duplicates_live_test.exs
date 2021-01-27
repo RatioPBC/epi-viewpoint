@@ -65,4 +65,13 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
     |> Pages.PotentialDuplicates.assert_here(alice)
     |> Pages.PotentialDuplicates.assert_table_contents([["alice"], ["billy"], ["cindy"]], tids: true, headers: false, columns: [])
   end
+
+  test "records an audit log entry for the person and their duplicates", %{conn: conn, user: user} do
+    alice = create_person(user, "alice", %{first_name: "Alice", last_name: "Testuser", dob: ~D[1900-01-01]})
+    billy = create_person(user, "billy", %{first_name: "Billy", last_name: "Testuser", dob: ~D[1900-01-01]})
+    cindy = create_person(user, "cindy", %{first_name: "Cindy", last_name: "Testuser", dob: ~D[1900-01-01]})
+
+    capture_log(fn -> Pages.PotentialDuplicates.visit(conn, alice) end)
+    |> AuditLogAssertions.assert_viewed_people(user, [alice, billy, cindy])
+  end
 end
