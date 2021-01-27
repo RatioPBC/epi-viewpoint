@@ -199,6 +199,9 @@ defmodule Epicenter.Cases.Person do
 
     def assigned_to_id(query, user_id), do: query |> where([p], p.assigned_to_id == ^user_id)
 
+    def reject_archived_people(query, true = _reject_archived), do: query |> where([p], is_nil(p.archived_at))
+    def reject_archived_people(query, false = _reject_archived), do: query
+
     def duplicates(%Person{id: person_id}) do
       target_query =
         from source in Demographic,

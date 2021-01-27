@@ -60,6 +60,14 @@ defmodule EpicenterWeb.Test.Pages.People do
     view
   end
 
+  def click_archive(%View{} = view) do
+    view
+    |> element("[data-role=archive-button]")
+    |> render_click()
+
+    view
+  end
+
   def click_assigned_to_me_checkbox(%View{} = view) do
     view |> element("[data-tid=assigned-to-me-checkbox]") |> render_click()
     view

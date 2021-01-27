@@ -95,6 +95,23 @@ defmodule EpicenterWeb.PeopleLive do
   def handle_event("form-change", _, socket),
     do: socket |> noreply()
 
+  def handle_event("archive", _, socket) do
+    for {person_id, _is_selected} <- socket.assigns.selected_people do
+      {:ok, _} =
+        Cases.archive_person(
+          person_id,
+          socket.assigns.current_user,
+          %AuditLog.Meta{
+            author_id: socket.assigns.current_user.id,
+            reason_action: AuditLog.Revision.archive_person_action(),
+            reason_event: AuditLog.Revision.people_archive_people_event()
+          }
+        )
+    end
+
+    socket |> load_and_assign_people() |> noreply()
+  end
+
   def handle_info(:display_people_assigned_to_me_toggled, socket) do
     socket
     |> assign(:display_people_assigned_to_me, !socket.assigns.display_people_assigned_to_me)
@@ -147,10 +164,14 @@ defmodule EpicenterWeb.PeopleLive do
     people =
       cond do
         socket.assigns.display_people_assigned_to_me ->
-          Cases.list_people(socket.assigns.filter, assigned_to_id: socket.assigns.current_user.id, user: socket.assigns.current_user)
+          Cases.list_people(socket.assigns.filter,
+            assigned_to_id: socket.assigns.current_user.id,
+            user: socket.assigns.current_user,
+            reject_archived_people: true
+          )
 
         true ->
-          Cases.list_people(socket.assigns.filter, user: socket.assigns.current_user)
+          Cases.list_people(socket.assigns.filter, user: socket.assigns.current_user, reject_archived_people: true)
       end
 
     socket

@@ -59,7 +59,12 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_2.request_facility_name == nil
       assert lab_result_2.source == "import"
 
-      [alice, billy] = Cases.list_people(:all, user: @admin) |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
+      [alice, billy] =
+        Cases.list_people(:all, user: @admin, reject_archived_people: true)
+        |> Cases.preload_phones()
+        |> Cases.preload_addresses()
+        |> Cases.preload_demographics()
+
       [alice_demographic_1] = alice.demographics
       assert alice_demographic_1.dob == ~D[1970-01-01]
       assert alice_demographic_1.external_id == "10000"
@@ -114,7 +119,10 @@ defmodule Epicenter.Cases.ImportTest do
                }
                |> Import.import_csv(originator)
 
-      [alice, _billy] = Cases.list_people(:all, user: @admin) |> Cases.preload_case_investigations()
+      [alice, _billy] =
+        Cases.list_people(:all, user: @admin, reject_archived_people: true)
+        |> Cases.preload_case_investigations()
+
       case_investigations = alice.case_investigations
       assert [%CaseInvestigation{} = case_investigation] = case_investigations
       case_investigation = case_investigation |> Cases.preload_initiating_lab_result()
@@ -191,7 +199,12 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.request_facility_name == "Lab Co South"
       assert lab_result_1.source == "import"
 
-      [alice] = Cases.list_people(:all, user: @admin) |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
+      [alice] =
+        Cases.list_people(:all, user: @admin, reject_archived_people: true)
+        |> Cases.preload_phones()
+        |> Cases.preload_addresses()
+        |> Cases.preload_demographics()
+
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.phones |> pluck(:source) == ["import"]
       [alice_demographics] = alice.demographics
@@ -239,7 +252,12 @@ defmodule Epicenter.Cases.ImportTest do
       assert lab_result_1.request_facility_name == "Lab Co South"
       assert lab_result_1.source == "import"
 
-      [alice] = Cases.list_people(:all, user: @admin) |> Cases.preload_phones() |> Cases.preload_addresses() |> Cases.preload_demographics()
+      [alice] =
+        Cases.list_people(:all, user: @admin, reject_archived_people: true)
+        |> Cases.preload_phones()
+        |> Cases.preload_addresses()
+        |> Cases.preload_demographics()
+
       assert alice.phones |> pluck(:number) == ["1111111000"]
       assert alice.phones |> pluck(:source) == ["import"]
       [alice_demographics] = alice.demographics
@@ -299,7 +317,7 @@ defmodule Epicenter.Cases.ImportTest do
 
       assert imported_people |> tids() == ["alice", "billy-1", "billy-2"]
 
-      [alice, billy_1, billy_2] = Cases.list_people(:all, user: @admin) |> Enum.map(&Cases.preload_lab_results/1)
+      [alice, billy_1, billy_2] = Cases.list_people(:all, user: @admin, reject_archived_people: true) |> Enum.map(&Cases.preload_lab_results/1)
 
       assert alice.tid == "alice"
       assert alice.lab_results |> tids() == ~w{alice-result}
@@ -327,7 +345,7 @@ defmodule Epicenter.Cases.ImportTest do
                }
                |> Import.import_csv(originator)
 
-      [person_1, person_2] = Cases.list_people(:all, user: @admin) |> Enum.map(&Cases.preload_lab_results/1)
+      [person_1, person_2] = Cases.list_people(:all, user: @admin, reject_archived_people: true) |> Enum.map(&Cases.preload_lab_results/1)
 
       assert person_1.tid == "person-1"
       assert person_2.tid == "person-2"

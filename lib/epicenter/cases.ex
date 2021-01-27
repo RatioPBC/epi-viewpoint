@@ -108,7 +108,8 @@ defmodule Epicenter.Cases do
   # people
   #
 
-  def archive_person(%Person{} = person, user, audit_meta), do: person |> Person.changeset_for_archive(user) |> AuditLog.update(audit_meta)
+  def archive_person(person_id, current_user, audit_meta),
+    do: person_id |> get_person(current_user) |> Person.changeset_for_archive(current_user) |> AuditLog.update(audit_meta)
 
   def assign_user_to_people(user_id: nil, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user),
     do: assign_user_to_people(user: nil, people_ids: people_ids, audit_meta: audit_meta, current_user: current_user)
@@ -156,10 +157,15 @@ defmodule Epicenter.Cases do
   def get_people(ids, user), do: Person.Query.get_people(ids) |> AuditLog.all(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)
 
-  def list_people(filter, user: %User{} = user), do: Person.Query.filter_with_case_investigation(filter) |> AuditLog.all(user)
+  def list_people(filter, user: %User{} = user, reject_archived_people: reject_archived_people),
+    do: Person.Query.filter_with_case_investigation(filter) |> Person.Query.reject_archived_people(reject_archived_people) |> AuditLog.all(user)
 
-  def list_people(filter, assigned_to_id: user_id, user: %User{} = user),
-    do: Person.Query.filter_with_case_investigation(filter) |> Person.Query.assigned_to_id(user_id) |> AuditLog.all(user)
+  def list_people(filter, assigned_to_id: user_id, user: %User{} = user, reject_archived_people: reject_archived_people),
+    do:
+      Person.Query.filter_with_case_investigation(filter)
+      |> Person.Query.assigned_to_id(user_id)
+      |> Person.Query.reject_archived_people(reject_archived_people)
+      |> AuditLog.all(user)
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)

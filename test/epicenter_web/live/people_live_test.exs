@@ -356,6 +356,25 @@ defmodule EpicenterWeb.PeopleLiveTest do
     end
   end
 
+  describe "archiving people" do
+    test "person can be archived", %{conn: conn, people: [alice | _]} do
+      Pages.People.visit(conn)
+      |> Pages.People.assert_table_contents([
+        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""],
+        ["", "Alice Testuser", "", "10/30/2020", "", ""]
+      ])
+      |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
+      |> Pages.People.click_person_checkbox(person: alice, value: "on")
+      |> Pages.People.assert_checked("[data-tid=alice.tid]")
+      |> Pages.People.click_archive()
+      |> Pages.People.assert_table_contents([
+        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""]
+      ])
+    end
+  end
+
   describe "handle_params" do
     test "blows up when an unknown filter is provided" do
       assert_raise Epicenter.CaseInvestigationFilterError, "Unmatched filter “foo_bar”", fn ->

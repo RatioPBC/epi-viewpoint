@@ -74,7 +74,7 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
              }
              |> Cases.Import.import_csv(@admin)
 
-    [person] = Cases.list_people(:with_positive_lab_results, user: @admin)
+    [person] = Cases.list_people(:with_positive_lab_results, user: @admin, reject_archived_people: true)
 
     conn
     |> Pages.Profile.visit(person)

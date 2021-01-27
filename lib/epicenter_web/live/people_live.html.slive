@@ -16,6 +16,8 @@ section#people-page data-page="people"
                 option value="#{user.id}" #{user.name}
         #assignment-dropdown-tooltip Select people below, then assign them to a user
 
+      button phx-click="archive" data-role="archive-button" Archive
+
     #toolbar-right
       = component(@socket, PeopleFilter, "people filter", display_people_assigned_to_me: @display_people_assigned_to_me, filter: @filter, on_toggle_assigned_to_me: &on_toggle_assigned_to_me/0)
       = if @display_import_button, do: live_redirect "Import labs", to: "/import/start", id: "import-labs", data_role: "import-labs"
