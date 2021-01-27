@@ -193,6 +193,15 @@ defmodule Epicenter.Cases.PersonTest do
 
       assert %{street: "1023 Test St", city: "City7", state: "ZB", postal_code: "00002"} = address_changeset.changes
     end
+
+    test "archiving" do
+      originator = Test.Fixtures.user_attrs(@admin, "originator") |> Accounts.register_user!()
+      originator_id = originator.id
+      person = %Person{tid: "archived-person"}
+      archiving_changeset = Person.changeset(person, %{archived_at: ~U[2020-10-31 23:03:07Z], archived_by_id: originator_id})
+
+      assert %{archived_at: ~U[2020-10-31 23:03:07Z], archived_by_id: ^originator_id} = archiving_changeset.changes
+    end
   end
 
   describe "changeset_for_archive" do

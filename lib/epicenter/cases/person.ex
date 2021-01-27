@@ -13,7 +13,7 @@ defmodule Epicenter.Cases.Person do
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
 
-  @optional_attrs ~w{assigned_to_id tid}a
+  @optional_attrs ~w{assigned_to_id tid archived_at archived_by_id}a
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -69,6 +69,11 @@ defmodule Epicenter.Cases.Person do
   def changeset_for_archive(person, %User{id: archiving_user_id}) do
     person
     |> cast(%{archived_by_id: archiving_user_id, archived_at: DateTime.utc_now()}, ~w{archived_by_id archived_at}a)
+  end
+
+  def changeset_for_unarchive(person_or_changeset) do
+    person_or_changeset
+    |> cast(%{archived_by_id: nil, archived_at: nil}, ~w{archived_by_id archived_at}a)
   end
 
   defp cast_demographics_assoc(changeset, attrs) do

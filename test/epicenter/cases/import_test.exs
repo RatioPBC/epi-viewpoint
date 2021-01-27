@@ -80,7 +80,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice_demographic_1.race == %{"asian" => ["asian_indian"]}
       assert alice_demographic_1.source == "import"
 
-      assert_revision_count(alice, 1)
+      # 2 revisions happen, one to create alice, and one to make sure she is not archived if she gets a positive
+      assert_revision_count(alice, 2)
 
       [billy_demographic_1] = billy.demographics
       assert billy_demographic_1.dob == ~D[1990-03-01]
@@ -219,7 +220,8 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice_demographics.occupation == "Rocket Scientist"
       assert alice_demographics.race == %{"asian" => ["asian_indian"]}
 
-      assert_revision_count(alice, 1)
+      # 2 revisions happen, one to create alice, and one to make sure she is not archived if she gets a positive
+      assert_revision_count(alice, 2)
     end
 
     test "processes empty LabResult 'result' records", %{originator: originator} do
@@ -461,6 +463,73 @@ defmodule Epicenter.Cases.ImportTest do
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:city) == ["City", "City"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:state) == ["OH", "OH"]
       assert alice.addresses |> Euclid.Extra.Enum.pluck(:postal_code) == ["00000", "00000"]
+    end
+
+    test "de-archives the person if a new positive lab result is added to an archived person", %{originator: originator} do
+      # create a person
+      {:ok,
+       %Epicenter.Cases.Import.ImportInfo{
+         imported_people: [imported_person]
+       }} =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
+          Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , OH                   , 00000
+          """
+        }
+        |> Import.import_csv(originator)
+
+      # archive the person
+
+      Cases.archive_person(imported_person.id, originator, Test.Fixtures.audit_meta(originator))
+      assert Cases.get_person(imported_person.id, originator).archived_at != nil
+
+      # upload new lab result for person
+      %{
+        file_name: "test.csv",
+        contents: """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 07/01/2020       , 07/03/2020    , positive  , Lab Co South           , alice      , alice-result-2 , 4251 Test St                , City               , OH                   , 00000
+        """
+      }
+      |> Import.import_csv(originator)
+
+      # check that person is no longer archived
+      assert Cases.get_person(imported_person.id, originator).archived_at == nil
+    end
+
+    test "leaves the person archived if a new negative lab result is added to the archived person", %{originator: originator} do
+      {:ok,
+       %Epicenter.Cases.Import.ImportInfo{
+         imported_people: [imported_person]
+       }} =
+        %{
+          file_name: "test.csv",
+          contents: """
+          search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
+          Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , OH                   , 00000
+          """
+        }
+        |> Import.import_csv(originator)
+
+      # archive the person
+
+      Cases.archive_person(imported_person.id, originator, Test.Fixtures.audit_meta(originator))
+      assert Cases.get_person(imported_person.id, originator).archived_at != nil
+
+      # upload new lab result for person
+      %{
+        file_name: "test.csv",
+        contents: """
+        search_firstname_2 , search_lastname_1 , dateofbirth_8 , phonenumber_7 , caseid_0 , datecollected_36 , resultdate_42 , result_39 , orderingfacilityname_37, person_tid , lab_result_tid , diagaddress_street1_3       , diagaddress_city_4 , diagaddress_state_5  , diagaddress_zip_6
+        Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 07/01/2020       , 07/03/2020    , negative  , Lab Co South           , alice      , alice-result-2 , 4251 Test St                , City               , OH                   , 00000
+        """
+      }
+      |> Import.import_csv(originator)
+
+      # check that person is no longer archived
+      assert Cases.get_person(imported_person.id, originator).archived_at != nil
     end
   end
 

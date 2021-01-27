@@ -190,8 +190,31 @@ defmodule Epicenter.Cases.Import do
       find_or_create_case_investigation_for_positive_lab_result(lab_result, person, originator)
       import_phone_number(row, person, originator)
       import_address(row, person, originator)
+      person = person |> unarchive_person_for_positive_lab_result(lab_result, originator)
       %{person: person, lab_result: lab_result}
     end
+  end
+
+  defp unarchive_person_for_positive_lab_result(
+         person,
+         %LabResult{is_positive_or_detected: is_positive_or_detected} = _lab_result,
+         originator
+       ) do
+    cond do
+      is_positive_or_detected -> unarchive_person(person, originator)
+      true -> person
+    end
+  end
+
+  defp unarchive_person(person, originator) do
+    {:ok, person} =
+      person.id
+      |> Cases.unarchive_person(
+        originator,
+        audit_tuple(originator, AuditLog.Revision.archive_person_action())
+      )
+
+    person
   end
 
   def find_or_create_case_investigation_for_positive_lab_result(
@@ -292,6 +315,14 @@ defmodule Epicenter.Cases.Import do
         |> in_audit_tuple(author, AuditLog.Revision.upsert_address_action())
       )
     end
+  end
+
+  defp audit_tuple(originator, reason_action) do
+    %AuditLog.Meta{
+      author_id: originator.id,
+      reason_action: reason_action,
+      reason_event: AuditLog.Revision.import_csv_event()
+    }
   end
 
   defp in_audit_tuple(data, author, reason_action) do
