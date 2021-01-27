@@ -202,20 +202,6 @@ defmodule Epicenter.Cases.Person do
     def reject_archived_people(query, true = _reject_archived), do: query |> where([p], is_nil(p.archived_at))
     def reject_archived_people(query, false = _reject_archived), do: query
 
-    def duplicates(%Person{id: person_id}) do
-      target_query =
-        from source in Demographic,
-          where: source.person_id == ^person_id,
-          join: target in Demographic,
-          on: fragment("lower(?)", source.last_name) == fragment("lower(?)", target.last_name),
-          where: target.person_id != ^person_id,
-          where: fragment("lower(?)", source.first_name) == fragment("lower(?)", target.first_name) or source.dob == target.dob,
-          select: target.person_id
-
-      from people in Person,
-        where: people.id in subquery(target_query)
-    end
-
     def filter_with_case_investigation(:all), do: Person.Query.all()
     def filter_with_case_investigation(:with_isolation_monitoring), do: Person.Query.with_case_investigation_isolation_monitoring()
     def filter_with_case_investigation(:with_ongoing_interview), do: Person.Query.with_case_investigation_ongoing_interview()
@@ -346,6 +332,87 @@ defmodule Epicenter.Cases.Person do
 
     defp is_uuid?(term) do
       String.match?(term, ~r/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/)
+    end
+
+    @duplicates_sql """
+    select distinct(potential_duplicate_person_id) from (
+        with latest_last_name as (
+            select max(seq) max_seq, person_id
+            from demographics
+            where last_name is not null
+            group by person_id
+        ),
+        latest_first_name as (
+            select max(seq) max_seq, person_id
+            from demographics
+            where first_name is not null
+            group by person_id
+        ),
+        latest_dob as (
+            select max(seq) max_seq, person_id
+            from demographics
+            where dob is not null
+            group by person_id
+        )
+        select d.person_id as potential_duplicate_person_id
+        from demographics d
+        join latest_last_name latest on d.seq = latest.max_seq and d.person_id = latest.person_id
+        and lower(d.last_name) = lower($1)
+        where d.person_id != $4
+        INTERSECT
+        (
+            select d.person_id
+            from demographics d
+            join latest_first_name latest
+            on d.seq = latest.max_seq and d.person_id = latest.person_id
+            where lower(d.first_name) = lower($2)
+            UNION
+            select d.person_id
+            from demographics d
+            join latest_dob latest
+            on d.seq = latest.max_seq and d.person_id = latest.person_id
+            where d.dob = $3
+            UNION
+            select target.person_id
+            from phones target
+            join phones source on target.number = source.number
+            where source.person_id = $4
+            and source.person_id != target.person_id
+            UNION
+            select target.person_id
+            from addresses target
+            join addresses source on
+                lower(target.street) = lower(source.street) and
+                lower(target.city) = lower(source.city) and
+                lower(target.state) = lower(source.state) and
+                lower(target.postal_code) = lower(source.postal_code)
+            where source.tid = 'source'
+            and target.person_id != source.person_id
+        )
+    ) as potential_duplicates
+    """
+
+    def duplicates(person) do
+      demographic = Person.coalesce_demographics(person)
+
+      {:ok, person_uuid} = person.id |> Ecto.UUID.dump()
+
+      %{rows: person_ids} =
+        Ecto.Adapters.SQL.query!(
+          Epicenter.Repo,
+          @duplicates_sql,
+          [demographic.last_name, demographic.first_name, demographic.dob, person_uuid]
+        )
+
+      person_ids =
+        person_ids
+        |> Enum.map(fn val ->
+          {:ok, uuid} = Ecto.UUID.cast(hd(val))
+          uuid
+        end)
+
+      from people in Person,
+        where: people.id in ^person_ids
     end
   end
 end
