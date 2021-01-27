@@ -140,7 +140,7 @@ defmodule Epicenter.Cases do
   def create_person({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert(audit_meta)
 
   def find_duplicates(%Person{} = person) do
-    person |> preload_demographics |> Person.Query.duplicates() |> Repo.all()
+    person |> preload_demographics |> Person.Duplicates.Query.all() |> Repo.all()
   end
 
   def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name})
