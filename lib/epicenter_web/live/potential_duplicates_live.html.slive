@@ -24,7 +24,7 @@
         = for person <- @duplicate_people do
           tr data-role="duplicate-person" data-tid=person.tid
             td
-              input type="checkbox" phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
+              input type="checkbox" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
             td= Format.person(person)
             td= person.demographics |> pluck(:dob) |> list_or_unknown(transform: &Format.date/1, pre: &Extra.Enum.sort_uniq(&1, Date))
             td= person.phones |> list_or_unknown(transform: &Format.phone/1, post: &Extra.Enum.sort_uniq/1)
