@@ -56,7 +56,7 @@ defmodule Epicenter.Cases.Person.Duplicates do
                 lower(target.city) = lower(source.city) and
                 lower(target.state) = lower(source.state) and
                 lower(target.postal_code) = lower(source.postal_code)
-            where source.tid = 'source'
+            where source.person_id = $4
             and target.person_id != source.person_id
         )
     ) as potential_duplicates

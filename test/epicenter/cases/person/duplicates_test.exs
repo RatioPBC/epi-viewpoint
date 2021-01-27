@@ -16,14 +16,23 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
     end
 
     defp add_phone(person, number) do
-      Test.Fixtures.phone_attrs(@admin, person, person.tid, %{number: number}) |> Cases.create_phone!()
+      %Cases.Phone{} = Test.Fixtures.phone_attrs(@admin, person, person.tid, %{number: number}) |> Cases.create_phone!()
       person
     end
 
-    #    defp add_address(person, number) do
-    #      Test.Fixtures.address_attrs(@admin, person, person.tid, %{number: number}) |> Cases.create_phone!()
-    #      person
-    #    end
+    defp add_address(person, address \\ :source) do
+      attrs = %{
+        source: %{street: "1000 Test St", city: "City1", state: "CA", postal_code: "00001"},
+        different_street: %{street: "1001 Test St", city: "City1", state: "CA", postal_code: "00001"},
+        different_city: %{street: "1000 Test St", city: "City2", state: "CA", postal_code: "00001"},
+        different_state: %{street: "1000 Test St", city: "City1", state: "NC", postal_code: "00001"},
+        different_postal_code: %{street: "1000 Test St", city: "City1", state: "CA", postal_code: "00002"},
+        different_everything: %{street: "1001 Test St", city: "City2", state: "NC", postal_code: "00002"}
+      }
+
+      %Cases.Address{} = Test.Fixtures.address_attrs(@admin, person, "address-" <> person.tid, 0, attrs[address]) |> Cases.create_address!()
+      person
+    end
 
     defp create_demographic(person, attrs) do
       {:ok, _result} = Test.Fixtures.demographic_attrs(@admin, person, nil, attrs) |> Cases.create_demographic()
@@ -36,14 +45,12 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
       Person.Duplicates.Query.all(source) |> Repo.all() |> assert_eq([])
     end
 
-    # todo: also consider phone number and address
-    # todo: also handle multiple demographics for a person
     test "returns people with the same last name at least one of the same: first name, date of birth" do
       first = "Alice"
       last = "Testuser1"
       dob = ~D[2004-01-01]
       phone = "111-111-1234"
-      source = create_person("source", %{first_name: first, last_name: last, dob: dob}) |> add_phone(phone)
+      source = create_person("source", %{first_name: first, last_name: last, dob: dob}) |> add_phone(phone) |> add_address()
 
       # not duplicates
       create_person("different", %{first_name: "Different", last_name: "Testuser-different", dob: ~D[1900-01-01]})
@@ -57,7 +64,11 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
 
       create_person("dob-used-to-match", %{first_name: "Different", last_name: last, dob: dob}) |> create_demographic(%{dob: ~D[1900-01-01]})
       create_person("different-phone", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_phone("111-111-1999")
-      #      create_person("different-address", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address
+      create_person("different-address", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address(:different_everything)
+      create_person("different-street", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address(:different_street)
+      create_person("different-city", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address(:different_city)
+      create_person("different-state", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address(:different_state)
+      create_person("different-postal_code", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address(:different_postal_code)
 
       # duplicates
       create_person("last+first", %{first_name: first, last_name: last, dob: ~D[1900-01-01]})
@@ -65,6 +76,7 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
       create_person("last+dob", %{first_name: "Different", last_name: last, dob: dob})
       create_person("last+dob+first", %{first_name: first, last_name: last, dob: dob})
       create_person("last+phone", %{last_name: last}) |> add_phone(phone)
+      create_person("last+address", %{last_name: last}) |> add_address(:source)
 
       create_person("latest-last+first", %{last_name: "Testuser-different", first_name: first})
       |> create_demographic(%{last_name: last, first_name: first})
@@ -86,6 +98,7 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
         latest-last+first
         last+latest-first
         last+latest-dob
+        last+address
         },
         ignore_order: true
       )
