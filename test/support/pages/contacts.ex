@@ -40,6 +40,14 @@ defmodule EpicenterWeb.Test.Pages.Contacts do
     view
   end
 
+  def click_archive(%View{} = view) do
+    view
+    |> element("[data-role=archive-button]")
+    |> render_click()
+
+    view
+  end
+
   def select_filter(%View{} = view, filter_name) do
     view |> element("[data-tid=#{filter_name}]") |> render_click()
     view

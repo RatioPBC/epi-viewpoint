@@ -40,6 +40,27 @@ defmodule EpicenterWeb.ContactsLiveTest do
     end
   end
 
+  describe "archiving people" do
+    test "person can be archived", %{conn: conn, bob: bob, caroline: caroline, donald: donald} do
+      Pages.Contacts.visit(conn)
+      |> Pages.Contacts.assert_table_contents([
+        ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],
+        ["", "Bob Testuser", bob.id, "10/31/2020", "Ongoing monitoring (11 days remaining)", ""],
+        ["", "Caroline Testuser", caroline.id, "10/31/2020", "Pending interview", "assignee"],
+        ["", "Donald Testuser", donald.id, "10/31/2020", "Discontinued", ""]
+      ])
+      |> Pages.Contacts.assert_unchecked("[data-tid=#{bob.tid}]")
+      |> Pages.Contacts.click_person_checkbox(person: bob, value: "on")
+      |> Pages.Contacts.assert_checked("[data-tid=#{bob.tid}]")
+      |> Pages.Contacts.click_archive()
+      |> Pages.Contacts.assert_table_contents([
+        ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],
+        ["", "Caroline Testuser", caroline.id, "10/31/2020", "Pending interview", "assignee"],
+        ["", "Donald Testuser", donald.id, "10/31/2020", "Discontinued", ""]
+      ])
+    end
+  end
+
   describe "filtering" do
     setup %{user: user, bob: bob, caroline: caroline, donald: donald} do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()

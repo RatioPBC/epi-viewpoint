@@ -35,7 +35,8 @@ defmodule Epicenter.ContactInvestigations do
     |> log_case_investigations(user)
   end
 
-  def list_exposed_people(filter, user), do: Person.Query.filter_with_contact_investigation(filter) |> AuditLog.all(user)
+  def list_exposed_people(filter, user, reject_archived_people: reject_archived_people),
+    do: Person.Query.filter_with_contact_investigation(filter) |> Person.Query.reject_archived_people(reject_archived_people) |> AuditLog.all(user)
 
   defp log_case_investigations(nil, _user), do: nil
 

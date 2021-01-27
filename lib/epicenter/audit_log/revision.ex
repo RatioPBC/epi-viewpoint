@@ -75,6 +75,7 @@ defmodule Epicenter.AuditLog.Revision do
   def conclude_contact_investigation_quarantine_monitoring_event(), do: "conclude-contact-investigation-quarantine-monitoring"
   def complete_case_investigation_interview_event(), do: "complete-case-investigation-interview"
   def complete_contact_investigation_interview_event(), do: "complete-contact-investigation-interview"
+  def contacts_archive_people_event(), do: "contacts-archive-people"
   def create_contact_event(), do: "create-contact"
   def discontinue_pending_case_interview_event(), do: "discontinue-pending-case-interview"
   def discontinue_contact_investigation_event(), do: "discontinue-contact-investigation"

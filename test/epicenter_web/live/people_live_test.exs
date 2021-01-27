@@ -366,7 +366,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       ])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
       |> Pages.People.click_person_checkbox(person: alice, value: "on")
-      |> Pages.People.assert_checked("[data-tid=alice.tid]")
+      |> Pages.People.assert_checked("[data-tid=#{alice.tid}]")
       |> Pages.People.click_archive()
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],

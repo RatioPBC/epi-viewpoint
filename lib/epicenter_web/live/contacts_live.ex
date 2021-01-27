@@ -53,6 +53,23 @@ defmodule EpicenterWeb.ContactsLive do
     |> ok()
   end
 
+  def handle_event("archive", _, socket) do
+    for {person_id, _is_selected} <- socket.assigns.selected_people do
+      {:ok, _} =
+        Cases.archive_person(
+          person_id,
+          socket.assigns.current_user,
+          %AuditLog.Meta{
+            author_id: socket.assigns.current_user.id,
+            reason_action: AuditLog.Revision.archive_person_action(),
+            reason_event: AuditLog.Revision.contacts_archive_people_event()
+          }
+        )
+    end
+
+    socket |> load_and_assign_exposed_people() |> noreply()
+  end
+
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
     do: socket |> select_person(person_id) |> noreply()
 
@@ -114,7 +131,9 @@ defmodule EpicenterWeb.ContactsLive do
     do: socket |> assign(selected_people: %{})
 
   defp load_and_assign_exposed_people(socket),
-    do: socket |> assign_people(ContactInvestigations.list_exposed_people(socket.assigns.filter, socket.assigns.current_user))
+    do:
+      socket
+      |> assign_people(ContactInvestigations.list_exposed_people(socket.assigns.filter, socket.assigns.current_user, reject_archived_people: true))
 
   defp load_and_assign_users(socket),
     do: socket |> assign(users: Accounts.list_users())

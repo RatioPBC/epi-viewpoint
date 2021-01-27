@@ -60,29 +60,54 @@ defmodule Epicenter.ContactInvestigationsTest do
 
     setup do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
-      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
-      lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
-      case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
-
-      {:ok, contact_investigation} =
-        {Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id}),
-         Test.Fixtures.admin_audit_meta()}
-        |> ContactInvestigations.create()
-
-      [contact_investigation: contact_investigation]
+      [user: user]
     end
 
-    test "returns exposed people",
-      do:
-        ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin)
-        |> tids()
-        |> assert_eq(~w{exposed_person_contact_investigation})
+    defp create_contact_investigation(user, exposing_person_tid, exposed_person_tid) do
+      exposing_person = Test.Fixtures.person_attrs(user, exposing_person_tid) |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(exposing_person, user, "lab-result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+      case_investigation = Test.Fixtures.case_investigation_attrs(exposing_person, lab_result, user, "case") |> Cases.create_case_investigation!()
+      {exposed_person_attrs, _meta} = Test.Fixtures.person_attrs(user, exposed_person_tid)
 
-    test "records audit log for viewed people", %{contact_investigation: contact_investigation} do
+      {:ok, contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs("#{exposed_person_tid}-contact-investigation",
+           exposing_case_id: case_investigation.id,
+           exposed_person: exposed_person_attrs
+         ), Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
       exposed_person = contact_investigation |> Repo.preload(:exposed_person) |> Map.get(:exposed_person)
+      {contact_investigation, exposed_person}
+    end
 
-      capture_log(fn -> ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin) end)
+    test "returns exposed people", %{user: user} do
+      create_contact_investigation(user, "exposing", "exposed-1")
+      create_contact_investigation(user, "exposing", "exposed-2")
+
+      ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin, reject_archived_people: true)
+      |> tids()
+      |> assert_eq(~w{exposed-1 exposed-2}, ignore_order: true)
+    end
+
+    test "records audit log for viewed people", %{user: user} do
+      {_, exposed_person} = create_contact_investigation(user, "exposing", "exposed")
+
+      capture_log(fn -> ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin, reject_archived_people: true) end)
       |> AuditLogAssertions.assert_viewed_person(@admin, exposed_person)
+    end
+
+    test "can optionally show archived people", %{user: user} do
+      create_contact_investigation(user, "exposing", "not-archived")
+      {_, archived_person} = create_contact_investigation(user, "exposing", "archived")
+      Cases.archive_person(archived_person.id, user, Test.Fixtures.admin_audit_meta())
+
+      ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin, reject_archived_people: false)
+      |> tids()
+      |> assert_eq(~w{archived not-archived}, ignore_order: true)
+
+      ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin, reject_archived_people: true)
+      |> tids()
+      |> assert_eq(~w{not-archived}, ignore_order: true)
     end
   end
 
