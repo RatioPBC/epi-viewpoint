@@ -43,6 +43,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> assign_updated_person(person)
     |> assign_case_investigations(person)
     |> assign_contact_investigations(person)
+    |> assign_potential_duplicate_count(person)
     |> assign_users()
     |> assign_current_date()
     |> ok()
@@ -220,6 +221,10 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_investigation_notes()
 
     assign(socket, contact_investigations: contact_investigations)
+  end
+
+  defp assign_potential_duplicate_count(socket, person) do
+    assign(socket, potential_duplicate_count: Cases.count_duplicate_people(person))
   end
 
   defp assign_users(socket),

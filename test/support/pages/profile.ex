@@ -187,6 +187,14 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_potential_duplicates_button_present(%View{} = view, present?) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.present?(role: "view-potential-duplicates")
+    |> assert_eq(present?)
+  end
+
   def assert_start_interview_button_title(%View{} = view, number, title) do
     view
     |> render()

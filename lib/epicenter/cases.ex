@@ -138,13 +138,12 @@ defmodule Epicenter.Cases do
   end
 
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
+  def count_duplicate_people(person), do: person |> Person.Duplicates.Query.all() |> Repo.aggregate(:count)
   def count_people(), do: Person |> Repo.aggregate(:count)
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)
   def create_person({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert(audit_meta)
 
-  def find_duplicates(%Person{} = person) do
-    person |> preload_demographics |> Person.Duplicates.Query.all() |> Repo.all()
-  end
+  def find_duplicate_people(%Person{} = person), do: person |> Person.Duplicates.Query.all() |> Repo.all()
 
   def find_matching_person(%{"dob" => dob, "first_name" => first_name, "last_name" => last_name})
       when not is_nil(dob) and not is_nil(first_name) and not is_nil(last_name) do

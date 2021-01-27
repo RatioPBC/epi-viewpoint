@@ -66,6 +66,28 @@ defmodule EpicenterWeb.ProfileLiveTest do
     |> AuditLogAssertions.assert_viewed_person(user, contact_investigation2.exposed_person)
   end
 
+  describe "potential duplicates" do
+    defp create_person(tid, attrs) do
+      Test.Fixtures.person_attrs(@admin, tid, %{}) |> Test.Fixtures.add_demographic_attrs(attrs) |> Cases.create_person!()
+    end
+
+    test "when there are potential duplicates, it shows the 'View potential duplicates' button", %{conn: conn} do
+      person = create_person("person", %{last_name: "Testuser", first_name: "Alice"})
+      create_person("duplicate", %{last_name: "Testuser", first_name: "Alice"})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_potential_duplicates_button_present(true)
+    end
+
+    test "when there are not potential duplicates, it does not show the button", %{conn: conn} do
+      person = create_person("person", %{last_name: "Testuser999", first_name: "Doug", dob: ~D[2004-01-01]})
+      create_person("not-duplicate", %{last_name: "Testuser", first_name: "Bob", dob: ~D[1990-01-01]})
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_potential_duplicates_button_present(false)
+    end
+  end
+
   describe "when the person has no identifying information" do
     test "showing person identifying information", %{conn: conn, person: person, user: user} do
       {:ok, _} =

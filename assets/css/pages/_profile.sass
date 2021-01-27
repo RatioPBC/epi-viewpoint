@@ -6,6 +6,18 @@
   #heading
     @include vertical-flow
 
+    #toolbar
+      @include level($justify: space-between)
+
+      #toolbar-left
+        @include level($justify: left)
+
+      #toolbar-right
+        @include level($justify: right)
+
+        a
+          @include button-primary
+
     #external-id
       color: $secondary-text-color
 

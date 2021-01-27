@@ -244,7 +244,7 @@ defmodule Epicenter.CasesTest do
              } = recent_audit_log(person).change
     end
 
-    test "find_duplicates finds similar people" do
+    test "duplicates" do
       [alice, _amy, _billy] =
         [{"alice", "Alice", "Testuser1"}, {"amy", "Amy", "Testuser1"}, {"billy", "Billy", "Testuser2"}]
         |> Enum.map(fn {tid, first, last} ->
@@ -253,7 +253,8 @@ defmodule Epicenter.CasesTest do
           |> Cases.create_person!()
         end)
 
-      assert Cases.find_duplicates(alice) |> tids() == ["amy"]
+      assert Cases.find_duplicate_people(alice) |> tids() == ["amy"]
+      assert Cases.count_duplicate_people(alice) == 1
     end
 
     test "get_people fetches all the people" do

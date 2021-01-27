@@ -2,7 +2,13 @@
 
   section#heading
     div
-      h1 data-role="full-name"= string_or_unknown(Format.person(@person))
+      div#toolbar
+        h1#toolbar-left data-role="full-name"= string_or_unknown(Format.person(@person))
+        #toolbar-right
+          = if @potential_duplicate_count > 0 do
+            = live_redirect "View potential duplicates (#{@potential_duplicate_count})",
+              to: Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person),
+              data_role: "view-potential-duplicates"
       h3#external-id data-role="external-id"= demographic_field(@person, :external_id) |> Format.demographic(:external_id)
 
     form id="assignment-form" phx-change="form-change"
