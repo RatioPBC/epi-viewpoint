@@ -24,6 +24,6 @@ defmodule EpicenterWeb.Test.Pages.PotentialDuplicates do
     view
   end
 
-  defp table_contents(view, opts),
+  def table_contents(view, opts),
     do: view |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "duplicates"))
 end

@@ -19,11 +19,18 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
       |> Cases.preload_phones()
       |> Cases.preload_addresses()
 
+    duplicate_people =
+      Cases.find_duplicate_people(person)
+      |> Cases.preload_demographics()
+      |> Cases.preload_phones()
+      |> Cases.preload_addresses()
+      |> Enum.sort_by(&Format.person(&1), &Extra.String.case_insensitive_sort_fun/2)
+
     socket
     |> assign_defaults(body_class: "body-background-none")
     |> assign_page_title(Format.person(person))
     |> assign(:person, person)
-    |> assign(:duplicate_people, [person])
+    |> assign(:duplicate_people, [person | duplicate_people])
     |> ok()
   end
 end

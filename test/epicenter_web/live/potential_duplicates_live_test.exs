@@ -28,6 +28,10 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
     [person: person, user: user]
   end
 
+  defp create_person(user, tid, attrs) do
+    Test.Fixtures.person_attrs(user, tid, %{}) |> Test.Fixtures.add_demographic_attrs(attrs) |> Cases.create_person!()
+  end
+
   test "disconnected and connected render", %{conn: conn, person: person} do
     {:ok, page_live, disconnected_html} = live(conn, "/people/#{person.id}/potential-duplicates")
 
@@ -35,7 +39,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
     assert_has_role(page_live, "potential-duplicates-page")
   end
 
-  test "showing the page", %{conn: conn, person: person} do
+  test "shows all relevant information about a person", %{conn: conn, person: person} do
     Pages.PotentialDuplicates.visit(conn, person)
     |> Pages.PotentialDuplicates.assert_here(person)
     |> Pages.PotentialDuplicates.assert_table_contents(
@@ -50,5 +54,15 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
       ],
       columns: ["Name", "Date of Birth", "Phone", "Address"]
     )
+  end
+
+  test "shows all the duplicates of the person", %{conn: conn, user: user} do
+    alice = create_person(user, "alice", %{first_name: "Alice", last_name: "Testuser", dob: ~D[1900-01-01]})
+    create_person(user, "cindy", %{first_name: "Cindy", last_name: "Testuser", dob: ~D[1900-01-01]})
+    create_person(user, "billy", %{first_name: "Billy", last_name: "Testuser", dob: ~D[1900-01-01]})
+
+    Pages.PotentialDuplicates.visit(conn, alice)
+    |> Pages.PotentialDuplicates.assert_here(alice)
+    |> Pages.PotentialDuplicates.assert_table_contents([["alice"], ["billy"], ["cindy"]], tids: true, headers: false, columns: [])
   end
 end
