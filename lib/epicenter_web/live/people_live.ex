@@ -109,7 +109,7 @@ defmodule EpicenterWeb.PeopleLive do
         )
     end
 
-    socket |> load_and_assign_people() |> noreply()
+    socket |> assign_selected_to_empty() |> load_and_assign_people() |> noreply()
   end
 
   def handle_info(:display_people_assigned_to_me_toggled, socket) do

@@ -301,6 +301,18 @@ defmodule EpicenterWeb.PeopleLiveTest do
   end
 
   describe "assigning people" do
+    test "the assignment dropdown is disabled by default", %{conn: conn} do
+      {:ok, index_live, _} = live(conn, "/people")
+      Pages.People.assert_assignment_dropdown_disabled(index_live)
+    end
+
+    test "the assignment dropdown is enabled after selecting a person", %{conn: conn, people: [alice | _]} do
+      {:ok, index_live, _} = live(conn, "/people")
+      Pages.People.assert_assignment_dropdown_disabled(index_live)
+      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
+      Pages.People.assert_assignment_dropdown_enabled(index_live)
+    end
+
     test "user can be assigned to people", %{assignee: assignee, conn: conn, people: [alice, billy | _]} do
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents([
@@ -319,6 +331,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ["", "Alice Testuser", "", "10/30/2020", "", "assignee"]
       ])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
+      |> Pages.People.assert_assignment_dropdown_disabled()
+      |> Pages.People.assert_archive_button_disabled()
 
       Cases.get_people([alice.id, billy.id], @admin)
       |> Cases.preload_assigned_to()
@@ -359,6 +373,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
   describe "archiving people" do
     test "person can be archived", %{conn: conn, people: [alice | _]} do
       Pages.People.visit(conn)
+      |> Pages.People.assert_archive_button_disabled()
       |> Pages.People.assert_table_contents([
         ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""],
@@ -372,6 +387,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
         ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""]
       ])
+      |> Pages.People.assert_assignment_dropdown_disabled()
+      |> Pages.People.assert_archive_button_disabled()
     end
   end
 
@@ -380,20 +397,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
       assert_raise Epicenter.CaseInvestigationFilterError, "Unmatched filter “foo_bar”", fn ->
         PeopleLive.handle_params(%{"filter" => "foo_bar"}, "http://example.com", %Phoenix.LiveView.Socket{})
       end
-    end
-  end
-
-  describe "save button" do
-    test "it is disabled by default", %{conn: conn} do
-      {:ok, index_live, _} = live(conn, "/people")
-      assert_disabled(index_live, "[data-role=users]")
-    end
-
-    test "it is enabled after selecting a person", %{conn: conn, people: [alice | _]} do
-      {:ok, index_live, _} = live(conn, "/people")
-      assert_disabled(index_live, "[data-role=users]")
-      index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
-      assert_enabled(index_live, "[data-role=users]")
     end
   end
 
