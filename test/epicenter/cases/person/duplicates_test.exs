@@ -70,6 +70,10 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
       create_person("different-state", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address(:different_state)
       create_person("different-postal_code", %{first_name: "Different", last_name: last, dob: ~D[1900-01-01]}) |> add_address(:different_postal_code)
 
+      create_person("last+first+but-archived", %{first_name: first, last_name: last, dob: ~D[1900-01-01]})
+      |> Map.get(:id)
+      |> Cases.archive_person(@admin, Test.Fixtures.admin_audit_meta())
+
       # duplicates
       create_person("last+first", %{first_name: first, last_name: last, dob: ~D[1900-01-01]})
       create_person("last+first-upcase", %{first_name: String.upcase(first), last_name: String.upcase(last), dob: ~D[1900-01-01]})

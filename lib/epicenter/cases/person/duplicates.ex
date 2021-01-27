@@ -81,8 +81,8 @@ defmodule Epicenter.Cases.Person.Duplicates do
           uuid
         end)
 
-      from people in Person,
-        where: people.id in ^person_ids
+      from(people in Person, where: people.id in ^person_ids)
+      |> Person.Query.reject_archived_people(true)
     end
   end
 end
