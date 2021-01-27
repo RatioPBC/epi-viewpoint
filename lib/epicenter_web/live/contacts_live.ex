@@ -67,7 +67,7 @@ defmodule EpicenterWeb.ContactsLive do
         )
     end
 
-    socket |> load_and_assign_exposed_people() |> noreply()
+    socket |> assign_selected_to_empty() |> load_and_assign_exposed_people() |> noreply()
   end
 
   def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),

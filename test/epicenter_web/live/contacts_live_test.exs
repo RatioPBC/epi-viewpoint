@@ -43,6 +43,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
   describe "archiving people" do
     test "person can be archived", %{conn: conn, bob: bob, caroline: caroline, donald: donald} do
       Pages.Contacts.visit(conn)
+      |> Pages.Contacts.assert_archive_button_disabled()
       |> Pages.Contacts.assert_table_contents([
         ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],
         ["", "Bob Testuser", bob.id, "10/31/2020", "Ongoing monitoring (11 days remaining)", ""],
@@ -58,6 +59,8 @@ defmodule EpicenterWeb.ContactsLiveTest do
         ["", "Caroline Testuser", caroline.id, "10/31/2020", "Pending interview", "assignee"],
         ["", "Donald Testuser", donald.id, "10/31/2020", "Discontinued", ""]
       ])
+      |> Pages.Contacts.assert_assignment_dropdown_disabled()
+      |> Pages.Contacts.assert_archive_button_disabled()
     end
   end
 

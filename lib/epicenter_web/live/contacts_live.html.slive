@@ -6,7 +6,7 @@ section#contacts-page data-page="contacts"
   #toolbar
     #toolbar-left
       = component(@socket, EpicenterWeb.AssignmentSelector, "assignment-selection", users: @users, disabled: disabled?(@selected_people), on_assignee_selected: fn user_id -> send(self(), {:assignee_selected, user_id}) end)
-      button#archive-button phx-click="archive" data-role="archive-button" Archive
+      button#archive-button phx-click="archive" data-role="archive-button" disabled=disabled?(@selected_people) Archive
 
 
     #toolbar-right

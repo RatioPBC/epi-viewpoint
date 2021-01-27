@@ -12,6 +12,11 @@ defmodule EpicenterWeb.Test.Pages.Contacts do
     view
   end
 
+  def assert_assignment_dropdown_disabled(%View{} = view) do
+    LiveViewAssertions.assert_disabled(view, "[data-role=users]")
+    view
+  end
+
   def assert_checked(%View{} = view, selector) do
     LiveViewAssertions.assert_attribute(view, selector, "checked", ["checked"])
     view
@@ -32,6 +37,11 @@ defmodule EpicenterWeb.Test.Pages.Contacts do
 
   def assert_unchecked(%View{} = view, selector) do
     LiveViewAssertions.assert_attribute(view, selector, "checked", [])
+    view
+  end
+
+  def assert_archive_button_disabled(%View{} = view) do
+    LiveViewAssertions.assert_disabled(view, "[data-role=archive-button]")
     view
   end
 
