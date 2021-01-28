@@ -11,7 +11,7 @@
       h2 Step 1: View potential duplicates
       p These records share the same (last name) and (first name, date of birth, phone number, or address).
 
-    = form_for :records_to_merge, Routes.resolve_conflicts_path(EpicenterWeb.Endpoint, EpicenterWeb.ResolveConflictsLive), [id: "records-to-merge-form", phx_submit: "merge-selected-people", phx_change: "set-selected-people"], fn f ->
+    = form_for :records_to_merge, Routes.resolve_conflicts_path(EpicenterWeb.Endpoint, EpicenterWeb.ResolveConflictsLive, @person.id), [id: "records-to-merge-form", phx_submit: "merge-selected-people", phx_change: "set-selected-people"], fn f ->
       table data-role="duplicates"
         thead
           tr data-role="table-column-names"
@@ -40,5 +40,3 @@
         = submit data_role: "merge-button", disabled: (@selected_people == []), id: "merge-button" do
           span Merge
           = arrow_right_icon()
-
-

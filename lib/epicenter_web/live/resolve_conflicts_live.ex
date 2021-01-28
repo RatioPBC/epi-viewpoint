@@ -8,10 +8,10 @@ defmodule EpicenterWeb.ResolveConflictsLive do
   alias EpicenterWeb.Format
   alias EpicenterWeb.Forms.ResolveConflictsForm
 
-  def mount(%{"person_ids" => comma_separated_person_ids} = _params, session, socket) do
+  def mount(%{"id" => person_id, "duplicate_person_ids" => comma_separated_duplicate_person_ids} = _params, session, socket) do
     socket = socket |> authenticate_user(session)
 
-    person_ids = String.split(comma_separated_person_ids, ",")
+    person_ids = [person_id] ++ String.split(comma_separated_duplicate_person_ids, ",")
     merge_fields = [{:first_name, :string}, {:dob, :date}, {:preferred_language, :string}]
     merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, merge_fields)
 
@@ -20,7 +20,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> assign_page_title("Resolve Conflicts")
     |> assign(:merge_conflicts, merge_conflicts)
     |> assign(:form_changeset, ResolveConflictsForm.changeset(merge_conflicts, %{}))
-    |> assign_person_ids(comma_separated_person_ids)
+    |> assign_person_ids(comma_separated_duplicate_person_ids)
     |> ok()
   end
 
