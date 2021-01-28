@@ -1079,6 +1079,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
       view =
         Pages.Profile.visit(conn, sick_person)
         |> Pages.Profile.refute_archived_banner_is_visible()
+        |> Pages.assert_element_triggers_confirmation_prompt(
+          "archive",
+          "Archive record? This record will no longer be editable and will not appear on the index case list, contacts list, nor in the search results."
+        )
         |> Pages.Profile.click_archive_button()
 
       sick_person = Cases.get_person(sick_person.id, user)

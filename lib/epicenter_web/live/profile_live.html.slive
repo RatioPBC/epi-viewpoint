@@ -10,7 +10,7 @@
       div#toolbar
         h1#toolbar-left data-role="full-name"= string_or_unknown(Format.person(@person))
         #toolbar-right
-          button#archive data-role="archive" phx-click="archive" Archive
+          button#archive data-role="archive" phx-click="archive" data-confirm="Archive record? This record will no longer be editable and will not appear on the index case list, contacts list, nor in the search results." Archive
           = if @potential_duplicate_count > 0 do
             = live_redirect "View potential duplicates (#{@potential_duplicate_count})",
               id: "view-potential-duplicates",
