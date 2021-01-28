@@ -340,6 +340,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_view_potential_duplicates(%View{} = view) do
+    view
+    |> element("#view-potential-duplicates")
+    |> render_click()
+  end
+
   def case_investigation_notes(%View{} = view, number) do
     view
     |> render()

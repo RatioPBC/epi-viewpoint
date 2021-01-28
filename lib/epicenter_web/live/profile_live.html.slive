@@ -12,6 +12,7 @@
         #toolbar-right
           = if @potential_duplicate_count > 0 do
             = live_redirect "View potential duplicates (#{@potential_duplicate_count})",
+              id: "view-potential-duplicates",
               to: Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person),
               data_role: "view-potential-duplicates"
       h3#external-id data-role="external-id"= demographic_field(@person, :external_id) |> Format.demographic(:external_id)

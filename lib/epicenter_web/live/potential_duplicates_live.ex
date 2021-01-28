@@ -35,9 +35,17 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
     |> ok()
   end
 
-  def handle_event("change", params, socket) do
+  def handle_event("set-selected-people", params, socket) do
     selected_people = params |> Map.get("selected_people") || []
     socket |> assign(:selected_people, selected_people) |> noreply
+  end
+
+  def handle_event("merge-selected-people", _params, socket) do
+    person_ids = socket.assigns[:selected_people] |> Enum.join(",")
+
+    socket
+    |> push_redirect(to: "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive)}?person_ids=#{person_ids}")
+    |> noreply
   end
 
   defp selected?(selected_people, person) do

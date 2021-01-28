@@ -39,26 +39,16 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
     assert_has_role(page_live, "potential-duplicates-page")
   end
 
-  test "enables and disables the merge button when checkboxes are clicked", %{conn: conn, person: person} do
-    Pages.PotentialDuplicates.visit(conn, person)
-    |> Pages.PotentialDuplicates.assert_merge_button_disabled()
+  test "enables and disables the merge button when people are selected / deselected", %{conn: conn, user: user} do
+    alice = create_person(user, "alice", %{first_name: "Alice", last_name: "Testuser", dob: ~D[1900-01-01]})
+    duplicate = create_person(user, "alice", %{first_name: "Alice", last_name: "Testuser", dob: ~D[1900-01-01]})
 
-    #    |> Pages.People.assert_table_contents([
-    #      ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
-    #      ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""],
-    #      ["", "Alice Testuser", "", "10/30/2020", "", ""]
-    #    ])
-    #    |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
-    #    |> Pages.People.click_person_checkbox(person: alice, value: "on")
-    #    |> Pages.People.assert_checked("[data-tid=#{alice.tid}]")
-    #    |> Pages.assert_element_triggers_confirmation_prompt("archive-button", "Are you sure you want to archive 1 person(s)?")
-    #    |> Pages.People.click_archive()
-    #    |> Pages.People.assert_table_contents([
-    #      ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
-    #      ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""]
-    #    ])
-    #    |> Pages.People.assert_assignment_dropdown_disabled()
-    #    |> Pages.People.assert_archive_button_disabled()
+    Pages.PotentialDuplicates.visit(conn, alice)
+    |> Pages.PotentialDuplicates.assert_merge_button_disabled()
+    |> Pages.PotentialDuplicates.set_selected_people([duplicate])
+    |> Pages.PotentialDuplicates.assert_merge_button_enabled()
+    |> Pages.PotentialDuplicates.set_selected_people([])
+    |> Pages.PotentialDuplicates.assert_merge_button_disabled()
   end
 
   test "shows all relevant information about a person", %{conn: conn, person: person} do
