@@ -86,6 +86,15 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_potential_duplicates_button_present(false)
     end
+
+    test "when the person is archived and there are potential duplicates, it hides the 'View potential duplicates' button", %{conn: conn, user: user} do
+      person = create_person("person", %{last_name: "Testuser", first_name: "Alice"})
+      create_person("duplicate", %{last_name: "Testuser", first_name: "Alice"})
+      Cases.archive_person(person.id, user, Test.Fixtures.admin_audit_meta())
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_potential_duplicates_button_present(false)
+    end
   end
 
   describe "when the person has no identifying information" do

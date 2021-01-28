@@ -18,8 +18,8 @@ defmodule EpicenterWeb.ProfileLive do
     ]
 
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
-
   import EpicenterWeb.Presenters.LabResultPresenter, only: [pretty_result: 1]
+  import EpicenterWeb.Presenters.PeoplePresenter, only: [is_archived?: 1]
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
@@ -43,7 +43,7 @@ defmodule EpicenterWeb.ProfileLive do
     |> assign_updated_person(person)
     |> assign_case_investigations(person)
     |> assign_contact_investigations(person)
-    |> assign_potential_duplicate_count(person)
+    |> assign_potential_duplicate_count()
     |> assign_users()
     |> assign_current_date()
     |> ok()
@@ -246,8 +246,15 @@ defmodule EpicenterWeb.ProfileLive do
     assign(socket, contact_investigations: contact_investigations)
   end
 
-  defp assign_potential_duplicate_count(socket, person) do
-    assign(socket, potential_duplicate_count: Cases.count_duplicate_people(person))
+  defp assign_potential_duplicate_count(socket) do
+    count =
+      if is_archived?(socket.assigns.person) do
+        0
+      else
+        Cases.count_duplicate_people(socket.assigns.person)
+      end
+
+    assign(socket, potential_duplicate_count: count)
   end
 
   defp assign_users(socket),
