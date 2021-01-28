@@ -17,12 +17,14 @@ defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
     view_or_conn_or_html
   end
 
-  def assert_person_present(view, person) do
-    if !person.tid, do: raise("Person must have a tid for this assertion: #{inspect(person)}")
+  def assert_first_names_present(view, first_names) do
+    text =
+      view
+      |> Pages.parse()
+      |> Test.Html.find!("[data-role=resolve-conflicts-form-first-name]")
+      |> Test.Html.text()
 
-    view
-    |> Pages.parse()
-    |> Test.Html.find!("[data-tid=#{person.tid}]")
+    Enum.each(first_names, &assert(text =~ &1))
 
     view
   end

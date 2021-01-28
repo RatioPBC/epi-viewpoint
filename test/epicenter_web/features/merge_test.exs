@@ -11,17 +11,17 @@ defmodule EpicenterWeb.Features.MergeTest do
 
   test "user can review potential duplicates and merge records", %{conn: conn} do
     person = create_person("person", %{last_name: "Testuser", first_name: "Alice"})
-    duplicate1 = create_person("duplicate1", %{last_name: "Testuser", first_name: "Alice"})
-    create_person("duplicate2", %{last_name: "Testuser", first_name: "Alice"})
+    duplicate = create_person("duplicate", %{last_name: "Testuser", first_name: "Different"})
 
     Pages.Profile.visit(conn, person)
     |> Pages.Profile.click_view_potential_duplicates()
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.PotentialDuplicates.assert_here(person)
-    |> Pages.PotentialDuplicates.set_selected_people([duplicate1])
+    |> Pages.PotentialDuplicates.set_selected_people([duplicate])
     |> Pages.PotentialDuplicates.submit_merge()
     |> Pages.follow_live_view_redirect(conn)
     |> Pages.ResolveConflicts.assert_here()
+    |> Pages.ResolveConflicts.assert_first_names_present(["Alice", "Different"])
   end
 
   defp create_person(tid, attrs) do
