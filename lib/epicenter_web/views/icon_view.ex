@@ -8,7 +8,7 @@ defmodule EpicenterWeb.IconView do
     |> icon(width, height, 24)
   end
 
-  def arrow_right_icon(width, height) do
+  def arrow_right_icon(width \\ 8, height \\ 12) do
     """
     <path d="M2.00009 0L0.590088 1.41L5.17009 6L0.590088 10.59L2.00009 12L8.00009 6L2.00009 0Z" fill="#B0B0B0"/>
     """

@@ -1,8 +1,8 @@
 defmodule EpicenterWeb.PotentialDuplicatesLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.IconView, only: [back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, ok: 1]
+  import EpicenterWeb.IconView, only: [arrow_right_icon: 0, back_icon: 0]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.Unknown, only: [list_or_unknown: 2]
   import Euclid.Extra.Enum, only: [pluck: 2]
 
@@ -31,6 +31,16 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
     |> assign_page_title(Format.person(person))
     |> assign(:person, person)
     |> assign(:duplicate_people, [person | duplicate_people])
+    |> assign(:selected_people, [])
     |> ok()
+  end
+
+  def handle_event("change", params, socket) do
+    selected_people = params |> Map.get("selected_people") || []
+    socket |> assign(:selected_people, selected_people) |> noreply
+  end
+
+  defp selected?(selected_people, person) do
+    person.id in selected_people
   end
 end

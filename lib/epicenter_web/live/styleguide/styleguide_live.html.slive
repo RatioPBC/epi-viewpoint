@@ -64,9 +64,14 @@
       code @include button-primary
 
     .styleguide-example
-      a#primary-button-with-icon href="#"
-        = checkmark_icon()
-        span Primary button with icon
+      div#primary-button-container
+        a#primary-button-with-icon href="#"
+          = checkmark_icon()
+          span Primary button with icon
+        a#primary-button-with-icon-disabled href="#" data-disabled="true"
+          = checkmark_icon()
+          span Primary button with icon disabled
+
       code
         ' @include button-primary
         ' @include has-icon($color: white)

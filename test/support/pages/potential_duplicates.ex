@@ -5,6 +5,7 @@ defmodule EpicenterWeb.Test.Pages.PotentialDuplicates do
 
   alias Epicenter.Cases.Person
   alias Epicenter.Test
+  alias EpicenterWeb.Test.LiveViewAssertions
   alias EpicenterWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
@@ -17,6 +18,11 @@ defmodule EpicenterWeb.Test.Pages.PotentialDuplicates do
     if !person.tid, do: raise("Person must have a tid for this assertion: #{inspect(person)}")
     view_or_conn_or_html |> Pages.parse() |> Test.Html.attr("[data-page=potential-duplicates]", "data-tid") |> assert_eq([person.tid])
     view_or_conn_or_html
+  end
+
+  def assert_merge_button_disabled(%View{} = view) do
+    LiveViewAssertions.assert_disabled(view, "[data-role=merge-button]")
+    view
   end
 
   def assert_table_contents(%View{} = view, expected_table_content, opts \\ []) do

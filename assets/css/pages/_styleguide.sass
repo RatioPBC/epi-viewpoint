@@ -75,10 +75,13 @@
   #disabled-buttons, #disabled-link-buttons
     @include horizontal-flow
 
+  #primary-button-container
+    @include horizontal-flow
+
   #primary-button, #primary-button-disabled, #primary-link-button-disabled
     @include button-primary
 
-  #primary-button-with-icon
+  #primary-button-with-icon, #primary-button-with-icon-disabled
     @include button-primary
     @include has-icon($color: white)
 

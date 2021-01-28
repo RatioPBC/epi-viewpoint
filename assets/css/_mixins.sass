@@ -72,6 +72,9 @@
     &:hover
       background-color: $disabled-bg-color
 
+    svg
+      @include svg-color($disabled-text-color)
+
   @if $size == small
     font-size: $small-body-text-size
     padding: 0.5rem 1rem
