@@ -1086,6 +1086,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Pages.Profile.visit(conn, sick_person)
       |> Pages.Profile.assert_archived_banner_is_visible(user.name, Format.date(sick_person.archived_at))
     end
+
+    test "unarchiving a person", %{conn: conn, user: user, person: sick_person} do
+      Cases.archive_person(sick_person.id, user, Test.Fixtures.admin_audit_meta())
+      sick_person = Cases.get_person(sick_person.id, user)
+
+      Pages.Profile.visit(conn, sick_person)
+      |> Pages.Profile.assert_archived_banner_is_visible(user.name, Format.date(sick_person.archived_at))
+      |> Pages.Profile.click_unarchive_person_button()
+      |> Pages.Profile.refute_archived_banner_is_visible()
+
+      assert_recent_audit_log(sick_person, user, action: "unarchive-person", event: "profile-unarchive-person")
+    end
   end
 
   defp create_case_investigation(person, user, tid, reported_on, attrs \\ %{}) do

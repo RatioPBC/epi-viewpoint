@@ -732,7 +732,15 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
     |> Pages.parse()
     |> Test.Html.text("[data-role=archived-banner]")
-    |> assert_eq("This record was archived on #{archived_date_str} by #{archiver_name}.")
+    |> assert_eq("This record was archived on #{archived_date_str} by #{archiver_name}.Unarchive")
+
+    view
+  end
+
+  def click_unarchive_person_button(%View{} = view) do
+    view
+    |> element("#unarchive")
+    |> render_click()
 
     view
   end

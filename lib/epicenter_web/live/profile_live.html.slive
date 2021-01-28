@@ -3,6 +3,7 @@
   = if @person.archived_by != nil do
     div#archived-banner data-role="archived-banner"
       span This record was archived on #{Format.date(@person.archived_at)} by #{@person.archived_by.name}.
+      button#unarchive data-role="unarchive" phx-click="unarchive" Unarchive
 
   section#heading
     div

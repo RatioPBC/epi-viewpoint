@@ -181,6 +181,17 @@ defmodule EpicenterWeb.ProfileLive do
     {:noreply, assign_updated_person(socket, updated_person)}
   end
 
+  def handle_event("unarchive", _params, socket) do
+    {:ok, updated_person} =
+      Cases.unarchive_person(socket.assigns.person.id, socket.assigns.current_user, %AuditLog.Meta{
+        author_id: socket.assigns.current_user.id,
+        reason_action: AuditLog.Revision.unarchive_person_action(),
+        reason_event: AuditLog.Revision.profile_unarchive_person_event()
+      })
+
+    {:noreply, assign_updated_person(socket, updated_person)}
+  end
+
   def assign_updated_person(socket, person) do
     updated_person =
       person
