@@ -41,12 +41,14 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
   end
 
   def handle_event("merge-selected-people", _params, socket) do
-    person_id = socket.assigns[:person].id
     duplicate_person_ids = socket.assigns[:selected_people] |> Enum.join(",")
 
     socket
     |> push_redirect(
-      to: "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive, person_id)}?duplicate_person_ids=#{duplicate_person_ids}"
+      to:
+        "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive, socket.assigns[:person])}?duplicate_person_ids=#{
+          duplicate_person_ids
+        }"
     )
     |> noreply
   end

@@ -1,6 +1,7 @@
 defmodule EpicenterWeb.ResolveConflictsLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Cases
@@ -20,6 +21,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> assign_page_title("Resolve Conflicts")
     |> assign(:merge_conflicts, merge_conflicts)
     |> assign(:form_changeset, ResolveConflictsForm.changeset(merge_conflicts, %{}))
+    |> assign(:person_id, person_id)
     |> assign_person_ids(comma_separated_duplicate_person_ids)
     |> ok()
   end
