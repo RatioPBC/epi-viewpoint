@@ -1076,14 +1076,15 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "archiving people" do
     test "displaying an archived person", %{conn: conn, user: user, person: sick_person} do
-      Pages.Profile.visit(conn, sick_person)
-      |> Pages.Profile.refute_archived_banner_is_visible()
+      view =
+        Pages.Profile.visit(conn, sick_person)
+        |> Pages.Profile.refute_archived_banner_is_visible()
+        |> Pages.Profile.click_archive_button()
 
-      # TODO archive them using the button on the profile?
-      Cases.archive_person(sick_person.id, user, Test.Fixtures.admin_audit_meta())
       sick_person = Cases.get_person(sick_person.id, user)
 
-      Pages.Profile.visit(conn, sick_person)
+      view
+      |> assert_audit_logged_change(sick_person, user, "archive-person", "profile-archive-person")
       |> Pages.Profile.assert_archived_banner_is_visible(user.name, Format.date(sick_person.archived_at))
     end
 
@@ -1095,8 +1096,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       |> Pages.Profile.assert_archived_banner_is_visible(user.name, Format.date(sick_person.archived_at))
       |> Pages.Profile.click_unarchive_person_button()
       |> Pages.Profile.refute_archived_banner_is_visible()
+      |> assert_audit_logged_change(sick_person, user, "unarchive-person", "profile-unarchive-person")
+    end
 
-      assert_recent_audit_log(sick_person, user, action: "unarchive-person", event: "profile-unarchive-person")
+    defp assert_audit_logged_change(view, person, user, action, event) do
+      assert_recent_audit_log(person, user, action: action, event: event)
+      view
     end
   end
 

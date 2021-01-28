@@ -10,6 +10,7 @@
       div#toolbar
         h1#toolbar-left data-role="full-name"= string_or_unknown(Format.person(@person))
         #toolbar-right
+          button#archive data-role="archive" phx-click="archive" Archive
           = if @potential_duplicate_count > 0 do
             = live_redirect "View potential duplicates (#{@potential_duplicate_count})",
               id: "view-potential-duplicates",

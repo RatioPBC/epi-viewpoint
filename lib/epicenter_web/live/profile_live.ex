@@ -141,6 +141,17 @@ defmodule EpicenterWeb.ProfileLive do
     send(self(), {:delete_note, note, subject})
   end
 
+  def handle_event("archive", _params, socket) do
+    {:ok, updated_person} =
+      Cases.archive_person(socket.assigns.person.id, socket.assigns.current_user, %AuditLog.Meta{
+        author_id: socket.assigns.current_user.id,
+        reason_action: AuditLog.Revision.archive_person_action(),
+        reason_event: AuditLog.Revision.profile_archive_person_event()
+      })
+
+    {:noreply, assign_updated_person(socket, updated_person)}
+  end
+
   def handle_event("remove-contact", %{"contact-investigation-id" => contact_investigation_id}, socket) do
     with contact_investigation when not is_nil(contact_investigation) <-
            ContactInvestigations.get(contact_investigation_id, socket.assigns.current_user) do

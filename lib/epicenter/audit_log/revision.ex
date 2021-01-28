@@ -90,6 +90,7 @@ defmodule Epicenter.AuditLog.Revision do
   def import_csv_event(), do: "import-csv"
   def login_user_event(), do: "login-user"
   def people_archive_people_event(), do: "people-archive-people"
+  def profile_archive_person_event(), do: "profile-archive-person"
   def people_selected_assignee_event(), do: "people-selected-assignee"
   def profile_case_investigation_note_deletion_event(), do: "profile-case-investigation-note-deletion"
   def profile_case_investigation_note_submission_event(), do: "profile-case-investigation-note-submission"

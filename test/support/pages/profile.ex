@@ -743,6 +743,14 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def click_archive_button(%View{} = view) do
+    view
+    |> element("#archive")
+    |> render_click()
+
+    view
+  end
+
   def click_unarchive_person_button(%View{} = view) do
     view
     |> element("#unarchive")
