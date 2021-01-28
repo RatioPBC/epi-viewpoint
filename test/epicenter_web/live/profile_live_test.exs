@@ -1074,6 +1074,20 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
   end
 
+  describe "archiving people" do
+    test "displaying an archived person", %{conn: conn, user: user, person: sick_person} do
+      Pages.Profile.visit(conn, sick_person)
+      |> Pages.Profile.refute_archived_banner_is_visible()
+
+      # TODO archive them using the button on the profile?
+      Cases.archive_person(sick_person.id, user, Test.Fixtures.admin_audit_meta())
+      sick_person = Cases.get_person(sick_person.id, user)
+
+      Pages.Profile.visit(conn, sick_person)
+      |> Pages.Profile.assert_archived_banner_is_visible(user.name, Format.date(sick_person.archived_at))
+    end
+  end
+
   defp create_case_investigation(person, user, tid, reported_on, attrs \\ %{}) do
     lab_result =
       Test.Fixtures.lab_result_attrs(person, user, "lab_result_#{tid}", reported_on, %{

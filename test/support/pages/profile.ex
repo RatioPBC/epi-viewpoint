@@ -723,4 +723,26 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     assert view |> Pages.parse() |> Test.Html.text("[data-role=preferred-language]") == expected_preferred_language
     view
   end
+
+  #
+  # Archiving
+  #
+
+  def assert_archived_banner_is_visible(%View{} = view, archiver_name, archived_date_str) do
+    view
+    |> Pages.parse()
+    |> Test.Html.text("[data-role=archived-banner]")
+    |> assert_eq("This record was archived on #{archived_date_str} by #{archiver_name}.")
+
+    view
+  end
+
+  def refute_archived_banner_is_visible(%View{} = view) do
+    view
+    |> Pages.parse()
+    |> Test.Html.text("[data-role=archived-banner]")
+    |> assert_eq("")
+
+    view
+  end
 end

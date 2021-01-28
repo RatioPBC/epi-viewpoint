@@ -190,6 +190,7 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_demographics()
       |> Cases.preload_emails()
       |> Cases.preload_phones()
+      |> Cases.preload_archived_by()
 
     socket |> assign(person: updated_person)
   end
