@@ -53,6 +53,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
       |> Pages.Contacts.assert_unchecked("[data-tid=#{bob.tid}]")
       |> Pages.Contacts.click_person_checkbox(person: bob, value: "on")
       |> Pages.Contacts.assert_checked("[data-tid=#{bob.tid}]")
+      |> Pages.assert_element_triggers_confirmation_prompt("archive-button", "Are you sure you want to archive 1 person(s)?")
       |> Pages.Contacts.click_archive()
       |> Pages.Contacts.assert_table_contents([
         ["", "Name", "Viewpoint ID", "Exposure date", "Investigation status", "Assignee"],

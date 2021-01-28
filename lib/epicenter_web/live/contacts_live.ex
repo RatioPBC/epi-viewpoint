@@ -23,6 +23,7 @@ defmodule EpicenterWeb.ContactsLive do
 
   import EpicenterWeb.Presenters.PeoplePresenter,
     only: [
+      archive_confirmation_message: 1,
       assigned_to_name: 1,
       disabled?: 1,
       exposure_date: 1,

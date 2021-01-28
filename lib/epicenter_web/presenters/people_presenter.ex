@@ -5,6 +5,9 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   alias EpicenterWeb.Format
   alias EpicenterWeb.Unknown
 
+  def archive_confirmation_message(selected_people),
+    do: "Are you sure you want to archive #{map_size(selected_people)} person(s)?"
+
   def assigned_to_name(%Person{assigned_to: nil}),
     do: ""
 

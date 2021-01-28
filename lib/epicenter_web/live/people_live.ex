@@ -31,6 +31,7 @@ defmodule EpicenterWeb.PeopleLive do
 
   import EpicenterWeb.Presenters.PeoplePresenter,
     only: [
+      archive_confirmation_message: 1,
       assigned_to_name: 1,
       disabled?: 1,
       external_id: 1,

@@ -47,6 +47,15 @@ defmodule EpicenterWeb.Test.Pages do
     view
   end
 
+  def assert_element_triggers_confirmation_prompt(%View{} = view, element_role, expected_text) do
+    view
+    |> parse()
+    |> Test.Html.attr("[data-role=#{element_role}]", "data-confirm")
+    |> assert_eq([expected_text])
+
+    view
+  end
+
   def assert_current_user(conn_or_view_or_html, user_name) do
     conn_or_view_or_html |> parse() |> Test.Html.role_text("current-user-name") |> assert_eq(user_name)
     conn_or_view_or_html
