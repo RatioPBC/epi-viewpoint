@@ -46,7 +46,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
       [
         ["Name", "Date of Birth", "Phone", "Address"],
         [
-          "Alice Testuser",
+          "Alice Testuser ID: 987650",
           "05/01/1999 01/01/2000 05/01/2001",
           "(111) 111-1000 (111) 111-1111",
           "4444 Test St, City, OH 00000 5555 Test St, City, OH 00000"
