@@ -24,6 +24,20 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view_or_conn_or_html
   end
 
+  def click_edit_identifying_information(%View{} = view, conn) do
+    view
+    |> element("[data-role=edit-identifying-information-link]")
+    |> render_click
+    |> Pages.follow_live_view_redirect(conn)
+  end
+
+  def click_edit_demographics(%View{} = view, conn) do
+    view
+    |> element("[data-role=edit-demographics-link]")
+    |> render_click
+    |> Pages.follow_live_view_redirect(conn)
+  end
+
   #
   # address
   #

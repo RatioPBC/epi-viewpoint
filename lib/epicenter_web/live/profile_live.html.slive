@@ -31,7 +31,7 @@
   section#profile
     header
       h2 Profile
-      span= live_redirect "Update", to: Routes.profile_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileEditLive, @person)
+      span= live_redirect "Update", to: Routes.profile_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileEditLive, @person), data_role: "edit-identifying-information-link"
 
     table#profile-data
       tbody
@@ -211,7 +211,7 @@
   section#demographics
     header
       h2 Demographics
-      span= live_redirect "Update", to: Routes.demographics_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.DemographicsEditLive, @person)
+      span= live_redirect "Update", to: Routes.demographics_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.DemographicsEditLive, @person), data_role: "edit-demographics-link"
 
     table#demographics-data
       tbody

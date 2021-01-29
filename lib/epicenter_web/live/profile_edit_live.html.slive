@@ -1,4 +1,4 @@
-#profile-edit-page data-role="profile-edit-page" data-confirm-navigation=confirmation_prompt(@changeset)
+#profile-edit-page data-page="profile-edit" data-role="profile-edit-page" data-confirm-navigation=confirmation_prompt(@changeset)
 
   section
     header#subnav

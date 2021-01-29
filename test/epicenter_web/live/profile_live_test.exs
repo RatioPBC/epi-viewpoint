@@ -149,6 +149,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
       Test.Fixtures.phone_attrs(user, person, "phone-3", number: "1-111-111-1009") |> Cases.create_phone!()
       person |> load() |> ProfileLive.phone_numbers() |> assert_eq(["(111) 111-1001", "(111) 111-1000", "+1 (111) 111-1009"])
     end
+
+    test "editing the identifying information", %{conn: conn, person: person} do
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.click_edit_identifying_information(conn)
+      |> Pages.ProfileEdit.assert_here()
+    end
+
+    test "editing the demographics", %{conn: conn, person: person} do
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.click_edit_demographics(conn)
+      |> Pages.DemographicsEdit.assert_here()
+    end
   end
 
   describe "when the person has no test results" do

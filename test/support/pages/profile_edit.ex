@@ -28,6 +28,9 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     conn |> Pages.visit("/people/#{person_id}/edit")
   end
 
+  def assert_here(view_or_conn_or_html),
+    do: view_or_conn_or_html |> Pages.assert_on_page("profile-edit")
+
   #
   # address
   #
