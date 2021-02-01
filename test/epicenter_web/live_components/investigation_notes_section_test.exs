@@ -57,6 +57,7 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
                   InvestigationNotesSection,
                   "displays-a-notes-section",
                   notes: @notes,
+                  is_editable: true,
                   current_user_id: @current_user_id,
                   on_add_note: @on_add_note,
                   on_delete_note: @on_delete_note)

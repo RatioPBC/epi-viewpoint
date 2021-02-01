@@ -257,7 +257,9 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       |> ignore_contact_investigations_scroll_anchor_link
       |> ignore_visit_exposing_case_link()
 
-    buttons ++ links
+    text_boxes = view |> Pages.parse() |> Test.Html.find("textarea")
+
+    buttons ++ links ++ text_boxes
   end
 
   defp ignore_current_user_settings_dropdown(list_of_buttons) do

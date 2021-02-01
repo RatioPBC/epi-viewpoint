@@ -76,6 +76,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
               InvestigationNotesSection,
               @contact_investigation.id <> "note section",
               notes: @contact_investigation.notes,
+              is_editable: is_editable?(@contact_investigation.exposed_person),
               current_user_id: @current_user_id,
               on_add_note: @on_add_note,
               on_delete_note: @on_delete_note)
