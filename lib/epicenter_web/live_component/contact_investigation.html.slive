@@ -41,7 +41,8 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
             span
               | Clinical
           .links
-            span= live_redirect "Edit", to: Routes.contact_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationClinicalDetailsLive, @contact_investigation), class: "contact-investigation-clinical-details-link", data: [role: "edit-contact-clinical-details-link"]
+            = if is_editable?(@contact_investigation.exposed_person) do
+              span= live_redirect "Edit", to: Routes.contact_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationClinicalDetailsLive, @contact_investigation), class: "contact-investigation-clinical-details-link", data: [role: "edit-contact-clinical-details-link"]
         table.clinical-data data-role="clinical-data-table"
           thead
             tr data-role="table-column-names"

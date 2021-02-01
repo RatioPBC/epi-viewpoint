@@ -14,7 +14,7 @@ defmodule EpicenterWeb.ProfileLive do
       history_items: 2,
       interview_buttons: 2,
       isolation_monitoring_button: 2,
-      isolation_monitoring_history_items: 1
+      isolation_monitoring_history_items: 2
     ]
 
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]

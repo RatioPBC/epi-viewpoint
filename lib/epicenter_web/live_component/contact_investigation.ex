@@ -4,6 +4,7 @@ defmodule EpicenterWeb.ContactInvestigation do
   import EpicenterWeb.LiveComponent.Helpers
   import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1, quarantine_history_items: 1]
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
+  import EpicenterWeb.Presenters.PeoplePresenter, only: [is_editable?: 1]
 
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias EpicenterWeb.Format
@@ -58,24 +59,30 @@ defmodule EpicenterWeb.ContactInvestigation do
   end
 
   defp interview_buttons(contact_investigation) do
-    case contact_investigation.interview_status do
-      "pending" ->
-        [
-          redirect_to(contact_investigation, :start_interview),
-          redirect_to(contact_investigation, :discontinue_interview)
-        ]
-
-      "started" ->
-        [
-          redirect_to(contact_investigation, :complete_interview),
-          redirect_to(contact_investigation, :discontinue_interview)
-        ]
-
-      "completed" ->
+    case is_editable?(contact_investigation.exposed_person) do
+      false ->
         []
 
-      "discontinued" ->
-        []
+      true ->
+        case contact_investigation.interview_status do
+          "pending" ->
+            [
+              redirect_to(contact_investigation, :start_interview),
+              redirect_to(contact_investigation, :discontinue_interview)
+            ]
+
+          "started" ->
+            [
+              redirect_to(contact_investigation, :complete_interview),
+              redirect_to(contact_investigation, :discontinue_interview)
+            ]
+
+          "completed" ->
+            []
+
+          "discontinued" ->
+            []
+        end
     end
   end
 
@@ -115,33 +122,39 @@ defmodule EpicenterWeb.ContactInvestigation do
   end
 
   def quarantine_monitoring_button(contact_investigation) do
-    case contact_investigation.quarantine_monitoring_status do
-      "pending" ->
-        live_redirect("Add quarantine dates",
-          to:
-            Routes.contact_investigation_quarantine_monitoring_path(
-              EpicenterWeb.Endpoint,
-              EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
-              contact_investigation
-            ),
-          class: "primary",
-          data: [role: "contact-investigation-quarantine-monitoring-start-link"]
-        )
-
-      "ongoing" ->
-        live_redirect("Conclude monitoring",
-          to:
-            Routes.contact_investigation_conclude_quarantine_monitoring_path(
-              EpicenterWeb.Endpoint,
-              EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
-              contact_investigation
-            ),
-          class: "primary",
-          data: [role: "conclude-contact-investigation-quarantine-monitoring-link"]
-        )
-
-      "concluded" ->
+    case is_editable?(contact_investigation.exposed_person) do
+      false ->
         nil
+
+      true ->
+        case contact_investigation.quarantine_monitoring_status do
+          "pending" ->
+            live_redirect("Add quarantine dates",
+              to:
+                Routes.contact_investigation_quarantine_monitoring_path(
+                  EpicenterWeb.Endpoint,
+                  EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
+                  contact_investigation
+                ),
+              class: "primary",
+              data: [role: "contact-investigation-quarantine-monitoring-start-link"]
+            )
+
+          "ongoing" ->
+            live_redirect("Conclude monitoring",
+              to:
+                Routes.contact_investigation_conclude_quarantine_monitoring_path(
+                  EpicenterWeb.Endpoint,
+                  EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
+                  contact_investigation
+                ),
+              class: "primary",
+              data: [role: "conclude-contact-investigation-quarantine-monitoring-link"]
+            )
+
+          "concluded" ->
+            nil
+        end
     end
   end
 end

@@ -77,16 +77,19 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
                 case_investigation.interview_discontinue_reason
               }",
             link:
-              live_redirect(
-                "Edit",
-                to:
-                  Routes.case_investigation_discontinue_path(
-                    EpicenterWeb.Endpoint,
-                    EpicenterWeb.CaseInvestigationDiscontinueLive,
-                    case_investigation
-                  ),
-                id: "edit-discontinue-case-investigation-link-001",
-                class: "discontinue-case-investigation-link"
+              link_if_editable(
+                person,
+                live_redirect(
+                  "Edit",
+                  to:
+                    Routes.case_investigation_discontinue_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.CaseInvestigationDiscontinueLive,
+                      case_investigation
+                    ),
+                  id: "edit-discontinue-case-investigation-link-001",
+                  class: "discontinue-case-investigation-link"
+                )
               )
           }
           | items
@@ -186,7 +189,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     end
   end
 
-  def isolation_monitoring_history_items(case_investigation) do
+  def isolation_monitoring_history_items(person, case_investigation) do
     items = []
 
     items =
@@ -198,16 +201,19 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
                 Format.date(case_investigation.isolation_monitoring_ends_on)
               }",
             link:
-              live_redirect(
-                "Edit",
-                to:
-                  Routes.case_investigation_isolation_monitoring_path(
-                    EpicenterWeb.Endpoint,
-                    EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
-                    case_investigation
-                  ),
-                id: "edit-isolation-monitoring-link-001",
-                class: "case-investigation-link"
+              link_if_editable(
+                person,
+                live_redirect(
+                  "Edit",
+                  to:
+                    Routes.case_investigation_isolation_monitoring_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
+                      case_investigation
+                    ),
+                  id: "edit-isolation-monitoring-link-001",
+                  class: "case-investigation-link"
+                )
               )
           }
           | items
@@ -225,16 +231,19 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
                 Gettext.gettext(Epicenter.Gettext, case_investigation.isolation_conclusion_reason)
               }",
             link:
-              live_redirect(
-                "Edit",
-                to:
-                  Routes.case_investigation_conclude_isolation_monitoring_path(
-                    EpicenterWeb.Endpoint,
-                    EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
-                    case_investigation
-                  ),
-                id: "edit-isolation-monitoring-conclusion-link-001",
-                class: "case-investigation-link"
+              link_if_editable(
+                person,
+                live_redirect(
+                  "Edit",
+                  to:
+                    Routes.case_investigation_conclude_isolation_monitoring_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
+                      case_investigation
+                    ),
+                  id: "edit-isolation-monitoring-conclusion-link-001",
+                  class: "case-investigation-link"
+                )
               )
           }
           | items

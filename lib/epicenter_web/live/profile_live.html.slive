@@ -143,7 +143,7 @@
               div
                 = isolation_monitoring_button(@person, case_investigation)
             .case-investigation-history
-              = for item <- isolation_monitoring_history_items(case_investigation) do
+              = for item <- isolation_monitoring_history_items(@person, case_investigation) do
                 div
                   span data-role="isolation-monitoring-history-item-text" = item.text
                   span class="history-item-link" = item.link
@@ -154,7 +154,8 @@
               h4
                 span Isolation Order Details
               .links
-                span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "primary"
+                = if is_editable?(@person) do
+                  span= live_redirect "Edit", to: Routes.case_investigation_isolation_order_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationIsolationOrderLive, case_investigation), id: "edit-isolation-order-case-investigation-link-001", class: "primary"
 
             table.clinical-data
               thead

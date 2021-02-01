@@ -6,6 +6,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.ContactInvestigations
   alias EpicenterWeb.Format
+  alias EpicenterWeb.Presenters.PeoplePresenter
   alias EpicenterWeb.Router.Helpers, as: Routes
 
   def exposing_case_link(contact_investigation) do
@@ -44,16 +45,19 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     %{
       text: "Started interview with #{with_interviewee_name(contact_investigation)} on #{format_date(contact_investigation.interview_started_at)}",
       link:
-        live_redirect(
-          "Edit",
-          to:
-            Routes.contact_investigation_start_interview_path(
-              EpicenterWeb.Endpoint,
-              EpicenterWeb.ContactInvestigationStartInterviewLive,
-              contact_investigation
-            ),
-          class: "contact-investigation-link",
-          data: [role: "contact-investigation-start-interview-edit-link"]
+        link_if_editable(
+          contact_investigation.exposed_person,
+          live_redirect(
+            "Edit",
+            to:
+              Routes.contact_investigation_start_interview_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.ContactInvestigationStartInterviewLive,
+                contact_investigation
+              ),
+            class: "contact-investigation-link",
+            data: [role: "contact-investigation-start-interview-edit-link"]
+          )
         )
     }
   end
@@ -64,16 +68,19 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     %{
       text: "Completed interview on #{format_date(contact_investigation.interview_completed_at)}",
       link:
-        live_redirect(
-          "Edit",
-          to:
-            Routes.contact_investigation_complete_interview_path(
-              EpicenterWeb.Endpoint,
-              :complete_contact_investigation,
-              contact_investigation
-            ),
-          class: "contact-investigation-link",
-          data: [role: "contact-investigation-complete-interview-edit-link"]
+        link_if_editable(
+          contact_investigation.exposed_person,
+          live_redirect(
+            "Edit",
+            to:
+              Routes.contact_investigation_complete_interview_path(
+                EpicenterWeb.Endpoint,
+                :complete_contact_investigation,
+                contact_investigation
+              ),
+            class: "contact-investigation-link",
+            data: [role: "contact-investigation-complete-interview-edit-link"]
+          )
         )
     }
   end
@@ -101,6 +108,14 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     }
   end
 
+  defp link_if_editable(person, link) do
+    if PeoplePresenter.is_editable?(person) do
+      link
+    else
+      []
+    end
+  end
+
   def quarantine_history_items(contact_investigation) do
     [
       quarantine_dates_history(contact_investigation),
@@ -119,16 +134,19 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
           Format.date(contact_investigation.quarantine_monitoring_ends_on)
         }",
       link:
-        live_redirect(
-          "Edit",
-          to:
-            Routes.contact_investigation_quarantine_monitoring_path(
-              EpicenterWeb.Endpoint,
-              EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
-              contact_investigation
-            ),
-          class: "contact-investigation-link",
-          data: [role: "edit-contact-investigation-quarantine-monitoring-link"]
+        link_if_editable(
+          contact_investigation.exposed_person,
+          live_redirect(
+            "Edit",
+            to:
+              Routes.contact_investigation_quarantine_monitoring_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
+                contact_investigation
+              ),
+            class: "contact-investigation-link",
+            data: [role: "edit-contact-investigation-quarantine-monitoring-link"]
+          )
         )
     }
   end
@@ -142,16 +160,19 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
           Gettext.gettext(Epicenter.Gettext, contact_investigation.quarantine_conclusion_reason)
         }",
       link:
-        live_redirect(
-          "Edit",
-          to:
-            Routes.contact_investigation_conclude_quarantine_monitoring_path(
-              EpicenterWeb.Endpoint,
-              EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
-              contact_investigation
-            ),
-          class: "contact-investigation-link",
-          data: [role: "conclude-contact-investigation-quarantine-monitoring-edit-link"]
+        link_if_editable(
+          contact_investigation.exposed_person,
+          live_redirect(
+            "Edit",
+            to:
+              Routes.contact_investigation_conclude_quarantine_monitoring_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
+                contact_investigation
+              ),
+            class: "contact-investigation-link",
+            data: [role: "conclude-contact-investigation-quarantine-monitoring-edit-link"]
+          )
         )
     }
   end
