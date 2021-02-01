@@ -21,10 +21,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
   test "no buttons on profile of archived person with pending case investigation", %{conn: conn, user: user, person: person} do
     create_case_investigation(person, user, "pending-case-investigation", ~D[2021-01-28], %{})
 
-    Cases.archive_person(person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, person)
 
-    Pages.Profile.visit(conn, person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person with started case investigation interview", %{conn: conn, user: user, person: person} do
@@ -33,10 +38,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       clinical_status: "symptomatic"
     })
 
-    Cases.archive_person(person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, person)
 
-    Pages.Profile.visit(conn, person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person with discontinued case investigation interview", %{conn: conn, user: user, person: person} do
@@ -46,10 +56,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       interview_discontinue_reason: "Unable to reach"
     })
 
-    Cases.archive_person(person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, person)
 
-    Pages.Profile.visit(conn, person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person with completed case investigation interview", %{conn: conn, user: user, person: person} do
@@ -58,10 +73,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       interview_started_at: ~U[2020-10-31 22:03:07Z]
     })
 
-    Cases.archive_person(person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, person)
 
-    Pages.Profile.visit(conn, person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person with started case investigation isolation monitoring", %{conn: conn, user: user, person: person} do
@@ -72,10 +92,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       isolation_monitoring_ends_on: ~D[2020-11-15]
     })
 
-    Cases.archive_person(person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, person)
 
-    Pages.Profile.visit(conn, person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person with completed case investigation isolation monitoring", %{conn: conn, user: user, person: person} do
@@ -88,10 +113,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       isolation_monitoring_starts_on: ~D[2020-11-05]
     })
 
-    Cases.archive_person(person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, person)
 
-    Pages.Profile.visit(conn, person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person who is the subject of a pending contact investigation", %{conn: conn, user: user, person: person} do
@@ -100,10 +130,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
         tid: "contact_investigation"
       })
 
-    Cases.archive_person(contact_investigation.exposed_person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
-    Pages.Profile.visit(conn, contact_investigation.exposed_person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person who is the subject of an ongoing contact investigation", %{conn: conn, user: user, person: person} do
@@ -113,10 +148,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
         interview_started_at: ~U[2020-10-05 18:57:00Z]
       })
 
-    Cases.archive_person(contact_investigation.exposed_person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
-    Pages.Profile.visit(conn, contact_investigation.exposed_person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person who is the subject contact investigation with a completed interview",
@@ -128,10 +168,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
         interview_completed_at: ~U[2020-10-05 19:57:00Z]
       })
 
-    Cases.archive_person(contact_investigation.exposed_person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
-    Pages.Profile.visit(conn, contact_investigation.exposed_person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person who is the quarantining subject of a contact investigation",
@@ -145,10 +190,15 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
         quarantine_monitoring_ends_on: ~D[2020-11-15]
       })
 
-    Cases.archive_person(contact_investigation.exposed_person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
-    Pages.Profile.visit(conn, contact_investigation.exposed_person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   test "no buttons on profile of archived person who is subject of a contact investigation who has completed their quarantine",
@@ -164,23 +214,37 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
         quarantine_conclusion_reason: "successfully_completed_quarantine"
       })
 
-    Cases.archive_person(contact_investigation.exposed_person.id, user, Test.Fixtures.admin_audit_meta())
+    view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
 
-    Pages.Profile.visit(conn, contact_investigation.exposed_person)
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
     |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
   defp assert_no_edit_buttons_or_links(view) do
-    all_buttons =
+    assert_eq([], get_edit_buttons_and_links(view))
+
+    view
+  end
+
+  defp assert_edit_buttons_and_links(view, expected_edit_buttons) do
+    assert_eq(expected_edit_buttons, get_edit_buttons_and_links(view))
+    view
+  end
+
+  defp get_edit_buttons_and_links(view) do
+    buttons =
       view
       |> Pages.parse()
       |> Test.Html.find("button")
       |> ignore_unarchive_button()
       |> ignore_current_user_settings_dropdown()
 
-    assert [] == all_buttons
-
-    all_links =
+    links =
       view
       |> Pages.parse()
       |> Test.Html.find("a")
@@ -193,7 +257,7 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       |> ignore_contact_investigations_scroll_anchor_link
       |> ignore_visit_exposing_case_link()
 
-    assert [] == all_links
+    buttons ++ links
   end
 
   defp ignore_current_user_settings_dropdown(list_of_buttons) do

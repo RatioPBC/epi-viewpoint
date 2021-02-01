@@ -42,7 +42,6 @@ defmodule EpicenterWeb.ProfileLive do
     |> assign_page_title(Format.person(person))
     |> assign_updated_person(person)
     |> assign_case_investigations(person)
-    |> assign_contact_investigations(person)
     |> assign_potential_duplicate_count()
     |> assign_users()
     |> assign_current_date()
@@ -214,7 +213,9 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_phones()
       |> Cases.preload_archived_by()
 
-    socket |> assign(person: updated_person)
+    socket
+    |> assign(person: updated_person)
+    |> assign_contact_investigations(person)
   end
 
   defp assign_case_investigations(socket, person) do
