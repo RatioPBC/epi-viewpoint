@@ -10,7 +10,8 @@
       div#toolbar
         h1#toolbar-left data-role="full-name"= string_or_unknown(Format.person(@person))
         #toolbar-right
-          button#archive data-role="archive" phx-click="archive" data-confirm="Archive record? This record will no longer be editable and will not appear on the index case list, contacts list, nor in the search results." Archive
+          = if is_editable?(@person) do
+            button#archive data-role="archive" phx-click="archive" data-confirm="Archive record? This record will no longer be editable and will not appear on the index case list, contacts list, nor in the search results." Archive
           = if @potential_duplicate_count > 0 do
             = live_redirect "View potential duplicates (#{@potential_duplicate_count})",
               id: "view-potential-duplicates",
@@ -31,7 +32,8 @@
   section#profile
     header
       h2 Profile
-      span= live_redirect "Update", to: Routes.profile_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileEditLive, @person), data_role: "edit-identifying-information-link"
+      = if is_editable?(@person) do
+        span= live_redirect "Update", to: Routes.profile_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileEditLive, @person), data_role: "edit-identifying-information-link"
 
     table#profile-data
       tbody
@@ -74,11 +76,11 @@
             h3.status data-role="status"
               = displayable_interview_status(case_investigation)
             .case-investigation-interview-buttons
-              = for link <- interview_buttons(case_investigation) do
+              = for link <- interview_buttons(@person, case_investigation) do
                 span= link
 
           .case-investigation-history
-            = for history_item <- history_items(case_investigation) do
+            = for history_item <- history_items(@person, case_investigation) do
               div
                 span data-role="case-investigation-history-item-text" = history_item.text
                 span class="history-item-link" = history_item.link
@@ -90,7 +92,8 @@
                 span id="clinical-details-#{case_investigation.name}"
                   | Clinical
               .links
-                span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation) , id: "case-investigation-clinical-details-link-001", class: "case-investigation-clinical-details-link"
+                = if is_editable?(@person) do
+                  span= live_redirect "Edit", to: Routes.case_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationClinicalDetailsLive, case_investigation) , id: "case-investigation-clinical-details-link-001", class: "case-investigation-clinical-details-link"
 
             table.clinical-data data-role="clinical-data-table"
               thead
@@ -113,7 +116,12 @@
                 span
                   | Contacts
               div
-                = live_redirect "+ Contact", to: Routes.create_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation) , id: "add-contact-case-investigation-link-001", class: "add-contact-case-investigation-link"
+                = if is_editable?(@person) do
+                  = live_redirect "+ Contact",
+                  to: Routes.create_case_investigation_contact_path(EpicenterWeb.Endpoint,
+                  EpicenterWeb.CaseInvestigationContactLive, case_investigation) ,
+                  id: "add-contact-case-investigation-link-001",
+                  class: "add-contact-case-investigation-link"
             = for contact_investigation <- case_investigation.contact_investigations do
               .contact
                 .contact-details
@@ -133,7 +141,7 @@
               h3.status data-role="status"
                 = displayable_isolation_monitoring_status(case_investigation, @current_date)
               div
-                = isolation_monitoring_button(case_investigation)
+                = isolation_monitoring_button(@person, case_investigation)
             .case-investigation-history
               = for item <- isolation_monitoring_history_items(case_investigation) do
                 div
@@ -211,7 +219,8 @@
   section#demographics
     header
       h2 Demographics
-      span= live_redirect "Update", to: Routes.demographics_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.DemographicsEditLive, @person), data_role: "edit-demographics-link"
+      = if is_editable?(@person) do
+        span= live_redirect "Update", to: Routes.demographics_edit_path(EpicenterWeb.Endpoint, EpicenterWeb.DemographicsEditLive, @person), data_role: "edit-demographics-link"
 
     table#demographics-data
       tbody

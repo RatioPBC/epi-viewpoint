@@ -26,8 +26,9 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   def full_name(person),
     do: person |> Person.coalesce_demographics() |> Format.person() |> Unknown.string_or_unknown()
 
-  def is_archived?(person),
-    do: person.archived_by != nil
+  def is_archived?(person), do: person.archived_at != nil
+
+  def is_editable?(person), do: !is_archived?(person)
 
   def latest_case_investigation_status(person, current_date),
     do: person |> Person.latest_case_investigation() |> displayable_status(current_date)

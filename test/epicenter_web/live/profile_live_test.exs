@@ -559,7 +559,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
       started_at = ~U[2020-11-05 18:57:00Z]
 
       case_investigation =
-        create_case_investigation(person, user, "case_investigation", nil, %{interview_completed_at: completed_at, interview_started_at: started_at})
+        create_case_investigation(person, user, "case_investigation", nil, %{
+          interview_completed_at: completed_at,
+          interview_started_at: started_at
+        })
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{

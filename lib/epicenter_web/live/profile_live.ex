@@ -11,15 +11,15 @@ defmodule EpicenterWeb.ProfileLive do
       contact_details_as_list: 1,
       displayable_interview_status: 1,
       displayable_isolation_monitoring_status: 2,
-      history_items: 1,
-      interview_buttons: 1,
-      isolation_monitoring_button: 1,
+      history_items: 2,
+      interview_buttons: 2,
+      isolation_monitoring_button: 2,
       isolation_monitoring_history_items: 1
     ]
 
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
   import EpicenterWeb.Presenters.LabResultPresenter, only: [pretty_result: 1]
-  import EpicenterWeb.Presenters.PeoplePresenter, only: [is_archived?: 1]
+  import EpicenterWeb.Presenters.PeoplePresenter, only: [is_archived?: 1, is_editable?: 1]
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
