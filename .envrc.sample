@@ -1,3 +1,1 @@
-export BASIC_AUTH_PASSWORD=""
-export BASIC_AUTH_USERNAME="" # leave blank in dev to disable basic auth
 export CANONICAL_HOST="localhost"

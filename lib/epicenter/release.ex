@@ -45,7 +45,7 @@ defmodule Epicenter.Release do
 
   Then call this function by providing a list of email addresses of users to disable:
 
-  iex> Epicenter.Release.create_user(administrator, "Fred Durst", "limpbizkit@example.com", :member)
+  iex> Epicenter.Release.create_user(administrator, "Fred Durst", "limpbizkit@example.com", :admin)
   """
 
   def create_user(%Epicenter.Accounts.User{} = author, name, email, level, opts \\ []) when level in [:member, :admin] do

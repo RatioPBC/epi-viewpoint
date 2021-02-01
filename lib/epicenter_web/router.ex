@@ -16,7 +16,6 @@ defmodule EpicenterWeb.Router do
     }
 
     plug :fetch_current_user
-    plug :protected_via_basic_auth
   end
 
   scope "/", EpicenterWeb do
@@ -118,14 +117,5 @@ defmodule EpicenterWeb.Router do
       pipe_through :browser
       live_dashboard "/dashboard", metrics: EpicenterWeb.Telemetry
     end
-  end
-
-  def protected_via_basic_auth(conn, _opts) do
-    basic_auth_username = System.get_env("BASIC_AUTH_USERNAME")
-    basic_auth_password = System.get_env("BASIC_AUTH_PASSWORD")
-
-    if Euclid.Exists.present?(basic_auth_username),
-      do: Plug.BasicAuth.basic_auth(conn, username: basic_auth_username, password: basic_auth_password),
-      else: conn
   end
 end

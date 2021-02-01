@@ -12,9 +12,12 @@ use Mix.Config
 config :epicenter, EpicenterWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: true,
-  url: [host: {:system, "CANONICAL_HOST"}, port: 443, scheme: "https"]
+  http: [port: {:system, "PORT"}],
+  url: [scheme: "https", host: {:system, "CANONICAL_HOST"}, port: 443],
+  force_ssl: [rewrite_on: [:x_forwarded_proto]]
 
 config :epicenter,
+  application_version_sha: System.get_env("SOURCE_VERSION"),
   user_input_restrictions: :unrestricted
 
 config :logger,
@@ -29,4 +32,7 @@ config :logger_json, :backend,
 # prevents duplicate ecto logs (LoggerJSON configured in application.ex start/2)
 config :epicenter, Epicenter.Repo,
   adapter: Ecto.Adapters.Postgres,
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+  ssl: System.get_env("DBSSL", "true") == "true",
+  url: System.get_env("DATABASE_URL"),
   log: false

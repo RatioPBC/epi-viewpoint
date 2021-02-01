@@ -65,3 +65,21 @@ msgstr "Person unable to quarantine"
 ```
 
 Note that `mix gettext.extract --merge` is run as part of `shipit`, and `shipit` will fail if there are any changes as a result. 
+
+
+# Deploying
+
+## Heroku
+
+Run `bin/staging/deploy` which will make sure your Heroku account is all set up for deploying this project, and once
+it's happy, it will deploy to Heroku.
+
+## GCP
+
+When deploying to GCP, set the `REMOVE_CITEXT_EXTENSION` environment variable to `true` to work around an issue with
+GCP cloud_sql import/export.
+
+## Creating users
+
+You must create the first admin user manually (see the docs for `Epicenter.Release.create_user`). After that, you can
+log in as that admin user and create other users.

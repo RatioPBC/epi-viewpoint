@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+source "bin/_support/step.sh"
+source "bin/_support/check.sh"
+
+deploy() {
+  check "heroku: remote exists" \
+    "git remote -v | grep 'heroku'" \
+    "heroku git:remote -a geometer-epicenter"
+
+  check "heroku: elixir buildpack is set" \
+    "heroku buildpacks | grep -s 'elixir-buildpack/heroku-elixir'" \
+    "heroku buildpacks:add --index 1 elixir-buildpack/heroku-elixir"
+
+  check "heroku: phoenix static buildpack is set" \
+    "heroku buildpacks | grep -s 'gjaldon/phoenix-static-buildpack'" \
+    "heroku buildpacks:add --index 2 https://github.com/gjaldon/phoenix-static-buildpack"
+
+  check "heroku: git version buildpack is set" \
+    "heroku buildpacks | grep -s 'ianpurvis/heroku-buildpack-version'" \
+    "heroku buildpacks:add --index 3 https://github.com/ianpurvis/heroku-buildpack-version"
+
+  check "heroku: DATABASE_URL is set" \
+    "heroku config | grep -s DATABASE_URL" \
+    "open https://dashboard.heroku.com/apps/geometer-epicenter/resources # now add a database"
+
+  check "heroku: SECRET_KEY_BASE is set" \
+    "heroku config | grep -s SECRET_KEY_BASE" \
+    "heroku config:set SECRET_KEY_BASE=$(mix phx.gen.secret)"
+
+  check "heroku: POOL_SIZE is set" \
+    "heroku config | grep -s POOL_SIZE" \
+    "heroku config:set POOL_SIZE=10"
+
+  envrc_variables=$(sed -E 's/export ([^=]+)=.+/\1/' .envrc.sample)
+  while IFS= read -r var; do
+    check "heroku: ${var} is set" \
+      "heroku config | grep -s ${var}" \
+      "heroku config:set ${var}=VALUE-GOES-HERE"
+  done <<<"$envrc_variables"
+
+  step "Deploying" "git push heroku main:master"
+}
+
+case $1 in
+fast | no-doctor)
+  deploy
+  ;;
+*)
+  step "Running doctor" "bin/dev/doctor"
+  deploy
+  ;;
+esac
