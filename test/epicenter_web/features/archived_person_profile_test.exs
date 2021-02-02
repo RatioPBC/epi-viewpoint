@@ -159,13 +159,34 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
     |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
   end
 
-  test "no buttons on profile of archived person who is the subject contact investigation with a completed interview",
+  test "no buttons on profile of archived person who is the subject of a contact investigation with a completed interview",
        %{conn: conn, user: user, person: person} do
     contact_investigation =
       create_contact_investigation(user, person, %{}, %{}, %{
         tid: "contact_investigation",
         interview_started_at: ~U[2020-10-05 18:57:00Z],
         interview_completed_at: ~U[2020-10-05 19:57:00Z]
+      })
+
+    view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
+
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
+    |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
+  end
+
+  test "no buttons on profile of archived person who is the subject of a discontinued contact investigation",
+       %{conn: conn, user: user, person: person} do
+    contact_investigation =
+      create_contact_investigation(user, person, %{}, %{}, %{
+        tid: "contact_investigation",
+        interview_started_at: ~U[2020-10-05 18:57:00Z],
+        interview_discontinued_at: ~U[2020-10-31 23:03:07Z],
+        interview_discontinue_reason: "Unable to reach"
       })
 
     view = Pages.Profile.visit(conn, contact_investigation.exposed_person)

@@ -94,16 +94,19 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
           contact_investigation.interview_discontinue_reason
         }",
       link:
-        live_redirect(
-          "Edit",
-          to:
-            Routes.contact_investigation_discontinue_path(
-              EpicenterWeb.Endpoint,
-              EpicenterWeb.ContactInvestigationDiscontinueLive,
-              contact_investigation
-            ),
-          class: "contact-investigation-link",
-          data: [role: "contact-investigation-discontinue-interview-edit-link"]
+        link_if_editable(
+          contact_investigation.exposed_person,
+          live_redirect(
+            "Edit",
+            to:
+              Routes.contact_investigation_discontinue_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.ContactInvestigationDiscontinueLive,
+                contact_investigation
+              ),
+            class: "contact-investigation-link",
+            data: [role: "contact-investigation-discontinue-interview-edit-link"]
+          )
         )
     }
   end
