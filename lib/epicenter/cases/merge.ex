@@ -1,5 +1,6 @@
 defmodule Epicenter.Cases.Merge do
   alias Epicenter.Cases
+  alias Epicenter.Cases.Merge.SaveMerge
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
 
@@ -30,6 +31,10 @@ defmodule Epicenter.Cases.Merge do
 
       all_conflicts |> Map.put(field_name, conflicts)
     end)
+  end
+
+  def merge(people, into: into_person, with_attrs: into_person_attrs, current_user: current_user) do
+    SaveMerge.merge(people, into: into_person, with_attrs: into_person_attrs, current_user: current_user)
   end
 
   defp sort(values, sort_fun),

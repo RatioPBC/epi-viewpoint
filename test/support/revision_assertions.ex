@@ -1,5 +1,4 @@
 defmodule Epicenter.Test.RevisionAssertions do
-  # import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
 
   def assert_audit_logged(%{id: model_id}) do
@@ -27,6 +26,15 @@ defmodule Epicenter.Test.RevisionAssertions do
     assert ^change = Map.take(entry.change |> remove_ids(), Map.keys(change))
   end
 
+  def assert_semi_recent_audit_log(model, author, action, event, change) do
+    entry = audit_log_that_matches(model, action, event)
+    assert entry.author_id == author.id
+
+    for {key, expected_value} <- change do
+      assert ^expected_value = entry.change[key]
+    end
+  end
+
   def assert_recent_audit_log_snapshots(model, author, expected_before, expected_after) do
     entry = recent_audit_log(model)
     if entry == nil, do: flunk("Expected schema to have an audit log entry, but found none.")
@@ -37,6 +45,11 @@ defmodule Epicenter.Test.RevisionAssertions do
 
   def recent_audit_log(%{id: model_id}) do
     Epicenter.AuditLog.entries_for(model_id) |> List.last()
+  end
+
+  def audit_log_that_matches(model, action, event) do
+    Epicenter.AuditLog.entries_for(model.id)
+    |> Enum.find(&(&1.reason_action == action && &1.reason_event == event))
   end
 
   defp remove_ids(map) when is_map(map) do

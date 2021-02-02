@@ -66,7 +66,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
   end
 
   describe "filtering" do
-    setup %{user: user, bob: bob, caroline: caroline, donald: donald} do
+    setup %{conn: conn, user: user, bob: bob, caroline: caroline, donald: donald} do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       lab_result = Test.Fixtures.lab_result_attrs(alice, user, "lab_result", ~D[2020-10-27]) |> Cases.create_lab_result!()
       case_investigation = Test.Fixtures.case_investigation_attrs(alice, lab_result, user, "investigation") |> Cases.create_case_investigation!()
@@ -111,23 +111,26 @@ defmodule EpicenterWeb.ContactsLiveTest do
       frank = frank_contact_investigation.exposed_person
       george = george_contact_investigation.exposed_person
 
-      [bob: bob, caroline: caroline, donald: donald, ernst: ernst, frank: frank, george: george]
+      view =
+        Pages.Contacts.visit(conn)
+        |> Pages.Contacts.assert_table_contents(
+          [
+            ["Name", "Investigation status"],
+            ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
+            ["Caroline Testuser", "Pending interview"],
+            ["Donald Testuser", "Discontinued"],
+            ["Ernst Testuser", "Pending monitoring"],
+            ["Frank Testuser", "Concluded monitoring"],
+            ["George Testuser", "Ongoing interview"]
+          ],
+          columns: ["Name", "Investigation status"]
+        )
+
+      [view: view, bob: bob, caroline: caroline, donald: donald, ernst: ernst, frank: frank, george: george]
     end
 
-    test "users can filter contacts by pending interview status", %{conn: conn} do
-      Pages.Contacts.visit(conn)
-      |> Pages.Contacts.assert_table_contents(
-        [
-          ["Name", "Investigation status"],
-          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
-          ["Caroline Testuser", "Pending interview"],
-          ["Donald Testuser", "Discontinued"],
-          ["Ernst Testuser", "Pending monitoring"],
-          ["Frank Testuser", "Concluded monitoring"],
-          ["George Testuser", "Ongoing interview"]
-        ],
-        columns: ["Name", "Investigation status"]
-      )
+    test "users can filter contacts by pending interview status", %{view: view} do
+      view
       |> Pages.Contacts.assert_filter_selected(:all)
       |> Pages.Contacts.select_filter(:with_pending_interview)
       |> Pages.Contacts.assert_table_contents(
@@ -139,20 +142,8 @@ defmodule EpicenterWeb.ContactsLiveTest do
       )
     end
 
-    test "users can filter contacts by ongoing interview status", %{conn: conn} do
-      Pages.Contacts.visit(conn)
-      |> Pages.Contacts.assert_table_contents(
-        [
-          ["Name", "Investigation status"],
-          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
-          ["Caroline Testuser", "Pending interview"],
-          ["Donald Testuser", "Discontinued"],
-          ["Ernst Testuser", "Pending monitoring"],
-          ["Frank Testuser", "Concluded monitoring"],
-          ["George Testuser", "Ongoing interview"]
-        ],
-        columns: ["Name", "Investigation status"]
-      )
+    test "users can filter contacts by ongoing interview status", %{view: view} do
+      view
       |> Pages.Contacts.assert_filter_selected(:all)
       |> Pages.Contacts.select_filter(:with_ongoing_interview)
       |> Pages.Contacts.assert_table_contents(
@@ -164,20 +155,8 @@ defmodule EpicenterWeb.ContactsLiveTest do
       )
     end
 
-    test "users can filter contacts by people who are pending or ongoing quarantine monitoring", %{conn: conn} do
-      Pages.Contacts.visit(conn)
-      |> Pages.Contacts.assert_table_contents(
-        [
-          ["Name", "Investigation status"],
-          ["Bob Testuser", "Ongoing monitoring (11 days remaining)"],
-          ["Caroline Testuser", "Pending interview"],
-          ["Donald Testuser", "Discontinued"],
-          ["Ernst Testuser", "Pending monitoring"],
-          ["Frank Testuser", "Concluded monitoring"],
-          ["George Testuser", "Ongoing interview"]
-        ],
-        columns: ["Name", "Investigation status"]
-      )
+    test "users can filter contacts by people who are pending or ongoing quarantine monitoring", %{view: view} do
+      view
       |> Pages.Contacts.assert_filter_selected(:all)
       |> Pages.Contacts.select_filter(:with_quarantine_monitoring)
       |> Pages.Contacts.assert_table_contents(
@@ -190,8 +169,8 @@ defmodule EpicenterWeb.ContactsLiveTest do
       )
     end
 
-    test "users can unfilter contacts using the all button", %{conn: conn} do
-      Pages.Contacts.visit(conn)
+    test "users can unfilter contacts using the all button", %{view: view} do
+      view
       |> Pages.Contacts.select_filter(:with_quarantine_monitoring)
       |> Pages.Contacts.assert_table_contents(
         [
