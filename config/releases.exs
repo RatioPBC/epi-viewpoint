@@ -32,6 +32,7 @@ config :epicenter, EpicenterWeb.Endpoint,
   live_view: [signing_salt: CFG.live_view_signing_salt()],
   secret_key_base: CFG.secret_key_base(),
   server: true,
+  force_ssl: false,
   url: [
     host: CFG.canonical_host(),
     port: 443,
