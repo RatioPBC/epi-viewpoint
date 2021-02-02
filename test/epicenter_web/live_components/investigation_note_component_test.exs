@@ -31,6 +31,7 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
             InvestigationNoteComponent,
             "renders-a-note",
             note: @note,
+            is_editable: true,
             current_user_id: @current_user_id,
             on_delete: @on_delete)
       """

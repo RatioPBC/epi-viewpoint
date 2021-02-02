@@ -24,7 +24,7 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
         span.investigation-note-author data-role="investigation-note-author" = @note.author.name
         span data-role="investigation-note-date" = Format.date(@note.inserted_at)
       .investigation-note-text data-role="investigation-note-text" = @note.text
-      = if @note.author_id == @current_user_id do
+      = if @note.author_id == @current_user_id && @is_editable do
         div
           a.investigation-note-delete-link href="#" data-confirm="Remove your note?" phx-click="delete-note" data-role="delete-note" phx-target=@myself Delete
     """

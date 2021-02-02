@@ -335,15 +335,19 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
       })
       |> Cases.create_lab_result!()
 
-    Test.Fixtures.case_investigation_attrs(
-      person,
-      lab_result,
-      user,
-      tid,
-      %{name: "001"}
-      |> Map.merge(attrs)
-    )
-    |> Cases.create_case_investigation!()
+    case_investigation =
+      Test.Fixtures.case_investigation_attrs(
+        person,
+        lab_result,
+        user,
+        tid,
+        %{name: "001"}
+        |> Map.merge(attrs)
+      )
+      |> Cases.create_case_investigation!()
+
+    Test.Fixtures.case_investigation_note_attrs(case_investigation, user, "note-a", %{text: "Note A"})
+    |> Cases.create_investigation_note!()
   end
 
   defp create_contact_investigation(user, sick_person, lab_result_attrs, case_investigation_attrs, contact_investigation_attrs) do
@@ -361,6 +365,9 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
          Map.put(contact_investigation_attrs, :exposing_case_id, case_investigation.id)
        ), Test.Fixtures.admin_audit_meta()}
       |> ContactInvestigations.create()
+
+    Test.Fixtures.contact_investigation_note_attrs(contact_investigation, user, "note-b", %{text: "Note B"})
+    |> Cases.create_investigation_note!()
 
     contact_investigation
   end

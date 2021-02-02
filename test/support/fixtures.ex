@@ -2,6 +2,7 @@ defmodule Epicenter.Test.Fixtures do
   alias Epicenter.AuditLog
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.DateParser
@@ -63,6 +64,18 @@ defmodule Epicenter.Test.Fixtures do
       %{
         author_id: author_id,
         case_investigation_id: case_investigation_id,
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
+  end
+
+  def contact_investigation_note_attrs(%ContactInvestigation{id: contact_investigation_id}, %User{id: author_id} = author, tid, attrs) do
+    attrs =
+      %{
+        author_id: author_id,
+        contact_investigation_id: contact_investigation_id,
         tid: tid
       }
       |> merge_attrs(attrs)
