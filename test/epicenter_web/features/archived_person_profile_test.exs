@@ -18,6 +18,24 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
     [person: person, user: user]
   end
 
+  test "the duplicates button is hidden on the profile of an archived person", %{conn: conn, user: user, person: person} do
+    create_case_investigation(person, user, "pending-case-investigation", ~D[2021-01-28], %{})
+
+    Test.Fixtures.person_attrs(user, "alice")
+    |> Test.Fixtures.add_demographic_attrs(%{first_name: "almost-alice"})
+    |> Cases.create_person!()
+
+    view = Pages.Profile.visit(conn, person)
+
+    edit_buttons_before_archiving = get_edit_buttons_and_links(view)
+
+    view
+    |> Pages.Profile.click_archive_button()
+    |> assert_no_edit_buttons_or_links()
+    |> Pages.Profile.click_unarchive_person_button()
+    |> assert_edit_buttons_and_links(edit_buttons_before_archiving)
+  end
+
   test "no buttons on profile of archived person with pending case investigation", %{conn: conn, user: user, person: person} do
     create_case_investigation(person, user, "pending-case-investigation", ~D[2021-01-28], %{})
 

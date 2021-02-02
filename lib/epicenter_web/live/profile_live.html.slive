@@ -12,7 +12,7 @@
         #toolbar-right
           = if is_editable?(@person) do
             button#archive data-role="archive" phx-click="archive" data-confirm="Archive record? This record will no longer be editable and will not appear on the index case list, contacts list, nor in the search results." Archive
-          = if @potential_duplicate_count > 0 do
+          = if @potential_duplicate_count > 0 and is_editable?(@person) do
             = live_redirect "View potential duplicates (#{@potential_duplicate_count})",
               id: "view-potential-duplicates",
               to: Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person),
