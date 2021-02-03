@@ -138,7 +138,7 @@ defmodule Epicenter.Cases do
   end
 
   def change_person(%Person{} = person, attrs), do: Person.changeset(person, attrs)
-  def count_duplicate_people(person), do: person |> Person.Duplicates.Query.all() |> Repo.aggregate(:count)
+  def count_duplicate_people(person), do: Person.Duplicates.find(person, &AuditLog.all(&1, :unlogged)) |> length()
   def count_people(), do: Person |> Repo.aggregate(:count)
   def create_person!({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert!(audit_meta)
   def create_person({attrs, audit_meta}), do: %Person{} |> change_person(attrs) |> AuditLog.insert(audit_meta)
@@ -159,8 +159,7 @@ defmodule Epicenter.Cases do
 
   def get_people(ids, user), do: Person.Query.get_people(ids) |> AuditLog.all(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)
-
-  def list_duplicate_people(%Person{} = person, user), do: person |> Person.Duplicates.Query.all() |> AuditLog.all(user)
+  def list_duplicate_people(%Person{} = person, user), do: Person.Duplicates.find(person, &AuditLog.all(&1, user))
 
   def list_people(filter, user: %User{} = user, reject_archived_people: reject_archived_people),
     do: Person.Query.filter_with_case_investigation(filter) |> Person.Query.reject_archived_people(reject_archived_people) |> AuditLog.all(user)

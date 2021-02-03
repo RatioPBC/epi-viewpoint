@@ -19,6 +19,9 @@ defmodule Epicenter.Extra.Enum do
     end
   end
 
+  def intersect?(a, b),
+    do: MapSet.intersection(MapSet.new(a || []), MapSet.new(b || [])) |> MapSet.size() > 0
+
   def reject_blank(enum),
     do: Enum.reject(enum, &Euclid.Exists.blank?/1)
 

@@ -19,6 +19,20 @@ defmodule Epicenter.Extra.EnumTest do
     end
   end
 
+  describe "intersect?" do
+    test "returns true if the enums have any common elements" do
+      assert Extra.Enum.intersect?(["a", "b", "c"], ["b", "d"])
+      refute Extra.Enum.intersect?(["a", "b", "c"], ["d"])
+    end
+
+    test "handles empty enumerables and nils" do
+      refute Extra.Enum.intersect?(nil, ["a", "b"])
+      refute Extra.Enum.intersect?(nil, nil)
+      refute Extra.Enum.intersect?(["a", "b"], nil)
+      refute Extra.Enum.intersect?([], [])
+    end
+  end
+
   describe "reject_blank" do
     test "rejects blank values" do
       assert Extra.Enum.reject_blank(["a", "", "b", " ", "c", nil, "d"]) == ["a", "b", "c", "d"]

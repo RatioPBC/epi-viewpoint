@@ -1,46 +1,54 @@
 defmodule Epicenter.Cases.Person.Duplicates do
+  alias Epicenter.Cases
+  alias Epicenter.Cases.Address
   alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Person.Duplicates.Query
+  alias Epicenter.Extra
+
+  def find(person, repo_fn),
+    do: person |> Query.all() |> repo_fn.() |> preload() |> Enum.filter(&coalesced_match?(person, &1))
+
+  def coalesced_match?(person1, person2) do
+    person1 = person1 |> preload()
+    person2 = person2 |> preload()
+
+    demographics1 = person1 |> Person.coalesce_demographics()
+    demographics2 = person2 |> Person.coalesce_demographics()
+
+    last_names? = String.downcase(demographics1.last_name) == String.downcase(demographics2.last_name)
+    first_names? = String.downcase(demographics1.first_name) == String.downcase(demographics2.first_name)
+    dobs? = demographics1.dob == demographics2.dob
+    phones? = Extra.Enum.intersect?(Euclid.Extra.Enum.pluck(person1.phones, :number), Euclid.Extra.Enum.pluck(person2.phones, :number))
+
+    addresses? =
+      Extra.Enum.intersect?(
+        Enum.map(person1.addresses, &Address.to_comparable_string/1),
+        Enum.map(person2.addresses, &Address.to_comparable_string/1)
+      )
+
+    last_names? && (first_names? || dobs? || phones? || addresses?)
+  end
+
+  defp preload(person_or_people_or_nil),
+    do: person_or_people_or_nil |> Cases.preload_demographics() |> Cases.preload_phones() |> Cases.preload_addresses()
 
   defmodule Query do
     import Ecto.Query
 
     @duplicates_sql """
     select distinct(potential_duplicate_person_id) from (
-        with latest_last_name as (
-            select max(seq) max_seq, person_id
-            from demographics
-            where last_name is not null
-            group by person_id
-        ),
-        latest_first_name as (
-            select max(seq) max_seq, person_id
-            from demographics
-            where first_name is not null
-            group by person_id
-        ),
-        latest_dob as (
-            select max(seq) max_seq, person_id
-            from demographics
-            where dob is not null
-            group by person_id
-        )
         select d.person_id as potential_duplicate_person_id
         from demographics d
-        join latest_last_name latest on d.seq = latest.max_seq and d.person_id = latest.person_id
-        and lower(d.last_name) = lower($1)
-        where d.person_id != $4
+        where lower(d.last_name) = lower($1)
+        and d.person_id != $4
         INTERSECT
         (
             select d.person_id
             from demographics d
-            join latest_first_name latest
-            on d.seq = latest.max_seq and d.person_id = latest.person_id
             where lower(d.first_name) = lower($2)
             UNION
             select d.person_id
             from demographics d
-            join latest_dob latest
-            on d.seq = latest.max_seq and d.person_id = latest.person_id
             where d.dob = $3
             UNION
             select target.person_id

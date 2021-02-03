@@ -258,7 +258,10 @@ defmodule Epicenter.CasesTest do
       end)
       |> AuditLogAssertions.assert_viewed_people(@admin, [amy])
 
-      assert Cases.count_duplicate_people(alice) == 1
+      capture_log(fn ->
+        assert Cases.count_duplicate_people(alice) == 1
+      end)
+      |> AuditLogAssertions.assert_viewed_nobody()
     end
 
     test "get_people fetches all the people" do

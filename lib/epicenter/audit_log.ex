@@ -11,6 +11,7 @@ defmodule Epicenter.AuditLog do
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Repo
 
+  def all(query, :unlogged), do: Repo.all(query)
   def all(query, user), do: Repo.all(query) |> view(user)
 
   def create_revision(

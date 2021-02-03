@@ -5,6 +5,7 @@ defmodule Epicenter.Cases.Address do
   import Epicenter.PhiValidation, only: [validate_phi: 2]
 
   alias Epicenter.Cases.Address
+  alias Epicenter.Extra
 
   @required_attrs ~w{}a
   @optional_attrs ~w(street city state postal_code type tid is_preferred person_id source)a
@@ -35,6 +36,13 @@ defmodule Epicenter.Cases.Address do
     |> validate_required(@required_attrs)
     |> validate_phi(:address)
     |> unique_constraint([:person_id, :address_fingerprint], name: :addresses_address_fingerprint_person_id_index)
+  end
+
+  def to_comparable_string(%Address{} = address) do
+    [address.street, address.city, address.state, address.postal_code]
+    |> Euclid.Extra.Enum.compact()
+    |> Enum.map(fn s -> s |> Extra.String.squish() |> Extra.String.trim() |> String.downcase() end)
+    |> Enum.join(" ")
   end
 
   defmodule Query do

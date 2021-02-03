@@ -61,6 +61,20 @@ defmodule Epicenter.Cases.AddressTest do
     test "validates personal health information on address", do: assert_invalid(new_changeset(street: "123 main st"))
   end
 
+  describe "to_comparable_string" do
+    test "returns a string that's meant for comparison" do
+      %Address{street: "1000  Test st", city: "   City3  ", state: "Al", postal_code: " 00001 "}
+      |> Address.to_comparable_string()
+      |> assert_eq("1000 test st city3 al 00001")
+    end
+
+    test "handles missing fields" do
+      %Address{street: "1000  Test st", city: nil, state: "Al", postal_code: " 00001 "}
+      |> Address.to_comparable_string()
+      |> assert_eq("1000 test st al 00001")
+    end
+  end
+
   describe "query" do
     import Euclid.Extra.Enum, only: [tids: 1]
 

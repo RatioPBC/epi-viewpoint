@@ -276,24 +276,18 @@ defmodule Epicenter.Cases.PersonTest do
   end
 
   describe "coalesce_demographics" do
-    test "prioritizes manual data > old import data > new import data" do
-      older_import_attrs = %{dob: ~D[2000-01-01], first_name: "Older-Import", source: "import", inserted_at: ~N[2020-01-01 00:00:00]}
-      manual_attrs = %{first_name: "Manual", source: "form", inserted_at: ~N[2020-01-01 00:01:00]}
+    test "prioritizes new manual data > old manual data > old import data > new import data" do
+      older_manual_attrs = %{dob: nil, first_name: "Older-Manual", source: "form", seq: 1}
+      newer_manual_attrs = %{dob: nil, first_name: "Newer-Manual", source: "form", seq: 2}
+      older_import_attrs = %{dob: ~D[2000-03-01], first_name: "Older-Import", source: "import", seq: 3}
+      newer_import_attrs = %{dob: ~D[2000-04-01], first_name: "Newer-Import", source: "import", last_name: "Testuser", seq: 4}
 
-      newer_import_attrs = %{
-        dob: ~D[2000-02-01],
-        first_name: "Newer-Import",
-        source: "import",
-        last_name: "Testuser",
-        inserted_at: ~N[2020-01-01 00:02:00]
-      }
-
-      person = %{demographics: [older_import_attrs, manual_attrs, newer_import_attrs]}
+      person = %{demographics: [older_import_attrs, newer_import_attrs, newer_manual_attrs, older_manual_attrs]}
 
       coalesced_demographics = person |> Person.coalesce_demographics()
 
       assert coalesced_demographics.dob == older_import_attrs.dob
-      assert coalesced_demographics.first_name == manual_attrs.first_name
+      assert coalesced_demographics.first_name == newer_manual_attrs.first_name
       assert coalesced_demographics.last_name == newer_import_attrs.last_name
     end
   end

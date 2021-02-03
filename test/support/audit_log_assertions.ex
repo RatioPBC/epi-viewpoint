@@ -4,6 +4,10 @@ defmodule Epicenter.Test.AuditLogAssertions do
   alias Epicenter.Accounts.User
   alias Epicenter.Cases.Person
 
+  def assert_viewed_nobody(log_output) do
+    refute log_output =~ "viewed Person"
+  end
+
   def assert_viewed_person(log_output, %User{} = user, %Person{} = person) do
     assert log_output =~ "User(#{user.id}) viewed Person(#{person.id})"
     log_output

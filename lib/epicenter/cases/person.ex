@@ -160,15 +160,19 @@ defmodule Epicenter.Cases.Person do
   end
 
   def coalesce_demographics(person) do
-    scores = %{"form" => 0, "import" => 1}
-
     Epicenter.Cases.Demographic.__schema__(:fields)
     |> Enum.reduce(%{}, fn field, data ->
       demographic =
         person.demographics
         |> Enum.filter(fn demo -> Map.get(demo, field) != nil end)
-        |> Enum.sort_by(& &1.inserted_at, {:asc, NaiveDateTime})
-        |> Enum.sort_by(&Map.get(scores, &1.source, 2))
+        |> Enum.sort(fn a, b ->
+          case {{a.source, a.seq}, {b.source, b.seq}} do
+            {{"form", _}, {_, _}} -> true
+            {{_, _}, {"form", _}} -> false
+            {{"form", seq1}, {"form", seq2}} -> seq2 <= seq1
+            {{_, seq1}, {_, seq2}} -> seq2 >= seq1
+          end
+        end)
         |> Enum.at(0)
 
       case demographic do
