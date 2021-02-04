@@ -318,29 +318,5 @@ defmodule Epicenter.Cases.Person do
         where: contact_investigation.interview_status == "pending",
         order_by: [asc: person.seq]
     end
-
-    def with_search_term(term) do
-      case is_uuid?(term) do
-        true ->
-          from person in Person,
-            join: demographic in Demographic,
-            on: person.id == demographic.person_id,
-            where: person.id == ^term,
-            select: person.id,
-            distinct: true
-
-        _ ->
-          from person in Person,
-            join: demographic in Demographic,
-            on: person.id == demographic.person_id,
-            where: demographic.external_id == ^term,
-            select: person.id,
-            distinct: true
-      end
-    end
-
-    defp is_uuid?(term) do
-      String.match?(term, ~r/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/)
-    end
   end
 end

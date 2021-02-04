@@ -546,24 +546,6 @@ defmodule Epicenter.Cases.PersonTest do
     end
   end
 
-  describe "find_person_by_search_term" do
-    test "finds the person associated with an external id" do
-      external_id = "10004"
-      author = Test.Fixtures.admin()
-      {:ok, person} = Test.Fixtures.person_attrs(author, "person") |> Cases.create_person()
-      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "first", %{external_id: external_id}) |> Cases.create_demographic()
-      {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "second", %{external_id: external_id}) |> Cases.create_demographic()
-
-      assert Person.Query.with_search_term(external_id) |> Repo.one() == person.id
-    end
-
-    test "finds the person associated with a viewpoint id" do
-      {:ok, person} = Test.Fixtures.person_attrs(Test.Fixtures.admin(), "person") |> Cases.create_person()
-
-      assert Person.Query.with_search_term(person.id) |> Repo.one() == person.id
-    end
-  end
-
   defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, person \\ nil)
 
   defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, nil) do

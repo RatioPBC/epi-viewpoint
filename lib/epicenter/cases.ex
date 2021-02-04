@@ -155,8 +155,6 @@ defmodule Epicenter.Cases do
   end
 
   def find_matching_person(_), do: nil
-  def find_person_id_by_search_term(term), do: Person.Query.with_search_term(term) |> Repo.one()
-
   def get_people(ids, user), do: Person.Query.get_people(ids) |> AuditLog.all(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)
   def list_duplicate_people(%Person{} = person, user), do: Person.Duplicates.find(person, &AuditLog.all(&1, user))

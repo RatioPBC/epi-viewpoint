@@ -61,14 +61,14 @@ defmodule EpicenterWeb do
         term = term |> String.trim()
 
         socket =
-          case Epicenter.Cases.find_person_id_by_search_term(term) do
-            nil ->
+          case Epicenter.Cases.Person.Search.find(term) do
+            [] ->
               socket
               |> Phoenix.LiveView.assign(:search_results, [])
               |> Phoenix.LiveView.assign(:search_term, term)
 
-            person_id ->
-              socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person_id))
+            [person] ->
+              socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person.id))
           end
 
         socket

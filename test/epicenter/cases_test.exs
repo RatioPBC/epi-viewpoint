@@ -569,15 +569,6 @@ defmodule Epicenter.CasesTest do
     refute Cases.find_matching_person(%{"first_name" => "Firsty", "last_name" => "Testuser", "dob" => ~D[2000-01-02]})
   end
 
-  test "find_person_id_by_search_term returns the person ID for the associated demographic external ID" do
-    external_id = "10004"
-    author = Test.Fixtures.admin()
-    {:ok, person} = Test.Fixtures.person_attrs(author, "person") |> Cases.create_person()
-    {:ok, _} = Test.Fixtures.demographic_attrs(author, person, "first", %{external_id: external_id}) |> Cases.create_demographic()
-
-    assert Cases.find_person_id_by_search_term(external_id) == person.id
-  end
-
   test "create_demographic/2" do
     person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
 
