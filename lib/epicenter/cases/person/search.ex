@@ -1,13 +1,12 @@
 defmodule Epicenter.Cases.Person.Search do
   import Ecto.Query
 
-  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Demographic
   alias Epicenter.Repo
 
-  def find(search_string, user) do
+  def find(search_string) do
     case is_uuid?(search_string) do
       true ->
         find_matches(:person_id, [search_string], downcase: false)
@@ -29,7 +28,6 @@ defmodule Epicenter.Cases.Person.Search do
 
         (external_id_matches ++ first_name_matches ++ last_name_matches) |> Enum.uniq()
     end
-    |> AuditLog.view(user)
   end
 
   def coalesced_field_matches?(person, field, search_tokens) do

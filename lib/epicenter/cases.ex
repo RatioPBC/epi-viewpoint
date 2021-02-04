@@ -171,6 +171,7 @@ defmodule Epicenter.Cases do
 
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def preload_archived_by(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:archived_by])
+  def search_people(search_string, user), do: Person.Search.find(search_string) |> AuditLog.view(user)
   def update_person(%Person{} = person, {attrs, audit_meta}), do: person |> change_person(attrs) |> AuditLog.update(audit_meta)
 
   #

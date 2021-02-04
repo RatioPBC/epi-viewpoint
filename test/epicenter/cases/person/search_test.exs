@@ -1,6 +1,7 @@
 defmodule Epicenter.Cases.Person.SearchTest do
   use Epicenter.DataCase, async: true
 
+  import Euclid.Extra.Enum, only: [tids: 1]
   import ExUnit.CaptureLog
 
   alias Epicenter.Cases
@@ -20,9 +21,36 @@ defmodule Epicenter.Cases.Person.SearchTest do
     person
   end
 
+  describe "Cases.search_people context delegation" do
+    def search_via_context(term) do
+      Cases.search_people(term, @admin) |> tids()
+    end
+
+    test "finds people" do
+      create_person("alice")
+      assert search_via_context("alice") == ~w[alice]
+    end
+
+    test "viewpoint id results are audit logged" do
+      person = create_person("person")
+
+      assert capture_log(fn ->
+               search_via_context(person.id)
+             end) =~ person.id
+    end
+
+    test "non-viewpoint-id results are audit logged" do
+      alice = create_person("alice", first_name: "alice", last_name: "testuser")
+
+      assert capture_log(fn ->
+               search_via_context("alice testuser")
+             end) =~ alice.id
+    end
+  end
+
   describe "find" do
     def search(term) do
-      Person.Search.find(term, @admin) |> Enum.map(& &1.tid)
+      Person.Search.find(term) |> tids()
     end
 
     test "empty string returns empty results" do
@@ -73,22 +101,6 @@ defmodule Epicenter.Cases.Person.SearchTest do
       assert search("alice") == ~w[not-archived]
       assert search(not_archived.id) == ~w[not-archived]
       assert search(archived.id) == []
-    end
-
-    test "viewpoint id results are audit logged" do
-      person = create_person("person")
-
-      assert capture_log(fn ->
-               search(person.id)
-             end) =~ person.id
-    end
-
-    test "non-viewpoint-id results are audit logged" do
-      alice = create_person("alice", first_name: "alice", last_name: "testuser")
-
-      assert capture_log(fn ->
-               search("alice testuser")
-             end) =~ alice.id
     end
   end
 end
