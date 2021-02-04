@@ -167,9 +167,9 @@ defmodule Epicenter.Cases.Person do
         |> Enum.filter(fn demo -> Map.get(demo, field) != nil end)
         |> Enum.sort(fn a, b ->
           case {{a.source, a.seq}, {b.source, b.seq}} do
+            {{"form", seq1}, {"form", seq2}} -> seq2 <= seq1
             {{"form", _}, {_, _}} -> true
             {{_, _}, {"form", _}} -> false
-            {{"form", seq1}, {"form", seq2}} -> seq2 <= seq1
             {{_, seq1}, {_, seq2}} -> seq2 >= seq1
           end
         end)

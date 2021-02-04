@@ -282,7 +282,7 @@ defmodule Epicenter.Cases.PersonTest do
       older_import_attrs = %{dob: ~D[2000-03-01], first_name: "Older-Import", source: "import", seq: 3}
       newer_import_attrs = %{dob: ~D[2000-04-01], first_name: "Newer-Import", source: "import", last_name: "Testuser", seq: 4}
 
-      person = %{demographics: [older_import_attrs, newer_import_attrs, newer_manual_attrs, older_manual_attrs]}
+      person = %{demographics: [newer_import_attrs, older_import_attrs, older_manual_attrs, newer_manual_attrs]}
 
       coalesced_demographics = person |> Person.coalesce_demographics()
 
