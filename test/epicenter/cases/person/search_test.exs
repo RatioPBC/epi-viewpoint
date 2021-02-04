@@ -1,6 +1,8 @@
 defmodule Epicenter.Cases.Person.SearchTest do
   use Epicenter.DataCase, async: true
 
+  import ExUnit.CaptureLog
+
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Test
@@ -62,6 +64,22 @@ defmodule Epicenter.Cases.Person.SearchTest do
       assert search("alice") == ["alice"]
       assert search("Alice") == ["alice"]
       assert search("testuser") == ["alice"]
+    end
+
+    test "viewpoint id results are audit logged" do
+      person = create_person("person")
+
+      assert capture_log(fn ->
+               search(person.id)
+             end) =~ person.id
+    end
+
+    test "non-viewpoint-id results are audit logged" do
+      alice = create_person("alice", first_name: "alice", last_name: "testuser")
+
+      assert capture_log(fn ->
+               search("alice testuser")
+             end) =~ alice.id
     end
   end
 end

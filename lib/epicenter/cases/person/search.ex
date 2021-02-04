@@ -1,5 +1,7 @@
 defmodule Epicenter.Cases.Person.Search do
   import Ecto.Query
+
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Demographic
@@ -25,7 +27,9 @@ defmodule Epicenter.Cases.Person.Search do
           |> Cases.preload_demographics()
           |> Enum.filter(&coalesced_field_matches?(&1, :last_name, search_tokens))
 
-        (external_id_matches ++ first_name_matches ++ last_name_matches) |> Enum.uniq()
+        (external_id_matches ++ first_name_matches ++ last_name_matches)
+        |> Enum.uniq()
+        |> AuditLog.view(user)
     end
   end
 

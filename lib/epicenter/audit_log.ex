@@ -96,7 +96,7 @@ defmodule Epicenter.AuditLog do
   end
 
   def view(nil, _user_id), do: nil
-  def view(phi_loggable, %User{} = user) when is_list(phi_loggable), do: Enum.map(phi_loggable, &view(&1, user))
+  def view(phi_loggables, %User{} = user) when is_list(phi_loggables), do: Enum.map(phi_loggables, &view(&1, user))
 
   def view(phi_loggable, %User{id: user_id}) do
     subject_type = "Person"
