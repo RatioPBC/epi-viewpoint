@@ -5,13 +5,13 @@ defmodule Epicenter.Cases.Person.Search do
   alias Epicenter.Cases.Demographic
   alias Epicenter.Repo
 
-  def find(search_string) do
+  def find(search_string, user) do
     case is_uuid?(search_string) do
       true ->
-        find_matches(:person_id, [search_string])
+        Cases.get_person(search_string, user) |> List.wrap()
 
       false ->
-        search_tokens = search_string |> String.split(" ") |> Enum.map(&String.trim/1)
+        search_tokens = search_string |> String.split(" ") |> Enum.map(&String.trim/1) |> Enum.map(&String.downcase/1)
 
         external_id_matches = find_matches(:external_id, search_tokens)
 
@@ -25,13 +25,13 @@ defmodule Epicenter.Cases.Person.Search do
           |> Cases.preload_demographics()
           |> Enum.filter(&coalesced_field_matches?(&1, :last_name, search_tokens))
 
-        external_id_matches ++ first_name_matches ++ last_name_matches
+        (external_id_matches ++ first_name_matches ++ last_name_matches) |> Enum.uniq()
     end
   end
 
   def coalesced_field_matches?(person, field, search_tokens) do
     demographic = person |> Person.coalesce_demographics()
-    search_tokens |> Enum.member?(demographic[field])
+    search_tokens |> Enum.member?(String.downcase(demographic[field]))
   end
 
   defp is_uuid?(term) do
@@ -45,9 +45,8 @@ defmodule Epicenter.Cases.Person.Search do
         distinct: true
 
     query
-    |> where([d], field(d, ^field) in ^search_tokens)
+    |> where([d], fragment("lower(?)", field(d, ^field)) in ^search_tokens)
     |> Repo.all()
-    |> Enum.uniq()
     |> Person.Query.get_people()
     |> Repo.all()
   end

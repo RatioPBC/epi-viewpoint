@@ -20,7 +20,7 @@ defmodule Epicenter.Cases.Person.SearchTest do
 
   describe "find" do
     def search(term) do
-      Person.Search.find(term) |> Enum.map(& &1.tid)
+      Person.Search.find(term, @admin) |> Enum.map(& &1.tid)
     end
 
     test "empty string returns empty results" do
@@ -53,17 +53,15 @@ defmodule Epicenter.Cases.Person.SearchTest do
     end
 
     test "returning unique results" do
-      create_person("first-name-match", %{first_name: "OldFirstName"})
-      |> create_demographic(%{first_name: "NewFirstName"})
+      create_person("alice", first_name: "alice", last_name: "testuser")
+      assert search("alice testuser") == ["alice"]
+    end
 
-      create_person("last-name-match", %{last_name: "TestuserOldLastName"})
-      |> create_demographic(%{last_name: "TestuserNewLastName"})
-
-      assert search("NewFirstName TestuserNewLastName") == ["first-name-match", "last-name-match"]
-      assert search("OldFirstName") == []
-      assert search("TestuserOldLastName") == []
-      assert search("NewFirstName TestuserOldLastName") == ["first-name-match"]
-      assert search("OldFirstName TestuserNewLastName") == ["last-name-match"]
+    test "searches are case-insensitive" do
+      create_person("alice", first_name: "Alice", last_name: "TeStUsEr")
+      assert search("alice") == ["alice"]
+      assert search("Alice") == ["alice"]
+      assert search("testuser") == ["alice"]
     end
   end
 end
