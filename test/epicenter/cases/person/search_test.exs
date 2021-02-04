@@ -35,10 +35,17 @@ defmodule Epicenter.Cases.Person.SearchTest do
     end
 
     test "finds people whose coalesced first name or coalesced last name match any of the search terms" do
-      create_person("first-name-match", %{first_name: "old first name"}) |> create_demographic(%{first_name: "new first name"})
+      create_person("first-name-match", %{first_name: "OldFirstName"})
+      |> create_demographic(%{first_name: "NewFirstName"})
 
-      assert search("new first name") == ["first-name-match"]
-      assert search("old first name") == []
+      create_person("last-name-match", %{last_name: "TestuserOldLastName"})
+      |> create_demographic(%{last_name: "TestuserNewLastName"})
+
+      assert search("NewFirstName TestuserNewLastName") == ["first-name-match", "last-name-match"]
+      assert search("OldFirstName") == []
+      assert search("TestuserOldLastName") == []
+      assert search("NewFirstName TestuserOldLastName") == ["first-name-match"]
+      assert search("OldFirstName TestuserNewLastName") == ["last-name-match"]
     end
   end
 end

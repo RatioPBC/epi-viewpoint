@@ -5,30 +5,41 @@ defmodule Epicenter.Cases.Person.Search do
   alias Epicenter.Cases.Demographic
   alias Epicenter.Repo
 
-  def find(term) do
-    case is_uuid?(term) do
+  def find(search_string) do
+    case is_uuid?(search_string) do
       true ->
-        Query.uuid_matches(term) |> Repo.all() |> Person.Query.get_people() |> Repo.all()
+        Query.uuid_matches(search_string) |> Repo.all() |> Person.Query.get_people() |> Repo.all()
 
       false ->
-        external_id_matches = Query.external_id_matches(term) |> Repo.all() |> Person.Query.get_people() |> Repo.all()
+        external_id_matches = Query.external_id_matches(search_string) |> Repo.all() |> Person.Query.get_people() |> Repo.all()
+
+        search_terms = search_string |> String.split(" ") |> Enum.map(&String.trim/1)
 
         first_name_matches =
-          Query.first_name_matches(term)
+          Query.first_name_matches(search_terms)
           |> Repo.all()
           |> Enum.uniq()
           |> Person.Query.get_people()
           |> Repo.all()
           |> Cases.preload_demographics()
-          |> Enum.filter(&coalesced_first_name_matches?(&1, term))
+          |> Enum.filter(&coalesced_field_matches?(&1, :first_name, search_terms))
 
-        external_id_matches ++ first_name_matches
+        last_name_matches =
+          Query.last_name_matches(search_terms)
+          |> Repo.all()
+          |> Enum.uniq()
+          |> Person.Query.get_people()
+          |> Repo.all()
+          |> Cases.preload_demographics()
+          |> Enum.filter(&coalesced_field_matches?(&1, :last_name, search_terms))
+
+        external_id_matches ++ first_name_matches ++ last_name_matches
     end
   end
 
-  def coalesced_first_name_matches?(person, term) do
+  def coalesced_field_matches?(person, field, search_terms) do
     demographic = person |> Person.coalesce_demographics()
-    demographic.first_name == term
+    search_terms |> Enum.member?(demographic[field])
   end
 
   defp is_uuid?(term) do
@@ -56,11 +67,20 @@ defmodule Epicenter.Cases.Person.Search do
         distinct: true
     end
 
-    def first_name_matches(term) do
+    def first_name_matches(search_terms) do
       from person in Person,
         join: demographic in Demographic,
         on: person.id == demographic.person_id,
-        where: demographic.first_name == ^term,
+        where: demographic.first_name in ^search_terms,
+        select: person.id,
+        distinct: true
+    end
+
+    def last_name_matches(search_terms) do
+      from person in Person,
+        join: demographic in Demographic,
+        on: person.id == demographic.person_id,
+        where: demographic.last_name in ^search_terms,
         select: person.id,
         distinct: true
     end
