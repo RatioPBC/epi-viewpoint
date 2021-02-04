@@ -23,10 +23,14 @@ defmodule Epicenter.Cases.Person.SearchTest do
       Person.Search.find(term) |> Enum.map(& &1.tid)
     end
 
+    test "empty string returns empty results" do
+      assert search("") == []
+      assert search("   ") == []
+    end
+
     test "finds the person associated with an external id" do
-      external_id = "10004"
-      create_person("person", %{external_id: external_id})
-      assert search(external_id) == ["person"]
+      create_person("person", %{external_id: "10004"})
+      assert search("10004 10002 james") == ["person"]
     end
 
     test "finds the person associated with a viewpoint id" do
@@ -35,6 +39,20 @@ defmodule Epicenter.Cases.Person.SearchTest do
     end
 
     test "finds people whose coalesced first name or coalesced last name match any of the search terms" do
+      create_person("first-name-match", %{first_name: "OldFirstName"})
+      |> create_demographic(%{first_name: "NewFirstName"})
+
+      create_person("last-name-match", %{last_name: "TestuserOldLastName"})
+      |> create_demographic(%{last_name: "TestuserNewLastName"})
+
+      assert search("NewFirstName TestuserNewLastName") == ["first-name-match", "last-name-match"]
+      assert search("OldFirstName") == []
+      assert search("TestuserOldLastName") == []
+      assert search("NewFirstName TestuserOldLastName") == ["first-name-match"]
+      assert search("OldFirstName TestuserNewLastName") == ["last-name-match"]
+    end
+
+    test "returning unique results" do
       create_person("first-name-match", %{first_name: "OldFirstName"})
       |> create_demographic(%{first_name: "NewFirstName"})
 
