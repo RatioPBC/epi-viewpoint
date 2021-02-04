@@ -212,10 +212,6 @@ defmodule Epicenter.Cases.Person do
     def reject_archived_people(query, false = _reject_archived), do: query
 
     def filter_with_case_investigation(:all), do: Person.Query.all()
-    def filter_with_case_investigation(:with_isolation_monitoring), do: Person.Query.with_case_investigation_isolation_monitoring()
-    def filter_with_case_investigation(:with_ongoing_interview), do: Person.Query.with_case_investigation_ongoing_interview()
-    def filter_with_case_investigation(:with_pending_interview), do: Person.Query.with_case_investigation_pending_interview()
-    def filter_with_case_investigation(:with_positive_lab_results), do: Person.Query.with_case_investigation_positive_lab_results()
 
     def filter_with_contact_investigation(:with_contact_investigation), do: Person.Query.with_contact_investigation()
     def filter_with_contact_investigation(:with_quarantine_monitoring), do: Person.Query.with_contact_investigation_quarantine_monitoring()
@@ -228,63 +224,6 @@ defmodule Epicenter.Cases.Person do
     def opts_for_upsert(), do: [returning: true, on_conflict: {:replace, @fields_to_replace_from_csv}, conflict_target: :fingerprint]
 
     def with_demographic_field(query, field, value), do: query |> join(:inner, [p], d in assoc(p, :demographics), on: field(d, ^field) == ^value)
-
-    def with_case_investigation_isolation_monitoring() do
-      case_investigations_in_isolation_monitoring =
-        from case_investigation in CaseInvestigation,
-          distinct: [desc: parent_as(:person).id],
-          where:
-            parent_as(:person).id == case_investigation.person_id and case_investigation.interview_status == "completed" and
-              case_investigation.isolation_monitoring_status in ["pending", "ongoing"],
-          order_by: [desc: parent_as(:person).id, desc: case_investigation.inserted_at, desc: case_investigation.seq]
-
-      from person in Person,
-        as: :person,
-        inner_lateral_join: case_investigation in subquery(case_investigations_in_isolation_monitoring),
-        order_by: [
-          desc: case_investigation.isolation_monitoring_status,
-          asc: case_investigation.isolation_monitoring_ends_on,
-          desc: case_investigation.interview_completed_at,
-          desc: person.seq
-        ]
-    end
-
-    def with_case_investigation_ongoing_interview(), do: sorted_people_with_case_investigation_interview_status("started")
-    def with_case_investigation_pending_interview(), do: sorted_people_with_case_investigation_interview_status("pending")
-
-    defp sorted_people_with_case_investigation_interview_status(interview_status) do
-      person_latest_positive_lab_results_most_recently_sampled_on =
-        from lab_result in LabResult,
-          where: lab_result.is_positive_or_detected == true,
-          distinct: [desc: lab_result.person_id],
-          order_by: [desc: lab_result.person_id, desc: lab_result.sampled_on, asc: lab_result.seq]
-
-      from person in Person,
-        join: case_investigation in CaseInvestigation,
-        on: case_investigation.person_id == person.id,
-        left_join: assignee in User,
-        on: assignee.id == person.assigned_to_id,
-        join: lab_result in subquery(person_latest_positive_lab_results_most_recently_sampled_on),
-        on: lab_result.person_id == person.id,
-        where: case_investigation.interview_status == ^interview_status,
-        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on]
-    end
-
-    def with_case_investigation_positive_lab_results() do
-      newest_positive_lab_result =
-        from lab_result in LabResult,
-          select: %{
-            person_id: lab_result.person_id,
-            max_sampled_on: max(lab_result.sampled_on)
-          },
-          where: lab_result.is_positive_or_detected == true,
-          group_by: lab_result.person_id
-
-      from person in Person,
-        inner_join: lab_result in subquery(newest_positive_lab_result),
-        on: lab_result.person_id == person.id,
-        order_by: [asc: lab_result.max_sampled_on, asc: person.seq]
-    end
 
     def with_contact_investigation do
       from person in Person,

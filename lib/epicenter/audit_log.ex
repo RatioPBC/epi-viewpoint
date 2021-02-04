@@ -95,7 +95,7 @@ defmodule Epicenter.AuditLog do
     create_revision(changeset, %Meta{} = meta, &Repo.update!/2, ecto_options, changeset_flattening_function)
   end
 
-  def view(nil, _user_id), do: nil
+  def view(nil, _user), do: nil
   def view(phi_loggables, %User{} = user) when is_list(phi_loggables), do: Enum.map(phi_loggables, &view(&1, user))
 
   def view(phi_loggable, %User{id: user_id}) do

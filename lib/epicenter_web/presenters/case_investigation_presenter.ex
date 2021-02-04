@@ -276,6 +276,53 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     ]
   end
 
+  def displayable_status(nil, _),
+    do: ""
+
+  def displayable_status(%CaseInvestigation{} = investigation, current_date) do
+    displayable_status(
+      investigation.interview_status,
+      investigation.isolation_monitoring_status,
+      investigation.isolation_monitoring_ends_on,
+      current_date
+    )
+  end
+
+  def displayable_status(%ContactInvestigation{} = investigation, current_date) do
+    displayable_status(
+      investigation.interview_status,
+      investigation.quarantine_monitoring_status,
+      investigation.quarantine_monitoring_ends_on,
+      current_date
+    )
+  end
+
+  def displayable_status(interview_status, monitoring_status, monitoring_ends_on, current_date) do
+    case interview_status do
+      "pending" ->
+        "Pending interview"
+
+      "started" ->
+        "Ongoing interview"
+
+      "completed" ->
+        case monitoring_status do
+          "pending" ->
+            "Pending monitoring"
+
+          "ongoing" ->
+            diff = Date.diff(monitoring_ends_on, current_date)
+            "Ongoing monitoring (#{diff} days remaining)"
+
+          "concluded" ->
+            "Concluded monitoring"
+        end
+
+      "discontinued" ->
+        "Discontinued"
+    end
+  end
+
   # # #
 
   defp build_details_list(%{

@@ -97,5 +97,54 @@ defmodule Epicenter.Cases.CaseInvestigation do
       from case_investigation in CaseInvestigation,
         order_by: [asc: case_investigation.seq]
     end
+
+    def list(filter)
+
+    def list(:pending_interview) do
+      from case_investigation in CaseInvestigation,
+        join: person in assoc(case_investigation, :person),
+        left_join: assignee in assoc(person, :assigned_to),
+        join: lab_result in assoc(case_investigation, :initiating_lab_result),
+        where: is_nil(person.archived_at) and case_investigation.interview_status == "pending",
+        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on, asc: case_investigation.seq]
+    end
+
+    def list(:ongoing_interview) do
+      from case_investigation in CaseInvestigation,
+        join: person in assoc(case_investigation, :person),
+        left_join: assignee in assoc(person, :assigned_to),
+        join: lab_result in assoc(case_investigation, :initiating_lab_result),
+        where: is_nil(person.archived_at) and case_investigation.interview_status == "started",
+        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on, asc: case_investigation.seq]
+    end
+
+    def list(:isolation_monitoring) do
+      from case_investigation in CaseInvestigation,
+        join: person in assoc(case_investigation, :person),
+        where:
+          is_nil(person.archived_at) and
+            case_investigation.interview_status == "completed" and
+            case_investigation.isolation_monitoring_status in ["pending", "ongoing"],
+        order_by: [
+          desc: case_investigation.isolation_monitoring_status,
+          asc: case_investigation.isolation_monitoring_ends_on,
+          desc: case_investigation.interview_completed_at,
+          desc: person.seq
+        ]
+    end
+
+    def list(:all) do
+      from case_investigation in CaseInvestigation,
+        join: person in assoc(case_investigation, :person),
+        left_join: assignee in assoc(person, :assigned_to),
+        join: lab_result in assoc(case_investigation, :initiating_lab_result),
+        where: is_nil(person.archived_at),
+        order_by: [asc_nulls_first: assignee.name, asc: lab_result.sampled_on, asc: case_investigation.seq]
+    end
+
+    def assigned_to_user(query, user_id) do
+      query
+      |> where([case_investigation, person, assignee], assignee.id == ^user_id)
+    end
   end
 end

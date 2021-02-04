@@ -55,6 +55,12 @@ defmodule Epicenter.Cases do
 
   def get_case_investigation(id, user), do: AuditLog.get(CaseInvestigation, id, user)
 
+  def list_case_investigations(filter, user: %User{} = current_user),
+    do: CaseInvestigation.Query.list(filter) |> AuditLog.all(current_user)
+
+  def list_case_investigations(filter, assigned_to_id: user_id, user: %User{} = current_user),
+    do: CaseInvestigation.Query.list(filter) |> CaseInvestigation.Query.assigned_to_user(user_id) |> AuditLog.all(current_user)
+
   def preload_contact_investigations(has_many_contacts_or_nil, user) do
     has_many_contacts_or_nil
     |> Repo.preload(
@@ -65,6 +71,19 @@ defmodule Epicenter.Cases do
          ]}
     )
     |> log_contact_investigations(user)
+  end
+
+  def preload_people(case_investigations) do
+    case_investigations
+    |> Repo.preload(
+      [
+        person: [
+          :assigned_to,
+          :demographics
+        ]
+      ],
+      force: true
+    )
   end
 
   defp log_contact_investigations(has_many_contacts_or_nil, _user) when is_nil(has_many_contacts_or_nil), do: has_many_contacts_or_nil

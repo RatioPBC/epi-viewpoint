@@ -8,10 +8,10 @@ defmodule EpicenterWeb.PeopleFilter do
   def render(assigns) do
     ~H"""
     #status-filter
-      = live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_positive_lab_results), class: "button", data: [active: assigns.filter in [:with_positive_lab_results, nil], role: "people-filter", tid: "all"]
-      = live_patch "Pending interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_pending_interview), class: "button", data: [active: assigns.filter == :with_pending_interview, role: "people-filter", tid: "with_pending_interview"]
-      = live_patch "Ongoing interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_ongoing_interview), class: "button", data: [active: assigns.filter == :with_ongoing_interview, role: "people-filter", tid: "with_ongoing_interview"]
-      = live_patch "Isolation monitoring", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :with_isolation_monitoring), class: "button", data: [active: assigns.filter == :with_isolation_monitoring, role: "people-filter", tid: "with_isolation_monitoring"]
+      = live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :all), class: "button", data: [active: assigns.filter in [:all, nil], role: "people-filter", tid: "all"]
+      = live_patch "Pending interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :pending_interview), class: "button", data: [active: assigns.filter == :pending_interview, role: "people-filter", tid: "pending_interview"]
+      = live_patch "Ongoing interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :ongoing_interview), class: "button", data: [active: assigns.filter == :ongoing_interview, role: "people-filter", tid: "ongoing_interview"]
+      = live_patch "Isolation monitoring", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :isolation_monitoring), class: "button", data: [active: assigns.filter == :isolation_monitoring, role: "people-filter", tid: "isolation_monitoring"]
     label#assigned-to-me-button
       input type="checkbox" phx-click="toggle-assigned-to-me" checked=@display_people_assigned_to_me data-tid="assigned-to-me-checkbox" phx-target=@myself
       span My assignments only
@@ -36,16 +36,17 @@ defmodule EpicenterWeb.PeopleLive do
       disabled?: 1,
       external_id: 1,
       full_name: 1,
-      latest_case_investigation_status: 2,
       selected?: 2
     ]
+
+  import EpicenterWeb.Presenters.CaseInvestigationPresenter, only: [displayable_status: 2]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
   alias Epicenter.CaseInvestigationFilterError
   alias Epicenter.Cases
+  alias EpicenterWeb.Format
   alias EpicenterWeb.PeopleFilter
-  alias EpicenterWeb.Presenters.LabResultPresenter
 
   @clock Application.get_env(:epicenter, :clock)
 
@@ -58,8 +59,8 @@ defmodule EpicenterWeb.PeopleLive do
     |> assign_reload_message(nil)
     |> assign(:display_people_assigned_to_me, false)
     |> assign_display_import_button()
-    |> assign_filter(:with_positive_lab_results)
-    |> load_and_assign_people()
+    |> assign_filter(:all)
+    |> load_and_assign_case_investigations()
     |> load_and_assign_users()
     |> assign_selected_to_empty()
     |> ok()
@@ -75,13 +76,15 @@ defmodule EpicenterWeb.PeopleLive do
     do: handle_event("form-change", %{"user" => nil}, socket)
 
   def handle_event("form-change", %{"user" => user_id}, socket) do
-    {:ok, updated_people} =
+    {:ok, _} =
       Cases.assign_user_to_people(
         user_id: user_id,
         people_ids:
-          socket.assigns.people
-          |> Enum.filter(fn person -> Map.get(socket.assigns.selected_people, person.id) end)
-          |> Euclid.Extra.Enum.pluck(:id),
+          socket.assigns.case_investigations
+          |> Enum.filter(fn case_investigation ->
+            Map.get(socket.assigns.selected_people, case_investigation.person.id)
+          end)
+          |> Enum.map(fn case_investigation -> case_investigation.person.id end),
         audit_meta: %AuditLog.Meta{
           author_id: socket.assigns.current_user.id,
           reason_action: AuditLog.Revision.update_assignment_bulk_action(),
@@ -90,7 +93,7 @@ defmodule EpicenterWeb.PeopleLive do
         current_user: socket.assigns.current_user
       )
 
-    socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> noreply()
+    socket |> assign_selected_to_empty() |> preload_and_assign_case_investigations() |> noreply()
   end
 
   def handle_event("form-change", _, socket),
@@ -110,23 +113,20 @@ defmodule EpicenterWeb.PeopleLive do
         )
     end
 
-    socket |> assign_selected_to_empty() |> load_and_assign_people() |> noreply()
+    socket |> assign_selected_to_empty() |> load_and_assign_case_investigations() |> noreply()
   end
 
   def handle_info(:display_people_assigned_to_me_toggled, socket) do
     socket
     |> assign(:display_people_assigned_to_me, !socket.assigns.display_people_assigned_to_me)
-    |> load_and_assign_people()
+    |> load_and_assign_case_investigations()
     |> noreply()
   end
 
-  def handle_info({:people, updated_people}, socket),
-    do: socket |> assign_selected_to_empty() |> refresh_existing_people(updated_people) |> prompt_to_reload(updated_people) |> noreply()
-
-  @case_investigation_filters ~w{with_ongoing_interview with_pending_interview with_positive_lab_results with_isolation_monitoring}
+  @case_investigation_filters ~w{all ongoing_interview pending_interview isolation_monitoring}
 
   def handle_params(%{"filter" => filter}, _url, socket) when filter in @case_investigation_filters,
-    do: socket |> assign_filter(filter) |> load_and_assign_people() |> noreply()
+    do: socket |> assign_filter(filter) |> load_and_assign_case_investigations() |> noreply()
 
   def handle_params(%{"filter" => unmatched_filter}, _url, _socket),
     do: raise(CaseInvestigationFilterError, user_readable: "Unmatched filter “#{unmatched_filter}”")
@@ -140,10 +140,10 @@ defmodule EpicenterWeb.PeopleLive do
 
   # # # View helpers
 
-  def page_title(:with_isolation_monitoring), do: "Isolation monitoring"
-  def page_title(:with_ongoing_interview), do: "Ongoing interviews"
-  def page_title(:with_pending_interview), do: "Pending interviews"
-  def page_title(:with_positive_lab_results), do: "Index Cases"
+  def page_title(:isolation_monitoring), do: "Isolation monitoring"
+  def page_title(:ongoing_interview), do: "Ongoing interviews"
+  def page_title(:pending_interview), do: "Pending interviews"
+  def page_title(:all), do: "Index Cases"
 
   # # # Private
 
@@ -153,58 +153,42 @@ defmodule EpicenterWeb.PeopleLive do
     socket |> assign(current_date: current_date)
   end
 
-  defp assign_people(socket, people) do
-    AuditLog.view(people, socket.assigns.current_user)
-    assign(socket, people: people, person_count: length(people))
+  defp assign_case_investigations(socket, case_investigations) do
+    assign(socket, case_investigations: case_investigations, case_count: length(case_investigations))
   end
 
   defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.delete(selected_people, person_id))
 
-  defp load_and_assign_people(socket) do
-    people =
+  defp load_and_assign_case_investigations(socket) do
+    case_investigations =
       cond do
         socket.assigns.display_people_assigned_to_me ->
-          Cases.list_people(socket.assigns.filter,
+          Cases.list_case_investigations(socket.assigns.filter,
             assigned_to_id: socket.assigns.current_user.id,
-            user: socket.assigns.current_user,
-            reject_archived_people: true
+            user: socket.assigns.current_user
           )
 
         true ->
-          Cases.list_people(socket.assigns.filter, user: socket.assigns.current_user, reject_archived_people: true)
+          Cases.list_case_investigations(socket.assigns.filter, user: socket.assigns.current_user)
       end
 
     socket
-    |> assign_people(people)
-    |> preload_and_assign_people()
+    |> assign_case_investigations(case_investigations)
+    |> preload_and_assign_case_investigations()
   end
 
-  defp preload_and_assign_people(socket) do
-    people =
-      socket.assigns.people
-      |> Cases.preload_lab_results()
-      |> Cases.preload_assigned_to()
-      |> Cases.preload_demographics()
-      |> Cases.preload_case_investigations()
+  defp preload_and_assign_case_investigations(socket) do
+    case_investigations =
+      socket.assigns.case_investigations
+      |> Cases.preload_initiating_lab_result()
+      |> Cases.preload_people()
 
-    assign_people(socket, people)
+    assign_case_investigations(socket, case_investigations)
   end
 
   defp load_and_assign_users(socket),
     do: socket |> assign(users: Accounts.list_users())
-
-  defp prompt_to_reload(socket, _people) do
-    assign_reload_message(socket, "Changes have been made. Click here to refresh.")
-  end
-
-  defp refresh_existing_people(socket, updated_people) do
-    id_to_people_map = updated_people |> Enum.reduce(%{}, fn person, acc -> acc |> Map.put(person.id, person) end)
-    refreshed_people = socket.assigns.people |> Enum.map(fn person -> Map.get(id_to_people_map, person.id, person) end)
-
-    assign_people(socket, refreshed_people)
-    |> preload_and_assign_people()
-  end
 
   defp select_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),
     do: assign(socket, selected_people: Map.put(selected_people, person_id, true))

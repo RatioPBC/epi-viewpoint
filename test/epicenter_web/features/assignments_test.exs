@@ -11,15 +11,23 @@ defmodule EpicenterWeb.Features.AssignmentsTest do
 
   @admin Test.Fixtures.admin()
 
-  test "people can be assigned to users on people and profile page", %{conn: conn} do
+  test "people can be assigned to users on people and profile page", %{conn: conn, user: user} do
     assignee = Test.Fixtures.user_attrs(@admin, "assignee") |> Accounts.register_user!()
     Test.Fixtures.user_attrs(@admin, "nonassignee") |> Accounts.register_user!()
 
     alice = Test.Fixtures.person_attrs(assignee, "alice") |> Cases.create_person!()
-    Test.Fixtures.lab_result_attrs(alice, @admin, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
-    billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
-    Test.Fixtures.lab_result_attrs(billy, @admin, "billy-result-1", Extra.Date.days_ago(2), result: "positive") |> Cases.create_lab_result!()
 
+    alice_lab_result =
+      Test.Fixtures.lab_result_attrs(alice, @admin, "alice-result-1", Extra.Date.days_ago(1), result: "positive") |> Cases.create_lab_result!()
+
+    Test.Fixtures.case_investigation_attrs(alice, alice_lab_result, user, "") |> Cases.create_case_investigation!()
+
+    billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
+
+    billy_lab_result =
+      Test.Fixtures.lab_result_attrs(billy, @admin, "billy-result-1", Extra.Date.days_ago(2), result: "positive") |> Cases.create_lab_result!()
+
+    Test.Fixtures.case_investigation_attrs(billy, billy_lab_result, user, "") |> Cases.create_case_investigation!()
     #
     # nobody is assigned
     #

@@ -2,12 +2,14 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [tids: 1]
+  import ExUnit.CaptureLog
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.ContactInvestigations
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
 
   setup :persist_admin
   @admin Test.Fixtures.admin()
@@ -183,6 +185,364 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
 
       assert monitoring_concluded_case_investigation.isolation_monitoring_status == "concluded"
     end
+  end
+
+  describe "fetching filtered lists of case investigations" do
+    setup do
+      alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
+      create_case_investigation(alice, @admin, "pending-case-investigation", ~D[2021-01-28], %{})
+
+      bob = Test.Fixtures.person_attrs(@admin, "bob") |> Cases.create_person!()
+
+      create_case_investigation(bob, @admin, "started-case-investigation", nil, %{
+        interview_started_at: NaiveDateTime.utc_now(),
+        clinical_status: "symptomatic"
+      })
+
+      create_case_investigation(bob, @admin, "interview-completed-case-investigation", nil, %{
+        interview_completed_at: ~U[2020-10-31 23:03:07Z],
+        interview_started_at: ~U[2020-10-31 22:03:07Z]
+      })
+
+      cindy = Test.Fixtures.person_attrs(@admin, "cindy") |> Cases.create_person!()
+
+      create_case_investigation(cindy, @admin, "discontinued-case-investigation", nil, %{
+        interview_started_at: ~U[2020-10-31 22:03:07Z],
+        interview_discontinued_at: ~U[2020-10-31 23:03:07Z],
+        interview_discontinue_reason: "Unable to reach"
+      })
+
+      david = Test.Fixtures.person_attrs(@admin, "david") |> Cases.create_person!()
+
+      create_case_investigation(david, @admin, "isolation-monitoring-started-case-investigation", nil, %{
+        interview_completed_at: ~U[2020-10-05 19:57:00Z],
+        interview_started_at: ~U[2020-10-05 18:57:00Z],
+        isolation_monitoring_starts_on: ~D[2020-11-05],
+        isolation_monitoring_ends_on: ~D[2020-11-15]
+      })
+
+      eva = Test.Fixtures.person_attrs(@admin, "eva") |> Cases.create_person!()
+
+      create_case_investigation(eva, @admin, "isolation-monitoring-completed-case-investigation", nil, %{
+        interview_completed_at: ~U[2020-10-05 19:57:00Z],
+        interview_started_at: ~U[2020-10-05 18:57:00Z],
+        isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
+        isolation_conclusion_reason: "successfully_completed",
+        isolation_monitoring_ends_on: ~D[2020-11-15],
+        isolation_monitoring_starts_on: ~D[2020-11-05]
+      })
+
+      create_archived_person(
+        "frank",
+        %{},
+        "ongoing-interview"
+      )
+
+      create_archived_person(
+        "george",
+        %{
+          interview_started_at: NaiveDateTime.utc_now(),
+          clinical_status: "symptomatic"
+        },
+        "ongoing-interview"
+      )
+
+      create_archived_person(
+        "haley",
+        %{
+          interview_completed_at: ~U[2020-10-31 23:03:07Z],
+          interview_started_at: ~U[2020-10-31 22:03:07Z]
+        },
+        "ongoing-interview"
+      )
+
+      create_archived_person(
+        "ingrid",
+        %{
+          interview_started_at: ~U[2020-10-31 22:03:07Z],
+          interview_discontinued_at: ~U[2020-10-31 23:03:07Z],
+          interview_discontinue_reason: "Unable to reach"
+        },
+        "ongoing-interview"
+      )
+
+      create_archived_person(
+        "james",
+        %{
+          interview_completed_at: ~U[2020-10-05 19:57:00Z],
+          interview_started_at: ~U[2020-10-05 18:57:00Z],
+          isolation_monitoring_starts_on: ~D[2020-11-05],
+          isolation_monitoring_ends_on: ~D[2020-11-15]
+        },
+        "ongoing-interview"
+      )
+
+      create_archived_person(
+        "kris",
+        %{
+          interview_completed_at: ~U[2020-10-05 19:57:00Z],
+          interview_started_at: ~U[2020-10-05 18:57:00Z],
+          isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
+          isolation_conclusion_reason: "successfully_completed",
+          isolation_monitoring_ends_on: ~D[2020-11-15],
+          isolation_monitoring_starts_on: ~D[2020-11-05]
+        },
+        "ongoing-interview"
+      )
+
+      user = Test.Fixtures.user_attrs(@admin, "the-user") |> Accounts.register_user!()
+
+      [user: user, alice: alice, bob: bob, cindy: cindy, david: david, eva: eva]
+    end
+
+    defp create_archived_person(tid, case_investigation_attrs, state) do
+      person = Test.Fixtures.person_attrs(@admin, tid) |> Cases.create_person!()
+
+      create_case_investigation(person, @admin, "archived-case-investigation-#{state}", nil, case_investigation_attrs)
+
+      Cases.archive_person(person.id, @admin, Test.Fixtures.admin_audit_meta())
+    end
+
+    test "fetching case investigations for the 'pending interview' tab", %{user: user, alice: alice} do
+      capture_log(fn ->
+        actual = Cases.list_case_investigations(:pending_interview, user: user) |> tids
+
+        assert actual == [
+                 "pending-case-investigation"
+               ]
+      end)
+      |> AuditLogAssertions.assert_viewed_people(user, [alice])
+    end
+
+    test "fetching case investigations for the ongoing interview tab", %{user: user, bob: bob} do
+      capture_log(fn ->
+        actual = Cases.list_case_investigations(:ongoing_interview, user: user) |> tids
+
+        assert actual == [
+                 "started-case-investigation"
+               ]
+      end)
+      |> AuditLogAssertions.assert_viewed_people(user, [bob])
+    end
+
+    test "fetching case investigations for the isolation monitoring tab", %{user: user, bob: bob, david: david} do
+      capture_log(fn ->
+        actual = Cases.list_case_investigations(:isolation_monitoring, user: user) |> tids
+
+        assert actual == [
+                 "interview-completed-case-investigation",
+                 "isolation-monitoring-started-case-investigation"
+               ]
+      end)
+      |> AuditLogAssertions.assert_viewed_people(user, [bob, david])
+    end
+
+    test "fetching case investigations for the all tab",
+         %{user: user, alice: alice, bob: bob, cindy: cindy, david: david, eva: eva} do
+      capture_log(fn ->
+        actual = Cases.list_case_investigations(:all, user: user) |> tids
+
+        assert actual == [
+                 "pending-case-investigation",
+                 "started-case-investigation",
+                 "interview-completed-case-investigation",
+                 "discontinued-case-investigation",
+                 "isolation-monitoring-started-case-investigation",
+                 "isolation-monitoring-completed-case-investigation"
+               ]
+      end)
+      |> AuditLogAssertions.assert_viewed_people(user, [alice, bob, cindy, david, eva])
+    end
+  end
+
+  describe "sorting lists of case investigations" do
+    test "'pending interview' sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
+      first_assignee = Test.Fixtures.user_attrs(@admin, "assignee") |> Accounts.register_user!()
+      second_assignee = Test.Fixtures.user_attrs(@admin, "second_assignee") |> Accounts.register_user!()
+
+      # Assigned last
+      setup_case_investigation_with_assigns(@admin, second_assignee, "assigned_last",
+        result: "pOsItIvE",
+        sampled_on: ~D[2020-06-06]
+      )
+
+      # Assigned middle
+      setup_case_investigation_with_assigns(@admin, first_assignee, "assigned_middle",
+        result: "pOsItIvE",
+        sampled_on: ~D[2020-06-05]
+      )
+
+      # Assigned first
+      setup_case_investigation_with_assigns(@admin, first_assignee, "assigned_first",
+        result: "DeTectEd",
+        sampled_on: ~D[2020-06-08]
+      )
+
+      # Unassigned last
+      setup_case_investigation_with_assigns(@admin, nil, "unassigned_last",
+        result: "negative",
+        sampled_on: ~D[2020-06-03]
+      )
+
+      # Unassigned first
+      setup_case_investigation_with_assigns(@admin, nil, "unassigned_first",
+        result: "positive",
+        sampled_on: ~D[2020-06-04]
+      )
+
+      CaseInvestigation.Query.list(:pending_interview)
+      |> Epicenter.Repo.all()
+      |> tids()
+      |> assert_eq(~w{unassigned_first_case_investigation
+        unassigned_last_case_investigation
+        assigned_first_case_investigation
+        assigned_middle_case_investigation
+        assigned_last_case_investigation})
+    end
+
+    test "'ongoing interview' sorts by assignee name, then tie-breaks with most recent positive lab result near the top" do
+      first_assignee = Test.Fixtures.user_attrs(@admin, "assignee") |> Accounts.register_user!()
+      second_assignee = Test.Fixtures.user_attrs(@admin, "second_assignee") |> Accounts.register_user!()
+
+      # Assigned last
+      setup_case_investigation_with_assigns(@admin, second_assignee, "assigned_last",
+        result: "positive",
+        sampled_on: ~D[2020-06-04],
+        interview_started_at: ~U[2020-01-01 22:03:07Z]
+      )
+
+      # Assigned middle
+      setup_case_investigation_with_assigns(@admin, first_assignee, "assigned_middle",
+        result: "positive",
+        sampled_on: ~D[2020-06-04],
+        interview_started_at: ~U[2020-01-01 22:03:07Z]
+      )
+
+      # Assigned first
+      setup_case_investigation_with_assigns(@admin, first_assignee, "assigned_first",
+        result: "DeTectEd",
+        sampled_on: ~D[2020-06-08],
+        interview_started_at: ~U[2020-01-01 22:03:07Z]
+      )
+
+      # Unassigned last
+      setup_case_investigation_with_assigns(@admin, nil, "unassigned_last",
+        result: "positive",
+        sampled_on: ~D[2020-05-03],
+        interview_started_at: ~U[2020-01-01 22:03:07Z]
+      )
+
+      # Unassigned first
+      setup_case_investigation_with_assigns(@admin, nil, "unassigned_first",
+        result: "positive",
+        sampled_on: ~D[2020-06-03],
+        interview_started_at: ~U[2020-01-01 22:03:07Z]
+      )
+
+      CaseInvestigation.Query.list(:ongoing_interview)
+      |> Epicenter.Repo.all()
+      |> tids()
+      |> assert_eq(~w{unassigned_first_case_investigation
+        unassigned_last_case_investigation
+        assigned_first_case_investigation
+        assigned_middle_case_investigation
+        assigned_last_case_investigation})
+    end
+
+    test "'isolation monitoring' sorts by isolation_monitoring_status, then tie-breaks with monitoring-end-time" do
+      setup_person_with_case_investigation(@admin, "pending_new", {~U{2020-11-29 10:30:00Z}, nil, nil})
+      setup_person_with_case_investigation(@admin, "pending_old", {~U{2020-11-21 10:30:00Z}, nil, nil})
+      setup_person_with_case_investigation(@admin, "ongoing_ends_soon", {~U{2020-11-21 10:30:00Z}, ~D{2020-11-25}, ~D{2020-12-05}})
+
+      # Adds a duplicate case investigation for a person - we should see two rows for the person, one per case investigation
+      person = setup_person_with_case_investigation(@admin, "ongoing_ends_later", {~U{2020-11-21 10:30:00Z}, ~D{2020-11-25}, ~D{2020-12-10}})
+      setup_person_with_case_investigation(@admin, "duplicate_ongoing_ends_later", {~U{2020-11-21 10:30:00Z}, ~D{2020-11-25}, ~D{2020-12-11}}, person)
+
+      CaseInvestigation.Query.list(:isolation_monitoring)
+      |> Epicenter.Repo.all()
+      |> tids()
+      |> assert_eq(~w{pending_new_case_investigation
+        pending_old_case_investigation
+        ongoing_ends_soon_case_investigation
+        ongoing_ends_later_case_investigation
+        duplicate_ongoing_ends_later_case_investigation})
+    end
+
+    defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, person \\ nil)
+
+    defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, nil) do
+      person = Test.Fixtures.person_attrs(user, person_tid) |> Cases.create_person!()
+      setup_case_investigation(user, person_tid, case_investigation_attrs, person)
+
+      person
+    end
+
+    defp setup_person_with_case_investigation(user, person_tid, case_investigation_attrs, person) do
+      setup_case_investigation(user, person_tid, case_investigation_attrs, person)
+      person
+    end
+
+    defp setup_case_investigation(user, person_tid, {interview_completed_at, isolation_monitoring_starts_on, isolation_monitoring_ends_on}, person) do
+      lab_result =
+        Test.Fixtures.lab_result_attrs(person, user, "#{person_tid}_lab_result", ~D{2020-11-21}, result: "positive") |> Cases.create_lab_result!()
+
+      Test.Fixtures.case_investigation_attrs(person, lab_result, user, "#{person_tid}_case_investigation", %{
+        interview_started_at: interview_completed_at,
+        interview_completed_at: interview_completed_at,
+        isolation_monitoring_starts_on: isolation_monitoring_starts_on,
+        isolation_monitoring_ends_on: isolation_monitoring_ends_on
+      })
+      |> Cases.create_case_investigation!()
+    end
+
+    defp setup_case_investigation_with_assigns(user, assignee, assign_tid,
+           result: result,
+           sampled_on: sampled_on
+         ) do
+      setup_case_investigation_with_assigns(user, assignee, assign_tid,
+        result: result,
+        sampled_on: sampled_on,
+        interview_started_at: nil
+      )
+    end
+
+    defp setup_case_investigation_with_assigns(user, assignee, assign_tid,
+           result: result,
+           sampled_on: sampled_on,
+           interview_started_at: interview_started_at
+         ) do
+      person = Test.Fixtures.person_attrs(user, assign_tid) |> Cases.create_person!()
+
+      person_lab_result = Test.Fixtures.lab_result_attrs(person, user, "#{assign_tid}_2", sampled_on, result: result) |> Cases.create_lab_result!()
+
+      Cases.assign_user_to_people(user: assignee, people_ids: [person.id], audit_meta: Test.Fixtures.admin_audit_meta(), current_user: @admin)
+
+      Test.Fixtures.case_investigation_attrs(person, person_lab_result, user, "#{assign_tid}_case_investigation", %{
+        interview_started_at: interview_started_at
+      })
+      |> Cases.create_case_investigation!()
+    end
+  end
+
+  defp create_case_investigation(person, user, tid, reported_on, attrs) do
+    lab_result =
+      Test.Fixtures.lab_result_attrs(person, user, "lab_result_#{tid}", reported_on, %{
+        result: "positive",
+        request_facility_name: "Big Big Hospital",
+        reported_on: reported_on,
+        test_type: "PCR"
+      })
+      |> Cases.create_lab_result!()
+
+    Test.Fixtures.case_investigation_attrs(
+      person,
+      lab_result,
+      user,
+      tid,
+      %{name: "001"}
+      |> Map.merge(attrs)
+    )
+    |> Cases.create_case_investigation!()
   end
 
   defp new_changeset(attr_updates) do

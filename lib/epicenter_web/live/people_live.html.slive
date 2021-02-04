@@ -28,17 +28,17 @@ section#people-page data-page="people"
         th width="1%"
         th width="20%" Name
         th width="15%" ID
-        th width="25%" Latest positive result
+        th width="25%" Collection date
         th width="20%" Investigation status
         th width="25%" Assignee
 
     tbody
-      = for person <- @people do
+      = for case_investigation <- @case_investigations do
         tr data-role="person"
           td
-            input type="checkbox" checked=selected?(@selected_people, person) phx-click="checkbox-click" phx-value-person-id="#{person.id}" data-tid="#{person.tid}"
-          td= live_redirect full_name(person), to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)
-          td= external_id(person)
-          td= LabResultPresenter.latest_positive(person.lab_results)
-          td= latest_case_investigation_status(person, @current_date)
-          td= assigned_to_name(person)
+            input type="checkbox" checked=selected?(@selected_people, case_investigation.person) phx-click="checkbox-click" phx-value-person-id="#{case_investigation.person.id}" data-tid="#{case_investigation.person.tid}"
+          td= live_redirect full_name(case_investigation.person), to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, case_investigation.person)
+          td= external_id(case_investigation.person)
+          td= Format.date(case_investigation.initiating_lab_result.sampled_on)
+          td= displayable_status(case_investigation, @current_date)
+          td= assigned_to_name(case_investigation.person)

@@ -953,7 +953,11 @@ defmodule EpicenterWeb.ProfileLiveTest do
       user: user
     } do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
-      Test.Fixtures.lab_result_attrs(billy, user, "billy-lab1", ~D[2020-04-10]) |> Cases.create_lab_result!()
+      lab_result = Test.Fixtures.lab_result_attrs(billy, user, "billy-lab1", ~D[2020-04-12]) |> Cases.create_lab_result!()
+      Test.Fixtures.case_investigation_attrs(billy, lab_result, user, "") |> Cases.create_case_investigation!()
+
+      alice = alice |> Cases.preload_lab_results()
+      Test.Fixtures.case_investigation_attrs(alice, hd(alice.lab_results), user, "") |> Cases.create_case_investigation!()
 
       {:ok, index_page_live, _html} = live(conn, "/people")
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")

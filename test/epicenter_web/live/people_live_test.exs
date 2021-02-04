@@ -8,7 +8,6 @@ defmodule EpicenterWeb.PeopleLiveTest do
   alias Epicenter.Cases
   alias Epicenter.Cases.LabResult
   alias Epicenter.Extra
-  alias Epicenter.Repo
   alias Epicenter.Test
   alias EpicenterWeb.PeopleLive
   alias EpicenterWeb.Test.Pages
@@ -18,20 +17,11 @@ defmodule EpicenterWeb.PeopleLiveTest do
   @stub_date ~D[2020-10-31]
 
   describe "rendering" do
-    test "shows people with positive lab tests", %{conn: conn} do
-      Pages.People.visit(conn)
-      |> Pages.People.assert_table_contents(
-        [
-          ["Name", "Latest positive result"],
-          ["Billy Testuser", "10/28/2020"],
-          ["Alice Testuser", "10/30/2020"]
-        ],
-        columns: ["Name", "Latest positive result"]
-      )
-    end
-
-    test "records an audit log entry for each person on the page", %{conn: conn, user: user, people: people} do
+    test "records an audit log entry for each person on the page", %{conn: conn, user: user, people: people, lab_results: lab_results} do
       [alice, billy, _nancy] = people
+      %{alice_positive: alice_positive, billy_positive: billy_positive} = lab_results
+      Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(billy, billy_positive, user, "") |> Cases.create_case_investigation!()
 
       capture_log(fn ->
         Pages.People.visit(conn)
@@ -39,40 +29,36 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> AuditLogAssertions.assert_viewed_people(user, [alice, billy])
     end
 
-    test "only shows positive lab results, ordered by most recent positive result", %{conn: conn} do
-      Repo.get_by!(LabResult, tid: "alice-positive")
-      |> LabResult.changeset(%{sampled_on: Extra.Date.days_ago(4, from: @stub_date)})
-      |> Repo.update!()
+    test "shows unknown as the name of people that lack a first and last name", %{
+      conn: conn,
+      user: user,
+      people: [alice, billy | _],
+      lab_results: lab_results
+    } do
+      %{alice_positive: alice_positive, billy_positive: billy_positive} = lab_results
+      Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(billy, billy_positive, user, "") |> Cases.create_case_investigation!()
 
-      Pages.People.visit(conn)
-      |> Pages.People.assert_table_contents(
-        [
-          ["Name", "Latest positive result"],
-          ["Alice Testuser", "10/27/2020"],
-          ["Billy Testuser", "10/28/2020"]
-        ],
-        columns: ["Name", "Latest positive result"]
-      )
-    end
-
-    test "shows unknown as the name of people that lack a first and last name", %{conn: conn, user: user} do
       nameless =
         Test.Fixtures.person_attrs(user, "nameless")
         |> Test.Fixtures.add_demographic_attrs(%{first_name: nil, last_name: nil})
         |> Cases.create_person!()
 
-      Test.Fixtures.lab_result_attrs(nameless, user, "nameless-result-1", Extra.Date.days_ago(4, from: @stub_date), result: "positive")
-      |> Cases.create_lab_result!()
+      lab_result =
+        Test.Fixtures.lab_result_attrs(nameless, user, "nameless-result-1", Extra.Date.days_ago(4, from: @stub_date), result: "positive")
+        |> Cases.create_lab_result!()
+
+      Test.Fixtures.case_investigation_attrs(nameless, lab_result, user, "") |> Cases.create_case_investigation!()
 
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents(
         [
-          ["Name", "Latest positive result"],
+          ["Name", "Collection date"],
           ["Unknown", "10/27/2020"],
           ["Billy Testuser", "10/28/2020"],
           ["Alice Testuser", "10/30/2020"]
         ],
-        columns: ["Name", "Latest positive result"]
+        columns: ["Name", "Collection date"]
       )
     end
 
@@ -117,15 +103,15 @@ defmodule EpicenterWeb.PeopleLiveTest do
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents(
         [
-          ["Name", "Investigation status"],
-          ["Billy Testuser", "Ongoing interview"],
-          ["Nancy Testuser", "Discontinued"],
-          ["David Testuser", "Ongoing monitoring (13 days remaining)"],
-          ["Emily Testuser", "Pending monitoring"],
-          ["Alice Testuser", "Pending interview"],
-          ["Cindy Testuser", "Concluded monitoring"]
+          ["Name", "Investigation status", "Collection date"],
+          ["Billy Testuser", "Ongoing interview", "10/28/2020"],
+          ["David Testuser", "Ongoing monitoring (13 days remaining)", "10/28/2020"],
+          ["Emily Testuser", "Pending monitoring", "10/28/2020"],
+          ["Nancy Testuser", "Discontinued", "10/28/2020"],
+          ["Alice Testuser", "Pending interview", "10/30/2020"],
+          ["Cindy Testuser", "Concluded monitoring", "10/30/2020"]
         ],
-        columns: ["Name", "Investigation status"]
+        columns: ["Name", "Investigation status", "Collection date"]
       )
     end
 
@@ -184,17 +170,17 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
+        ["", "Name", "ID", "Collection date", "Investigation status", "Assignee"],
         ["", "Billy Testuser", "billy-id", "10/28/2020", "Ongoing interview", ""],
         ["", "David Testuser", "david-id", "10/28/2020", "Ongoing monitoring (13 days remaining)", ""],
         ["", "Emily Testuser", "nancy-id", "10/28/2020", "Pending monitoring", ""],
-        ["", "Alice Testuser", "", "10/30/2020", "Pending interview", user.name],
-        ["", "Cindy Testuser", "", "10/30/2020", "Concluded monitoring", ""]
+        ["", "Cindy Testuser", "", "10/30/2020", "Concluded monitoring", ""],
+        ["", "Alice Testuser", "", "10/30/2020", "Pending interview", user.name]
       ])
       |> Pages.People.assert_unchecked("[data-tid=assigned-to-me-checkbox]")
       |> Pages.People.click_assigned_to_me_checkbox()
       |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
+        ["", "Name", "ID", "Collection date", "Investigation status", "Assignee"],
         ["", "Alice Testuser", "", "10/30/2020", "Pending interview", user.name]
       ])
       |> Pages.People.assert_checked("[data-tid=assigned-to-me-checkbox]")
@@ -240,7 +226,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
         columns: ["Name", "Investigation status"]
       )
       |> Pages.People.assert_filter_selected(:all)
-      |> Pages.People.select_filter(:with_pending_interview)
+      |> Pages.People.select_filter(:pending_interview)
       |> Pages.People.assert_table_contents(
         [
           ["Name", "Investigation status"],
@@ -264,7 +250,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
         columns: ["Name", "Investigation status"]
       )
       |> Pages.People.assert_filter_selected(:all)
-      |> Pages.People.select_filter(:with_ongoing_interview)
+      |> Pages.People.select_filter(:ongoing_interview)
       |> Pages.People.assert_table_contents(
         [
           ["Name", "Investigation status"],
@@ -288,7 +274,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
         columns: ["Name", "Investigation status"]
       )
       |> Pages.People.assert_filter_selected(:all)
-      |> Pages.People.select_filter(:with_isolation_monitoring)
+      |> Pages.People.select_filter(:isolation_monitoring)
       |> Pages.People.assert_table_contents(
         [
           ["Name", "Investigation status"],
@@ -306,19 +292,26 @@ defmodule EpicenterWeb.PeopleLiveTest do
       Pages.People.assert_assignment_dropdown_disabled(index_live)
     end
 
-    test "the assignment dropdown is enabled after selecting a person", %{conn: conn, people: [alice | _]} do
+    test "the assignment dropdown is enabled after selecting a person", %{conn: conn, user: user, people: [alice | _], lab_results: lab_results} do
+      %{alice_positive: alice_positive} = lab_results
+      Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
+
       {:ok, index_live, _} = live(conn, "/people")
       Pages.People.assert_assignment_dropdown_disabled(index_live)
       index_live |> element("[data-tid=#{alice.tid}]") |> render_click(%{"person-id" => alice.id, "value" => "on"})
       Pages.People.assert_assignment_dropdown_enabled(index_live)
     end
 
-    test "user can be assigned to people", %{assignee: assignee, conn: conn, people: [alice, billy | _]} do
+    test "user can be assigned to people", %{assignee: assignee, conn: conn, user: user, people: [alice, billy | _], lab_results: lab_results} do
+      %{alice_positive: alice_positive, billy_positive: billy_positive} = lab_results
+      Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(billy, billy_positive, user, "") |> Cases.create_case_investigation!()
+
       Pages.People.visit(conn)
       |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""],
-        ["", "Alice Testuser", "", "10/30/2020", "", ""]
+        ["", "Name", "ID", "Collection date", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "10/28/2020", "Pending interview", ""],
+        ["", "Alice Testuser", "", "10/30/2020", "Pending interview", ""]
       ])
       |> Pages.People.assert_assign_dropdown_options(data_role: "users", expected: ["", "Unassigned", "assignee", "fixture admin", "user"])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
@@ -326,9 +319,9 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.People.assert_checked("[data-tid=alice.tid]")
       |> Pages.People.change_form(%{"user" => assignee.id})
       |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""],
-        ["", "Alice Testuser", "", "10/30/2020", "", "assignee"]
+        ["", "Name", "ID", "Collection date", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "10/28/2020", "Pending interview", ""],
+        ["", "Alice Testuser", "", "10/30/2020", "Pending interview", "assignee"]
       ])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
       |> Pages.People.assert_assignment_dropdown_disabled()
@@ -340,7 +333,11 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> assert_eq([assignee, nil])
     end
 
-    test "users can be unassigned from people", %{assignee: assignee, conn: conn, people: [alice, billy | _], user: user} do
+    test "users can be unassigned from people", %{assignee: assignee, conn: conn, people: [alice, billy | _], lab_results: lab_results, user: user} do
+      %{alice_positive: alice_positive, billy_positive: billy_positive} = lab_results
+      Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(billy, billy_positive, user, "") |> Cases.create_case_investigation!()
+
       Cases.assign_user_to_people(
         user_id: assignee.id,
         people_ids: [alice.id, billy.id],
@@ -371,13 +368,18 @@ defmodule EpicenterWeb.PeopleLiveTest do
   end
 
   describe "archiving people" do
-    test "person can be archived", %{conn: conn, people: [alice | _]} do
+    test "person can be archived",
+         %{conn: conn, user: user, people: [alice | [billy | _]], lab_results: lab_results} do
+      %{alice_positive: alice_positive, billy_positive: billy_positive} = lab_results
+      Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
+      Test.Fixtures.case_investigation_attrs(billy, billy_positive, user, "") |> Cases.create_case_investigation!()
+
       Pages.People.visit(conn)
       |> Pages.People.assert_archive_button_disabled()
       |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""],
-        ["", "Alice Testuser", "", "10/30/2020", "", ""]
+        ["", "Name", "ID", "Collection date", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "10/28/2020", "Pending interview", ""],
+        ["", "Alice Testuser", "", "10/30/2020", "Pending interview", ""]
       ])
       |> Pages.People.assert_unchecked("[data-tid=#{alice.tid}]")
       |> Pages.People.click_person_checkbox(person: alice, value: "on")
@@ -385,8 +387,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
       |> Pages.assert_element_triggers_confirmation_prompt("archive-button", "Are you sure you want to archive 1 person(s)?")
       |> Pages.People.click_archive()
       |> Pages.People.assert_table_contents([
-        ["", "Name", "ID", "Latest positive result", "Investigation status", "Assignee"],
-        ["", "Billy Testuser", "billy-id", "10/28/2020", "", ""]
+        ["", "Name", "ID", "Collection date", "Investigation status", "Assignee"],
+        ["", "Billy Testuser", "billy-id", "10/28/2020", "Pending interview", ""]
       ])
       |> Pages.People.assert_assignment_dropdown_disabled()
       |> Pages.People.assert_archive_button_disabled()
@@ -406,16 +408,18 @@ defmodule EpicenterWeb.PeopleLiveTest do
 
     alice = Test.Fixtures.person_attrs(user, "alice", external_id: nil) |> Cases.create_person!()
 
-    Test.Fixtures.lab_result_attrs(alice, user, "alice-positive", Extra.Date.days_ago(1, from: @stub_date), result: "positive")
-    |> Cases.create_lab_result!()
+    alice_positive =
+      Test.Fixtures.lab_result_attrs(alice, user, "alice-positive", Extra.Date.days_ago(1, from: @stub_date), result: "positive")
+      |> Cases.create_lab_result!()
 
     Test.Fixtures.lab_result_attrs(alice, user, "alice-negative", Extra.Date.days_ago(2, from: @stub_date), result: "negative")
     |> Cases.create_lab_result!()
 
     billy = Test.Fixtures.person_attrs(user, "billy") |> Test.Fixtures.add_demographic_attrs(%{external_id: "billy-id"}) |> Cases.create_person!()
 
-    Test.Fixtures.lab_result_attrs(billy, user, "billy-detected", Extra.Date.days_ago(3, from: @stub_date), result: "Detected")
-    |> Cases.create_lab_result!()
+    billy_positive =
+      Test.Fixtures.lab_result_attrs(billy, user, "billy-detected", Extra.Date.days_ago(3, from: @stub_date), result: "Detected")
+      |> Cases.create_lab_result!()
 
     nancy = Test.Fixtures.person_attrs(user, "nancy") |> Test.Fixtures.add_demographic_attrs(%{external_id: "nancy-id"}) |> Cases.create_person!()
 
@@ -423,7 +427,8 @@ defmodule EpicenterWeb.PeopleLiveTest do
     |> Cases.create_lab_result!()
 
     people = [alice, billy, nancy] |> Cases.preload_assigned_to() |> Cases.preload_lab_results() |> Cases.preload_case_investigations()
-    [assignee: assignee, people: people, user: user]
+    lab_results = %{alice_positive: alice_positive, billy_positive: billy_positive}
+    [assignee: assignee, people: people, user: user, lab_results: lab_results]
   end
 
   # todo: rename?

@@ -392,40 +392,6 @@ defmodule Epicenter.CasesTest do
       Cases.list_people(:all, assigned_to_id: user.id, user: @admin, reject_archived_people: true) |> tids() |> assert_eq(~w{alice billy emily nancy})
     end
 
-    test "with_isolation_monitoring", %{user: user} do
-      Cases.list_people(:with_isolation_monitoring, user: @admin, reject_archived_people: true) |> tids() |> assert_eq(~w{emily david})
-
-      Cases.list_people(:with_isolation_monitoring, assigned_to_id: user.id, user: @admin, reject_archived_people: true)
-      |> tids()
-      |> assert_eq(~w{emily})
-    end
-
-    test "with_ongoing_interview", %{user: user} do
-      Cases.list_people(:with_ongoing_interview, user: @admin, reject_archived_people: true) |> tids() |> assert_eq(~w{billy})
-
-      Cases.list_people(:with_ongoing_interview, assigned_to_id: user.id, user: @admin, reject_archived_people: true)
-      |> tids()
-      |> assert_eq(~w{billy})
-    end
-
-    test "with_pending_interview", %{user: user} do
-      Cases.list_people(:with_pending_interview, user: @admin, reject_archived_people: true) |> tids() |> assert_eq(~w{alice})
-
-      Cases.list_people(:with_pending_interview, assigned_to_id: user.id, user: @admin, reject_archived_people: true)
-      |> tids()
-      |> assert_eq(~w{alice})
-    end
-
-    test "with_positive_lab_results", %{user: user} do
-      Cases.list_people(:with_positive_lab_results, user: @admin, reject_archived_people: true)
-      |> tids()
-      |> assert_eq(~w{alice billy cindy david emily})
-
-      Cases.list_people(:with_positive_lab_results, assigned_to_id: user.id, user: @admin, reject_archived_people: true)
-      |> tids()
-      |> assert_eq(~w{alice billy emily})
-    end
-
     test "records audit log for viewed people", context do
       capture_log(fn -> Cases.list_people(:all, user: @admin, reject_archived_people: true) end)
       |> AuditLogAssertions.assert_viewed_person(@admin, context.alice)
@@ -434,17 +400,6 @@ defmodule Epicenter.CasesTest do
       |> AuditLogAssertions.assert_viewed_person(@admin, context.david)
       |> AuditLogAssertions.assert_viewed_person(@admin, context.emily)
       |> AuditLogAssertions.assert_viewed_person(@admin, context.nancy)
-    end
-
-    test "records audit log for viewed people with filter", context do
-      capture_log(fn -> Cases.list_people(:with_isolation_monitoring, user: @admin, reject_archived_people: true) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.david)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.emily)
-    end
-
-    test "records audit log for viewed people with filter and assigned_to", context do
-      capture_log(fn -> Cases.list_people(:with_isolation_monitoring, assigned_to_id: context.user.id, user: @admin, reject_archived_people: true) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.emily)
     end
   end
 

@@ -86,7 +86,7 @@ defmodule EpicenterWeb.Features.ArchivedPersonProfileTest do
   end
 
   test "no buttons on profile of archived person with completed case investigation interview", %{conn: conn, user: user, person: person} do
-    create_case_investigation(person, user, "completed-case-investigation", nil, %{
+    create_case_investigation(person, user, "interview-completed-case-investigation", nil, %{
       interview_completed_at: ~U[2020-10-31 23:03:07Z],
       interview_started_at: ~U[2020-10-31 22:03:07Z]
     })
