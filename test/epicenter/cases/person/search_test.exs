@@ -10,8 +10,8 @@ defmodule Epicenter.Cases.Person.SearchTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
 
-  defp create_person(tid, demographic_attrs \\ %{}) do
-    Test.Fixtures.person_attrs(@admin, tid, %{}) |> Test.Fixtures.add_demographic_attrs(demographic_attrs) |> Cases.create_person!()
+  defp create_person(tid, demographic_attrs \\ %{}, person_attrs \\ %{}) do
+    Test.Fixtures.person_attrs(@admin, tid, person_attrs) |> Test.Fixtures.add_demographic_attrs(demographic_attrs) |> Cases.create_person!()
   end
 
   defp create_demographic(person, attrs) do
@@ -64,6 +64,13 @@ defmodule Epicenter.Cases.Person.SearchTest do
       assert search("alice") == ["alice"]
       assert search("Alice") == ["alice"]
       assert search("testuser") == ["alice"]
+    end
+
+    test "ignore archived people" do
+      create_person("archived", %{first_name: "alice"}, %{archived_at: DateTime.utc_now(), archived_by: @admin})
+      create_person("not-archived", %{first_name: "alice"}, %{archived_at: nil, archived_by: nil})
+
+      assert search("alice") == ~w[not-archived]
     end
 
     test "viewpoint id results are audit logged" do

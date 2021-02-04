@@ -52,6 +52,7 @@ defmodule Epicenter.Cases.Person.Search do
     |> where([d], fragment("lower(?)", field(d, ^field)) in ^search_tokens)
     |> Repo.all()
     |> Person.Query.get_people()
+    |> Person.Query.reject_archived_people(true)
     |> Repo.all()
   end
 end
