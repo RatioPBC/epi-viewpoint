@@ -10,7 +10,7 @@ defmodule Epicenter.Cases.Person.Search do
   def find(search_string, user) do
     case is_uuid?(search_string) do
       true ->
-        Cases.get_person(search_string, user) |> List.wrap()
+        find_matches(:person_id, [search_string], downcase: false)
 
       false ->
         search_tokens = search_string |> String.split(" ") |> Enum.map(&String.trim/1) |> Enum.map(&String.downcase/1)
@@ -27,10 +27,9 @@ defmodule Epicenter.Cases.Person.Search do
           |> Cases.preload_demographics()
           |> Enum.filter(&coalesced_field_matches?(&1, :last_name, search_tokens))
 
-        (external_id_matches ++ first_name_matches ++ last_name_matches)
-        |> Enum.uniq()
-        |> AuditLog.view(user)
+        (external_id_matches ++ first_name_matches ++ last_name_matches) |> Enum.uniq()
     end
+    |> AuditLog.view(user)
   end
 
   def coalesced_field_matches?(person, field, search_tokens) do
@@ -42,14 +41,20 @@ defmodule Epicenter.Cases.Person.Search do
     String.match?(term, ~r/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/)
   end
 
-  def find_matches(field, search_tokens) do
+  def find_matches(field, search_tokens, opts \\ []) do
+    downcase? = Keyword.get(opts, :downcase, true)
+
     query =
       from demographic in Demographic,
         select: demographic.person_id,
         distinct: true
 
+    query =
+      if downcase?,
+        do: query |> where([d], fragment("lower(?)", field(d, ^field)) in ^search_tokens),
+        else: query |> where([d], field(d, ^field) in ^search_tokens)
+
     query
-    |> where([d], fragment("lower(?)", field(d, ^field)) in ^search_tokens)
     |> Repo.all()
     |> Person.Query.get_people()
     |> Person.Query.reject_archived_people(true)

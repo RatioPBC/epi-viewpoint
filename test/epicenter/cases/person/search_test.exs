@@ -67,10 +67,12 @@ defmodule Epicenter.Cases.Person.SearchTest do
     end
 
     test "ignore archived people" do
-      create_person("archived", %{first_name: "alice"}, %{archived_at: DateTime.utc_now(), archived_by: @admin})
-      create_person("not-archived", %{first_name: "alice"}, %{archived_at: nil, archived_by: nil})
+      archived = create_person("archived", %{first_name: "alice"}, %{archived_at: DateTime.utc_now(), archived_by: @admin})
+      not_archived = create_person("not-archived", %{first_name: "alice"}, %{archived_at: nil, archived_by: nil})
 
       assert search("alice") == ~w[not-archived]
+      assert search(not_archived.id) == ~w[not-archived]
+      assert search(archived.id) == []
     end
 
     test "viewpoint id results are audit logged" do
