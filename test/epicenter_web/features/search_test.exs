@@ -1,24 +1,29 @@
 defmodule EpicenterWeb.Features.SearchTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import Phoenix.ConnTest
-
   alias Epicenter.Test
   alias Epicenter.Cases
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
+  @admin Test.Fixtures.admin()
 
-  test "users see the seach field in the nav bar", %{conn: conn} do
+  defp create_person(tid, demographic_attrs, person_attrs) do
+    Test.Fixtures.person_attrs(@admin, tid, person_attrs) |> Test.Fixtures.add_demographic_attrs(demographic_attrs) |> Cases.create_person!()
+  end
+
+  test "user can perform a search", %{conn: conn} do
     conn
-    |> get("/people")
+    |> Pages.People.visit()
     |> Pages.Navigation.assert_has_search_field()
+    |> Pages.submit_live("[data-role=app-search] form", %{search: %{"term" => "anything"}})
+    |> Pages.Search.assert_search_term_in_search_box("anything")
   end
 
   test "closing the search results", %{conn: conn} do
     conn
     |> Pages.People.visit()
-    |> Pages.submit_live("[data-role=app-search] form", %{search_form: %{"term" => "id-that-does-not-exist"}})
+    |> Pages.submit_live("[data-role=app-search] form", %{search: %{"term" => "id-that-does-not-exist"}})
     |> Pages.Search.close_search_results()
     |> Pages.People.assert_here()
   end
@@ -31,7 +36,7 @@ defmodule EpicenterWeb.Features.SearchTest do
 
       conn
       |> Pages.People.visit()
-      |> Pages.submit_and_follow_redirect(conn, "[data-role=app-search] form", %{search_form: %{"term" => external_id}})
+      |> Pages.submit_and_follow_redirect(conn, "[data-role=app-search] form", %{search: %{"term" => external_id}})
       |> Pages.Profile.assert_here(person)
     end
 
@@ -46,7 +51,7 @@ defmodule EpicenterWeb.Features.SearchTest do
 
       conn
       |> Pages.People.visit()
-      |> Pages.submit_and_follow_redirect(conn, "[data-role=app-search] form", %{search_form: %{"term" => whitespaced_external_id}})
+      |> Pages.submit_and_follow_redirect(conn, "[data-role=app-search] form", %{search: %{"term" => whitespaced_external_id}})
       |> Pages.Profile.assert_here(person)
     end
 
@@ -57,8 +62,20 @@ defmodule EpicenterWeb.Features.SearchTest do
 
       conn
       |> Pages.People.visit()
-      |> Pages.submit_live("[data-role=app-search] form", %{search_form: %{"term" => "id-that-does-not-exist"}})
+      |> Pages.submit_live("[data-role=app-search] form", %{search: %{"term" => "id-that-does-not-exist"}})
       |> Pages.Search.assert_no_results("id-that-does-not-exist")
+    end
+  end
+
+  describe "when there are multiple results" do
+    test "it shows the results", %{conn: conn} do
+      create_person("person1", %{first_name: "first"}, %{})
+      create_person("person2", %{first_name: "first"}, %{})
+
+      conn
+      |> Pages.People.visit()
+      |> Pages.submit_live("[data-role=app-search] form", %{search: %{"term" => "first"}})
+      |> Pages.Search.assert_results([])
     end
   end
 end

@@ -1,12 +1,22 @@
 button#close-search-results data-role="close-search-results" phx-click="close-search-results"
   = back_icon()
   span Back
-div#no-results
-  img
-  div#no-search-results data-role="no-search-results"
-    #no-results-icon
-      = no_results_icon()
-    h2#title
-      | No results found for
-      span
-        | &nbsp;#{assigns[:search_term]}
+
+= if length(@search_results) == 0 do
+  div#no-results
+    img
+    div#no-search-results data-role="no-search-results"
+      #no-results-icon
+        = no_results_icon()
+      h2#title
+        | No results found for
+        span
+          | &nbsp;#{@search_term}
+
+- else
+  div#search-results data-role="search-results"
+    h2
+      span#search-result-count>
+       = "#{length(@search_results)} results for"
+      span#search-term= @search_term
+

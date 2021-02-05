@@ -12,6 +12,8 @@ defmodule EpicenterWeb.Test.Pages.Navigation do
     view_or_conn_or_html
     |> Pages.parse()
     |> Test.Html.find!("#search-form")
+
+    view_or_conn_or_html
   end
 
   def refute_has_menu_item(view_or_conn_or_html, menu_item) do

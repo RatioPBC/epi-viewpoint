@@ -10,12 +10,11 @@ body
             = link "Index cases", to: "/people"
             = link "Contacts", to: "/contacts"
 
-          = if @search_changeset do
-            #nav-search data-role="app-search"
-             = form_for @search_changeset, "#", [id: "search-form", phx_submit: "search"], fn f ->
-               = label f, :term do
-                 = search_icon()
-                 = text_input f, :term, [placeholder: "Search ..."]
+          #nav-search data-role="app-search"
+           = form_for :search, "#", [id: "search-form", phx_submit: "search"], fn f ->
+             = label f, :term do
+               = search_icon()
+               = text_input f, :term, placeholder: "Search ...", value: assigns[:search_term], data_role: "search-term-input"
 
           #nav-right
             #user-menu data-transient-control=true

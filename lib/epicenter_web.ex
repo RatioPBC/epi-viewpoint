@@ -57,7 +57,7 @@ defmodule EpicenterWeb do
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
-      def handle_event("search", %{"search_form" => %{"term" => term}}, socket) do
+      def handle_event("search", %{"search" => %{"term" => term}}, socket) do
         term = term |> String.trim()
 
         socket =
@@ -69,6 +69,11 @@ defmodule EpicenterWeb do
 
             [person] ->
               socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person.id))
+
+            results ->
+              socket
+              |> Phoenix.LiveView.assign(:search_results, results)
+              |> Phoenix.LiveView.assign(:search_term, term)
           end
 
         socket
