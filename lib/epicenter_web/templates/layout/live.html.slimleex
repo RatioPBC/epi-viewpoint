@@ -11,10 +11,10 @@ body
             = link "Contacts", to: "/contacts"
 
           #nav-search data-role="app-search"
-           = form_for :search, "#", [id: "search-form", phx_submit: "search"], fn f ->
-             = label f, :term do
-               = search_icon()
-               = text_input f, :term, placeholder: "Search ...", value: assigns[:search_term], data_role: "search-term-input"
+            = form_for :search, "#", [id: "search-form", phx_submit: "search"], fn f ->
+              = label f, :term do
+                = search_icon()
+                = text_input f, :term, placeholder: "Search ...", value: assigns[:search_term], data_role: "search-term-input"
 
           #nav-right
             #user-menu data-transient-control=true
