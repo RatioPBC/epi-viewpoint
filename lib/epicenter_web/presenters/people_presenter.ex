@@ -38,6 +38,20 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
     [full_name | external_ids] |> Euclid.Extra.Enum.compact() |> Enum.join(", ")
   end
 
+  def search_result_details(person) do
+    person = person |> Cases.preload_demographics() |> Cases.preload_phones() |> Cases.preload_addresses()
+    demographic = person |> Person.coalesce_demographics()
+
+    Phoenix.HTML.Tag.content_tag :ul do
+      [
+        Phoenix.HTML.Tag.content_tag(:li, Format.date(demographic.dob)),
+        Phoenix.HTML.Tag.content_tag(:li, Epicenter.Extra.String.capitalize(demographic.sex_at_birth)),
+        Phoenix.HTML.Tag.content_tag(:li, Format.phone(person.phones)),
+        Phoenix.HTML.Tag.content_tag(:li, Format.address(person.addresses))
+      ]
+    end
+  end
+
   def full_name(person),
     do: person |> Person.coalesce_demographics() |> Format.person() |> Unknown.string_or_unknown()
 

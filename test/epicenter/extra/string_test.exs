@@ -103,4 +103,14 @@ defmodule Epicenter.Extra.StringTest do
       assert Extra.String.underscore(["foo", nil, "bar", "", "baz"]) == "foo_bar_baz"
     end
   end
+
+  describe "capitalize" do
+    test "capitalizes a word" do
+      assert Extra.String.capitalize("foo") == "Foo"
+    end
+
+    test "returns an empty string when given a nil value" do
+      assert Extra.String.capitalize(nil) == ""
+    end
+  end
 end

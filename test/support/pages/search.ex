@@ -17,13 +17,18 @@ defmodule EpicenterWeb.Test.Pages.Search do
     view
   end
 
-  def assert_results(view, tids) do
+  def assert_results(view, search_result_rows) do
     view
     |> render()
     |> Test.Html.parse()
     |> assert_results_visible(true)
-    |> Test.Html.all("[data-role=search-result]", as: :tids)
-    |> assert_eq(tids, ignore_order: true, returning: view)
+    |> Test.Html.all("[data-role=search-result]", fn x ->
+      [
+        Test.Html.text(x, "[data-role=search-result-name"),
+        Test.Html.text(x, "[data-role=search-result-details")
+      ]
+    end)
+    |> assert_eq(search_result_rows, returning: view)
   end
 
   def assert_results_visible(%View{} = view, expected_visible?) do

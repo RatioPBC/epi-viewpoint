@@ -20,4 +20,7 @@
     = for person <- @search_results do
       .search-result data-role="search-result" data-tid=person.tid
         = link EpicenterWeb.Presenters.PeoplePresenter.full_name_and_external_ids(person),
-            to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)
+            to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person),
+            data_role: "search-result-name"
+        div data-role="search-result-details"
+          = EpicenterWeb.Presenters.PeoplePresenter.search_result_details(person)

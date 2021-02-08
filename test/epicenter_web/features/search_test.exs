@@ -14,16 +14,25 @@ defmodule EpicenterWeb.Features.SearchTest do
     |> Cases.create_person!()
   end
 
-  test "user can perform a search and then close the results", %{conn: conn} do
-    create_person("alice", %{first_name: "alice"}, %{})
-    create_person("billy", %{first_name: "billy"}, %{})
+  test "user can perform a search and then close the results", %{conn: conn, user: user} do
+    alice = create_person("alice", %{first_name: "Alice", dob: ~D[1990-12-01], sex_at_birth: "female"}, %{})
+    billy = create_person("billy", %{first_name: "Billy", dob: ~D[1941-08-01], sex_at_birth: "male"}, %{})
+
+    Test.Fixtures.phone_attrs(user, alice, "preferred", number: "111-111-1222") |> Cases.create_phone!()
+    Test.Fixtures.phone_attrs(user, billy, "preferred", number: "111-111-1333") |> Cases.create_phone!()
+
+    Test.Fixtures.address_attrs(user, alice, "alice-address", 1000, type: "home") |> Cases.create_address!()
+    Test.Fixtures.address_attrs(user, billy, "billy-address", 1222, type: "home") |> Cases.create_address!()
 
     conn
     |> Pages.People.visit()
     |> Pages.Navigation.assert_has_search_field()
     |> Pages.Search.search("testuser")
     |> Pages.Search.assert_search_term_in_search_box("testuser")
-    |> Pages.Search.assert_results(~w[alice billy])
+    |> Pages.Search.assert_results([
+      ["Alice Testuser", "12/01/1990Female(111) 111-12221000 Test St, City, OH 00000"],
+      ["Billy Testuser", "08/01/1941Male(111) 111-13331222 Test St, City, OH 00000"]
+    ])
     |> Pages.Search.close_search_results()
     |> Pages.Search.assert_results_visible(false)
   end
