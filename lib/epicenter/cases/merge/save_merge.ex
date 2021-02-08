@@ -5,6 +5,17 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
   alias Epicenter.Cases.Person
 
   def merge(people, into: canonical_person, with_attrs: _into_person_attrs, current_user: current_user) do
+    people =
+      Enum.map(people, fn duplicate_person ->
+        Cases.force_reload_person(duplicate_person) |> Cases.preload_demographics()
+      end)
+
+    merge_contact_info(people, canonical_person, current_user)
+
+    merge_demographics(people, canonical_person, current_user)
+  end
+
+  defp merge_contact_info(people, canonical_person, current_user) do
     for duplicate_person <- people do
       duplicate_person = duplicate_person |> Cases.preload_addresses() |> Cases.preload_emails() |> Cases.preload_phones()
       canonical_person = canonical_person |> Cases.preload_addresses() |> Cases.preload_emails() |> Cases.preload_phones()
@@ -34,16 +45,9 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
         end
       end
     end
-
-    merge_demographics(people, canonical_person, current_user)
   end
 
   defp merge_demographics(people, canonical_person, current_user) do
-    people =
-      Enum.map(people, fn duplicate_person ->
-        Cases.force_reload_person(duplicate_person) |> Cases.preload_demographics()
-      end)
-
     flattened_demographics =
       Enum.reduce(people, %{}, fn duplicate_person, acc ->
         Map.put(acc, duplicate_person.id, Person.coalesce_demographics(duplicate_person))
