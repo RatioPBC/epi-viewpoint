@@ -2,6 +2,7 @@ defmodule Epicenter.Cases.SaveMergeTest do
   use Epicenter.DataCase, async: true
 
   import Epicenter.Test.RevisionAssertions
+  import Euclid.Extra.Enum, only: [tids: 1]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog.Revision
@@ -39,11 +40,6 @@ defmodule Epicenter.Cases.SaveMergeTest do
       assert alice.addresses |> contains("billy-address")
     end
 
-    @tag :skip
-    test "when there are multiple preferred emails/phone numbers" do
-    end
-
-    @tag :skip
     test "when duplicate person and canonical person have the same phone number", %{user: user} do
       alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
       Test.Fixtures.email_attrs(user, alice, "alice-email") |> Cases.create_email!()
@@ -57,9 +53,9 @@ defmodule Epicenter.Cases.SaveMergeTest do
 
       Merge.merge([billy], into: alice, with_attrs: %{}, current_user: user)
       alice = alice |> Cases.preload_addresses() |> Cases.preload_emails() |> Cases.preload_phones()
-      assert alice.phones |> contains("alice-phone")
-      assert alice.emails |> contains("alice-email")
-      assert alice.addresses |> contains("alice-address")
+      assert alice.phones |> tids() == ["alice-phone"]
+      assert alice.emails |> tids() == ["alice-email", "billy-email"]
+      assert alice.addresses |> tids() == ["alice-address"]
     end
 
     @tag :skip
