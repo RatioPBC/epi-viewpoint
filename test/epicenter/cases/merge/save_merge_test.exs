@@ -8,6 +8,7 @@ defmodule Epicenter.Cases.SaveMergeTest do
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Merge
+  alias Epicenter.Cases.Person
   alias Epicenter.Test
 
   setup :persist_admin
@@ -64,6 +65,60 @@ defmodule Epicenter.Cases.SaveMergeTest do
 
     defp contains(list, tid) do
       Enum.find(list, &(&1.tid == tid)) != nil
+    end
+  end
+
+  describe "merging the demographics" do
+    # TODO
+    # coalesce the demographics on the duplicate person
+    # create but don't insert a new demographics
+    # move the demographics from the duplicate to the canonical person
+    # commit the flattened new demographic to the duplicate person (so that they still have a name)
+    # Add a demographics entry to the canonical person with the merge conflict resolutions
+
+    defp create_person(tid, demographic_attrs, person_attrs \\ %{}) do
+      {person_attrs, audit_meta} = Test.Fixtures.person_attrs(@admin, tid, person_attrs, demographics: false)
+
+      {Map.put(person_attrs, :demographics, [demographic_attrs]), audit_meta}
+      |> Cases.create_person!()
+    end
+
+    defp create_demographic(person, attrs) do
+      attrs = %{source: "form", person_id: person.id} |> Map.merge(attrs)
+      {:ok, _result} = {attrs, Test.Fixtures.admin_audit_meta()} |> Cases.create_demographic()
+      person
+    end
+
+    test "when there are no merge conflicts", %{user: user} do
+      # we need layers of demographics to prove that they are still coalesced in the same
+      # order after being transferred to Alice
+      alice = create_person("alice", %{tid: "alice-1", source: "form", dob: ~D[2001-10-01], first_name: "no"})
+      billy = create_person("billy", %{tid: "billy-2", source: "form", first_name: "yes-first-name", last_name: "Testuser-no"})
+      billy |> create_demographic(%{tid: "billy-3", source: "form", last_name: "Testuser-yes", occupation: "no"})
+      alice |> create_demographic(%{tid: "alice-4", source: "form", occupation: "yes-occupation"})
+      cindy = create_person("cindy", %{tid: "cindy-5", source: "form", employment: "yes-employment"})
+
+      Merge.merge([cindy, billy], into: alice, with_attrs: %{}, current_user: user)
+
+      coalesced_alice = Cases.get_person(alice.id, @admin) |> Cases.preload_demographics() |> Person.coalesce_demographics()
+      assert coalesced_alice[:dob] == ~D[2001-10-01]
+      assert coalesced_alice[:first_name] == "yes-first-name"
+      assert coalesced_alice[:last_name] == "Testuser-yes"
+      assert coalesced_alice[:occupation] == "yes-occupation"
+      assert coalesced_alice[:employment] == "yes-employment"
+
+      coalesced_billy = Cases.get_person(billy.id, @admin) |> Cases.preload_demographics() |> Person.coalesce_demographics()
+      assert coalesced_billy[:dob] == nil
+      assert coalesced_billy[:first_name] == "yes-first-name"
+      assert coalesced_billy[:last_name] == "Testuser-yes"
+      assert coalesced_billy[:occupation] == "no"
+
+      coalesced_cindy = cindy |> Cases.preload_demographics() |> Person.coalesce_demographics()
+      assert coalesced_cindy[:employment] == "yes-employment"
+    end
+
+    @tag :skip
+    test "when there are merge conflicts" do
     end
   end
 
