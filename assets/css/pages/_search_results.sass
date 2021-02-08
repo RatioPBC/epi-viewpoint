@@ -26,7 +26,10 @@
         font-weight: normal
 
     .search-result
-      @include vertical-flow
+      @include vertical-flow($margin: 0.5rem)
+
+      a
+        font-weight: bold
 
       .search-result-details
         ul

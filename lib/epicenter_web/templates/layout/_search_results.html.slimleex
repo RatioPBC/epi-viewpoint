@@ -24,3 +24,5 @@
             data_role: "search-result-name"
         .search-result-details data-role="search-result-details"
           = EpicenterWeb.Presenters.PeoplePresenter.search_result_details(person)
+        .search-result-labs data-role="search-result-labs"
+          = EpicenterWeb.Presenters.PeoplePresenter.latest_lab_result(person)

@@ -22,10 +22,11 @@ defmodule EpicenterWeb.Test.Pages.Search do
     |> render()
     |> Test.Html.parse()
     |> assert_results_visible(true)
-    |> Test.Html.all("[data-role=search-result]", fn x ->
+    |> Test.Html.all("[data-role=search-result]", fn search_result ->
       [
-        Test.Html.text(x, "[data-role=search-result-name"),
-        Test.Html.text(x, "[data-role=search-result-details")
+        Test.Html.text(search_result, "[data-role=search-result-name"),
+        Test.Html.text(search_result, "[data-role=search-result-details"),
+        Test.Html.text(search_result, "[data-role=search-result-labs")
       ]
     end)
     |> assert_eq(search_result_rows, returning: view)

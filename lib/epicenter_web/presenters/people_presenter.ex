@@ -1,9 +1,11 @@
 defmodule EpicenterWeb.Presenters.PeoplePresenter do
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
+  alias Epicenter.Extra
   alias EpicenterWeb.Format
-  alias EpicenterWeb.Unknown
   alias EpicenterWeb.Presenters.CaseInvestigationPresenter
+  alias EpicenterWeb.Presenters.LabResultPresenter
+  alias EpicenterWeb.Unknown
 
   def archive_confirmation_message(selected_people),
     do: "Are you sure you want to archive #{map_size(selected_people)} person(s)?"
@@ -48,6 +50,14 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   def latest_contact_investigation_status(person, current_date),
     do: person |> Person.latest_contact_investigation() |> CaseInvestigationPresenter.displayable_status(current_date)
 
+  def latest_lab_result(person) do
+    person
+    |> Cases.preload_lab_results()
+    |> Map.get(:lab_results)
+    |> LabResultPresenter.latest_positive()
+    |> Unknown.string_or_unknown(transform: &"Latest lab result on #{&1}", unknown_text: "No lab results")
+  end
+
   def search_result_details(person) do
     person = person |> Cases.preload_demographics() |> Cases.preload_phones() |> Cases.preload_addresses()
     demographic = person |> Person.coalesce_demographics()
@@ -55,7 +65,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
     Phoenix.HTML.Tag.content_tag :ul do
       [
         Format.date(demographic.dob),
-        Epicenter.Extra.String.capitalize(demographic.sex_at_birth),
+        Extra.String.capitalize(demographic.sex_at_birth),
         Format.phone(person.phones),
         Format.address(person.addresses)
       ]

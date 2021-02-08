@@ -24,14 +24,16 @@ defmodule EpicenterWeb.Features.SearchTest do
     Test.Fixtures.address_attrs(user, alice, "alice-address", 1000, type: "home") |> Cases.create_address!()
     Test.Fixtures.address_attrs(user, billy, "billy-address", 1222, type: "home") |> Cases.create_address!()
 
+    Test.Fixtures.lab_result_attrs(alice, @admin, "lab-result", ~D[2020-12-01]) |> Cases.create_lab_result!()
+
     conn
     |> Pages.People.visit()
     |> Pages.Navigation.assert_has_search_field()
     |> Pages.Search.search("testuser")
     |> Pages.Search.assert_search_term_in_search_box("testuser")
     |> Pages.Search.assert_results([
-      ["Alice Testuser", "12/01/1990Female(111) 111-12221000 Test St, City, OH 00000"],
-      ["Billy Testuser", "08/01/1941Male(111) 111-13331222 Test St, City, OH 00000"]
+      ["Alice Testuser", "12/01/1990Female(111) 111-12221000 Test St, City, OH 00000", "Latest lab result on 12/01/2020"],
+      ["Billy Testuser", "08/01/1941Male(111) 111-13331222 Test St, City, OH 00000", "No lab results"]
     ])
     |> Pages.Search.close_search_results()
     |> Pages.Search.assert_results_visible(false)

@@ -16,8 +16,16 @@ defmodule EpicenterWeb.UnknownTest do
       Unknown.string_or_unknown("")
       |> assert_html_eq(~s|<span class="unknown">Unknown</span>|)
 
-      Unknown.string_or_unknown("", "Not known")
+      Unknown.string_or_unknown("", unknown_text: "Not known")
       |> assert_html_eq(~s|<span class="unknown">Not known</span>|)
+    end
+
+    test "when the value is present, it can optionally transform the value" do
+      Unknown.string_or_unknown("something", transform: &String.upcase/1)
+      |> assert_html_eq("SOMETHING")
+
+      Unknown.string_or_unknown(nil, transform: &String.upcase/1)
+      |> assert_html_eq(~s|<span class="unknown">Unknown</span>|)
     end
   end
 
@@ -56,6 +64,11 @@ defmodule EpicenterWeb.UnknownTest do
 
       Unknown.list_or_unknown([nil])
       |> assert_html_eq(~s|<span class="unknown">Unknown</span>|)
+    end
+
+    test "the 'Unknown' string can be changed" do
+      Unknown.list_or_unknown(nil, unknown_text: "The thing cannot be known")
+      |> assert_html_eq(~s|<span class="unknown">The thing cannot be known</span>|)
     end
   end
 end

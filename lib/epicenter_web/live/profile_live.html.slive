@@ -249,4 +249,4 @@
         tr
           th Notes
         tr
-          td data-role="notes"= @person |> demographic_field(:notes) |> string_or_unknown("--")
+          td data-role="notes"= @person |> demographic_field(:notes) |> string_or_unknown(unknown_text: "--")
