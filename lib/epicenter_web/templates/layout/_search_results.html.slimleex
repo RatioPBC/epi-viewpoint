@@ -1,22 +1,23 @@
-button#close-search-results data-role="close-search-results" phx-click="close-search-results"
-  = back_icon()
-  span Back
+#search-results data-role="search-results"
+  #search-results-inner
+    div
+      div#search-close-results
+        a href="javascript:void(0);" data-role="close-search-results" phx-click="close-search-results"
+          = EpicenterWeb.IconView.close_icon()
 
-= if length(@search_results) == 0 do
-  div#no-results
-    img
-    div#no-search-results data-role="no-search-results"
-      #no-results-icon
+      h2
+        span#search-result-count>
+          = @search_results |> length() |> Epicenter.Extra.String.pluralize("result for", "results for")
+        span#search-term= @search_term
+
+    = if length(@search_results) == 0 do
+      div#no-search-results data-role="no-search-results"
         = no_results_icon()
-      h2#title
-        | No results found for
-        span
-          | &nbsp;#{@search_term}
+        ul
+          li Search by a person’s first name, last name, or ID number
+          li Double-check spelling for typos
 
-- else
-  div#search-results data-role="search-results"
-    h2
-      span#search-result-count>
-       = "#{length(@search_results)} results for"
-      span#search-term= @search_term
-
+    = for person <- @search_results do
+      .search-result data-role="search-result" data-tid=person.tid
+        = link EpicenterWeb.Presenters.PeoplePresenter.full_name_and_external_ids(person),
+            to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)

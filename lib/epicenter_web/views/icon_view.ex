@@ -5,35 +5,42 @@ defmodule EpicenterWeb.IconView do
     """
     <path d="M7.41 8.59003L12 13.17L16.59 8.59003L18 10L12 16L6 10L7.41 8.59003Z" fill="black" fill-opacity="0.87"/>
     """
-    |> icon(width, height, 24)
+    |> icon(width, height, [0, 0, 24, 24])
   end
 
   def arrow_right_icon(width \\ 8, height \\ 12) do
     """
     <path d="M2.00009 0L0.590088 1.41L5.17009 6L0.590088 10.59L2.00009 12L8.00009 6L2.00009 0Z" fill="#B0B0B0"/>
     """
-    |> icon(width, height, 8, 12)
+    |> icon(width, height, [0, 0, 12, 12])
   end
 
   def back_icon(width \\ 12, height \\ 12) do
     """
     <path d="M16 7H3.83L9.42 1.41L8 0L0 8L8 16L9.41 14.59L3.83 9H16V7Z" fill="black"/>
     """
-    |> icon(width, height, 16)
+    |> icon(width, height, [0, 0, 16, 16])
   end
 
   def checkmark_icon(width \\ 16, height \\ 14) do
     """
     <path d="M5.7963 11.17L1.6263 7L0.206299 8.41L5.7963 14L17.7963 2L16.3863 0.589996L5.7963 11.17Z" fill="white" fill-opacity="0.87"/>
     """
-    |> icon(width, height, 18, 14)
+    |> icon(width, height, [0, 0, 18, 14])
+  end
+
+  def close_icon(width \\ 36, height \\ 36) do
+    """
+    <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="black" fill-opacity="0.87"/>
+    """
+    |> icon(width, height, [0, 0, 24, 24])
   end
 
   def error_icon(width \\ 16, height \\ 16) do
     """
     <path d="M11 15H13V17H11V15ZM11 7H13V13H11V7ZM11.99 2C6.47 2 2 6.48 2 12C2 17.52 6.47 22 11.99 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 11.99 2ZM12 20C7.58 20 4 16.42 4 12C4 7.58 7.58 4 12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20Z" fill="black" fill-opacity="0.87"/>
     """
-    |> icon(width, height, 24)
+    |> icon(width, height, [0, 0, 24, 24])
   end
 
   def login_icon(width \\ 256, height \\ 75) do
@@ -51,7 +58,7 @@ defmodule EpicenterWeb.IconView do
       <path d="M50.5022 43.3634L44.9464 49.3585L50.6776 48.345L57.3463 51.7409L50.5022 43.3634Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
     """
-    |> icon(width, height, 256, 75)
+    |> icon(width, height, [0, 0, 256, 75])
   end
 
   def logo_icon(width \\ 96, height \\ 96) do
@@ -68,38 +75,38 @@ defmodule EpicenterWeb.IconView do
       <path d="M72.3206 51.3629L64.3485 59.9653L72.5723 58.511L82.1414 63.3839L72.3206 51.3629Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
     """
-    |> icon(width, height, 96)
+    |> icon(width, height, [0, 0, 96, 96])
   end
 
   def person_icon(width \\ 20, height \\ 20) do
     """
     <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z" fill="black" fill-opacity="0.87"/>
     """
-    |> icon(width, height, 24)
+    |> icon(width, height, [0, 0, 24, 24])
   end
 
   def phone_icon(width, height) do
     """
     <path d="M3.62 7.79C5.06 10.62 7.38 12.93 10.21 14.38L12.41 12.18C12.68 11.91 13.08 11.82 13.43 11.94C14.55 12.31 15.76 12.51 17 12.51C17.55 12.51 18 12.96 18 13.51V17C18 17.55 17.55 18 17 18C7.61 18 0 10.39 0 1C0 0.45 0.45 0 1 0H4.5C5.05 0 5.5 0.45 5.5 1C5.5 2.25 5.7 3.45 6.07 4.57C6.18 4.92 6.1 5.31 5.82 5.59L3.62 7.79Z" fill="white"/>
     """
-    |> icon(width, height, 18)
+    |> icon(width, height, [0, 0, 18, 18])
   end
 
   def plus_icon(width \\ 16, height \\ 16) do
     """
     <path d="M14.5 8H8.5V14H6.5V8H0.5V6H6.5V0H8.5V6H14.5V8Z" fill="black" fill-opacity="0.87"/>
     """
-    |> icon(width, height, 15, 14)
+    |> icon(width, height, [0, 0, 15, 14])
   end
 
   def search_icon(width \\ 18, height \\ 18) do
     """
     <path d="M12.5 11H11.71L11.43 10.73C12.41 9.59 13 8.11 13 6.5C13 2.91 10.09 0 6.5 0C2.91 0 0 2.91 0 6.5C0 10.09 2.91 13 6.5 13C8.11 13 9.59 12.41 10.73 11.43L11 11.71V12.5L16 17.49L17.49 16L12.5 11ZM6.5 11C4.01 11 2 8.99 2 6.5C2 4.01 4.01 2 6.5 2C8.99 2 11 4.01 11 6.5C11 8.99 8.99 11 6.5 11Z" fill="#718096"/>
     """
-    |> icon(width, height, 18)
+    |> icon(width, height, [0, 0, 18, 18])
   end
 
-  def no_results_icon(width \\ 107, height \\ 107) do
+  def no_results_icon(width \\ 60, height \\ 60) do
     """
     <circle cx="42.5" cy="42.5" r="21.5" fill="white"/>
     <path d="M69.1042 62.4167H65.5821L64.3338 61.2129C68.7029 56.1304 71.3333 49.5321 71.3333 42.3542C71.3333 26.3488 58.3596 13.375 42.3542 13.375C26.3488 13.375 13.375 26.3488 13.375 42.3542C13.375 58.3596 26.3488 71.3333 42.3542 71.3333C49.5321 71.3333 56.1304 68.7029 61.2129 64.3338L62.4167 65.5821V69.1042L84.7083 91.3512L91.3512 84.7083L69.1042 62.4167ZM42.3542 62.4167C31.2529 62.4167 22.2917 53.4554 22.2917 42.3542C22.2917 31.2529 31.2529 22.2917 42.3542 22.2917C53.4554 22.2917 62.4167 31.2529 62.4167 42.3542C62.4167 53.4554 53.4554 62.4167 42.3542 62.4167Z" fill="#C4C4C4"/>
@@ -113,29 +120,26 @@ defmodule EpicenterWeb.IconView do
     </clipPath>
     </defs>
     """
-    |> icon(width, height, 107)
+    |> icon(width, height, [13, 13, 80, 80])
   end
 
   def trash_icon(width \\ 24, height \\ 24) do
     """
     <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="black" fill-opacity="0.87"/>
     """
-    |> icon(width, height, 24)
+    |> icon(width, height, [0, 0, 24, 24])
   end
 
   # # #
 
-  defp icon(content, width, height, view_box_width_and_height),
-    do: icon(content, width, height, view_box_width_and_height, view_box_width_and_height)
-
   # sobelow_skip ["XSS.Raw"]
-  defp icon(content, width, height, view_box_width, view_box_height) do
+  defp icon(content, width, height, viewbox) do
     content_tag(
       :svg,
       raw(content),
       width: width,
       height: height,
-      viewBox: "0 0 #{view_box_width} #{view_box_height}",
+      viewBox: Enum.join(viewbox, " "),
       fill: "none",
       xmlns: "http://www.w3.org/2000/svg"
     )

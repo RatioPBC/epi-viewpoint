@@ -1,25 +1,33 @@
-#close-search-results
-  @include button-link
-  @include has-icon($link-color)
-  margin: 5rem
-
-#no-results
-  @include full-width-page
-  @include level($justify: center)
-
-  #no-search-results
-    background-color: white
-    padding-top: 10rem
-    padding-left: 6rem
-
-  #no-results-icon
-    @include level($justify: center)
-
-  #title
-    font-weight: normal
-    span
-      font-weight: bold
+@import "../mixins"
 
 #search-results
-  #search-result-count
-    font-weight: normal
+  position: absolute
+  left: 0
+  right: 0
+  z-index: 1
+
+  #search-results-inner
+    @include vertical-flow
+    @include dividers
+    @include shadow($style: dialog)
+
+    background-color: white
+    margin: 4rem
+    padding: 4rem
+
+    #search-close-results
+      text-align: right
+
+      a:hover
+        @include svg-color($link-color)
+
+    h2
+      #search-result-count
+        font-weight: normal
+
+    .search-result
+      @include vertical-flow
+
+    #no-search-results
+      ul
+        list-style: disc inside

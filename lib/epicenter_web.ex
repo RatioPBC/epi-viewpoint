@@ -50,35 +50,18 @@ defmodule EpicenterWeb do
 
       unquote(view_helpers())
 
-      def handle_event("close-search-results", params, socket) do
-        socket
-        |> Phoenix.LiveView.assign(:search_results, nil)
-        |> Phoenix.LiveView.assign(:search_term, nil)
-        |> EpicenterWeb.LiveHelpers.noreply()
-      end
+      def handle_event("close-search-results", params, socket),
+        do: socket |> assign_search(nil, nil) |> EpicenterWeb.LiveHelpers.noreply()
 
       def handle_event("search", %{"search" => %{"term" => term}}, socket) do
         term = term |> String.trim()
+        results = if String.length(term) < 3, do: nil, else: Epicenter.Cases.search_people(term, socket.assigns.current_user)
 
-        socket =
-          case Epicenter.Cases.search_people(term, socket.assigns.current_user) do
-            [] ->
-              socket
-              |> Phoenix.LiveView.assign(:search_results, [])
-              |> Phoenix.LiveView.assign(:search_term, term)
-
-            [person] ->
-              socket |> push_redirect(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person.id))
-
-            results ->
-              socket
-              |> Phoenix.LiveView.assign(:search_results, results)
-              |> Phoenix.LiveView.assign(:search_term, term)
-          end
-
-        socket
-        |> EpicenterWeb.LiveHelpers.noreply()
+        socket |> assign_search(term, results) |> EpicenterWeb.LiveHelpers.noreply()
       end
+
+      def assign_search(socket, term, results),
+        do: socket |> Phoenix.LiveView.assign(:search_term, term) |> Phoenix.LiveView.assign(:search_results, results)
     end
   end
 

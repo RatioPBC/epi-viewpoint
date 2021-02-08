@@ -1,4 +1,5 @@
 defmodule EpicenterWeb.Presenters.PeoplePresenter do
+  alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias EpicenterWeb.Format
   alias EpicenterWeb.Unknown
@@ -21,6 +22,21 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
 
   def external_id(person),
     do: Person.coalesce_demographics(person).external_id
+
+  def full_name_and_external_ids(person) do
+    person = person |> Cases.preload_demographics()
+
+    full_name = person |> Person.coalesce_demographics() |> Format.person()
+
+    external_ids =
+      person
+      |> Map.get(:demographics)
+      |> Enum.map(& &1.external_id)
+      |> Euclid.Extra.Enum.compact()
+      |> Enum.map(&"##{&1}")
+
+    [full_name | external_ids] |> Euclid.Extra.Enum.compact() |> Enum.join(", ")
+  end
 
   def full_name(person),
     do: person |> Person.coalesce_demographics() |> Format.person() |> Unknown.string_or_unknown()

@@ -118,6 +118,6 @@
             span Add email
 
       #form-end
-      #nav
+      #form-buttons
         #button-wrapper
           = submit "Save", id: "submit-button"

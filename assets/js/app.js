@@ -97,3 +97,9 @@ document.body.addEventListener(
   },
   false
 );
+
+document.body.addEventListener("keyup", (event) => {
+  if (event.target.tagName.toLowerCase() === "body" && event.code === "Slash") {
+    document.getElementById("search_term")?.focus();
+  }
+});

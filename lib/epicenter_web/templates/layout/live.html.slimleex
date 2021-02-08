@@ -11,10 +11,16 @@ body
             = link "Contacts", to: "/contacts"
 
           #nav-search data-role="app-search"
-            = form_for :search, "#", [id: "search-form", phx_submit: "search"], fn f ->
+            = form_for :search, "javascript:void(0);", [id: "search-form", phx_change: "search"], fn f ->
               = label f, :term do
                 = search_icon()
-                = text_input f, :term, placeholder: "Search ...", value: assigns[:search_term], data_role: "search-term-input"
+                = text_input f,
+                        :term,
+                        autocomplete: "off",
+                        data_role: "search-term-input",
+                        phx_debounce: 100,
+                        placeholder: "Search…",
+                        value: assigns[:search_term]
 
           #nav-right
             #user-menu data-transient-control=true
@@ -30,10 +36,7 @@ body
                 li = link "Settings", to: Routes.user_settings_path(EpicenterWeb.Endpoint, :edit)
                 li = link "Log out", to: Routes.user_session_path(EpicenterWeb.Endpoint, :delete), method: :delete
 
-  = if assigns[:search_results] != nil do
-    main#main role="main" phx-hook="MainHook" data-body-class="body-background-none"
+  main#main role="main" phx-hook="MainHook" data-body-class=@body_class
+    = if assigns[:search_results] do
       = render "_search_results.html", search_results: @search_results, search_term: assigns[:search_term]
-
-  - else
-    main#main role="main" phx-hook="MainHook" data-body-class=@body_class
-      = @inner_content
+    = @inner_content
