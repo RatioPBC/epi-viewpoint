@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
   use Epicenter.DataCase, async: true
 
+  import Epicenter.Test.HtmlAssertions, only: [assert_html_eq: 2]
+
   alias Epicenter.Test
 
   alias Epicenter.Cases
@@ -29,7 +31,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
       do: assert(PeoplePresenter.full_name(wrap(%{first_name: "", last_name: "TestuserLast"})) == "TestuserLast")
   end
 
-  describe("latest_contact_investigation_status") do
+  describe "latest_contact_investigation_status" do
     test "when interview status is pending" do
       assert(PeoplePresenter.latest_contact_investigation_status(person_with_contact_investigation(), ~D[2020-10-25]) == "Pending interview")
     end
@@ -100,6 +102,42 @@ defmodule EpicenterWeb.Presenters.PeoplePresenterTest do
       assert Cases.get_person(exposed_person.id, @admin)
              |> Cases.preload_contact_investigations(@admin)
              |> PeoplePresenter.latest_contact_investigation_status(~D[2020-10-25]) == "Ongoing interview"
+    end
+  end
+
+  describe "search_result_details" do
+    test "lists details" do
+      alice =
+        Test.Fixtures.person_attrs(@admin, "alice", %{})
+        |> Test.Fixtures.add_demographic_attrs(%{first_name: "Alice", dob: ~D[1990-12-01], sex_at_birth: "female"})
+        |> Cases.create_person!()
+
+      Test.Fixtures.phone_attrs(@admin, alice, "phone1", number: "111-111-1222") |> Cases.create_phone!()
+      Test.Fixtures.phone_attrs(@admin, alice, "phone2", number: "111-111-1333") |> Cases.create_phone!()
+      Test.Fixtures.address_attrs(@admin, alice, "address1", 1000, type: "home") |> Cases.create_address!()
+      Test.Fixtures.address_attrs(@admin, alice, "address2", 1001, type: "home") |> Cases.create_address!()
+
+      PeoplePresenter.search_result_details(alice)
+      |> Phoenix.HTML.safe_to_string()
+      |> assert_html_eq("""
+      <ul>
+        <li>12/01/1990</li>
+        <li>Female</li>
+        <li>(111) 111-1222, (111) 111-1333</li>
+        <li>1000 Test St, City, OH 00000; 1001 Test St, City, OH 00000</li>
+      </ul>
+      """)
+    end
+
+    test "doesn't render empty values" do
+      alice = Test.Fixtures.person_attrs(@admin, "alice", %{}, demographics: false) |> Cases.create_person!()
+
+      PeoplePresenter.search_result_details(alice)
+      |> Phoenix.HTML.safe_to_string()
+      |> assert_html_eq("""
+      <ul>
+      </ul>
+      """)
     end
   end
 
