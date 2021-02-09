@@ -360,6 +360,16 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def refute_potential_duplicates(%View{} = view) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> Test.Html.find("#view-potential-duplicates")
+    |> assert_eq([])
+
+    view
+  end
+
   def case_investigation_notes(%View{} = view, number) do
     view
     |> render()

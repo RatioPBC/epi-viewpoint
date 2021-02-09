@@ -48,6 +48,7 @@ defmodule EpicenterWeb.Features.MergeTest do
     |> Pages.Profile.assert_full_name("Different Testuser")
     |> Pages.Profile.assert_date_of_birth("01/01/2003")
     |> Pages.Profile.assert_preferred_language("Spanish")
+    |> Pages.Profile.refute_potential_duplicates()
   end
 
   defp create_person(tid, attrs) do

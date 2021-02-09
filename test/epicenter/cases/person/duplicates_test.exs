@@ -82,6 +82,10 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
       |> Map.get(:id)
       |> Cases.archive_person(@admin, Test.Fixtures.admin_audit_meta())
 
+      create_person("last+first+but-merged", %{first_name: first, last_name: last, dob: ~D[1900-01-01]})
+      |> Map.get(:id)
+      |> (&Cases.merge_people([&1], source.id, @admin, Test.Fixtures.admin_audit_meta())).()
+
       # duplicates
       create_person("last+first", %{first_name: first, last_name: last, dob: ~D[1900-01-01]})
       create_person("last+first-upcase", %{first_name: String.upcase(first), last_name: String.upcase(last), dob: ~D[1900-01-01]})
