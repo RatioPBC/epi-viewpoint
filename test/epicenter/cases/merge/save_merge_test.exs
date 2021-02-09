@@ -61,6 +61,65 @@ defmodule Epicenter.Cases.SaveMergeTest do
       assert alice.addresses |> tids() == ["alice-address"]
     end
 
+    test "when duplicate people have the same phone number", %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      Test.Fixtures.phone_attrs(user, alice, "alice-phone", number: "111-111-1000") |> Cases.create_phone!()
+
+      billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+      Test.Fixtures.phone_attrs(user, billy, "billy-phone", number: "111-111-1111") |> Cases.create_phone!()
+
+      cindy = Test.Fixtures.person_attrs(user, "cindy") |> Cases.create_person!()
+      Test.Fixtures.phone_attrs(user, cindy, "cindy-phone", number: "111-111-1111") |> Cases.create_phone!()
+
+      Merge.merge([billy.id, cindy.id], into: alice.id, merge_conflict_resolutions: %{}, current_user: user)
+
+      alice = alice |> Cases.preload_phones()
+      assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000", "1111111111"]
+    end
+
+    test "when duplicate people have the same address fingerprint", %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+
+      alice_address =
+        Test.Fixtures.address_attrs(user, alice, "alice-address", 1111, type: "home", address_fingerprint: "woof") |> Cases.create_address!()
+
+      billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+      billy_address = Test.Fixtures.address_attrs(user, billy, "billy-address", 1000, type: "home") |> Cases.create_address!()
+
+      cindy = Test.Fixtures.person_attrs(user, "cindy") |> Cases.create_person!()
+      Test.Fixtures.address_attrs(user, cindy, "cindy-address", 1000, type: "home") |> Cases.create_address!()
+
+      Merge.merge([billy.id, cindy.id], into: alice.id, merge_conflict_resolutions: %{}, current_user: user)
+
+      alice = alice |> Cases.preload_addresses()
+
+      assert alice.addresses |> Euclid.Extra.Enum.pluck(:address_fingerprint) |> Enum.sort() ==
+               Enum.sort([
+                 alice_address.address_fingerprint,
+                 billy_address.address_fingerprint
+               ])
+    end
+
+    test "when duplicate people have the same emails", %{user: user} do
+      alice = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
+      alice_email = Test.Fixtures.email_attrs(user, alice, "alice-email") |> Cases.create_email!()
+
+      billy = Test.Fixtures.person_attrs(user, "billy") |> Cases.create_person!()
+      billy_email = Test.Fixtures.email_attrs(user, billy, "billy-email") |> Cases.create_email!()
+
+      cindy = Test.Fixtures.person_attrs(user, "cindy") |> Cases.create_person!()
+      Test.Fixtures.email_attrs(user, alice, "billy-email") |> Cases.create_email!()
+
+      Merge.merge([billy.id, cindy.id], into: alice.id, merge_conflict_resolutions: %{}, current_user: user)
+
+      alice = alice |> Cases.preload_emails()
+
+      assert alice.emails |> Euclid.Extra.Enum.pluck(:address) == [
+               alice_email.address,
+               billy_email.address
+             ]
+    end
+
     @tag :skip
     test "if adding one of the phone numbers fails?" do
     end

@@ -15,7 +15,7 @@ defmodule Epicenter.Cases.Address do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "addresses" do
-    field :address_fingerprint, :string
+    field :address_fingerprint, :string, read_after_writes: true
     field :street, :string
     field :city, :string
     field :state, :string

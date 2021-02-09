@@ -33,9 +33,14 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
         end
       end
 
+      canonical_person_email_address = canonical_person.emails |> Enum.map(& &1.address)
+
       for email <- duplicate_person.emails do
         attrs = %{Map.from_struct(email) | person_id: canonical_person.id}
-        Cases.create_email!({attrs, audit_meta(current_user, Revision.create_email_action())})
+
+        if !(canonical_person_email_address |> Enum.member?(email.address)) do
+          Cases.create_email!({attrs, audit_meta(current_user, Revision.create_email_action())})
+        end
       end
 
       canonical_person_phone_numbers = canonical_person.phones |> Enum.map(& &1.number)
