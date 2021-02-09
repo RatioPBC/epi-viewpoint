@@ -24,4 +24,7 @@ defmodule EpicenterWeb.Pagination do
 
     %{pagination | current: current, next?: current < pages.last, pages: pages, prev?: current > 1, visible: visible}
   end
+
+  def next(%Pagination{current: current} = pagination),
+    do: goto(pagination, current + 1)
 end

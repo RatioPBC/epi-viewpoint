@@ -35,4 +35,10 @@ defmodule EpicenterWeb.PaginationTest do
       assert goto(5) == %Pagination{all: list(48), current: 5, next?: false, prev?: true, pages: 1..5, per_page: 10, total: 48, visible: list(41..48)}
     end
   end
+
+  describe "next" do
+    test "goes to the next page" do
+      assert %Pagination{current: 3} = list(30) |> Pagination.new() |> Pagination.next() |> Pagination.next()
+    end
+  end
 end
