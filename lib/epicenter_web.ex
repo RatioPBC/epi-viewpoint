@@ -66,6 +66,12 @@ defmodule EpicenterWeb do
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
+      def handle_event("search-prev", _, socket) do
+        socket
+        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.previous(socket.assigns.search_results))
+        |> EpicenterWeb.LiveHelpers.noreply()
+      end
+
       def assign_search(socket, term, results) do
         results = if results, do: EpicenterWeb.Pagination.new(results, per_page: 5), else: nil
 
