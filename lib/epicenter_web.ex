@@ -60,8 +60,13 @@ defmodule EpicenterWeb do
         socket |> assign_search(term, results) |> EpicenterWeb.LiveHelpers.noreply()
       end
 
-      def assign_search(socket, term, results),
-        do: socket |> Phoenix.LiveView.assign(:search_term, term) |> Phoenix.LiveView.assign(:search_results, results)
+      def assign_search(socket, term, results) do
+        results = if results, do: EpicenterWeb.Pagination.new(results, per_page: 5), else: nil
+
+        socket
+        |> Phoenix.LiveView.assign(:search_term, term)
+        |> Phoenix.LiveView.assign(:search_results, results)
+      end
     end
   end
 
