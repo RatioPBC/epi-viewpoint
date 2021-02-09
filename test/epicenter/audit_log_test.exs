@@ -1,10 +1,11 @@
-defmodule Epicenter.AuditLogTest do
+defmodule Epicenter.AuditingRepoTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [tids: 1]
   import ExUnit.CaptureLog
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditingRepo
   alias Epicenter.AuditLog
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
@@ -19,14 +20,14 @@ defmodule Epicenter.AuditLogTest do
 
   describe "inserting" do
     test "it creates revision, and submits the original changeset" do
-      assert [] = AuditLog.revisions(Cases.Person)
+      assert [] = AuditingRepo.revisions(Cases.Person)
 
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       {attrs_to_change_1, _audit_meta} = Test.Fixtures.person_attrs(user, "alice")
       changeset_1 = Cases.change_person(%Person{}, attrs_to_change_1)
 
       {:ok, inserted_person_1} =
-        AuditLog.insert(
+        AuditingRepo.insert(
           changeset_1,
           %AuditLog.Meta{
             author_id: user.id,
@@ -35,13 +36,13 @@ defmodule Epicenter.AuditLogTest do
           }
         )
 
-      assert [revision_1] = AuditLog.revisions(Cases.Person)
+      assert [revision_1] = AuditingRepo.revisions(Cases.Person)
 
       {attrs_to_change_2, _audit_meta} = Test.Fixtures.person_attrs(user, "billy")
       changeset_2 = Cases.change_person(%Person{}, attrs_to_change_2)
 
       inserted_person_2 =
-        AuditLog.insert!(
+        AuditingRepo.insert!(
           changeset_2,
           %AuditLog.Meta{
             author_id: user.id,
@@ -50,7 +51,7 @@ defmodule Epicenter.AuditLogTest do
           }
         )
 
-      assert [_, revision_2] = AuditLog.revisions(Cases.Person)
+      assert [_, revision_2] = AuditingRepo.revisions(Cases.Person)
 
       assert revision_1.changed_id == inserted_person_1.id
       assert revision_1.changed_type == "Cases.Person"
@@ -73,7 +74,7 @@ defmodule Epicenter.AuditLogTest do
       password_changeset = %Epicenter.Accounts.User{} |> Epicenter.Accounts.User.registration_changeset(user_attrs)
 
       {:ok, _inserted_user} =
-        AuditLog.insert(
+        AuditingRepo.insert(
           password_changeset,
           %AuditLog.Meta{
             author_id: Ecto.UUID.generate(),
@@ -82,7 +83,7 @@ defmodule Epicenter.AuditLogTest do
           }
         )
 
-      [revision] = AuditLog.revisions(Accounts.User)
+      [revision] = AuditingRepo.revisions(Accounts.User)
 
       has_password_in_value = fn
         {_key, value} when is_binary(value) -> String.contains?(value, password)
@@ -100,7 +101,7 @@ defmodule Epicenter.AuditLogTest do
       mfa_changeset = user |> Epicenter.Accounts.User.mfa_changeset(%{"mfa_secret" => mfa_secret})
 
       {:ok, _updated_user} =
-        AuditLog.update(
+        AuditingRepo.update(
           mfa_changeset,
           %AuditLog.Meta{
             author_id: Ecto.UUID.generate(),
@@ -114,7 +115,7 @@ defmodule Epicenter.AuditLogTest do
         _ -> false
       end
 
-      [_, revision] = AuditLog.revisions(Accounts.User)
+      [_, revision] = AuditingRepo.revisions(Accounts.User)
 
       refute Enum.any?(revision.after_change, has_mfa_secret_in_value)
       refute Enum.any?(revision.before_change, has_mfa_secret_in_value)
@@ -124,7 +125,7 @@ defmodule Epicenter.AuditLogTest do
 
   describe "updating" do
     test "it creates revision, and submits the original changeset" do
-      assert [] = AuditLog.revisions(Cases.Person)
+      assert [] = AuditingRepo.revisions(Cases.Person)
 
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!() |> Cases.preload_demographics()
@@ -132,10 +133,10 @@ defmodule Epicenter.AuditLogTest do
       [%{id: demographic_id}] = person.demographics
       changeset = Cases.change_person(person, Test.Fixtures.add_demographic_attrs(%{tid: "someone"}, %{id: demographic_id, first_name: "alice1"}))
 
-      assert [%{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
+      assert [%{changed_id: ^person_id}] = AuditingRepo.revisions(Cases.Person)
 
       {:ok, updated_person_1} =
-        AuditLog.update(
+        AuditingRepo.update(
           changeset,
           %AuditLog.Meta{
             author_id: user.id,
@@ -144,13 +145,13 @@ defmodule Epicenter.AuditLogTest do
           }
         )
 
-      assert [%{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
+      assert [%{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditingRepo.revisions(Cases.Person)
 
       changeset =
         Cases.change_person(updated_person_1, Test.Fixtures.add_demographic_attrs(%{tid: "someone"}, %{id: demographic_id, first_name: "alice2"}))
 
       {:ok, _updated_person_2} =
-        AuditLog.update(
+        AuditingRepo.update(
           changeset,
           %AuditLog.Meta{
             author_id: user.id,
@@ -160,7 +161,7 @@ defmodule Epicenter.AuditLogTest do
         )
 
       assert [_revision_0, revision_1, revision_2] =
-               [%{changed_id: ^person_id}, %{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
+               [%{changed_id: ^person_id}, %{changed_id: ^person_id}, %{changed_id: ^person_id}] = AuditingRepo.revisions(Cases.Person)
 
       assert revision_1.author_id == user.id
       assert revision_1.before_change["tid"] == "alice"
@@ -199,7 +200,7 @@ defmodule Epicenter.AuditLogTest do
       changeset = Cases.change_person(person, person_params)
 
       updated_person =
-        AuditLog.update!(
+        AuditingRepo.update!(
           changeset,
           %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
         )
@@ -261,7 +262,7 @@ defmodule Epicenter.AuditLogTest do
       changeset = Cases.change_person(person, update_email_params)
 
       updated_person =
-        AuditLog.update!(
+        AuditingRepo.update!(
           changeset,
           %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
         )
@@ -315,7 +316,7 @@ defmodule Epicenter.AuditLogTest do
       changeset = Cases.change_person(person, person_params) |> Ecto.Changeset.validate_required(:assigned_to)
 
       assert {:error, _} =
-               AuditLog.update(
+               AuditingRepo.update(
                  changeset,
                  %AuditLog.Meta{author_id: user.id, reason_action: "action", reason_event: "event"}
                )
@@ -330,10 +331,10 @@ defmodule Epicenter.AuditLogTest do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       changeset = %Person{} |> Cases.change_person(elem(Test.Fixtures.person_attrs(user, "tid"), 0))
       people_count_before = Cases.count_people()
-      audit_log_count_before = AuditLog.revisions(Cases.Person) |> length()
+      audit_log_count_before = AuditingRepo.revisions(Cases.Person) |> length()
 
       assert catch_throw(
-               AuditLog.insert(
+               AuditingRepo.insert(
                  changeset,
                  %AuditLog.Meta{
                    author_id: Ecto.UUID.generate(),
@@ -346,11 +347,11 @@ defmodule Epicenter.AuditLogTest do
              ) == "intentional"
 
       assert people_count_before == Cases.count_people()
-      assert audit_log_count_before == AuditLog.revisions(Cases.Person) |> length()
+      assert audit_log_count_before == AuditingRepo.revisions(Cases.Person) |> length()
     end
 
     test "it doesn't save the update if the audit log entry fails" do
-      [] = AuditLog.revisions(Cases.Person)
+      [] = AuditingRepo.revisions(Cases.Person)
 
       person = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!() |> Cases.preload_demographics()
 
@@ -361,11 +362,11 @@ defmodule Epicenter.AuditLogTest do
 
       changeset = Cases.change_person(person, attrs_to_change)
 
-      [%{changed_id: ^person_id}] = AuditLog.revisions(Cases.Person)
-      audit_log_count_before = AuditLog.entries_for(person_id) |> length()
+      [%{changed_id: ^person_id}] = AuditingRepo.revisions(Cases.Person)
+      audit_log_count_before = AuditingRepo.entries_for(person_id) |> length()
 
       assert catch_throw(
-               AuditLog.update(
+               AuditingRepo.update(
                  changeset,
                  %AuditLog.Meta{
                    author_id: @admin.id,
@@ -378,17 +379,17 @@ defmodule Epicenter.AuditLogTest do
              ) == "intentional"
 
       refute List.first(Cases.preload_demographics(Cases.get_person(person_id, @admin)).demographics).preferred_language == "preferred_language"
-      assert audit_log_count_before == AuditLog.entries_for(person_id) |> length()
+      assert audit_log_count_before == AuditingRepo.entries_for(person_id) |> length()
     end
   end
 
   describe "module_name returns the name of a module, without leading application name" do
     test "with a struct" do
-      assert AuditLog.module_name(%Revision{}) == "AuditLog.Revision"
+      assert AuditingRepo.module_name(%Revision{}) == "AuditLog.Revision"
     end
 
     test "with a module" do
-      assert AuditLog.module_name(Revision) == "AuditLog.Revision"
+      assert AuditingRepo.module_name(Revision) == "AuditLog.Revision"
     end
   end
 
@@ -412,7 +413,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$level - $message")
 
       assert capture_log(fn ->
-               AuditLog.view(subject, user)
+               AuditingRepo.view(subject, user)
              end) =~ "info - User(testuser) viewed Person(testperson)"
     end
 
@@ -420,7 +421,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$metadata[audit_log]", metadata: [:audit_log])
 
       assert capture_log(fn ->
-               AuditLog.view(subject, user)
+               AuditingRepo.view(subject, user)
              end) =~ "audit_log=true"
     end
 
@@ -428,7 +429,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$metadata[audit_user_id]", metadata: [:audit_user_id])
 
       assert capture_log(fn ->
-               AuditLog.view(subject, user)
+               AuditingRepo.view(subject, user)
              end) =~ "audit_user_id=testuser"
     end
 
@@ -436,7 +437,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$metadata[audit_action]", metadata: [:audit_action])
 
       assert capture_log(fn ->
-               AuditLog.view(subject, user)
+               AuditingRepo.view(subject, user)
              end) =~ "audit_action=view"
     end
 
@@ -447,13 +448,13 @@ defmodule Epicenter.AuditLogTest do
       )
 
       assert capture_log(fn ->
-               AuditLog.view(subject, user)
+               AuditingRepo.view(subject, user)
              end) =~ "audit_subject_type=Person audit_subject_id=testperson"
     end
 
     test "a list of people", %{user: user, subject: subject} do
       Application.put_env(:logger, :console, format: "$message")
-      audit_log = capture_log(fn -> AuditLog.view([subject, %Person{id: "testperson2"}], user) end)
+      audit_log = capture_log(fn -> AuditingRepo.view([subject, %Person{id: "testperson2"}], user) end)
 
       assert audit_log =~ "User(testuser) viewed Person(testperson)"
       assert audit_log =~ "User(testuser) viewed Person(testperson2)"
@@ -461,14 +462,14 @@ defmodule Epicenter.AuditLogTest do
 
     test "it doesn't log a person if the person is nil", %{user: user} do
       assert capture_log(fn ->
-               AuditLog.view(nil, user)
+               AuditingRepo.view(nil, user)
              end) == ""
     end
 
     @tag :skip
     test "it doesn't log a person when the id is missing", %{user: user} do
       assert capture_log(fn ->
-               AuditLog.view(%Person{}, user)
+               AuditingRepo.view(%Person{}, user)
              end) == ""
     end
   end
@@ -502,7 +503,7 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "it records the record", %{user: user, contact_investigation: contact_investigation} do
-      fetched_contact_investigation = AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+      fetched_contact_investigation = AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
       assert fetched_contact_investigation.tid == "contact-investigation-tid"
     end
 
@@ -510,7 +511,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$level - $message")
 
       assert capture_log(fn ->
-               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
              end) =~ "info - User(testuser) viewed Person(#{contact_investigation.exposed_person_id})"
     end
 
@@ -518,7 +519,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$metadata[audit_log]", metadata: [:audit_log])
 
       assert capture_log(fn ->
-               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
              end) =~ "audit_log=true"
     end
 
@@ -526,7 +527,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$metadata[audit_user_id]", metadata: [:audit_user_id])
 
       assert capture_log(fn ->
-               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
              end) =~ "audit_user_id=testuser"
     end
 
@@ -534,7 +535,7 @@ defmodule Epicenter.AuditLogTest do
       Application.put_env(:logger, :console, format: "$metadata[audit_action]", metadata: [:audit_action])
 
       assert capture_log(fn ->
-               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
              end) =~ "audit_action=view"
     end
 
@@ -545,13 +546,13 @@ defmodule Epicenter.AuditLogTest do
       )
 
       assert capture_log(fn ->
-               AuditLog.get(ContactInvestigation, contact_investigation.id, user)
+               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
              end) =~ "audit_subject_type=Person audit_subject_id=#{contact_investigation.exposed_person_id}"
     end
 
     test "it doesn't log a person if the person is not found", %{user: user} do
       assert capture_log(fn ->
-               AuditLog.get(ContactInvestigation, Ecto.UUID.generate(), user)
+               AuditingRepo.get(ContactInvestigation, Ecto.UUID.generate(), user)
              end) == ""
     end
   end
@@ -565,11 +566,11 @@ defmodule Epicenter.AuditLogTest do
     end
 
     test "returns all the records for a given query" do
-      assert Person.Query.filter_with_case_investigation(:all) |> AuditLog.all(@admin) |> tids() == ~w{alice billy}
+      assert Person.Query.filter_with_case_investigation(:all) |> AuditingRepo.all(@admin) |> tids() == ~w{alice billy}
     end
 
     test "records all the phi viewed for fetched records", %{alice: alice, billy: billy} do
-      capture_log(fn -> Person.Query.filter_with_case_investigation(:all) |> AuditLog.all(@admin) end)
+      capture_log(fn -> Person.Query.filter_with_case_investigation(:all) |> AuditingRepo.all(@admin) end)
       |> AuditLogAssertions.assert_viewed_person(@admin, alice)
       |> AuditLogAssertions.assert_viewed_person(@admin, billy)
     end

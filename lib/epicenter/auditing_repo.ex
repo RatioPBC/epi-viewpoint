@@ -1,8 +1,4 @@
-defmodule Epicenter.AuditLog do
-  defmodule Meta do
-    defstruct ~w{author_id reason_action reason_event}a
-  end
-
+defmodule Epicenter.AuditingRepo do
   require Logger
 
   alias Epicenter.Accounts.User

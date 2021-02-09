@@ -75,7 +75,7 @@ defmodule Epicenter.Cases.ImportedFileTest do
         "contents" => "<<REDACTED>>"
       })
 
-      refute Epicenter.AuditLog.entries_for(imported_file.id) |> List.last() |> Map.get(:after_change) |> Map.has_key?("seq")
+      refute Epicenter.AuditingRepo.entries_for(imported_file.id) |> List.last() |> Map.get(:after_change) |> Map.has_key?("seq")
     end
   end
 end

@@ -1,4 +1,5 @@
 defmodule Epicenter.ContactInvestigations do
+  alias Epicenter.AuditingRepo
   alias Epicenter.AuditLog
   alias Epicenter.Cases.Person
   alias Epicenter.ContactInvestigations.ContactInvestigation
@@ -21,9 +22,9 @@ defmodule Epicenter.ContactInvestigations do
   end
 
   def create({attrs, audit_meta}),
-    do: %ContactInvestigation{} |> change(attrs) |> AuditLog.insert(audit_meta)
+    do: %ContactInvestigation{} |> change(attrs) |> AuditingRepo.insert(audit_meta)
 
-  def get(id, user), do: AuditLog.get(ContactInvestigation, id, user)
+  def get(id, user), do: AuditingRepo.get(ContactInvestigation, id, user)
 
   def preload_exposed_person(contact_investigations), do: contact_investigations |> Repo.preload(exposed_person: [:demographics, :phones])
 
@@ -36,7 +37,8 @@ defmodule Epicenter.ContactInvestigations do
   end
 
   def list_exposed_people(filter, user, reject_archived_people: reject_archived_people),
-    do: Person.Query.filter_with_contact_investigation(filter) |> Person.Query.reject_archived_people(reject_archived_people) |> AuditLog.all(user)
+    do:
+      Person.Query.filter_with_contact_investigation(filter) |> Person.Query.reject_archived_people(reject_archived_people) |> AuditingRepo.all(user)
 
   defp log_case_investigations(nil, _user), do: nil
 
@@ -44,10 +46,10 @@ defmodule Epicenter.ContactInvestigations do
     do: contact_investigations |> Enum.map(&log_case_investigations(&1, user))
 
   defp log_case_investigations(contact_investigation, user) do
-    contact_investigation.exposing_case |> AuditLog.view(user)
+    contact_investigation.exposing_case |> AuditingRepo.view(user)
     contact_investigation
   end
 
   def update(%ContactInvestigation{} = investigation, {attrs, audit_meta}),
-    do: investigation |> change(attrs) |> AuditLog.update(audit_meta)
+    do: investigation |> change(attrs) |> AuditingRepo.update(audit_meta)
 end

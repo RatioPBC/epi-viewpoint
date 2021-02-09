@@ -117,7 +117,7 @@ defmodule Epicenter.AuditLog.Revision do
   defmodule Query do
     import Ecto.Query
 
-    alias Epicenter.AuditLog
+    alias Epicenter.AuditingRepo
     alias Epicenter.AuditLog.Revision
 
     def with_changed_id(changed_id) do
@@ -127,7 +127,7 @@ defmodule Epicenter.AuditLog.Revision do
     end
 
     def with_changed_type(changed_type) do
-      changed_type_module_name = AuditLog.module_name(changed_type)
+      changed_type_module_name = AuditingRepo.module_name(changed_type)
 
       from revision in Revision,
         where: revision.changed_type == ^changed_type_module_name,

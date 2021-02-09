@@ -33,6 +33,7 @@ defmodule EpicenterWeb.ContactsLive do
     ]
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditingRepo
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
@@ -116,7 +117,7 @@ defmodule EpicenterWeb.ContactsLive do
       |> Cases.preload_demographics()
       |> Cases.preload_assigned_to()
 
-    AuditLog.view(exposed_people, socket.assigns.current_user)
+    AuditingRepo.view(exposed_people, socket.assigns.current_user)
     assign(socket, exposed_people: exposed_people)
   end
 

@@ -23,6 +23,7 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
+  alias Epicenter.AuditingRepo
   alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
@@ -231,7 +232,7 @@ defmodule EpicenterWeb.ProfileLive do
       Enum.flat_map(case_investigations, & &1.contact_investigations)
       |> Enum.map(& &1.exposed_person)
 
-    AuditLog.view(case_investigations_contacts_persons, socket.assigns.current_user)
+    AuditingRepo.view(case_investigations_contacts_persons, socket.assigns.current_user)
 
     assign(socket, case_investigations: case_investigations)
   end

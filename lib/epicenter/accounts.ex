@@ -4,7 +4,7 @@ defmodule Epicenter.Accounts do
   alias Epicenter.Accounts.User
   alias Epicenter.Accounts.UserToken
   alias Epicenter.Accounts.UserNotifier
-  alias Epicenter.AuditLog
+  alias Epicenter.AuditingRepo
   alias Epicenter.Repo
 
   def change_login(attrs), do: Login.changeset(%Login{}, attrs)
@@ -23,7 +23,7 @@ defmodule Epicenter.Accounts do
   def register_user!({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> Admin.insert_by_admin!(audit_meta)
   def register_user({attrs, audit_meta}), do: %User{} |> change_user_registration(attrs) |> Admin.insert_by_admin(audit_meta)
   def update_user(%User{} = user, attrs, audit_meta), do: user |> change_user(attrs) |> Admin.update_by_admin(audit_meta)
-  def update_user_mfa!(%User{} = user, {mfa_secret, audit_meta}), do: user |> change_user_mfa(mfa_secret) |> AuditLog.update!(audit_meta)
+  def update_user_mfa!(%User{} = user, {mfa_secret, audit_meta}), do: user |> change_user_mfa(mfa_secret) |> AuditingRepo.update!(audit_meta)
 
   @doc """
   Emulates that the email will change without actually changing
@@ -70,7 +70,7 @@ defmodule Epicenter.Accounts do
     |> Ecto.Multi.run(
       :user,
       fn _repo, _changes ->
-        AuditLog.update(changeset, audit_meta)
+        AuditingRepo.update(changeset, audit_meta)
       end
     )
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
@@ -98,7 +98,7 @@ defmodule Epicenter.Accounts do
     |> Ecto.Multi.run(
       :user,
       fn _repo, _changes ->
-        AuditLog.update(changeset, audit_meta)
+        AuditingRepo.update(changeset, audit_meta)
       end
     )
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
@@ -249,7 +249,7 @@ defmodule Epicenter.Accounts do
         user
         |> User.password_changeset(attrs)
         |> User.confirm_changeset()
-        |> AuditLog.update(audit_meta)
+        |> AuditingRepo.update(audit_meta)
       end
     )
     |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, :all))
