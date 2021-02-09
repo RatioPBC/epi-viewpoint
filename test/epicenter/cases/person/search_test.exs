@@ -75,7 +75,7 @@ defmodule Epicenter.Cases.Person.SearchTest do
       create_person("last-name-match", %{last_name: "TestuserOldLastName"})
       |> create_demographic(%{last_name: "TestuserNewLastName"})
 
-      assert search("NewFirstName TestuserNewLastName") == ["first-name-match", "last-name-match"]
+      assert search("NewFirstName TestuserNewLastName") == ["last-name-match", "first-name-match"]
       assert search("OldFirstName") == []
       assert search("TestuserOldLastName") == []
       assert search("NewFirstName TestuserOldLastName") == ["first-name-match"]
@@ -101,6 +101,13 @@ defmodule Epicenter.Cases.Person.SearchTest do
       assert search("alice") == ~w[not-archived]
       assert search(not_archived.id) == ~w[not-archived]
       assert search(archived.id) == []
+    end
+
+    test "orders results by first name and last name" do
+      create_person("billy", first_name: "Billy", last_name: "Testuser")
+      create_person("alice", first_name: "Alice", last_name: "Testuser")
+
+      assert search("testuser") == ["alice", "billy"]
     end
   end
 end
