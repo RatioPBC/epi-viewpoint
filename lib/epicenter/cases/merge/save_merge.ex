@@ -4,7 +4,7 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
 
-  def merge(people, into: canonical_person, with_attrs: _into_person_attrs, current_user: current_user) do
+  def merge(people, into: canonical_person, merge_conflict_resolutions: merge_conflict_resolutions, current_user: current_user) do
     people =
       Enum.map(people, fn duplicate_person ->
         Cases.force_reload_person(duplicate_person) |> Cases.preload_demographics()
@@ -12,7 +12,7 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
 
     merge_contact_info(people, canonical_person, current_user)
 
-    merge_demographics(people, canonical_person, current_user)
+    merge_demographics(people, canonical_person, merge_conflict_resolutions, current_user)
   end
 
   defp merge_contact_info(people, canonical_person, current_user) do
@@ -47,7 +47,7 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
     end
   end
 
-  defp merge_demographics(people, canonical_person, current_user) do
+  defp merge_demographics(people, canonical_person, merge_conflict_resolutions, current_user) do
     flattened_demographics =
       Enum.reduce(people, %{}, fn duplicate_person, acc ->
         Map.put(acc, duplicate_person.id, Person.coalesce_demographics(duplicate_person))
@@ -70,6 +70,15 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
         else
           attrs
         end
+
+      Cases.create_demographic({attrs, audit_meta(current_user, Revision.insert_demographics_action())})
+    end
+
+    if !Enum.empty?(merge_conflict_resolutions) do
+      attrs =
+        merge_conflict_resolutions
+        |> Map.put(:person_id, canonical_person.id)
+        |> Map.put(:source, "form")
 
       Cases.create_demographic({attrs, audit_meta(current_user, Revision.insert_demographics_action())})
     end

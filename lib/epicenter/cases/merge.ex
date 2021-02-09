@@ -33,8 +33,8 @@ defmodule Epicenter.Cases.Merge do
     end)
   end
 
-  def merge(people, into: into_person, with_attrs: into_person_attrs, current_user: current_user) do
-    SaveMerge.merge(people, into: into_person, with_attrs: into_person_attrs, current_user: current_user)
+  def merge(people, into: into_person, merge_conflict_resolutions: into_person_attrs, current_user: current_user) do
+    SaveMerge.merge(people, into: into_person, merge_conflict_resolutions: into_person_attrs, current_user: current_user)
   end
 
   defp sort(values, sort_fun),
