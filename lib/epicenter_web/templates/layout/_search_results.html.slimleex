@@ -36,7 +36,10 @@
             span Previous
 
           = for page <- @search_results.pages do
-            = link "#{page}", to: "#"
+            = if @search_results.current == page do
+              = "#{page}"
+            - else
+              = link "#{page}", to: "#", phx_click: "search-goto", phx_value_page: page
 
           = if @search_results.next? do
             = link "Next", to: "#", phx_click: "search-next"

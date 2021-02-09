@@ -66,6 +66,14 @@ defmodule EpicenterWeb do
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
+      def handle_event("search-goto", %{"page" => page}, socket) do
+        page = page |> Integer.parse() |> elem(0)
+
+        socket
+        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.goto(socket.assigns.search_results, page))
+        |> EpicenterWeb.LiveHelpers.noreply()
+      end
+
       def handle_event("search-prev", _, socket) do
         socket
         |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.previous(socket.assigns.search_results))
