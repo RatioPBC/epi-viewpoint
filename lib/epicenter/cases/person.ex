@@ -19,6 +19,7 @@ defmodule Epicenter.Cases.Person do
   @foreign_key_type :binary_id
   schema "people" do
     field :archived_at, :utc_datetime
+    field :merged_at, :utc_datetime
     field :seq, :integer, read_after_writes: true
     field :tid, :string
 
@@ -26,6 +27,8 @@ defmodule Epicenter.Cases.Person do
 
     belongs_to :archived_by, User
     belongs_to :assigned_to, User
+    belongs_to :merged_by, User
+    belongs_to :merged_into, Person
     has_many :demographics, Demographic
     has_many :addresses, Address
     has_many :case_investigations, CaseInvestigation

@@ -1,4 +1,6 @@
 defmodule Epicenter.Cases.Person.Duplicates do
+  import Ecto.Changeset
+
   alias Epicenter.Cases
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Person
@@ -27,6 +29,24 @@ defmodule Epicenter.Cases.Person.Duplicates do
       )
 
     last_names? && (first_names? || dobs? || phones? || addresses?)
+  end
+
+  def merge(duplicate_person_ids, canonical_person_id, user, repo_fn) do
+    duplicate_person_ids
+    |> Enum.map(fn duplicate_person_id ->
+      duplicate_person_id
+      |> Cases.get_person(user)
+      |> changeset_for_merge(canonical_person_id, user.id)
+      |> repo_fn.()
+    end)
+  end
+
+  defp changeset_for_merge(duplicate_person_or_changeset, canonical_person_id, merged_by_user_id) do
+    duplicate_person_or_changeset
+    |> cast(
+      %{merged_into_id: canonical_person_id, merged_at: DateTime.utc_now(), merged_by_id: merged_by_user_id},
+      ~w{merged_into_id merged_at merged_by_id}a
+    )
   end
 
   defp preload(person_or_people_or_nil),

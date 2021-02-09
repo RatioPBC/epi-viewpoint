@@ -117,6 +117,25 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
     end
   end
 
+  test "merging" do
+    canonical = Test.Fixtures.person_attrs(@admin, "canonical") |> Cases.create_person!()
+    duplicate1 = Test.Fixtures.person_attrs(@admin, "duplicate1") |> Cases.create_person!()
+    duplicate2 = Test.Fixtures.person_attrs(@admin, "duplicate2") |> Cases.create_person!()
+
+    Cases.merge_people([duplicate1.id, duplicate2.id], canonical.id, @admin, Test.Fixtures.admin_audit_meta())
+
+    duplicate1 = Cases.get_person(duplicate1.id, @admin)
+    duplicate2 = Cases.get_person(duplicate2.id, @admin)
+
+    assert duplicate1.merged_into_id == canonical.id
+    assert duplicate1.merged_at != nil
+    assert duplicate1.merged_by_id == @admin.id
+
+    assert duplicate2.merged_into_id == canonical.id
+    assert duplicate2.merged_at != nil
+    assert duplicate2.merged_by_id == @admin.id
+  end
+
   describe "coalesced_match?" do
     setup do
       a =

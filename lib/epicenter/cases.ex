@@ -189,6 +189,9 @@ defmodule Epicenter.Cases do
       |> Person.Query.reject_archived_people(reject_archived_people)
       |> AuditLog.all(user)
 
+  def merge_people(duplicate_person_ids, canonical_person_id, user, audit_meta),
+    do: Person.Duplicates.merge(duplicate_person_ids, canonical_person_id, user, &AuditLog.update(&1, audit_meta))
+
   def preload_assigned_to(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:assigned_to])
   def preload_archived_by(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload([:archived_by])
   def search_people(search_string, user), do: Person.Search.find(search_string) |> AuditLog.view(user)
