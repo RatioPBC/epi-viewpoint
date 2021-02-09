@@ -290,6 +290,19 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         "ongoing-interview"
       )
 
+      meryl = Test.Fixtures.person_attrs(@admin, "meryl") |> Cases.create_person!()
+
+      create_case_investigation(meryl, @admin, "merged-person", nil, %{
+        interview_completed_at: ~U[2020-10-05 19:57:00Z],
+        interview_started_at: ~U[2020-10-05 18:57:00Z],
+        isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
+        isolation_conclusion_reason: "successfully_completed",
+        isolation_monitoring_ends_on: ~D[2020-11-15],
+        isolation_monitoring_starts_on: ~D[2020-11-05]
+      })
+
+      Cases.merge_people([meryl.id], alice.id, @admin, Test.Fixtures.admin_audit_meta())
+
       user = Test.Fixtures.user_attrs(@admin, "the-user") |> Accounts.register_user!()
 
       [user: user, alice: alice, bob: bob, cindy: cindy, david: david, eva: eva]
