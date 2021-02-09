@@ -1,9 +1,11 @@
 @import "../mixins"
 
 #search-results
-  position: absolute
+  bottom: 0
   left: 0
+  position: absolute
   right: 0
+  top: 0
   z-index: 1
 
   #search-results-inner
@@ -12,8 +14,10 @@
     @include shadow($style: dialog)
 
     background-color: white
+    height: 80vh
     margin: 4rem
     padding: 4rem
+    overflow-x: scroll
 
     #search-close-results
       text-align: right
