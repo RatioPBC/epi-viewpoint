@@ -14,30 +14,23 @@ defmodule Epicenter.Cases.Person.Search do
       false ->
         search_tokens = search_string |> String.split(" ") |> Enum.map(&String.trim/1) |> Enum.map(&String.downcase/1)
 
-        external_id_matches =
-          find_matching_people(:external_id, search_tokens, downcase: false)
+        [{:external_id, false}, {:first_name, true}, {:last_name, true}]
+        |> Enum.reduce(MapSet.new(), fn {field, string_field?}, results ->
+          find_matching_people(field, search_tokens, downcase: string_field?)
           |> Cases.preload_demographics()
-
-        first_name_matches =
-          find_matching_people(:first_name, search_tokens)
-          |> Cases.preload_demographics()
-          |> Enum.filter(&coalesced_field_matches?(&1, :first_name, search_tokens))
-
-        last_name_matches =
-          find_matching_people(:last_name, search_tokens)
-          |> Cases.preload_demographics()
-          |> Enum.filter(&coalesced_field_matches?(&1, :last_name, search_tokens))
-
-        (external_id_matches ++ first_name_matches ++ last_name_matches)
-        |> Enum.uniq()
+          |> Enum.filter(&coalesced_field_matches?(&1, field, search_tokens, string_field?))
+          |> MapSet.new()
+          |> MapSet.union(results)
+        end)
         |> Enum.sort_by(&full_name/1)
     end
   end
 
-  def coalesced_field_matches?(person, field, search_tokens) do
-    demographic = person |> Person.coalesce_demographics()
-    search_tokens |> Enum.member?(String.downcase(demographic[field]))
-  end
+  def coalesced_field_matches?(person, field, search_tokens, true = _string_field?),
+    do: (person |> Person.coalesce_demographics() |> Map.get(field) |> String.downcase()) in search_tokens
+
+  def coalesced_field_matches?(_person, _field, _search_tokens, false = _string_field?),
+    do: true
 
   def full_name(person) do
     demographic = person |> Person.coalesce_demographics()
