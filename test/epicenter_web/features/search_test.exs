@@ -67,46 +67,18 @@ defmodule EpicenterWeb.Features.SearchTest do
     |> Pages.Search.assert_results_tids(~w[person-K])
   end
 
-  # skipped for now since we're not sure we'll be handling IDs differently than other things
-  describe "searching by ODRS id" do
-    @tag :skip
-    test "search for known person displays person page", %{conn: conn, user: user} do
-      external_id = "10004"
-      {:ok, person} = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person()
-      {:ok, _} = Test.Fixtures.demographic_attrs(user, person, "first", %{external_id: external_id}) |> Cases.create_demographic()
+  test "searching for an existing person with extraneous whitespace", %{conn: conn, user: user} do
+    external_id = "10004"
+    whitespaced_external_id = "\t10004  "
+    {:ok, person} = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person()
 
-      conn
-      |> Pages.People.visit()
-      |> Pages.Search.search(external_id)
-      |> Pages.Profile.assert_here(person)
-    end
+    {:ok, _} =
+      Test.Fixtures.demographic_attrs(user, person, "first", %{external_id: external_id})
+      |> Cases.create_demographic()
 
-    @tag :skip
-    test "searching for an existing person with extraneous whitespace", %{conn: conn, user: user} do
-      external_id = "10004"
-      whitespaced_external_id = "\t10004  "
-      {:ok, person} = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person()
-
-      {:ok, _} =
-        Test.Fixtures.demographic_attrs(user, person, "first", %{external_id: external_id})
-        |> Cases.create_demographic()
-
-      conn
-      |> Pages.People.visit()
-      |> Pages.Search.search(whitespaced_external_id)
-      |> Pages.Profile.assert_here(person)
-    end
-
-    @tag :skip
-    test "search for unknown person displays no results page", %{conn: conn, user: user} do
-      external_id = "10004"
-      {:ok, person} = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person()
-      {:ok, _} = Test.Fixtures.demographic_attrs(user, person, "first", %{external_id: external_id}) |> Cases.create_demographic()
-
-      conn
-      |> Pages.People.visit()
-      |> Pages.Search.search("id-that-does-not-exist")
-      |> Pages.Search.assert_no_results("id-that-does-not-exist")
-    end
+    conn
+    |> Pages.People.visit()
+    |> Pages.Search.search(whitespaced_external_id)
+    |> Pages.Search.assert_results_tids([person.tid])
   end
 end
