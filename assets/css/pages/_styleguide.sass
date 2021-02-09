@@ -72,13 +72,13 @@
   //
   // buttons & links
   //
-  #disabled-buttons, #disabled-link-buttons
+  #disabled-buttons, #disabled-anchor-buttons
     @include horizontal-flow
 
   #primary-button-container
     @include horizontal-flow
 
-  #primary-button, #primary-button-disabled, #primary-link-button-disabled
+  #primary-button, #primary-button-disabled, #primary-anchor-button-disabled
     @include button-primary
 
   #primary-button-with-icon, #primary-button-with-icon-disabled
@@ -88,7 +88,7 @@
   #primary-button-small
     @include button-primary($size: small)
 
-  #secondary-button, #secondary-button-disabled, #secondary-link-button-disabled
+  #secondary-button, #secondary-button-disabled, #secondary-anchor-button-disabled
     @include button-secondary
 
   #secondary-button-with-icon
@@ -98,13 +98,13 @@
   #secondary-button-small
     @include button-secondary($size: small)
 
-  #outline-button, #outline-button-disabled, #outline-link-button-disabled
+  #outline-button, #outline-button-disabled, #outline-anchor-button-disabled
     @include button-outline
 
   #outline-button-small
     @include button-outline($size: small)
 
-  #link-button
+  #link-button, #link-button-disabled
     @include button-link
 
   #button-list

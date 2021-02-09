@@ -40,7 +40,18 @@
           @include dotted-details
 
     #search-results-pagination
-      @include horizontal-flow
+      @include horizontal-flow($justify: center)
+
+      button
+        @include button-link
+        border-width: 0
+
+        &[data-page-number]
+          border-radius: 50%
+
+          &[disabled]
+            background-color: $pagination-highlight-color
+            color: $primary-text-color
 
     #no-search-results
       ul

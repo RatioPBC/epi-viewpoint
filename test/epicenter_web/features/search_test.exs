@@ -46,6 +46,27 @@ defmodule EpicenterWeb.Features.SearchTest do
     |> Pages.Search.assert_results([])
   end
 
+  test "pagination", %{conn: conn} do
+    1..11 |> Enum.map(&create_person("person-#{<<64 + &1::utf8>>}", %{}, %{}))
+
+    conn
+    |> Pages.People.visit()
+    |> Pages.Search.search("testuser")
+    |> Pages.Search.assert_results_tids(~w[person-A person-B person-C person-D person-E])
+    |> Pages.Search.assert_disabled(:prev)
+    |> Pages.Search.click_next()
+    |> Pages.Search.assert_results_tids(~w[person-F person-G person-H person-I person-J])
+    |> Pages.Search.click_next()
+    |> Pages.Search.assert_results_tids(~w[person-K])
+    |> Pages.Search.assert_disabled(:next)
+    |> Pages.Search.click_prev()
+    |> Pages.Search.assert_results_tids(~w[person-F person-G person-H person-I person-J])
+    |> Pages.Search.click_page_number(1)
+    |> Pages.Search.assert_results_tids(~w[person-A person-B person-C person-D person-E])
+    |> Pages.Search.click_page_number(3)
+    |> Pages.Search.assert_results_tids(~w[person-K])
+  end
+
   # skipped for now since we're not sure we'll be handling IDs differently than other things
   describe "searching by ODRS id" do
     @tag :skip

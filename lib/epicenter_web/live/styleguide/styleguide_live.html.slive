@@ -107,16 +107,18 @@
       code @include button-outline($size: small)
 
     .styleguide-example
-      a#link-button href="#" Link button
+      div
+        a#link-button href="#" Link button
+        button#link-button-disabled disabled=true Disabled link button
       code
         ' @include button-link
         small Has the same display properties of a button, but without the border
 
     .styleguide-example
-      #disabled-link-buttons
-        a#primary-link-button-disabled href="#" data-disabled=true Primary
-        a#secondary-link-button-disabled href="#" data-disabled=true Secondary
-        a#outline-link-button-disabled href="#" data-disabled=true Outline
+      #disabled-anchor-buttons
+        a#primary-anchor-button-disabled href="#" data-disabled=true Primary
+        a#secondary-anchor-button-disabled href="#" data-disabled=true Secondary
+        a#outline-anchor-button-disabled href="#" data-disabled=true Outline
       code a data-disabled=true
 
     .styleguide-example

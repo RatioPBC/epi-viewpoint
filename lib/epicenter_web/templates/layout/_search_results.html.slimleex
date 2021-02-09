@@ -30,18 +30,12 @@
 
       div
         #search-results-pagination
-          = if @search_results.prev? do
-            = link "Previous", to: "#", phx_click: "search-prev"
-          - else
-            span Previous
+          button data-role="search-prev" phx-click="search-prev" disabled=!@search_results.prev?
+            ' Previous
 
           = for page <- @search_results.pages do
-            = if @search_results.current == page do
-              = "#{page}"
-            - else
-              = link "#{page}", to: "#", phx_click: "search-goto", phx_value_page: page
+            button phx-click="search-goto" phx-value-page=page data-page-number=page disabled=(@search_results.current == page)
+              = page
 
-          = if @search_results.next? do
-            = link "Next", to: "#", phx_click: "search-next"
-          - else
-            span Next
+          button data-role="search-next" phx-click="search-next" disabled=!@search_results.next?
+            ' Next

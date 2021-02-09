@@ -7,6 +7,11 @@ defmodule EpicenterWeb.Test.Pages.Search do
   alias Epicenter.Test.HtmlAssertions
   alias Phoenix.LiveViewTest.View
 
+  def assert_disabled(view, link) when link in ~w[prev next]a do
+    assert view |> render() |> Test.Html.parse() |> Test.Html.attr("[data-role=search-#{link}]", "disabled") == ["disabled"]
+    view
+  end
+
   def assert_no_results(view, search_term) do
     view
     |> render()
@@ -30,6 +35,15 @@ defmodule EpicenterWeb.Test.Pages.Search do
       ]
     end)
     |> assert_eq(search_result_rows, returning: view)
+  end
+
+  def assert_results_tids(view, expected_tids) do
+    view
+    |> render()
+    |> Test.Html.parse()
+    |> assert_results_visible(true)
+    |> Test.Html.all("[data-role=search-result]", as: :tids)
+    |> assert_eq(expected_tids, returning: view)
   end
 
   def assert_results_visible(%View{} = view, expected_visible?) do
@@ -59,6 +73,21 @@ defmodule EpicenterWeb.Test.Pages.Search do
     |> Test.Html.parse()
     |> Test.Html.attr("[data-role=search-term-input]", "value")
     |> assert_eq([search_term], returning: view)
+  end
+
+  def click_next(view) do
+    view |> element("[data-role=search-next]") |> render_click()
+    view
+  end
+
+  def click_page_number(view, page_number) do
+    view |> element("[data-page-number=#{page_number}]") |> render_click()
+    view
+  end
+
+  def click_prev(view) do
+    view |> element("[data-role=search-prev]") |> render_click()
+    view
   end
 
   def close_search_results(view) do
