@@ -5,6 +5,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Cases.Merge
+  alias Epicenter.DateParser
   alias EpicenterWeb.Form
   alias EpicenterWeb.Format
   alias EpicenterWeb.Forms.ResolveConflictsForm
@@ -37,7 +38,11 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     merge_conflict_resolutions =
       %{
         first_name: form_params["first_name"],
-        dob: form_params["dob"],
+        dob:
+          case form_params["dob"] do
+            nil -> nil
+            dob -> dob |> DateParser.parse_mm_dd_yyyy!()
+          end,
         preferred_language: form_params["preferred_language"]
       }
       |> Enum.filter(fn {_k, v} -> v != nil end)

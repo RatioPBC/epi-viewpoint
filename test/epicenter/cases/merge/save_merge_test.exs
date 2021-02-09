@@ -196,6 +196,20 @@ defmodule Epicenter.Cases.SaveMergeTest do
       assert merged_kate[:dob] == merge_conflict_resolutions[:dob]
       assert merged_kate[:preferred_language] == merge_conflict_resolutions[:preferred_language]
     end
+
+    test "when only some fields conflict", %{user: user} do
+      katie = create_person("katie", %{tid: "katie", source: "form", first_name: "katie", dob: ~D[2001-01-01], preferred_language: "English"})
+      katy = create_person("katy", %{tid: "katy", source: "form", first_name: "katy", dob: ~D[2003-01-01], preferred_language: "English"})
+      kate = create_person("kate", %{tid: "kate", source: "form", first_name: "kate", dob: ~D[2004-01-01], preferred_language: "English"})
+
+      merge_conflict_resolutions = %{first_name: "katie", dob: ~D[2001-01-01]}
+      Merge.merge([katie.id, katy.id], into: kate.id, merge_conflict_resolutions: merge_conflict_resolutions, current_user: user)
+
+      merged_kate = reload_demographics(kate)
+
+      assert merged_kate[:first_name] == merge_conflict_resolutions[:first_name]
+      assert merged_kate[:dob] == merge_conflict_resolutions[:dob]
+    end
   end
 
   describe "audit logging the merge" do
