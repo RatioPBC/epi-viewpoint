@@ -31,7 +31,8 @@ defmodule Epicenter.Cases.SaveMergeTest do
       Test.Fixtures.phone_attrs(user, billy, "billy-phone", number: "111-111-1002") |> Cases.create_phone!()
       Test.Fixtures.address_attrs(user, billy, "billy-address", 1001, type: "home") |> Cases.create_address!()
 
-      Merge.merge([billy], into: alice, merge_conflict_resolutions: %{}, current_user: user)
+      Merge.merge([billy.id], into: alice.id, merge_conflict_resolutions: %{}, current_user: user)
+
       alice = alice |> Cases.preload_addresses() |> Cases.preload_emails() |> Cases.preload_phones()
       assert alice.phones |> contains("alice-phone")
       assert alice.phones |> contains("billy-phone")
@@ -52,7 +53,8 @@ defmodule Epicenter.Cases.SaveMergeTest do
       Test.Fixtures.phone_attrs(user, billy, "billy-phone", number: "111-111-1000") |> Cases.create_phone!()
       Test.Fixtures.address_attrs(user, billy, "billy-address", 1000, type: "home") |> Cases.create_address!()
 
-      Merge.merge([billy], into: alice, merge_conflict_resolutions: %{}, current_user: user)
+      Merge.merge([billy.id], into: alice.id, merge_conflict_resolutions: %{}, current_user: user)
+
       alice = alice |> Cases.preload_addresses() |> Cases.preload_emails() |> Cases.preload_phones()
       assert alice.phones |> tids() == ["alice-phone"]
       assert alice.emails |> tids() == ["alice-email", "billy-email"]
@@ -102,7 +104,7 @@ defmodule Epicenter.Cases.SaveMergeTest do
       alice |> create_demographic(%{tid: "alice-4", source: "form", occupation: "yes-occupation"})
       cindy = create_person("cindy", %{tid: "cindy-5", source: "form", employment: "yes-employment"})
 
-      Merge.merge([cindy, billy], into: alice, merge_conflict_resolutions: %{}, current_user: user)
+      Merge.merge([cindy.id, billy.id], into: alice.id, merge_conflict_resolutions: %{}, current_user: user)
 
       coalesced_alice = reload_demographics(alice)
       assert coalesced_alice[:dob] == ~D[2001-10-01]
@@ -127,7 +129,7 @@ defmodule Epicenter.Cases.SaveMergeTest do
       kate = create_person("kate", %{tid: "kate", source: "form", first_name: "kate", dob: ~D[2004-01-01], preferred_language: "Japanese"})
 
       merge_conflict_resolutions = %{first_name: "katie", dob: ~D[2001-01-01], preferred_language: "Spanish"}
-      Merge.merge([katie, katy], into: kate, merge_conflict_resolutions: merge_conflict_resolutions, current_user: user)
+      Merge.merge([katie.id, katy.id], into: kate.id, merge_conflict_resolutions: merge_conflict_resolutions, current_user: user)
 
       merged_kate = reload_demographics(kate)
 
@@ -153,7 +155,8 @@ defmodule Epicenter.Cases.SaveMergeTest do
       Test.Fixtures.email_attrs(user, billy, "billy-email") |> Cases.create_email!()
       Test.Fixtures.phone_attrs(user, billy, "billy-phone", number: "111-111-1002") |> Cases.create_phone!()
 
-      Merge.merge([billy], into: alice, merge_conflict_resolutions: %{}, current_user: user)
+      Merge.merge([billy.id], into: alice.id, merge_conflict_resolutions: %{}, current_user: user)
+
       alice = alice |> Cases.preload_addresses() |> Cases.preload_emails() |> Cases.preload_phones()
 
       %{addresses: [_, new_address], emails: [_, new_email], phones: [_, new_phone]} = alice

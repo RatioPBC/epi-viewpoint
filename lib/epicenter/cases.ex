@@ -176,7 +176,7 @@ defmodule Epicenter.Cases do
   def find_matching_person(_), do: nil
   def get_people(ids, user), do: Person.Query.get_people(ids) |> AuditLog.all(user)
   def get_person(id, user), do: AuditLog.get(Person, id, user)
-  def force_reload_person(person), do: Repo.get(Person, person.id)
+  def get_person_without_audit_logging(id), do: Repo.get(Person, id)
   def list_duplicate_people(%Person{} = person, user), do: Person.Duplicates.find(person, &AuditLog.all(&1, user))
 
   def list_people(filter, user: %User{} = user, reject_archived_people: reject_archived_people),

@@ -3,12 +3,15 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
+  alias Epicenter.DateParser
 
-  def merge(people, into: canonical_person, merge_conflict_resolutions: merge_conflict_resolutions, current_user: current_user) do
+  def merge(duplicate_person_ids, into: canonical_person_id, merge_conflict_resolutions: merge_conflict_resolutions, current_user: current_user) do
     people =
-      Enum.map(people, fn duplicate_person ->
-        Cases.force_reload_person(duplicate_person) |> Cases.preload_demographics()
+      Enum.map(duplicate_person_ids, fn duplicate_person_id ->
+        Cases.get_person_without_audit_logging(duplicate_person_id) |> Cases.preload_demographics()
       end)
+
+    canonical_person = Cases.get_person_without_audit_logging(canonical_person_id)
 
     merge_contact_info(people, canonical_person, current_user)
 
@@ -76,7 +79,10 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
 
     if !Enum.empty?(merge_conflict_resolutions) do
       attrs =
-        merge_conflict_resolutions
+        %{}
+        |> Map.put(:first_name, merge_conflict_resolutions.first_name)
+        |> Map.put(:dob, merge_conflict_resolutions.dob |> DateParser.parse_mm_dd_yyyy!())
+        |> Map.put(:preferred_language, merge_conflict_resolutions.preferred_language)
         |> Map.put(:person_id, canonical_person.id)
         |> Map.put(:source, "form")
 

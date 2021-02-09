@@ -4,7 +4,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
   import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
-  alias Epicenter.Cases
+  alias Epicenter.Cases.Merge
   alias EpicenterWeb.Form
   alias EpicenterWeb.Format
   alias EpicenterWeb.Forms.ResolveConflictsForm
@@ -12,7 +12,8 @@ defmodule EpicenterWeb.ResolveConflictsLive do
   def mount(%{"id" => person_id, "duplicate_person_ids" => comma_separated_duplicate_person_ids} = _params, session, socket) do
     socket = socket |> authenticate_user(session)
 
-    person_ids = [person_id] ++ String.split(comma_separated_duplicate_person_ids, ",")
+    duplicate_person_ids = String.split(comma_separated_duplicate_person_ids, ",")
+    person_ids = [person_id] ++ duplicate_person_ids
     merge_fields = [{:first_name, :string}, {:dob, :date}, {:preferred_language, :string}]
     merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, merge_fields)
 
@@ -22,7 +23,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> assign(:merge_conflicts, merge_conflicts)
     |> assign(:form_changeset, ResolveConflictsForm.changeset(merge_conflicts, %{}))
     |> assign(:person_id, person_id)
-    |> assign_person_ids(comma_separated_duplicate_person_ids)
+    |> assign(:duplicate_person_ids, duplicate_person_ids)
     |> ok()
   end
 
@@ -32,15 +33,29 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> noreply()
   end
 
-  # # #
+  def handle_event("save", %{"resolve_conflicts_form" => form_params}, socket) do
+    merge_conflict_resolutions =
+      %{
+        first_name: form_params["first_name"],
+        dob: form_params["dob"],
+        preferred_language: form_params["preferred_language"]
+      }
+      |> Enum.filter(fn {_k, v} -> v != nil end)
+      |> Enum.into(%{})
 
-  defp assign_person_ids(socket, comma_separated_person_ids) do
-    person_ids = String.split(comma_separated_person_ids, ",")
-    people = Cases.get_people(person_ids, socket.assigns.current_user)
+    Merge.merge(
+      socket.assigns.duplicate_person_ids,
+      into: socket.assigns.person_id,
+      merge_conflict_resolutions: merge_conflict_resolutions,
+      current_user: socket.assigns.current_user
+    )
 
     socket
-    |> assign(:people, people)
+    |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person_id)}")
+    |> noreply()
   end
+
+  # # #
 
   def form_builder(form, merge_conflicts, valid_changeset?) do
     formatted_dates = merge_conflicts.dob |> Enum.map(&Format.date/1)
