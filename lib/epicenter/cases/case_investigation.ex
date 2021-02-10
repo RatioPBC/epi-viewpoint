@@ -114,7 +114,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
         join: person in assoc(case_investigation, :person),
         left_join: assignee in assoc(person, :assigned_to),
         join: lab_result in assoc(case_investigation, :initiating_lab_result),
-        where: is_nil(person.archived_at) and case_investigation.interview_status == "started" and is_nil(person.merged_at),
+        where: is_nil(person.archived_at) and case_investigation.interview_status == "started",
         order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on, asc: case_investigation.seq]
     end
 
@@ -124,8 +124,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
         where:
           is_nil(person.archived_at) and
             case_investigation.interview_status == "completed" and
-            case_investigation.isolation_monitoring_status in ["pending", "ongoing"] and
-            is_nil(person.merged_at),
+            case_investigation.isolation_monitoring_status in ["pending", "ongoing"],
         order_by: [
           desc: case_investigation.isolation_monitoring_status,
           asc: case_investigation.isolation_monitoring_ends_on,
@@ -139,7 +138,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
         join: person in assoc(case_investigation, :person),
         left_join: assignee in assoc(person, :assigned_to),
         join: lab_result in assoc(case_investigation, :initiating_lab_result),
-        where: is_nil(person.archived_at) and is_nil(person.merged_at),
+        where: is_nil(person.archived_at),
         order_by: [asc_nulls_first: assignee.name, asc: lab_result.sampled_on, asc: case_investigation.seq]
     end
 

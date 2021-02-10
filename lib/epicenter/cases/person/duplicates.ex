@@ -1,6 +1,7 @@
 defmodule Epicenter.Cases.Person.Duplicates do
   import Ecto.Changeset
 
+  alias Epicenter.Accounts.User
   alias Epicenter.Cases
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.Person
@@ -46,6 +47,7 @@ defmodule Epicenter.Cases.Person.Duplicates do
       %{merged_into_id: canonical_person_id, merged_at: DateTime.utc_now(), merged_by_id: merged_by_user_id},
       ~w{merged_into_id merged_at merged_by_id}a
     )
+    |> Person.changeset_for_archive(%User{id: merged_by_user_id})
   end
 
   defp preload(person_or_people_or_nil),

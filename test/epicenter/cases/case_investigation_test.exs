@@ -289,19 +289,6 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         "ongoing-interview"
       )
 
-      meryl = Test.Fixtures.person_attrs(@admin, "meryl") |> Cases.create_person!()
-
-      create_case_investigation(meryl, @admin, "merged-person", nil, %{
-        interview_completed_at: ~U[2020-10-05 19:57:00Z],
-        interview_started_at: ~U[2020-10-05 18:57:00Z],
-        isolation_concluded_at: ~U[2020-11-15 19:57:00Z],
-        isolation_conclusion_reason: "successfully_completed",
-        isolation_monitoring_ends_on: ~D[2020-11-15],
-        isolation_monitoring_starts_on: ~D[2020-11-05]
-      })
-
-      Cases.merge_people([meryl], alice.id, @admin, Test.Fixtures.admin_audit_meta())
-
       user = Test.Fixtures.user_attrs(@admin, "the-user") |> Accounts.register_user!()
 
       [user: user, alice: alice, bob: bob, cindy: cindy, david: david, eva: eva]
@@ -360,6 +347,26 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
              ]
 
       AuditLogAssertions.verify_phi_view_logged(user, [alice, bob, cindy, david, eva])
+    end
+
+    test "ignoring merged people", %{user: user, alice: alice, bob: bob, cindy: cindy, david: david, eva: eva} do
+      canonical_person = Test.Fixtures.person_attrs(@admin, "canonical") |> Cases.create_person!()
+
+      Cases.merge_people([alice, bob, cindy, david, eva], canonical_person.id, @admin, Test.Fixtures.admin_audit_meta())
+
+      actual = Cases.list_case_investigations(:pending_interview, user: user) |> Cases.preload_person() |> Enum.map(fn ci -> ci.person.tid end)
+      assert actual == []
+
+      actual = Cases.list_case_investigations(:ongoing_interview, user: user) |> Cases.preload_person() |> Enum.map(fn ci -> ci.person.tid end)
+      assert actual == []
+
+      actual = Cases.list_case_investigations(:isolation_monitoring, user: user) |> Cases.preload_person() |> Enum.map(fn ci -> ci.person.tid end)
+
+      assert actual == []
+
+      actual = Cases.list_case_investigations(:all, user: user) |> Cases.preload_person() |> Enum.map(fn ci -> ci.person.tid end)
+
+      assert actual == []
     end
   end
 
