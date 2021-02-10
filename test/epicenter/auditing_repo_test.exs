@@ -18,6 +18,20 @@ defmodule Epicenter.AuditingRepoTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
 
+  # This indirectly uses the prod logger so we
+  # can test the formatting of the logs in this test
+  defmodule StubNotStub do
+    @behaviour Epicenter.AuditLog.PhiLogger
+
+    def info(message, metadata),
+      do: Epicenter.AuditLog.PhiLogger.info(message, metadata)
+  end
+
+  setup do
+    Mox.stub_with(Epicenter.Test.PhiLoggerMock, StubNotStub)
+    :ok
+  end
+
   describe "inserting" do
     test "it creates revision, and submits the original changeset" do
       assert [] = AuditingRepo.revisions(Cases.Person)

@@ -35,8 +35,9 @@ defmodule EpicenterWeb.DemographicsEditLiveTest do
 
   describe "render" do
     test "records an audit log entry", %{conn: conn, person: person, user: user} do
-      capture_log(fn -> Pages.DemographicsEdit.visit(conn, person) end)
-      |> AuditLogAssertions.assert_viewed_person(user, person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+      Pages.DemographicsEdit.visit(conn, person)
+      AuditLogAssertions.verify_phi_view_logged(user, person)
     end
 
     test "initially shows current demographics values", %{conn: conn, person: person, user: user} do

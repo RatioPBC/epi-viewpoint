@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.PeopleLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import ExUnit.CaptureLog
   import Phoenix.LiveViewTest
 
   alias Epicenter.Accounts
@@ -23,10 +22,9 @@ defmodule EpicenterWeb.PeopleLiveTest do
       Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
       Test.Fixtures.case_investigation_attrs(billy, billy_positive, user, "") |> Cases.create_case_investigation!()
 
-      capture_log(fn ->
-        Pages.People.visit(conn)
-      end)
-      |> AuditLogAssertions.assert_viewed_people(user, [alice, billy])
+      AuditLogAssertions.expect_phi_view_logs(22)
+      Pages.People.visit(conn)
+      AuditLogAssertions.verify_phi_view_logged(user, [alice, billy])
     end
 
     test "shows unknown as the name of people that lack a first and last name", %{

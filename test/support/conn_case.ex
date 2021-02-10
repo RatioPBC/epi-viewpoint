@@ -44,6 +44,8 @@ defmodule EpicenterWeb.ConnCase do
       Ecto.Adapters.SQL.Sandbox.mode(Epicenter.Repo, {:shared, self()})
     end
 
+    Mox.stub_with(Epicenter.Test.PhiLoggerMock, Epicenter.Test.PhiLoggerStub)
+
     {:ok, conn: Phoenix.ConnTest.build_conn() |> Plug.Conn.put_req_header("user-agent", "browser")}
   end
 

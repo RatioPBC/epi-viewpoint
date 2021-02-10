@@ -2,7 +2,6 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [tids: 1]
-  import ExUnit.CaptureLog
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
@@ -317,54 +316,50 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
     end
 
     test "fetching case investigations for the 'pending interview' tab", %{user: user, alice: alice} do
-      capture_log(fn ->
-        actual = Cases.list_case_investigations(:pending_interview, user: user) |> tids
+      AuditLogAssertions.expect_phi_view_logs(1)
+      actual = Cases.list_case_investigations(:pending_interview, user: user) |> tids
 
-        assert actual == [
-                 "pending-case-investigation"
-               ]
-      end)
-      |> AuditLogAssertions.assert_viewed_people(user, [alice])
+      assert actual == ["pending-case-investigation"]
+
+      AuditLogAssertions.verify_phi_view_logged(user, [alice])
     end
 
     test "fetching case investigations for the ongoing interview tab", %{user: user, bob: bob} do
-      capture_log(fn ->
-        actual = Cases.list_case_investigations(:ongoing_interview, user: user) |> tids
+      AuditLogAssertions.expect_phi_view_logs(1)
+      actual = Cases.list_case_investigations(:ongoing_interview, user: user) |> tids
 
-        assert actual == [
-                 "started-case-investigation"
-               ]
-      end)
-      |> AuditLogAssertions.assert_viewed_people(user, [bob])
+      assert actual == ["started-case-investigation"]
+
+      AuditLogAssertions.verify_phi_view_logged(user, [bob])
     end
 
     test "fetching case investigations for the isolation monitoring tab", %{user: user, bob: bob, david: david} do
-      capture_log(fn ->
-        actual = Cases.list_case_investigations(:isolation_monitoring, user: user) |> tids
+      AuditLogAssertions.expect_phi_view_logs(2)
+      actual = Cases.list_case_investigations(:isolation_monitoring, user: user) |> tids
 
-        assert actual == [
-                 "interview-completed-case-investigation",
-                 "isolation-monitoring-started-case-investigation"
-               ]
-      end)
-      |> AuditLogAssertions.assert_viewed_people(user, [bob, david])
+      assert actual == [
+               "interview-completed-case-investigation",
+               "isolation-monitoring-started-case-investigation"
+             ]
+
+      AuditLogAssertions.verify_phi_view_logged(user, [bob, david])
     end
 
     test "fetching case investigations for the all tab",
          %{user: user, alice: alice, bob: bob, cindy: cindy, david: david, eva: eva} do
-      capture_log(fn ->
-        actual = Cases.list_case_investigations(:all, user: user) |> tids
+      AuditLogAssertions.expect_phi_view_logs(6)
+      actual = Cases.list_case_investigations(:all, user: user) |> tids
 
-        assert actual == [
-                 "pending-case-investigation",
-                 "started-case-investigation",
-                 "interview-completed-case-investigation",
-                 "discontinued-case-investigation",
-                 "isolation-monitoring-started-case-investigation",
-                 "isolation-monitoring-completed-case-investigation"
-               ]
-      end)
-      |> AuditLogAssertions.assert_viewed_people(user, [alice, bob, cindy, david, eva])
+      assert actual == [
+               "pending-case-investigation",
+               "started-case-investigation",
+               "interview-completed-case-investigation",
+               "discontinued-case-investigation",
+               "isolation-monitoring-started-case-investigation",
+               "isolation-monitoring-completed-case-investigation"
+             ]
+
+      AuditLogAssertions.verify_phi_view_logged(user, [alice, bob, cindy, david, eva])
     end
   end
 

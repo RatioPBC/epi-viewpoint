@@ -2,11 +2,11 @@ defmodule Epicenter.Cases.Person.SearchTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [tids: 1]
-  import ExUnit.CaptureLog
 
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
   alias Epicenter.Test
+  alias Epicenter.Test.AuditLogAssertions
 
   setup :persist_admin
   @admin Test.Fixtures.admin()
@@ -34,17 +34,18 @@ defmodule Epicenter.Cases.Person.SearchTest do
     test "viewpoint id results are audit logged" do
       person = create_person("person")
 
-      assert capture_log(fn ->
-               search_via_context(person.id)
-             end) =~ person.id
+      AuditLogAssertions.expect_phi_view_logs(1)
+      search_via_context(person.id)
+
+      AuditLogAssertions.verify_phi_view_logged(@admin, [person])
     end
 
     test "non-viewpoint-id results are audit logged" do
       alice = create_person("alice", first_name: "alice", last_name: "testuser")
 
-      assert capture_log(fn ->
-               search_via_context("alice testuser")
-             end) =~ alice.id
+      AuditLogAssertions.expect_phi_view_logs(1)
+      search_via_context("alice testuser")
+      AuditLogAssertions.verify_phi_view_logged(@admin, [alice])
     end
   end
 

@@ -28,7 +28,8 @@ config :epicenter,
   application_version_sha: "test-version-sha",
   clock: FakeDateTime,
   health_check: Epicenter.Test.HealthCheckMock,
-  totp: Epicenter.Test.TOTPMock
+  totp: Epicenter.Test.TOTPMock,
+  phi_logger: Epicenter.Test.PhiLoggerMock
 
 # Print only warnings and errors during test
 config :logger, level: :info, metadata: :all

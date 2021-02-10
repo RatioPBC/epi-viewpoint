@@ -40,8 +40,9 @@ defmodule EpicenterWeb.ProfileLiveTest do
   end
 
   test "records an audit log entry", %{conn: conn, person: person, user: user} do
-    capture_log(fn -> Pages.Profile.visit(conn, person) end)
-    |> AuditLogAssertions.assert_viewed_person(user, person)
+    AuditLogAssertions.expect_phi_view_logs(2)
+    Pages.Profile.visit(conn, person)
+    AuditLogAssertions.verify_phi_view_logged(user, person)
   end
 
   test "records an audit log entry for any contacts", %{conn: conn, user: user, person: sick_person} do
@@ -61,9 +62,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
         most_recent_date_together: ~D{2020-08-06}
       })
 
-    capture_log(fn -> Pages.Profile.visit(conn, sick_person) end)
-    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation1.exposed_person)
-    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation2.exposed_person)
+    # 10 audit logs seems excessive...
+    AuditLogAssertions.expect_phi_view_logs(10)
+    Pages.Profile.visit(conn, sick_person)
+    AuditLogAssertions.verify_phi_view_logged(user, [contact_investigation1.exposed_person, contact_investigation2.exposed_person])
   end
 
   describe "potential duplicates" do

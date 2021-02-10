@@ -1,8 +1,6 @@
 defmodule Epicenter.ContactInvestigationsTest do
   use Epicenter.DataCase, async: true
 
-  import ExUnit.CaptureLog
-
   import Euclid.Extra.Enum, only: [tids: 1]
 
   alias Epicenter.Accounts
@@ -17,8 +15,9 @@ defmodule Epicenter.ContactInvestigationsTest do
     setup [:setup_contact_investigations]
 
     test "records an audit log entry", %{contact_investigation: contact_investigation} do
-      capture_log(fn -> ContactInvestigations.get(contact_investigation.id, @admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, contact_investigation.exposed_person)
+      AuditLogAssertions.expect_phi_view_logs(1)
+      ContactInvestigations.get(contact_investigation.id, @admin)
+      AuditLogAssertions.verify_phi_view_logged(@admin, contact_investigation.exposed_person)
     end
   end
 
@@ -30,9 +29,9 @@ defmodule Epicenter.ContactInvestigationsTest do
       case_investigation: case_investigation
     } do
       case_investigation = case_investigation |> Cases.preload_person()
-
-      capture_log(fn -> contact_investigation |> ContactInvestigations.preload_exposing_case(@admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, case_investigation.person)
+      AuditLogAssertions.expect_phi_view_logs(1)
+      contact_investigation |> ContactInvestigations.preload_exposing_case(@admin)
+      AuditLogAssertions.verify_phi_view_logged(@admin, case_investigation.person)
     end
 
     test "records an audit log entry for the person on the case investigation with multiple contact investigations", %{
@@ -44,14 +43,19 @@ defmodule Epicenter.ContactInvestigationsTest do
       case_investigation = case_investigation |> Cases.preload_person()
       other_case_investigation = other_case_investigation |> Cases.preload_person()
 
-      capture_log(fn -> [contact_investigation, other_contact_investigation] |> ContactInvestigations.preload_exposing_case(@admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, case_investigation.person)
-      |> AuditLogAssertions.assert_viewed_person(@admin, other_case_investigation.person)
+      AuditLogAssertions.expect_phi_view_logs(2)
+
+      [contact_investigation, other_contact_investigation]
+      |> ContactInvestigations.preload_exposing_case(@admin)
+
+      AuditLogAssertions.verify_phi_view_logged(@admin, [case_investigation.person, other_case_investigation.person])
     end
 
     test "does not record an audit log entry when passed nil" do
       unique_user = @admin |> Map.put(:id, Ecto.UUID.generate())
-      refute capture_log(fn -> ContactInvestigations.preload_exposing_case(nil, unique_user) end) =~ unique_user.id
+
+      AuditLogAssertions.expect_phi_view_logs(0)
+      ContactInvestigations.preload_exposing_case(nil, unique_user)
     end
   end
 
@@ -92,8 +96,9 @@ defmodule Epicenter.ContactInvestigationsTest do
     test "records audit log for viewed people", %{user: user} do
       {_, exposed_person} = create_contact_investigation(user, "exposing", "exposed")
 
-      capture_log(fn -> ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin, reject_archived_people: true) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, exposed_person)
+      AuditLogAssertions.expect_phi_view_logs(1)
+      ContactInvestigations.list_exposed_people(:with_contact_investigation, @admin, reject_archived_people: true)
+      AuditLogAssertions.verify_phi_view_logged(@admin, [exposed_person])
     end
 
     test "can optionally show archived people", %{user: user} do

@@ -38,6 +38,8 @@ defmodule Epicenter.DataCase do
       Ecto.Adapters.SQL.Sandbox.mode(Epicenter.Repo, {:shared, self()})
     end
 
+    Mox.stub_with(Epicenter.Test.PhiLoggerMock, Epicenter.Test.PhiLoggerStub)
+
     :ok
   end
 

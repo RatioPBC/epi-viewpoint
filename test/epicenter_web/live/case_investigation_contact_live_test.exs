@@ -32,8 +32,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       person: person,
       user: user
     } do
-      capture_log(fn -> Pages.CaseInvestigationContact.visit(conn, case_investigation) end)
-      |> AuditLogAssertions.assert_viewed_person(user, person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+      Pages.CaseInvestigationContact.visit(conn, case_investigation)
+      AuditLogAssertions.verify_phi_view_logged(user, person)
     end
 
     test "has a case investigation view", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
@@ -282,10 +283,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       case_investigation = case_investigation |> Cases.preload_person()
       case_person = case_investigation.person
       exposed_person = contact_investigation.exposed_person
-
-      capture_log(fn -> Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation) end)
-      |> AuditLogAssertions.assert_viewed_person(user, case_person)
-      |> AuditLogAssertions.assert_viewed_person(user, exposed_person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+      Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation)
+      AuditLogAssertions.verify_phi_view_logged(user, [case_person, exposed_person])
     end
 
     test "prepopulates the form correctly", %{conn: conn, case_investigation: case_investigation, contact_investigation: contact_investigation} do

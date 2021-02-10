@@ -37,8 +37,9 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLiveTest do
   end
 
   test "records an audit log entry", %{conn: conn, contact_investigation: contact_investigation, user: user} do
-    capture_log(fn -> Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation) end)
-    |> AuditLogAssertions.assert_viewed_person(user, contact_investigation.exposed_person)
+    AuditLogAssertions.expect_phi_view_logs(22)
+    Pages.ContactInvestigationClinicalDetails.visit(conn, contact_investigation)
+    AuditLogAssertions.verify_phi_view_logged(user, contact_investigation.exposed_person)
   end
 
   test "has a contact investigation view", %{conn: conn, contact_investigation: contact_investigation} do

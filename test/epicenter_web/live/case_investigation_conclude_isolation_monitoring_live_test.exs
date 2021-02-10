@@ -26,8 +26,9 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLiveTest do
   test "records an audit log entry", %{conn: conn, case_investigation: case_investigation, user: user} do
     case_investigation = case_investigation |> Cases.preload_person()
 
-    capture_log(fn -> Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation) end)
-    |> AuditLogAssertions.assert_viewed_person(user, case_investigation.person)
+    AuditLogAssertions.expect_phi_view_logs(22)
+    Pages.CaseInvestigationConcludeIsolationMonitoring.visit(conn, case_investigation)
+    AuditLogAssertions.verify_phi_view_logged(user, case_investigation.person)
   end
 
   test "shows conclude isolation monitoring form", %{conn: conn, case_investigation: case_investigation} do

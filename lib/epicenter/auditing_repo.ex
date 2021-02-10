@@ -1,6 +1,4 @@
 defmodule Epicenter.AuditingRepo do
-  require Logger
-
   alias Epicenter.Accounts.User
   alias Epicenter.AuditLog.Meta
   alias Epicenter.AuditLog.PhiLoggable
@@ -98,7 +96,7 @@ defmodule Epicenter.AuditingRepo do
     subject_type = "Person"
     subject_id = PhiLoggable.phi_identifier(phi_loggable)
 
-    Logger.info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
+    phi_logger().info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
       audit_log: true,
       audit_user_id: user_id,
       audit_action: "view",
@@ -156,5 +154,9 @@ defmodule Epicenter.AuditingRepo do
         |> elem(1)
       end
     )
+  end
+
+  defp phi_logger() do
+    Application.get_env(:epicenter, :phi_logger)
   end
 end

@@ -30,8 +30,9 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
   test "records an audit log entry", %{conn: conn, case_investigation: case_investigation, user: user} do
     case_investigation = case_investigation |> Cases.preload_person()
 
-    capture_log(fn -> Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation) end)
-    |> AuditLogAssertions.assert_viewed_person(user, case_investigation.person)
+    AuditLogAssertions.expect_phi_view_logs(22)
+    Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
+    AuditLogAssertions.verify_phi_view_logged(user, case_investigation.person)
   end
 
   test "has a reason select radio", %{conn: conn, case_investigation: case_investigation} do

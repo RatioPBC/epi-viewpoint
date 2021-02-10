@@ -2,7 +2,6 @@ defmodule Epicenter.CasesTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [tids: 1, pluck: 2]
-  import ExUnit.CaptureLog
 
   alias Epicenter.Accounts
   alias Epicenter.Cases
@@ -253,15 +252,22 @@ defmodule Epicenter.CasesTest do
           |> Cases.create_person!()
         end)
 
-      capture_log(fn ->
-        assert Cases.list_duplicate_people(alice, @admin) |> tids() == ["amy"]
-      end)
-      |> AuditLogAssertions.assert_viewed_people(@admin, [amy])
+      AuditLogAssertions.expect_phi_view_logs(2)
+      assert Cases.list_duplicate_people(alice, @admin) |> tids() == ["amy"]
+      AuditLogAssertions.verify_phi_view_logged(@admin, [amy])
+    end
 
-      capture_log(fn ->
-        assert Cases.count_duplicate_people(alice) == 1
-      end)
-      |> AuditLogAssertions.assert_viewed_nobody()
+    test "counting duplicate people does not audit-log views" do
+      [alice, _amy, _billy] =
+        [{"alice", "Alice", "Testuser1"}, {"amy", "Amy", "Testuser1"}, {"billy", "Billy", "Testuser2"}]
+        |> Enum.map(fn {tid, first, last} ->
+          Test.Fixtures.person_attrs(@admin, tid, %{})
+          |> Test.Fixtures.add_demographic_attrs(%{first_name: first, last_name: last})
+          |> Cases.create_person!()
+        end)
+
+      AuditLogAssertions.expect_phi_view_logs(0)
+      assert Cases.count_duplicate_people(alice) == 1
     end
 
     test "get_people fetches all the people" do
@@ -274,9 +280,10 @@ defmodule Epicenter.CasesTest do
       alice = Test.Fixtures.person_attrs(@admin, "alice") |> Cases.create_person!()
       billy = Test.Fixtures.person_attrs(@admin, "billy") |> Cases.create_person!()
 
-      capture_log(fn -> Cases.get_people([alice.id, billy.id], @admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, alice)
-      |> AuditLogAssertions.assert_viewed_person(@admin, billy)
+      AuditLogAssertions.expect_phi_view_logs(22)
+      Cases.get_people([alice.id, billy.id], @admin)
+      AuditLogAssertions.verify_phi_view_logged(@admin, alice)
+      AuditLogAssertions.verify_phi_view_logged(@admin, billy)
     end
 
     test "get_person fetches record" do
@@ -290,8 +297,10 @@ defmodule Epicenter.CasesTest do
       user = Test.Fixtures.user_attrs(@admin, "user") |> Accounts.register_user!()
       person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
 
-      capture_log(fn -> Cases.get_person(person.id, @admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+
+      Cases.get_person(person.id, @admin)
+      AuditLogAssertions.verify_phi_view_logged(@admin, person)
     end
   end
 
@@ -393,13 +402,15 @@ defmodule Epicenter.CasesTest do
     end
 
     test "records audit log for viewed people", context do
-      capture_log(fn -> Cases.list_people(:all, user: @admin, reject_archived_people: true) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.alice)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.billy)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.cindy)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.david)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.emily)
-      |> AuditLogAssertions.assert_viewed_person(@admin, context.nancy)
+      AuditLogAssertions.expect_phi_view_logs(22)
+
+      Cases.list_people(:all, user: @admin, reject_archived_people: true)
+      AuditLogAssertions.verify_phi_view_logged(@admin, context.alice)
+      AuditLogAssertions.verify_phi_view_logged(@admin, context.billy)
+      AuditLogAssertions.verify_phi_view_logged(@admin, context.cindy)
+      AuditLogAssertions.verify_phi_view_logged(@admin, context.david)
+      AuditLogAssertions.verify_phi_view_logged(@admin, context.emily)
+      AuditLogAssertions.verify_phi_view_logged(@admin, context.nancy)
     end
   end
 
@@ -801,9 +812,9 @@ defmodule Epicenter.CasesTest do
 
     test "records an audit log entry", %{case_investigation: case_investigation} do
       case_investigation = case_investigation |> Cases.preload_person()
-
-      capture_log(fn -> Cases.get_case_investigation(case_investigation.id, @admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, case_investigation.person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+      Cases.get_case_investigation(case_investigation.id, @admin)
+      AuditLogAssertions.verify_phi_view_logged(@admin, case_investigation.person)
     end
   end
 
@@ -909,8 +920,12 @@ defmodule Epicenter.CasesTest do
     } do
       case = Cases.get_case_investigation(case_investigation.id, @admin)
 
-      capture_log(fn -> case |> Cases.preload_contact_investigations(@admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, contact_investigation.exposed_person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+
+      case
+      |> Cases.preload_contact_investigations(@admin)
+
+      AuditLogAssertions.verify_phi_view_logged(@admin, contact_investigation.exposed_person)
     end
 
     test "records an audit log entry for each contact investigation of each case investigation", %{
@@ -919,13 +934,18 @@ defmodule Epicenter.CasesTest do
       other_case_investigation: other_case_investigation,
       other_contact_investigation: other_contact_investigation
     } do
-      capture_log(fn -> [case_investigation, other_case_investigation] |> Cases.preload_contact_investigations(@admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, contact_investigation.exposed_person)
-      |> AuditLogAssertions.assert_viewed_person(@admin, other_contact_investigation.exposed_person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+
+      [case_investigation, other_case_investigation]
+      |> Cases.preload_contact_investigations(@admin)
+
+      AuditLogAssertions.verify_phi_view_logged(@admin, contact_investigation.exposed_person)
+      AuditLogAssertions.verify_phi_view_logged(@admin, other_contact_investigation.exposed_person)
     end
 
-    test "does record an audit log entry when the case investigation is nil" do
-      assert capture_log(fn -> Cases.preload_contact_investigations(nil, @admin) end) == ""
+    test "does not record an audit log entry when the case investigation is nil" do
+      AuditLogAssertions.expect_phi_view_logs(0)
+      Cases.preload_contact_investigations(nil, @admin)
     end
   end
 

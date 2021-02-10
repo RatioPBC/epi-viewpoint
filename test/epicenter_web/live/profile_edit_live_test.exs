@@ -26,8 +26,9 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
 
     test "records an audit log entry", %{conn: conn, person: person, user: user} do
-      capture_log(fn -> Pages.ProfileEdit.visit(conn, person) end)
-      |> AuditLogAssertions.assert_viewed_person(user, person)
+      AuditLogAssertions.expect_phi_view_logs(22)
+      Pages.ProfileEdit.visit(conn, person)
+      AuditLogAssertions.verify_phi_view_logged(user, person)
     end
 
     @tag :skip
