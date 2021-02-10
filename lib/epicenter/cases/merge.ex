@@ -1,5 +1,4 @@
 defmodule Epicenter.Cases.Merge do
-  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Merge.SaveMerge
   alias Epicenter.Cases.Person
@@ -36,12 +35,6 @@ defmodule Epicenter.Cases.Merge do
 
   def merge(duplicate_person_ids, into: canonical_person_id, merge_conflict_resolutions: into_person_attrs, current_user: current_user) do
     SaveMerge.merge(duplicate_person_ids, into: canonical_person_id, merge_conflict_resolutions: into_person_attrs, current_user: current_user)
-
-    Cases.merge_people(duplicate_person_ids, canonical_person_id, current_user, %AuditLog.Meta{
-      author_id: current_user.id,
-      reason_action: AuditLog.Revision.merge_people_action(),
-      reason_event: AuditLog.Revision.merge_people_event()
-    })
   end
 
   defp sort(values, sort_fun),

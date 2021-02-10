@@ -300,7 +300,7 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
         isolation_monitoring_starts_on: ~D[2020-11-05]
       })
 
-      Cases.merge_people([meryl.id], alice.id, @admin, Test.Fixtures.admin_audit_meta())
+      Cases.merge_people([meryl], alice.id, @admin, Test.Fixtures.admin_audit_meta())
 
       user = Test.Fixtures.user_attrs(@admin, "the-user") |> Accounts.register_user!()
 

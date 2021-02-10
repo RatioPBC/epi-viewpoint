@@ -31,11 +31,10 @@ defmodule Epicenter.Cases.Person.Duplicates do
     last_names? && (first_names? || dobs? || phones? || addresses?)
   end
 
-  def merge(duplicate_person_ids, canonical_person_id, user, repo_fn) do
-    duplicate_person_ids
-    |> Enum.map(fn duplicate_person_id ->
-      duplicate_person_id
-      |> Cases.get_person(user)
+  def merge(duplicate_people, canonical_person_id, user, repo_fn) do
+    duplicate_people
+    |> Enum.map(fn duplicate_person ->
+      duplicate_person
       |> changeset_for_merge(canonical_person_id, user.id)
       |> repo_fn.()
     end)

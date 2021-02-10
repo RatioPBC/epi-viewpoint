@@ -83,7 +83,6 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
       |> Cases.archive_person(@admin, Test.Fixtures.admin_audit_meta())
 
       create_person("last+first+but-merged", %{first_name: first, last_name: last, dob: ~D[1900-01-01]})
-      |> Map.get(:id)
       |> (&Cases.merge_people([&1], source.id, @admin, Test.Fixtures.admin_audit_meta())).()
 
       # duplicates
@@ -126,7 +125,7 @@ defmodule Epicenter.Cases.Person.DuplicatesTest do
     duplicate1 = Test.Fixtures.person_attrs(@admin, "duplicate1") |> Cases.create_person!()
     duplicate2 = Test.Fixtures.person_attrs(@admin, "duplicate2") |> Cases.create_person!()
 
-    Cases.merge_people([duplicate1.id, duplicate2.id], canonical.id, @admin, Test.Fixtures.admin_audit_meta())
+    Cases.merge_people([duplicate1, duplicate2], canonical.id, @admin, Test.Fixtures.admin_audit_meta())
 
     duplicate1 = Cases.get_person(duplicate1.id, @admin)
     duplicate2 = Cases.get_person(duplicate2.id, @admin)
