@@ -83,7 +83,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
     billy = create_person(user, "billy", %{first_name: "Billy", last_name: "Testuser", dob: ~D[1900-01-01]})
     cindy = create_person(user, "cindy", %{first_name: "Cindy", last_name: "Testuser", dob: ~D[1900-01-01]})
 
-    AuditLogAssertions.expect_phi_view_logs(22)
+    AuditLogAssertions.expect_phi_view_logs(8)
     Pages.PotentialDuplicates.visit(conn, alice)
     AuditLogAssertions.verify_phi_view_logged(user, [alice, billy, cindy])
   end

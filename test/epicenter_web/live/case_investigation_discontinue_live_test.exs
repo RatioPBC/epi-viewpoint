@@ -30,7 +30,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLiveTest do
   test "records an audit log entry", %{conn: conn, case_investigation: case_investigation, user: user} do
     case_investigation = case_investigation |> Cases.preload_person()
 
-    AuditLogAssertions.expect_phi_view_logs(22)
+    AuditLogAssertions.expect_phi_view_logs(2)
     Pages.CaseInvestigationDiscontinue.visit(conn, case_investigation)
     AuditLogAssertions.verify_phi_view_logged(user, case_investigation.person)
   end

@@ -16,7 +16,7 @@ defmodule EpicenterWeb.ContactsLiveTest do
     end
 
     test "records an audit log entry for each person on the page", %{user: user, bob: bob, caroline: caroline, donald: donald, conn: conn} do
-      AuditLogAssertions.expect_phi_view_logs(22)
+      AuditLogAssertions.expect_phi_view_logs(18)
       Pages.Contacts.visit(conn)
       AuditLogAssertions.verify_phi_view_logged(user, [bob, caroline, donald])
     end

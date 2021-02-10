@@ -23,7 +23,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLiveTest do
   end
 
   test "records an audit log entry", %{conn: conn, contact_investigation: contact_investigation, user: user} do
-    AuditLogAssertions.expect_phi_view_logs(22)
+    AuditLogAssertions.expect_phi_view_logs(2)
     Pages.ContactInvestigationDiscontinue.visit(conn, contact_investigation)
     AuditLogAssertions.verify_phi_view_logged(user, contact_investigation.exposed_person)
   end

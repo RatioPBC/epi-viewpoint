@@ -23,8 +23,8 @@ defmodule Epicenter.AuditingRepoTest do
   defmodule StubNotStub do
     @behaviour Epicenter.AuditLog.PhiLogger
 
-    def info(message, metadata),
-      do: Epicenter.AuditLog.PhiLogger.info(message, metadata)
+    def info(message, logged_metadata, unlogged_metadata),
+      do: Epicenter.AuditLog.PhiLogger.info(message, logged_metadata, unlogged_metadata)
   end
 
   setup do

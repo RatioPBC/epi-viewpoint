@@ -22,7 +22,7 @@ defmodule EpicenterWeb.PeopleLiveTest do
       Test.Fixtures.case_investigation_attrs(alice, alice_positive, user, "") |> Cases.create_case_investigation!()
       Test.Fixtures.case_investigation_attrs(billy, billy_positive, user, "") |> Cases.create_case_investigation!()
 
-      AuditLogAssertions.expect_phi_view_logs(22)
+      AuditLogAssertions.expect_phi_view_logs(4)
       Pages.People.visit(conn)
       AuditLogAssertions.verify_phi_view_logged(user, [alice, billy])
     end

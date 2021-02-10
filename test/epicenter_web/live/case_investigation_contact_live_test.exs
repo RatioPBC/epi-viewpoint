@@ -32,7 +32,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       person: person,
       user: user
     } do
-      AuditLogAssertions.expect_phi_view_logs(22)
+      AuditLogAssertions.expect_phi_view_logs(2)
       Pages.CaseInvestigationContact.visit(conn, case_investigation)
       AuditLogAssertions.verify_phi_view_logged(user, person)
     end
@@ -283,7 +283,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLiveTest do
       case_investigation = case_investigation |> Cases.preload_person()
       case_person = case_investigation.person
       exposed_person = contact_investigation.exposed_person
-      AuditLogAssertions.expect_phi_view_logs(22)
+      AuditLogAssertions.expect_phi_view_logs(4)
       Pages.CaseInvestigationContact.visit(conn, case_investigation, contact_investigation)
       AuditLogAssertions.verify_phi_view_logged(user, [case_person, exposed_person])
     end

@@ -110,7 +110,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
 
   describe "case investigations" do
     test "records an audit log entry for the person", %{conn: conn, case_investigation: case_investigation, person: person, user: user} do
-      AuditLogAssertions.expect_phi_view_logs(22)
+      AuditLogAssertions.expect_phi_view_logs(2)
       Pages.InvestigationCompleteInterview.visit(conn, case_investigation)
       AuditLogAssertions.verify_phi_view_logged(user, person)
     end
@@ -173,7 +173,7 @@ defmodule EpicenterWeb.InvestigationCompleteInterviewLiveTest do
     end
 
     test "records an audit log entry for the exposed person", %{conn: conn, contact_investigation: contact_investigation, user: user} do
-      AuditLogAssertions.expect_phi_view_logs(22)
+      AuditLogAssertions.expect_phi_view_logs(2)
       Pages.InvestigationCompleteInterview.visit(conn, contact_investigation)
       AuditLogAssertions.verify_phi_view_logged(user, contact_investigation.exposed_person)
     end

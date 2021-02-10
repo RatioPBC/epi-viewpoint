@@ -92,16 +92,15 @@ defmodule Epicenter.AuditingRepo do
   def view(nil, _user), do: nil
   def view(phi_loggables, %User{} = user) when is_list(phi_loggables), do: Enum.map(phi_loggables, &view(&1, user))
 
-  def view(phi_loggable, %User{id: user_id}) do
+  def view(phi_loggable, %User{id: user_id, tid: user_tid}) do
     subject_type = "Person"
     subject_id = PhiLoggable.phi_identifier(phi_loggable)
 
-    phi_logger().info("User(#{user_id}) viewed #{subject_type}(#{subject_id})",
-      audit_log: true,
-      audit_user_id: user_id,
-      audit_action: "view",
-      audit_subject_id: subject_id,
-      audit_subject_type: subject_type
+    phi_logger().info(
+      "User(#{user_id}) viewed #{subject_type}(#{subject_id})",
+      [audit_log: true, audit_user_id: user_id, audit_action: "view", audit_subject_id: subject_id, audit_subject_type: subject_type],
+      audit_subject_tid: Map.get(phi_loggable, :tid),
+      audit_user_tid: user_tid
     )
 
     phi_loggable
