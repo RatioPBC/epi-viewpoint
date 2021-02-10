@@ -32,7 +32,7 @@ config :epicenter,
   phi_logger: Epicenter.Test.PhiLoggerMock
 
 # Print only warnings and errors during test
-config :logger, level: :info, metadata: :all
+config :logger, level: :warn, metadata: :all
 
 config :phoenix_integration,
   endpoint: EpicenterWeb.Endpoint

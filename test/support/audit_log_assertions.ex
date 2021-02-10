@@ -7,9 +7,11 @@ defmodule Epicenter.Test.AuditLogAssertions do
   def expect_phi_view_logs(count) do
     Mox.verify_on_exit!()
 
+    log_level = :info
+
     Test.PhiLoggerMock
-    |> expect(:info, count, fn message, metadata, unlogged_metadata ->
-      Process.put(:phi_logger_messages, phi_logger_messages() ++ [{message, metadata, unlogged_metadata}])
+    |> expect(log_level, count, fn message, metadata, unlogged_metadata ->
+      Process.put(:phi_logger_messages, phi_logger_messages() ++ [{message, metadata, Keyword.put(unlogged_metadata, :log_level, log_level)}])
       :ok
     end)
   end
@@ -41,6 +43,6 @@ defmodule Epicenter.Test.AuditLogAssertions do
     end
   end
 
-  defp phi_logger_messages(),
+  def phi_logger_messages(),
     do: Process.get(:phi_logger_messages, [])
 end

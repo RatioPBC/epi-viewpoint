@@ -2,7 +2,6 @@ defmodule Epicenter.AuditingRepoTest do
   use Epicenter.DataCase, async: true
 
   import Euclid.Extra.Enum, only: [tids: 1]
-  import ExUnit.CaptureLog
 
   alias Epicenter.Accounts
   alias Epicenter.AuditingRepo
@@ -16,20 +15,6 @@ defmodule Epicenter.AuditingRepoTest do
 
   setup :persist_admin
   @admin Test.Fixtures.admin()
-
-  # This indirectly uses the prod logger so we
-  # can test the formatting of the logs in this test
-  defmodule StubNotStub do
-    @behaviour Epicenter.AuditLog.PhiLogger
-
-    def info(message, logged_metadata, unlogged_metadata),
-      do: Epicenter.AuditLog.PhiLogger.info(message, logged_metadata, unlogged_metadata)
-  end
-
-  setup do
-    Mox.stub_with(Epicenter.Test.PhiLoggerMock, StubNotStub)
-    :ok
-  end
 
   describe "inserting" do
     test "it creates revision, and submits the original changeset" do
@@ -422,68 +407,59 @@ defmodule Epicenter.AuditingRepoTest do
       ]
     end
 
-    test "formats the log message and uses info level", %{user: user, subject: subject} do
-      Application.put_env(:logger, :console, format: "$level - $message")
+    test "uses info level", %{user: user, subject: subject} do
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.view(subject, user)
+      [{_, _, unlogged_metadata}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.view(subject, user)
-             end) =~ "info - User(testuser) viewed Person(testperson)"
+      assert Keyword.get(unlogged_metadata, :log_level) == :info
     end
 
     test "sets `audit_log: true` metadata", %{user: user, subject: subject} do
-      Application.put_env(:logger, :console, format: "$metadata[audit_log]", metadata: [:audit_log])
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.view(subject, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.view(subject, user)
-             end) =~ "audit_log=true"
+      assert Keyword.get(metadata, :audit_log) == true
     end
 
     test "sets audit_user_id metadata", %{user: user, subject: subject} do
-      Application.put_env(:logger, :console, format: "$metadata[audit_user_id]", metadata: [:audit_user_id])
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.view(subject, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.view(subject, user)
-             end) =~ "audit_user_id=testuser"
+      assert Keyword.get(metadata, :audit_user_id) == "testuser"
     end
 
     test "sets `audit_action: 'view'` metadata", %{user: user, subject: subject} do
-      Application.put_env(:logger, :console, format: "$metadata[audit_action]", metadata: [:audit_action])
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.view(subject, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.view(subject, user)
-             end) =~ "audit_action=view"
+      assert Keyword.get(metadata, :audit_action) == "view"
     end
 
     test "sets audit_subject_id and audit_subject_type metadata", %{user: user, subject: subject} do
-      Application.put_env(:logger, :console,
-        format: "$metadata[audit_subject_type] $metadata[audit_subject_id]",
-        metadata: [:audit_subject_type, :audit_subject_id]
-      )
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.view(subject, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.view(subject, user)
-             end) =~ "audit_subject_type=Person audit_subject_id=testperson"
+      assert Keyword.get(metadata, :audit_subject_type) == "Person"
+      assert Keyword.get(metadata, :audit_subject_id) == "testperson"
     end
 
     test "a list of people", %{user: user, subject: subject} do
-      Application.put_env(:logger, :console, format: "$message")
-      audit_log = capture_log(fn -> AuditingRepo.view([subject, %Person{id: "testperson2"}], user) end)
+      Test.AuditLogAssertions.expect_phi_view_logs(2)
+      AuditingRepo.view([subject, %Person{id: "testperson2"}], user)
+      [{message1, _, _}, {message2, _, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert audit_log =~ "User(testuser) viewed Person(testperson)"
-      assert audit_log =~ "User(testuser) viewed Person(testperson2)"
+      assert message1 == "User(testuser) viewed Person(testperson)"
+      assert message2 == "User(testuser) viewed Person(testperson2)"
     end
 
     test "it doesn't log a person if the person is nil", %{user: user} do
-      assert capture_log(fn ->
-               AuditingRepo.view(nil, user)
-             end) == ""
-    end
-
-    @tag :skip
-    test "it doesn't log a person when the id is missing", %{user: user} do
-      assert capture_log(fn ->
-               AuditingRepo.view(%Person{}, user)
-             end) == ""
+      Test.AuditLogAssertions.expect_phi_view_logs(0)
+      AuditingRepo.view(nil, user)
     end
   end
 
@@ -520,53 +496,50 @@ defmodule Epicenter.AuditingRepoTest do
       assert fetched_contact_investigation.tid == "contact-investigation-tid"
     end
 
-    test "formats the log message and uses info level", %{user: user, contact_investigation: contact_investigation} do
-      Application.put_env(:logger, :console, format: "$level - $message")
+    test "uses info level", %{user: user, contact_investigation: contact_investigation} do
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
+      [{_, _, unlogged_metadata}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
-             end) =~ "info - User(testuser) viewed Person(#{contact_investigation.exposed_person_id})"
+      assert Keyword.get(unlogged_metadata, :log_level) == :info
     end
 
     test "sets `audit_log: true` metadata", %{user: user, contact_investigation: contact_investigation} do
-      Application.put_env(:logger, :console, format: "$metadata[audit_log]", metadata: [:audit_log])
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
-             end) =~ "audit_log=true"
+      assert Keyword.get(metadata, :audit_log) == true
     end
 
     test "sets audit_user_id metadata", %{user: user, contact_investigation: contact_investigation} do
-      Application.put_env(:logger, :console, format: "$metadata[audit_user_id]", metadata: [:audit_user_id])
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
-             end) =~ "audit_user_id=testuser"
+      assert Keyword.get(metadata, :audit_user_id) == "testuser"
     end
 
     test "sets `audit_action: 'view'` metadata", %{user: user, contact_investigation: contact_investigation} do
-      Application.put_env(:logger, :console, format: "$metadata[audit_action]", metadata: [:audit_action])
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
-             end) =~ "audit_action=view"
+      assert Keyword.get(metadata, :audit_action) == "view"
     end
 
     test "sets audit_subject_id and audit_subject_type metadata", %{user: user, contact_investigation: contact_investigation} do
-      Application.put_env(:logger, :console,
-        format: "$metadata[audit_subject_type] $metadata[audit_subject_id]",
-        metadata: [:audit_subject_type, :audit_subject_id]
-      )
+      Test.AuditLogAssertions.expect_phi_view_logs(1)
+      AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
+      [{_, metadata, _}] = Test.AuditLogAssertions.phi_logger_messages()
 
-      assert capture_log(fn ->
-               AuditingRepo.get(ContactInvestigation, contact_investigation.id, user)
-             end) =~ "audit_subject_type=Person audit_subject_id=#{contact_investigation.exposed_person_id}"
+      assert Keyword.get(metadata, :audit_subject_type) == "Person"
+      assert Keyword.get(metadata, :audit_subject_id) == contact_investigation.exposed_person_id
     end
 
     test "it doesn't log a person if the person is not found", %{user: user} do
-      assert capture_log(fn ->
-               AuditingRepo.get(ContactInvestigation, Ecto.UUID.generate(), user)
-             end) == ""
+      Test.AuditLogAssertions.expect_phi_view_logs(0)
+      AuditingRepo.get(ContactInvestigation, Ecto.UUID.generate(), user)
     end
   end
 
