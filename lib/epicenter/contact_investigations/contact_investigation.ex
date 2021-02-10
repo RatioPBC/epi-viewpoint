@@ -14,6 +14,7 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
     clinical_status
     deleted_at
     exposed_on
+    exposed_person_id
     guardian_name
     guardian_phone
     household_member
@@ -75,6 +76,10 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
     |> validate_guardian_fields()
     |> strip_non_digits_from_guardian_phone()
     |> validate_phi(:contact_investigation)
+  end
+
+  def changeset_for_merge(changeset_or_investigation, canonical_person_id) do
+    changeset(changeset_or_investigation, %{exposed_person_id: canonical_person_id})
   end
 
   def validate_guardian_fields(changeset) do

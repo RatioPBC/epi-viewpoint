@@ -36,6 +36,16 @@ defmodule Epicenter.Test.AuditLogAssertions do
     phi_logger_messages() |> IO.inspect(label: "phi_logger_messages")
   end
 
+  # this function will only work if you call expect_phi_view_logs() before the subject action
+  def refute_phi_view_logged(user, people) do
+    for person <- List.wrap(people) do
+      unexpected_log_text = "User(#{user.id}) viewed Person(#{person.id})"
+
+      refute_receive({:logged, ^unexpected_log_text}, nil, "view unexpectedly logged for person: #{person.tid}")
+    end
+  end
+
+  # this function will only work if you call expect_phi_view_logs() before the subject action
   def verify_phi_view_logged(user, person_or_people) do
     messages = phi_logger_messages() |> Enum.map(fn {message, _metadata, _unlogged_metadata} -> message end) |> MapSet.new()
     people = List.wrap(person_or_people)

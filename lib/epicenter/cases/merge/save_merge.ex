@@ -3,6 +3,7 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
   alias Epicenter.Cases.Person
+  alias Epicenter.ContactInvestigations
 
   def merge(duplicate_person_ids, into: canonical_person_id, merge_conflict_resolutions: merge_conflict_resolutions, current_user: current_user) do
     people =
@@ -13,8 +14,8 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
     canonical_person = Cases.get_person_without_audit_logging(canonical_person_id)
 
     merge_contact_info(people, canonical_person, current_user)
-
     merge_demographics(people, canonical_person, merge_conflict_resolutions, current_user)
+    merge_contact_investigations(people, canonical_person, current_user)
   end
 
   defp merge_contact_info(people, canonical_person, current_user) do
@@ -55,6 +56,12 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
   end
 
   defp merge_demographics(people, canonical_person, merge_conflict_resolutions, current_user) do
+    # 1. create but don't insert a new demographics snapshot row for each duplicate person
+    #    by coalescing the demographics on each duplicate person respectively
+    # 2. move all demographics rows from the duplicate people to the canonical person
+    # 3. commit the flattened snapshot demographics to their duplicate person
+    #    (so that they still have a name)
+    # 4. Add a demographics entry to the canonical person with the merge conflict resolutions
     flattened_demographics =
       Enum.reduce(people, %{}, fn duplicate_person, acc ->
         Map.put(acc, duplicate_person.id, Person.coalesce_demographics(duplicate_person))
@@ -93,6 +100,22 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
         |> Enum.into(%{})
 
       Cases.create_demographic({attrs, audit_meta(current_user, Revision.insert_demographics_action())})
+    end
+  end
+
+  defp merge_contact_investigations(people, canonical_person, current_user) do
+    for duplicate_person <- people do
+      duplicate_person =
+        duplicate_person
+        |> Cases.preload_contact_investigations(current_user, false)
+
+      for contact_investigation <- duplicate_person.contact_investigations do
+        ContactInvestigations.merge(
+          contact_investigation,
+          canonical_person.id,
+          audit_meta(current_user, Revision.update_contact_investigation_action())
+        )
+      end
     end
   end
 

@@ -63,16 +63,22 @@ defmodule Epicenter.Cases do
   def list_case_investigations(filter, assigned_to_id: user_id, user: %User{} = current_user),
     do: CaseInvestigation.Query.list(filter) |> CaseInvestigation.Query.assigned_to_user(user_id) |> AuditingRepo.all(current_user)
 
-  def preload_contact_investigations(has_many_contacts_or_nil, user) do
-    has_many_contacts_or_nil
-    |> Repo.preload(
-      contact_investigations:
-        {ContactInvestigation.Query.display_order(),
-         [
-           exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
-         ]}
-    )
-    |> log_contact_investigations(user)
+  def preload_contact_investigations(has_many_contacts_or_nil, user, with_audit_logging \\ true) do
+    preloaded =
+      has_many_contacts_or_nil
+      |> Repo.preload(
+        contact_investigations:
+          {ContactInvestigation.Query.display_order(),
+           [
+             exposed_person: [phones: Ecto.Query.from(p in Phone, order_by: p.seq), demographics: Ecto.Query.from(d in Demographic, order_by: d.seq)]
+           ]}
+      )
+
+    if with_audit_logging do
+      preloaded |> log_contact_investigations(user)
+    end
+
+    preloaded
   end
 
   def preload_people(case_investigations) do

@@ -20,8 +20,7 @@ defmodule Epicenter.AuditLog.PhiLoggableTest do
 
       {:ok, contact_investigation} =
         Test.Fixtures.contact_investigation_attrs("contact-investigation-tid", %{
-          exposing_case_id: case_investigation.id,
-          exposed_person_id: Ecto.UUID.generate()
+          exposing_case_id: case_investigation.id
         })
         |> Test.Fixtures.wrap_with_audit_meta()
         |> ContactInvestigations.create()

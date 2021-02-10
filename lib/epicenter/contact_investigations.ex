@@ -52,4 +52,10 @@ defmodule Epicenter.ContactInvestigations do
 
   def update(%ContactInvestigation{} = investigation, {attrs, audit_meta}),
     do: investigation |> change(attrs) |> AuditingRepo.update(audit_meta)
+
+  def merge(%ContactInvestigation{} = investigation, canonical_person_id, audit_meta),
+    do:
+      investigation
+      |> ContactInvestigation.changeset_for_merge(canonical_person_id)
+      |> AuditingRepo.update(audit_meta)
 end

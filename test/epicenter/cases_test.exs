@@ -890,6 +890,8 @@ defmodule Epicenter.CasesTest do
   end
 
   describe "preload_contact_investigations" do
+    alias Epicenter.Cases.Merge
+
     setup :create_multiple_case_and_contact_investigations
 
     test "hydrates exactly into an contact_investigation's exposed_person's demographics and phones", %{case_investigation: case_investigation} do
@@ -936,6 +938,22 @@ defmodule Epicenter.CasesTest do
       AuditLogAssertions.expect_phi_view_logs(0)
       Cases.preload_contact_investigations(nil, @admin)
     end
+
+    test "merging a contact investigation's exposed person into another causes the canonical person to be logged instead", %{
+      case_investigation: case_investigation,
+      contact_investigation: contact_investigation
+    } do
+      {:ok, %{exposed_person: duplicate_person}} = create_contact_investigation(case_investigation, "Merged", "1111111234")
+      canonical_person = Test.Fixtures.person_attrs(@admin, "canonical-person") |> Cases.create_person!()
+
+      Merge.merge([duplicate_person.id], into: canonical_person.id, merge_conflict_resolutions: %{}, current_user: @admin)
+
+      AuditLogAssertions.expect_phi_view_logs(2)
+      [case_investigation] |> Cases.preload_contact_investigations(@admin)
+      AuditLogAssertions.verify_phi_view_logged(@admin, contact_investigation.exposed_person)
+      AuditLogAssertions.verify_phi_view_logged(@admin, canonical_person)
+      AuditLogAssertions.refute_phi_view_logged(@admin, duplicate_person)
+    end
   end
 
   describe "preload_exposed_person" do
@@ -955,6 +973,21 @@ defmodule Epicenter.CasesTest do
     end
   end
 
+  defp create_contact_investigation(case_investigation, first_name, phone_number) do
+    ContactInvestigations.create({
+      Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})
+      |> Map.put(:exposed_person, %{
+        demographics: [
+          %{first_name: first_name}
+        ],
+        phones: [
+          %{number: phone_number}
+        ]
+      }),
+      Test.Fixtures.admin_audit_meta()
+    })
+  end
+
   defp create_multiple_case_and_contact_investigations(_context) do
     creator = Test.Fixtures.user_attrs(@admin, "creator") |> Accounts.register_user!()
     {:ok, person} = Test.Fixtures.person_attrs(creator, "person1") |> Cases.create_person()
@@ -964,37 +997,13 @@ defmodule Epicenter.CasesTest do
       Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
       |> Cases.create_case_investigation!()
 
-    {:ok, contact_investigation} =
-      ContactInvestigations.create({
-        Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})
-        |> Map.put(:exposed_person, %{
-          demographics: [
-            %{first_name: "Cindy"}
-          ],
-          phones: [
-            %{number: "1111111987"}
-          ]
-        }),
-        Test.Fixtures.admin_audit_meta()
-      })
+    {:ok, contact_investigation} = create_contact_investigation(case_investigation, "Cindy", "1111111987")
 
     other_case_investigation =
       Test.Fixtures.case_investigation_attrs(person, lab_result, creator, "person1_case_investigation", %{})
       |> Cases.create_case_investigation!()
 
-    {:ok, other_contact_investigation} =
-      ContactInvestigations.create({
-        Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: other_case_investigation.id})
-        |> Map.put(:exposed_person, %{
-          demographics: [
-            %{first_name: "Cindy"}
-          ],
-          phones: [
-            %{number: "1111111987"}
-          ]
-        }),
-        Test.Fixtures.admin_audit_meta()
-      })
+    {:ok, other_contact_investigation} = create_contact_investigation(other_case_investigation, "Cindy", "1111111987")
 
     [
       case_investigation: case_investigation,

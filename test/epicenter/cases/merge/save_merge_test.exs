@@ -9,6 +9,7 @@ defmodule Epicenter.Cases.SaveMergeTest do
   alias Epicenter.Cases
   alias Epicenter.Cases.Merge
   alias Epicenter.Cases.Person
+  alias Epicenter.ContactInvestigations
   alias Epicenter.Test
 
   setup :persist_admin
@@ -130,13 +131,6 @@ defmodule Epicenter.Cases.SaveMergeTest do
   end
 
   describe "merging the demographics" do
-    # TODO
-    # coalesce the demographics on the duplicate person
-    # create but don't insert a new demographics
-    # move the demographics from the duplicate to the canonical person
-    # commit the flattened new demographic to the duplicate person (so that they still have a name)
-    # Add a demographics entry to the canonical person with the merge conflict resolutions
-
     defp create_person(tid, demographic_attrs, person_attrs \\ %{}) do
       {person_attrs, audit_meta} = Test.Fixtures.person_attrs(@admin, tid, person_attrs, demographics: false)
 
@@ -209,6 +203,51 @@ defmodule Epicenter.Cases.SaveMergeTest do
 
       assert merged_kate[:first_name] == merge_conflict_resolutions[:first_name]
       assert merged_kate[:dob] == merge_conflict_resolutions[:dob]
+    end
+  end
+
+  describe "merging the contact investigations" do
+    test "it moves contact investigations from the duplicate person to the canonical person", %{user: user} do
+      sick_person = Test.Fixtures.person_attrs(user, "sick-person") |> Cases.create_person!()
+
+      contact_investigation = create_contact_investigation(@admin, sick_person, %{}, %{}, %{tid: "contact-investigation-to-move"})
+      duplicate_person = contact_investigation.exposed_person
+      case_investigation = Cases.get_case_investigation(contact_investigation.exposing_case_id, @admin)
+
+      canonical_person = Test.Fixtures.person_attrs(user, "canonical-person") |> Cases.create_person!()
+
+      Merge.merge([duplicate_person.id], into: canonical_person.id, merge_conflict_resolutions: %{}, current_user: user)
+
+      # contact investigation should have been moved
+      contact_investigation = ContactInvestigations.get(contact_investigation.id, @admin) |> ContactInvestigations.preload_exposed_person()
+      assert contact_investigation.exposed_person.id == canonical_person.id
+
+      # canonical_person  should have the contact_investigation
+      canonical_person = Cases.get_person(canonical_person.id, @admin) |> Cases.preload_contact_investigations(@admin)
+      assert canonical_person.contact_investigations |> tids() == ["contact-investigation-to-move"]
+
+      # case_investigation should show details for the canonical person instead of the duplicate person
+      case_investigation = case_investigation |> Cases.preload_contact_investigations(@admin, false)
+      assert case_investigation.contact_investigations |> tids() == ["contact-investigation-to-move"]
+    end
+
+    defp create_contact_investigation(user, sick_person, lab_result_attrs, case_investigation_attrs, contact_investigation_attrs) do
+      lab_result =
+        Test.Fixtures.lab_result_attrs(sick_person, user, "lab_result", ~D[2020-08-07], lab_result_attrs)
+        |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, user, "the contagious person's case investigation", case_investigation_attrs)
+        |> Cases.create_case_investigation!()
+
+      {:ok, contact_investigation} =
+        {Test.Fixtures.contact_investigation_attrs(
+           "contact_investigation",
+           Map.put(contact_investigation_attrs, :exposing_case_id, case_investigation.id)
+         ), Test.Fixtures.admin_audit_meta()}
+        |> ContactInvestigations.create()
+
+      contact_investigation
     end
   end
 
