@@ -13,7 +13,6 @@ defmodule Epicenter.AuditingRepoTest do
   alias Epicenter.ContactInvestigations
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Test
-  alias Epicenter.Test.AuditLogAssertions
 
   setup :persist_admin
   @admin Test.Fixtures.admin()
@@ -581,12 +580,6 @@ defmodule Epicenter.AuditingRepoTest do
 
     test "returns all the records for a given query" do
       assert Person.Query.filter_with_case_investigation(:all) |> AuditingRepo.all(@admin) |> tids() == ~w{alice billy}
-    end
-
-    test "records all the phi viewed for fetched records", %{alice: alice, billy: billy} do
-      capture_log(fn -> Person.Query.filter_with_case_investigation(:all) |> AuditingRepo.all(@admin) end)
-      |> AuditLogAssertions.assert_viewed_person(@admin, alice)
-      |> AuditLogAssertions.assert_viewed_person(@admin, billy)
     end
   end
 end
