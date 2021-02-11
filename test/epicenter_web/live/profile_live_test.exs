@@ -237,6 +237,37 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
   end
 
+  describe "when person has been merged" do
+    test "redirects to the canonical record", %{conn: conn, person: canonical_person} do
+      duplicate_person = Test.Fixtures.person_attrs(@admin, "duplicate-person") |> Cases.create_person!()
+      Cases.merge_people([duplicate_person], canonical_person.id, @admin, Test.Fixtures.admin_audit_meta())
+
+      Pages.Profile.visit(conn, duplicate_person)
+      |> Pages.Profile.assert_here(canonical_person)
+    end
+
+    test "follows redirection chain when multiple duplicates have been merged", %{conn: conn, person: canonical_person} do
+      duplicate_person_1 = Test.Fixtures.person_attrs(@admin, "duplicate-person-1") |> Cases.create_person!()
+      duplicate_person_2 = Test.Fixtures.person_attrs(@admin, "duplicate-person-2") |> Cases.create_person!()
+
+      Cases.merge_people([duplicate_person_2], duplicate_person_1.id, @admin, Test.Fixtures.admin_audit_meta())
+      Cases.merge_people([duplicate_person_1], canonical_person.id, @admin, Test.Fixtures.admin_audit_meta())
+
+      Pages.Profile.visit(conn, duplicate_person_2)
+      |> Pages.Profile.assert_here(canonical_person)
+    end
+
+    test "doesn't get stuck in redirect cycles", %{conn: conn} do
+      duplicate_person_1 = Test.Fixtures.person_attrs(@admin, "duplicate-person-1") |> Cases.create_person!()
+      duplicate_person_2 = Test.Fixtures.person_attrs(@admin, "duplicate-person-2") |> Cases.create_person!()
+
+      Cases.merge_people([duplicate_person_2], duplicate_person_1.id, @admin, Test.Fixtures.admin_audit_meta())
+      Cases.merge_people([duplicate_person_1], duplicate_person_2.id, @admin, Test.Fixtures.admin_audit_meta())
+
+      Pages.Profile.visit(conn, duplicate_person_1)
+    end
+  end
+
   describe "case investigations" do
     test "it shows a pending case investigation", %{conn: conn, person: person, user: user} do
       create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])

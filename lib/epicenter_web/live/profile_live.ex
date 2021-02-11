@@ -23,20 +23,23 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
-  alias Epicenter.AuditingRepo
   alias Epicenter.AuditLog
+  alias Epicenter.AuditingRepo
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.Person
   alias Epicenter.ContactInvestigations
+  alias EpicenterWeb.ContactInvestigation
   alias EpicenterWeb.Format
   alias EpicenterWeb.InvestigationNotesSection
-  alias EpicenterWeb.ContactInvestigation
 
   @clock Application.get_env(:epicenter, :clock)
 
   def mount(%{"id" => person_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    person = Cases.get_person(person_id, socket.assigns.current_user) |> Cases.preload_demographics()
+
+    potential_person = Cases.get_person(person_id, socket.assigns.current_user)
+    person = canonical_person(potential_person, socket.assigns.current_user, %{}) |> Cases.preload_demographics()
 
     socket
     |> assign_defaults(body_class: "body-background-color")
@@ -321,4 +324,14 @@ defmodule EpicenterWeb.ProfileLive do
   def detailed_ethnicities(%{ethnicity: nil}), do: []
   def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
   def detailed_ethnicities(person), do: person.ethnicity.detailed
+
+  defp canonical_person(%Person{merged_into_id: nil} = person, _current_user, _people_seen), do: person
+
+  defp canonical_person(%Person{merged_into_id: merged_into_id} = person, current_user, people_seen) do
+    if people_seen[person.id] do
+      person
+    else
+      canonical_person(Cases.get_person(merged_into_id, current_user), current_user, Map.put(people_seen, person.id, true))
+    end
+  end
 end
