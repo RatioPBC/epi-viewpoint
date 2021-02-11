@@ -3,6 +3,20 @@ defmodule Epicenter.Extra.EnumTest do
 
   alias Epicenter.Extra
 
+  describe "equal_ignoring_order?" do
+    test "returns true if the first enumerable is equal to the second, ignoring order" do
+      assert Extra.Enum.equal_ignoring_order?(["c", "a", "d", "b"], ["a", "b", "c", "d"])
+      refute Extra.Enum.equal_ignoring_order?(["c", "e", "d", "b"], ["a", "b", "c", "d"])
+    end
+
+    test "handles empty enumerables and nils" do
+      refute Extra.Enum.equal_ignoring_order?(nil, ["a", "b"])
+      assert Extra.Enum.equal_ignoring_order?(nil, nil)
+      refute Extra.Enum.equal_ignoring_order?(["a", "b"], nil)
+      assert Extra.Enum.equal_ignoring_order?([], [])
+    end
+  end
+
   describe "fetch_multiple" do
     test "fetches from multiple indices" do
       ~w{zero one two three four five}
@@ -45,6 +59,20 @@ defmodule Epicenter.Extra.EnumTest do
       assert Extra.Enum.sort_uniq([3, 2, 2, 3, 1]) == [1, 2, 3]
       assert Extra.Enum.sort_uniq([3, 2, 2, 3, 1], &(&1 >= &2)) == [3, 2, 1]
       assert Extra.Enum.sort_uniq([3, 2, 2, 3, 1], :desc) == [3, 2, 1]
+    end
+  end
+
+  describe "subset?" do
+    test "returns true if the first enumerable is a subset of the second, ignoring order" do
+      assert Extra.Enum.subset?(["c", "a"], ["a", "b", "c", "d"])
+      refute Extra.Enum.subset?(["c", "e"], ["a", "b", "c", "d"])
+    end
+
+    test "handles empty enumerables and nils" do
+      refute Extra.Enum.subset?(nil, ["a", "b"])
+      refute Extra.Enum.subset?(nil, nil)
+      refute Extra.Enum.subset?(["a", "b"], nil)
+      assert Extra.Enum.subset?([], [])
     end
   end
 end

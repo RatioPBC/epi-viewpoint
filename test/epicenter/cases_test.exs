@@ -950,9 +950,7 @@ defmodule Epicenter.CasesTest do
 
       AuditLogAssertions.expect_phi_view_logs(2)
       [case_investigation] |> Cases.preload_contact_investigations(@admin)
-      AuditLogAssertions.verify_phi_view_logged(@admin, contact_investigation.exposed_person)
-      AuditLogAssertions.verify_phi_view_logged(@admin, canonical_person)
-      AuditLogAssertions.refute_phi_view_logged(@admin, duplicate_person)
+      AuditLogAssertions.verify_phi_view_logged(@admin, [contact_investigation.exposed_person, canonical_person], match: :exact)
     end
   end
 

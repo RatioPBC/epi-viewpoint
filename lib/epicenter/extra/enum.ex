@@ -7,6 +7,9 @@ defmodule Epicenter.Extra.Enum do
     end
   end
 
+  def equal_ignoring_order?(a, b),
+    do: MapSet.equal?(MapSet.new(a || []), MapSet.new(b || []))
+
   def fetch_multiple(enum, indices) do
     for index <- indices do
       Enum.fetch!(enum, index)
@@ -30,4 +33,10 @@ defmodule Epicenter.Extra.Enum do
 
   def sort_uniq(enum, sort_fun),
     do: enum |> Enum.sort(sort_fun) |> Enum.uniq()
+
+  def subset?(a, b) when is_nil(a) or is_nil(b),
+    do: false
+
+  def subset?(a, b),
+    do: MapSet.subset?(MapSet.new(a || []), MapSet.new(b || []))
 end

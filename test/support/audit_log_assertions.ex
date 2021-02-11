@@ -1,12 +1,13 @@
 defmodule Epicenter.Test.AuditLogAssertions do
+  import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Mox
 
+  alias Epicenter.Extra
   alias Epicenter.Test
 
   def expect_phi_view_logs(count) do
     Mox.verify_on_exit!()
-
     log_level = :info
 
     Test.PhiLoggerMock
@@ -20,26 +21,29 @@ defmodule Epicenter.Test.AuditLogAssertions do
     phi_logger_messages() |> IO.inspect(label: "phi_logger_messages")
   end
 
-  # this function will only work if you call expect_phi_view_logs() before the subject action
-  def refute_phi_view_logged(user, people) do
-    for person <- List.wrap(people) do
-      unexpected_log_text = "User(#{user.id}) viewed Person(#{person.id})"
-
-      refute_receive({:logged, ^unexpected_log_text}, nil, "view unexpectedly logged for person: #{person.tid}")
-    end
-  end
-
-  # this function will only work if you call expect_phi_view_logs() before the subject action
-  def verify_phi_view_logged(user, person_or_people) do
-    messages = phi_logger_messages() |> Enum.map(fn {message, _metadata, _unlogged_metadata} -> message end) |> MapSet.new()
+  def verify_phi_view_logged(user, person_or_people, opts \\ []) do
+    messages = phi_logger_messages() |> Enum.map(fn {message, _metadata, _unlogged_metadata} -> message end)
     people = List.wrap(person_or_people)
-    expected_messages = people |> Enum.map(&"User(#{user.id}) viewed Person(#{&1.id})") |> MapSet.new()
+    expected_messages = people |> Enum.map(&"User(#{user.id}) viewed Person(#{&1.id})")
 
-    unless MapSet.subset?(expected_messages, messages) do
+    if Enum.empty?(messages) do
       flunk """
-      Expected phi logs to contain: #{expected_messages |> MapSet.to_list() |> inspect()}
-      but got: #{messages |> MapSet.to_list() |> inspect()}
+      Nothing was logged to the PHI audit log. Make sure you call `#{__MODULE__}.expect_phi_view_logs`
+      before calling code that writes to the PHI audit log.
       """
+    end
+
+    case Keyword.get(opts, :match, :subset) do
+      :subset ->
+        unless Extra.Enum.subset?(expected_messages, messages) do
+          flunk """
+          Expected phi logs to contain: #{inspect(expected_messages)}
+          but got: #{inspect(messages)}
+          """
+        end
+
+      :exact ->
+        assert_eq(expected_messages, messages, ignore_order: true)
     end
   end
 
