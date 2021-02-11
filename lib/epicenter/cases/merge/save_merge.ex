@@ -2,6 +2,7 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
   alias Epicenter.AuditLog
   alias Epicenter.AuditLog.Revision
   alias Epicenter.Cases
+  alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.ContactInvestigations
 
@@ -142,8 +143,16 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
     for duplicate_person <- people do
       duplicate_person = duplicate_person |> Cases.preload_lab_results()
 
+      canonical_person = canonical_person.id |> Cases.get_person_without_audit_logging() |> Cases.preload_lab_results()
+      canonical_person_fingerprints = canonical_person.lab_results |> Enum.map(& &1.fingerprint)
+
       for lab_result <- duplicate_person.lab_results do
-        lab_result |> Cases.reassociate_lab_result(canonical_person.id, audit_meta(current_user, Revision.update_lab_result_action()))
+        changeset = lab_result |> LabResult.changeset_for_merge(canonical_person.id)
+        fingerprint = changeset |> LabResult.generate_fingerprint()
+
+        if Enum.find(canonical_person_fingerprints, fn fp -> fp == fingerprint end) == nil do
+          lab_result |> Cases.reassociate_lab_result(canonical_person.id, audit_meta(current_user, Revision.update_lab_result_action()))
+        end
       end
     end
   end

@@ -880,6 +880,26 @@ defmodule Epicenter.Cases.ImportTest do
       assert case_investigation.id == existing_case_investigation.id
     end
 
+    test "does not create case investigation for a positive lab result when multiple case investigations exist", %{
+      originator: originator,
+      alice: alice,
+      positive_lab_result: positive_lab_result,
+      detected_lab_result: detected_lab_result
+    } do
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(alice, positive_lab_result, originator, "investigation")
+        |> Cases.create_case_investigation!()
+
+      another_case_investigation =
+        Test.Fixtures.case_investigation_attrs(alice, positive_lab_result, originator, "another-investigation")
+        |> Cases.create_case_investigation!()
+
+      :already_exists = Import.find_or_create_case_investigation_for_positive_lab_result(detected_lab_result, alice, originator)
+
+      existing_case_investigations = alice |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> Enum.map(& &1.tid)
+      assert [case_investigation.tid, another_case_investigation.tid] == existing_case_investigations
+    end
+
     test "does not create case investigation for a negative or blank lab result", %{
       originator: originator,
       alice: alice,

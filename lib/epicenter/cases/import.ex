@@ -233,9 +233,6 @@ defmodule Epicenter.Cases.Import do
     |> Cases.preload_case_investigations()
     |> Map.get(:case_investigations)
     |> case do
-      [_case_investigation] ->
-        :already_exists
-
       [] ->
         # TODO currently assuming max of 1 case investigation and so, hardcoding name to "001"
         %{person_id: person_id, initiating_lab_result_id: lab_result_id, name: "001"}
@@ -243,6 +240,9 @@ defmodule Epicenter.Cases.Import do
         |> Cases.create_case_investigation!()
 
         :ok
+
+      [_case_investigation | _tl] ->
+        :already_exists
     end
   end
 

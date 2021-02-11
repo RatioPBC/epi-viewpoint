@@ -302,25 +302,68 @@ defmodule Epicenter.Cases.SaveMergeTest do
     end
   end
 
-  test "lab results are moved from the duplicates to the canonical person", %{user: user} do
-    canonical = Test.Fixtures.person_attrs(user, "canonical") |> Cases.create_person!()
-    duplicate1 = Test.Fixtures.person_attrs(user, "duplicate1") |> Cases.create_person!()
-    duplicate2 = Test.Fixtures.person_attrs(user, "duplicate2") |> Cases.create_person!()
+  describe "merging lab_results" do
+    test "lab results are moved from the duplicates to the canonical person", %{user: user} do
+      canonical = Test.Fixtures.person_attrs(user, "canonical") |> Cases.create_person!()
+      duplicate1 = Test.Fixtures.person_attrs(user, "duplicate1") |> Cases.create_person!()
+      duplicate2 = Test.Fixtures.person_attrs(user, "duplicate2") |> Cases.create_person!()
 
-    result1 = Test.Fixtures.lab_result_attrs(duplicate1, user, "result1", ~D[2020-08-07]) |> Cases.create_lab_result!()
-    result2 = Test.Fixtures.lab_result_attrs(duplicate2, user, "result2", ~D[2020-08-07]) |> Cases.create_lab_result!()
+      result1 = Test.Fixtures.lab_result_attrs(duplicate1, user, "result1", ~D[2020-08-07]) |> Cases.create_lab_result!()
+      result2 = Test.Fixtures.lab_result_attrs(duplicate2, user, "result2", ~D[2020-08-07]) |> Cases.create_lab_result!()
 
-    Merge.merge([duplicate1.id, duplicate2.id], into: canonical.id, merge_conflict_resolutions: %{}, current_user: user)
+      Merge.merge([duplicate1.id, duplicate2.id], into: canonical.id, merge_conflict_resolutions: %{}, current_user: user)
 
-    canonical = Cases.preload_lab_results(canonical)
+      canonical = Cases.preload_lab_results(canonical)
 
-    lab_result_ids = canonical.lab_results |> Enum.map(& &1.id)
+      lab_result_ids = canonical.lab_results |> Enum.map(& &1.id)
 
-    assert Enum.member?(lab_result_ids, result1.id)
-    assert Enum.member?(lab_result_ids, result2.id)
+      assert Enum.member?(lab_result_ids, result1.id)
+      assert Enum.member?(lab_result_ids, result2.id)
 
-    assert_recent_audit_log(result1, user, action: Revision.update_lab_result_action(), event: Revision.save_merge_event())
-    assert_recent_audit_log(result2, user, action: Revision.update_lab_result_action(), event: Revision.save_merge_event())
+      assert_recent_audit_log(result1, user, action: Revision.update_lab_result_action(), event: Revision.save_merge_event())
+      assert_recent_audit_log(result2, user, action: Revision.update_lab_result_action(), event: Revision.save_merge_event())
+    end
+
+    test "when the lab results are exactly the same, it doesn't move them, and finishes the rest of the merge", %{user: user} do
+      canonical = Test.Fixtures.person_attrs(user, "canonical") |> Cases.create_person!()
+      duplicate1 = Test.Fixtures.person_attrs(user, "duplicate1") |> Cases.create_person!()
+      duplicate2 = Test.Fixtures.person_attrs(user, "duplicate2") |> Cases.create_person!()
+
+      result1 =
+        Test.Fixtures.lab_result_attrs(duplicate1, user, "result1", ~D[2020-08-07], %{
+          analyzed_on: ~D[2020-08-07],
+          reported_on: ~D[2020-08-07],
+          request_accession_number: "",
+          request_facility_code: "",
+          request_facility_name: "",
+          result: "positive",
+          sampled_on: ~D[2020-08-07],
+          test_type: "a"
+        })
+        |> Cases.create_lab_result!()
+
+      Test.Fixtures.lab_result_attrs(duplicate2, user, "result2", ~D[2020-08-07], %{
+        analyzed_on: ~D[2020-08-07],
+        reported_on: ~D[2020-08-07],
+        request_accession_number: "",
+        request_facility_code: "",
+        request_facility_name: "",
+        result: "positive",
+        sampled_on: ~D[2020-08-07],
+        test_type: "a"
+      })
+      |> Cases.create_lab_result!()
+
+      Merge.merge([duplicate1.id, duplicate2.id], into: canonical.id, merge_conflict_resolutions: %{}, current_user: user)
+
+      canonical = Cases.preload_lab_results(canonical)
+
+      lab_result_ids = canonical.lab_results |> Enum.map(& &1.id)
+
+      assert Enum.member?(lab_result_ids, result1.id)
+
+      assert_recent_audit_log(result1, user, action: Revision.update_lab_result_action(), event: Revision.save_merge_event())
+    end
   end
 
   describe "audit logging the merge" do
