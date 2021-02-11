@@ -110,6 +110,7 @@ defmodule Epicenter.AuditLog.Revision do
   def seed_event(), do: "seeds"
   def start_interview_event(), do: "start-interview"
   def update_contact_event(), do: "update-contact"
+  def update_lab_result_action(), do: "update-lab-result"
   def update_user_email_event(), do: "update-user-email"
   def update_user_email_request_event(), do: "update-user-email-request"
   def update_user_mfa_event(), do: "update-user-mfa"

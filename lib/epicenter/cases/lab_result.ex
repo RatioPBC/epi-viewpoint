@@ -42,6 +42,10 @@ defmodule Epicenter.Cases.LabResult do
     |> change_fingerprint()
   end
 
+  def changeset_for_merge(lab_result, canonical_person_id) do
+    changeset(lab_result, %{person_id: canonical_person_id})
+  end
+
   defp change_fingerprint(%Ecto.Changeset{valid?: true} = changeset),
     do: changeset |> change(fingerprint: generate_fingerprint(changeset))
 

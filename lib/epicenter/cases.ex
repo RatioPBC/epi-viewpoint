@@ -31,6 +31,9 @@ defmodule Epicenter.Cases do
   def preload_initiating_lab_result(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:initiating_lab_result)
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(lab_results: LabResult.Query.display_order())
 
+  def reassociate_lab_result(lab_result, canonical_person_id, audit_meta),
+    do: lab_result |> LabResult.changeset_for_merge(canonical_person_id) |> AuditingRepo.update(audit_meta)
+
   def upsert_lab_result!({attrs, audit_meta}),
     do: %LabResult{} |> change_lab_result(attrs) |> AuditingRepo.insert!(audit_meta, LabResult.Query.opts_for_upsert())
 

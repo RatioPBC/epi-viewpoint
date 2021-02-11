@@ -17,6 +17,7 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
     merge_demographics(people, canonical_person, merge_conflict_resolutions, current_user)
     merge_contact_investigations(people, canonical_person, current_user)
     mark_duplicate_people_merged(people, canonical_person, current_user)
+    merge_lab_results(people, canonical_person, current_user)
   end
 
   defp merge_contact_info(people, canonical_person, current_user) do
@@ -116,6 +117,16 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
           canonical_person.id,
           audit_meta(current_user, Revision.update_contact_investigation_action())
         )
+      end
+    end
+  end
+
+  defp merge_lab_results(people, canonical_person, current_user) do
+    for duplicate_person <- people do
+      duplicate_person = duplicate_person |> Cases.preload_lab_results()
+
+      for lab_result <- duplicate_person.lab_results do
+        lab_result |> Cases.reassociate_lab_result(canonical_person.id, audit_meta(current_user, Revision.update_lab_result_action()))
       end
     end
   end

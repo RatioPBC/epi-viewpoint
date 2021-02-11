@@ -229,6 +229,8 @@ defmodule Epicenter.Cases.SaveMergeTest do
       # case_investigation should show details for the canonical person instead of the duplicate person
       case_investigation = case_investigation |> Cases.preload_contact_investigations(@admin, false)
       assert case_investigation.contact_investigations |> tids() == ["contact-investigation-to-move"]
+
+      # TODO check that the right revision is made for the contact investigation
     end
 
     defp create_contact_investigation(user, sick_person, lab_result_attrs, case_investigation_attrs, contact_investigation_attrs) do
@@ -249,6 +251,27 @@ defmodule Epicenter.Cases.SaveMergeTest do
 
       contact_investigation
     end
+  end
+
+  test "lab results are moved from the duplicates to the canonical person", %{user: user} do
+    canonical = Test.Fixtures.person_attrs(user, "canonical") |> Cases.create_person!()
+    duplicate1 = Test.Fixtures.person_attrs(user, "duplicate1") |> Cases.create_person!()
+    duplicate2 = Test.Fixtures.person_attrs(user, "duplicate2") |> Cases.create_person!()
+
+    result1 = Test.Fixtures.lab_result_attrs(duplicate1, user, "result1", ~D[2020-08-07]) |> Cases.create_lab_result!()
+    result2 = Test.Fixtures.lab_result_attrs(duplicate2, user, "result2", ~D[2020-08-07]) |> Cases.create_lab_result!()
+
+    Merge.merge([duplicate1.id, duplicate2.id], into: canonical.id, merge_conflict_resolutions: %{}, current_user: user)
+
+    canonical = Cases.preload_lab_results(canonical)
+
+    lab_result_ids = canonical.lab_results |> Enum.map(& &1.id)
+
+    assert Enum.member?(lab_result_ids, result1.id)
+    assert Enum.member?(lab_result_ids, result2.id)
+
+    assert_recent_audit_log(result1, user, action: Revision.update_lab_result_action(), event: Revision.save_merge_event())
+    assert_recent_audit_log(result2, user, action: Revision.update_lab_result_action(), event: Revision.save_merge_event())
   end
 
   describe "audit logging the merge" do
