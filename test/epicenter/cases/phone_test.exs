@@ -50,6 +50,14 @@ defmodule Epicenter.Cases.PhoneTest do
     test "number is required", do: assert_invalid(new_changeset(number: nil))
 
     test "validates personal health information on number", do: assert_invalid(new_changeset(number: "211-111-1000"))
+
+    test "marks changeset for delete only when delete flag is true" do
+      new_changeset = new_changeset(%{})
+      assert new_changeset.action == nil
+
+      changeset = new_changeset |> Repo.insert!() |> Phone.changeset(%{delete: true})
+      assert changeset.action == :delete
+    end
   end
 
   describe "query" do

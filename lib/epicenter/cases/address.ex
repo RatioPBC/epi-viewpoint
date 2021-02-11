@@ -8,7 +8,7 @@ defmodule Epicenter.Cases.Address do
   alias Epicenter.Extra
 
   @required_attrs ~w{}a
-  @optional_attrs ~w(street city state postal_code type tid is_preferred person_id source)a
+  @optional_attrs ~w(delete street city state postal_code type tid is_preferred person_id source)a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
@@ -16,6 +16,7 @@ defmodule Epicenter.Cases.Address do
   @foreign_key_type :binary_id
   schema "addresses" do
     field :address_fingerprint, :string, read_after_writes: true
+    field :delete, :boolean, virtual: true
     field :street, :string
     field :city, :string
     field :state, :string
@@ -36,6 +37,7 @@ defmodule Epicenter.Cases.Address do
     |> validate_required(@required_attrs)
     |> validate_phi(:address)
     |> unique_constraint([:person_id, :address_fingerprint], name: :addresses_address_fingerprint_person_id_index)
+    |> Extra.Changeset.maybe_mark_for_deletion()
   end
 
   def to_comparable_string(%Address{} = address) do

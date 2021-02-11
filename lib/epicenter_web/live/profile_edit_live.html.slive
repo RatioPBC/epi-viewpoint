@@ -93,6 +93,9 @@
                     = arrow_down_icon()
                     = select address_form, :state, states(address_form.data.state), data_role: "state-input"
                   = text_input address_form, :postal_code, data: [role: "postal-code-input", tid: address_form.data.tid]
+                  = label address_form, :delete, phx_click: "remove-address", phx_value_address_index: address_form.index do
+                    .trash-icon
+                      = trash_icon()
 
           a#add-address[phx-click="add-address"]
             = plus_icon()

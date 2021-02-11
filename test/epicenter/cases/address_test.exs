@@ -59,6 +59,14 @@ defmodule Epicenter.Cases.AddressTest do
     test "postal_code is optional", do: assert_valid(new_changeset(postal_code: nil))
 
     test "validates personal health information on address", do: assert_invalid(new_changeset(street: "123 main st"))
+
+    test "marks changeset for delete only when delete flag is true" do
+      new_changeset = new_changeset(%{})
+      assert new_changeset.action == nil
+
+      changeset = new_changeset |> Repo.insert!() |> Address.changeset(%{delete: true})
+      assert changeset.action == :delete
+    end
   end
 
   describe "to_comparable_string" do

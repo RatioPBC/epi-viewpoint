@@ -54,6 +54,11 @@ defmodule EpicenterWeb.Test.Pages.ProfileEdit do
     |> Map.new()
   end
 
+  def click_remove_address_button(%View{} = view, index: index) do
+    view |> render_click("remove-address", %{"address-index" => index})
+    view
+  end
+
   #
   # email address
   #

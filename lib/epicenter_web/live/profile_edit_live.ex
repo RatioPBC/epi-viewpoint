@@ -108,6 +108,16 @@ defmodule EpicenterWeb.ProfileEditLive do
     |> noreply()
   end
 
+  def handle_event("remove-address", %{"address-index" => address_index_param}, socket) do
+    address_index = address_index_param |> Euclid.Extra.String.to_integer()
+
+    existing_addresses = socket.assigns.changeset |> Extra.Changeset.get_field_from_changeset(:addresses)
+    addresses = existing_addresses |> List.delete_at(address_index)
+
+    changeset = socket.assigns.changeset |> Ecto.Changeset.put_embed(:addresses, addresses)
+    {:noreply, assign(socket, changeset: changeset |> Extra.Changeset.clear_validation_errors())}
+  end
+
   def handle_event("remove-email", %{"email-index" => email_index_param}, socket) do
     email_index = email_index_param |> Euclid.Extra.String.to_integer()
 

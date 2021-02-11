@@ -298,6 +298,19 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       |> Map.get(:addresses)
       |> assert_eq([])
     end
+
+    test "deleting existing address", %{conn: conn, person: person, user: user} do
+      Test.Fixtures.address_attrs(user, person, "address-1", 5555) |> Cases.create_address!()
+
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.ProfileEdit.assert_address_form(%{"form_data[addresses][0][street]" => "5555 Test St"})
+      |> Pages.ProfileEdit.click_remove_address_button(index: "0")
+      |> Pages.ProfileEdit.assert_address_form(%{})
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form", form_data: %{"emails" => %{}})
+      |> Pages.Profile.assert_addresses([])
+
+      Cases.get_person(person.id, user) |> Cases.preload_addresses() |> Map.get(:addresses) |> assert_eq([])
+    end
   end
 
   describe "email addresses" do
