@@ -72,6 +72,10 @@ defmodule Epicenter.Cases.CaseInvestigation do
     |> validate_required(@required_attrs)
   end
 
+  def changeset_for_merge(case_investigation, canonical_person_id) do
+    changeset(case_investigation, %{person_id: canonical_person_id})
+  end
+
   def text_field_values(field_name) do
     %{
       clinical_status: [

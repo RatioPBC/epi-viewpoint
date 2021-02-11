@@ -66,6 +66,12 @@ defmodule Epicenter.Cases do
   def list_case_investigations(filter, assigned_to_id: user_id, user: %User{} = current_user),
     do: CaseInvestigation.Query.list(filter) |> CaseInvestigation.Query.assigned_to_user(user_id) |> AuditingRepo.all(current_user)
 
+  def merge_case_investigations(%CaseInvestigation{} = investigation, canonical_person_id, audit_meta),
+    do:
+      investigation
+      |> CaseInvestigation.changeset_for_merge(canonical_person_id)
+      |> AuditingRepo.update(audit_meta)
+
   def preload_contact_investigations(has_many_contacts_or_nil, user, with_audit_logging \\ true) do
     preloaded =
       has_many_contacts_or_nil

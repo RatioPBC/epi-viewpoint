@@ -253,6 +253,55 @@ defmodule Epicenter.Cases.SaveMergeTest do
     end
   end
 
+  describe "merging the case_investigations" do
+    test "it moves contact investigations from the duplicate person to the canonical person", %{user: user} do
+      person = Test.Fixtures.person_attrs(@admin, "canonical") |> Cases.create_person!()
+
+      lab_result =
+        Test.Fixtures.lab_result_attrs(person, @admin, "lab_result", ~D[2021-02-10], %{
+          result: "positive"
+        })
+        |> Cases.create_lab_result!()
+
+      Test.Fixtures.case_investigation_attrs(
+        person,
+        lab_result,
+        user,
+        "case-investigation",
+        %{name: "001"}
+      )
+      |> Cases.create_case_investigation!()
+
+      duplicate_person = Test.Fixtures.person_attrs(@admin, "duplicate") |> Cases.create_person!()
+
+      duplicate_lab_result =
+        Test.Fixtures.lab_result_attrs(duplicate_person, @admin, "duplicate_lab_result", ~D[2021-02-10], %{
+          result: "positive"
+        })
+        |> Cases.create_lab_result!()
+
+      duplicate_case_investigation =
+        Test.Fixtures.case_investigation_attrs(
+          duplicate_person,
+          duplicate_lab_result,
+          @admin,
+          "duplicate-case-investigation",
+          %{name: "001"}
+        )
+        |> Cases.create_case_investigation!()
+
+      Merge.merge([duplicate_person.id], into: person.id, merge_conflict_resolutions: %{}, current_user: user)
+
+      person = Cases.get_person(person.id, @admin) |> Cases.preload_case_investigations()
+      assert ["case-investigation", "duplicate-case-investigation"] == person.case_investigations |> Enum.map(& &1.tid)
+
+      assert_recent_audit_log(duplicate_case_investigation, user,
+        action: Revision.update_case_investigation_action(),
+        event: Revision.save_merge_event()
+      )
+    end
+  end
+
   test "lab results are moved from the duplicates to the canonical person", %{user: user} do
     canonical = Test.Fixtures.person_attrs(user, "canonical") |> Cases.create_person!()
     duplicate1 = Test.Fixtures.person_attrs(user, "duplicate1") |> Cases.create_person!()
