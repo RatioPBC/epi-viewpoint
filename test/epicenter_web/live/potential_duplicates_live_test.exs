@@ -4,10 +4,12 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases
+  alias Epicenter.Cases.Merge
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
+  @admin Test.Fixtures.admin()
 
   setup %{user: user} do
     person =
@@ -86,5 +88,23 @@ defmodule EpicenterWeb.PotentialDuplicatesLiveTest do
     AuditLogAssertions.expect_phi_view_logs(8)
     Pages.PotentialDuplicates.visit(conn, alice)
     AuditLogAssertions.verify_phi_view_logged(user, [alice, billy, cindy])
+  end
+
+  test "shows potential duplicates who were merged, but then unarchived", %{conn: conn, user: user, person: person} do
+    david = create_person(user, "david", %{first_name: "David", last_name: "Testuser", dob: ~D[1900-01-01]})
+    create_person(user, "cindy", %{first_name: "Cindy", last_name: "Testuser", dob: ~D[1900-01-01]})
+    billy = create_person(user, "billy", %{first_name: "Billy", last_name: "Testuser", dob: ~D[1900-01-01]})
+
+    Merge.merge([billy.id], into: person.id, merge_conflict_resolutions: %{}, current_user: @admin)
+    Cases.unarchive_person(billy.id, @admin, Test.Fixtures.admin_audit_meta())
+
+    Pages.PotentialDuplicates.visit(conn, david)
+    |> Pages.PotentialDuplicates.assert_here(david)
+    |> Pages.PotentialDuplicates.assert_table_contents(
+      [["david"], ["billy"], ["cindy"]],
+      tids: true,
+      headers: false,
+      columns: []
+    )
   end
 end

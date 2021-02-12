@@ -63,7 +63,7 @@ defmodule Epicenter.Cases.Person.Duplicates do
         join people p on d.person_id = p.id
         where lower(d.last_name) = lower($1)
         and d.person_id != $4
-        and p.merged_by_id is null
+        and p.archived_by_id is null
         INTERSECT
         (
             select d.person_id
