@@ -41,7 +41,7 @@ pull requests or issues at this time.
 
 `docker-compose` uses the same docker image that production does.
 
-There are some scripts to make local docker development easier:
+There are some scripts to make local docker development easier (though they don't get used very often so they may not work):
 
 * `bin/dev/docker-start` will:
   * check that your computer is set up to run the app via docker
