@@ -167,15 +167,31 @@ defmodule EpicenterWeb.ProfileEditLive do
   end
 
   defp upsert_only_form_demographics(demographics, changeset) do
-    non_form_demographics = demographics |> Enum.reject(&(&1.source == "form")) |> Euclid.Extra.Enum.pluck([:id])
-    form_demographic = demographics |> Enum.find(&(&1.source == "form"))
+    # find the most recent(highest precedence form demographic and update that one)
+    # otherwise, add a new form demographic
 
-    non_form_demographics ++
+    {_, latest_form_demographic_id} =
+      Enum.reduce(
+        demographics,
+        {~U[2019-01-01 00:00:00Z], nil},
+        fn demographic, {latest_inserted_at, form_demographic_id} ->
+          if demographic.source == "form" && DateTime.compare(demographic.inserted_at, latest_inserted_at) == :gt do
+            {demographic.inserted_at, demographic.id}
+          else
+            {latest_inserted_at, form_demographic_id}
+          end
+        end
+      )
+
+    non_changing_demographics = demographics |> Enum.reject(&(&1.id == latest_form_demographic_id)) |> Euclid.Extra.Enum.pluck([:id])
+    changing_form_demographic = demographics |> Enum.find(&(&1.id == latest_form_demographic_id))
+
+    non_changing_demographics ++
       [
         changeset.changes
         |> update_if_present(:dob, &update_dob/1)
         |> rewrite_preferred_language(changeset)
-        |> Map.merge(%{id: if(form_demographic, do: form_demographic.id, else: nil), source: "form"})
+        |> Map.merge(%{id: if(changing_form_demographic, do: changing_form_demographic.id, else: nil), source: "form"})
       ]
   end
 

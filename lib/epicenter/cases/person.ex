@@ -92,7 +92,7 @@ defmodule Epicenter.Cases.Person do
       end
 
     if Map.has_key?(attrs, :form_demographic) && get_change(changeset, :demographics) do
-      throw("person changeset cannot contain both phones and additive phones because we haven't thought about which ones take precendence")
+      throw("person changeset cannot contain both form_demographic and demographics because we haven't thought about which ones take precendence")
     end
 
     with {:ok, form_demographic_params} <- Map.fetch(attrs, :form_demographic) do

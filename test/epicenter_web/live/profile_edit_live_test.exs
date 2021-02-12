@@ -5,11 +5,14 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases
+  alias Epicenter.Cases.Merge
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
   alias EpicenterWeb.ProfileEditLive
 
   setup :register_and_log_in_user
+
+  @admin Test.Fixtures.admin()
 
   setup %{user: user} do
     person = Test.Fixtures.person_attrs(user, "alice") |> Cases.create_person!()
@@ -512,6 +515,47 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
       ProfileEditLive.states("OH")
       |> Enum.count(fn state_tuple -> {"OH", "OH"} == state_tuple end)
       |> assert_eq(1)
+    end
+  end
+
+  describe "editing merged people" do
+    test "you can still edit identifying information after merging another person into this one", %{conn: conn, person: person} do
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        form_data: %{
+          "first_name" => "Aaron",
+          "last_name" => "Testuser2",
+          "dob" => "02/01/2020",
+          "preferred_language" => "Hindi"
+        }
+      )
+      |> Pages.Profile.assert_here(person)
+
+      duplicate_person = Test.Fixtures.person_attrs(@admin, "duplicate") |> Cases.create_person!()
+
+      Pages.ProfileEdit.visit(conn, duplicate_person)
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        form_data: %{
+          "first_name" => "Aaron",
+          "last_name" => "Testuser2",
+          "dob" => "02/01/2020",
+          "preferred_language" => "Spanish"
+        }
+      )
+      |> Pages.Profile.assert_here(duplicate_person)
+
+      Merge.merge([duplicate_person.id], into: person.id, merge_conflict_resolutions: %{}, current_user: @admin)
+
+      Pages.ProfileEdit.visit(conn, person)
+      |> Pages.submit_and_follow_redirect(conn, "#profile-form",
+        form_data: %{
+          "first_name" => "Aaron",
+          "last_name" => "Testuser2",
+          "dob" => "01/01/2020",
+          "preferred_language" => "French"
+        }
+      )
+      |> Pages.Profile.assert_here(person)
     end
   end
 end
