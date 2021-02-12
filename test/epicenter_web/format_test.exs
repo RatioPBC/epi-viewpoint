@@ -169,8 +169,8 @@ defmodule EpicenterWeb.FormatTest do
     end
 
     test "formats multiple phone numbers" do
-      assert phone([%Phone{number: "4155551212"}, %Phone{number: "3037971101"}, "5551231234"]) ==
-               "(415) 555-1212, (303) 797-1101, (555) 123-1234"
+      assert phone([%Phone{number: "4155551212"}, %Phone{number: "5551111234"}, "5551231234"]) ==
+               "(415) 555-1212, (555) 111-1234, (555) 123-1234"
     end
   end
 
