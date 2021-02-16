@@ -1,11 +1,6 @@
 defmodule Epicenter.Cases.Place do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
-  import Epicenter.PhiValidation, only: [validate_phi: 2]
-
-  alias Epicenter.Cases.Place
-  alias Epicenter.Extra
 
   @required_attrs ~w{}a
   @optional_attrs ~w{name type}a

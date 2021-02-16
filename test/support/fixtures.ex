@@ -207,6 +207,7 @@ defmodule Epicenter.Test.Fixtures do
     attrs =
       %{
         name: "123 Elementary",
+        tid: tid,
         type: "school"
       }
       |> merge_attrs(attrs)
@@ -290,6 +291,19 @@ defmodule Epicenter.Test.Fixtures do
     }
     |> merge_attrs(attrs)
   end
+
+  def visit_attrs(author, tid, %Place{} = place, attrs \\ %{}) do
+    attrs =
+      %{
+        place_id: place.id,
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(author)}
+  end
+
+  # # #
 
   defp merge_attrs(defaults, attrs) do
     Map.merge(defaults, Enum.into(attrs, %{}))
