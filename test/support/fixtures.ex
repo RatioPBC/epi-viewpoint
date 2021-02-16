@@ -187,7 +187,8 @@ defmodule Epicenter.Test.Fixtures do
     {attrs, audit_meta(originator)}
   end
 
-  def place_address_attrs(originator, %Place{id: place_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
+  def place_address_attrs(originator, %Place{id: place_id}, tid, street_number, attrs \\ %{})
+      when is_binary(tid) and is_integer(street_number) do
     attrs =
       %{
         city: "City",

@@ -13,6 +13,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.ImportedFile
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Place
   alias Epicenter.Cases.Phone
   alias Epicenter.Repo
 
@@ -258,4 +259,11 @@ defmodule Epicenter.Cases do
   def get_demographic(%Person{} = person, source: :form), do: Demographic.Query.latest_form_demographic(person) |> Repo.one()
   def preload_demographics(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(demographics: Demographic.Query.display_order())
   def update_demographic(%Demographic{} = demo, {attrs, audit_meta}), do: demo |> change_demographic(attrs) |> AuditingRepo.update(audit_meta)
+
+  #
+  # places
+  #
+  def change_place(place, attrs), do: Place.changeset(place, attrs)
+  def create_place({attrs, audit_meta}), do: %Place{} |> change_place(attrs) |> AuditingRepo.insert(audit_meta)
+  def create_place!({attrs, audit_meta}), do: %Place{} |> change_place(attrs) |> AuditingRepo.insert!(audit_meta)
 end
