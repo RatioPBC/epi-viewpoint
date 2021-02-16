@@ -32,21 +32,38 @@ defmodule EpicenterWeb.ResolveConflictsLiveTest do
     assert_has_role(page_live, "resolve-conflicts-page")
   end
 
-  test "showing the merge conflicts", %{conn: conn, person1: person1, person2: person2} do
+  test "shows merge conflict line for conflicting fields", %{conn: conn, person1: person1, person2: person2} do
     Pages.ResolveConflicts.visit(conn, person1.id, [person2.id])
     |> Pages.ResolveConflicts.assert_unique_values_present("first_name", ["Alice", "Alicia"])
+    |> Pages.ResolveConflicts.assert_message("These fields differ between the merged records. Choose the correct information for each.")
   end
 
-  test "when there are no conflicts, we do not render a form line", %{conn: conn, person1: person1, person2: person2} do
+  test "doesn't show merge conflict line for non-conflicting fields", %{conn: conn, person1: person1, person2: person2} do
     Pages.ResolveConflicts.visit(conn, person1.id, [person2.id])
     |> Pages.ResolveConflicts.assert_no_conflicts_for_field("dob")
   end
 
+  test "when there are no conflicting fields, no form lines are shown and the message and button are different", %{
+    user: user,
+    conn: conn,
+    person1: person1
+  } do
+    non_conflicting_person =
+      Test.Fixtures.person_attrs(user, "alice")
+      |> Test.Fixtures.add_demographic_attrs(%{external_id: "111222"})
+      |> Test.Fixtures.add_demographic_attrs(%{dob: ~D[1980-01-01]})
+      |> Cases.create_person!()
+
+    Pages.ResolveConflicts.visit(conn, person1.id, [non_conflicting_person.id])
+    |> Pages.ResolveConflicts.assert_no_conflicts()
+    |> Pages.ResolveConflicts.assert_message("No conflicts found.")
+  end
+
   test "save button is disabled until all conflicts are resolved", %{conn: conn, person1: person1, person2: person2} do
     Pages.ResolveConflicts.visit(conn, person1.id, [person2.id])
-    |> Pages.ResolveConflicts.assert_save_button_enabled(false)
+    |> Pages.ResolveConflicts.assert_merge_button_enabled(false)
     |> Pages.ResolveConflicts.click_first_name("Alicia")
-    |> Pages.ResolveConflicts.assert_save_button_enabled(true)
+    |> Pages.ResolveConflicts.assert_merge_button_enabled(true)
   end
 
   # TODO what if 0 or 1 person ids are sent to the page

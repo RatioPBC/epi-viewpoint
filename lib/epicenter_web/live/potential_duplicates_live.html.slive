@@ -37,6 +37,6 @@
               td= live_redirect "View", to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person.id)
 
       section
-        = submit data_role: "merge-button", disabled: (@selected_people == []), id: "merge-button" do
-          span Merge
+        = submit data_role: "resolve-conflicts-button", disabled: (@selected_people == []), id: "resolve-conflicts-button" do
+          span Resolve conflicts
           = arrow_right_icon()

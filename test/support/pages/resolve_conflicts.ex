@@ -29,14 +29,23 @@ defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
     view
   end
 
-  def assert_save_button_enabled(view, enabled?) do
+  def assert_message(view, expected_message) do
+    view |> Pages.parse() |> Test.Html.text(role: "merge-message") |> assert_eq(expected_message, returning: view)
+  end
+
+  def assert_merge_button_enabled(view, enabled?) do
     expected = if enabled?, do: [], else: ["disabled"]
-    view |> Pages.parse() |> Test.Html.attr("[data-role=save-button]", "disabled") |> assert_eq(expected, returning: view)
+    view |> Pages.parse() |> Test.Html.attr("[data-role=merge-button]", "disabled") |> assert_eq(expected, returning: view)
   end
 
   def assert_unique_values_present(view, field_name, values) do
     role = ["resolve-conflicts-form", field_name] |> Extra.String.dasherize()
     assert view |> Pages.parse() |> Test.Html.role_texts(role) |> Enum.sort() == values |> Enum.sort()
+    view
+  end
+
+  def assert_no_conflicts(view) do
+    refute view |> Pages.parse() |> Test.Html.present?(selector: "form[data-role=resolve-conflicts-form] input[type=radio]")
     view
   end
 

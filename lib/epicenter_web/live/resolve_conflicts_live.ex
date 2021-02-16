@@ -22,6 +22,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> assign_defaults(body_class: "body-background-none")
     |> assign_page_title("Resolve Conflicts")
     |> assign(:merge_conflicts, merge_conflicts)
+    |> assign(:has_merge_conflicts?, Merge.has_merge_conflicts?(merge_conflicts))
     |> assign(:form_changeset, ResolveConflictsForm.changeset(merge_conflicts, %{}))
     |> assign(:person_id, person_id)
     |> assign(:duplicate_person_ids, duplicate_person_ids)
@@ -69,7 +70,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> add_line(:first_name, "Choose the correct first name", merge_conflicts.first_name)
     |> add_line(:dob, "Choose the correct date of birth", formatted_dates)
     |> add_line(:preferred_language, "Choose the correct preferred language", merge_conflicts.preferred_language)
-    |> Form.line(&Form.save_button(&1, disabled: !valid_changeset?))
+    |> Form.line(&Form.merge_button(&1, disabled: !valid_changeset?))
     |> Form.safe()
   end
 

@@ -21,12 +21,12 @@ defmodule EpicenterWeb.Test.Pages.PotentialDuplicates do
   end
 
   def assert_merge_button_disabled(%View{} = view) do
-    LiveViewAssertions.assert_disabled(view, "[data-role=merge-button]")
+    LiveViewAssertions.assert_disabled(view, "[data-role=resolve-conflicts-button]")
     view
   end
 
   def assert_merge_button_enabled(%View{} = view) do
-    LiveViewAssertions.assert_enabled(view, "[data-role=merge-button]")
+    LiveViewAssertions.assert_enabled(view, "[data-role=resolve-conflicts-button]")
     view
   end
 

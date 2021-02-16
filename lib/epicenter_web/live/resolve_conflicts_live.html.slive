@@ -9,7 +9,10 @@
   section#potential-duplicates-details
     div
       h2 Step 2: Resolve Conflicts
-      p These fields differ between the merged records. Choose the correct information for each.
+      = if @has_merge_conflicts? do
+        p data-role="merge-message" These fields differ between the merged records. Choose the correct information for each.
+      - else
+        p data-role="merge-message" No conflicts found.
 
     = form_for @form_changeset, "#", [data: [role: "resolve-conflicts-form"], id: "resolve-conflicts-form", phx_submit: "save", phx_change: "form-change"], fn f ->
       = form_builder(f, @merge_conflicts, @form_changeset.valid?)

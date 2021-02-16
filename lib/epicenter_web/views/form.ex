@@ -146,6 +146,14 @@ defmodule EpicenterWeb.Form do
     |> add_to_line(line, opts)
   end
 
+  def merge_button(%Form.Line{} = line, opts \\ []) do
+    data_opts = grid_data(1, line, opts) |> Keyword.put(:role, "merge-button")
+    disabled? = Keyword.get(opts, :disabled, false)
+
+    submit("Merge", data: data_opts, disabled: disabled?)
+    |> add_to_line(line, opts)
+  end
+
   @doc "opts: span"
   def select(%Form.Line{f: f} = line, field, label_text, options, opts \\ []) do
     [

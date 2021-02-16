@@ -227,6 +227,18 @@ defmodule EpicenterWeb.FormTest do
     """)
   end
 
+  test "merge_button" do
+    phx_form()
+    |> Form.new()
+    |> Form.line(&Form.merge_button(&1, disabled: true))
+    |> render()
+    |> assert_html_eq("""
+    <fieldset>\v
+      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="merge-button" type="submit" disabled="disabled">Merge</button>\v
+    </fieldset>
+    """)
+  end
+
   test "select" do
     parsed =
       phx_form(language: "English")

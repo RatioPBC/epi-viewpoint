@@ -13,6 +13,10 @@ defmodule Epicenter.Cases.Merge do
     end)
   end
 
+  def has_merge_conflicts?(merge_conflicts) do
+    Enum.any?(merge_conflicts, fn {_k, v} -> Euclid.Exists.present?(v) end)
+  end
+
   def merge_conflicts(person_ids, user, field_names_and_types) when is_list(field_names_and_types) do
     people =
       Cases.get_people(person_ids, user)
