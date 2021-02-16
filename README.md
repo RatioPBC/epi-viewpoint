@@ -92,6 +92,21 @@ GCP cloud_sql import/export.
 You must create the first admin user manually (see the docs for `Epicenter.Release.create_user`). After that, you can
 log in as that admin user and create other users.
 
+### Exporting Data
+
+This command will copy data from the database into the CSV files.
+
+```
+psql -f export_csvs.sql <database-name>
+```
+
+Depending on permissions with the database, it may be necessary to modify the script to be run within `psql` using the
+`\copy` command.
+
+```
+\copy ... to ...;
+```
+
 ## Copyright and license
 
 TBD

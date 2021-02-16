@@ -1,3 +1,4 @@
+-- Additional details and usage information can be found in the README.md
 copy (
     select *
     from addresses
