@@ -5,6 +5,7 @@ defmodule Epicenter.Test.Fixtures do
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
+  alias Epicenter.Cases.Place
   alias Epicenter.DateParser
 
   def audit_meta(author) do
@@ -180,6 +181,32 @@ defmodule Epicenter.Test.Fixtures do
         street: "#{street_number} Test St",
         tid: tid,
         type: "home"
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(originator)}
+  end
+
+  def place_address_attrs(originator, %Place{id: place_id}, tid, street_number, attrs \\ %{}) when is_binary(tid) and is_integer(street_number) do
+    attrs =
+      %{
+        city: "City",
+        place_id: place_id,
+        postal_code: "00000",
+        state: "OH",
+        street: "#{street_number} Test St",
+        tid: tid
+      }
+      |> merge_attrs(attrs)
+
+    {attrs, audit_meta(originator)}
+  end
+
+  def place_attrs(originator, tid, attrs \\ %{}) do
+    attrs =
+      %{
+        name: "123 Elementary",
+        type: "school"
       }
       |> merge_attrs(attrs)
 
