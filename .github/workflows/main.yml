@@ -61,9 +61,5 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: docker/build-push-action@v2.3.0
-        with:
-          target: geometer/docker-gcp:latest
-      
       - name: Build image
         run: bin/docker/build
