@@ -3,28 +3,33 @@ name: CI
 on:
   push:
     branches: [ gh-actions ]
+
+env:
+  GIT_DEPTH: 0
+  GIT_STRATEGY: clone
+  POSTGRES_DB: epicenter_test
+  POSTGRES_HOST: postgres
+  POSTGRES_HOST_AUTH_METHOD: trust
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_USER: postgres
     
 jobs:
   test:
     runs-on: ubuntu-latest
     
-    container: circleci/elixir:1.11.3-node-browsers
+#     container: circleci/elixir:1.11.3-node-browsers
     
     services:
       postgres:
         image: postgres:12.5-alpine
-        env: 
-          POSTGRES_DB: epicenter_test
-          POSTGRES_HOST: postgres
-          POSTGRES_HOST_AUTH_METHOD: trust
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
 
     env:
       MIX_ENV: test
     
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: $BASE_BRANCH
 
       - name: Hello world
         run: echo "Hello World!"
