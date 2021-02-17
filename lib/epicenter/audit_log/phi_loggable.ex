@@ -13,3 +13,7 @@ end
 defimpl Epicenter.AuditLog.PhiLoggable, for: Epicenter.Cases.Person do
   def phi_identifier(subject), do: subject.id
 end
+
+defimpl Epicenter.AuditLog.PhiLoggable, for: Epicenter.Cases.Place do
+  def phi_identifier(subject), do: subject.id
+end

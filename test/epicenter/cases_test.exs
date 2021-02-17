@@ -971,6 +971,17 @@ defmodule Epicenter.CasesTest do
     end
   end
 
+  describe "places" do
+    test "list_places" do
+      {:ok, _} = Test.Fixtures.place_attrs(@admin, "place-1") |> Cases.create_place()
+      {:ok, _} = Test.Fixtures.place_attrs(@admin, "place-2") |> Cases.create_place()
+
+      Cases.list_places(@admin) |> tids() |> assert_eq(~w[place-1 place-2], ignore_order: true)
+    end
+  end
+
+  # # #
+
   defp create_contact_investigation(case_investigation, first_name, phone_number) do
     ContactInvestigations.create({
       Test.Fixtures.contact_investigation_attrs("contact_investigation", %{exposing_case_id: case_investigation.id})

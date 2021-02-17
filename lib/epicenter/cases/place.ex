@@ -3,7 +3,7 @@ defmodule Epicenter.Cases.Place do
   import Ecto.Changeset
 
   @required_attrs ~w{}a
-  @optional_attrs ~w{name type}a
+  @optional_attrs ~w{name tid type}a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
