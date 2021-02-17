@@ -75,14 +75,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: AkhileshNS/heroku-deploy@v3.11.10
-        with:
-          # This will be used for authentication. You can find it in your heroku homepage account settings
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          # Email that you use with heroku
-          heroku_app_name: ${{ secrets.HEROKU_APP_STAGING }}
+#       - uses: AkhileshNS/heroku-deploy@v3.11.10
+#         with:
+#           # This will be used for authentication. You can find it in your heroku homepage account settings
+#           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+#           # Email that you use with heroku
+#           heroku_app_name: ${{ secrets.HEROKU_APP_STAGING }}
       
-#       - name: Deploy to Heroku
-#         run: |
-#           git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_STAGING.git || true
-#           git push -f heroku HEAD:master
+      - name: Deploy to Heroku
+        run: |
+          git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_STAGING }}.git || true
+          git push -f heroku HEAD:master
