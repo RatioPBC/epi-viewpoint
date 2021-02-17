@@ -10,18 +10,18 @@ jobs:
     
     container: circleci/elixir:1.11.3-node-browsers
     
-#     services:
-#       postgres:
-#         image: postgres:12.5-alpine
-#         env: 
-#           POSTGRES_DB: epicenter_test
-#           POSTGRES_HOST: postgres
-#           POSTGRES_HOST_AUTH_METHOD: trust
-#           POSTGRES_PASSWORD: postgres
-#           POSTGRES_USER: postgres
+    services:
+      postgres:
+        image: postgres:12.5-alpine
+        env: 
+          POSTGRES_DB: epicenter_test
+          POSTGRES_HOST: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
 
-#     env:
-#       MIX_ENV: test
+    env:
+      MIX_ENV: test
     
     steps:
       - uses: actions/checkout@v2
@@ -29,16 +29,16 @@ jobs:
       - name: Hello world
         run: echo "Hello World!"
 
-#       - name: Install dependencies
-#         run: |
-#           npm install --prefix assets
-#           mix local.rebar --force
-#           mix local.hex --force
-#           mix deps.get
-#           mix deps.unlock --check-unused
-#           mix deps.audit
-#           npm audit --audit-level=moderate --prefix assets
-#           mix sobelow --config
+      - name: Install dependencies
+        run: |
+          npm install --prefix assets
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+          mix deps.unlock --check-unused
+          mix deps.audit
+          npm audit --audit-level=moderate --prefix assets
+          mix sobelow --config
       
-#       - name: Run tests
-#         run: bin/dev/test
+      - name: Run tests
+        run: bin/dev/test
