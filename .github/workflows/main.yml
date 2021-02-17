@@ -6,8 +6,6 @@ on:
 
 env:
   GITLAB_CI: true
-  GIT_DEPTH: 0
-  GIT_STRATEGY: clone
   POSTGRES_DB: epicenter_test
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
@@ -61,5 +59,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
       - name: Build image
         run: bin/docker/build
