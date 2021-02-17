@@ -16,12 +16,16 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
-#     container: circleci/elixir:1.11.3-node-browsers
-    
+
     services:
       postgres:
         image: postgres:12.5-alpine
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     env:
       MIX_ENV: test
@@ -32,9 +36,6 @@ jobs:
         with:
           otp-version: '23.2.2'
           elixir-version: '1.11.3'
-
-      - name: Hello world
-        run: echo "Hello World!"
 
       - name: Install dependencies
         run: |
