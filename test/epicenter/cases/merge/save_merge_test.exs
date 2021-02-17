@@ -121,10 +121,6 @@ defmodule Epicenter.Cases.SaveMergeTest do
              ]
     end
 
-    @tag :skip
-    test "if adding one of the phone numbers fails?" do
-    end
-
     defp contains(list, tid) do
       Enum.find(list, &(&1.tid == tid)) != nil
     end
