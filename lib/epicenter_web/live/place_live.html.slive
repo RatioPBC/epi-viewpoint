@@ -1,2 +1,4 @@
 #place-page data-page="place"
-  ' place
+  section#place
+    = form_for @form_changeset, "#", [id: "place-form", phx_change: "form-change", phx_submit: "save"], fn f ->
+      = place_form_builder(f)

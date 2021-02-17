@@ -59,4 +59,14 @@ defmodule Epicenter.AuditLog.PhiLoggableTest do
       assert PhiLoggable.phi_identifier(person) == person.id
     end
   end
+
+  describe "Place" do
+    setup do
+      [place: Test.Fixtures.place_attrs(@admin, "alice") |> Cases.create_place!()]
+    end
+
+    test "returns the place_id", %{place: place} do
+      assert PhiLoggable.phi_identifier(place) == place.id
+    end
+  end
 end
