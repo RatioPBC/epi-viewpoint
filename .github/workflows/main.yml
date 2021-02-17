@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ gh-actions ]
+    branches: [ main ]
 
 env:
   POSTGRES_DB: epicenter_test
