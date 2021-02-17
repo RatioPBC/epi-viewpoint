@@ -149,7 +149,7 @@ defmodule EpicenterWeb.ContactsLive do
   defp assign_filter(socket, filter) when is_atom(filter) do
     page_title =
       case filter do
-        :with_contact_investigation -> "Contacts"
+        :with_contact_investigation -> "Contact investigations"
         :with_ongoing_interview -> "Ongoing interviews"
         :with_pending_interview -> "Pending interviews"
         :with_quarantine_monitoring -> "Quarantine monitoring"

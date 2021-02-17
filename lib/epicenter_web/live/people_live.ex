@@ -143,7 +143,7 @@ defmodule EpicenterWeb.PeopleLive do
   def page_title(:isolation_monitoring), do: "Isolation monitoring"
   def page_title(:ongoing_interview), do: "Ongoing interviews"
   def page_title(:pending_interview), do: "Pending interviews"
-  def page_title(:all), do: "Index Cases"
+  def page_title(:all), do: "Index case investigations"
 
   # # # Private
 
