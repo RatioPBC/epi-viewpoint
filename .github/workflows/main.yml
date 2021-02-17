@@ -13,45 +13,54 @@ env:
   POSTGRES_USER: postgres
     
 jobs:
-  test:
+#   test:
+#     runs-on: ubuntu-latest
+    
+#     env:
+#       MIX_ENV: test
+
+#     services:
+#       postgres:
+#         image: postgres:12.5-alpine
+#         env:
+#           POSTGRES_PASSWORD: postgres
+#         options: >-
+#           --health-cmd pg_isready
+#           --health-interval 10s
+#           --health-timeout 5s
+#           --health-retries 5
+#         ports:
+#           - 5432:5432
+
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: actions/setup-elixir@v1
+#         with:
+#           otp-version: '23.2.2'
+#           elixir-version: '1.11.3'
+
+#       - name: Install dependencies
+#         run: |
+#           npm install --prefix assets
+#           mix local.rebar --force
+#           mix local.hex --force
+#           mix deps.get
+#           mix deps.unlock --check-unused
+#           mix deps.audit
+#           npm audit --audit-level=moderate --prefix assets
+#           mix sobelow --config
+      
+#       - name: Run tests
+#         run: bin/dev/test
+#         env: 
+#           POSTGRES_HOST: localhost
+#           POSTGRES_PORT: 5432
+  
+  build_image:
     runs-on: ubuntu-latest
     
-    env:
-      MIX_ENV: test
-
-    services:
-      postgres:
-        image: postgres:12.5-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-elixir@v1
-        with:
-          otp-version: '23.2.2'
-          elixir-version: '1.11.3'
-
-      - name: Install dependencies
-        run: |
-          npm install --prefix assets
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get
-          mix deps.unlock --check-unused
-          mix deps.audit
-          npm audit --audit-level=moderate --prefix assets
-          mix sobelow --config
+      - uses: ouzi-dev/dind-action@v1.0.1
       
-      - name: Run tests
-        run: bin/dev/test
-        env: 
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
+      - name: Build image
+        run: bin/docker/build
