@@ -12,8 +12,6 @@ jobs:
       postgres:
         image: postgres:12.5-alpine
         env: 
-          GIT_DEPTH: 0
-          GIT_STRATEGY: clone
           POSTGRES_DB: epicenter_test
           POSTGRES_HOST: postgres
           POSTGRES_HOST_AUTH_METHOD: trust
