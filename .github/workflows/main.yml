@@ -5,7 +5,6 @@ on:
     branches: [ gh-actions ]
 
 env:
-  GITLAB_CI: true
   POSTGRES_DB: epicenter_test
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
@@ -55,6 +54,7 @@ jobs:
 #           POSTGRES_HOST: localhost
 #           POSTGRES_PORT: 5432
   
+  # TODO: this needs a new container registry to store/retrieve images
   build_image:
     runs-on: ubuntu-latest
     
