@@ -8,7 +8,6 @@ env:
   GIT_DEPTH: 0
   GIT_STRATEGY: clone
   POSTGRES_DB: epicenter_test
-  POSTGRES_HOST: postgres
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
   POSTGRES_USER: postgres
@@ -16,9 +15,12 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    env:
+      MIX_ENV: test
 
     services:
-      db:
+      postgres:
         image: postgres:12.5-alpine
         env:
           POSTGRES_PASSWORD: postgres
@@ -27,10 +29,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432
 
-    env:
-      MIX_ENV: test
-    
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
@@ -51,3 +52,6 @@ jobs:
       
       - name: Run tests
         run: bin/dev/test
+        env: 
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
