@@ -62,13 +62,9 @@
   a#case-investigations
   = for case_investigation <- @case_investigations do
     section.case-investigation id="case-investigation-#{case_investigation.name}"
-      header data-role="case-investigation-title"
-        h2= "Case investigation #{case_investigation.name}"
-
-      .reported-on data-role="reported-on"
-        span
-          = "Initiated by positive lab result reported on "
-          = string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))
+      header
+        h2 data-role="case-investigation-title" Case investigation #{string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))}
+        span.case-investigation-timestamp data-role="case-investigation-timestamp" Created on #{Format.date(case_investigation.inserted_at)}
 
       .case-investigation-sections
         div

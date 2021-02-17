@@ -174,7 +174,7 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # case investigations
   #
 
-  def assert_case_investigations(%View{} = view, %{status: status, status_value: status_value, reported_on: reported_on, number: number}) do
+  def assert_case_investigations(%View{} = view, %{status: status, status_value: status_value, reported_on: reported_on, timestamp: timestamp}) do
     parsed_html =
       view
       |> render()
@@ -182,8 +182,8 @@ defmodule EpicenterWeb.Test.Pages.Profile do
 
     parsed_html
     |> HtmlAssertions.assert_text("status", status)
-    |> HtmlAssertions.assert_text("reported-on", reported_on)
-    |> HtmlAssertions.assert_text("case-investigation-title", number)
+    |> HtmlAssertions.assert_text("case-investigation-title", reported_on)
+    |> HtmlAssertions.assert_text("case-investigation-timestamp", timestamp)
 
     assert parsed_html
            |> Test.Html.present?(selector: ".#{status_value}")

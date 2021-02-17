@@ -273,7 +273,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "08/07/2020", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{
+        status: "Pending",
+        status_value: "pending",
+        reported_on: "08/07/2020",
+        timestamp: "02/17/2021"
+      })
       |> Pages.Profile.refute_clinical_details_showing("001")
       |> Pages.Profile.refute_contacts_showing("001")
     end
@@ -282,7 +287,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       create_case_investigation(person, user, "case_investigation", nil)
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "Unknown", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{
+        status: "Pending",
+        status_value: "pending",
+        reported_on: "Unknown",
+        timestamp: "02/17/2021"
+      })
     end
 
     test "if there are no case investigations, don't  show a case investigation", %{conn: conn, person: person} do
@@ -320,7 +330,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Discontinued", status_value: "discontinued", reported_on: "Unknown", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{
+        status: "Discontinued",
+        status_value: "discontinued",
+        reported_on: "Unknown",
+        timestamp: "02/17/2021"
+      })
       # in discontinued case investigations, start and discontinue buttons move down to history section
       |> Pages.Profile.refute_start_interview_button("001")
       |> Pages.Profile.refute_discontinue_interview_button("001")
@@ -349,7 +364,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
       })
 
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_case_investigations(%{status: "Ongoing interview", status_value: "started", reported_on: "Unknown", number: "001"})
+      |> Pages.Profile.assert_case_investigations(%{
+        status: "Ongoing interview",
+        status_value: "started",
+        reported_on: "Unknown",
+        timestamp: "02/17/2021"
+      })
       |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "Symptomatic"})
       |> Pages.Profile.assert_contacts_showing("001")
     end
@@ -602,7 +622,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         status: "Completed interview",
         status_value: "completed-interview",
         reported_on: "Unknown",
-        number: "001"
+        timestamp: "02/17/2021"
       })
       |> Pages.Profile.assert_case_investigation_has_history(
         "Started interview with Alice Testuser on 11/05/2020 at 01:57pm EST Completed interview on 11/05/2020 at 02:57pm EST"
@@ -665,7 +685,12 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       view =
         Pages.Profile.visit(conn, person)
-        |> Pages.Profile.assert_case_investigations(%{status: "Pending", status_value: "pending", reported_on: "08/07/2020", number: "001"})
+        |> Pages.Profile.assert_case_investigations(%{
+          status: "Pending",
+          status_value: "pending",
+          reported_on: "08/07/2020",
+          timestamp: "02/17/2021"
+        })
 
       assert [%{text: "newer note"}, %{text: "older note"}] = Pages.Profile.case_investigation_notes(view, "001")
     end
