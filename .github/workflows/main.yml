@@ -28,8 +28,6 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: $BASE_BRANCH
 
       - name: Hello world
         run: echo "Hello World!"
