@@ -157,7 +157,7 @@ defmodule Epicenter.Cases.SaveMergeTest do
 
       coalesced_alice = reload_demographics(alice)
       assert coalesced_alice[:dob] == ~D[2001-10-01]
-      assert coalesced_alice[:first_name] == "yes-first-name"
+      assert coalesced_alice[:first_name] == "no"
       assert coalesced_alice[:last_name] == "Testuser-yes"
       assert coalesced_alice[:occupation] == "yes-occupation"
       assert coalesced_alice[:employment] == "yes-employment"

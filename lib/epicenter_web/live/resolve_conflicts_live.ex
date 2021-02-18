@@ -61,6 +61,10 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> noreply()
   end
 
+  def handle_event("save", _params, socket) do
+    handle_event("save", %{"resolve_conflicts_form" => %{}}, socket)
+  end
+
   # # #
 
   def form_builder(form, merge_conflicts, valid_changeset?) do

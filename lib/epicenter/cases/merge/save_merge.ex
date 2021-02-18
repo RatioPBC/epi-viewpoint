@@ -59,6 +59,19 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
     end
   end
 
+  defp merge_demographics(people, canonical_person, merge_conflict_resolutions, current_user) when merge_conflict_resolutions == %{} do
+    coalesce_canonical_person = canonical_person |> Cases.preload_demographics() |> Person.coalesce_demographics()
+
+    default_conflict_resolutions = %{
+      :dob => coalesce_canonical_person.dob,
+      :first_name => coalesce_canonical_person.first_name,
+      :last_name => coalesce_canonical_person.last_name,
+      :preferred_language => coalesce_canonical_person.preferred_language
+    }
+
+    merge_demographics(people, canonical_person, default_conflict_resolutions, current_user)
+  end
+
   defp merge_demographics(people, canonical_person, merge_conflict_resolutions, current_user) do
     # 1. create but don't insert a new demographics snapshot row for each duplicate person
     #    by coalescing the demographics on each duplicate person respectively
@@ -92,19 +105,17 @@ defmodule Epicenter.Cases.Merge.SaveMerge do
       Cases.create_demographic({attrs, audit_meta(current_user, Revision.insert_demographics_action())})
     end
 
-    if !Enum.empty?(merge_conflict_resolutions) do
-      attrs =
-        %{}
-        |> Map.put(:first_name, merge_conflict_resolutions[:first_name])
-        |> Map.put(:dob, merge_conflict_resolutions[:dob])
-        |> Map.put(:preferred_language, merge_conflict_resolutions[:preferred_language])
-        |> Map.put(:person_id, canonical_person.id)
-        |> Map.put(:source, "form")
-        |> Enum.filter(fn {_k, v} -> v != nil end)
-        |> Enum.into(%{})
+    attrs =
+      %{}
+      |> Map.put(:first_name, merge_conflict_resolutions[:first_name])
+      |> Map.put(:dob, merge_conflict_resolutions[:dob])
+      |> Map.put(:preferred_language, merge_conflict_resolutions[:preferred_language])
+      |> Map.put(:person_id, canonical_person.id)
+      |> Map.put(:source, "form")
+      |> Enum.filter(fn {_k, v} -> v != nil end)
+      |> Enum.into(%{})
 
-      Cases.create_demographic({attrs, audit_meta(current_user, Revision.insert_demographics_action())})
-    end
+    Cases.create_demographic({attrs, audit_meta(current_user, Revision.insert_demographics_action())})
   end
 
   defp merge_contact_investigations(people, canonical_person, current_user) do
