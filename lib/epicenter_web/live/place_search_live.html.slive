@@ -2,3 +2,9 @@
   h2 Add place visited
   p Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
 
+  form data-role="place-search-form" phx-change="suggest-place"
+    #place-autocomplete
+      input name="query" value=@query placeholder="name or address" phx-debounce="200" phx-hook="AutocompleteInput"  autocapitalize="none" type="text" autocomplete="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="true"
+      ul phx-hook="AutocompleteList" role="listbox"
+        = for place_address <- @result_place_addresses do
+          li data-role="place-search-result" = address(place_address)

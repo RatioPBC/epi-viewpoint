@@ -1,5 +1,4 @@
 defmodule EpicenterWeb.Format do
-  alias Epicenter.Cases.Address
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
@@ -8,7 +7,7 @@ defmodule EpicenterWeb.Format do
 
   def address(nil), do: ""
 
-  def address(%Address{street: street, city: city, state: state, postal_code: postal_code}) do
+  def address(%{street: street, city: city, state: state, postal_code: postal_code}) do
     non_postal_code = [street, city, state] |> Euclid.Extra.List.compact() |> Enum.join(", ")
     [non_postal_code, postal_code] |> Euclid.Extra.List.compact() |> Enum.join(" ")
   end

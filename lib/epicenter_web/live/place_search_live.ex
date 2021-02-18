@@ -1,8 +1,10 @@
 defmodule EpicenterWeb.PlaceSearchLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.Format, only: [address: 1]
+
   import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, ok: 1]
+    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Cases
 
@@ -14,7 +16,17 @@ defmodule EpicenterWeb.PlaceSearchLive do
     socket
     |> assign_defaults()
     |> assign_page_title("Add place visited")
+    |> assign(:result_place_addresses, [])
+    |> assign(:query, "")
     |> assign(:case_investigation, case_investigation)
     |> ok()
+  end
+
+  def handle_event("suggest-place", %{"query" => _query_text}, socket) do
+    all_place_addresses = Cases.list_place_addresses()
+
+    socket
+    |> assign(:result_place_addresses, all_place_addresses)
+    |> noreply()
   end
 end

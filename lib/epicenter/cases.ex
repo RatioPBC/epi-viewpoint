@@ -14,6 +14,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Place
+  alias Epicenter.Cases.PlaceAddress
   alias Epicenter.Cases.Phone
   alias Epicenter.Repo
 
@@ -267,6 +268,14 @@ defmodule Epicenter.Cases do
   def create_place({attrs, audit_meta}), do: %Place{} |> change_place(attrs) |> AuditingRepo.insert(audit_meta)
   def create_place!({attrs, audit_meta}), do: %Place{} |> change_place(attrs) |> AuditingRepo.insert!(audit_meta)
   def list_places(user), do: AuditingRepo.all(Place, user)
+
+  #
+  # place_address
+  #
+  def change_place_address(place_address, attrs), do: PlaceAddress.changeset(place_address, attrs)
+  def create_place_address({attrs, audit_meta}), do: %PlaceAddress{} |> change_place_address(attrs) |> AuditingRepo.insert(audit_meta)
+  def create_place_address!({attrs, audit_meta}), do: %PlaceAddress{} |> change_place_address(attrs) |> AuditingRepo.insert!(audit_meta)
+  def list_place_addresses(), do: Repo.all(PlaceAddress)
 
   #
   # visits
