@@ -270,28 +270,28 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
   describe "case investigations" do
     test "it shows a pending case investigation", %{conn: conn, person: person, user: user} do
-      create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+      case_investigation = create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
         status: "Pending",
         status_value: "pending",
         reported_on: "08/07/2020",
-        timestamp: "02/17/2021"
+        timestamp: Format.date(case_investigation.inserted_at)
       })
       |> Pages.Profile.refute_clinical_details_showing("001")
       |> Pages.Profile.refute_contacts_showing("001")
     end
 
     test "if lab result is missing reported_on, initiated date is unknown", %{conn: conn, person: person, user: user} do
-      create_case_investigation(person, user, "case_investigation", nil)
+      case_investigation = create_case_investigation(person, user, "case_investigation", nil)
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
         status: "Pending",
         status_value: "pending",
         reported_on: "Unknown",
-        timestamp: "02/17/2021"
+        timestamp: Format.date(case_investigation.inserted_at)
       })
     end
 
@@ -324,17 +324,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
     test "discontinued case investigations say so", %{conn: conn, person: person, user: user} do
       date = ~N[2020-01-02 01:00:07]
 
-      create_case_investigation(person, user, "case_investigation", nil, %{
-        interview_discontinued_at: date,
-        interview_discontinue_reason: "Unable to reach"
-      })
+      case_investigation =
+        create_case_investigation(person, user, "case_investigation", nil, %{
+          interview_discontinued_at: date,
+          interview_discontinue_reason: "Unable to reach"
+        })
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
         status: "Discontinued",
         status_value: "discontinued",
         reported_on: "Unknown",
-        timestamp: "02/17/2021"
+        timestamp: Format.date(case_investigation.inserted_at)
       })
       # in discontinued case investigations, start and discontinue buttons move down to history section
       |> Pages.Profile.refute_start_interview_button("001")
@@ -358,17 +359,18 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
 
     test "started case investigations say so", %{conn: conn, person: person, user: user} do
-      create_case_investigation(person, user, "case_investigation", nil, %{
-        interview_started_at: NaiveDateTime.utc_now(),
-        clinical_status: "symptomatic"
-      })
+      case_investigation =
+        create_case_investigation(person, user, "case_investigation", nil, %{
+          interview_started_at: NaiveDateTime.utc_now(),
+          clinical_status: "symptomatic"
+        })
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
         status: "Ongoing interview",
         status_value: "started",
         reported_on: "Unknown",
-        timestamp: "02/17/2021"
+        timestamp: Format.date(case_investigation.inserted_at)
       })
       |> Pages.Profile.assert_clinical_details_showing("001", %{clinical_status: "Symptomatic"})
       |> Pages.Profile.assert_contacts_showing("001")
@@ -622,7 +624,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         status: "Completed interview",
         status_value: "completed-interview",
         reported_on: "Unknown",
-        timestamp: "02/17/2021"
+        timestamp: Format.date(case_investigation.inserted_at)
       })
       |> Pages.Profile.assert_case_investigation_has_history(
         "Started interview with Alice Testuser on 11/05/2020 at 01:57pm EST Completed interview on 11/05/2020 at 02:57pm EST"
@@ -689,7 +691,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
           status: "Pending",
           status_value: "pending",
           reported_on: "08/07/2020",
-          timestamp: "02/17/2021"
+          timestamp: Format.date(case_investigation.inserted_at)
         })
 
       assert [%{text: "newer note"}, %{text: "older note"}] = Pages.Profile.case_investigation_notes(view, "001")
