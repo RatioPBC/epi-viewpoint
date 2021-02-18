@@ -8,6 +8,7 @@ defmodule Epicenter.Cases.Phone do
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Phone
   alias Epicenter.Extra
+  alias Epicenter.PhoneNumber
 
   @required_attrs ~w{number}a
   @optional_attrs ~w{delete is_preferred person_id source tid type}a
@@ -33,28 +34,11 @@ defmodule Epicenter.Cases.Phone do
   def changeset(phone, attrs) do
     phone
     |> cast(attrs, @required_attrs ++ @optional_attrs)
-    |> strip_non_digits_from_number()
+    |> PhoneNumber.strip_non_digits_from_number(:number)
     |> validate_required(@required_attrs)
     |> validate_phi(:phone)
     |> unique_constraint([:person_id, :number], name: :phones_number_person_id_index)
     |> Extra.Changeset.maybe_mark_for_deletion()
-  end
-
-  defp strip_non_digits_from_number(%Ecto.Changeset{} = changeset) do
-    changeset
-    |> Ecto.Changeset.fetch_field(:number)
-    |> elem(1)
-    |> case do
-      nil -> changeset
-      number -> Ecto.Changeset.put_change(changeset, :number, strip_non_digits_from_number(number))
-    end
-  end
-
-  defp strip_non_digits_from_number(number) when is_binary(number) do
-    number
-    |> String.graphemes()
-    |> Enum.filter(fn element -> element =~ ~r{\d} end)
-    |> Enum.join()
   end
 
   defmodule Query do

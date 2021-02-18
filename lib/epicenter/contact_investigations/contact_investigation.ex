@@ -8,6 +8,7 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.Person
+  alias Epicenter.PhoneNumber
 
   @required_attrs ~w{exposing_case_id most_recent_date_together relationship_to_case}a
   @optional_attrs ~w{
@@ -74,7 +75,7 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
     |> validate_required(@required_attrs)
     |> cast_assoc(:exposed_person, with: &Person.changeset/2)
     |> validate_guardian_fields()
-    |> strip_non_digits_from_guardian_phone()
+    |> PhoneNumber.strip_non_digits_from_number(:guardian_phone)
     |> validate_phi(:contact_investigation)
   end
 
@@ -87,20 +88,6 @@ defmodule Epicenter.ContactInvestigations.ContactInvestigation do
       {_, true} -> validate_required(changeset, [:guardian_name])
       _ -> changeset
     end
-  end
-
-  defp strip_non_digits_from_guardian_phone(%Ecto.Changeset{} = changeset) do
-    case Ecto.Changeset.fetch_field(changeset, :guardian_phone) do
-      {_, number} when not is_nil(number) -> Ecto.Changeset.put_change(changeset, :guardian_phone, strip_non_digits_from_number(number))
-      _ -> changeset
-    end
-  end
-
-  defp strip_non_digits_from_number(number) when is_binary(number) do
-    number
-    |> String.graphemes()
-    |> Enum.filter(fn element -> element =~ ~r{\d} end)
-    |> Enum.join()
   end
 
   def text_field_values(field_name) do
