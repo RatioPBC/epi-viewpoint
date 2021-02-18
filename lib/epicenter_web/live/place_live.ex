@@ -29,7 +29,7 @@ defmodule EpicenterWeb.PlaceLive do
   def handle_event("save", %{"place_form" => params}, socket) do
     with %Ecto.Changeset{} = form_changeset <- PlaceForm.changeset(socket.assigns.place, params),
          {:form, {:ok, place_attrs}} <- {:form, PlaceForm.place_attrs(form_changeset)},
-         {:place, {:ok, _case_investigation}} <- {:place, create_place(socket, place_attrs)} do
+         {:place, {:ok, _place}} <- {:place, create_place(socket, place_attrs)} do
       socket
       |> push_redirect(to: Routes.people_path(socket, EpicenterWeb.PeopleLive))
       |> noreply()
@@ -37,9 +37,9 @@ defmodule EpicenterWeb.PlaceLive do
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset) |> noreply()
 
-      {:place, {:error, _}} ->
+      {:place, {:error, form_changeset}} ->
         socket
-        |> assign_form_changeset(PlaceForm.changeset(socket.assigns.place, params), "An unexpected error occurred")
+        |> assign_form_changeset(form_changeset, "An unexpected error occurred")
         |> noreply()
     end
   end

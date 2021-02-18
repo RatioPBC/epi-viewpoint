@@ -36,8 +36,21 @@ defmodule EpicenterWeb.PlaceLiveTest do
       # assert new_visit.place.id == new_place.id
     end
 
-    @tag :skip
-    test "shows errors when creating invalid place" do
+    test "shows errors when creating invalid place", %{conn: conn} do
+      Pages.Place.visit(conn)
+      |> Pages.Place.assert_here()
+      |> Pages.submit_live("#place-form",
+        place_form: %{
+          "name" => "Alice HQ",
+          "contact_name" => "Alice Invalid",
+          "contact_phone" => "111-111-1000",
+          "contact_email" => "alice@example.com",
+          "type" => "workplace"
+        }
+      )
+      |> Pages.assert_validation_messages(%{
+        "place[contact_name]" => "In non-PHI environment, must contain 'Testuser'"
+      })
     end
 
     @tag :skip
