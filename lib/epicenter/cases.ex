@@ -1,21 +1,23 @@
 defmodule Epicenter.Cases do
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
-  alias Epicenter.AuditingRepo
   alias Epicenter.AuditLog
+  alias Epicenter.AuditingRepo
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.ContactInvestigations.ContactInvestigation
-  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
   alias Epicenter.Cases.ImportedFile
+  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
   alias Epicenter.Cases.Place
   alias Epicenter.Cases.PlaceAddress
   alias Epicenter.Cases.Phone
+  alias Epicenter.Cases.Place
+  alias Epicenter.Cases.PlaceAddress
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Repo
 
   import Ecto.Query, only: [distinct: 3, first: 1]

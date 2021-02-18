@@ -12,6 +12,7 @@ defmodule EpicenterWeb.PlaceLiveTest do
       |> Pages.Place.assert_here()
       |> Pages.Place.submit_place(conn,
         name: "Alicecorp HQ",
+        street: "1234 Test St.",
         contact_name: "Alice Testuser",
         contact_phone: "111-111-1234",
         contact_email: "alice@example.com",
@@ -28,6 +29,7 @@ defmodule EpicenterWeb.PlaceLiveTest do
       # [new_visit] = Cases.list_visits()
 
       assert new_place.name == "Alicecorp HQ"
+      assert new_place.street == "1234 Test St."
       assert new_place.type == "workplace"
       assert new_place.contact_name == "Alice Testuser"
       assert new_place.contact_phone == "1111111234"

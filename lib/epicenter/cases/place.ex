@@ -20,6 +20,8 @@ defmodule Epicenter.Cases.Place do
     field :contact_email, :string
 
     timestamps(type: :utc_datetime)
+
+    # TODO: has_one PlaceAddress?
   end
 
   def changeset(place, attrs) do
