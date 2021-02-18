@@ -27,6 +27,13 @@ defmodule Epicenter.PhiValidation do
     |> validate_change(:postal_code, &address_postal_code_validator/2)
   end
 
+  defp validate(changeset, :place) do
+    changeset
+    |> validate_change(:contact_name, &contact_name_validator/2)
+    |> validate_change(:contact_phone, &phone_number_validator/2)
+    |> validate_change(:contact_email, &email_address_validator/2)
+  end
+
   defp validate(changeset, :phone) do
     changeset
     |> validate_change(:number, &phone_number_validator/2)
@@ -54,6 +61,12 @@ defmodule Epicenter.PhiValidation do
   @city_followed_by_numbers ~r|\ACity\d*\z|
   @four_leading_zeroes_followed_by_one_digit ~r|\A0000\d\z|
   @seven_leading_ones_followed_by_three_digits ~r|1{7}\d+|
+
+  defp contact_name_validator(field, value) do
+    if value |> String.downcase() |> String.contains?("testuser"),
+      do: valid(),
+      else: invalid(field, "must contain 'Testuser'")
+  end
 
   defp date_validator(field, date) when is_binary(date) do
     date_parsing_result = DateParser.parse_mm_dd_yyyy(date)

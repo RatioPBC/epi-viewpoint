@@ -7,10 +7,13 @@ defmodule EpicenterWeb.Forms.PlaceForm do
 
   @primary_key false
   @required_attrs ~w{}a
-  @optional_attrs ~w{name type}a
+  @optional_attrs ~w{name type contact_name contact_phone contact_email}a
   embedded_schema do
     field :name, :string
     field :type, :string
+    field :contact_name, :string
+    field :contact_phone, :string
+    field :contact_email, :string
   end
 
   def changeset(_place, attrs) do
@@ -21,7 +24,14 @@ defmodule EpicenterWeb.Forms.PlaceForm do
 
   def place_attrs(%Ecto.Changeset{} = changeset) do
     with {:ok, place_form} <- apply_action(changeset, :create) do
-      {:ok, %{name: Map.get(place_form, :name), type: Map.get(place_form, :type)}}
+      {:ok,
+       %{
+         name: Map.get(place_form, :name),
+         type: Map.get(place_form, :type),
+         contact_name: Map.get(place_form, :contact_name),
+         contact_phone: Map.get(place_form, :contact_phone),
+         contact_email: Map.get(place_form, :contact_email)
+       }}
     else
       other -> other
     end

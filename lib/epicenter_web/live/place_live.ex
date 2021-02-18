@@ -86,6 +86,9 @@ defmodule EpicenterWeb.PlaceLive do
     Form.new(form)
     |> Form.line(&Form.text_field(&1, :name, "Location name", span: 4))
     |> Form.line(&Form.select(&1, :type, "Type of place", @place_types, span: 4))
+    |> Form.line(&Form.text_field(&1, :contact_name, "Name of main contact", span: 4))
+    |> Form.line(&Form.text_field(&1, :contact_phone, "Phone", span: 4))
+    |> Form.line(&Form.text_field(&1, :contact_email, "Email", span: 4))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end

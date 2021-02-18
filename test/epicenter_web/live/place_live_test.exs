@@ -10,11 +10,17 @@ defmodule EpicenterWeb.PlaceLiveTest do
     test "user can create a new place", %{user: user, conn: conn} do
       Pages.Place.visit(conn)
       |> Pages.Place.assert_here()
-      |> Pages.Place.submit_place(conn, name: "Alicecorp HQ", type: "workplace")
+      |> Pages.Place.submit_place(conn,
+        name: "Alicecorp HQ",
+        contact_name: "Alice Testuser",
+        contact_phone: "111-111-1234",
+        contact_email: "alice@example.com",
+        type: "workplace"
+      )
 
-      # |> Pages.Visit.assert_here()
-      # |> Pages.Visit.submit_visit(~D[2020-01-01])
-      # |> Pages.Profile.assert_here()
+      #     |> Pages.Profile.assert_here()
+      #     |> Pages.Visit.submit_visit(~D[2020-01-01])
+      #     |> Pages.Profile.assert_here()
       # todo: place: need address fields, plus contact_name, contact_phone, contact_email
       # todo: visit: need case_investigation or person, and relationship_to_place
 
@@ -23,6 +29,9 @@ defmodule EpicenterWeb.PlaceLiveTest do
 
       assert new_place.name == "Alicecorp HQ"
       assert new_place.type == "workplace"
+      assert new_place.contact_name == "Alice Testuser"
+      assert new_place.contact_phone == "1111111234"
+      assert new_place.contact_email == "alice@example.com"
       # assert new_visit.occurred_on == ~D[2020-01-01]
       # assert new_visit.place.id == new_place.id
     end
