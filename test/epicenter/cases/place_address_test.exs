@@ -29,8 +29,13 @@ defmodule Epicenter.Cases.PlaceAddressTest do
   setup :persist_admin
   @admin Test.Fixtures.admin()
   describe "changeset" do
-    defp new_changeset(attr_updates) do
-      place = Test.Fixtures.place_attrs(@admin, "place") |> Cases.create_place!()
+    defp new_changeset(attr_updates, place \\ nil) do
+      place =
+        if place == nil do
+          Test.Fixtures.place_attrs(@admin, "place") |> Cases.create_place!()
+        else
+          place
+        end
 
       {default_attrs, _} = Test.Fixtures.place_address_attrs(@admin, place, "school-address", 1234, %{})
 
@@ -38,12 +43,14 @@ defmodule Epicenter.Cases.PlaceAddressTest do
     end
 
     test "attributes" do
-      changes = new_changeset(is_preferred: true, source: "form").changes
+      place = Test.Fixtures.place_attrs(@admin, "place") |> Cases.create_place!()
+      changes = new_changeset([], place).changes
       assert changes.street == "1234 Test St"
       assert changes.city == "City"
       assert changes.state == "OH"
       assert changes.postal_code == "00000"
       assert changes.tid == "school-address"
+      assert changes.place_id == place.id
     end
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))

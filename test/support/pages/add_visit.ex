@@ -21,4 +21,27 @@ defmodule EpicenterWeb.Test.Pages.AddVisit do
     |> Test.Html.attr("[data-page=add-visit]", "data-place-address-tid")
     |> assert_eq([place_address.tid], returning: view_or_conn_or_html)
   end
+
+  def assert_onset_date(view, date_string) do
+    view
+    |> Pages.parse()
+    |> Test.Html.text("[data-role=onset-date]")
+    |> assert_eq(date_string)
+
+    view
+  end
+
+  def assert_place_name_and_address(view, name, address) do
+    html =
+      view
+      |> Pages.parse()
+
+    html
+    |> Test.Html.text("[data-role=place-name]")
+    |> assert_eq(name)
+
+    html
+    |> Test.Html.text("[data-role=place-address]")
+    |> assert_eq(address, returning: view)
+  end
 end
