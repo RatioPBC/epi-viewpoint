@@ -19,7 +19,7 @@ defmodule EpicenterWeb.Test.Pages.PlaceSearch do
   def type_in_the_search_box(view, text) do
     view
     |> element("[data-role=place-search-form]")
-    |> render_change(%{"_target" => ["query"], "query" => "s"})
+    |> render_change(%{"_target" => ["query"], "query" => text})
 
     view
   end
@@ -30,4 +30,12 @@ defmodule EpicenterWeb.Test.Pages.PlaceSearch do
       |> Pages.parse()
       |> Test.Html.all("[data-role=place-search-result]", as: :text)
       |> assert_eq(expected_texts, returning: view)
+
+  def click_result_and_follow_redirect(view, conn, place_address_tid) do
+    view
+    |> element("[data-role=place_address_link][data-tid=#{place_address_tid}]")
+    |> render_click()
+    |> Pages.assert_redirect_succeeded()
+    |> Pages.follow_live_view_redirect(conn)
+  end
 end

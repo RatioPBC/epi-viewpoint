@@ -19,15 +19,17 @@ defmodule EpicenterWeb.PlaceSearchLiveTest do
 
       place_1 = Test.Fixtures.place_attrs(@admin, "place-1") |> Cases.create_place!()
 
-      Test.Fixtures.place_address_attrs(@admin, place_1, "place-address-1", 1111)
-      |> Cases.create_place_address!()
+      place_address_1 =
+        Test.Fixtures.place_address_attrs(@admin, place_1, "place-address-1", 1111)
+        |> Cases.create_place_address!()
 
       place_2 = Test.Fixtures.place_attrs(@admin, "place-2") |> Cases.create_place!()
 
-      Test.Fixtures.place_address_attrs(@admin, place_2, "place-address-2", 2222)
-      |> Cases.create_place_address!()
+      place_address_2 =
+        Test.Fixtures.place_address_attrs(@admin, place_2, "place-address-2", 2222)
+        |> Cases.create_place_address!()
 
-      [case_investigation: case_investigation]
+      [case_investigation: case_investigation, place_address_1: place_address_1, place_address_2: place_address_2]
     end
 
     test "showing a typeahead result", %{conn: conn, case_investigation: case_investigation} do
@@ -36,6 +38,14 @@ defmodule EpicenterWeb.PlaceSearchLiveTest do
       |> Pages.PlaceSearch.assert_selectable_results([])
       |> Pages.PlaceSearch.type_in_the_search_box("11")
       |> Pages.PlaceSearch.assert_selectable_results(["1111 Test St, City, OH 00000", "2222 Test St, City, OH 00000"])
+    end
+
+    test "clicking a typeahead result", %{conn: conn, case_investigation: case_investigation, place_address_1: place_address_1} do
+      Pages.PlaceSearch.visit(conn, case_investigation)
+      |> Pages.PlaceSearch.type_in_the_search_box("11")
+      |> Pages.PlaceSearch.assert_selectable_results(["1111 Test St, City, OH 00000", "2222 Test St, City, OH 00000"])
+      |> Pages.PlaceSearch.click_result_and_follow_redirect(conn, "place-address-1")
+      |> Pages.AddVisit.assert_here(case_investigation, place_address_1)
     end
   end
 end

@@ -1,0 +1,3 @@
+#add-visit-page data-page="add-visit" data-case-investigation-tid=@case_investigation.tid data-place-address-tid=@place_address.tid
+  h2 Add place visited
+  p Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
