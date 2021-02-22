@@ -1,7 +1,12 @@
 #add-visit-page data-page="add-visit" data-case-investigation-tid=@case_investigation.tid data-place-address-tid=@place_address.tid
-  h2 Add place visited
-  p Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
+  section
+    h2 Add place visited
+    p Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
 
-  div
-    div data-role="place-name" =@place_address.place.name
+  section.place-info
+    div.place-name data-role="place-name" =@place_address.place.name
     div data-role="place-address" =address(@place_address)
+
+  section
+    = form_for @form_changeset, "#", [data: [role: ""], id: "", phx_submit: "save", phx_change: "form-change"], fn f ->
+      = form_builder(f, %{}, @form_changeset.valid?)

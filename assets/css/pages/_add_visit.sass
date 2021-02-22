@@ -1,0 +1,18 @@
+@import "../mixins"
+
+#add-visit-page
+  #subnav
+    @include subnav
+
+    a
+      @include has-icon($link-color)
+
+  .place-info
+    background-color: $-gray-lighter
+    border: $-gray-light 1px
+
+    .place-name
+      font-weight: bold
+
+  form
+    @include form-grid
