@@ -8,5 +8,5 @@
     div data-role="place-address" =address(@place_address)
 
   section
-    = form_for @form_changeset, "#", [data: [role: ""], id: "", phx_submit: "save", phx_change: "form-change"], fn f ->
+    = form_for @form_changeset, "#", [data: [role: "add-visit-form"], id: "add-visit-form", phx_submit: "save"], fn f ->
       = form_builder(f, %{}, @form_changeset.valid?)

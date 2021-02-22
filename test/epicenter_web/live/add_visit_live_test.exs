@@ -31,5 +31,15 @@ defmodule EpicenterWeb.AddVisitLiveTest do
       |> Pages.AddVisit.assert_here(case_investigation, place_address)
       |> Pages.AddVisit.assert_place_name_and_address("the best place", "1111 Test St, City, OH 00000")
     end
+
+    test "submits form correctly", %{conn: conn, case_investigation: case_investigation, place_address: place_address} do
+      Pages.AddVisit.visit(conn, case_investigation, place_address)
+      |> Pages.submit_and_follow_redirect(conn, "#add-visit-form",
+        add_visit_form: %{
+          "relationship" => "A reasonable bit of text",
+          "occurred_on" => "09/06/2020"
+        }
+      )
+    end
   end
 end
