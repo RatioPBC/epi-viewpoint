@@ -266,7 +266,7 @@ defmodule Epicenter.Cases do
   def preload_demographics(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(demographics: Demographic.Query.display_order())
   def update_demographic(%Demographic{} = demo, {attrs, audit_meta}), do: demo |> change_demographic(attrs) |> AuditingRepo.update(audit_meta)
 
-  # 
+  #
   # places
   #
   def change_place(place, attrs), do: Place.changeset(place, attrs)
