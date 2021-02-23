@@ -32,6 +32,7 @@ defmodule Epicenter.Cases.Place do
   def changeset(place, attrs) do
     place
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
+    |> cast_assoc(:place_addresses, with: &PlaceAddress.changeset/2)
     |> Epicenter.PhoneNumber.strip_non_digits_from_number(:contact_phone)
     |> validate_phi(:place)
   end

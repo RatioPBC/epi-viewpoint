@@ -52,6 +52,49 @@ defmodule Epicenter.Cases.PlaceTest do
       assert changes.contact_email == "test@example.com"
     end
 
+    test "attributes can include address attributes" do
+      changes =
+        new_changeset(
+          name: "444 Elementary",
+          type: "school",
+          contact_name: "Alice Testuser",
+          contact_phone: "111-111-1234",
+          contact_email: "test@example.com",
+          place_addresses: [
+            %{
+              city: "City1",
+              postal_code: "00001",
+              state: "AL",
+              street: "1001 Test St",
+              tid: "address-1"
+            },
+            %{
+              city: "City2",
+              postal_code: "00002",
+              state: "AZ",
+              street: "1002 Test St",
+              tid: "address-2"
+            }
+          ]
+        ).changes
+
+      assert changes.name == "444 Elementary"
+      assert changes.type == "school"
+      assert changes.contact_name == "Alice Testuser"
+      assert changes.contact_phone == "1111111234"
+      assert changes.contact_email == "test@example.com"
+
+      changes.place_addresses
+      |> Enum.map(& &1.changes)
+      |> assert_eq(
+        [
+          %{city: "City1", postal_code: "00001", state: "AL", street: "1001 Test St", tid: "address-1"},
+          %{city: "City2", postal_code: "00002", state: "AZ", street: "1002 Test St", tid: "address-2"}
+        ],
+        ignore_order: true
+      )
+    end
+
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
 
     test "validates name doesn't contain pii in non-prod", do: assert_invalid(new_changeset(contact_name: "Alice"))

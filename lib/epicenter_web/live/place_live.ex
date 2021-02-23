@@ -30,8 +30,7 @@ defmodule EpicenterWeb.PlaceLive do
   def handle_event("save", %{"place_form" => params}, socket) do
     with %Ecto.Changeset{} = form_changeset <- PlaceForm.changeset(socket.assigns.place, params),
          {:form, {:ok, place_attrs}} <- {:form, PlaceForm.place_attrs(form_changeset)},
-         {:form, {:ok, place_address_attrs}} = {:form, PlaceForm.place_address_attrs(form_changeset)},
-         {:place, {:ok, _place}} <- {:place, create_place(socket, place_attrs, place_address_attrs)} do
+         {:place, {:ok, _place}} <- {:place, create_place(socket, place_attrs)} do
       socket
       |> push_redirect(to: Routes.people_path(socket, EpicenterWeb.PeopleLive))
       |> noreply()
@@ -46,15 +45,14 @@ defmodule EpicenterWeb.PlaceLive do
     end
   end
 
-  defp create_place(socket, place_attrs, place_address_attrs) do
+  defp create_place(socket, place_attrs) do
     Cases.create_place(
-      place_attrs,
-      place_address_attrs,
-      %AuditLog.Meta{
-        author_id: socket.assigns.current_user.id,
-        reason_action: AuditLog.Revision.create_place_action(),
-        reason_event: AuditLog.Revision.create_place_event()
-      }
+      {place_attrs,
+       %AuditLog.Meta{
+         author_id: socket.assigns.current_user.id,
+         reason_action: AuditLog.Revision.create_place_action(),
+         reason_event: AuditLog.Revision.create_place_event()
+       }}
     )
   end
 

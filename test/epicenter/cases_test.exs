@@ -980,10 +980,8 @@ defmodule Epicenter.CasesTest do
     end
 
     test "create_place with place address" do
-      {place_attrs, _} = Test.Fixtures.place_attrs(@admin, "place")
-      place_address_attrs = %{street: "3456 Test St", tid: "place-address"}
-
-      {:ok, place} = Cases.create_place(place_attrs, place_address_attrs, Test.Fixtures.admin_audit_meta())
+      {place_attrs, _} = Test.Fixtures.place_attrs(@admin, "place", place_addresses: [%{street: "3456 Test St", tid: "place-address"}])
+      {:ok, place} = Cases.create_place({place_attrs, Test.Fixtures.admin_audit_meta()})
 
       place = place |> Cases.preload_place_addresses()
 
