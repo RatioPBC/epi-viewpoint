@@ -7,10 +7,14 @@ defmodule EpicenterWeb.Forms.PlaceForm do
 
   @primary_key false
   @required_attrs ~w{}a
-  @optional_attrs ~w{name street type contact_name contact_phone contact_email}a
+  @optional_attrs ~w{name street street_2 city state postal_code type contact_name contact_phone contact_email}a
   embedded_schema do
     field :name, :string
     field :street, :string
+    field :street_2, :string
+    field :city, :string
+    field :state, :string
+    field :postal_code, :string
     field :type, :string
     field :contact_name, :string
     field :contact_phone, :string
@@ -34,7 +38,11 @@ defmodule EpicenterWeb.Forms.PlaceForm do
       }
 
       address_attrs = %{
-        street: Map.get(place_form, :street)
+        street: Map.get(place_form, :street),
+        street_2: Map.get(place_form, :street_2),
+        city: Map.get(place_form, :city),
+        state: Map.get(place_form, :state),
+        postal_code: Map.get(place_form, :postal_code)
       }
 
       attrs =
@@ -43,21 +51,6 @@ defmodule EpicenterWeb.Forms.PlaceForm do
           else: attrs |> Map.put(:place_addresses, [address_attrs])
 
       {:ok, attrs}
-    else
-      other -> other
-    end
-  end
-
-  def place_address_attrs(%Ecto.Changeset{} = changeset) do
-    with {:ok, place_form} <- apply_action(changeset, :create) do
-      attrs = %{
-        street: Map.get(place_form, :street)
-      }
-
-      case Euclid.Extra.Map.all_values_blank?(attrs) do
-        true -> {:ok, nil}
-        false -> {:ok, attrs}
-      end
     else
       other -> other
     end

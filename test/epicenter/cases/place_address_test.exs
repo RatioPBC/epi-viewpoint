@@ -19,6 +19,7 @@ defmodule Epicenter.Cases.PlaceAddressTest do
           {:seq, :integer},
           {:state, :string},
           {:street, :string},
+          {:street_2, :string},
           {:tid, :string},
           {:updated_at, :utc_datetime}
         ]
@@ -46,6 +47,7 @@ defmodule Epicenter.Cases.PlaceAddressTest do
       place = Test.Fixtures.place_attrs(@admin, "place") |> Cases.create_place!()
       changes = new_changeset([], place).changes
       assert changes.street == "1234 Test St"
+      assert changes.street_2 == "Unit 303"
       assert changes.city == "City"
       assert changes.state == "OH"
       assert changes.postal_code == "00000"
@@ -55,6 +57,7 @@ defmodule Epicenter.Cases.PlaceAddressTest do
 
     test "default test attrs are valid", do: assert_valid(new_changeset(%{}))
     test "street is optional", do: assert_valid(new_changeset(street: nil))
+    test "street_2 is optional", do: assert_valid(new_changeset(street_2: nil))
     test "city is optional", do: assert_valid(new_changeset(city: nil))
     test "state is optional", do: assert_valid(new_changeset(state: nil))
     test "postal_code is optional", do: assert_valid(new_changeset(postal_code: nil))
@@ -64,13 +67,13 @@ defmodule Epicenter.Cases.PlaceAddressTest do
 
   describe "to_comparable_string" do
     test "returns a string that's meant for comparison" do
-      %PlaceAddress{street: "1000  Test st", city: "   City3  ", state: "Al", postal_code: " 00001 "}
+      %PlaceAddress{street: "1000  Test st", street_2: "APT 202", city: "   City3  ", state: "Al", postal_code: " 00001 "}
       |> PlaceAddress.to_comparable_string()
-      |> assert_eq("1000 test st city3 al 00001")
+      |> assert_eq("1000 test st apt 202 city3 al 00001")
     end
 
     test "handles missing fields" do
-      %PlaceAddress{street: "1000  Test st", city: nil, state: "Al", postal_code: " 00001 "}
+      %PlaceAddress{street: "1000  Test st", street_2: nil, city: nil, state: "Al", postal_code: " 00001 "}
       |> PlaceAddress.to_comparable_string()
       |> assert_eq("1000 test st al 00001")
     end

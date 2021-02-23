@@ -1,8 +1,6 @@
 defmodule EpicenterWeb.Presenters.LabResultPresenterTest do
   use Epicenter.DataCase, async: true
 
-  alias Epicenter.Test
-
   alias Epicenter.Cases
   alias Epicenter.Test
   alias EpicenterWeb.Presenters.LabResultPresenter

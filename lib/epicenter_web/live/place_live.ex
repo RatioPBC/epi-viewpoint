@@ -4,11 +4,12 @@ defmodule EpicenterWeb.PlaceLive do
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, ok: 1, noreply: 1]
 
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias Epicenter.Cases.Place
-  alias Epicenter.AuditLog
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.PlaceForm
+  alias EpicenterWeb.Presenters.GeographyPresenter
 
   def mount(_params, session, socket) do
     socket = socket |> authenticate_user(session)
@@ -87,6 +88,13 @@ defmodule EpicenterWeb.PlaceLive do
     Form.new(form)
     |> Form.line(&Form.text_field(&1, :name, "Location name", span: 4))
     |> Form.line(&Form.text_field(&1, :street, "Address", span: 4))
+    |> Form.line(&Form.text_field(&1, :street_2, "Apartment, suite, etc.", span: 4))
+    |> Form.line(fn line ->
+      line
+      |> Form.text_field(:city, "City", span: 2)
+      |> Form.select(:state, "State", GeographyPresenter.states(nil), span: 1)
+      |> Form.text_field(:postal_code, "Zip", span: 1)
+    end)
     |> Form.line(&Form.select(&1, :type, "Type of place", @place_types, span: 4))
     |> Form.line(&Form.text_field(&1, :contact_name, "Name of main contact", span: 4))
     |> Form.line(&Form.text_field(&1, :contact_phone, "Phone", span: 4))

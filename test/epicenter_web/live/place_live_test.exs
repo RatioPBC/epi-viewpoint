@@ -13,6 +13,10 @@ defmodule EpicenterWeb.PlaceLiveTest do
       |> Pages.Place.submit_place(conn,
         name: "Alicecorp HQ",
         street: "1234 Test St",
+        street_2: "Unit 303",
+        city: "City",
+        state: "OH",
+        postal_code: "00000",
         contact_name: "Alice Testuser",
         contact_phone: "111-111-1234",
         contact_email: "alice@example.com",
@@ -29,6 +33,10 @@ defmodule EpicenterWeb.PlaceLiveTest do
 
       [place_address] = new_place.place_addresses
       assert place_address.street == "1234 Test St"
+      assert place_address.street_2 == "Unit 303"
+      assert place_address.city == "City"
+      assert place_address.state == "OH"
+      assert place_address.postal_code == "00000"
     end
 
     test "user can create a new place without an address", %{user: user, conn: conn} do

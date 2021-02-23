@@ -8,7 +8,7 @@ defmodule Epicenter.Cases.PlaceAddress do
   alias Epicenter.Extra
 
   @required_attrs ~w{}a
-  @optional_attrs ~w{city place_id postal_code state street tid}a
+  @optional_attrs ~w{city place_id postal_code state street street_2 tid}a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
@@ -21,6 +21,7 @@ defmodule Epicenter.Cases.PlaceAddress do
     field :seq, :integer, read_after_writes: true
     field :state, :string
     field :street, :string
+    field :street_2, :string
     field :tid, :string
 
     belongs_to :place, Place
@@ -35,7 +36,7 @@ defmodule Epicenter.Cases.PlaceAddress do
   end
 
   def to_comparable_string(%PlaceAddress{} = address) do
-    [address.street, address.city, address.state, address.postal_code]
+    [address.street, address.street_2, address.city, address.state, address.postal_code]
     |> Euclid.Extra.Enum.compact()
     |> Enum.map(fn s -> s |> Extra.String.squish() |> Extra.String.trim() |> String.downcase() end)
     |> Enum.join(" ")

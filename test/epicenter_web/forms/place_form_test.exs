@@ -34,7 +34,11 @@ defmodule EpicenterWeb.Forms.PlaceFormTest do
           contact_phone: "111-111-1234",
           name: "123 Elementary",
           type: "school",
-          street: "1234 Test St"
+          street: "1234 Test St",
+          street_2: "Apt. 202",
+          city: "City",
+          state: "OH",
+          postal_code: "00000"
         })
 
       assert PlaceForm.place_attrs(changeset) ==
@@ -45,7 +49,15 @@ defmodule EpicenterWeb.Forms.PlaceFormTest do
                   contact_phone: "111-111-1234",
                   name: "123 Elementary",
                   type: "school",
-                  place_addresses: [%{street: "1234 Test St"}]
+                  place_addresses: [
+                    %{
+                      street: "1234 Test St",
+                      street_2: "Apt. 202",
+                      city: "City",
+                      state: "OH",
+                      postal_code: "00000"
+                    }
+                  ]
                 }}
     end
   end

@@ -196,6 +196,7 @@ defmodule Epicenter.Test.Fixtures do
         postal_code: "00000",
         state: "OH",
         street: "#{street_number} Test St",
+        street_2: "Unit 303",
         tid: tid
       }
       |> merge_attrs(attrs)

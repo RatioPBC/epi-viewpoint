@@ -488,36 +488,6 @@ defmodule EpicenterWeb.ProfileEditLiveTest do
     end
   end
 
-  describe "states" do
-    test "returns a list of states tuples" do
-      "TS"
-      |> ProfileEditLive.states()
-      |> Enum.each(fn
-        {"", nil} ->
-          # pass
-          nil
-
-        state_tuple ->
-          assert {state, state} = state_tuple
-      end)
-    end
-
-    test "includes the passed-in current state" do
-      assert {"TS", "TS"} in ProfileEditLive.states("TS")
-    end
-
-    test "includes blank state" do
-      assert {"", nil} in ProfileEditLive.states(nil)
-      assert {"", nil} in ProfileEditLive.states("TS")
-    end
-
-    test "does not duplicate existing states" do
-      ProfileEditLive.states("OH")
-      |> Enum.count(fn state_tuple -> {"OH", "OH"} == state_tuple end)
-      |> assert_eq(1)
-    end
-  end
-
   describe "editing merged people" do
     test "you can still edit identifying information after merging another person into this one", %{conn: conn, person: person} do
       Pages.ProfileEdit.visit(conn, person)
