@@ -68,7 +68,7 @@
 
       .case-investigation-sections
         div
-          .case-investigation-interview-status
+          .case-investigation-interview-status data-role="case-investigation-interview-status"
             h3.status data-role="status"
               = displayable_interview_status(case_investigation)
             .case-investigation-interview-buttons

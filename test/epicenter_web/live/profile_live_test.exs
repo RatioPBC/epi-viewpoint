@@ -274,7 +274,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
-        status: "Pending",
+        status: "Pending interview",
         status_value: "pending",
         reported_on: "08/07/2020",
         timestamp: Format.date(case_investigation.inserted_at)
@@ -288,7 +288,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
-        status: "Pending",
+        status: "Pending interview",
         status_value: "pending",
         reported_on: "Unknown",
         timestamp: Format.date(case_investigation.inserted_at)
@@ -688,7 +688,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       view =
         Pages.Profile.visit(conn, person)
         |> Pages.Profile.assert_case_investigations(%{
-          status: "Pending",
+          status: "Pending interview",
           status_value: "pending",
           reported_on: "08/07/2020",
           timestamp: Format.date(case_investigation.inserted_at)

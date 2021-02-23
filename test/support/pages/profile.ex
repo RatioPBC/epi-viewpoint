@@ -7,7 +7,6 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   alias Epicenter.Cases.Person
   alias Epicenter.Extra
   alias Epicenter.Test
-  alias Epicenter.Test.HtmlAssertions
   alias EpicenterWeb.Test.LiveViewAssertions
   alias EpicenterWeb.Test.Components
   alias EpicenterWeb.Test.Pages
@@ -175,18 +174,13 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   #
 
   def assert_case_investigations(%View{} = view, %{status: status, status_value: status_value, reported_on: reported_on, timestamp: timestamp}) do
-    parsed_html =
-      view
-      |> render()
-      |> Test.Html.parse()
+    parsed_html = view |> render() |> Test.Html.parse()
 
-    parsed_html
-    |> HtmlAssertions.assert_contains_text("status", status)
-    |> HtmlAssertions.assert_contains_text("case-investigation-title", reported_on)
-    |> HtmlAssertions.assert_contains_text("case-investigation-timestamp", timestamp)
+    parsed_html |> Test.Html.text("[data-role=case-investigation-title]") |> String.trim() |> assert_eq("Case investigation #{reported_on}")
+    parsed_html |> Test.Html.text("[data-role=case-investigation-interview-status] [data-role=status]") |> String.trim() |> assert_eq(status)
+    parsed_html |> Test.Html.text("[data-role=case-investigation-timestamp]") |> String.trim() |> assert_eq("Created on #{timestamp}")
 
-    assert parsed_html
-           |> Test.Html.present?(selector: ".#{status_value}")
+    assert parsed_html |> Test.Html.present?(selector: ".#{status_value}")
 
     view
   end
