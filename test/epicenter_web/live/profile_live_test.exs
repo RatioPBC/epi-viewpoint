@@ -109,7 +109,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_full_name("Alice Testuser")
-      |> Pages.Profile.assert_external_id("ODRS ID: 987650")
+      |> Pages.Profile.assert_external_id("ID: 987650")
       |> Pages.Profile.assert_date_of_birth("01/01/2000")
       |> Pages.Profile.assert_preferred_language("Unknown")
       |> Pages.Profile.assert_phone_numbers(["Unknown"])

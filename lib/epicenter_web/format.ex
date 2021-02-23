@@ -40,7 +40,7 @@ defmodule EpicenterWeb.Format do
   def demographic(nil, _field), do: nil
   def demographic("unknown", _field), do: "Unknown"
   def demographic("declined_to_answer", _field), do: "Declined to answer"
-  def demographic(value, :external_id), do: "ODRS ID: #{value}"
+  def demographic(value, :external_id), do: "ID: #{value}"
   def demographic(value, field), do: Demographic.find_humanized_value(field, value)
 
   def person(nil), do: ""
