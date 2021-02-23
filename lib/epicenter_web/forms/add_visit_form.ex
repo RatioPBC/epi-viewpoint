@@ -3,6 +3,7 @@ defmodule EpicenterWeb.Forms.AddVisitForm do
 
   import Ecto.Changeset
 
+  alias Epicenter.DateParser
   alias EpicenterWeb.Forms.AddVisitForm
 
   @primary_key false
@@ -19,17 +20,15 @@ defmodule EpicenterWeb.Forms.AddVisitForm do
     |> validate_required(@required_attrs)
   end
 
-  # def place_attrs(%Ecto.Changeset{} = changeset) do
-  #   with {:ok, place_form} <- apply_action(changeset, :create) do
-  #     {:ok,
-  #      %{
-  #        city: Map.get(place_form, :city),
-  #        postal_code: Map.get(place_form, :postal_code),
-  #        state: Map.get(place_form, :state),
-  #        street: Map.get(place_form, :street)
-  #      }}
-  #   else
-  #     other -> other
-  #   end
-  # end
+  def visit_attrs(case_investigation, place, %{"add_visit_form" => add_visit_form_params}) do
+    %{"occurred_on" => occurred_on, "relationship" => relationship} = add_visit_form_params
+    occurred_on = DateParser.parse_mm_dd_yyyy!(occurred_on)
+
+    %{
+      case_investigation_id: case_investigation.id,
+      place_id: place.id,
+      occurred_on: occurred_on,
+      relationship: relationship
+    }
+  end
 end

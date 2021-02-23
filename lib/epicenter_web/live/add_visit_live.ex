@@ -6,6 +6,7 @@ defmodule EpicenterWeb.AddVisitLive do
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, ok: 1, noreply: 1]
 
+  alias Epicenter.AuditLog
   alias Epicenter.Cases
   alias EpicenterWeb.Form
   alias EpicenterWeb.Forms.AddVisitForm
@@ -38,7 +39,18 @@ defmodule EpicenterWeb.AddVisitLive do
     |> Form.safe()
   end
 
-  def handle_event("save", _params, socket) do
+  def handle_event("save", params, socket) do
+    attrs = AddVisitForm.visit_attrs(socket.assigns.case_investigation, socket.assigns.place_address.place, params)
+
+    Cases.create_visit({
+      attrs,
+      %AuditLog.Meta{
+        author_id: socket.assigns.current_user.id,
+        reason_action: AuditLog.Revision.add_visit_action(),
+        reason_event: AuditLog.Revision.add_visit_event()
+      }
+    })
+
     socket
     |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
     |> noreply()

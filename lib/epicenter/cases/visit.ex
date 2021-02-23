@@ -38,4 +38,15 @@ defmodule Epicenter.Cases.Visit do
     |> Enum.map(fn s -> s |> Extra.String.squish() |> Extra.String.trim() |> String.downcase() end)
     |> Enum.join(" ")
   end
+
+  defmodule Query do
+    import Ecto.Query
+
+    alias Epicenter.Cases.Visit
+
+    def display_order() do
+      from visit in Visit,
+        order_by: [asc: visit.seq]
+    end
+  end
 end

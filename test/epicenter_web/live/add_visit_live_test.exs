@@ -40,6 +40,7 @@ defmodule EpicenterWeb.AddVisitLiveTest do
           "occurred_on" => "09/06/2020"
         }
       )
+      |> Pages.Profile.assert_visit(case_investigation, "school", "A reasonable bit of text", "09/06/2020")
     end
   end
 end

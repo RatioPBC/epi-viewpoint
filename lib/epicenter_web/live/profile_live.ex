@@ -20,6 +20,7 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
   import EpicenterWeb.Presenters.LabResultPresenter, only: [pretty_result: 1]
   import EpicenterWeb.Presenters.PeoplePresenter, only: [is_archived?: 1, is_editable?: 1]
+  import EpicenterWeb.Presenters.PlacePresenter, only: [address: 1]
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
@@ -230,6 +231,7 @@ defmodule EpicenterWeb.ProfileLive do
       |> Cases.preload_initiating_lab_result()
       |> Cases.preload_contact_investigations(socket.assigns.current_user)
       |> Cases.preload_investigation_notes()
+      |> Cases.preload_visit_details()
 
     case_investigations_contacts_persons =
       Enum.flat_map(case_investigations, & &1.contact_investigations)

@@ -979,6 +979,35 @@ defmodule EpicenterWeb.ProfileLiveTest do
     end
   end
 
+  describe "place visits" do
+    setup %{person: person} do
+      lab_result = Test.Fixtures.lab_result_attrs(person, @admin, "lab-result", ~D[2020-10-27]) |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case-investigation", %{symptom_onset_on: ~D[2021-02-18]})
+        |> Cases.create_case_investigation!()
+
+      place = Test.Fixtures.place_attrs(@admin, "place", %{name: "the best place", type: "retail"}) |> Cases.create_place!()
+
+      Test.Fixtures.place_address_attrs(@admin, place, "place-address-1", 1111)
+      |> Cases.create_place_address!()
+
+      visit =
+        Test.Fixtures.visit_attrs(@admin, "visit", place, case_investigation, %{
+          relationship: "employee",
+          occurred_on: ~D[2020-09-06]
+        })
+        |> Cases.create_visit!()
+
+      [place: place, visit: visit, case_investigation: case_investigation]
+    end
+
+    test " it displays place and date", %{case_investigation: case_investigation, person: person, conn: conn} do
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_visit(case_investigation, "retail", "employee", "09/06/2020")
+    end
+  end
+
   describe "assigning and unassigning user to a person" do
     defp table_contents(live, opts),
       do: live |> render() |> Test.Html.parse_doc() |> Test.Table.table_contents(opts |> Keyword.merge(role: "people"))

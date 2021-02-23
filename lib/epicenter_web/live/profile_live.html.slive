@@ -61,7 +61,7 @@
 
   a#case-investigations
   = for case_investigation <- @case_investigations do
-    section.case-investigation id="case-investigation-#{case_investigation.name}"
+    section.case-investigation id="case-investigation-#{case_investigation.name}" data-tid=case_investigation.tid
       header
         h2 data-role="case-investigation-title" Case investigation #{string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))}
         span.case-investigation-timestamp data-role="case-investigation-timestamp" Created on #{Format.date(case_investigation.inserted_at)}
@@ -130,6 +130,17 @@
                 .contact-edit-remove
                   = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, contact_investigation), data: [role: "edit-contact", contact_investigation: contact_investigation.id]
                   a href="#" data-confirm="Remove #{Format.person(contact_investigation.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-contact-investigation-id=contact_investigation.id data-role="remove-contact" Remove
+        .case-investigation-places
+          h4
+            span Places visited
+          = for visit <- case_investigation.visits do
+            div.visit
+              div.visit-address data-role="visit-address" =address(visit)
+              div
+                ul.dotted-details
+                  li data-role="place-type" =visit.place.type
+                  li data-role="relationship" =visit.relationship
+                  li data-role="occurred-on" ="Visited on #{Format.date(visit.occurred_on)}"
 
         = if case_investigation.interview_status == "completed" do
           div

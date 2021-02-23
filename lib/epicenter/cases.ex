@@ -5,6 +5,7 @@ defmodule Epicenter.Cases do
   alias Epicenter.AuditingRepo
   alias Epicenter.Cases.Address
   alias Epicenter.Cases.CaseInvestigation
+  alias Epicenter.Cases.InvestigationNote
   alias Epicenter.Cases.Demographic
   alias Epicenter.Cases.Email
   alias Epicenter.Cases.Import
@@ -19,6 +20,8 @@ defmodule Epicenter.Cases do
   alias Epicenter.Cases.PlaceAddress
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Extra
+  alias Epicenter.Cases.Visit
+  alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Repo
 
   import Ecto.Query, only: [distinct: 3, first: 1]
@@ -294,5 +297,27 @@ defmodule Epicenter.Cases do
   #
   # visits
   #
+  def change_visit(visit, attrs), do: Visit.changeset(visit, attrs)
+
+  def create_visit({attrs, audit_meta}),
+    do: %Visit{} |> change_visit(attrs) |> AuditingRepo.insert(audit_meta)
+
+  def create_visit!({attrs, audit_meta}) do
+    %Visit{} |> change_visit(attrs) |> AuditingRepo.insert!(audit_meta)
+  end
+
   def list_visits(), do: []
+
+  def preload_visits(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:visits)
+
+  def preload_visit_details(case_investigations) do
+    case_investigations
+    |> Repo.preload(
+      visits:
+        {Visit.Query.display_order(),
+         [
+           place: [place_addresses: Ecto.Query.from(a in PlaceAddress, order_by: a.seq)]
+         ]}
+    )
+  end
 end
