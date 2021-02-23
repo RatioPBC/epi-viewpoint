@@ -109,4 +109,5 @@ Depending on permissions with the database, it may be necessary to modify the sc
 
 ## Copyright and license
 
-TBD
+Copyright © 2021 Geometer, LLC, and Resolve to Save Lives. This code is available under the Apache 2.0 license.
+See also [license](LICENSE.txt).
