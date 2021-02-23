@@ -7,6 +7,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
 
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.InvestigationNote
+  alias Epicenter.Cases.Visit
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.LabResult
   alias Epicenter.Cases.Person
@@ -61,6 +62,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
 
     has_many :contact_investigations, ContactInvestigation, foreign_key: :exposing_case_id, where: [deleted_at: nil]
     has_many :notes, InvestigationNote, foreign_key: :case_investigation_id, where: [deleted_at: nil]
+    has_many :visits, Visit, foreign_key: :case_investigation_id
   end
 
   derive_jason_encoder(except: [:seq])

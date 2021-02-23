@@ -2,12 +2,13 @@ defmodule Epicenter.Cases.Visit do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.Cases.Place
   alias Epicenter.Cases.PlaceAddress
   alias Epicenter.Extra
 
-  @required_attrs ~w{place_id}a
-  @optional_attrs ~w{tid}a
+  @required_attrs ~w{place_id case_investigation_id}a
+  @optional_attrs ~w{tid relationship occurred_on}a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
@@ -15,12 +16,12 @@ defmodule Epicenter.Cases.Visit do
   @foreign_key_type :binary_id
   schema "visits" do
     field :occurred_on, :date
+    field :relationship, :string
     field :seq, :integer, read_after_writes: true
     field :tid, :string
 
+    belongs_to :case_investigation, CaseInvestigation
     belongs_to :place, Place
-    # todo: should belong to a CaseInvestigation or a Person, depending on outcome of some decision
-    # belongs_to :case_investigation, CaseInvestigation
 
     timestamps(type: :utc_datetime)
   end

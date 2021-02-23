@@ -295,9 +295,10 @@ defmodule Epicenter.Test.Fixtures do
     |> merge_attrs(attrs)
   end
 
-  def visit_attrs(author, tid, %Place{} = place, attrs \\ %{}) do
+  def visit_attrs(author, tid, %Place{} = place, case_investigation, attrs \\ %{}) do
     attrs =
       %{
+        case_investigation_id: case_investigation.id,
         place_id: place.id,
         tid: tid
       }
