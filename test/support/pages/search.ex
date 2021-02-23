@@ -16,8 +16,8 @@ defmodule EpicenterWeb.Test.Pages.Search do
     view
     |> render()
     |> Test.Html.parse()
-    |> HtmlAssertions.assert_text("no-search-results", "No results found for")
-    |> HtmlAssertions.assert_text("no-search-results", search_term)
+    |> HtmlAssertions.assert_contains_text("no-search-results", "No results found for")
+    |> HtmlAssertions.assert_contains_text("no-search-results", search_term)
 
     view
   end

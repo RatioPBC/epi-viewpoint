@@ -181,9 +181,9 @@ defmodule EpicenterWeb.Test.Pages.Profile do
       |> Test.Html.parse()
 
     parsed_html
-    |> HtmlAssertions.assert_text("status", status)
-    |> HtmlAssertions.assert_text("case-investigation-title", reported_on)
-    |> HtmlAssertions.assert_text("case-investigation-timestamp", timestamp)
+    |> HtmlAssertions.assert_contains_text("status", status)
+    |> HtmlAssertions.assert_contains_text("case-investigation-title", reported_on)
+    |> HtmlAssertions.assert_contains_text("case-investigation-timestamp", timestamp)
 
     assert parsed_html
            |> Test.Html.present?(selector: ".#{status_value}")
