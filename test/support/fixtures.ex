@@ -208,7 +208,10 @@ defmodule Epicenter.Test.Fixtures do
       %{
         name: "123 Elementary",
         tid: tid,
-        type: "school"
+        type: "school",
+        contact_name: "Alice Testuser",
+        contact_phone: "111-111-1234",
+        contact_email: "alice@example.com"
       }
       |> merge_attrs(attrs)
 

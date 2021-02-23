@@ -978,6 +978,18 @@ defmodule Epicenter.CasesTest do
 
       Cases.list_places(@admin) |> tids() |> assert_eq(~w[place-1 place-2], ignore_order: true)
     end
+
+    test "create_place with place address" do
+      {place_attrs, _} = Test.Fixtures.place_attrs(@admin, "place")
+      place_address_attrs = %{street: "3456 Test St", tid: "place-address"}
+
+      {:ok, place} = Cases.create_place(place_attrs, place_address_attrs, Test.Fixtures.admin_audit_meta())
+
+      place = place |> Cases.preload_place_address()
+
+      assert place.tid == "place"
+      assert place.place_address.tid == "place-address"
+    end
   end
 
   # # #

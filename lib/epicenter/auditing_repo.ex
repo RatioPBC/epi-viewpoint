@@ -79,6 +79,8 @@ defmodule Epicenter.AuditingRepo do
   def module_name(%module{} = _struct), do: module |> module_name()
   def module_name(module), do: module |> inspect() |> String.split(".") |> Enum.reject(&(&1 in ~w{Epicenter EpicenterWeb})) |> Enum.join(".")
 
+  def multi(multi, %Meta{} = _meta), do: multi |> Repo.transaction()
+
   def revisions(changed_type), do: Revision.Query.with_changed_type(changed_type) |> Repo.all()
 
   def update(changeset, %Meta{} = meta, ecto_options \\ [], changeset_flattening_function \\ &recursively_get_changes_from_changeset/1) do

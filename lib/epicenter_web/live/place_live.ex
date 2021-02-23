@@ -28,57 +28,33 @@ defmodule EpicenterWeb.PlaceLive do
   end
 
   def handle_event("save", %{"place_form" => params}, socket) do
-    IO.inspect params, label: "params"
-    IO.inspect socket.assigns.form_changeset, label: "foof"
-    # "street" field is currently getting dropped in update
-    changeset = update(socket.assigns.form_changeset, params)
-    place_params = PlaceForm.place_attrs(changeset)
-
-    IO.inspect(place_params, label: "place param")
-
-    with {:validation_step, []} <- {:validation_step, changeset.errors},
-         {:ok, _place} <-
-           Cases.create_place(
-             {place_params,
-              %AuditLog.Meta{
-                author_id: socket.assigns.current_user.id,
-                reason_action: AuditLog.Revision.create_place_action(),
-                reason_event: AuditLog.Revision.create_place_event()
-              }}
-           ) do
+    with %Ecto.Changeset{} = form_changeset <- PlaceForm.changeset(socket.assigns.place, params),
+         {:form, {:ok, place_attrs}} <- {:form, PlaceForm.place_attrs(form_changeset)},
+         {:form, {:ok, place_address_attrs}} = {:form, PlaceForm.place_address_attrs(form_changeset)},
+         {:place, {:ok, _place}} <- {:place, create_place(socket, place_attrs, place_address_attrs)} do
       socket
       |> push_redirect(to: Routes.people_path(socket, EpicenterWeb.PeopleLive))
       |> noreply()
     else
-      {:validation_step, _} ->
-        socket |> assign_form_changeset(changeset) |> noreply()
+      {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
+        socket |> assign_form_changeset(form_changeset) |> noreply()
 
-        # {:place, {:error, form_changeset}} ->
-        #   socket
-        #   |> assign_form_changeset(form_changeset, "An unexpected error occurred")
-        #   |> noreply()
+      {:place, {:error, _, _}} ->
+        socket
+        |> assign_form_changeset(PlaceForm.changeset(socket.assigns.place, params), "An unexpected error occurred")
+        |> noreply()
     end
   end
 
-  defp update(changeset, params) do
-    IO.inspect(changeset)
-
-    changeset
-    |> Ecto.Changeset.cast(params, [:name, :street, :type, :contact_name, :contact_phone, :contact_email])
-
-    # |> Ecto.Changeset.cast_embed(:place, with: &PlaceForm.changeset/2)
-    # |> Ecto.Changeset.cast_embed(:place, with: &Cases.Place.changeset/2)
-    # |> Ecto.Changeset.cast_embed(:place_address, with: &Cases.PlaceAddress.changeset/2)
-  end
-
-  defp create_place(socket, place_attrs) do
+  defp create_place(socket, place_attrs, place_address_attrs) do
     Cases.create_place(
-      {place_attrs,
-       %AuditLog.Meta{
-         author_id: socket.assigns.current_user.id,
-         reason_action: AuditLog.Revision.create_place_action(),
-         reason_event: AuditLog.Revision.create_place_event()
-       }}
+      place_attrs,
+      place_address_attrs,
+      %AuditLog.Meta{
+        author_id: socket.assigns.current_user.id,
+        reason_action: AuditLog.Revision.create_place_action(),
+        reason_event: AuditLog.Revision.create_place_event()
+      }
     )
   end
 

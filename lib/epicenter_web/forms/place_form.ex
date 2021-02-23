@@ -24,17 +24,30 @@ defmodule EpicenterWeb.Forms.PlaceForm do
   end
 
   def place_attrs(%Ecto.Changeset{} = changeset) do
-    IO.inspect(changeset, label: "changeset")
     with {:ok, place_form} <- apply_action(changeset, :create) do
       {:ok,
        %{
          name: Map.get(place_form, :name),
-         street: Map.get(place_form, :street),
          type: Map.get(place_form, :type),
          contact_name: Map.get(place_form, :contact_name),
          contact_phone: Map.get(place_form, :contact_phone),
          contact_email: Map.get(place_form, :contact_email)
        }}
+    else
+      other -> other
+    end
+  end
+
+  def place_address_attrs(%Ecto.Changeset{} = changeset) do
+    with {:ok, place_form} <- apply_action(changeset, :create) do
+      attrs = %{
+        street: Map.get(place_form, :street)
+      }
+
+      case Euclid.Extra.Map.all_values_blank?(attrs) do
+        true -> {:ok, nil}
+        false -> {:ok, attrs}
+      end
     else
       other -> other
     end

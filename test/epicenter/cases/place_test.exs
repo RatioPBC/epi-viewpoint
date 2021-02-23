@@ -1,6 +1,8 @@
 defmodule Epicenter.Cases.PlaceTest do
   use Epicenter.DataCase, async: true
 
+  alias Ecto.Multi
+  alias Epicenter.Cases
   alias Epicenter.Cases.Place
   alias Epicenter.Test
 
@@ -55,5 +57,33 @@ defmodule Epicenter.Cases.PlaceTest do
     test "validates name doesn't contain pii in non-prod", do: assert_invalid(new_changeset(contact_name: "Alice"))
     test "validates phone doesn't contain pii in non-prod", do: assert_invalid(new_changeset(contact_phone: "323-555-1234"))
     test "validates email doesn't contain pii in non-prod", do: assert_invalid(new_changeset(contact_email: "test@google.com"))
+  end
+
+  describe "associations" do
+    test "has one place_address" do
+      place = Test.Fixtures.place_attrs(@admin, "place") |> Cases.create_place!()
+      Test.Fixtures.place_address_attrs(@admin, place, "place-address", 3456) |> Cases.create_place_address!()
+
+      place = place |> Cases.preload_place_address()
+
+      assert place.place_address.tid == "place-address"
+    end
+  end
+
+  describe "multi_for_insert" do
+    test "when there are place_address_attrs, it includes an insert for place_addresses" do
+      place_attrs = %{name: "123 Elementary", type: "school"}
+      place_address_attrs = %{street: "1234 Test St"}
+
+      multi_keys = Place.multi_for_insert(place_attrs, place_address_attrs) |> Multi.to_list() |> Keyword.keys()
+      assert multi_keys == [:place, :place_address]
+    end
+
+    test "when there place_address_attrs is nil, it only does the place insert" do
+      place_attrs = %{name: "123 Elementary", type: "school"}
+
+      multi_keys = Place.multi_for_insert(place_attrs, nil) |> Multi.to_list() |> Keyword.keys()
+      assert multi_keys == [:place]
+    end
   end
 end

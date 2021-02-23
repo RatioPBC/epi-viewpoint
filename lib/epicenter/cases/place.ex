@@ -3,6 +3,11 @@ defmodule Epicenter.Cases.Place do
   import Ecto.Changeset
   import Epicenter.PhiValidation, only: [validate_phi: 2]
 
+  alias Ecto.Multi
+  alias Epicenter.Cases
+  alias Epicenter.Cases.Place
+  alias Epicenter.Cases.PlaceAddress
+
   @required_attrs ~w{}a
   @optional_attrs ~w{name tid type contact_name contact_phone contact_email}a
 
@@ -21,7 +26,7 @@ defmodule Epicenter.Cases.Place do
 
     timestamps(type: :utc_datetime)
 
-    # TODO: has_one PlaceAddress?
+    has_one :place_address, PlaceAddress
   end
 
   def changeset(place, attrs) do
@@ -29,5 +34,19 @@ defmodule Epicenter.Cases.Place do
     |> cast(Enum.into(attrs, %{}), @required_attrs ++ @optional_attrs)
     |> Epicenter.PhoneNumber.strip_non_digits_from_number(:contact_phone)
     |> validate_phi(:place)
+  end
+
+  def multi_for_insert(place_attrs, nil) do
+    Multi.new()
+    |> Multi.insert(:place, fn %{} ->
+      %Place{} |> Cases.change_place(place_attrs)
+    end)
+  end
+
+  def multi_for_insert(place_attrs, place_address_attrs) do
+    multi_for_insert(place_attrs, nil)
+    |> Multi.insert(:place_address, fn %{place: place} ->
+      %PlaceAddress{place_id: place.id} |> Cases.change_place_address(place_address_attrs)
+    end)
   end
 end
