@@ -1,7 +1,7 @@
 section#people-page data-page="people"
   h2
     #title
-      span Index cases
+      span Index case investigations
 
   #toolbar
     #toolbar-left
