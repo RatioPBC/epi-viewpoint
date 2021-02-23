@@ -985,10 +985,10 @@ defmodule Epicenter.CasesTest do
 
       {:ok, place} = Cases.create_place(place_attrs, place_address_attrs, Test.Fixtures.admin_audit_meta())
 
-      place = place |> Cases.preload_place_address()
+      place = place |> Cases.preload_place_addresses()
 
       assert place.tid == "place"
-      assert place.place_address.tid == "place-address"
+      place.place_addresses |> tids() |> assert_eq(~w[place-address])
     end
   end
 

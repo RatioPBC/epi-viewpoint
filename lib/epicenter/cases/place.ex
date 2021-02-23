@@ -26,7 +26,7 @@ defmodule Epicenter.Cases.Place do
 
     timestamps(type: :utc_datetime)
 
-    has_one :place_address, PlaceAddress
+    has_many :place_addresses, PlaceAddress
   end
 
   def changeset(place, attrs) do

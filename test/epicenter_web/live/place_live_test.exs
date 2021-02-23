@@ -19,14 +19,16 @@ defmodule EpicenterWeb.PlaceLiveTest do
         type: "workplace"
       )
 
-      [new_place] = Cases.list_places(user) |> Cases.preload_place_address()
+      [new_place] = Cases.list_places(user) |> Cases.preload_place_addresses()
 
       assert new_place.name == "Alicecorp HQ"
-      assert new_place.place_address.street == "1234 Test St"
       assert new_place.type == "workplace"
       assert new_place.contact_name == "Alice Testuser"
       assert new_place.contact_phone == "1111111234"
       assert new_place.contact_email == "alice@example.com"
+
+      [place_address] = new_place.place_addresses
+      assert place_address.street == "1234 Test St"
     end
 
     test "user can create a new place without an address", %{user: user, conn: conn} do
@@ -37,7 +39,7 @@ defmodule EpicenterWeb.PlaceLiveTest do
         type: "workplace"
       )
 
-      [new_place] = Cases.list_places(user) |> Cases.preload_place_address()
+      [new_place] = Cases.list_places(user) |> Cases.preload_place_addresses()
 
       assert new_place.name == "Alicecorp HQ"
       assert new_place.type == "workplace"

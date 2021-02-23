@@ -108,7 +108,7 @@ defmodule Epicenter.Cases do
     )
   end
 
-  def preload_place_address(place), do: place |> Repo.preload(:place_address)
+  def preload_place_addresses(place), do: place |> Repo.preload(:place_addresses)
 
   defp log_contact_investigations(has_many_contacts_or_nil, _user) when is_nil(has_many_contacts_or_nil), do: has_many_contacts_or_nil
 

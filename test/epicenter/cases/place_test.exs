@@ -64,9 +64,8 @@ defmodule Epicenter.Cases.PlaceTest do
       place = Test.Fixtures.place_attrs(@admin, "place") |> Cases.create_place!()
       Test.Fixtures.place_address_attrs(@admin, place, "place-address", 3456) |> Cases.create_place_address!()
 
-      place = place |> Cases.preload_place_address()
-
-      assert place.place_address.tid == "place-address"
+      [place_address] = place |> Cases.preload_place_addresses() |> Map.get(:place_addresses)
+      assert place_address.tid == "place-address"
     end
   end
 
