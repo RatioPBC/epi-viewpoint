@@ -31,6 +31,14 @@ defmodule EpicenterWeb.Test.Pages.PlaceSearch do
       |> Test.Html.all("[data-role=place-search-result]", as: :text)
       |> assert_eq(expected_texts, returning: view)
 
+  def click_add_new_place_and_follow_redirect(view, conn) do
+    view
+    |> element("[data-role=add-new-place]")
+    |> render_click()
+    |> Pages.assert_redirect_succeeded()
+    |> Pages.follow_live_view_redirect(conn)
+  end
+
   def click_result_and_follow_redirect(view, conn, place_address_tid) do
     view
     |> element("[data-role=place_address_link][data-tid=#{place_address_tid}]")

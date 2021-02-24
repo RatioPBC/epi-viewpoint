@@ -25,7 +25,7 @@ defmodule EpicenterWeb.PlaceLiveTest do
     } do
       view =
         Pages.Place.visit(conn, case_investigation)
-        |> Pages.Place.assert_here()
+        |> Pages.Place.assert_here(case_investigation)
         |> Pages.Place.submit_place(conn,
           name: "Alicecorp HQ",
           street: "1234 Test St",
@@ -60,7 +60,7 @@ defmodule EpicenterWeb.PlaceLiveTest do
 
     test "user can create a new place without an address", %{user: user, conn: conn, case_investigation: case_investigation} do
       Pages.Place.visit(conn, case_investigation)
-      |> Pages.Place.assert_here()
+      |> Pages.Place.assert_here(case_investigation)
       |> Pages.Place.submit_place(conn,
         name: "Alicecorp HQ",
         type: "workplace"
@@ -74,7 +74,7 @@ defmodule EpicenterWeb.PlaceLiveTest do
 
     test "shows errors when creating invalid place", %{conn: conn, case_investigation: case_investigation} do
       Pages.Place.visit(conn, case_investigation)
-      |> Pages.Place.assert_here()
+      |> Pages.Place.assert_here(case_investigation)
       |> Pages.submit_live("#place-form",
         place_form: %{
           "city" => "glorp",

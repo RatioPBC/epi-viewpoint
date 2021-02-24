@@ -59,5 +59,11 @@ defmodule EpicenterWeb.PlaceSearchLiveTest do
       |> Pages.PlaceSearch.type_in_the_search_box("Alice's Donuts")
       |> Pages.PlaceSearch.assert_selectable_results(["Alice's Donuts1111 Test St, City, OH 00000"])
     end
+
+    test "navigating to create a new  place", %{conn: conn, case_investigation: case_investigation} do
+      Pages.PlaceSearch.visit(conn, case_investigation)
+      |> Pages.PlaceSearch.click_add_new_place_and_follow_redirect(conn)
+      |> Pages.Place.assert_here(case_investigation)
+    end
   end
 end

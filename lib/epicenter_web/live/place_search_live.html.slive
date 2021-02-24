@@ -1,17 +1,25 @@
 #place-page data-page="place-search" data-tid=@case_investigation.tid
-  h2 Add place visited
-  p Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
+  section
+    h2 Add place visited
+    p Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
 
-  form data-role="place-search-form" phx-change="suggest-place"
-    #place-autocomplete
-      input name="query" value=@query placeholder="name or address" phx-debounce="200" phx-hook="AutocompleteInput"  autocapitalize="none" type="text" autocomplete="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="true"
-      ul phx-hook="AutocompleteList" role="listbox"
-        = for place_address <- @result_place_addresses do
-          li data-role="place-search-result"
-            = live_redirect \
-                to: Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, @case_investigation, place: place_address.place, place_address: place_address),
-                data_role: "place_address_link",
-                data_tid: place_address.tid \
-            do
-              span.place-name =place_address.place.name
-              span =address(place_address)
+  section
+    div.left-right
+      form data-role="place-search-form" phx-change="suggest-place"
+        #place-autocomplete
+          input name="query" value=@query placeholder="name or address" phx-debounce="200" phx-hook="AutocompleteInput"  autocapitalize="none" type="text" autocomplete="off" spellcheck="false" aria-autocomplete="list" role="combobox" aria-expanded="true"
+          ul phx-hook="AutocompleteList" role="listbox"
+            = for place_address <- @result_place_addresses do
+              li data-role="place-search-result"
+                = live_redirect \
+                    to: Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, @case_investigation, place: place_address.place, place_address: place_address),
+                    data_role: "place_address_link",
+                    data_tid: place_address.tid \
+                do
+                  span.place-name =place_address.place.name
+                  span =address(place_address)
+
+      = live_redirect "+ Add new Place",
+        to: Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, @case_investigation),
+        data_role: "add-new-place",
+        class: "new-place-link"
