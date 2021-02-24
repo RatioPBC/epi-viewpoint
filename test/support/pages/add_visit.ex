@@ -4,8 +4,8 @@ defmodule EpicenterWeb.Test.Pages.AddVisit do
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
-  def visit(%Plug.Conn{} = conn, case_investigation, place_address),
-    do: conn |> Pages.visit("/case-investigations/#{case_investigation.id}/place-addresses/#{place_address.id}/add-visit")
+  def visit(%Plug.Conn{} = conn, case_investigation, place, place_address),
+    do: conn |> Pages.visit("/case-investigations/#{case_investigation.id}/add-visit?place=#{place.id}&place_address=#{place_address.id}")
 
   def assert_here(view_or_conn_or_html, case_investigation, place_address) do
     html =

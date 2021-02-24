@@ -8,8 +8,10 @@
       ul phx-hook="AutocompleteList" role="listbox"
         = for place_address <- @result_place_addresses do
           li data-role="place-search-result"
-            = live_redirect to: Routes.add_visit_path(EpicenterWeb.Endpoint,
-              EpicenterWeb.AddVisitLive, @case_investigation, place_address), data_role: "place_address_link",
-              data_tid: place_address.tid do
-                span.place-name =place_address.place.name
-                span =address(place_address)
+            = live_redirect \
+                to: Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, @case_investigation, place: place_address.place, place_address: place_address),
+                data_role: "place_address_link",
+                data_tid: place_address.tid \
+            do
+              span.place-name =place_address.place.name
+              span =address(place_address)

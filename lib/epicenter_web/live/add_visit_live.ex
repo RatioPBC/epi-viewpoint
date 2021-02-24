@@ -18,11 +18,13 @@ defmodule EpicenterWeb.AddVisitLive do
       Cases.get_case_investigation(params["case_investigation_id"], socket.assigns.current_user)
       |> Cases.preload_person()
 
-    place_address = Cases.get_place_address(params["place_address_id"]) |> Cases.preload_place()
+    place = Cases.get_place(params["place"])
+    place_address = Cases.get_place_address(params["place_address"]) |> Cases.preload_place()
 
     socket
     |> assign_defaults()
     |> assign_page_title("Add place visited")
+    |> assign(:place, place)
     |> assign(:place_address, place_address)
     |> assign(:case_investigation, case_investigation)
     |> assign_form_changeset(AddVisitForm.changeset(%AddVisitForm{}, %{}))
@@ -43,7 +45,7 @@ defmodule EpicenterWeb.AddVisitLive do
          {:data, {:ok, data}} <-
            {:data, AddVisitForm.visit_attrs(form_changeset)},
          data = data |> Map.put(:case_investigation_id, socket.assigns.case_investigation.id),
-         data = data |> Map.put(:place_id, socket.assigns.place_address.place.id),
+         data = data |> Map.put(:place_id, socket.assigns.place.id),
          {:save, {:ok, _visit}} <- {:save, Cases.create_visit({data, audit_meta_create_visit(socket)})} do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")

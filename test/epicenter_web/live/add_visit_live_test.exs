@@ -17,23 +17,28 @@ defmodule EpicenterWeb.AddVisitLiveTest do
         Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case-investigation", %{symptom_onset_on: ~D[2021-02-18]})
         |> Cases.create_case_investigation!()
 
-      place_1 = Test.Fixtures.place_attrs(@admin, "place-1", %{name: "the best place"}) |> Cases.create_place!()
+      place = Test.Fixtures.place_attrs(@admin, "place-1", %{name: "the best place"}) |> Cases.create_place!()
 
       place_address =
-        Test.Fixtures.place_address_attrs(@admin, place_1, "place-address-1", 1111)
+        Test.Fixtures.place_address_attrs(@admin, place, "place-address-1", 1111)
         |> Cases.create_place_address!()
 
-      [case_investigation: case_investigation, place_address: place_address]
+      [case_investigation: case_investigation, place_address: place_address, place: place]
     end
 
-    test "showing the selected case investigation and place", %{conn: conn, case_investigation: case_investigation, place_address: place_address} do
-      Pages.AddVisit.visit(conn, case_investigation, place_address)
+    test "showing the selected case investigation and place", %{
+      conn: conn,
+      case_investigation: case_investigation,
+      place_address: place_address,
+      place: place
+    } do
+      Pages.AddVisit.visit(conn, case_investigation, place, place_address)
       |> Pages.AddVisit.assert_here(case_investigation, place_address)
       |> Pages.AddVisit.assert_place_name_and_address("the best place", "1111 Test St, City, OH 00000")
     end
 
-    test "submits form correctly", %{conn: conn, case_investigation: case_investigation, place_address: place_address} do
-      Pages.AddVisit.visit(conn, case_investigation, place_address)
+    test "submits form correctly", %{conn: conn, case_investigation: case_investigation, place_address: place_address, place: place} do
+      Pages.AddVisit.visit(conn, case_investigation, place, place_address)
       |> Pages.submit_and_follow_redirect(conn, "#add-visit-form",
         add_visit_form: %{
           "relationship" => "A reasonable bit of text",
@@ -43,8 +48,13 @@ defmodule EpicenterWeb.AddVisitLiveTest do
       |> Pages.Profile.assert_visit(case_investigation, "school", "A reasonable bit of text", "1111111234", "09/06/2020")
     end
 
-    test "it shows an error if you submit a badly formatted date", %{conn: conn, case_investigation: case_investigation, place_address: place_address} do
-      Pages.AddVisit.visit(conn, case_investigation, place_address)
+    test "it shows an error if you submit a badly formatted date", %{
+      conn: conn,
+      case_investigation: case_investigation,
+      place_address: place_address,
+      place: place
+    } do
+      Pages.AddVisit.visit(conn, case_investigation, place, place_address)
       |> Pages.submit_expecting_error("#add-visit-form",
         add_visit_form: %{
           "relationship" => "A reasonable bit of text",
@@ -57,9 +67,10 @@ defmodule EpicenterWeb.AddVisitLiveTest do
     test "it shows an error if you don't enter an occurred_on date", %{
       conn: conn,
       case_investigation: case_investigation,
-      place_address: place_address
+      place_address: place_address,
+      place: place
     } do
-      Pages.AddVisit.visit(conn, case_investigation, place_address)
+      Pages.AddVisit.visit(conn, case_investigation, place, place_address)
       |> Pages.submit_expecting_error("#add-visit-form",
         add_visit_form: %{
           "relationship" => "A reasonable bit of text"

@@ -274,6 +274,7 @@ defmodule Epicenter.Cases do
   def change_place(place, attrs), do: Place.changeset(place, attrs)
   def create_place({attrs, audit_meta}), do: %Place{} |> change_place(attrs) |> AuditingRepo.insert(audit_meta)
   def create_place!({attrs, audit_meta}), do: %Place{} |> change_place(attrs) |> AuditingRepo.insert!(audit_meta)
+  def get_place(place_id), do: Repo.get(Place, place_id)
   def list_places(user), do: AuditingRepo.all(Place, user)
 
   def search_places(search_string) do

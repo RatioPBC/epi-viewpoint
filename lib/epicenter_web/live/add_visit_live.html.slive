@@ -4,7 +4,7 @@
     p Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
 
   section.place-info
-    div.place-name data-role="place-name" =@place_address.place.name
+    div.place-name data-role="place-name" =@place.name
     div data-role="place-address" =address(@place_address)
 
   section
