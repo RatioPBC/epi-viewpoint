@@ -138,8 +138,15 @@
                   = live_redirect "Edit", to: Routes.edit_case_investigation_contact_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation, contact_investigation), data: [role: "edit-contact", contact_investigation: contact_investigation.id]
                   a href="#" data-confirm="Remove #{Format.person(contact_investigation.exposed_person)} as a contact?" phx-click="remove-contact" phx-value-contact-investigation-id=contact_investigation.id data-role="remove-contact" Remove
         .case-investigation-places
-          h4
-            span Places visited
+          .places-header-row
+            h4
+              span Places visited
+            div
+              = if is_editable?(@person) do
+                = live_redirect "+ Place",
+                to: Routes.place_search_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceSearchLive, case_investigation),
+                id: "add-place-link-#{case_investigation.tid}",
+                class: "add-place-link"
           = for visit <- case_investigation.visits do
             div.visit
               div

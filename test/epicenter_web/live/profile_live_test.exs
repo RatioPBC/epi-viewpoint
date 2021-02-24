@@ -1008,7 +1008,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       [place: place, visit: visit, case_investigation: case_investigation]
     end
 
-    test " it displays place and date", %{case_investigation: case_investigation, person: person, conn: conn} do
+    test "it displays place and date", %{case_investigation: case_investigation, person: person, conn: conn} do
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_visit_address(case_investigation, "the best place", "1111 Test St, City, OH 00000")
       |> Pages.Profile.assert_visit(case_investigation, "retail", "employee", "1111111234", "09/06/2020")

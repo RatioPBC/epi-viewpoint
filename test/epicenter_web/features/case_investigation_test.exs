@@ -76,6 +76,10 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
 
     [person] = Cases.list_people(:all, user: @admin, reject_archived_people: true)
 
+    case_investigation = person |> Cases.preload_case_investigations() |> Map.get(:case_investigations) |> hd()
+
+    {:ok, case_investigation} = Cases.update_case_investigation(case_investigation, {%{tid: "case-investigation"}, Test.Fixtures.admin_audit_meta()})
+
     conn
     |> Pages.Profile.visit(person)
     |> Pages.Profile.assert_here(person)
@@ -173,6 +177,9 @@ defmodule EpicenterWeb.Features.CaseInvestigationTest do
         " "
       )
     )
+    |> Pages.Profile.click_add_place_link(case_investigation.tid)
+    |> Pages.follow_live_view_redirect(conn)
+    |> Pages.PlaceSearch.assert_here(case_investigation)
 
     Pages.Contacts.visit(conn)
     |> Pages.Contacts.assert_here()

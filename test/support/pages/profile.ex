@@ -530,6 +530,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_add_place_link(%View{} = view, number) do
+    view
+    |> element("#add-place-link-#{number}")
+    |> render_click()
+  end
+
   def click_add_isolation_dates(%View{} = view, number) do
     view
     |> element("#add-isolation-dates-case-investigation-link-#{number}")
