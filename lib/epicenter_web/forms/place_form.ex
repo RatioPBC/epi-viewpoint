@@ -3,6 +3,7 @@ defmodule EpicenterWeb.Forms.PlaceForm do
 
   import Ecto.Changeset
 
+  alias Epicenter.PhiValidation
   alias EpicenterWeb.Forms.PlaceForm
 
   @primary_key false
@@ -25,6 +26,9 @@ defmodule EpicenterWeb.Forms.PlaceForm do
     %PlaceForm{}
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+    |> Epicenter.PhoneNumber.strip_non_digits_from_number(:contact_phone)
+    |> PhiValidation.validate_phi(:place)
+    |> PhiValidation.validate_phi(:address)
   end
 
   def place_attrs(%Ecto.Changeset{} = changeset) do

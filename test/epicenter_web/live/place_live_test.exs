@@ -53,21 +53,30 @@ defmodule EpicenterWeb.PlaceLiveTest do
       assert new_place.type == "workplace"
     end
 
-    @tag :skip
     test "shows errors when creating invalid place", %{conn: conn} do
       Pages.Place.visit(conn)
       |> Pages.Place.assert_here()
       |> Pages.submit_live("#place-form",
         place_form: %{
-          "name" => "Alice HQ",
+          "city" => "glorp",
+          "contact_email" => "alice@google.com",
           "contact_name" => "Alice Invalid",
-          "contact_phone" => "111-111-1000",
-          "contact_email" => "alice@example.com",
+          "contact_phone" => "123-456-7890",
+          "name" => "Alice HQ",
+          "postal_code" => "12345",
+          "state" => "AL",
+          "street" => "1234 Unsafe St",
+          "street_2" => "Anything",
           "type" => "workplace"
         }
       )
       |> Pages.assert_validation_messages(%{
-        "place[contact_name]" => "In non-PHI environment, must contain 'Testuser'"
+        "place_form[contact_name]" => "In non-PHI environment, must contain 'Testuser'",
+        "place_form[city]" => "In non-PHI environment, must match 'City#'",
+        "place_form[contact_email]" => "In non-PHI environment, must end with '@example.com'",
+        "place_form[contact_phone]" => "In non-PHI environment, must match '111-111-1xxx'",
+        "place_form[postal_code]" => "In non-PHI environment, must match '0000x'",
+        "place_form[street]" => "In non-PHI environment, must match '#### Test St'"
       })
     end
 

@@ -20,7 +20,7 @@ defmodule EpicenterWeb.Forms.PlaceFormTest do
                 %{
                   contact_email: "alice@example.com",
                   contact_name: "Alice Testuser",
-                  contact_phone: "111-111-1234",
+                  contact_phone: "1111111234",
                   name: "123 Elementary",
                   type: "school"
                 }}
@@ -46,7 +46,7 @@ defmodule EpicenterWeb.Forms.PlaceFormTest do
                 %{
                   contact_email: "alice@example.com",
                   contact_name: "Alice Testuser",
-                  contact_phone: "111-111-1234",
+                  contact_phone: "1111111234",
                   name: "123 Elementary",
                   type: "school",
                   place_addresses: [
@@ -59,6 +59,29 @@ defmodule EpicenterWeb.Forms.PlaceFormTest do
                     }
                   ]
                 }}
+    end
+
+    test "validates" do
+      valid_attrs = %{
+        contact_email: "alice@example.com",
+        contact_name: "Alice Testuser",
+        contact_phone: "111-111-1234",
+        name: "123 Elementary",
+        type: "school",
+        street: "1234 Test St",
+        street_2: "Apt. 202",
+        city: "City",
+        state: "OH",
+        postal_code: "00000"
+      }
+
+      assert_valid(PlaceForm.changeset(nil, valid_attrs))
+      assert_invalid(PlaceForm.changeset(nil, %{valid_attrs | contact_email: "unsafe@google.com"}))
+      assert_invalid(PlaceForm.changeset(nil, %{valid_attrs | contact_name: "Unsafe name"}))
+      assert_invalid(PlaceForm.changeset(nil, %{valid_attrs | contact_phone: "123-456-7890"}))
+      assert_invalid(PlaceForm.changeset(nil, %{valid_attrs | street: "Unsafe street"}))
+      assert_invalid(PlaceForm.changeset(nil, %{valid_attrs | street: "Unsafe city"}))
+      assert_invalid(PlaceForm.changeset(nil, %{valid_attrs | street: "Unsafe postal code"}))
     end
   end
 end

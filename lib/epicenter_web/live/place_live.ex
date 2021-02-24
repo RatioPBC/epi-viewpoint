@@ -39,7 +39,7 @@ defmodule EpicenterWeb.PlaceLive do
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset) |> noreply()
 
-      {:place, {:error, _, _}} ->
+      {:place, {:error, _}} ->
         socket
         |> assign_form_changeset(PlaceForm.changeset(socket.assigns.place, params), "An unexpected error occurred")
         |> noreply()
