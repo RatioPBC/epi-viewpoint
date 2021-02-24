@@ -793,13 +793,25 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
-  def assert_visit(view, case_investigation, place_type, relationship, occurred_on) do
+  def assert_visit_address(view, case_investigation, name, address) do
+    html =
+      view
+      |> Pages.parse()
+
+    html |> Test.Html.text("[data-tid=#{case_investigation.tid}] [data-role=place-name]") |> assert_eq(name)
+    html |> Test.Html.text("[data-tid=#{case_investigation.tid}] [data-role=place-address]") |> assert_eq(address)
+
+    view
+  end
+
+  def assert_visit(view, case_investigation, place_type, relationship, phone, occurred_on) do
     html =
       view
       |> Pages.parse()
 
     html |> Test.Html.text("[data-tid=#{case_investigation.tid}] [data-role=place-type]") |> assert_eq(place_type)
     html |> Test.Html.text("[data-tid=#{case_investigation.tid}] [data-role=relationship]") |> assert_eq(relationship)
+    html |> Test.Html.text("[data-tid=#{case_investigation.tid}] [data-role=contact-phone]") |> assert_eq(phone)
     html |> Test.Html.text("[data-tid=#{case_investigation.tid}] [data-role=occurred-on]") |> assert =~ occurred_on
 
     view

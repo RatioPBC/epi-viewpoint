@@ -22,8 +22,8 @@ defmodule EpicenterWeb.PlaceSearchLive do
     |> ok()
   end
 
-  def handle_event("suggest-place", %{"query" => _query_text}, socket) do
-    all_place_addresses = Cases.list_place_addresses()
+  def handle_event("suggest-place", %{"query" => query_text}, socket) do
+    all_place_addresses = Cases.search_places(query_text)
 
     socket
     |> assign(:result_place_addresses, all_place_addresses)

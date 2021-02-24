@@ -17,16 +17,16 @@ defmodule EpicenterWeb.PlaceSearchLiveTest do
         Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case-investigation")
         |> Cases.create_case_investigation!()
 
-      place_1 = Test.Fixtures.place_attrs(@admin, "place-1") |> Cases.create_place!()
+      place_1 = Test.Fixtures.place_attrs(@admin, "place-1", %{name: "Alice's Donuts"}) |> Cases.create_place!()
 
       place_address_1 =
         Test.Fixtures.place_address_attrs(@admin, place_1, "place-address-1", 1111)
         |> Cases.create_place_address!()
 
-      place_2 = Test.Fixtures.place_attrs(@admin, "place-2") |> Cases.create_place!()
+      place_2 = Test.Fixtures.place_attrs(@admin, "place-2", %{name: "David's Donuts"}) |> Cases.create_place!()
 
       place_address_2 =
-        Test.Fixtures.place_address_attrs(@admin, place_2, "place-address-2", 2222)
+        Test.Fixtures.place_address_attrs(@admin, place_2, "place-address-2", 1122)
         |> Cases.create_place_address!()
 
       [case_investigation: case_investigation, place_address_1: place_address_1, place_address_2: place_address_2]
@@ -37,15 +37,27 @@ defmodule EpicenterWeb.PlaceSearchLiveTest do
       |> Pages.PlaceSearch.assert_here(case_investigation)
       |> Pages.PlaceSearch.assert_selectable_results([])
       |> Pages.PlaceSearch.type_in_the_search_box("11")
-      |> Pages.PlaceSearch.assert_selectable_results(["1111 Test St, City, OH 00000", "2222 Test St, City, OH 00000"])
+      |> Pages.PlaceSearch.assert_selectable_results([
+        "Alice's Donuts1111 Test St, City, OH 00000",
+        "David's Donuts1122 Test St, City, OH 00000"
+      ])
     end
 
     test "clicking a typeahead result", %{conn: conn, case_investigation: case_investigation, place_address_1: place_address_1} do
       Pages.PlaceSearch.visit(conn, case_investigation)
       |> Pages.PlaceSearch.type_in_the_search_box("11")
-      |> Pages.PlaceSearch.assert_selectable_results(["1111 Test St, City, OH 00000", "2222 Test St, City, OH 00000"])
+      |> Pages.PlaceSearch.assert_selectable_results([
+        "Alice's Donuts1111 Test St, City, OH 00000",
+        "David's Donuts1122 Test St, City, OH 00000"
+      ])
       |> Pages.PlaceSearch.click_result_and_follow_redirect(conn, "place-address-1")
       |> Pages.AddVisit.assert_here(case_investigation, place_address_1)
+    end
+
+    test "only matching results show up", %{conn: conn, case_investigation: case_investigation} do
+      Pages.PlaceSearch.visit(conn, case_investigation)
+      |> Pages.PlaceSearch.type_in_the_search_box("Alice's Donuts")
+      |> Pages.PlaceSearch.assert_selectable_results(["Alice's Donuts1111 Test St, City, OH 00000"])
     end
   end
 end

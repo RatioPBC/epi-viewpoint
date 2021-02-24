@@ -20,7 +20,7 @@ defmodule EpicenterWeb.ProfileLive do
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
   import EpicenterWeb.Presenters.LabResultPresenter, only: [pretty_result: 1]
   import EpicenterWeb.Presenters.PeoplePresenter, only: [is_archived?: 1, is_editable?: 1]
-  import EpicenterWeb.Presenters.PlacePresenter, only: [address: 1]
+  import EpicenterWeb.Presenters.PlacePresenter, only: [address: 1, place_name: 1]
   import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
