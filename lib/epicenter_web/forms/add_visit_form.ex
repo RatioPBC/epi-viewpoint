@@ -4,31 +4,35 @@ defmodule EpicenterWeb.Forms.AddVisitForm do
   import Ecto.Changeset
 
   alias Epicenter.DateParser
+  alias Epicenter.Validation
   alias EpicenterWeb.Forms.AddVisitForm
 
   @primary_key false
-  @required_attrs ~w{}a
-  @optional_attrs ~w{}a
+  @required_attrs ~w{occurred_on}a
+  @optional_attrs ~w{relationship}a
   embedded_schema do
-    field :occurred_on, :date
+    field :occurred_on, :string
     field :relationship, :string
   end
 
-  def changeset(_place, attrs) do
+  def changeset(_visit, attrs) do
     %AddVisitForm{}
     |> cast(attrs, @required_attrs ++ @optional_attrs)
+    |> Validation.validate_date(:occurred_on)
     |> validate_required(@required_attrs)
   end
 
-  def visit_attrs(case_investigation, place, %{"add_visit_form" => add_visit_form_params}) do
-    %{"occurred_on" => occurred_on, "relationship" => relationship} = add_visit_form_params
-    occurred_on = DateParser.parse_mm_dd_yyyy!(occurred_on)
-
-    %{
-      case_investigation_id: case_investigation.id,
-      place_id: place.id,
-      occurred_on: occurred_on,
-      relationship: relationship
-    }
+  # if the visit is invalid, returns form_changeset, but marked to display validation messages
+  # otherwise, returns attrs for creating a visit changeset
+  def visit_attrs(%Ecto.Changeset{} = form_changeset) do
+    with {:ok, visit_data} <- apply_action(form_changeset, :create) do
+      {:ok,
+       %{
+         relationship: Map.get(visit_data, :relationship),
+         occurred_on: Map.get(visit_data, :occurred_on) |> DateParser.parse_mm_dd_yyyy!()
+       }}
+    else
+      other -> other
+    end
   end
 end

@@ -26,7 +26,7 @@ defmodule EpicenterWeb.AddVisitLiveTest do
       [case_investigation: case_investigation, place_address: place_address]
     end
 
-    test "showing a typeahead result", %{conn: conn, case_investigation: case_investigation, place_address: place_address} do
+    test "showing the selected case investigation and place", %{conn: conn, case_investigation: case_investigation, place_address: place_address} do
       Pages.AddVisit.visit(conn, case_investigation, place_address)
       |> Pages.AddVisit.assert_here(case_investigation, place_address)
       |> Pages.AddVisit.assert_place_name_and_address("the best place", "1111 Test St, City, OH 00000")
@@ -41,6 +41,31 @@ defmodule EpicenterWeb.AddVisitLiveTest do
         }
       )
       |> Pages.Profile.assert_visit(case_investigation, "school", "A reasonable bit of text", "1111111234", "09/06/2020")
+    end
+
+    test "it shows an error if you submit a badly formatted date", %{conn: conn, case_investigation: case_investigation, place_address: place_address} do
+      Pages.AddVisit.visit(conn, case_investigation, place_address)
+      |> Pages.submit_expecting_error("#add-visit-form",
+        add_visit_form: %{
+          "relationship" => "A reasonable bit of text",
+          "occurred_on" => "09376248/7506/2020"
+        }
+      )
+      |> Pages.assert_validation_messages(%{"add_visit_form[occurred_on]" => "please enter dates as mm/dd/yyyy"})
+    end
+
+    test "it shows an error if you don't enter an occurred_on date", %{
+      conn: conn,
+      case_investigation: case_investigation,
+      place_address: place_address
+    } do
+      Pages.AddVisit.visit(conn, case_investigation, place_address)
+      |> Pages.submit_expecting_error("#add-visit-form",
+        add_visit_form: %{
+          "relationship" => "A reasonable bit of text"
+        }
+      )
+      |> Pages.assert_validation_messages(%{"add_visit_form[occurred_on]" => "can't be blank"})
     end
   end
 end

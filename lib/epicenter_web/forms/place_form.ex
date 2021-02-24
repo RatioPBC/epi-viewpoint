@@ -31,8 +31,8 @@ defmodule EpicenterWeb.Forms.PlaceForm do
     |> PhiValidation.validate_phi(:address)
   end
 
-  def place_attrs(%Ecto.Changeset{} = changeset) do
-    with {:ok, place_form} <- apply_action(changeset, :create) do
+  def place_attrs(%Ecto.Changeset{} = form_changeset) do
+    with {:ok, place_form} <- apply_action(form_changeset, :create) do
       attrs = %{
         name: Map.get(place_form, :name),
         type: Map.get(place_form, :type),

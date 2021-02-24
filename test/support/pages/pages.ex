@@ -292,6 +292,12 @@ defmodule EpicenterWeb.Test.Pages do
     |> follow_live_view_redirect(conn)
   end
 
+  def submit_expecting_error(%View{} = view, form_selector, params_keyword_list) do
+    view
+    |> form(form_selector, params_keyword_list)
+    |> render_submit()
+  end
+
   def submit_live(%View{} = view, form_selector, params_keyword_list) do
     view
     |> form(form_selector, params_keyword_list)
