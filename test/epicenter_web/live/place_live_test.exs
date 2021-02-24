@@ -2,26 +2,45 @@ defmodule EpicenterWeb.PlaceLiveTest do
   use EpicenterWeb.ConnCase, async: true
 
   alias Epicenter.Cases
+  alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
 
   setup :register_and_log_in_user
 
   describe "creating a place" do
-    test "user can create a new place with an address", %{user: user, conn: conn} do
-      Pages.Place.visit(conn)
-      |> Pages.Place.assert_here()
-      |> Pages.Place.submit_place(conn,
-        name: "Alicecorp HQ",
-        street: "1234 Test St",
-        street_2: "Unit 303",
-        city: "City",
-        state: "OH",
-        postal_code: "00000",
-        contact_name: "Alice Testuser",
-        contact_phone: "111-111-1234",
-        contact_email: "alice@example.com",
-        type: "workplace"
-      )
+    setup %{user: user} do
+      person = Test.Fixtures.person_attrs(user, "person") |> Cases.create_person!()
+      lab_result = Test.Fixtures.lab_result_attrs(person, user, "lab-result", ~D[2000-01-01]) |> Cases.create_lab_result!()
+
+      case_investigation =
+        Test.Fixtures.case_investigation_attrs(person, lab_result, user, "case-investigation") |> Cases.create_case_investigation!()
+
+      [case_investigation: case_investigation]
+    end
+
+    test "user can create a new place with an address and is sent to the new visit page", %{
+      user: user,
+      conn: conn,
+      case_investigation: case_investigation
+    } do
+      view =
+        Pages.Place.visit(conn, case_investigation)
+        |> Pages.Place.assert_here()
+        |> Pages.Place.submit_place(conn,
+          name: "Alicecorp HQ",
+          street: "1234 Test St",
+          street_2: "Unit 303",
+          city: "City",
+          state: "OH",
+          postal_code: "00000",
+          contact_name: "Alice Testuser",
+          contact_phone: "111-111-1234",
+          contact_email: "alice@example.com",
+          type: "workplace"
+        )
+
+      [place_address] = Cases.list_place_addresses()
+      view |> Pages.AddVisit.assert_here(case_investigation, place_address)
 
       [new_place] = Cases.list_places(user) |> Cases.preload_place_addresses()
 
@@ -39,8 +58,8 @@ defmodule EpicenterWeb.PlaceLiveTest do
       assert place_address.postal_code == "00000"
     end
 
-    test "user can create a new place without an address", %{user: user, conn: conn} do
-      Pages.Place.visit(conn)
+    test "user can create a new place without an address", %{user: user, conn: conn, case_investigation: case_investigation} do
+      Pages.Place.visit(conn, case_investigation)
       |> Pages.Place.assert_here()
       |> Pages.Place.submit_place(conn,
         name: "Alicecorp HQ",
@@ -53,8 +72,8 @@ defmodule EpicenterWeb.PlaceLiveTest do
       assert new_place.type == "workplace"
     end
 
-    test "shows errors when creating invalid place", %{conn: conn} do
-      Pages.Place.visit(conn)
+    test "shows errors when creating invalid place", %{conn: conn, case_investigation: case_investigation} do
+      Pages.Place.visit(conn, case_investigation)
       |> Pages.Place.assert_here()
       |> Pages.submit_live("#place-form",
         place_form: %{

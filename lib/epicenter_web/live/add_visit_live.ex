@@ -19,14 +19,20 @@ defmodule EpicenterWeb.AddVisitLive do
       |> Cases.preload_person()
 
     place = Cases.get_place(params["place"])
-    place_address = Cases.get_place_address(params["place_address"]) |> Cases.preload_place()
+
+    place_address =
+      if Euclid.Exists.present?(params["place_address"]),
+        do: Cases.get_place_address(params["place_address"]) |> Cases.preload_place(),
+        else: nil
 
     socket
     |> assign_defaults()
     |> assign_page_title("Add place visited")
     |> assign(:place, place)
     |> assign(:place_address, place_address)
+    |> assign(:place_address_tid, if(place_address, do: place_address.tid, else: nil))
     |> assign(:case_investigation, case_investigation)
+    |> assign(:case_investigation_tid, case_investigation.tid)
     |> assign_form_changeset(AddVisitForm.changeset(%AddVisitForm{}, %{}))
     |> ok()
   end

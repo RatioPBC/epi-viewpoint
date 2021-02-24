@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Test.Pages.AddVisit do
   import Euclid.Test.Extra.Assertions
+  import ExUnit.Assertions
 
   alias Epicenter.Test
   alias EpicenterWeb.Test.Pages
@@ -17,9 +18,9 @@ defmodule EpicenterWeb.Test.Pages.AddVisit do
     |> Test.Html.attr("[data-page=add-visit]", "data-case-investigation-tid")
     |> assert_eq([case_investigation.tid])
 
-    html
-    |> Test.Html.attr("[data-page=add-visit]", "data-place-address-tid")
-    |> assert_eq([place_address.tid], returning: view_or_conn_or_html)
+    assert html |> Test.Html.text("[data-role=place-address]") |> String.starts_with?(place_address.street)
+
+    view_or_conn_or_html
   end
 
   def assert_onset_date(view, date_string) do

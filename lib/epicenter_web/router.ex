@@ -70,6 +70,7 @@ defmodule EpicenterWeb.Router do
     live "/case-investigations/:id/discontinue", CaseInvestigationDiscontinueLive, as: :case_investigation_discontinue
     live "/case-investigations/:id/isolation-monitoring", CaseInvestigationIsolationMonitoringLive, as: :case_investigation_isolation_monitoring
     live "/case-investigations/:id/isolation-order", CaseInvestigationIsolationOrderLive, as: :case_investigation_isolation_order
+    live "/case-investigations/:id/place", PlaceLive, as: :new_place
     live "/case-investigations/:id/place-search", PlaceSearchLive, as: :place_search
     live "/case-investigations/:case_investigation_id/add-visit", AddVisitLive, as: :add_visit
     live "/case-investigations/:id/start-interview", CaseInvestigationStartInterviewLive, as: :case_investigation_start_interview
@@ -95,8 +96,6 @@ defmodule EpicenterWeb.Router do
     live "/people/:id/edit-demographics", DemographicsEditLive, as: :demographics_edit
     live "/people/:id/potential-duplicates", PotentialDuplicatesLive, as: :potential_duplicates
     live "/people/:id/resolve-conflicts", ResolveConflictsLive, as: :resolve_conflicts
-
-    live "/place", PlaceLive, as: :new_place
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings/update-password", UserSettingsController, :update_password

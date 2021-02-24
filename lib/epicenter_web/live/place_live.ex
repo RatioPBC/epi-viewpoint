@@ -11,14 +11,16 @@ defmodule EpicenterWeb.PlaceLive do
   alias EpicenterWeb.Forms.PlaceForm
   alias EpicenterWeb.Presenters.GeographyPresenter
 
-  def mount(_params, session, socket) do
+  def mount(params, session, socket) do
     socket = socket |> authenticate_user(session)
     place = %Place{}
     changeset = PlaceForm.changeset(%{}, %{})
+    case_investigation = Cases.get_case_investigation(params["id"], socket.assigns.current_user)
 
     socket
     |> assign_defaults()
     |> assign_page_title("New place")
+    |> assign(case_investigation: case_investigation)
     |> assign(place: place)
     |> assign_form_changeset(changeset)
     |> ok()
@@ -31,9 +33,18 @@ defmodule EpicenterWeb.PlaceLive do
   def handle_event("save", %{"place_form" => params}, socket) do
     with %Ecto.Changeset{} = form_changeset <- PlaceForm.changeset(socket.assigns.place, params),
          {:form, {:ok, place_attrs}} <- {:form, PlaceForm.place_attrs(form_changeset)},
-         {:place, {:ok, _place}} <- {:place, create_place(socket, place_attrs)} do
+         {:place, {:ok, place}} <- {:place, create_place(socket, place_attrs)} do
+      place = place |> Cases.preload_place_addresses()
+      place_address = if Euclid.Exists.present?(place.place_addresses), do: List.first(place.place_addresses), else: nil
+
       socket
-      |> push_redirect(to: Routes.people_path(socket, EpicenterWeb.PeopleLive))
+      |> push_redirect(
+        to:
+          Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, socket.assigns.case_investigation,
+            place: place,
+            place_address: place_address
+          )
+      )
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
