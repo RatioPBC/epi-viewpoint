@@ -62,9 +62,16 @@
   a#case-investigations
   = for case_investigation <- @case_investigations do
     section.case-investigation id="case-investigation-#{case_investigation.name}" data-tid=case_investigation.tid
-      header
-        h2 data-role="case-investigation-title" Case investigation #{string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))}
-        span.case-investigation-timestamp data-role="case-investigation-timestamp" Created on #{Format.date(case_investigation.inserted_at)}
+      div
+        header
+          h2 data-role="case-investigation-title" Case investigation #{string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on))}
+          span.case-investigation-timestamp data-role="case-investigation-timestamp" Created on #{Format.date(case_investigation.inserted_at)}
+
+        div.case-investigation-details data-role="case-investigation-initiated-by"
+          ' Initiated by positive lab result collected on
+          => Format.date(case_investigation.initiating_lab_result.sampled_on)
+          ' at
+          = case_investigation.initiating_lab_result.request_facility_name
 
       .case-investigation-sections
         div

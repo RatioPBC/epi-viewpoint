@@ -173,10 +173,17 @@ defmodule EpicenterWeb.Test.Pages.Profile do
   # case investigations
   #
 
-  def assert_case_investigations(%View{} = view, %{status: status, status_value: status_value, reported_on: reported_on, timestamp: timestamp}) do
+  def assert_case_investigations(%View{} = view, %{
+        initiated_by: initiated_by,
+        status: status,
+        status_value: status_value,
+        reported_on: reported_on,
+        timestamp: timestamp
+      }) do
     parsed_html = view |> render() |> Test.Html.parse()
 
     parsed_html |> Test.Html.text("[data-role=case-investigation-title]") |> String.trim() |> assert_eq("Case investigation #{reported_on}")
+    parsed_html |> Test.Html.text("[data-role=case-investigation-initiated-by]") |> String.trim() |> assert_eq("Initiated by #{initiated_by}")
     parsed_html |> Test.Html.text("[data-role=case-investigation-interview-status] [data-role=status]") |> String.trim() |> assert_eq(status)
     parsed_html |> Test.Html.text("[data-role=case-investigation-timestamp]") |> String.trim() |> assert_eq("Created on #{timestamp}")
 

@@ -274,6 +274,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
+        initiated_by: "positive lab result collected on 01/02/2020 at Big Big Hospital",
         status: "Pending interview",
         status_value: "pending",
         reported_on: "08/07/2020",
@@ -288,6 +289,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
+        initiated_by: "positive lab result collected on 01/02/2020 at Big Big Hospital",
         status: "Pending interview",
         status_value: "pending",
         reported_on: "Unknown",
@@ -332,6 +334,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
+        initiated_by: "positive lab result collected on 01/02/2020 at Big Big Hospital",
         status: "Discontinued",
         status_value: "discontinued",
         reported_on: "Unknown",
@@ -367,6 +370,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
+        initiated_by: "positive lab result collected on 01/02/2020 at Big Big Hospital",
         status: "Ongoing interview",
         status_value: "started",
         reported_on: "Unknown",
@@ -621,6 +625,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_case_investigations(%{
+        initiated_by: "positive lab result collected on 01/02/2020 at Big Big Hospital",
         status: "Completed interview",
         status_value: "completed-interview",
         reported_on: "Unknown",
@@ -688,6 +693,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
       view =
         Pages.Profile.visit(conn, person)
         |> Pages.Profile.assert_case_investigations(%{
+          initiated_by: "positive lab result collected on 01/02/2020 at Big Big Hospital",
           status: "Pending interview",
           status_value: "pending",
           reported_on: "08/07/2020",
@@ -1232,6 +1238,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
         result: "positive",
         request_facility_name: "Big Big Hospital",
         reported_on: reported_on,
+        sampled_on: ~D[2020-01-02],
         test_type: "PCR"
       })
       |> Cases.create_lab_result!()
