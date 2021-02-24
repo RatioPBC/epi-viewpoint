@@ -35,7 +35,7 @@ defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
 
   def assert_merge_button_enabled(view, enabled?) do
     expected = if enabled?, do: [], else: ["disabled"]
-    view |> Pages.parse() |> Test.Html.attr("[data-role=merge-button]", "disabled") |> assert_eq(expected, returning: view)
+    view |> Pages.parse() |> Test.Html.attr("[data-role=save-button]", "disabled") |> assert_eq(expected, returning: view)
   end
 
   def assert_unique_values_present(view, field_name, values) do

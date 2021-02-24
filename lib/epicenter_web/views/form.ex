@@ -6,6 +6,7 @@ defmodule EpicenterWeb.Form do
   alias Epicenter.Extra
   alias EpicenterWeb.Form
   alias EpicenterWeb.FormHelpers
+  alias EpicenterWeb.IconView
   alias EpicenterWeb.Multiselect
 
   defstruct ~w{f safe}a
@@ -141,16 +142,14 @@ defmodule EpicenterWeb.Form do
   def save_button(%Form.Line{} = line, opts \\ []) do
     data_opts = grid_data(1, line, opts) |> Keyword.put(:role, "save-button")
     disabled? = Keyword.get(opts, :disabled, false)
+    title = Keyword.get(opts, :title, "Save")
+    icon = Keyword.get(opts, :icon, nil)
 
-    submit("Save", data: data_opts, disabled: disabled?)
-    |> add_to_line(line, opts)
-  end
-
-  def merge_button(%Form.Line{} = line, opts \\ []) do
-    data_opts = grid_data(1, line, opts) |> Keyword.put(:role, "merge-button")
-    disabled? = Keyword.get(opts, :disabled, false)
-
-    submit("Merge", data: data_opts, disabled: disabled?)
+    submit data: data_opts, disabled: disabled? do
+      if icon,
+        do: [content_tag(:span, title), apply(IconView, icon, [])],
+        else: title
+    end
     |> add_to_line(line, opts)
   end
 

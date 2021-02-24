@@ -99,7 +99,7 @@ defmodule EpicenterWeb.PlaceLive do
     |> Form.line(&Form.text_field(&1, :contact_name, "Name of main contact", span: 4))
     |> Form.line(&Form.text_field(&1, :contact_phone, "Phone", span: 4))
     |> Form.line(&Form.text_field(&1, :contact_email, "Email", span: 4))
-    |> Form.line(&Form.save_button(&1))
+    |> Form.line(&Form.save_button(&1, title: "Next", icon: :arrow_right_icon))
     |> Form.safe()
   end
 end

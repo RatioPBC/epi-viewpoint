@@ -227,14 +227,19 @@ defmodule EpicenterWeb.FormTest do
     """)
   end
 
-  test "merge_button" do
+  test "save_button with a custom title and icon" do
     phx_form()
     |> Form.new()
-    |> Form.line(&Form.merge_button(&1, disabled: true))
+    |> Form.line(&Form.save_button(&1, title: "Custom Title", icon: :checkmark_icon))
     |> render()
     |> assert_html_eq("""
     <fieldset>\v
-      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="merge-button" type="submit" disabled="disabled">Merge</button>\v
+      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="save-button" type="submit">
+        <span>Custom Title</span>
+        <svg fill="none" height="14" viewbox="0 0 18 14" width="16" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5.7963 11.17L1.6263 7L0.206299 8.41L5.7963 14L17.7963 2L16.3863 0.589996L5.7963 11.17Z" fill="white" fill-opacity="0.87"></path>
+        </svg>
+      </button>\v
     </fieldset>
     """)
   end

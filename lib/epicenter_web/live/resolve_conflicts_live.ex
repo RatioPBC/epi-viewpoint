@@ -74,7 +74,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     |> add_line(:first_name, "Choose the correct first name", merge_conflicts.first_name)
     |> add_line(:dob, "Choose the correct date of birth", formatted_dates)
     |> add_line(:preferred_language, "Choose the correct preferred language", merge_conflicts.preferred_language)
-    |> Form.line(&Form.merge_button(&1, disabled: !valid_changeset?))
+    |> Form.line(&Form.save_button(&1, title: "Merge", disabled: !valid_changeset?))
     |> Form.safe()
   end
 
