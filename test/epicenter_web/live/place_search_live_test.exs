@@ -54,6 +54,15 @@ defmodule EpicenterWeb.PlaceSearchLiveTest do
       |> Pages.AddVisit.assert_here(case_investigation, place_address_1)
     end
 
+    test "choosing a link with the keyboard or in safari", %{conn: conn, case_investigation: case_investigation, place_address_1: place_address_1} do
+      # in safari the click event never makes it to the anchor, but if we add a phoenix click
+      # handler (which we use to enable keyboard navigation of the search results) then it works
+      Pages.PlaceSearch.visit(conn, case_investigation)
+      |> Pages.PlaceSearch.type_in_the_search_box("11")
+      |> Pages.PlaceSearch.click_result_the_other_way_and_follow_redirect(conn, place_address_1.tid)
+      |> Pages.AddVisit.assert_here(case_investigation, place_address_1)
+    end
+
     test "only matching results show up", %{conn: conn, case_investigation: case_investigation} do
       Pages.PlaceSearch.visit(conn, case_investigation)
       |> Pages.PlaceSearch.type_in_the_search_box("Alice's Donuts")

@@ -30,4 +30,18 @@ defmodule EpicenterWeb.PlaceSearchLive do
     |> assign(:result_place_addresses, all_place_addresses)
     |> noreply()
   end
+
+  def handle_event("choose-place-address", %{"place-address-id" => place_address_id}, socket) do
+    place_address = Cases.get_place_address(place_address_id) |> Cases.preload_place()
+
+    socket
+    |> push_redirect(
+      to:
+        Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, socket.assigns.case_investigation,
+          place: place_address.place,
+          place_address: place_address
+        )
+    )
+    |> noreply()
+  end
 end

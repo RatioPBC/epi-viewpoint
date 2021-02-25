@@ -16,6 +16,7 @@ import "../css/app.sass";
 // User menu
 //
 import { TransientControl } from "./transient_control";
+import { AutocompleteInput, AutocompleteList } from "./autocomplete";
 document.addEventListener("DOMContentLoaded", TransientControl.setup);
 
 //
@@ -53,14 +54,15 @@ let liveSocket = new LiveSocket("/live", Socket, {
       },
 
       updated() {
-        console.log("updating");
         this.setBodyClass();
       },
 
       setBodyClass() {
         document.getElementsByTagName("body")[0].className = this.el.dataset.bodyClass;
       }
-    }
+    },
+    AutocompleteInput: AutocompleteInput,
+    AutocompleteList: AutocompleteList
   },
   params: { _csrf_token: csrfToken }
 });

@@ -46,4 +46,12 @@ defmodule EpicenterWeb.Test.Pages.PlaceSearch do
     |> Pages.assert_redirect_succeeded()
     |> Pages.follow_live_view_redirect(conn)
   end
+
+  def click_result_the_other_way_and_follow_redirect(view, conn, place_address_tid) do
+    view
+    |> element("[data-role=place-search-result][data-tid=#{place_address_tid}]")
+    |> render_click()
+    |> Pages.assert_redirect_succeeded()
+    |> Pages.follow_live_view_redirect(conn)
+  end
 end

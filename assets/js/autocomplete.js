@@ -2,7 +2,8 @@
  * Prototype for a simple autocomplete with keyboard accessibility.
  * Relies on LiveView for populating results.
  */
-Hooks.AutocompleteInput = {
+
+export const AutocompleteInput = {
   mounted() {
     this.el.addEventListener("keyup", (e) => {
       switch (e.code) {
@@ -29,7 +30,7 @@ Hooks.AutocompleteInput = {
   }
 };
 
-Hooks.AutocompleteList = {
+export const AutocompleteList = {
   mounted() {
     document.addEventListener("keydown", (e) => {
       let listbox = document.querySelector("[role=listbox]");
