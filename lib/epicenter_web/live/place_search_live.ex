@@ -2,6 +2,7 @@ defmodule EpicenterWeb.PlaceSearchLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.Format, only: [address: 1]
+  import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
@@ -11,7 +12,7 @@ defmodule EpicenterWeb.PlaceSearchLive do
   def mount(params, session, socket) do
     socket = socket |> authenticate_user(session)
 
-    case_investigation = Cases.get_case_investigation(params["id"], socket.assigns.current_user)
+    case_investigation = Cases.get_case_investigation(params["id"], socket.assigns.current_user) |> Cases.preload_person()
 
     socket
     |> assign_defaults()
