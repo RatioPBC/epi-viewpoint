@@ -1028,7 +1028,13 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       place = Test.Fixtures.place_attrs(@admin, "place", %{name: "the best place", type: "retail"}) |> Cases.create_place!()
 
+      place_with_empty_fields =
+        Test.Fixtures.place_attrs(@admin, "place_with_empty_fields", %{name: nil, type: nil, contact_phone: nil}) |> Cases.create_place!()
+
       Test.Fixtures.place_address_attrs(@admin, place, "place-address-1", 1111)
+      |> Cases.create_place_address!()
+
+      Test.Fixtures.place_address_attrs(@admin, place_with_empty_fields, "place-address-2", 2222)
       |> Cases.create_place_address!()
 
       visit =
@@ -1038,13 +1044,32 @@ defmodule EpicenterWeb.ProfileLiveTest do
         })
         |> Cases.create_visit!()
 
-      [place: place, visit: visit, case_investigation: case_investigation]
+      visit_with_empty_fields =
+        Test.Fixtures.visit_attrs(@admin, "visit_with_empty_fields", place_with_empty_fields, case_investigation, %{
+          relationship: nil,
+          occurred_on: ~D[2020-09-06]
+        })
+        |> Cases.create_visit!()
+
+      [visit: visit, visit_with_empty_fields: visit_with_empty_fields, case_investigation: case_investigation]
     end
 
-    test "it displays place and date", %{case_investigation: case_investigation, person: person, conn: conn} do
+    test "it displays place and date", %{case_investigation: case_investigation, person: person, visit: visit, conn: conn} do
       Pages.Profile.visit(conn, person)
-      |> Pages.Profile.assert_visit_address(case_investigation, "the best place", "1111 Test St, City, OH 00000")
+      |> Pages.Profile.assert_visit_address(case_investigation, visit, "the best place", "1111 Test St, City, OH 00000")
       |> Pages.Profile.assert_visit(case_investigation, "retail", "employee", "1111111234", "09/06/2020")
+    end
+
+    test "it does not show empty fields", %{
+      case_investigation: case_investigation,
+      person: person,
+      visit_with_empty_fields: visit_with_empty_fields,
+      conn: conn
+    } do
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.visit_field_hidden(case_investigation, visit_with_empty_fields, "place-type")
+      |> Pages.Profile.visit_field_hidden(case_investigation, visit_with_empty_fields, "relationship")
+      |> Pages.Profile.visit_field_hidden(case_investigation, visit_with_empty_fields, "contact-phone")
     end
   end
 
