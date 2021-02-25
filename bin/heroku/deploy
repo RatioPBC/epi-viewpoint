@@ -24,10 +24,6 @@ deploy() {
     "heroku config | grep -s DATABASE_URL" \
     "open https://dashboard.heroku.com/apps/geometer-epicenter/resources # now add a database"
 
-  check "heroku: SECRET_KEY_BASE is set" \
-    "heroku config | grep -s SECRET_KEY_BASE" \
-    "heroku config:set SECRET_KEY_BASE=$(mix phx.gen.secret)"
-
   check "heroku: POOL_SIZE is set" \
     "heroku config | grep -s POOL_SIZE" \
     "heroku config:set POOL_SIZE=10"

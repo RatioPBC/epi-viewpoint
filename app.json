@@ -1,0 +1,41 @@
+{
+  "name": "epi_viewpoint",
+  "success_url": "/healthcheck",
+  "scripts": {
+    "postdeploy": "mix ecto.migrate"
+  },
+  "env": {
+    "DATABASE_URL": {
+      "description": "Heroku database URL",
+      "required": true
+    },
+    "LIVE_VIEW_SIGNING_SALT": {
+      "description": "Signing salt for Phoenix LiveView",
+      "generator": "secret",
+      "required": true
+    },
+    "POOL_SIZE": {
+      "description": "Database connection pool size",
+      "value": 10,
+      "required": true
+    },
+    "SECRET_KEY_BASE": {
+      "description": "Secret key base for Phoenix",
+      "generator": "secret",
+      "required": true
+    },
+    "MIX_ENV": "prod"
+  },
+  "formation": [
+    {
+      "web": {
+        "quantity": 1
+      }
+    }
+  ],
+  "buildpacks": [
+    { "url": "https://github.com/elixir-buildpack/heroku-buildpack" },
+    { "url": "https://github.com/gjaldon/heroku-buildpack-phoenix-static" },
+    { "url": "https://github.com/ianpurvis/heroku-buildpack-version" }
+  ]
+}

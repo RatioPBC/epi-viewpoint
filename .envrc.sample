@@ -1,1 +1,3 @@
 export CANONICAL_HOST="localhost"
+export LIVE_VIEW_SIGNING_SALT="" # generate with: mix phx.gen.secret
+export SECRET_KEY_BASE="" # generate with: mix phx.gen.secret

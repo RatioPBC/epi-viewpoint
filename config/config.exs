@@ -21,10 +21,10 @@ config :epicenter,
 # Configures the endpoint
 config :epicenter, EpicenterWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "ZUHdh7oLc6zGSaqOFlF6PMIAw//3cB916WPDO5Ny10ugUPWVStG2J18BTBs+9kFc",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: EpicenterWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Epicenter.PubSub,
-  live_view: [signing_salt: "KRXie/vG"]
+  live_view: [signing_salt: System.get_env("LIVE_VIEW_SIGNING_SALT")]
 
 # Configures Elixir's Logger
 config :logger, :console,
