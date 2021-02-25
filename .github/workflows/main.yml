@@ -53,8 +53,11 @@ jobs:
       - name: Run tests
         run: bin/dev/test
         env: 
+          CANONICAL_HOST: localhost
+          LIVE_VIEW_SIGNING_SALT: mZT0Lo72e+U9KLtsTQzdKmmxpda0uuJJlMWTzJYdFBhddwbGbAC3h5T1QusYBhBr
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
+          SECRET_KEY_BASE: iuJS3FLMrRqbKug/CE4zGGd31eY6FMdmpQGjy8RMaQoxk59wAvSxuUKM6c/uaOo4
   
   # TODO: this needs a new container registry to store/retrieve images
   build_image:
