@@ -26,6 +26,7 @@ defmodule EpicenterWeb.Forms.PlaceForm do
     %PlaceForm{}
     |> cast(attrs, @required_attrs ++ @optional_attrs)
     |> validate_required(@required_attrs)
+    |> validate_name_or_address_present()
     |> Epicenter.PhoneNumber.strip_non_digits_from_number(:contact_phone)
     |> PhiValidation.validate_phi(:place)
     |> PhiValidation.validate_phi(:address)
@@ -58,5 +59,20 @@ defmodule EpicenterWeb.Forms.PlaceForm do
     else
       other -> other
     end
+  end
+
+  def validate_name_or_address_present(changeset) do
+    if name_present?(changeset) or address_present?(changeset) do
+      changeset
+    else
+      add_error(changeset, :name, "Name or address is required!")
+    end
+  end
+
+  defp name_present?(changeset), do: get_field(changeset, :name) != nil
+
+  defp address_present?(changeset) do
+    address_fields = [:street, :city, :state, :postal_code]
+    Enum.all?(address_fields, &get_field(changeset, &1))
   end
 end

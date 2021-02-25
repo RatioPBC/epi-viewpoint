@@ -84,4 +84,30 @@ defmodule EpicenterWeb.Forms.PlaceFormTest do
       assert_invalid(PlaceForm.changeset(nil, %{valid_attrs | street: "Unsafe postal code"}))
     end
   end
+
+  test "requires either name or address" do
+    name_only_attrs = %{
+      name: "123 Elementary"
+    }
+
+    address_only_attrs = %{
+      street: "1234 Test St",
+      street_2: "Apt. 202",
+      city: "City",
+      state: "OH",
+      postal_code: "00000"
+    }
+
+    partial_address_only_attrs = %{
+      street: "1234 Test St",
+      postal_code: "00000"
+    }
+
+    empty_attrs = %{}
+
+    assert_valid(PlaceForm.changeset(nil, name_only_attrs))
+    assert_valid(PlaceForm.changeset(nil, address_only_attrs))
+    assert_invalid(PlaceForm.changeset(nil, partial_address_only_attrs))
+    assert_invalid(PlaceForm.changeset(nil, empty_attrs))
+  end
 end
