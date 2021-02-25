@@ -1,6 +1,8 @@
 defmodule EpicenterWeb.PlaceLive do
   use EpicenterWeb, :live_view
 
+  import EpicenterWeb.IconView, only: [back_icon: 0]
+
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, authenticate_user: 2, ok: 1, noreply: 1]
 

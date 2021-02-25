@@ -1,4 +1,10 @@
 #place-page data-page="place" data-tid=@case_investigation.tid
+  section
+    header#subnav
+      = live_redirect to: Routes.place_search_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceSearchLive, @case_investigation), data: [role: "back-link"] do
+        = back_icon()
+        span Back
+
   section#place
     h2 Add place visited
     div Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
