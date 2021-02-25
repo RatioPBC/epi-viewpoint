@@ -303,9 +303,12 @@ defmodule Epicenter.Cases do
     %Visit{} |> change_visit(attrs) |> AuditingRepo.insert!(audit_meta)
   end
 
-  def list_visits(), do: []
+  def get_visit(id), do: Repo.get(Visit, id)
 
-  def preload_visits(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:visits)
+  def update_visit(%Visit{} = visit, {attrs, audit_meta}),
+    do: visit |> change_visit(attrs) |> AuditingRepo.update(audit_meta)
+
+  def list_visits(), do: []
 
   def preload_visit_details(case_investigations) do
     case_investigations

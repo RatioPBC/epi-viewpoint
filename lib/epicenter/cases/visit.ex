@@ -8,13 +8,14 @@ defmodule Epicenter.Cases.Visit do
   alias Epicenter.Extra
 
   @required_attrs ~w{place_id case_investigation_id}a
-  @optional_attrs ~w{tid relationship occurred_on}a
+  @optional_attrs ~w{deleted_at tid relationship occurred_on}a
 
   @derive {Jason.Encoder, only: [:id] ++ @required_attrs ++ @optional_attrs}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "visits" do
+    field :deleted_at, :utc_datetime
     field :occurred_on, :date
     field :relationship, :string
     field :seq, :integer, read_after_writes: true
@@ -46,6 +47,7 @@ defmodule Epicenter.Cases.Visit do
 
     def display_order() do
       from visit in Visit,
+        where: is_nil(visit.deleted_at),
         order_by: [asc: visit.seq]
     end
   end

@@ -554,6 +554,12 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> render_click()
   end
 
+  def click_remove_visit_link(%View{} = view, visit) do
+    view
+    |> element("[data-role=remove-visit][phx-value-visit-id=#{visit.id}]")
+    |> render_click()
+  end
+
   def click_on_contact(%View{} = view, number, exposed_person_name) do
     view
     |> element("#contacts-#{number} [data-role=visit-contact-link]", exposed_person_name)
@@ -795,6 +801,20 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     |> Pages.parse()
     |> Test.Html.text("[data-role=archived-banner]")
     |> assert_eq("")
+
+    view
+  end
+
+  def assert_visit(view, visit, is_visible: is_visible) do
+    html =
+      view
+      |> Pages.parse()
+
+    if is_visible do
+      html |> Test.Html.find!("[data-tid=#{visit.tid}]")
+    else
+      html |> Test.Html.find("[data-tid=#{visit.tid}]") |> assert_eq([])
+    end
 
     view
   end

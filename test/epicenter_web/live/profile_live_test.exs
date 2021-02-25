@@ -613,6 +613,39 @@ defmodule EpicenterWeb.ProfileLiveTest do
                |> Pages.Profile.case_investigation_contact_details("001")
     end
 
+    test "a visit can be removed", %{conn: conn, person: person, user: user} do
+      case_investigation =
+        create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+        |> Cases.preload_person()
+
+      person = case_investigation.person
+
+      place = Test.Fixtures.place_attrs(@admin, "place") |> Cases.create_place!()
+
+      Test.Fixtures.place_address_attrs(@admin, place, "place-address", 1234)
+      |> Cases.create_place_address!()
+
+      visit =
+        Test.Fixtures.visit_attrs(@admin, "visit", place, case_investigation, %{
+          relationship: "employee",
+          occurred_on: ~D[2020-09-06]
+        })
+        |> Cases.create_visit!()
+
+      view =
+        Pages.Profile.visit(conn, person)
+        |> Pages.Profile.assert_here(person)
+        |> Pages.Profile.assert_visit(visit, is_visible: true)
+        |> Pages.Profile.click_remove_visit_link(visit)
+
+      case_investigation = Cases.get_case_investigation(case_investigation.id, user) |> Cases.preload_visit_details()
+      assert case_investigation.visits == []
+
+      view
+      |> Pages.Profile.assert_here(person)
+      |> Pages.Profile.assert_visit(visit, is_visible: false)
+    end
+
     test "case investigations with completed interviews render correctly", %{conn: conn, person: person, user: user} do
       completed_at = ~U[2020-11-05 19:57:00Z]
       started_at = ~U[2020-11-05 18:57:00Z]

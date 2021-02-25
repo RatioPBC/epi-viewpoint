@@ -177,6 +177,27 @@ defmodule EpicenterWeb.ProfileLive do
     |> noreply()
   end
 
+  def handle_event("remove-visit", %{"visit-id" => visit_id}, socket) do
+    with visit when not is_nil(visit) <-
+           Cases.get_visit(visit_id) do
+      Cases.update_visit(
+        visit,
+        {
+          %{deleted_at: NaiveDateTime.utc_now()},
+          %AuditLog.Meta{
+            author_id: socket.assigns.current_user.id,
+            reason_action: AuditLog.Revision.remove_contact_investigation_action(),
+            reason_event: AuditLog.Revision.remove_contact_event()
+          }
+        }
+      )
+    end
+
+    socket
+    |> assign_case_investigations(socket.assigns.person)
+    |> noreply()
+  end
+
   def handle_event("form-change", %{"user" => "-unassigned-"}, socket),
     do: handle_event("form-change", %{"user" => nil}, socket)
 

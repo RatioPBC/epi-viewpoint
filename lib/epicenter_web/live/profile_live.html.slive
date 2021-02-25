@@ -148,7 +148,7 @@
                 id: "add-place-link-#{case_investigation.tid}",
                 class: "add-place-link"
           = for visit <- case_investigation.visits do
-            div.visit
+            div.visit data-tid=visit.tid
               div
                 span.place-name data-role="place-name" =place_name(visit)
                 span.visit-address data-role="place-address" =address(visit)
@@ -158,6 +158,8 @@
                   li data-role="relationship" =visit.relationship
                   li data-role="contact-phone" =visit.place.contact_phone
                   li data-role="occurred-on" ="Visited on #{Format.date(visit.occurred_on)}"
+              .visit-remove
+                  a href="#" data-confirm="Remove #{address(visit)} as a place visited?" phx-click="remove-visit" phx-value-visit-id=visit.id data-role="remove-visit" Remove
 
         = if case_investigation.interview_status == "completed" do
           div
