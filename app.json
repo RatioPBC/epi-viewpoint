@@ -5,10 +5,6 @@
     "postdeploy": "mix ecto.migrate"
   },
   "env": {
-    "DATABASE_URL": {
-      "description": "Heroku database URL",
-      "required": false
-    },
     "LIVE_VIEW_SIGNING_SALT": {
       "description": "Signing salt for Phoenix LiveView",
       "generator": "secret",
