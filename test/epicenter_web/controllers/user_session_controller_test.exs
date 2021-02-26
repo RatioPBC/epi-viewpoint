@@ -3,6 +3,8 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
   import Epicenter.AccountsFixtures
 
+  alias Epicenter.Accounts
+  alias Epicenter.Repo
   alias EpicenterWeb.Test.Pages
 
   setup do
@@ -19,6 +21,47 @@ defmodule EpicenterWeb.UserSessionControllerTest do
     test "redirects if already logged in", %{conn: conn, user: user} do
       conn = conn |> log_in_user(user) |> get(Routes.user_session_path(conn, :new))
       assert redirected_to(conn) == "/"
+    end
+  end
+
+  describe "new when there are no existing users" do
+    setup do
+      Accounts.list_users() |> Enum.each(fn user -> Repo.delete(user) end)
+      assert Accounts.count_users() == 0
+
+      on_exit(fn ->
+        Application.put_env(:epicenter, :initial_user_email, nil)
+      end)
+    end
+
+    test "when initial_user_email is not set, a message is shown", %{conn: conn} do
+      conn = get(conn, Routes.user_session_path(conn, :new))
+      assert html_response(conn, 200) =~ "No users have been set up"
+    end
+
+    test "when initial_user_email is set, a new initial admin user is created", %{conn: conn} do
+      Application.put_env(:epicenter, :initial_user_email, "initial@example.com")
+
+      assert Accounts.count_users() == 0
+
+      conn = get(conn, Routes.user_session_path(conn, :new))
+
+      base_64_url_characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+      at_least_ten_base_64_characters = "[#{base_64_url_characters}]{10,}"
+      assert redirected_to(conn) =~ ~r|/users/reset-password/#{at_least_ten_base_64_characters}|
+
+      assert Accounts.count_users() == 1
+      [initial_user] = Accounts.list_users()
+      assert initial_user.email == "initial@example.com"
+      assert initial_user.admin == true
+      assert initial_user.hashed_password != nil
+    end
+
+    test "when initial_user_email is set but user could not be created, an error is shown", %{conn: conn} do
+      Application.put_env(:epicenter, :initial_user_email, "invalid email address")
+
+      conn = get(conn, Routes.user_session_path(conn, :new))
+      assert html_response(conn, 200) =~ "Initial user email address “invalid email address” is invalid: must have the @ sign and no spaces"
     end
   end
 

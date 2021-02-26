@@ -1,10 +1,22 @@
 {
   "name": "epi_viewpoint",
-  "success_url": "/healthcheck",
+  "success_url": "/",
   "scripts": {
     "postdeploy": "mix ecto.migrate"
   },
   "env": {
+    "CANONICAL_HOST": {
+      "description": "Hostname (perhaps <app-name>.herokuapp.com)",
+      "required": true
+    },
+    "INITIAL_USER_EMAIL": {
+      "description": "Email address for the first user, which will be auto-generated (must have an '@' sign and no spaces)",
+      "required": true
+    },
+    "LANG": {
+      "description": "Language setting",
+      "value": "en_US.UTF-8"
+    },
     "LIVE_VIEW_SIGNING_SALT": {
       "description": "Signing salt for Phoenix LiveView",
       "generator": "secret",
@@ -12,7 +24,7 @@
     },
     "POOL_SIZE": {
       "description": "Database connection pool size",
-      "value": 10,
+      "value": "10",
       "required": true
     },
     "SECRET_KEY_BASE": {
@@ -20,18 +32,25 @@
       "generator": "secret",
       "required": true
     },
-    "MIX_ENV": "prod"
-  },
-  "formation": [
-    {
-      "web": {
-        "quantity": 1
-      }
+    "SOURCE_VERSION": {
+      "description": "Initial source version for deploy script",
+      "value": "000000",
+      "required": true
+    },
+    "MIX_ENV": {
+      "value": "prod",
+      "required": true
     }
-  ],
+  },
+  "addons": ["heroku-postgresql"],
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
   "buildpacks": [
-    { "url": "https://github.com/elixir-buildpack/heroku-buildpack" },
-    { "url": "https://github.com/gjaldon/heroku-buildpack-phoenix-static" },
+    { "url": "https://github.com/elixir-buildpack/heroku-buildpack.git" },
+    { "url": "https://github.com/gjaldon/heroku-buildpack-phoenix-static.git" },
     { "url": "https://github.com/ianpurvis/heroku-buildpack-version" }
   ]
 }

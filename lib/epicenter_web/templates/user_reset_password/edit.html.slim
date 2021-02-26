@@ -1,4 +1,4 @@
-#reset-password-page
+#reset-password-page data-page="reset-password"
   = form_for @changeset, Routes.user_reset_password_path(@conn, :update, @token), [data: [role: "reset-password-form"]], fn f ->
     #form-contents
       header
@@ -26,4 +26,3 @@
 
       fieldset
         = link "Back to login", to: Routes.user_session_path(@conn, :new), id: "back-to-login"
-

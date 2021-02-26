@@ -155,6 +155,16 @@ defmodule Epicenter.AccountsTest do
     end
   end
 
+  describe "count_users" do
+    test "counts users" do
+      assert Accounts.count_users() == 1
+
+      %User{} = Test.Fixtures.user_attrs(@admin, "user-1") |> Accounts.register_user!()
+      %User{} = Test.Fixtures.user_attrs(@admin, "user-2") |> Accounts.register_user!()
+      assert Accounts.count_users() == 3
+    end
+  end
+
   describe "get_user!/1" do
     test "raises if id is invalid" do
       assert_raise Ecto.NoResultsError, fn ->

@@ -12,6 +12,7 @@ defmodule Epicenter.Accounts do
   def change_user_mfa(user, mfa_secret), do: User.mfa_changeset(user, %{mfa_secret: mfa_secret})
   def change_user_password(user, attrs \\ %{}), do: User.password_changeset(user, attrs)
   def change_user_registration(%User{} = user, attrs \\ %{}), do: User.registration_changeset(user, attrs)
+  def count_users(), do: User |> Repo.aggregate(:count)
   def create_login(attrs), do: change_login(attrs) |> Repo.insert()
   def get_user!(id) when is_binary(id), do: Repo.get!(User, id)
   def get_user(email: email) when is_binary(email), do: User |> Repo.get_by(email: email)

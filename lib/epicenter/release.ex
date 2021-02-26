@@ -64,11 +64,13 @@ defmodule Epicenter.Release do
 
     case Accounts.register_user({attrs, audit_meta}) do
       {:ok, user} ->
-        {:ok, generated_password_reset_url(user)}
+        url = generated_password_reset_url(user)
+        puts.(url)
+        {:ok, url}
 
       {:error, %Ecto.Changeset{errors: errors}} ->
         puts.("FAILED!")
-        {:error, errors}
+        {:error, errors} |> inspect() |> puts.()
     end
   end
 

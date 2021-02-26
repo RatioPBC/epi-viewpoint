@@ -37,7 +37,7 @@ pull requests or issues at this time.
   * (to skip running doctor when starting, use `bin/dev/start fast`)
 * Run tests and push: `bin/dev/shipit`
 
-### Docker
+### Running docker on a development machine 
 
 `docker-compose` uses the same docker image that production does.
 
@@ -77,6 +77,34 @@ Note that `mix gettext.extract --merge` is run as part of `shipit`, and `shipit`
 
 ## Deploying
 
+### "Deploy to Heroku" button
+
+Use the Deploy to Heroku button to quickly deploy this app to your Heroku account for demo or exploration purposes.
+Heroku accounts are free, and the Deploy to Heroku button only provisions free resources (with the standard limitations
+that Heroku puts on free resources).
+
+<a href="https://heroku.com/deploy?template=https://github.com/geometricservices/epi-viewpoint/tree/wip-heroku">
+  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
+</a>
+
+#### Instructions
+
+1. Click the button above.
+1. Sign up or log into Heroku.
+1. Set the app name (e.g., `myviewpoint`).
+1. Set the **CANONICAL_HOST** configuration variable to the app name you chose above, 
+   followed by `.herokuapp.com` (e.g., `myviewpoint.herokuapp.com`).
+1. Set the **INITIAL_USER_EMAIL** configuration variable to the email address you want for the first admin user.
+   You will use this email address to log in. 
+   Epi Viewpoint does not currently send email, so this technically does not need to be a real email address,
+   but it does need to have an "@" sign and cannot include spaces.
+1. Click the "Deploy app" button.
+1. If the deploy is successful, click on the "View" button at the bottom of the page. 
+   If everything has worked properly, you will land on a page asking you to set your password. 
+   Enter a new password and click "Continue".
+1. You will then be asked to log in. Use the email address you set up earlier plus the password you just created.
+1. Configure multifactor authentication with a tool like Google Authenticator, 1Password, etc. 
+
 ### Heroku
 
 Run `bin/staging/deploy` which will make sure your Heroku account is all set up for deploying this project, and once
@@ -89,8 +117,8 @@ GCP cloud_sql import/export.
 
 ### Creating users
 
-You must create the first admin user manually (see the docs for `Epicenter.Release.create_user`). After that, you can
-log in as that admin user and create other users.
+Unless you used the "Deploy to Heroku" button, you must create the first admin user manually (see the docs 
+for `Epicenter.Release.create_user`). After that, you can log in as that admin user and create other users.
 
 ### Exporting Data
 
