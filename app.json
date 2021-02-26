@@ -7,7 +7,7 @@
   "env": {
     "DATABASE_URL": {
       "description": "Heroku database URL",
-      "required": true
+      "required": false
     },
     "LIVE_VIEW_SIGNING_SALT": {
       "description": "Signing salt for Phoenix LiveView",
