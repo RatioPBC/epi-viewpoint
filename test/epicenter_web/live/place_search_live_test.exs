@@ -74,5 +74,19 @@ defmodule EpicenterWeb.PlaceSearchLiveTest do
       |> Pages.PlaceSearch.click_add_new_place_and_follow_redirect(conn)
       |> Pages.Place.assert_here(case_investigation)
     end
+
+    test "when there are no matching search results", %{conn: conn, case_investigation: case_investigation} do
+      Pages.PlaceSearch.visit(conn, case_investigation)
+      |> Pages.PlaceSearch.assert_selectable_results([])
+      |> Pages.PlaceSearch.type_in_the_search_box("11")
+      |> Pages.PlaceSearch.assert_selectable_results([
+        "Alice's Donuts1111 Test St, City, OH 00000",
+        "David's Donuts1122 Test St, City, OH 00000"
+      ])
+      |> Pages.PlaceSearch.type_in_the_search_box("1111111")
+      |> Pages.PlaceSearch.assert_no_results()
+      |> Pages.PlaceSearch.click_no_results_add_new_place_and_follow_redirect(conn)
+      |> Pages.Place.assert_here(case_investigation)
+    end
   end
 end

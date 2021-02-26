@@ -24,6 +24,13 @@ defmodule EpicenterWeb.Test.Pages.PlaceSearch do
     view
   end
 
+  def assert_no_results(view) do
+    view
+    |> Pages.parse()
+    |> Test.Html.text("[data-role=place-search-results]")
+    |> assert_eq("No results+ Add new place", returning: view)
+  end
+
   def assert_selectable_results(view, expected_texts),
     do:
       view
@@ -34,6 +41,14 @@ defmodule EpicenterWeb.Test.Pages.PlaceSearch do
   def click_add_new_place_and_follow_redirect(view, conn) do
     view
     |> element("[data-role=add-new-place]")
+    |> render_click()
+    |> Pages.assert_redirect_succeeded()
+    |> Pages.follow_live_view_redirect(conn)
+  end
+
+  def click_no_results_add_new_place_and_follow_redirect(view, conn) do
+    view
+    |> element("[data-role=no-results-add-new-place]")
     |> render_click()
     |> Pages.assert_redirect_succeeded()
     |> Pages.follow_live_view_redirect(conn)

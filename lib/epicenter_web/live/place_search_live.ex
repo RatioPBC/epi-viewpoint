@@ -20,14 +20,24 @@ defmodule EpicenterWeb.PlaceSearchLive do
     |> assign(:result_place_addresses, [])
     |> assign(:query, "")
     |> assign(:case_investigation, case_investigation)
+    |> assign(:no_results_message, nil)
     |> ok()
   end
 
   def handle_event("suggest-place", %{"query" => query_text}, socket) do
     all_place_addresses = Cases.search_places(query_text)
 
+    message = if all_place_addresses == [], do: "No results", else: nil
+
     socket
     |> assign(:result_place_addresses, all_place_addresses)
+    |> assign(:no_results_message, message)
+    |> noreply()
+  end
+
+  def handle_event("choose-place-address", %{"value" => 0}, socket) do
+    socket
+    |> push_redirect(to: Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, socket.assigns.case_investigation))
     |> noreply()
   end
 
