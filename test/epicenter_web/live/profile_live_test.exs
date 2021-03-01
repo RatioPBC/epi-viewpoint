@@ -615,7 +615,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "a visit can be removed", %{conn: conn, person: person, user: user} do
       case_investigation =
-        create_case_investigation(person, user, "case_investigation", ~D[2020-08-07])
+        create_case_investigation(person, user, "case_investigation", ~D[2020-08-07], %{
+          interview_started_at: DateTime.utc_now(),
+          interview_completed_at: DateTime.utc_now()
+        })
         |> Cases.preload_person()
 
       person = case_investigation.person
@@ -1023,7 +1026,10 @@ defmodule EpicenterWeb.ProfileLiveTest do
       lab_result = Test.Fixtures.lab_result_attrs(person, @admin, "lab-result", ~D[2020-10-27]) |> Cases.create_lab_result!()
 
       case_investigation =
-        Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case-investigation", %{symptom_onset_on: ~D[2021-02-18]})
+        Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case-investigation", %{
+          symptom_onset_on: ~D[2021-02-18],
+          interview_started_at: DateTime.utc_now()
+        })
         |> Cases.create_case_investigation!()
 
       place = Test.Fixtures.place_attrs(@admin, "place", %{name: "the best place", type: "retail"}) |> Cases.create_place!()
@@ -1054,7 +1060,27 @@ defmodule EpicenterWeb.ProfileLiveTest do
       [visit: visit, visit_with_empty_fields: visit_with_empty_fields, case_investigation: case_investigation]
     end
 
+    test "it does not show places div unless case investigation is complete", %{
+      case_investigation: case_investigation,
+      person: person,
+      conn: conn
+    } do
+      assert case_investigation.interview_status != "completed"
+
+      Pages.Profile.visit(conn, person)
+      |> Pages.Profile.assert_places_section_hidden()
+    end
+
     test "it displays place and date", %{case_investigation: case_investigation, person: person, visit: visit, conn: conn} do
+      {:ok, case_investigation} =
+        Cases.complete_case_investigation_interview(
+          case_investigation,
+          @admin.id,
+          %{interview_completed_at: DateTime.utc_now()}
+        )
+
+      case_investigation = Cases.get_case_investigation(case_investigation.id, @admin)
+
       Pages.Profile.visit(conn, person)
       |> Pages.Profile.assert_visit_address(case_investigation, visit, "the best place", "1111 Test St, City, OH 00000")
       |> Pages.Profile.assert_visit(case_investigation, "retail", "employee", "1111111234", "09/06/2020")

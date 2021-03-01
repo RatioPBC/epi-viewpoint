@@ -14,7 +14,11 @@ defmodule EpicenterWeb.AddVisitLiveTest do
       lab_result = Test.Fixtures.lab_result_attrs(person, @admin, "lab-result", ~D[2020-10-27]) |> Cases.create_lab_result!()
 
       case_investigation =
-        Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case-investigation", %{symptom_onset_on: ~D[2021-02-18]})
+        Test.Fixtures.case_investigation_attrs(person, lab_result, @admin, "case-investigation", %{
+          symptom_onset_on: ~D[2021-02-18],
+          interview_started_at: DateTime.utc_now(),
+          interview_completed_at: DateTime.utc_now()
+        })
         |> Cases.create_case_investigation!()
 
       place = Test.Fixtures.place_attrs(@admin, "place-1", %{name: "the best place"}) |> Cases.create_place!()

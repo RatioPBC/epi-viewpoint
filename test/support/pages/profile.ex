@@ -805,6 +805,11 @@ defmodule EpicenterWeb.Test.Pages.Profile do
     view
   end
 
+  def assert_places_section_hidden(view) do
+    refute view |> Pages.parse() |> Test.Html.present?(selector: ".case-investigation-places")
+    view
+  end
+
   def assert_visit(view, visit, is_visible: is_visible) do
     html =
       view
