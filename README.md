@@ -98,7 +98,7 @@ that Heroku puts on free resources).
    You will use this email address to log in. 
    Epi Viewpoint does not currently send email, so this technically does not need to be a real email address,
    but it does need to have an "@" sign and cannot include spaces.
-1. Click the "Deploy app" button.
+1. Click the "Deploy app" button. Some progress information will be displayed and the deploy should take about 5 minutes.
 1. If the deploy is successful, click on the "View" button at the bottom of the page. 
    If everything has worked properly, you will land on a page asking you to set your password. 
    Enter a new password and click "Continue".
