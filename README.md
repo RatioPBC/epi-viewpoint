@@ -83,7 +83,7 @@ Use the Deploy to Heroku button to quickly deploy this app to your Heroku accoun
 Heroku accounts are free, and the Deploy to Heroku button only provisions free resources (with the standard limitations
 that Heroku puts on free resources).
 
-<a href="https://heroku.com/deploy?template=https://github.com/geometricservices/epi-viewpoint/tree/wip-heroku">
+<a href="https://heroku.com/deploy?template=https://github.com/geometricservices/epi-viewpoint">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
 </a>
 
