@@ -2,7 +2,7 @@
 set -e
 
 git remote rename origin gitlab
-git remote add origin git@github.com:geometricservices/epi-viewpoint.git
+git remote add origin git@github.com:RatioPBC/epi-viewpoint.git
 git remote -v
 
 git pull gitlab main
