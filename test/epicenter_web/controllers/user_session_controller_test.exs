@@ -46,7 +46,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
       conn = get(conn, Routes.user_session_path(conn, :new))
 
-      base_64_url_characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+      base_64_url_characters = "a-zA-Z0-9-_"
       at_least_ten_base_64_characters = "[#{base_64_url_characters}]{10,}"
       assert redirected_to(conn) =~ ~r|/users/reset-password/#{at_least_ten_base_64_characters}|
 
