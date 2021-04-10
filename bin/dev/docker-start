@@ -7,13 +7,13 @@ source "bin/_support/step.sh"
 set -e
 
 check "hostname in /etc/hosts" \
-  "grep -q viewpoint-dev.network.geometer.dev /etc/hosts" \
-  "hostess add viewpoint-dev.network.geometer.dev 127.0.0.1 # or manually edit /etc/hosts"
+  "grep -q viewpoint-dev.network.ratiopbc.dev /etc/hosts" \
+  "hostess add viewpoint-dev.network.ratiopbc.dev 127.0.0.1 # or manually edit /etc/hosts"
 
 step "Stopping local postgres" "bin/dev/postgres-stop -q"
 step "Building docker image" "bin/docker/build"
 
-cecho --yellow "after docker starts, go to" --bold-bright-yellow "http://viewpoint-dev.network.geometer.dev:4001"
+cecho --yellow "after docker starts, go to" --bold-bright-yellow "http://viewpoint-dev.network.ratiopbc.dev:4001"
 
 step_header "Starting docker" "docker-compose up"
 docker-compose up

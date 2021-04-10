@@ -6,7 +6,7 @@ source "bin/_support/check.sh"
 deploy() {
   check "heroku: remote exists" \
     "git remote -v | grep 'heroku'" \
-    "heroku git:remote -a geometer-epicenter"
+    "heroku git:remote -a ratiopbc-epicenter"
 
   check "heroku: elixir buildpack is set" \
     "heroku buildpacks | grep -s 'elixir-buildpack/heroku-elixir'" \
@@ -22,7 +22,7 @@ deploy() {
 
   check "heroku: DATABASE_URL is set" \
     "heroku config | grep -s DATABASE_URL" \
-    "open https://dashboard.heroku.com/apps/geometer-epicenter/resources # now add a database"
+    "open https://dashboard.heroku.com/apps/ratiopbc-epicenter/resources # now add a database"
 
   check "heroku: POOL_SIZE is set" \
     "heroku config | grep -s POOL_SIZE" \
