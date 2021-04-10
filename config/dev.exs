@@ -5,13 +5,12 @@ config :epicenter,
   seeds_enabled?: true
 
 # Configure your database
-config :epicenter, Epicenter.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "epicenter_dev",
-  hostname: "localhost",
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+repo_opts =
+  if socket_dir = System.get_env("PGDATA"),
+    do: [socket_dir: socket_dir],
+    else: [username: "postgres", password: "postgres"]
+
+config :epicenter, Epicenter.Repo, [database: "epicenter_dev", show_sensitive_data_on_connection_error: true, pool_size: 10] ++ repo_opts
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
