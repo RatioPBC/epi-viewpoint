@@ -24,3 +24,5 @@ npm-debug.log
 .vscode/
 .DS_Store
 logfile
+/.direnv/
+.envrc.private
