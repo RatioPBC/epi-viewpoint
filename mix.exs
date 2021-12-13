@@ -52,7 +52,7 @@ defmodule Epicenter.MixProject do
       {:gettext, "~> 0.11"},
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.0"},
-      {:logger_json, git: "https://github.com/patmaddox/logger_json.git", ref: "8e76992cc61bc8194ef687ce5985b18e9fccd179"},
+      {:logger_json, "~> 4.3"},
       {:mix_audit, "~> 0.1", runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:mox, "~> 1.0"},
