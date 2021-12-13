@@ -18,7 +18,7 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
   end
 
   def render(assigns) do
-    ~H"""
+    ~M"""
     .investigation-note data-role="investigation-note" data-note-id=@note.id
       .investigation-note-header
         span.investigation-note-author data-role="investigation-note-author" = @note.author.name

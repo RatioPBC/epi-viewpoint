@@ -52,7 +52,7 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
     end
 
     def render(assigns) do
-      ~H"""
+      ~M"""
       = component(@socket,
                   InvestigationNotesSection,
                   "displays-a-notes-section",

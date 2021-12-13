@@ -1,5 +1,5 @@
 defmodule EpicenterWeb.SlimeSigilWrapper do
-  defmacro sigil_H({:<<>>, meta, [expr]}, _opts) do
+  defmacro sigil_M({:<<>>, meta, [expr]}, _opts) do
     ast =
       expr
       |> Slime.Renderer.precompile()
