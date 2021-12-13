@@ -14,7 +14,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
     alias EpicenterWeb.InvestigationNoteForm
 
     def render(assigns) do
-      ~H"""
+      ~M"""
       = component(@socket,
             InvestigationNoteForm,
             "renders-a-form",

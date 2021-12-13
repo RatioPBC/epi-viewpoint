@@ -4,7 +4,7 @@ defmodule EpicenterWeb.AssignmentSelector do
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
   def render(assigns) do
-    ~H"""
+    ~M"""
     form id="assignment-form" phx-change="form-change" data-disabled=@disabled phx-target=@myself
       #user-list
         span#assign-to-label Assign to

@@ -7,7 +7,7 @@ defmodule EpicenterWeb.InvestigationNotesSection do
   def render(assigns) do
     # TODO: we should have a nice way of automatically providing @key or @id regardless of whether the component is
     #       stateless or stateful, to prevent regressions.
-    ~H"""
+    ~M"""
     .investigation-notes-section
       h3.additional_notes Additional Notes
       = if @is_editable do

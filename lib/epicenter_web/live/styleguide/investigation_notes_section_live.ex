@@ -21,7 +21,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   def render(assigns) do
     contact_investigation = %ContactInvestigation{id: "styleguide-contact-investigation"}
 
-    ~H"""
+    ~M"""
     = component(@socket,
           InvestigationNotesSection,
           "styleguide-note-section",

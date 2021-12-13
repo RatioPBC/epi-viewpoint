@@ -6,7 +6,7 @@ defmodule EpicenterWeb.ContactsFilter do
   alias Epicenter.AuditLog
 
   def render(assigns) do
-    ~H"""
+    ~M"""
     #status-filter
       = live_patch "All", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_contact_investigation), class: "button", data: [active: assigns.filter in [:with_contact_investigation, nil], role: "contacts-filter", tid: "all"]
       = live_patch "Pending interview", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_pending_interview), class: "button", data: [active: assigns.filter == :with_pending_interview, role: "contacts-filter", tid: "with_pending_interview"]
