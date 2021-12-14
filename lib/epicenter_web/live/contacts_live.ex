@@ -13,6 +13,7 @@ defmodule EpicenterWeb.ContactsFilter do
       = live_patch "Ongoing interview", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_ongoing_interview), class: "button", data: [active: assigns.filter == :with_ongoing_interview, role: "contacts-filter", tid: "with_ongoing_interview"]
       = live_patch "Quarantine monitoring", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_quarantine_monitoring), class: "button", data: [active: assigns.filter == :with_quarantine_monitoring, role: "contacts-filter", tid: "with_quarantine_monitoring"]
     """
+    |> Map.put(:root, true)
   end
 end
 

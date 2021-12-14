@@ -1119,7 +1119,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
           current_user: @admin
         )
 
-      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}} |> ProfileLive.assign_updated_person(alice)
+      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user, __changed__: %{}}} |> ProfileLive.assign_updated_person(alice)
       assert updated_socket.assigns.person.addresses |> tids() == ["address1"]
       assert updated_socket.assigns.person.assigned_to.tid == "assignee"
       assert updated_socket.assigns.person.lab_results |> tids() == ["lab1"]
@@ -1164,7 +1164,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "handles assign_users message when the changed people include the current person", %{person: alice, assignee: assignee, user: user} do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
-      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}}
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user, __changed__: %{}}}
 
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{alice | tid: "updated-alice"}, billy]}, socket)
       assert updated_socket.assigns.person.tid == "updated-alice"
@@ -1172,14 +1172,14 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
     test "handles assign_users message when the changed people do not include the current person", %{person: alice, assignee: assignee} do
       billy = Test.Fixtures.person_attrs(assignee, "billy") |> Cases.create_person!()
-      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice}}
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, __changed__: %{}}}
 
       {:noreply, updated_socket} = ProfileLive.handle_info({:people, [%{billy | tid: "updated-billy"}]}, socket)
       assert updated_socket.assigns.person.tid == "alice"
     end
 
     test "handles {:people, updated_people} when csv upload includes new values", %{conn: conn, person: alice, user: user} do
-      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user}}
+      socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user, __changed__: %{}}}
       {:ok, show_page_live, _html} = live(conn, "/people/#{alice.id}")
       assert_role_text(show_page_live, "addresses", "1000 Test St, City, OH 00000")
 

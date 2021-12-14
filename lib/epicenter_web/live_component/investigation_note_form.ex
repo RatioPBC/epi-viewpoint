@@ -49,6 +49,7 @@ defmodule EpicenterWeb.InvestigationNoteForm do
     = form_for @changeset, "#", [class: "investigation-note-form", "data-role": "note-form", "data-confirm-navigation": confirmation_prompt(@changeset), phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f ->
       = add_note_form_builder(f)
     """
+    |> Map.put(:root, true)
   end
 
   def handle_event("change_note", %{"form_field_data" => params}, socket) do

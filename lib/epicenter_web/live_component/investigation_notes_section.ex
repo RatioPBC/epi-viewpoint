@@ -19,5 +19,6 @@ defmodule EpicenterWeb.InvestigationNotesSection do
       = for note <- @notes |> Enum.reverse() do
         = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, is_editable: @is_editable, current_user_id: @current_user_id, on_delete: @on_delete_note)
     """
+    |> Map.put(:root, true)
   end
 end

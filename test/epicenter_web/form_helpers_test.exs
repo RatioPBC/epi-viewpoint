@@ -33,7 +33,7 @@ defmodule EpicenterWeb.FormHelpersTest do
 
     test "marks the checkbox as checked if it's in the form data", %{form: form} do
       FormHelpers.checkbox_list_checkbox(form, :genres, "drama")
-      |> assert_html_eq(~s|<input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/>|)
+      |> assert_html_eq(~s|<input checked id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>|)
     end
   end
 
@@ -58,7 +58,7 @@ defmodule EpicenterWeb.FormHelpersTest do
           Comedy\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/>\v
+          <input checked id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>\v
           Drama\v
         </label>
         <label data-role="movie-genres">\v
@@ -86,7 +86,7 @@ defmodule EpicenterWeb.FormHelpersTest do
           Comedy\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama" checked/>\v
+          <input checked id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>\v
           Drama\v
         </label>
         <label data-role="movie-genres">\v
@@ -150,7 +150,7 @@ defmodule EpicenterWeb.FormHelpersTest do
           Italian\v
         </label>
         <label data-role="movie-language">\v
-          <input id="movie_language_German" name="movie[language]" type="radio" value="German" checked="checked"/>\v
+          <input checked="checked" id="movie_language_German" name="movie[language]" type="radio" value="German" />\v
           German\v
         </label>
         <label data-role="movie-language">\v
@@ -166,7 +166,7 @@ defmodule EpicenterWeb.FormHelpersTest do
       |> assert_html_eq("""
       <div class="radio-button-list" id="language-list">
         <label data-role="movie-language">\v
-          <input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>\v
+          <input checked="checked" id="movie_language_" name="movie[language]" type="radio" value=""/>\v
           Other\v
           <input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="German">\v
         </label>
@@ -199,7 +199,7 @@ defmodule EpicenterWeb.FormHelpersTest do
           Italian\v
         </label>
         <label data-role="movie-language">\v
-          <input id="movie_language_english" name="movie[language]" type="radio" value="english" checked="checked"/>\v
+          <input checked="checked" id="movie_language_english" name="movie[language]" type="radio" value="english"/>\v
           English\v
           </label>
       </div>
@@ -218,7 +218,7 @@ defmodule EpicenterWeb.FormHelpersTest do
           Italian\v
         </label>
         <label data-role="movie-language">\v
-          <input id="movie_language_deutsch" name="movie[language]" type="radio" value="deutsch" checked="checked"/>\v
+          <input checked="checked" id="movie_language_deutsch" name="movie[language]" type="radio" value="deutsch" />\v
           German\v
         </label>
         <label data-role="movie-language">\v
@@ -236,13 +236,13 @@ defmodule EpicenterWeb.FormHelpersTest do
 
       FormHelpers.select_with_wrapper(form, :language, options, data: [grid: [row: 3, col: 1, span: 2]])
       |> assert_html_eq("""
-      <div class="select-wrapper" data-grid-col="1" data-grid-row="3" data-grid-span="2">
+      <div class="select-wrapper" data-grid-row="3" data-grid-col="1" data-grid-span="2">
         <svg fill="none" height="20" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
           <path d="M7.41 8.59003L12 13.17L16.59 8.59003L18 10L12 16L6 10L7.41 8.59003Z" fill="black" fill-opacity="0.87"></path>
         </svg>
-        <select data-grid-col="1" data-grid-row="3" data-grid-span="2" id="movie_language" name="movie[language]">
+        <select data-grid-row="3" data-grid-col="1" data-grid-span="2" id="movie_language" name="movie[language]">
           <option value="English">English</option>
-          <option value="German" selected>Deutsche</option>
+          <option selected value="German">Deutsche</option>
           <option value="Spanish">Español</option>
         </select>
       </div>

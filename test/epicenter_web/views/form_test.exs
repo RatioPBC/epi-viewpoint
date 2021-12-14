@@ -91,20 +91,20 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <label data-grid-col="1" data-grid-row="1" data-grid-span="3" for="movie_genres">Genres</label>
-      <div class="checkbox-list" data-grid-col="1" data-grid-row="3" data-grid-span="3">
+      <label data-grid-row="1" data-grid-col="1" data-grid-span="3" for="movie_genres">Genres</label>
+      <div class="checkbox-list" data-grid-row="3" data-grid-col="1" data-grid-span="3">
 
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy" checked="checked"/>Comedy\v
+          <input checked="checked" id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/>Comedy\v
         </label>
         <label data-role="movie-genres">\v
           <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>Drama\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="musical" checked="checked"/>Musical\v
+          <input checked="checked" id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/>Musical\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres_other]" type="checkbox" value="true" checked="checked"/>Other\v
+          <input checked="checked" id="movie_genres" name="movie[genres_other]" type="checkbox" value="true" />Other\v
           <input data-reveal="when-parent-checked" id="movie_genres" name="movie[genres][]" type="text" value="Indie"/>\v
         </label>
       </div>
@@ -119,7 +119,7 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <div data-grid-col="1" data-grid-row="1" data-grid-span="2">some content</div>
+      <div data-grid-row="1" data-grid-col="1" data-grid-span="2">some content</div>
     </fieldset>
     """)
   end
@@ -132,11 +132,11 @@ defmodule EpicenterWeb.FormTest do
       |> render()
       |> assert_html_eq("""
       <fieldset>
-        <label data-grid-col="1" data-grid-row="1" data-grid-span="4" for="movie_release_date">Release date</label>
-        <div data-grid-col="1" data-grid-row="2" data-grid-span="4"><div>MM/DD/YYYY</div></div>
+        <label data-grid-row="1" data-grid-col="1" data-grid-span="4" for="movie_release_date">Release date</label>
+        <div data-grid-row="2" data-grid-col="1" data-grid-span="4"><div>MM/DD/YYYY</div></div>
         <input
-          data-grid-col="1"
           data-grid-row="4"
+          data-grid-col="1"
           data-grid-span="4"
           id="movie_release_date"
           name="movie[release_date]"
@@ -153,11 +153,11 @@ defmodule EpicenterWeb.FormTest do
       |> render()
       |> assert_html_eq("""
       <fieldset>
-        <label data-grid-col="1" data-grid-row="1" data-grid-span="2" for="movie_release_date">Release date</label>
-        <div data-grid-col="1" data-grid-row="2" data-grid-span="2"><div>This is a cool release date!</div></div>
+        <label data-grid-row="1" data-grid-col="1" data-grid-span="2" for="movie_release_date">Release date</label>
+        <div data-grid-row="2" data-grid-col="1" data-grid-span="2"><div>This is a cool release date!</div></div>
         <input
-          data-grid-col="1"
           data-grid-row="4"
+          data-grid-col="1"
           data-grid-span="2"
           id="movie_release_date"
           name="movie[release_date]"
@@ -175,7 +175,7 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <footer data-grid-col="1" data-grid-row="1" data-grid-span="8" data-sticky="false">
+      <footer data-grid-row="1" data-grid-col="1" data-grid-span="8" data-sticky="false">
         <div id="form-footer-content">
           <button type="submit">Save</button>
           <div class="form-error-message" data-form-error-message="some error message">some error message</div>
@@ -192,12 +192,12 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <label data-grid-col="1" data-grid-row="1" data-grid-span="5" for="movie_language">\v
+      <label data-grid-row="1" data-grid-col="1" data-grid-span="5" for="movie_language">\v
         Language\v
       </label>
-      <div class="radio-button-list" data-grid-col="1" data-grid-row="3" data-grid-span="5">
+      <div class="radio-button-list" data-grid-row="3" data-grid-col="1" data-grid-span="5">
         <label data-role="movie-language">
-          <input id="movie_language_" name="movie[language]" type="radio" value="" checked="checked"/>\v
+          <input checked="checked" id="movie_language_" name="movie[language]" type="radio" value="" />\v
           Other\v
 
           <input data-reveal="when-parent-checked" id="movie_language" name="movie[language]" type="text" value="Weird English"/>
@@ -222,7 +222,7 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>\v
-      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="save-button" type="submit" disabled="disabled">Save</button>\v
+      <button data-role="save-button" data-grid-row="1" data-grid-col="1" data-grid-span="2" disabled="disabled" type="submit">Save</button>\v
     </fieldset>
     """)
   end
@@ -234,7 +234,7 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>\v
-      <button data-grid-col="1" data-grid-row="1" data-grid-span="2" data-role="save-button" type="submit">
+      <button data-role="save-button" data-grid-row="1" data-grid-col="1" data-grid-span="2" type="submit">
         <span>Custom Title</span>
         <svg fill="none" height="14" viewbox="0 0 18 14" width="16" xmlns="http://www.w3.org/2000/svg">
           <path d="M5.7963 11.17L1.6263 7L0.206299 8.41L5.7963 14L17.7963 2L16.3863 0.589996L5.7963 11.17Z" fill="white" fill-opacity="0.87"></path>
@@ -257,7 +257,7 @@ defmodule EpicenterWeb.FormTest do
     label
     |> render()
     |> assert_html_eq("""
-    <label data-grid-col="1" data-grid-row="1" data-grid-span="4" for="movie_language">\v
+    <label data-grid-row="1" data-grid-col="1" data-grid-span="4" for="movie_language">\v
       Language\v
     </label>
     """)
@@ -265,7 +265,7 @@ defmodule EpicenterWeb.FormTest do
     select
     |> render()
     |> assert_html_eq("""
-    <select data-grid-col="1" data-grid-row="3" data-grid-span="4" id="movie_language" name="movie[language]">\v
+    <select data-grid-row="3" data-grid-col="1" data-grid-span="4" id="movie_language" name="movie[language]">\v
       <option value="italian">Italian</option>\v
       <option value="english">English</option>\v
     </select>
@@ -279,11 +279,11 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <label data-grid-col="1" data-grid-row="1" data-grid-span="3" for="movie_title">\v
+      <label data-grid-row="1" data-grid-col="1" data-grid-span="3" for="movie_title">\v
         Title\v
       </label>
       <textarea
-        data-grid-col="1" data-grid-row="3" data-grid-span="3"
+        data-grid-row="3" data-grid-col="1" data-grid-span="3"
         id="movie_title" name="movie[title]" rows="4">
     \v  Strange Brew\v
       </textarea>
@@ -298,11 +298,11 @@ defmodule EpicenterWeb.FormTest do
     |> render()
     |> assert_html_eq("""
     <fieldset>
-      <label data-grid-col="1" data-grid-row="1" data-grid-span="3" for="movie_title">\v
+      <label data-grid-row="1" data-grid-col="1" data-grid-span="3" for="movie_title">\v
         Title\v
       </label>
       <input
-        data-grid-col="1" data-grid-row="3" data-grid-span="3"
+        data-grid-row="3" data-grid-col="1" data-grid-span="3"
         id="movie_title" name="movie[title]" type="text" value="Strange Brew"
       />
     </fieldset>

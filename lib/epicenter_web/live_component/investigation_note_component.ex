@@ -28,6 +28,7 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
         div
           a.investigation-note-delete-link href="#" data-confirm="Remove your note?" phx-click="delete-note" data-role="delete-note" phx-target=@myself Delete
     """
+    |> Map.put(:root, true)
   end
 
   def handle_event("delete-note", _params, socket) do
