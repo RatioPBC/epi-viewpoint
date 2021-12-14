@@ -52,22 +52,22 @@ defmodule EpicenterWeb.MultiselectTest do
       <div class="label-wrapper">
         <label data-multiselect="parent" data-role="movie-genres">
           <input
+            checked="checked"
             id="movie_genres_comedy"
             name="movie[genres][major][values][]"
             type="checkbox"
-            value="comedy"
-            checked="checked"/>\v
+            value="comedy"/>\v
           Comedy\v
         </label>
       </div>
       <div class="label-wrapper">
         <label data-multiselect="parent" data-role="movie-genres">
           <input
+            checked="checked"
             id="movie_genres_scifi"
             name="movie[genres][major][values][]"
             type="checkbox"
-            value="scifi"
-            checked="checked"/>\v
+            value="scifi"/>\v
           Scifi\v
         </label>
       </div>
@@ -255,11 +255,11 @@ defmodule EpicenterWeb.MultiselectTest do
       <div class="label-wrapper">
         <label data-multiselect="parent" data-role="movie-genres">
           <input
+            checked="checked"
             id="movie_genres_other"
             name="movie[genres][_ignore][major][other]"
             type="radio"
-            value="true"
-            checked="checked"/>\v
+            value="true"/>\v
           Other\v
           <div data-multiselect="text-wrapper">
             <input
@@ -330,11 +330,11 @@ defmodule EpicenterWeb.MultiselectTest do
       |> render()
       |> assert_html_eq("""
       <input
+        checked="checked"
         id="movie_genres_other"
         name="movie[genres][_ignore][major][other]"
         type="checkbox"
-        value="true"
-        checked="checked"/>\v
+        value="true"/>\v
       Other\v
       <div data-multiselect="text-wrapper">
         <input

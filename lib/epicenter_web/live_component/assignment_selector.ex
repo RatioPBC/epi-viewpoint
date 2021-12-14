@@ -16,6 +16,7 @@ defmodule EpicenterWeb.AssignmentSelector do
               option value="#{user.id}" #{user.name}
       #assignment-dropdown-tooltip Select people below, then assign them to a user
     """
+    |> Map.put(:root, true)
   end
 
   def handle_event("form-change", %{"user" => "-unassigned-"}, socket),

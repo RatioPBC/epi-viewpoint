@@ -16,6 +16,7 @@ defmodule EpicenterWeb.PeopleFilter do
       input type="checkbox" phx-click="toggle-assigned-to-me" checked=@display_people_assigned_to_me data-tid="assigned-to-me-checkbox" phx-target=@myself
       span My assignments only
     """
+    |> Map.put(:root, true)
   end
 
   def handle_event("toggle-assigned-to-me", _, socket) do

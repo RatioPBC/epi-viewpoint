@@ -32,6 +32,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
           on_add_note: &on_add/1,
           on_delete_note: &on_delete/1)
     """
+    |> Map.put(:root, true)
   end
 
   def on_add(note_attrs) do
