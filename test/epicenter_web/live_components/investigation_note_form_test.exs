@@ -15,8 +15,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
 
     def render(assigns) do
       ~M"""
-      = component(@socket,
-            InvestigationNoteForm,
+      = component(InvestigationNoteForm,
             "renders-a-form",
             on_add: @on_add)
       """

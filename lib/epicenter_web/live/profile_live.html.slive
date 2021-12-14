@@ -201,8 +201,7 @@
                   td data-tid="case-investigation-001-isolation-clearance-order-sent-date"
                     = Format.date(case_investigation.isolation_clearance_order_sent_on, "Not sent")
 
-        = component @socket,
-                    InvestigationNotesSection,
+        = component InvestigationNotesSection,
                     case_investigation.id <> "note section",
                     notes: case_investigation.notes,
                     is_editable: is_editable?(@person),
@@ -212,8 +211,7 @@
 
   a#contact-investigations
   = for contact_investigation <- @contact_investigations do
-    = component @socket,
-                ContactInvestigation,
+    = component ContactInvestigation,
                 contact_investigation.id <> "contact investigation",
                 contact_investigation: contact_investigation,
                 current_user_id: @current_user.id,

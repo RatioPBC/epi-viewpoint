@@ -22,8 +22,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
     contact_investigation = %ContactInvestigation{id: "styleguide-contact-investigation"}
 
     ~M"""
-    = component(@socket,
-          InvestigationNotesSection,
+    = component(InvestigationNotesSection,
           "styleguide-note-section",
           current_user_id: "author-1",
           subject: contact_investigation,

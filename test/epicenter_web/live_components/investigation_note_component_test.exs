@@ -27,8 +27,7 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
 
     def render(assigns) do
       ~M"""
-      = component(@socket,
-            InvestigationNoteComponent,
+      = component(InvestigationNoteComponent,
             "renders-a-note",
             note: @note,
             is_editable: true,

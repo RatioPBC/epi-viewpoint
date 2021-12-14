@@ -72,8 +72,7 @@ section.contact-investigation data-role="contact-investigation" data-contact-inv
                     span class="history-item-link" = history_item.link
 
     .contact-investigation-notes
-      = component(@socket,
-              InvestigationNotesSection,
+      = component(InvestigationNotesSection,
               @contact_investigation.id <> "note section",
               notes: @contact_investigation.notes,
               is_editable: is_editable?(@contact_investigation.exposed_person),

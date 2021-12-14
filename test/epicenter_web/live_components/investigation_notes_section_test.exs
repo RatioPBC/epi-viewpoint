@@ -53,8 +53,7 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
 
     def render(assigns) do
       ~M"""
-      = component(@socket,
-                  InvestigationNotesSection,
+      = component(InvestigationNotesSection,
                   "displays-a-notes-section",
                   notes: @notes,
                   is_editable: true,
