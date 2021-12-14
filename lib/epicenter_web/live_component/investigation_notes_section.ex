@@ -11,13 +11,12 @@ defmodule EpicenterWeb.InvestigationNotesSection do
     .investigation-notes-section
       h3.additional_notes Additional Notes
       = if @is_editable do
-        = component(@socket,
-          InvestigationNoteForm,
+        = component(InvestigationNoteForm,
           @key <> "note form",
           current_user_id: @current_user_id,
           on_add: @on_add_note )
       = for note <- @notes |> Enum.reverse() do
-        = component(@socket, InvestigationNoteComponent, note.id <> "note", note: note, is_editable: @is_editable, current_user_id: @current_user_id, on_delete: @on_delete_note)
+        = component(InvestigationNoteComponent, note.id <> "note", note: note, is_editable: @is_editable, current_user_id: @current_user_id, on_delete: @on_delete_note)
     """
     |> Map.put(:root, true)
   end

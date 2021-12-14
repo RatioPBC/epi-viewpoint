@@ -54,8 +54,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
 
     def render(assigns) do
       ~M"""
-      = component(@socket,
-            ContactInvestigation,
+      = component(ContactInvestigation,
             "renders-a-contact-investigation",
             contact_investigation: @contact_investigation,
             current_user_id: @current_user_id,
