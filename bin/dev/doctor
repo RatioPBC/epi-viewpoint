@@ -103,7 +103,7 @@ check "npm: packages installed" \
   "npm install --prefix assets"
 
 check "yq: correct version is installed" \
-  "yq --version 2>&1 | grep -q 'yq version 4'" \
+  "yq --version 2>&1 | grep -q 'version 4'" \
   "brew upgrade yq # you may need to uninstall python-yq"
 
 check "postgres: running" \
