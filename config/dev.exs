@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :epicenter,
   application_version_sha: System.cmd("git", ["rev-parse", "HEAD"]) |> elem(0) |> String.trim(),

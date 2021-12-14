@@ -29,5 +29,5 @@ defmodule EpicenterWeb.Presenters.InvestigationPresenter do
     do: "None"
 
   def displayable_symptoms(%{symptoms: symptoms}),
-    do: Enum.map(symptoms, &Map.get(@symptoms_map(), &1, &1)) |> Enum.join(", ")
+    do: Enum.map(symptoms, &Map.get(@symptoms_map, &1, &1)) |> Enum.join(", ")
 end
