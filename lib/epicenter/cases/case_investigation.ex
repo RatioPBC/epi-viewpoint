@@ -127,6 +127,7 @@ defmodule Epicenter.Cases.CaseInvestigation do
     def list(:isolation_monitoring) do
       from case_investigation in CaseInvestigation,
         join: person in assoc(case_investigation, :person),
+        left_join: assignee in assoc(person, :assigned_to),
         where:
           is_nil(person.archived_at) and
             case_investigation.interview_status == "completed" and

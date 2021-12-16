@@ -332,6 +332,15 @@ defmodule Epicenter.Cases.CaseInvestigationTest do
       AuditLogAssertions.verify_phi_view_logged(user, [bob, david])
     end
 
+    test "fetching case investigations for the isolation monitoring tab, assigned to a user", %{user: user, david: david} do
+      Cases.assign_user_to_people(user: user, people_ids: [david.id], audit_meta: Test.Fixtures.admin_audit_meta(), current_user: @admin)
+      actual = Cases.list_case_investigations(:isolation_monitoring, assigned_to_id: user.id, user: user) |> tids
+
+      assert actual == [
+               "isolation-monitoring-started-case-investigation"
+             ]
+    end
+
     test "fetching case investigations for the all tab",
          %{user: user, alice: alice, bob: bob, cindy: cindy, david: david, eva: eva} do
       AuditLogAssertions.expect_phi_view_logs(6)
