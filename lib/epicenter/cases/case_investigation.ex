@@ -107,51 +107,58 @@ defmodule Epicenter.Cases.CaseInvestigation do
     def list(filter)
 
     def list(:pending_interview) do
-      from case_investigation in CaseInvestigation,
-        join: person in assoc(case_investigation, :person),
-        left_join: assignee in assoc(person, :assigned_to),
-        join: lab_result in assoc(case_investigation, :initiating_lab_result),
-        where: is_nil(person.archived_at) and case_investigation.interview_status == "pending",
-        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on, asc: case_investigation.seq]
+      list_case_investigations()
+      |> where_interview_status("pending")
+      |> order_by_name_and_sampled_on(sampled_on: :desc)
     end
 
     def list(:ongoing_interview) do
-      from case_investigation in CaseInvestigation,
-        join: person in assoc(case_investigation, :person),
-        left_join: assignee in assoc(person, :assigned_to),
-        join: lab_result in assoc(case_investigation, :initiating_lab_result),
-        where: is_nil(person.archived_at) and case_investigation.interview_status == "started",
-        order_by: [asc_nulls_first: assignee.name, desc: lab_result.sampled_on, asc: case_investigation.seq]
+      list_case_investigations()
+      |> where_interview_status("started")
+      |> order_by_name_and_sampled_on(sampled_on: :desc)
     end
 
     def list(:isolation_monitoring) do
-      from case_investigation in CaseInvestigation,
-        join: person in assoc(case_investigation, :person),
-        left_join: assignee in assoc(person, :assigned_to),
-        where:
-          is_nil(person.archived_at) and
-            case_investigation.interview_status == "completed" and
-            case_investigation.isolation_monitoring_status in ["pending", "ongoing"],
-        order_by: [
-          desc: case_investigation.isolation_monitoring_status,
-          asc: case_investigation.isolation_monitoring_ends_on,
-          desc: case_investigation.interview_completed_at,
-          desc: person.seq
-        ]
+      list_case_investigations()
+      |> where_interview_status("completed")
+      |> where([case_investigation], case_investigation.isolation_monitoring_status in ["pending", "ongoing"])
+      |> order_by([case_investigation, person, assignee, lab_result],
+        desc: case_investigation.isolation_monitoring_status,
+        asc: case_investigation.isolation_monitoring_ends_on,
+        desc: case_investigation.interview_completed_at,
+        desc: person.seq
+      )
     end
 
     def list(:all) do
-      from case_investigation in CaseInvestigation,
-        join: person in assoc(case_investigation, :person),
-        left_join: assignee in assoc(person, :assigned_to),
-        join: lab_result in assoc(case_investigation, :initiating_lab_result),
-        where: is_nil(person.archived_at),
-        order_by: [asc_nulls_first: assignee.name, asc: lab_result.sampled_on, asc: case_investigation.seq]
+      list_case_investigations()
+      |> order_by_name_and_sampled_on(sampled_on: :asc)
     end
 
     def assigned_to_user(query, user_id) do
       query
       |> where([case_investigation, person, assignee], assignee.id == ^user_id)
+    end
+
+    defp list_case_investigations do
+      from case_investigation in CaseInvestigation,
+        join: person in assoc(case_investigation, :person),
+        left_join: assignee in assoc(person, :assigned_to),
+        join: lab_result in assoc(case_investigation, :initiating_lab_result),
+        where: is_nil(person.archived_at)
+    end
+
+    defp where_interview_status(query, status) do
+      query |> where([case_investigation], case_investigation.interview_status == ^status)
+    end
+
+    defp order_by_name_and_sampled_on(query, sampled_on: sampled_on_direction) do
+      query
+      |> order_by([case_investigation, _person, assignee, lab_result], [
+        {:asc_nulls_first, assignee.name},
+        {^sampled_on_direction, lab_result.sampled_on},
+        {:asc, case_investigation.seq}
+      ])
     end
   end
 end
