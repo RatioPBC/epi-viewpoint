@@ -1,12 +1,12 @@
 defmodule EpicenterWeb.Presenters.PlacePresenter do
-  alias Epicenter.Cases.Visit
+  alias Epicenter.Cases.Place
   alias EpicenterWeb.Format
 
-  def address(%Visit{} = visit) do
-    Format.address(hd(visit.place.place_addresses))
+  def address(%Place{} = place) do
+    Format.address(hd(place.place_addresses))
   end
 
-  def place_name(%Visit{} = visit) do
-    visit.place.name
+  def place_name(%Place{} = place) do
+    place.name
   end
 end
