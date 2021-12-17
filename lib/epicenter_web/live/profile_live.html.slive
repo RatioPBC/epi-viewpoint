@@ -152,7 +152,7 @@
             = for visit <- case_investigation.visits do
               div.visit data-tid=visit.tid
                 div
-                  span.place-name data-role="place-name" =place_name(visit.place)
+                  span.place-name data-role="place-name" =visit.place.name
                   span.visit-address data-role="place-address" =address(visit.place)
                 div
                   ul.dotted-details
