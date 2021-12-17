@@ -3,7 +3,5 @@ defmodule EpicenterWeb.Presenters.PlacePresenter do
   alias EpicenterWeb.Format
 
   def address(%Place{place_addresses: []}), do: ""
-  def address(%Place{} = place), do: Format.address(hd(place.place_addresses))
-
-  def place_name(%Place{} = place), do: place.name
+  def address(%Place{place_addresses: [address | _]}), do: Format.address(address)
 end
