@@ -17,7 +17,7 @@ defmodule EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive do
 
     import Ecto.Changeset
 
-    @clock Application.get_env(:epicenter, :clock)
+    @clock Application.compile_env(:epicenter, :clock)
 
     @required_attrs ~w{reason}a
     @optional_attrs ~w{}a

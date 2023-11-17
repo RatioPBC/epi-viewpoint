@@ -49,7 +49,7 @@ defmodule EpicenterWeb.PeopleLive do
   alias EpicenterWeb.Format
   alias EpicenterWeb.PeopleFilter
 
-  @clock Application.get_env(:epicenter, :clock)
+  @clock Application.compile_env(:epicenter, :clock)
 
   def mount(_params, session, socket) do
     socket

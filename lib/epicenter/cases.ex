@@ -25,7 +25,7 @@ defmodule Epicenter.Cases do
 
   import Ecto.Query, only: [distinct: 3, first: 1]
 
-  @clock Application.get_env(:epicenter, :clock)
+  @clock Application.compile_env(:epicenter, :clock)
 
   #
   # lab results

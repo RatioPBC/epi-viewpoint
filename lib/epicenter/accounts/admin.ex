@@ -3,7 +3,7 @@ defmodule Epicenter.Accounts.Admin do
   alias Epicenter.AuditingRepo
   alias Epicenter.AuditLog
 
-  @unpersisted_admin_id Application.get_env(:epicenter, :unpersisted_admin_id)
+  @unpersisted_admin_id Application.compile_env(:epicenter, :unpersisted_admin_id)
 
   def insert_by_admin(%Ecto.Changeset{} = changeset, %AuditLog.Meta{} = audit_meta),
     do: ensure_persisted_or_unpersisted_admin(audit_meta, &AuditingRepo.insert(changeset, &1))

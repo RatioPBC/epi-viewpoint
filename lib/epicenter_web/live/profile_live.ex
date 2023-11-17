@@ -34,7 +34,7 @@ defmodule EpicenterWeb.ProfileLive do
   alias EpicenterWeb.Format
   alias EpicenterWeb.InvestigationNotesSection
 
-  @clock Application.get_env(:epicenter, :clock)
+  @clock Application.compile_env(:epicenter, :clock)
 
   def mount(%{"id" => person_id}, session, socket) do
     socket = socket |> authenticate_user(session)

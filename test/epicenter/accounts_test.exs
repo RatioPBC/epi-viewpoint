@@ -38,7 +38,7 @@ defmodule Epicenter.AccountsTest do
       })
     end
 
-    @ops_admin %Epicenter.Accounts.User{id: Application.get_env(:epicenter, :unpersisted_admin_id)}
+    @ops_admin %Epicenter.Accounts.User{id: Application.compile_env(:epicenter, :unpersisted_admin_id)}
     test "register_user creates a user with a ops admin" do
       {:ok, user} = Test.Fixtures.user_attrs(@ops_admin, "alice") |> Accounts.register_user()
 
