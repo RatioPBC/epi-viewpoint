@@ -43,7 +43,7 @@ RUN chown -R app:app /usr/local/etc \
   && sed -i 's|root:x:0:0:root:/root:/bin/ash|root:x:0:0:root:/root:/bin/bash|' /etc/passwd
 
 # ---- Build Stage ----
-FROM elixir:1.11.3-alpine AS app_builder
+FROM elixir:1.14.5-otp-25-alpine AS app_builder
 
 # Set environment variables for building the application
 ENV MIX_ENV=prod\
