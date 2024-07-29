@@ -44,7 +44,6 @@ defmodule EpicenterWeb do
 
   def live_view do
     quote do
-      use PhoenixSlime.LiveView.CollocatedTemplate, extension: :slive
       use Phoenix.HTML
       use Phoenix.LiveView, layout: {EpicenterWeb.LayoutView, "live.html"}
       use EpicenterWeb.SearchHandling
@@ -55,7 +54,6 @@ defmodule EpicenterWeb do
 
   def live_component do
     quote do
-      use PhoenixSlime.LiveView.CollocatedTemplate, extension: :slive
       use Phoenix.LiveComponent
 
       unquote(view_helpers())
@@ -88,7 +86,6 @@ defmodule EpicenterWeb do
 
       # Import LiveView helpers (live_render, component, live_patch, etc)
       import Phoenix.LiveView.Helpers
-      import EpicenterWeb.SlimeSigilWrapper
       import EpicenterWeb.LiveComponent.Helpers
 
       # Import basic rendering functionality (render, render_layout, etc)

@@ -67,8 +67,6 @@ defmodule Epicenter.MixProject do
       {:phoenix_live_dashboard, "~> 0.6"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.17"},
-      {:phoenix_slime, override: true, git: "https://github.com/slime-lang/phoenix_slime", ref: "dc451d879abba94d390ef34c82f0dd9083e068fd"},
-      {:phoenix_slime_live_view_collocated_template, "~> 0.1"},
       {:plug_cowboy, "~> 2.0"},
       {:postgrex, ">= 0.0.0"},
       {:sobelow, "~> 0.8", only: [:dev, :test]},

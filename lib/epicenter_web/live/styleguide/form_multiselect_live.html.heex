@@ -1,0 +1,19 @@
+<div id="styleguide-form-multiselect-page">
+  <section>
+    <h2>Multiselect</h2>
+    <i>Demo of multiselects</i>
+
+    <%= form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save", phx_change: "form-change"], fn f -> %>
+      <%= example_form_builder(f, @form_error) %>
+    <% end %>
+  </section>
+
+  <div class="debug">
+    <b>form changeset (changed on "Save")</b>
+    <div><%= inspect(@form_changeset) %></div>
+  </div>
+  <div class="debug">
+    <b>example (created on "Save" if the form changeset is valid)</b>
+    <div></div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<div id="styleguide-form-builder-page">
+  <section>
+    <h2>Movie</h2>
+    <i>Non-interactive demo of a form built with a form builder</i>
+
+    <%= form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save"], fn f -> %>
+      <%= movie_form_builder(f) %>
+    <% end %>
+  </section>
+</div>
