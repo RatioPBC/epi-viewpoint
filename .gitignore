@@ -26,3 +26,4 @@ npm-debug.log
 logfile
 /.direnv/
 .envrc.private
+postgres/
