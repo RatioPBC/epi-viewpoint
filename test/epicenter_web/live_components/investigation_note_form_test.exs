@@ -10,14 +10,18 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
   alias EpicenterWeb.Test.Pages
 
   defmodule TestLiveView do
-    use EpicenterWeb.Test.ComponentEmbeddingLiveView, default_assigns: [current_user: %Accounts.User{}, on_add: &Function.identity/1]
+    use EpicenterWeb.Test.ComponentEmbeddingLiveView,
+      default_assigns: [current_user: %Accounts.User{}, on_add: &Function.identity/1]
+
     alias EpicenterWeb.InvestigationNoteForm
 
     def render(assigns) do
-      ~M"""
-      = component(InvestigationNoteForm,
-            "renders-a-form",
-            on_add: @on_add)
+      ~H"""
+      <%= component(
+        InvestigationNoteForm,
+        "renders-a-form",
+        on_add: @on_add
+      ) %>
       """
     end
   end

@@ -12,7 +12,9 @@ defmodule EpicenterWeb.PlaceSearchLive do
   def mount(params, session, socket) do
     socket = socket |> authenticate_user(session)
 
-    case_investigation = Cases.get_case_investigation(params["id"], socket.assigns.current_user) |> Cases.preload_person()
+    case_investigation =
+      Cases.get_case_investigation(params["id"], socket.assigns.current_user)
+      |> Cases.preload_person()
 
     socket
     |> assign_defaults()
@@ -37,7 +39,14 @@ defmodule EpicenterWeb.PlaceSearchLive do
 
   def handle_event("choose-place-address", %{"value" => 0}, socket) do
     socket
-    |> push_redirect(to: Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, socket.assigns.case_investigation))
+    |> push_redirect(
+      to:
+        Routes.new_place_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.PlaceLive,
+          socket.assigns.case_investigation
+        )
+    )
     |> noreply()
   end
 
@@ -47,7 +56,10 @@ defmodule EpicenterWeb.PlaceSearchLive do
     socket
     |> push_redirect(
       to:
-        Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, socket.assigns.case_investigation,
+        Routes.add_visit_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.AddVisitLive,
+          socket.assigns.case_investigation,
           place: place_address.place,
           place_address: place_address
         )

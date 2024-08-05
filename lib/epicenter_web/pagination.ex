@@ -16,13 +16,22 @@ defmodule EpicenterWeb.Pagination do
     do: new([], opts)
 
   def new(list, opts) when is_list(list),
-    do: %Pagination{all: list, total: length(list), per_page: Keyword.get(opts, :per_page, 10)} |> goto(1)
+    do:
+      %Pagination{all: list, total: length(list), per_page: Keyword.get(opts, :per_page, 10)}
+      |> goto(1)
 
   def goto(%Pagination{all: all, per_page: per_page, total: total} = pagination, current) do
     pages = Range.new(1, Integer.floor_div(total, per_page) + 1)
     visible = Enum.slice(all, (current - 1) * per_page, per_page)
 
-    %{pagination | current: current, next?: current < pages.last, pages: pages, prev?: current > 1, visible: visible}
+    %{
+      pagination
+      | current: current,
+        next?: current < pages.last,
+        pages: pages,
+        prev?: current > 1,
+        visible: visible
+    }
   end
 
   def next(%Pagination{current: current} = pagination),

@@ -1,18 +1,429 @@
 <div id="styleguide-page">
   <div id="nav">
-    <a href="#text">Text</a>
-    <a href="#buttons-and-links">Buttons & links</a>
-    <a href="#layout">Layout</a>
-    <a href="#containers">Containers</a>
-    <a href="#elements">Elements & controls</a>
-    <a href="#data">Data</a>
-    <a href="#form">Form</a>
-    <a href="#effects">Effects</a>
-    <a href="#components">Components</a>
-    <a href="#icebox">Icebox</a>
+    <a href="#text">Text</a><a href="#buttons-and-links">Buttons & links</a><a href="#layout">Layout</a><a href="#containers">Containers</a><a href="#elements">Elements & controls</a><a href="#data">Data</a><a href="#form">Form</a><a href="#effects">Effects</a><a href="#components">Components</a><a href="#icebox">Icebox</a>
   </div>
-
-  <!--
-  // text
-  -->
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="text">Text</div>
+    <div class="styleguide-example">
+      <span id="primary-text">Primary text</span><code>color: $primary-text-color</code>
+    </div>
+    <div class="styleguide-example">
+      <span id="secondary-text">Secondary text</span><code>color: $secondary-text-color</code>
+    </div>
+    <div class="styleguide-example">
+      <span id="disabled-text">Disabled text</span><code>color: $disabled-text-color</code>
+    </div>
+    <div class="styleguide-example">
+      <h1>Heading 1</h1>
+      <code>h1 (or @include h1)</code>
+    </div>
+    <div class="styleguide-example">
+      <h2>Heading 2</h2>
+      <code>h2 (or @include h2)</code>
+    </div>
+    <div class="styleguide-example">
+      <h3>Heading 3</h3>
+      <code>h3 (or @include h3)</code>
+    </div>
+    <div class="styleguide-example">
+      <h4>Heading 4</h4>
+      <code>h4 (or @include h4)</code>
+    </div>
+    <div class="styleguide-example">
+      <div id="body-text-size">Body text size</div>
+      <code>font-size: $body-text-size</code>
+    </div>
+    <div class="styleguide-example">
+      <div id="small-body-text-size">Small body text size</div>
+      <code>font-size: $small-body-text-size</code>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="buttons-and-links">Buttons & links</div>
+    <div class="styleguide-example">
+      <a href="#" id="primary-button">Primary button</a><code>@include button-primary</code>
+    </div>
+    <div class="styleguide-example">
+      <div id="primary-button-container">
+        <a href="#" id="primary-button-with-icon">
+          <%= checkmark_icon() %><span>Primary button with icon</span>
+        </a><a data-disabled="true" href="#" id="primary-button-with-icon-disabled"><%= checkmark_icon() %><span>Primary button with icon disabled</span></a>
+      </div>
+      <code>
+        @include button-primary @include has-icon($color: white)
+        <small>Text should be wrapped in a span in order to be spaced properly</small>
+      </code>
+    </div>
+    <div class="styleguide-example">
+      <a href="#" id="primary-button-small">Primary button (small)</a><code>@include button-primary($size: small)</code>
+    </div>
+    <div class="styleguide-example">
+      <a href="#" id="secondary-button">Secondary button</a><code>@include button-secondary</code>
+    </div>
+    <div class="styleguide-example">
+      <a href="#" id="secondary-button-with-icon">
+        <%= plus_icon() %><span>Secondary button with icon</span>
+      </a><code>@include button-secondary @include has-icon <small>Text should be wrapped in a span in order to be spaced properly</small></code>
+    </div>
+    <div class="styleguide-example">
+      <a href="#" id="secondary-button-small">Secondary button (small)</a><code>@include button-secondary($size: small)</code>
+    </div>
+    <div class="styleguide-example">
+      <a href="#" id="outline-button">Outline button</a><code>@include button-outline</code>
+    </div>
+    <div class="styleguide-example">
+      <a href="#" id="outline-button-small">Outline button (small)</a><code>@include button-outline($size: small)</code>
+    </div>
+    <div class="styleguide-example">
+      <div>
+        <a href="#" id="link-button">Link button</a><button disabled id="link-button-disabled">Disabled link button</button>
+      </div>
+      <code>
+        @include button-link
+        <small>Has the same display properties of a button, but without the border</small>
+      </code>
+    </div>
+    <div class="styleguide-example">
+      <div id="disabled-anchor-buttons">
+        <a data-disabled href="#" id="primary-anchor-button-disabled">Primary</a><a
+          data-disabled
+          href="#"
+          id="secondary-anchor-button-disabled"
+        >Secondary</a><a data-disabled href="#" id="outline-anchor-button-disabled">Outline</a>
+      </div>
+      <code>a data-disabled=true</code>
+    </div>
+    <div class="styleguide-example">
+      <div id="disabled-buttons">
+        <button disabled id="primary-button-disabled">Primary</button><button
+          disabled
+          id="secondary-button-disabled"
+        >Secondary</button><button disabled id="outline-button-disabled">Outline</button>
+      </div>
+      <code>button disabled=true</code>
+    </div>
+    <div class="styleguide-example">
+      <span id="button-list">
+        <a class="button" href="#">Button</a><a class="button" href="#">List</a><a
+          class="button"
+          data-active="true"
+          href="#"
+        >Active</a><a class="button" data-disabled="true" href="#">Disabled</a><a
+          class="button"
+          href="#"
+        >Button</a>
+      </span><code>@include button-list</code>
+    </div>
+    <div class="styleguide-example">
+      <a href="#" id="link">Link</a><code>a</code>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="layout">Layout</div>
+    <div class="styleguide-example-title">Centered</div>
+    <div class="styleguide-example">
+      <div id="centered">
+        <div id="centered-contents">This is in <br />the middle</div>
+      </div>
+      <code>
+        @include centered
+        <small>
+          The contents are centered horizontally and vertically within the element that includes the mixin
+        </small>
+      </code>
+    </div>
+    <div class="styleguide-example-title">Level</div>
+    <div class="styleguide-example">
+      <div id="level">
+        <button>Item 1</button>
+        <div style="height: 40px">Tall item</div>
+        <span>
+          <span>3a</span><span>3b</span><span>3c</span>
+        </span><a>Item 4</a>
+      </div>
+      <code>
+        @include level
+        <small>Like horizontal-flow, but the contents are vertically aligned</small>
+      </code>
+    </div>
+    <div class="styleguide-example-title">Horizontal Flow</div>
+    <div class="styleguide-example">
+      <div id="horizontal-flow">
+        <button>Item 1</button>
+        <div style="height: 40px">Tall item</div>
+        <span>
+          <span>3a</span><span>3b</span><span>3c</span>
+        </span><a>Item 4</a>
+      </div>
+      <code>
+        @include horizontal-flow <small>The children have a horizontal space between them</small>
+      </code>
+    </div>
+    <div class="styleguide-example">
+      <div id="horizontal-flow-right">
+        <span>a</span><span>b</span><span>c</span>
+      </div>
+      <code>
+        @include horizontal-flow($justify: right) <small>The children are right-aligned</small>
+      </code>
+    </div>
+    <div class="styleguide-example">
+      <div id="horizontal-flow-space-between">
+        <span>a</span><span>b</span><span>c</span>
+      </div>
+      <code>
+        @include horizontal-flow($justify: space-between)
+        <small>The children are spaced apart evenly</small>
+      </code>
+    </div>
+    <div class="styleguide-example">
+      <div id="dotted-details">
+        <ul>
+          <li>Minor</li>
+          <li>Guardian: Alice</li>
+          <li>Guardian phone: (111) 111-1222</li>
+        </ul>
+      </div>
+      <code>
+        @include dotted-details <small>The list items flow horizontally, separated by dots</small>
+      </code>
+    </div>
+    <div class="styleguide-example-title">Vertical Flow</div>
+    <div class="styleguide-example">
+      <div id="vertical-flow">
+        <button>Item 1</button>
+        <div style="height: 40px">Tall item</div>
+        <span>
+          <span>3a</span><span>3b</span><span>3c</span>
+        </span><a>Item 4</a>
+      </div>
+      <code>
+        @include vertical-flow <small>The children have a vertical space between them</small>
+      </code>
+    </div>
+    <div class="styleguide-example-title">Nested</div>
+    <div class="styleguide-example">
+      <div id="nested-flows">
+        <div id="outer-vertical-flow">
+          <div id="inner-horizontal-flow-1">
+            <span>Nested</span><span>example</span>
+          </div>
+          <div id="inner-horizontal-flow-2">
+            <span>2A</span><span>2B</span><span>2C</span>
+          </div>
+          <div id="inner-horizontal-flow-3"><span>The end</span></div>
+        </div>
+      </div>
+      <code>@include vertical-flow, @include horizontal-flow</code>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="containers">Containers</div>
+    <div class="styleguide-example-title">Section</div>
+    <div class="styleguide-example">
+      <div id="section-container">
+        <section>Here is some text in a section</section>
+      </div>
+      <code>section</code>
+    </div>
+    <div class="styleguide-example-title">Dividers</div>
+    <div class="styleguide-example">
+      <div id="divider-list">
+        <div>
+          Here is some text in a div with no border top
+          <div id="first-grandchild">Here is a grandchild having no top border</div>
+          <div id="second-grandchild">Here is a second grandchild also having no top border</div>
+        </div>
+        <div>Here is some text in a div with a border</div>
+        <div>Here is some text in a div with a border</div>
+        <div>Here is some text in a div with no border bottom</div>
+      </div>
+      <code>
+        @include dividers
+        <small>Add border dividers between its children, excluding the first child</small>
+      </code>
+    </div>
+    <div class="styleguide-example-title">Card</div>
+    <div class="styleguide-example">
+      <div id="card-container">
+        <div id="card1">
+          <header>Here is a header</header>
+          Here is some text in a card
+        </div>
+        <div id="card2">
+          <header>Here is another header</header>
+          Here is some more text in another card
+        </div>
+      </div>
+      <code>
+        @include card
+        <small>use vertical-flow on a container to make vertical space between cards</small>
+      </code>
+    </div>
+    <div class="styleguide-example-title">Subnav</div>
+    <div class="styleguide-example">
+      <div id="subnav-container">
+        <div id="subnav">
+          <a>Item 1</a><%= arrow_right_icon(6, 9) %><a>Item 2</a>
+        </div>
+      </div>
+      <code>@include subnav</code>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="elements">Elements & controls</div>
+    <div class="styleguide-example-title">Tooltip</div>
+    <div class="styleguide-example">
+      <div id="tooltip-when-disabled">
+        <div id="button-1-container">
+          <a id="button-1">Button 1's container is not disabled</a>
+          <div id="button-1-tooltip">Tooltip for button 1</div>
+        </div>
+        <div data-disabled id="button-2-container">
+          <a data-disabled id="button-2">Button 2's container is disabled</a>
+          <div id="button-2-tooltip">Tooltip for button 2</div>
+        </div>
+      </div>
+      <code>@include has-tooltip-when-disabled(#button-2-tooltip)</code>
+    </div>
+    <div class="styleguide-example-title">Select</div>
+    <div class="styleguide-example">
+      <div id="select">
+        <div id="select-enabled">
+          <%= arrow_down_icon() %><select><option>Option 1</option><option>Option 2</option><option>Option 3</option></select>
+        </div>
+        <div data-disabled id="select-disabled">
+          <%= arrow_down_icon() %><select disabled><option>Disabled 1</option><option>Disabled 2</option><option>Disabled 3</option></select>
+        </div>
+        <div data-unset id="select-unset">
+          <%= arrow_down_icon() %><select><option>Unset option</option><option>Option 2</option><option>Option 3</option></select>
+        </div>
+      </div>
+      <code>@include select</code>
+    </div>
+    <div class="styleguide-example-title">Dropdown</div>
+    <div class="styleguide-example">
+      <div id="dropdowns">
+        <div data-transient-control id="dropdown-button-style">
+          <button><span>Dropdown (button style)</span><%= arrow_down_icon() %></button>
+          <ul>
+            <li><a href="#">Item 1</a></li>
+            <li><a href="#">Item 2</a></li>
+            <li><a href="#">Item 3</a></li>
+            <li><a href="#">Item 4</a></li>
+            <li><a href="#">Item 5</a></li>
+          </ul>
+        </div>
+        <div data-transient-control id="dropdown-link-style">
+          <button><span>Dropdown (link style)</span><%= arrow_down_icon() %></button>
+          <ul>
+            <li><a href="#">Item 1</a></li>
+            <li><a href="#">Item 2</a></li>
+          </ul>
+        </div>
+      </div>
+      <code>
+        <div>@include dropdown($style: button)</div>
+        <div>@include dropdown($style: link)</div>
+      </code>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="data">Data</div>
+    <div class="styleguide-example">
+      <div id="data-table">coming soon</div>
+      <code>@include data-table</code>
+    </div>
+    <div class="styleguide-example">
+      <div id="detail-table">coming soon</div>
+      <code>@include detail-table</code>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="form">Form</div>
+    <div class="styleguide-example-title">Full form examples</div>
+    <div>
+      <%= live_redirect("Form builder example",
+        to:
+          Routes.styleguide_form_builder_path(
+            EpicenterWeb.Endpoint,
+            EpicenterWeb.Styleguide.FormBuilderLive
+          )
+      ) %>
+    </div>
+    <div>
+      <%= live_redirect("Form multiselect example",
+        to:
+          Routes.styleguide_form_multiselect_path(
+            EpicenterWeb.Endpoint,
+            EpicenterWeb.Styleguide.FormMultiselectLive
+          )
+      ) %>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="effects">Effects</div>
+    <div class="styleguide-example-title">Shadow</div>
+    <div class="styleguide-example">
+      <div id="shadow-overlay">Shadow for overlays</div>
+      <code>@include shadow($style: overlay)</code>
+    </div>
+    <div class="styleguide-example">
+      <div id="shadow-dialog">Shadow for dialogs</div>
+      <code>@include shadow($style: dialog)</code>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="components">Components</div>
+    <div class="styleguide-example-title">Component examples</div>
+    <div>
+      <%= live_redirect("InvestigationNotesSection example",
+        to:
+          Routes.styleguide_investigation_notes_section_path(
+            EpicenterWeb.Endpoint,
+            EpicenterWeb.Styleguide.InvestigationNotesSectionLive
+          )
+      ) %>
+    </div>
+  </div>
+  
+  <div class="styleguide-section">
+    <div class="styleguide-section-title" id="icebox">Icebox</div>
+    <div class="styleguide-example-title">Autocomplete</div>
+    <div class="styleguide-example">
+      <form phx-change="suggest-address">
+        <div id="autocomplete">
+          <input />
+          <ul id="AutocompleteList" phx-hook="AutocompleteList" role="listbox">
+            <%= for address <- @suggested_addresses do %>
+              <li
+                aria-selected="false"
+                phx-click="choose-address"
+                phx-value-address={"#{address}"}
+                role="option"
+                tabindex="-1"
+              >
+                <%= address %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+        <input
+          placeholder="not an autocomplete field"
+          style="width: 400px; margin-top: 2rem"
+          type="text"
+        />
+      </form>
+      <code>@include autocomplete</code>
+    </div>
+  </div>
 </div>

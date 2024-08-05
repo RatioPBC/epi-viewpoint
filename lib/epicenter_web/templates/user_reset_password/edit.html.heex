@@ -1,0 +1,31 @@
+<div data-page="reset-password" id="reset-password-page">
+  <%= form_for @changeset, Routes.user_reset_password_path(@conn, :update, @token), [data: [role: "reset-password-form"]], fn f -> %>
+    <div id="form-contents">
+      <header><%= login_icon() %></header>
+      <h4 id="title">Set your password</h4>
+      <%= if @changeset.action do %>
+        <div class="form-error-message">
+          <%= error_icon() %>
+          <div>Please check the errors below</div>
+        </div>
+      <% end %>
+      <fieldset>
+        <%= label(f, :password, "New password") %><%= error_tag(f, :password) %><%= password_input(
+          f,
+          :password,
+          required: true
+        ) %>
+      </fieldset>
+      <fieldset>
+        <%= label(f, :password_confirmation, "Confirm new password") %><%= error_tag(
+          f,
+          :password_confirmation
+        ) %><%= password_input(f, :password_confirmation, required: true) %>
+      </fieldset>
+      <fieldset><%= submit("Continue", id: "submit") %></fieldset>
+      <fieldset>
+        <%= link("Back to login", to: Routes.user_session_path(@conn, :new), id: "back-to-login") %>
+      </fieldset>
+    </div>
+  <% end %>
+</div>

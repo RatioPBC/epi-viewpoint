@@ -18,15 +18,29 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
   end
 
   def render(assigns) do
-    ~M"""
-    .investigation-note data-role="investigation-note" data-note-id=@note.id
-      .investigation-note-header
-        span.investigation-note-author data-role="investigation-note-author" = @note.author.name
-        span data-role="investigation-note-date" = Format.date(@note.inserted_at)
-      .investigation-note-text data-role="investigation-note-text" = @note.text
-      = if @note.author_id == @current_user_id && @is_editable do
-        div
-          a.investigation-note-delete-link href="#" data-confirm="Remove your note?" phx-click="delete-note" data-role="delete-note" phx-target=@myself Delete
+    ~H"""
+    <div class="investigation-note" data-note-id={"#{@note.id}"} data-role="investigation-note">
+      <div class="investigation-note-header">
+        <span class="investigation-note-author" data-role="investigation-note-author">
+          <%= @note.author.name %>
+        </span><span data-role="investigation-note-date"><%= Format.date(@note.inserted_at) %></span>
+      </div>
+      <div class="investigation-note-text" data-role="investigation-note-text"><%= @note.text %></div>
+      <%= if @note.author_id == @current_user_id && @is_editable do %>
+        <div>
+          <a
+            class="investigation-note-delete-link"
+            data-confirm="Remove your note?"
+            data-role="delete-note"
+            href="#"
+            phx-click="delete-note"
+            phx-target={"#{@myself}"}
+          >
+            Delete
+          </a>
+        </div>
+      <% end %>
+    </div>
     """
     |> Map.put(:root, true)
   end

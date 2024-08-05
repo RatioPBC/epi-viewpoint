@@ -20,8 +20,11 @@ defmodule EpicenterWeb.Multiselect.Spec do
 
   def type(value, spec) do
     Enum.find_value(spec, fn
-      {type, _display, spec_value} -> if spec_value == value, do: type, else: nil
-      {type, _display, spec_value, children} -> if spec_value == value, do: type, else: type(value, children)
+      {type, _display, spec_value} ->
+        if spec_value == value, do: type, else: nil
+
+      {type, _display, spec_value, children} ->
+        if spec_value == value, do: type, else: type(value, children)
     end)
   end
 end

@@ -27,3 +27,4 @@ logfile
 /.direnv/
 .envrc.private
 postgres/
+/.nix-mix/

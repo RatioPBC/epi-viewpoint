@@ -1,0 +1,25 @@
+<section data-page="user-logins" id="user-logins-page">
+  <h2>
+    <div id="title"><span data-role="title"><%= "Audit trail for #{@user.name}" %></span></div>
+  </h2>
+  <table data-role="logins-table">
+    <thead>
+      <tr data-role="table-column-names">
+        <th>Timestamp</th>
+        <th>OS</th>
+        <th>Browser</th>
+        <th>Session ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for login <- @logins do %>
+        <tr>
+          <td><%= format_date(login.inserted_at) %></td>
+          <td><%= operating_system(login) %></td>
+          <td><%= browser(login) %></td>
+          <td><%= login.session_id %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

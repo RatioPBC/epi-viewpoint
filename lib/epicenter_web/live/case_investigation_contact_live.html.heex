@@ -1,0 +1,24 @@
+<div
+  data-confirm-navigation={"#{confirmation_prompt(@form_changeset)}"}
+  data-page="case-investigation-contact"
+  id="case-investigation-clinical-details-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="case-investigation-contact">
+    <h2>
+      <%= if(@form_changeset.data.contact_investigation_id,
+        do: "Edit contact",
+        else: "Add contact"
+      ) %>
+    </h2>
+    <%= form_for @form_changeset, "#", [id: "case-investigation-contact-form", phx_change: "change", phx_submit: "save"], fn f -> %>
+      <%= contact_form_builder(f, @case_investigation, @form_error) %>
+    <% end %>
+  </section>
+</div>

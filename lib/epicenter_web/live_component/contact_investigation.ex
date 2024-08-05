@@ -2,8 +2,13 @@ defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
 
   import EpicenterWeb.LiveComponent.Helpers
-  import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1, quarantine_history_items: 1]
-  import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
+
+  import EpicenterWeb.Presenters.ContactInvestigationPresenter,
+    only: [exposing_case_link: 1, history_items: 1, quarantine_history_items: 1]
+
+  import EpicenterWeb.Presenters.InvestigationPresenter,
+    only: [displayable_clinical_status: 1, displayable_symptoms: 1]
+
   import EpicenterWeb.Presenters.PeoplePresenter, only: [is_editable?: 1]
 
   alias Epicenter.ContactInvestigations.ContactInvestigation
@@ -30,10 +35,15 @@ defmodule EpicenterWeb.ContactInvestigation do
   end
 
   defp quarantine_monitoring_status_text(
-         %{quarantine_monitoring_status: status, quarantine_monitoring_ends_on: quarantine_monitoring_ends_on},
+         %{
+           quarantine_monitoring_status: status,
+           quarantine_monitoring_ends_on: quarantine_monitoring_ends_on
+         },
          current_date
        ) do
-    content_tag :h3, class: "contact-investigation-quarantine-monitoring-status", data_role: "contact-investigation-quarantine-monitoring-status" do
+    content_tag :h3,
+      class: "contact-investigation-quarantine-monitoring-status",
+      data_role: "contact-investigation-quarantine-monitoring-status" do
       case status do
         "ongoing" ->
           diff = Date.diff(quarantine_monitoring_ends_on, current_date)
@@ -102,7 +112,11 @@ defmodule EpicenterWeb.ContactInvestigation do
   defp redirect_to(contact_investigation, :discontinue_interview) do
     live_redirect("Discontinue",
       to:
-        Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, contact_investigation),
+        Routes.contact_investigation_discontinue_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.ContactInvestigationDiscontinueLive,
+          contact_investigation
+        ),
       class: "discontinue-link",
       data: [role: "contact-investigation-discontinue-interview"]
     )

@@ -1,0 +1,49 @@
+<div data-page="multifactor-auth" id="multifactor-auth-page">
+  <%= form_for @conn, Routes.user_multifactor_auth_path(@conn, :create), [as: :user, data: [role: "multifactor-auth-form"]], fn f -> %>
+    <div id="form-contents">
+      <header><%= login_icon() %></header>
+      <h4 id="title">Multi-factor authentication</h4>
+      <%= if get_flash(@conn, :info) do %>
+        <div id="flash"><%= get_flash(@conn, :info) %></div>
+      <% end %>
+      <%= if get_flash(@conn, :extra) do %>
+        <div id="flash-extra"><%= get_flash(@conn, :extra) %></div>
+      <% end %>
+      <%= if get_flash(@conn, :error) do %>
+        <% error = get_flash(@conn, :error) %>
+        <div data-form-error-message={"#{error}"} id="flash-error"><%= error %></div>
+      <% end %>
+      <%= if @error_message do %>
+        <div>
+          <div class="form-error-message">
+            <%= error_icon() %>
+            <div data-form-error-message={"#{@error_message}"}><%= @error_message %></div>
+          </div>
+        </div>
+      <% end %>
+      <p>To continue, enter the six-digit code from your authenticator app</p>
+      <fieldset>
+        <%= label f, :passcode do %>
+          Six-digit passcode
+        <% end %>
+        <%= number_input(:user, :passcode,
+          required: true,
+          autocapitalize: "none",
+          autocomplete: "off",
+          spellcheck: "false",
+          maxlength: 6,
+          minlength: 6,
+          autofocus: true
+        ) %>
+      </fieldset>
+      <fieldset><%= submit("Continue", id: "submit") %></fieldset>
+      <fieldset>
+        <%= link("Cancel",
+          to: Routes.user_session_path(@conn, :delete),
+          method: :delete,
+          id: "back-to-login"
+        ) %>
+      </fieldset>
+    </div>
+  <% end %>
+</div>

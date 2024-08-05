@@ -94,6 +94,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
     person = Cases.get_person(id, socket.assigns.current_user) |> Cases.preload_demographics()
+
     demographic = Cases.Person.coalesce_demographics(person) |> Map.put(:__struct__, Cases.Demographic)
 
     socket
@@ -127,16 +128,26 @@ defmodule EpicenterWeb.DemographicsEditLive do
     person = socket.assigns.person
     current_user = socket.assigns.current_user
 
-    with %Ecto.Changeset{} = form_changeset <- DemographicForm.attrs_to_form_changeset(demographic_params),
-         {:form, {:ok, model_attrs}} <- {:form, DemographicForm.form_changeset_to_model_attrs(form_changeset)},
-         {:model, {:ok, _model}} <- {:model, create_or_update_model(model_attrs, person, current_user)} do
-      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#demographics-data") |> noreply()
+    with %Ecto.Changeset{} = form_changeset <-
+           DemographicForm.attrs_to_form_changeset(demographic_params),
+         {:form, {:ok, model_attrs}} <-
+           {:form, DemographicForm.form_changeset_to_model_attrs(form_changeset)},
+         {:model, {:ok, _model}} <-
+           {:model, create_or_update_model(model_attrs, person, current_user)} do
+      socket
+      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#demographics-data")
+      |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset, "Check the errors above") |> noreply()
 
       {:model, {:error, _}} ->
-        socket |> assign_form_changeset(DemographicForm.attrs_to_form_changeset(params), "An unexpected error occurred") |> noreply()
+        socket
+        |> assign_form_changeset(
+          DemographicForm.attrs_to_form_changeset(params),
+          "An unexpected error occurred"
+        )
+        |> noreply()
     end
   end
 

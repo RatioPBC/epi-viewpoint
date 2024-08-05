@@ -11,8 +11,8 @@ defmodule EpicenterWeb.Forms.AddVisitForm do
   @required_attrs ~w{occurred_on}a
   @optional_attrs ~w{relationship}a
   embedded_schema do
-    field :occurred_on, :string
-    field :relationship, :string
+    field(:occurred_on, :string)
+    field(:relationship, :string)
   end
 
   def changeset(_visit, attrs) do

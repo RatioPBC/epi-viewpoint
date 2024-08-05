@@ -1,0 +1,29 @@
+<div
+  data-case-investigation-tid={"#{@case_investigation_tid}"}
+  data-page="add-visit"
+  data-place-address-tid={"#{@place_address_tid}"}
+  id="add-visit-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.place_search_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceSearchLive, @case_investigation), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section>
+    <h2>Add place visited</h2>
+    <p>
+      Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
+    </p>
+  </section>
+  <section class="place-info">
+    <div class="place-name" data-role="place-name"><%= @place.name %></div>
+    <div data-role="place-address"><%= address(@place_address) %></div>
+  </section>
+  <section>
+    <%= form_for @form_changeset, "#", [data: [role: "add-visit-form"], id: "add-visit-form", phx_submit: "save"], fn f -> %>
+      <%= form_builder(f, %{}, @form_changeset.valid?) %>
+    <% end %>
+  </section>
+</div>

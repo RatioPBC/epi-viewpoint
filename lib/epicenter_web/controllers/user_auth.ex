@@ -23,6 +23,7 @@ defmodule EpicenterWeb.UserAuth do
 
     user_return_to = get_session(conn, :user_return_to)
     mfa_path = user.mfa_secret == nil && Routes.user_multifactor_auth_setup_path(conn, :new)
+
     user_agent = get_req_header(conn, "user-agent") |> Euclid.Extra.List.first("user_agent_not_found")
 
     {:ok, _} = Accounts.create_login(%{session_id: user_token.id, user_agent: user_agent, user_id: user.id})
@@ -131,13 +132,26 @@ defmodule EpicenterWeb.UserAuth do
 
     error =
       case user_authentication_status(conn, opts) do
-        :authenticated -> nil
-        :not_logged_in -> {"You must log in to access this page", login_path}
-        :disabled -> {"Your account has been disabled by an administrator", login_path}
-        :not_confirmed -> {"The account you logged into has not yet been activated", login_path}
-        :no_mfa -> {"You must have multi-factor authentication set up before you can continue", mfa_setup_path}
-        :needs_second_factor -> :needs_second_factor
-        :expired -> {"Your session has expired. Please log in again.", login_path}
+        :authenticated ->
+          nil
+
+        :not_logged_in ->
+          {"You must log in to access this page", login_path}
+
+        :disabled ->
+          {"Your account has been disabled by an administrator", login_path}
+
+        :not_confirmed ->
+          {"The account you logged into has not yet been activated", login_path}
+
+        :no_mfa ->
+          {"You must have multi-factor authentication set up before you can continue", mfa_setup_path}
+
+        :needs_second_factor ->
+          :needs_second_factor
+
+        :expired ->
+          {"Your session has expired. Please log in again.", login_path}
       end
 
     case error do
@@ -163,13 +177,26 @@ defmodule EpicenterWeb.UserAuth do
     mfa_required? = Keyword.get(opts, :mfa_required?, true)
 
     cond do
-      conn.assigns[:current_user] == nil -> :not_logged_in
-      conn.assigns[:current_user].confirmed_at == nil -> :not_confirmed
-      conn.assigns[:current_user].disabled -> :disabled
-      mfa_required? && conn.assigns[:current_user].mfa_secret == nil -> :no_mfa
-      mfa_required? && !Session.multifactor_auth_success?(conn) -> :needs_second_factor
-      Accounts.session_token_status(conn.private.plug_session["user_token"]) == :expired -> :expired
-      true -> :authenticated
+      conn.assigns[:current_user] == nil ->
+        :not_logged_in
+
+      conn.assigns[:current_user].confirmed_at == nil ->
+        :not_confirmed
+
+      conn.assigns[:current_user].disabled ->
+        :disabled
+
+      mfa_required? && conn.assigns[:current_user].mfa_secret == nil ->
+        :no_mfa
+
+      mfa_required? && !Session.multifactor_auth_success?(conn) ->
+        :needs_second_factor
+
+      Accounts.session_token_status(conn.private.plug_session["user_token"]) == :expired ->
+        :expired
+
+      true ->
+        :authenticated
     end
   end
 

@@ -2,7 +2,10 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [arrow_right_icon: 0, back_icon: 0]
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+
   import EpicenterWeb.Unknown, only: [list_or_unknown: 2]
   import Euclid.Extra.Enum, only: [pluck: 2]
 
@@ -46,9 +49,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
     socket
     |> push_redirect(
       to:
-        "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive, socket.assigns[:person])}?duplicate_person_ids=#{
-          duplicate_person_ids
-        }"
+        "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive, socket.assigns[:person])}?duplicate_person_ids=#{duplicate_person_ids}"
     )
     |> noreply
   end

@@ -55,12 +55,16 @@ defmodule EpicenterWeb.Form do
   def footer(%Form.Line{} = line, error_message, opts \\ []) do
     opts = opts |> Keyword.put_new(:span, 8)
 
-    content_tag :footer, data: grid_data(1, line, opts) ++ [sticky: Keyword.get(opts, :sticky, false)] do
+    content_tag :footer,
+      data: grid_data(1, line, opts) ++ [sticky: Keyword.get(opts, :sticky, false)] do
       [
         content_tag(:div, id: "form-footer-content") do
           [
             submit("Save"),
-            content_tag(:div, error_message, class: "form-error-message", data: [form_error_message: error_message])
+            content_tag(:div, error_message,
+              class: "form-error-message",
+              data: [form_error_message: error_message]
+            )
           ]
         end
       ]
@@ -95,7 +99,12 @@ defmodule EpicenterWeb.Form do
       content_tag(
         :div,
         Multiselect.multiselect_inputs(f, field, specs, nil),
-        data: grid_data(3, line, opts) ++ [multiselect: "container", role: "multiselect-" <> Extra.String.dasherize([f.name, field])]
+        data:
+          grid_data(3, line, opts) ++
+            [
+              multiselect: "container",
+              role: "multiselect-" <> Extra.String.dasherize([f.name, field])
+            ]
       )
     ]
     |> add_to_line(line, opts)
@@ -168,7 +177,11 @@ defmodule EpicenterWeb.Form do
     [
       label(f, field, label_text, data: grid_data(1, line, opts)),
       error_tag(f, field, data: grid_data(2, line, opts)),
-      textarea(f, field, rows: Keyword.get(opts, :rows, 4), data: grid_data(3, line, opts), placeholder: Keyword.get(opts, :placeholder))
+      textarea(f, field,
+        rows: Keyword.get(opts, :rows, 4),
+        data: grid_data(3, line, opts),
+        placeholder: Keyword.get(opts, :placeholder)
+      )
     ]
     |> add_to_line(line, opts)
   end

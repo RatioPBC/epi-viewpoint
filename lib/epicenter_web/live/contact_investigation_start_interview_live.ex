@@ -22,7 +22,10 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
+
+    contact_investigation =
+      ContactInvestigations.get(id, socket.assigns.current_user)
+      |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
@@ -35,12 +38,20 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
   def handle_event("change", %{"start_interview_form" => params}, socket) do
     new_changeset = StartInterviewForm.changeset(socket.assigns.contact_investigation, params)
-    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
+
+    socket
+    |> assign(
+      confirmation_prompt: confirmation_prompt(new_changeset),
+      form_changeset: new_changeset
+    )
+    |> noreply()
   end
 
   def handle_event("save", %{"start_interview_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.contact_investigation, params),
-         {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
+    with %Ecto.Changeset{} = form_changeset <-
+           StartInterviewForm.changeset(socket.assigns.contact_investigation, params),
+         {:form, {:ok, cast_investigation_attrs}} <-
+           {:form, StartInterviewForm.investigation_attrs(form_changeset)},
          {:contact_investigation, {:ok, _contact_investigation}} <-
            {:contact_investigation, update_contact_investigation(socket, cast_investigation_attrs)} do
       socket
@@ -54,7 +65,10 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
 
       {:case_investigation, {:error, _}} ->
         socket
-        |> assign_form_changeset(StartInterviewForm.changeset(socket.assigns.contact_investigation, params), "An unexpected error occurred")
+        |> assign_form_changeset(
+          StartInterviewForm.changeset(socket.assigns.contact_investigation, params),
+          "An unexpected error occurred"
+        )
         |> noreply()
     end
   end

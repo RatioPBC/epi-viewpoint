@@ -8,9 +8,9 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
 
   @primary_key false
   embedded_schema do
-    field :date_completed, :string
-    field :time_completed, :string
-    field :time_completed_am_pm, :string
+    field(:date_completed, :string)
+    field(:time_completed, :string)
+    field(:time_completed_am_pm, :string)
   end
 
   @required_attrs ~w{date_completed time_completed time_completed_am_pm}a
@@ -23,7 +23,9 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
     |> extract_and_validate_date(:date_completed, :time_completed, :time_completed_am_pm)
   end
 
-  defp investigation_complete_interview_form_attrs(%{interview_completed_at: interview_completed_at}) do
+  defp investigation_complete_interview_form_attrs(%{
+         interview_completed_at: interview_completed_at
+       }) do
     if interview_completed_at == nil do
       Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
       |> form_attrs_from_date_time()
@@ -37,6 +39,7 @@ defmodule EpicenterWeb.Forms.CompleteInterviewForm do
   def investigation_attrs(%Ecto.Changeset{} = changeset) do
     with {:ok, complete_interview_form} <- apply_action(changeset, :create) do
       {:ok, interview_completed_at} = convert_time_completed_and_date_completed(complete_interview_form)
+
       {:ok, %{interview_completed_at: interview_completed_at}}
     else
       other -> other

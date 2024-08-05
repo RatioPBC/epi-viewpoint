@@ -1,0 +1,67 @@
+<body>
+  <%= if @show_nav do %>
+    <header id="nav">
+      <div id="nav-inner">
+        <div id="nav-items">
+          <div id="nav-left">
+            <%= link to: "/", id: "logo" do %>
+              <%= logo_icon() %>
+            <% end %>
+            <%= link("Index cases", to: "/people") %><%= link("Contacts", to: "/contacts") %>
+          </div>
+          <div data-role="app-search" id="nav-search">
+            <%= form_for :search, "javascript:void(0);", [id: "search-form", phx_change: "search"], fn f -> %>
+              <%= label f, :term do %>
+                <%= search_icon() %><%= text_input(
+                  f,
+                  :term,
+                  autocomplete: "off",
+                  data_role: "search-term-input",
+                  phx_debounce: 100,
+                  placeholder: "Search…",
+                  value: assigns[:search_term]
+                ) %>
+              <% end %>
+            <% end %>
+          </div>
+          <div id="nav-right">
+            <div data-transient-control id="user-menu">
+              <button>
+                <%= person_icon() %><span data-role="current-user-name"><%= @current_user.name %></span><%= arrow_down_icon() %>
+              </button>
+              <ul>
+                <%= if @current_user.admin do %>
+                  <li>
+                    <%= live_redirect("Admin",
+                      to: Routes.users_path(EpicenterWeb.Endpoint, EpicenterWeb.UsersLive)
+                    ) %>
+                  </li>
+                <% end %>
+                <li>
+                  <%= link("Settings",
+                    to: Routes.user_settings_path(EpicenterWeb.Endpoint, :edit)
+                  ) %>
+                </li>
+                <li>
+                  <%= link("Log out",
+                    to: Routes.user_session_path(EpicenterWeb.Endpoint, :delete),
+                    method: :delete
+                  ) %>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  <% end %>
+  <main data-body-class={"#{@body_class}"} id="main" phx-hook="MainHook" role="main">
+    <%= if assigns[:search_results] do %>
+      <%= render("_search_results.html",
+        search_results: @search_results,
+        search_term: assigns[:search_term]
+      ) %>
+    <% end %>
+    <%= @inner_content %>
+  </main>
+</body>

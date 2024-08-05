@@ -1,0 +1,97 @@
+<div data-page="place-search" data-tid={"#{@case_investigation.tid}"} id="place-page">
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section>
+    <h2>Add place visited</h2>
+    <p>
+      Include workplaces, schools, healthcare facilities, gyms, places of worship, and residence where you spent a meaningful amount of time.
+    </p>
+  </section>
+  <section>
+    <div class="left-right">
+      <form data-role="place-search-form" phx-change="suggest-place">
+        <div id="place-autocomplete">
+          <input
+            aria-autocomplete="list"
+            aria-expanded="true"
+            autocapitalize="none"
+            autocomplete="off"
+            id="place-search-box"
+            name="query"
+            phx-debounce="200"
+            phx-hook="AutocompleteInput"
+            placeholder="name or address"
+            role="combobox"
+            spellcheck="false"
+            type="text"
+            value={"#{@query}"}
+          />
+          <ul
+            data-role="place-search-results"
+            id="place-search-results"
+            phx-hook="AutocompleteList"
+            role="listbox"
+          >
+            <%= if @no_results_message do %>
+              <li
+                aria-selected="false"
+                data-role="place-search-no-results"
+                phx-click="choose-place-address"
+                role="option"
+                tabindex="-1"
+              >
+                <div><%= @no_results_message %></div>
+                <%= live_redirect("+ Add new place",
+                  to:
+                    Routes.new_place_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.PlaceLive,
+                      @case_investigation
+                    ),
+                  data_role: "no-results-add-new-place",
+                  class: "new-place-link"
+                ) %>
+              </li>
+            <% end %>
+            <%= for place_address <- @result_place_addresses do %>
+              <li
+                aria-selected="false"
+                data-role="place-search-result"
+                data-tid={"#{place_address.tid}"}
+                phx-click="choose-place-address"
+                phx-value-place-address-id={"#{place_address.id}"}
+                role="option"
+                tabindex="-1"
+              >
+                <%= live_redirect \
+                    to: Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, @case_investigation, place: place_address.place, place_address: place_address),
+                    data_role: "place_address_link",
+                    data_tid: place_address.tid \
+                do %>
+                  <span class="place-name"><%= place_address.place.name %></span><span><%= address(
+  place_address
+) %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </form>
+      <%= live_redirect("+ Add new place",
+        to:
+          Routes.new_place_path(
+            EpicenterWeb.Endpoint,
+            EpicenterWeb.PlaceLive,
+            @case_investigation
+          ),
+        data_role: "add-new-place",
+        class: "new-place-link"
+      ) %>
+    </div>
+  </section>
+</div>

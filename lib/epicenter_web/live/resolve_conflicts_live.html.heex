@@ -1,0 +1,24 @@
+<div data-page="resolve-conflicts" data-role="resolve-conflicts-page" id="resolve-conflicts-page">
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person_id), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="potential-duplicates-details">
+    <div>
+      <h2>Step 2: Resolve Conflicts</h2>
+      <%= if @has_merge_conflicts? do %>
+        <p data-role="merge-message">
+          These fields differ between the merged records. Choose the correct information for each.
+        </p>
+      <% else %>
+        <p data-role="merge-message">No conflicts found.</p>
+      <% end %>
+    </div>
+    <%= form_for @form_changeset, "#", [data: [role: "resolve-conflicts-form"], id: "resolve-conflicts-form", phx_submit: "save", phx_change: "form-change"], fn f -> %>
+      <%= form_builder(f, @merge_conflicts, @form_changeset.valid?) %>
+    <% end %>
+  </section>
+</div>

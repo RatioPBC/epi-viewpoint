@@ -6,15 +6,47 @@ defmodule EpicenterWeb.PeopleFilter do
   alias Epicenter.AuditLog
 
   def render(assigns) do
-    ~M"""
-    #status-filter
-      = live_patch "All", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :all), class: "button", data: [active: assigns.filter in [:all, nil], role: "people-filter", tid: "all"]
-      = live_patch "Pending interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :pending_interview), class: "button", data: [active: assigns.filter == :pending_interview, role: "people-filter", tid: "pending_interview"]
-      = live_patch "Ongoing interview", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :ongoing_interview), class: "button", data: [active: assigns.filter == :ongoing_interview, role: "people-filter", tid: "ongoing_interview"]
-      = live_patch "Isolation monitoring", to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :isolation_monitoring), class: "button", data: [active: assigns.filter == :isolation_monitoring, role: "people-filter", tid: "isolation_monitoring"]
-    label#assigned-to-me-button
-      input type="checkbox" phx-click="toggle-assigned-to-me" checked=@display_people_assigned_to_me data-tid="assigned-to-me-checkbox" phx-target=@myself
-      span My assignments only
+    ~H"""
+    <div id="status-filter">
+      <%= live_patch("All",
+        to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :all),
+        class: "button",
+        data: [active: assigns.filter in [:all, nil], role: "people-filter", tid: "all"]
+      ) %><%= live_patch("Pending interview",
+        to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :pending_interview),
+        class: "button",
+        data: [
+          active: assigns.filter == :pending_interview,
+          role: "people-filter",
+          tid: "pending_interview"
+        ]
+      ) %><%= live_patch("Ongoing interview",
+        to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :ongoing_interview),
+        class: "button",
+        data: [
+          active: assigns.filter == :ongoing_interview,
+          role: "people-filter",
+          tid: "ongoing_interview"
+        ]
+      ) %><%= live_patch("Isolation monitoring",
+        to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :isolation_monitoring),
+        class: "button",
+        data: [
+          active: assigns.filter == :isolation_monitoring,
+          role: "people-filter",
+          tid: "isolation_monitoring"
+        ]
+      ) %>
+    </div>
+    <label id="assigned-to-me-button">
+      <input
+        checked={"#{@display_people_assigned_to_me}"}
+        data-tid="assigned-to-me-checkbox"
+        phx-click="toggle-assigned-to-me"
+        phx-target={"#{@myself}"}
+        type="checkbox"
+      /><span>My assignments only</span>
+    </label>
     """
     |> Map.put(:root, true)
   end
@@ -28,7 +60,8 @@ end
 defmodule EpicenterWeb.PeopleLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   import EpicenterWeb.Presenters.PeoplePresenter,
     only: [
@@ -67,8 +100,12 @@ defmodule EpicenterWeb.PeopleLive do
     |> ok()
   end
 
-  def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
-    do: socket |> select_person(person_id) |> noreply()
+  def handle_event(
+        "checkbox-click",
+        %{"value" => "on", "person-id" => person_id} = _value,
+        socket
+      ),
+      do: socket |> select_person(person_id) |> noreply()
 
   def handle_event("checkbox-click", %{"person-id" => person_id} = _value, socket),
     do: socket |> deselect_person(person_id) |> noreply()
@@ -126,8 +163,9 @@ defmodule EpicenterWeb.PeopleLive do
 
   @case_investigation_filters ~w{all ongoing_interview pending_interview isolation_monitoring}
 
-  def handle_params(%{"filter" => filter}, _url, socket) when filter in @case_investigation_filters,
-    do: socket |> assign_filter(filter) |> load_and_assign_case_investigations() |> noreply()
+  def handle_params(%{"filter" => filter}, _url, socket)
+      when filter in @case_investigation_filters,
+      do: socket |> assign_filter(filter) |> load_and_assign_case_investigations() |> noreply()
 
   def handle_params(%{"filter" => unmatched_filter}, _url, _socket),
     do: raise(CaseInvestigationFilterError, user_readable: "Unmatched filter “#{unmatched_filter}”")
@@ -155,7 +193,10 @@ defmodule EpicenterWeb.PeopleLive do
   end
 
   defp assign_case_investigations(socket, case_investigations) do
-    assign(socket, case_investigations: case_investigations, case_count: length(case_investigations))
+    assign(socket,
+      case_investigations: case_investigations,
+      case_count: length(case_investigations)
+    )
   end
 
   defp deselect_person(%{assigns: %{selected_people: selected_people}} = socket, person_id),

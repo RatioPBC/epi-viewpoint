@@ -23,8 +23,8 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
     @optional_attrs ~w{}a
     @primary_key false
     embedded_schema do
-      field :clearance_order_sent_on, :string
-      field :order_sent_on, :string
+      field(:clearance_order_sent_on, :string)
+      field(:order_sent_on, :string)
     end
 
     def changeset(case_investigation, attrs) do
@@ -54,13 +54,22 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
 
   def handle_event("change", %{"isolation_order_form" => params}, socket) do
     new_changeset = IsolationOrderForm.changeset(socket.assigns.case_investigation, params)
-    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
+
+    socket
+    |> assign(
+      confirmation_prompt: confirmation_prompt(new_changeset),
+      form_changeset: new_changeset
+    )
+    |> noreply()
   end
 
   def handle_event("save", %{"isolation_order_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- IsolationOrderForm.changeset(socket.assigns.case_investigation, params),
-         {:form, {:ok, model_attrs}} <- {:form, IsolationOrderForm.form_changeset_to_model_attrs(form_changeset)},
-         {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, model_attrs)} do
+    with %Ecto.Changeset{} = form_changeset <-
+           IsolationOrderForm.changeset(socket.assigns.case_investigation, params),
+         {:form, {:ok, model_attrs}} <-
+           {:form, IsolationOrderForm.form_changeset_to_model_attrs(form_changeset)},
+         {:case_investigation, {:ok, _case_investigation}} <-
+           {:case_investigation, update_case_investigation(socket, model_attrs)} do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
@@ -80,7 +89,10 @@ defmodule EpicenterWeb.CaseInvestigationIsolationOrderLive do
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    case_investigation = Cases.get_case_investigation(case_investigation_id, socket.assigns.current_user) |> Cases.preload_person()
+
+    case_investigation =
+      Cases.get_case_investigation(case_investigation_id, socket.assigns.current_user)
+      |> Cases.preload_person()
 
     socket
     |> assign_defaults()

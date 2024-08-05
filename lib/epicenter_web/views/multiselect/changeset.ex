@@ -49,7 +49,11 @@ defmodule EpicenterWeb.Multiselect.Changeset do
     |> Extra.Map.delete_in(["_ignore", "detailed", removed_value])
   end
 
-  def apply_event(values, {:remove, :checkbox, ["_ignore", "major", "other"], _removed_value}, _spec) do
+  def apply_event(
+        values,
+        {:remove, :checkbox, ["_ignore", "major", "other"], _removed_value},
+        _spec
+      ) do
     values
     |> Extra.Map.delete_in(["_ignore", "major", "other"])
     |> Extra.Map.delete_in(["major", "other"])
@@ -77,13 +81,26 @@ defmodule EpicenterWeb.Multiselect.Changeset do
     removed = List.first(old -- new)
 
     case {added, removed, keypath} do
-      {"true", _, ["_ignore", "major", "other"]} -> {:add, :other, ["major", "other"], "true"}
-      {"true", _, ["_ignore", "detailed", added_value, "other"]} -> {:add, :other, ["detailed", added_value, "other"], "true"}
-      {added, _, keypath} when not is_nil(added) -> {:add, Spec.type(added, spec), keypath, added}
-      {_, removed, keypath} when not is_nil(removed) -> {:remove, Spec.type(removed, spec), keypath, removed}
-      {_, _, ["_ignore", "major", "other"]} -> {:remove, :other, ["major"], "other"}
-      {_, _, ["_ignore", "detailed", removed_value, "other"]} -> {:remove, :other, ["detailed", removed_value], "other"}
-      _ -> :nothing
+      {"true", _, ["_ignore", "major", "other"]} ->
+        {:add, :other, ["major", "other"], "true"}
+
+      {"true", _, ["_ignore", "detailed", added_value, "other"]} ->
+        {:add, :other, ["detailed", added_value, "other"], "true"}
+
+      {added, _, keypath} when not is_nil(added) ->
+        {:add, Spec.type(added, spec), keypath, added}
+
+      {_, removed, keypath} when not is_nil(removed) ->
+        {:remove, Spec.type(removed, spec), keypath, removed}
+
+      {_, _, ["_ignore", "major", "other"]} ->
+        {:remove, :other, ["major"], "other"}
+
+      {_, _, ["_ignore", "detailed", removed_value, "other"]} ->
+        {:remove, :other, ["detailed", removed_value], "other"}
+
+      _ ->
+        :nothing
     end
   end
 

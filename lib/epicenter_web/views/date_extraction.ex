@@ -19,8 +19,13 @@ defmodule EpicenterWeb.Views.DateExtraction do
   end
 
   def convert_time(datestring, timestring, ampmstring) do
-    with {:ok, datetime} <- Timex.parse("#{datestring} #{timestring} #{ampmstring}", "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"),
-         %Timex.TimezoneInfo{} = timezone <- Timex.timezone(PresentationConstants.presented_time_zone(), datetime),
+    with {:ok, datetime} <-
+           Timex.parse(
+             "#{datestring} #{timestring} #{ampmstring}",
+             "{0M}/{0D}/{YYYY} {h12}:{m} {AM}"
+           ),
+         %Timex.TimezoneInfo{} = timezone <-
+           Timex.timezone(PresentationConstants.presented_time_zone(), datetime),
          %DateTime{} = time <- Timex.to_datetime(datetime, timezone) do
       {:ok, time}
     end

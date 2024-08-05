@@ -13,7 +13,8 @@ defmodule EpicenterWeb.ErrorHelpers do
       content_tag(
         :span,
         translate_error(error),
-        [class: "invalid-feedback", phx_feedback_for: input_id(form, field)] |> Keyword.merge(html_opts)
+        [class: "invalid-feedback", phx_feedback_for: input_id(form, field)]
+        |> Keyword.merge(html_opts)
       )
     end)
   end

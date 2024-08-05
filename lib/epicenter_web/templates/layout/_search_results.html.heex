@@ -1,0 +1,73 @@
+<div data-role="search-results" id="search-results">
+  <div id="search-results-inner">
+    <div>
+      <div id="search-close-results">
+        <a
+          data-role="close-search-results"
+          href="javascript:void(0);"
+          phx-click="close-search-results"
+        >
+          <%= EpicenterWeb.IconView.close_icon() %>
+        </a>
+      </div>
+      <h2>
+        <span id="search-result-count">
+          <%= @search_results.total
+          |> Epicenter.Extra.String.pluralize("result for", "results for") %>
+        </span> <span id="search-term"><%= @search_term %></span>
+      </h2>
+    </div>
+    <%= if @search_results.total == 0 do %>
+      <div data-role="no-search-results" id="no-search-results">
+        <%= no_results_icon() %>
+        <ul>
+          <li>Search by a person’s first name, last name, or ID number</li>
+          <li>Double-check spelling for typos</li>
+        </ul>
+      </div>
+    <% else %>
+      <%= for person <- @search_results.visible do %>
+        <div class="search-result" data-role="search-result" data-tid={"#{person.tid}"}>
+          <%= link(EpicenterWeb.Presenters.PeoplePresenter.full_name_and_external_ids(person),
+            to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person),
+            data_role: "search-result-name"
+          ) %>
+          <div class="search-result-details" data-role="search-result-details">
+            <%= EpicenterWeb.Presenters.PeoplePresenter.search_result_details(person) %>
+          </div>
+          <div class="search-result-labs" data-role="search-result-labs">
+            <%= EpicenterWeb.Presenters.PeoplePresenter.latest_lab_result(person) %>
+          </div>
+        </div>
+      <% end %>
+      <div>
+        <div id="search-results-pagination">
+          <button
+            data-role="search-prev"
+            disabled={"#{!@search_results.prev?}"}
+            phx-click="search-prev"
+          >
+            Previous
+          </button>
+          <%= for page <- @search_results.pages do %>
+            <button
+              data-page-number={"#{page}"}
+              disabled={"#{@search_results.current == page}"}
+              phx-click="search-goto"
+              phx-value-page={"#{page}"}
+            >
+              <%= page %>
+            </button>
+          <% end %>
+          <button
+            data-role="search-next"
+            disabled={"#{!@search_results.next?}"}
+            phx-click="search-next"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -6,14 +6,21 @@ defmodule EpicenterWeb.SearchHandling do
 
       def handle_event("search", %{"search" => %{"term" => term}}, socket) do
         term = term |> String.trim()
-        results = if String.length(term) < 3, do: nil, else: Epicenter.Cases.search_people(term, socket.assigns.current_user)
+
+        results =
+          if String.length(term) < 3,
+            do: nil,
+            else: Epicenter.Cases.search_people(term, socket.assigns.current_user)
 
         socket |> assign_search(term, results) |> EpicenterWeb.LiveHelpers.noreply()
       end
 
       def handle_event("search-next", _, socket) do
         socket
-        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.next(socket.assigns.search_results))
+        |> Phoenix.LiveView.assign(
+          :search_results,
+          EpicenterWeb.Pagination.next(socket.assigns.search_results)
+        )
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
@@ -21,13 +28,19 @@ defmodule EpicenterWeb.SearchHandling do
         page = page |> Integer.parse() |> elem(0)
 
         socket
-        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.goto(socket.assigns.search_results, page))
+        |> Phoenix.LiveView.assign(
+          :search_results,
+          EpicenterWeb.Pagination.goto(socket.assigns.search_results, page)
+        )
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
       def handle_event("search-prev", _, socket) do
         socket
-        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.previous(socket.assigns.search_results))
+        |> Phoenix.LiveView.assign(
+          :search_results,
+          EpicenterWeb.Pagination.previous(socket.assigns.search_results)
+        )
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 

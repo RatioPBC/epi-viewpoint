@@ -1,0 +1,90 @@
+<div
+  data-page="potential-duplicates"
+  data-role="potential-duplicates-page"
+  data-tid={"#{@person.tid}"}
+  id="potential-duplicates-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person.id), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="potential-duplicates-details">
+    <div>
+      <h2>Step 1: View potential duplicates</h2>
+      <p>
+        These records share the same (last name) and (first name, date of birth, phone number, or address).
+      </p>
+    </div>
+    <%= form_for :records_to_merge, Routes.resolve_conflicts_path(EpicenterWeb.Endpoint, EpicenterWeb.ResolveConflictsLive, @person), [id: "records-to-merge-form", phx_submit: "merge-selected-people", phx_change: "set-selected-people"], fn f -> %>
+      <table data-role="duplicates">
+        <thead>
+          <tr data-role="table-column-names">
+            <th width="1%"></th>
+            <th width="15%">Name</th>
+            <th width="15%">Date of Birth</th>
+            <th width="15%">Phone</th>
+            <th width="30%">Address</th>
+            <th width="10%"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= for person <- @duplicate_people do %>
+            <tr data-role="duplicate-person" data-tid={"#{person.tid}"}>
+              <td>
+                <%= checkbox(f, :people,
+                  name: "selected_people[]",
+                  checked: selected?(@selected_people, person),
+                  checked_value: person.id,
+                  hidden_input: false,
+                  data: [tid: person.tid]
+                ) %>
+              </td>
+              <td>
+                <div><%= Format.person(person) %></div>
+                <div class="odrs-ids">
+                  <%= person.demographics
+                  |> pluck(:external_id)
+                  |> list_or_unknown(transform: &"ID: #{&1}", pre: &Extra.Enum.sort_uniq(&1)) %>
+                </div>
+              </td>
+              <td>
+                <%= person.demographics
+                |> pluck(:dob)
+                |> list_or_unknown(
+                  transform: &Format.date/1,
+                  pre: &Extra.Enum.sort_uniq(&1, Date)
+                ) %>
+              </td>
+              <td>
+                <%= person.phones
+                |> list_or_unknown(transform: &Format.phone/1, post: &Extra.Enum.sort_uniq/1) %>
+              </td>
+              <td>
+                <%= person.addresses
+                |> list_or_unknown(transform: &Format.address/1, post: &Extra.Enum.sort_uniq/1) %>
+              </td>
+              <td>
+                <%= live_redirect("View",
+                  to:
+                    Routes.profile_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.ProfileLive,
+                      person.id
+                    )
+                ) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <section>
+        <%= submit data_role: "resolve-conflicts-button", disabled: (@selected_people == []), id: "resolve-conflicts-button" do %>
+          <span>Resolve conflicts</span><%= arrow_right_icon() %>
+        <% end %>
+      </section>
+    <% end %>
+  </section>
+</div>

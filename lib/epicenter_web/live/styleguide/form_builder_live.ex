@@ -1,7 +1,8 @@
 defmodule EpicenterWeb.Styleguide.FormBuilderLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias EpicenterWeb.Form
 
@@ -13,14 +14,14 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
     @primary_key false
 
     embedded_schema do
-      field :director, :string
-      field :genres, {:array, :string}
-      field :language, :string
-      field :notes, :string
-      field :producer, :string
-      field :release_date, :string
-      field :status, :string
-      field :title, :string
+      field(:director, :string)
+      field(:genres, {:array, :string})
+      field(:language, :string)
+      field(:notes, :string)
+      field(:producer, :string)
+      field(:release_date, :string)
+      field(:status, :string)
+      field(:title, :string)
     end
 
     @required_attrs ~w{director language release_date title}a
@@ -62,7 +63,12 @@ defmodule EpicenterWeb.Styleguide.FormBuilderLive do
   # # #
 
   def genres(),
-    do: [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}, {"Science Fiction", "scifi"}]
+    do: [
+      {"Comedy", "comedy"},
+      {"Drama", "drama"},
+      {"Musical", "musical"},
+      {"Science Fiction", "scifi"}
+    ]
 
   def languages(),
     do: [{"English", "english"}, {"German", "german"}, {"Italian", "italian"}]

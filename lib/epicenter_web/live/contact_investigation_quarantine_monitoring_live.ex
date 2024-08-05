@@ -35,8 +35,8 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
     @optional_attrs ~w{}a
     @primary_key false
     embedded_schema do
-      field :date_ended, :string
-      field :date_started, :string
+      field(:date_ended, :string)
+      field(:date_started, :string)
     end
 
     def changeset(contact_investigation, attrs) do
@@ -63,18 +63,29 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
       end
     end
 
-    defp isolation_dates(%ContactInvestigation{quarantine_monitoring_starts_on: nil, quarantine_monitoring_ends_on: nil} = contact_investigation) do
+    defp isolation_dates(
+           %ContactInvestigation{
+             quarantine_monitoring_starts_on: nil,
+             quarantine_monitoring_ends_on: nil
+           } = contact_investigation
+         ) do
       {Format.date(contact_investigation.exposed_on), nil}
     end
 
-    defp isolation_dates(%ContactInvestigation{quarantine_monitoring_starts_on: starts_on, quarantine_monitoring_ends_on: ends_on}) do
+    defp isolation_dates(%ContactInvestigation{
+           quarantine_monitoring_starts_on: starts_on,
+           quarantine_monitoring_ends_on: ends_on
+         }) do
       {Format.date(starts_on), Format.date(ends_on)}
     end
   end
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
+
+    contact_investigation =
+      ContactInvestigations.get(id, socket.assigns.current_user)
+      |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
@@ -88,13 +99,19 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
   def handle_event("change", %{"quarantine_monitoring_form" => params}, socket) do
     new_changeset = QuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params)
 
-    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset)) |> assign_form_changeset(new_changeset) |> noreply()
+    socket
+    |> assign(confirmation_prompt: confirmation_prompt(new_changeset))
+    |> assign_form_changeset(new_changeset)
+    |> noreply()
   end
 
   def handle_event("save", %{"quarantine_monitoring_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <- QuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params),
-         {:form, {:ok, model_attrs}} <- {:form, QuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
-         {:contact_investigation, {:ok, _contact_investigation}} <- {:contact_investigation, update_contact_investigation(socket, model_attrs)} do
+    with %Ecto.Changeset{} = form_changeset <-
+           QuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params),
+         {:form, {:ok, model_attrs}} <-
+           {:form, QuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
+         {:contact_investigation, {:ok, _contact_investigation}} <-
+           {:contact_investigation, update_contact_investigation(socket, model_attrs)} do
       socket
       |> push_redirect(
         to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#case-investigations"
@@ -128,7 +145,9 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
 
   # # #
 
-  defp page_title(%{quarantine_monitoring_starts_on: nil, quarantine_monitoring_ends_on: nil}), do: "Add quarantine dates"
+  defp page_title(%{quarantine_monitoring_starts_on: nil, quarantine_monitoring_ends_on: nil}),
+    do: "Add quarantine dates"
+
   defp page_title(_), do: "Edit quarantine dates"
 
   defp update_contact_investigation(socket, params) do

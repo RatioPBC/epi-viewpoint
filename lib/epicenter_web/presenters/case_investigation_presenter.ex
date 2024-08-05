@@ -73,9 +73,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Discontinued interview on #{case_investigation.interview_discontinued_at |> Format.date_time_with_presented_time_zone()}: #{
-                case_investigation.interview_discontinue_reason
-              }",
+              "Discontinued interview on #{case_investigation.interview_discontinued_at |> Format.date_time_with_presented_time_zone()}: #{case_investigation.interview_discontinue_reason}",
             link:
               link_if_editable(
                 person,
@@ -197,9 +195,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_starts_on)} - #{
-                Format.date(case_investigation.isolation_monitoring_ends_on)
-              }",
+              "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_starts_on)} - #{Format.date(case_investigation.isolation_monitoring_ends_on)}",
             link:
               link_if_editable(
                 person,
@@ -227,9 +223,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{
-                Gettext.gettext(Epicenter.Gettext, case_investigation.isolation_conclusion_reason)
-              }",
+              "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{Gettext.gettext(Epicenter.Gettext, case_investigation.isolation_conclusion_reason)}",
             link:
               link_if_editable(
                 person,
@@ -344,13 +338,22 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
       if under_18 do
         details = details ++ ["Minor"]
         details = details ++ ["Guardian: #{guardian_name}"]
-        details = if Euclid.Exists.present?(guardian_phone), do: details ++ [Format.phone(guardian_phone)], else: details
+
+        details =
+          if Euclid.Exists.present?(guardian_phone),
+            do: details ++ [Format.phone(guardian_phone)],
+            else: details
+
         details
       else
         details ++ phones
       end
 
-    details = if Euclid.Exists.present?(demographic.preferred_language), do: details ++ [demographic.preferred_language], else: details
+    details =
+      if Euclid.Exists.present?(demographic.preferred_language),
+        do: details ++ [demographic.preferred_language],
+        else: details
+
     details ++ ["Last together #{Format.date(most_recent_date_together)}"]
   end
 
@@ -386,7 +389,12 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
 
   defp redirect_to(case_investigation, :start_interview) do
     live_redirect("Start interview",
-      to: Routes.case_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartInterviewLive, case_investigation),
+      to:
+        Routes.case_investigation_start_interview_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.CaseInvestigationStartInterviewLive,
+          case_investigation
+        ),
       id: "start-interview-case-investigation-link-001",
       class: "primary"
     )
@@ -394,13 +402,19 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
 
   defp redirect_to(case_investigation, :discontinue_interview) do
     live_redirect("Discontinue",
-      to: Routes.case_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationDiscontinueLive, case_investigation),
+      to:
+        Routes.case_investigation_discontinue_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.CaseInvestigationDiscontinueLive,
+          case_investigation
+        ),
       id: "discontinue-case-investigation-link-001",
       class: "discontinue-case-investigation-link"
     )
   end
 
-  defp styled_status(displayable_status, status, type, postscript \\ "") when type in [:interview, :isolation_monitoring] do
+  defp styled_status(displayable_status, status, type, postscript \\ "")
+       when type in [:interview, :isolation_monitoring] do
     type_string = %{interview: "interview", isolation_monitoring: "isolation monitoring"}[type]
 
     content_tag :span do
@@ -409,7 +423,12 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   end
 
   defp with_interviewee_name(%CaseInvestigation{interview_proxy_name: nil} = case_investigation),
-    do: case_investigation |> Cases.preload_person() |> Map.get(:person) |> Cases.preload_demographics() |> Format.person()
+    do:
+      case_investigation
+      |> Cases.preload_person()
+      |> Map.get(:person)
+      |> Cases.preload_demographics()
+      |> Format.person()
 
   defp with_interviewee_name(%CaseInvestigation{interview_proxy_name: interview_proxy_name}),
     do: "proxy #{interview_proxy_name}"

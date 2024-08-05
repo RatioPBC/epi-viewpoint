@@ -26,7 +26,12 @@ defmodule EpicenterWeb.ContactInvestigationTest do
         |> Cases.create_lab_result!()
 
       case_investigation =
-        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, @admin, "the contagious person's case investigation")
+        Test.Fixtures.case_investigation_attrs(
+          sick_person,
+          lab_result,
+          @admin,
+          "the contagious person's case investigation"
+        )
         |> Cases.create_case_investigation!()
 
       {:ok, contact_investigation} =
@@ -40,7 +45,9 @@ defmodule EpicenterWeb.ContactInvestigationTest do
          }), Test.Fixtures.admin_audit_meta()}
         |> ContactInvestigations.create()
 
-      contact_investigation |> ContactInvestigations.preload_exposing_case() |> Cases.preload_investigation_notes()
+      contact_investigation
+      |> ContactInvestigations.preload_exposing_case()
+      |> Cases.preload_investigation_notes()
     end
 
     use EpicenterWeb.Test.ComponentEmbeddingLiveView,
@@ -53,13 +60,15 @@ defmodule EpicenterWeb.ContactInvestigationTest do
       ]
 
     def render(assigns) do
-      ~M"""
-      = component(ContactInvestigation,
-            "renders-a-contact-investigation",
-            contact_investigation: @contact_investigation,
-            current_user_id: @current_user_id,
-            on_add_note: @on_add_note,
-            on_delete_note: @on_delete_note)
+      ~H"""
+      <%= component(
+        ContactInvestigation,
+        "renders-a-contact-investigation",
+        contact_investigation: @contact_investigation,
+        current_user_id: @current_user_id,
+        on_add_note: @on_add_note,
+        on_delete_note: @on_delete_note
+      ) %>
       """
     end
   end
@@ -91,13 +100,21 @@ defmodule EpicenterWeb.ContactInvestigationTest do
         |> Cases.create_lab_result!()
 
       case_investigation =
-        Test.Fixtures.case_investigation_attrs(sick_person, lab_result, @admin, "the contagious person's case investigation")
+        Test.Fixtures.case_investigation_attrs(
+          sick_person,
+          lab_result,
+          @admin,
+          "the contagious person's case investigation"
+        )
         |> Cases.create_case_investigation!()
 
       [case_investigation: case_investigation]
     end
 
-    test "started case investigations that lack a clinical details show the values as 'None'", %{conn: conn, case_investigation: case_investigation} do
+    test "started case investigations that lack a clinical details show the values as 'None'", %{
+      conn: conn,
+      case_investigation: case_investigation
+    } do
       {:ok, contact_investigation} =
         Test.Fixtures.contact_investigation_attrs(
           "contact_investigation",
@@ -123,7 +140,10 @@ defmodule EpicenterWeb.ContactInvestigationTest do
       })
     end
 
-    test "started contact investigations with a unknown clinical details render correctly", %{conn: conn, case_investigation: case_investigation} do
+    test "started contact investigations with a unknown clinical details render correctly", %{
+      conn: conn,
+      case_investigation: case_investigation
+    } do
       {:ok, contact_investigation} =
         Test.Fixtures.contact_investigation_attrs(
           "contact_investigation",
@@ -137,6 +157,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
         |> ContactInvestigations.create()
 
       contact_investigation = contact_investigation |> ContactInvestigations.preload_exposed_person()
+
       person = contact_investigation.exposed_person
 
       Pages.Profile.visit(conn, person)
@@ -145,7 +166,10 @@ defmodule EpicenterWeb.ContactInvestigationTest do
       })
     end
 
-    test "contact investigations with empty lists of symptoms show None for symptoms", %{conn: conn, case_investigation: case_investigation} do
+    test "contact investigations with empty lists of symptoms show None for symptoms", %{
+      conn: conn,
+      case_investigation: case_investigation
+    } do
       {:ok, contact_investigation} =
         Test.Fixtures.contact_investigation_attrs(
           "contact_investigation",
@@ -159,6 +183,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
         |> ContactInvestigations.create()
 
       contact_investigation = contact_investigation |> ContactInvestigations.preload_exposed_person()
+
       person = contact_investigation.exposed_person
 
       Pages.Profile.visit(conn, person)

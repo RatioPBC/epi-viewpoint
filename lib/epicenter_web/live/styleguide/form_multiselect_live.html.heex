@@ -2,18 +2,27 @@
   <section>
     <h2>Multiselect</h2>
     <i>Demo of multiselects</i>
-
     <%= form_for @form_changeset, "#", [id: "form-layout", phx_submit: "save", phx_change: "form-change"], fn f -> %>
       <%= example_form_builder(f, @form_error) %>
     <% end %>
+    <div class="debug">
+      <b>form changeset (changed on "Save")</b>
+      <div><%= inspect(@form_changeset) %></div>
+    </div>
+    <div class="debug">
+      <b>example (created on "Save" if the form changeset is valid)</b>
+      <div>
+        <%= if @example do %>
+          <table>
+            <%= for key <- @example |> Map.from_struct() |> Map.keys() |> Enum.sort() do %>
+              <tr>
+                <td><%= key %></td>
+                <td><%= @example |> Map.get(key) |> inspect() %></td>
+              </tr>
+            <% end %>
+          </table>
+        <% end %>
+      </div>
+    </div>
   </section>
-
-  <div class="debug">
-    <b>form changeset (changed on "Save")</b>
-    <div><%= inspect(@form_changeset) %></div>
-  </div>
-  <div class="debug">
-    <b>example (created on "Save" if the form changeset is valid)</b>
-    <div></div>
-  </div>
 </div>

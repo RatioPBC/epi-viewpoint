@@ -21,18 +21,25 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
     }
 
     use EpicenterWeb.Test.ComponentEmbeddingLiveView,
-      default_assigns: [current_user: %User{}, current_user_id: "test-user-id", note: @note, on_delete: &Function.identity/1]
+      default_assigns: [
+        current_user: %User{},
+        current_user_id: "test-user-id",
+        note: @note,
+        on_delete: &Function.identity/1
+      ]
 
     def default_note, do: @note
 
     def render(assigns) do
-      ~M"""
-      = component(InvestigationNoteComponent,
-            "renders-a-note",
-            note: @note,
-            is_editable: true,
-            current_user_id: @current_user_id,
-            on_delete: @on_delete)
+      ~H"""
+      <%= component(
+        InvestigationNoteComponent,
+        "renders-a-note",
+        note: @note,
+        is_editable: true,
+        current_user_id: @current_user_id,
+        on_delete: @on_delete
+      ) %>
       """
     end
   end
@@ -51,14 +58,18 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
              ] = Components.InvestigationNote.note_content(view)
     end
 
-    test "does not show a delete link if the current user is not the author of the note", %{conn: conn} do
+    test "does not show a delete link if the current user is not the author of the note", %{
+      conn: conn
+    } do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
       send(view.pid, {:assigns, current_user_id: "not-the-author-id"})
 
       assert :delete_button_not_found = Components.InvestigationNote.delete_note(view, "test-note-id")
     end
 
-    test "allows the current user to click a delete link if they are the author of the note", %{conn: conn} do
+    test "allows the current user to click a delete link if they are the author of the note", %{
+      conn: conn
+    } do
       {:ok, view, _html} = live_isolated(conn, TestLiveView)
       send(view.pid, {:assigns, current_user_id: TestLiveView.default_note().author_id})
 
@@ -72,7 +83,11 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
 
       pid = self()
       on_delete = fn note -> send(pid, {:received_on_delete, note}) end
-      send(view.pid, {:assigns, on_delete: on_delete, current_user_id: TestLiveView.default_note().author_id})
+
+      send(
+        view.pid,
+        {:assigns, on_delete: on_delete, current_user_id: TestLiveView.default_note().author_id}
+      )
 
       assert :ok = Components.InvestigationNote.delete_note(view, "test-note-id")
       default_note = TestLiveView.default_note()

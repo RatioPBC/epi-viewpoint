@@ -1,0 +1,21 @@
+<div
+  data-confirm-navigation={"#{confirmation_prompt(@form_changeset)}"}
+  data-page="case-investigation-discontinue"
+  data-role="case-investigation-discontinue-page"
+  id="case-investigation-discontinue-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="case-investigation-discontinue">
+    <h2>Discontinue interview</h2>
+    <h3>before interview start</h3>
+    <%= form_for @form_changeset, "#", [id: "case-investigation-discontinue-form", phx_change: "change", phx_submit: "save"], fn f -> %>
+      <%= discontinue_form_builder(f) %>
+    <% end %>
+  </section>
+</div>

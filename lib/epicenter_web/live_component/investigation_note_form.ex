@@ -13,7 +13,7 @@ defmodule EpicenterWeb.InvestigationNoteForm do
 
     @primary_key false
     embedded_schema do
-      field :text, :string
+      field(:text, :string)
     end
 
     @required_attrs ~w{text}a
@@ -37,7 +37,10 @@ defmodule EpicenterWeb.InvestigationNoteForm do
   end
 
   def update(assigns, socket) do
-    {:ok, socket |> assign(assigns) |> assign(changeset: socket.assigns[:changeset] || empty_note(assigns))}
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(changeset: socket.assigns[:changeset] || empty_note(assigns))}
   end
 
   defp empty_note(_assigns) do
@@ -45,9 +48,10 @@ defmodule EpicenterWeb.InvestigationNoteForm do
   end
 
   def render(assigns) do
-    ~M"""
-    = form_for @changeset, "#", [class: "investigation-note-form", "data-role": "note-form", "data-confirm-navigation": confirmation_prompt(@changeset), phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f ->
-      = add_note_form_builder(f)
+    ~H"""
+    <%= form_for @changeset, "#", [class: "investigation-note-form", "data-role": "note-form", "data-confirm-navigation": confirmation_prompt(@changeset), phx_change: "change_note", phx_submit: "save_note", phx_target: @myself], fn f -> %>
+      <%= add_note_form_builder(f) %>
+    <% end %>
     """
     |> Map.put(:root, true)
   end

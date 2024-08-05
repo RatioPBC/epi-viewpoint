@@ -1,0 +1,19 @@
+<div
+  data-confirm-navigation={"#{@confirmation_prompt}"}
+  data-page="contact-investigation-quarantine-monitoring"
+  id="contact-investigation-quarantine-monitoring-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @contact_investigation.exposed_person), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="contact-investigation-quarantine-monitoring">
+    <h2 data-role="quarantine-page-title"><%= page_title(@contact_investigation) %></h2>
+    <%= form_for @form_changeset, "#", [id: "contact-investigation-quarantine-monitoring-form", phx_submit: "save", phx_change: "change"], fn f -> %>
+      <%= quarantine_monitoring_form_builder(f, @contact_investigation) %>
+    <% end %>
+  </section>
+</div>

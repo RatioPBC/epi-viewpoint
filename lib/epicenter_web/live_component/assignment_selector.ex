@@ -4,17 +4,27 @@ defmodule EpicenterWeb.AssignmentSelector do
   import EpicenterWeb.LiveHelpers, only: [noreply: 1]
 
   def render(assigns) do
-    ~M"""
-    form id="assignment-form" phx-change="form-change" data-disabled=@disabled phx-target=@myself
-      #user-list
-        span#assign-to-label Assign to
-        #select-wrapper
-          select name="user" data-role="users" disabled=@disabled
-            option value=""
-            option value="-unassigned-" Unassigned
-            = for user <- @users do
-              option value="#{user.id}" #{user.name}
-      #assignment-dropdown-tooltip Select people below, then assign them to a user
+    ~H"""
+    <form
+      data-disabled={"#{@disabled}"}
+      id="assignment-form"
+      phx-change="form-change"
+      phx-target={"#{@myself}"}
+    >
+      <div id="user-list">
+        <span id="assign-to-label">Assign to</span>
+        <div id="select-wrapper">
+          <select data-role="users" disabled={"#{@disabled}"} name="user">
+            <option></option>
+            <option value="-unassigned-">Unassigned</option>
+            <%= for user <- @users do %>
+              <option value={"#{user.id}"}><%= user.name %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+      <div id="assignment-dropdown-tooltip">Select people below, then assign them to a user</div>
+    </form>
     """
     |> Map.put(:root, true)
   end

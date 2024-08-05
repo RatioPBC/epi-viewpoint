@@ -1,0 +1,171 @@
+<div
+  data-confirm-navigation={"#{confirmation_prompt(@changeset)}"}
+  data-page="profile-edit"
+  data-role="profile-edit-page"
+  id="profile-edit-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="profile-edit">
+    <%= form_for @changeset, "#", [id: "profile-form", phx_change: "form-change", phx_submit: "save"], fn f -> %>
+      <div id="identifying-information">
+        <header>
+          <h2>Identifying Information</h2>
+        </header>
+        <div id="name-fields">
+          <fieldset>
+            <%= label f, :first_name do %>
+              First name<%= error_tag(f, :first_name) %>
+            <% end %>
+            <%= text_input(f, :first_name) %>
+          </fieldset>
+          <fieldset>
+            <%= label f, :last_name do %>
+              Last name<%= error_tag(f, :last_name) %>
+            <% end %>
+            <%= text_input(f, :last_name) %>
+          </fieldset>
+        </div>
+        <fieldset>
+          <%= label f, :dob do %>
+            Date of birth<%= error_tag(f, :dob) %>
+          <% end %>
+          <%= text_input(f, :dob, data_role: "dob") %>
+        </fieldset>
+        <div id="language-fields">
+          <fieldset>
+            <%= label f, :preferred_language do %>
+              Preferred language<%= error_tag(f, :preferred_language) %>
+            <% end %>
+            <div id="preferred-language">
+              <%= arrow_down_icon() %><%= select(
+                f,
+                :preferred_language,
+                preferred_languages(demographic_field(@person, :preferred_language)),
+                data_role: "preferred-language"
+              ) %>
+            </div>
+          </fieldset>
+          <fieldset
+            data-disabled={"#{!@preferred_language_is_other}"}
+            data-role="other-preferred-language"
+            id="other-preferred-language"
+          >
+            <%= label f, :other_specified_language do %>
+              Please specify<%= error_tag(f, :other_specified_language) %>
+            <% end %>
+            <%= text_input(f, :other_specified_language) %>
+          </fieldset>
+        </div>
+      </div>
+      <div id="locating-information">
+        <header>
+          <h2>Locating Information</h2>
+        </header>
+        <div class="locating-information-section">
+          <fieldset>
+            <%= if has_field?(@changeset, :phones) do %>
+              <header data-role="phone-fieldset-header"><span>Phone</span></header>
+            <% end %>
+            <%= inputs_for f, :phones, fn phone_form -> %>
+              <%= error_tag(phone_form, :number) %>
+              <div class="phone-wrapper">
+                <%= checkbox(phone_form, :delete) %>
+                <div class="phone-and-trash-can">
+                  <%= telephone_input(phone_form, :number,
+                    data: [role: "phone-input", tid: phone_form.data.tid]
+                  ) %>
+                  <div class="select-wrapper">
+                    <%= arrow_down_icon() %><%= select(phone_form, :type, phone_types(),
+                      data: [role: "phone-types"]
+                    ) %>
+                  </div>
+                  <%= label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do %>
+                    <div class="trash-icon"><%= trash_icon() %></div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </fieldset>
+          <a id="add-phone" phx-click="add-phone">
+            <%= plus_icon() %><span>Add phone</span>
+          </a>
+        </div>
+        <div class="locating-information-section">
+          <fieldset>
+            <%= if has_field?(@changeset, :addresses) do %>
+              <header data-role="address-fieldset-header" id="address-form-header">
+                <span>Street address</span><span>City</span><span>State</span><span>Zipcode</span>
+              </header>
+            <% end %>
+            <%= inputs_for f, :addresses, fn address_form -> %>
+              <%= error_tag(address_form, :street) %><%= error_tag(address_form, :city) %><%= error_tag(
+                address_form,
+                :state
+              ) %><%= error_tag(address_form, :postal_code) %>
+              <div class="address-wrapper">
+                <div class="address-and-trash-can">
+                  <%= text_input(address_form, :street,
+                    data: [role: "street-input", tid: address_form.data.tid]
+                  ) %><%= text_input(address_form, :city,
+                    data: [role: "city-input", tid: address_form.data.tid]
+                  ) %>
+                  <div class="select-wrapper">
+                    <%= arrow_down_icon() %><%= select(
+                      address_form,
+                      :state,
+                      GeographyPresenter.states(address_form.data.state),
+                      data_role: "state-input"
+                    ) %>
+                  </div>
+                  <%= text_input(address_form, :postal_code,
+                    data: [role: "postal-code-input", tid: address_form.data.tid]
+                  ) %>
+                  <%= label address_form, :delete, phx_click: "remove-address", phx_value_address_index: address_form.index do %>
+                    <div class="trash-icon"><%= trash_icon() %></div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </fieldset>
+          <a id="add-address" phx-click="add-address">
+            <%= plus_icon() %><span>Add address</span>
+          </a>
+        </div>
+        <div class="locating-information-section">
+          <fieldset>
+            <%= if has_field?(@changeset, :emails) do %>
+              <header data-role="email-fieldset-header"><span>Email</span></header>
+            <% end %>
+            <%= inputs_for f, :emails, fn email_form -> %>
+              <%= error_tag(email_form, :address) %>
+              <div class="email-address-wrapper">
+                <%= checkbox(email_form, :delete) %>
+                <div class="email-address-and-trash-can">
+                  <%= email_input(email_form, :address,
+                    data: [role: "email-address-input", tid: email_form.data.tid]
+                  ) %>
+                  <%= label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do %>
+                    <div class="trash-icon"><%= trash_icon() %></div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </fieldset>
+          <a id="add-email" phx-click="add-email">
+            <%= plus_icon() %><span>Add email</span>
+          </a>
+        </div>
+      </div>
+      <div id="form-end"></div>
+      <div id="form-buttons">
+        <div id="button-wrapper"><%= submit("Save", id: "submit-button") %></div>
+      </div>
+    <% end %>
+  </section>
+</div>

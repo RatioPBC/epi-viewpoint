@@ -11,10 +11,10 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
 
   @primary_key false
   embedded_schema do
-    field :person_interviewed, :string
-    field :date_started, :string
-    field :time_started, :string
-    field :time_started_am_pm, :string
+    field(:person_interviewed, :string)
+    field(:date_started, :string)
+    field(:time_started, :string)
+    field(:time_started_am_pm, :string)
   end
 
   @required_attrs ~w{date_started person_interviewed time_started time_started_am_pm}a
@@ -33,7 +33,10 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   defp investigation_start_interview_form_attrs(%{interview_started_at: interview_started_at} = investigation) do
     time =
       if interview_started_at do
-        Timex.Timezone.convert(interview_started_at, EpicenterWeb.PresentationConstants.presented_time_zone())
+        Timex.Timezone.convert(
+          interview_started_at,
+          EpicenterWeb.PresentationConstants.presented_time_zone()
+        )
       else
         Timex.now(EpicenterWeb.PresentationConstants.presented_time_zone())
       end
@@ -57,7 +60,9 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
   def investigation_attrs(%Ecto.Changeset{} = form_changeset) do
     with {:ok, case_investigation_start_form} <- apply_action(form_changeset, :create) do
       interview_proxy_name = convert_name(case_investigation_start_form)
+
       {:ok, interview_started_at} = convert_time_started_and_date_started(case_investigation_start_form)
+
       {:ok, %{interview_proxy_name: interview_proxy_name, interview_started_at: interview_started_at}}
     else
       other -> other
@@ -83,7 +88,15 @@ defmodule EpicenterWeb.Forms.StartInterviewForm do
     timezone = Timex.timezone(PresentationConstants.presented_time_zone(), Timex.now())
 
     Form.new(form)
-    |> Form.line(&Form.radio_button_list(&1, :person_interviewed, "Person interviewed", people_interviewed(person), other: "Proxy"))
+    |> Form.line(
+      &Form.radio_button_list(
+        &1,
+        :person_interviewed,
+        "Person interviewed",
+        people_interviewed(person),
+        other: "Proxy"
+      )
+    )
     |> Form.line(&Form.date_field(&1, :date_started, "Date started"))
     |> Form.line(fn line ->
       line

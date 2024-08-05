@@ -11,9 +11,9 @@ defmodule EpicenterWeb.Forms.ResolveConflictsForm do
   @required_attrs ~w{}a
   @optional_attrs ~w{first_name dob preferred_language}a
   embedded_schema do
-    field :first_name, :string
-    field :dob, :string
-    field :preferred_language, :string
+    field(:first_name, :string)
+    field(:dob, :string)
+    field(:preferred_language, :string)
   end
 
   def changeset(merge_conflicts, attrs) do

@@ -1,0 +1,19 @@
+<div
+  data-confirm-navigation={"#{@confirmation_prompt}"}
+  data-page="case-investigation-conclude-isolation-monitoring"
+  id="case-investigation-conclude-isolation-monitoring-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="case-investigation-conclude-isolation-monitoring">
+    <h2 id="conclude-isolation-monitoring-heading"><%= @page_heading %></h2>
+    <%= form_for @form_changeset, "#", [id: "case-investigation-conclude-isolation-monitoring-form", phx_change: "change", phx_submit: "save"], fn f -> %>
+      <%= conclude_isolation_monitoring_form_builder(f) %>
+    <% end %>
+  </section>
+</div>
