@@ -1,0 +1,51 @@
+<div id="user-settings-page">
+  <section>
+    <h2>Settings</h2>
+  </section>
+  <%= if get_flash(@conn, :info) do %>
+    <section id="flash"><%= get_flash(@conn, :info) %></section>
+  <% end %>
+  <%= if get_flash(@conn, :error) do %>
+    <section id="flash-error"><%= get_flash(@conn, :error) %></section>
+  <% end %>
+  <%= if get_flash(@conn, :extra) do %>
+    <section id="flash-extra"><%= get_flash(@conn, :extra) %></section>
+  <% end %>
+  <div id="change-password">
+    <header>Change password</header>
+    <%= form_for @password_changeset, Routes.user_settings_path(@conn, :update_password), fn f -> %>
+      <%= if @password_changeset.action do %>
+        <div class="form-error-message">
+          <%= error_icon() %>
+          <div>Please check the errors below</div>
+        </div>
+      <% end %>
+      <fieldset>
+        <%= label(f, :password, "New password") %><%= error_tag(f, :password) %><%= password_input(
+          f,
+          :password,
+          required: true
+        ) %>
+      </fieldset>
+      <fieldset>
+        <%= label(f, :password_confirmation, "Confirm new password") %><%= error_tag(
+          f,
+          :password_confirmation
+        ) %><%= password_input(f, :password_confirmation, required: true) %>
+      </fieldset>
+      <fieldset>
+        <%= label(f, :current_password, for: "current_password_for_password") %><%= error_tag(
+          f,
+          :current_password
+        ) %><%= password_input(f, :current_password,
+          required: true,
+          name: "current_password",
+          id: "current_password_for_password"
+        ) %>
+      </fieldset>
+      <div id="password-actions">
+        <%= submit("Change password") %><%= link("Cancel", to: "/", id: "cancel-button") %>
+      </div>
+    <% end %>
+  </div>
+</div>

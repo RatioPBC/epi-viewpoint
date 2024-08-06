@@ -1,0 +1,485 @@
+<div data-page="profile" data-role="profile-page" data-tid={@person.tid} id="profile-page">
+  <%= if @person.archived_by != nil do %>
+    <div data-role="archived-banner" id="archived-banner">
+      <span>This record was archived on <%= Format.date(@person.archived_at) %> by <%= @person.archived_by.name %>.</span>
+      <button data-role="unarchive" id="unarchive" phx-click="unarchive">Unarchive</button>
+    </div>
+  <% end %>
+  <section id="heading">
+    <div>
+      <div id="toolbar">
+        <h1 data-role="full-name" id="toolbar-left"><%= string_or_unknown(Format.person(@person)) %></h1>
+        <div id="toolbar-right">
+          <%= if is_editable?(@person) do %>
+            <button
+              data-confirm="Archive record? This record will no longer be editable and will not appear on the index case list, contacts list, nor in the search results."
+              data-role="archive"
+              id="archive"
+              phx-click="archive"
+            >
+              Archive
+            </button>
+          <% end %>
+          <%= if @potential_duplicate_count > 0 and is_editable?(@person) do %>
+            <%= live_redirect("View potential duplicates (#{@potential_duplicate_count})",
+              id: "view-potential-duplicates",
+              to:
+                Routes.potential_duplicates_path(
+                  EpicenterWeb.Endpoint,
+                  EpicenterWeb.PotentialDuplicatesLive,
+                  @person
+                ),
+              data_role: "view-potential-duplicates"
+            ) %>
+          <% end %>
+        </div>
+      </div>
+      <h3 data-role="external-id" id="external-id"><%= demographic_field(@person, :external_id) |> Format.demographic(:external_id) %></h3>
+    </div>
+    <form id="assignment-form" phx-change="form-change">
+      <div id="user-list">
+        <div id="assignee-label">Assignee</div>
+        <div data-unset={unassigned?(@person)} id="select-wrapper">
+          <%= arrow_down_icon() %>
+          <select data-role="users" name="user">
+            <option selected={selected?(nil, @person)} value="-unassigned-">Unassigned</option>
+            <%= for user <- @users do %>
+              <option selected={selected?(user, @person)} value={user.id}><%= user.name %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+    </form>
+  </section>
+  <section id="profile">
+    <header>
+      <h2>Profile</h2>
+      <%= if is_editable?(@person) do %>
+        <span>
+          <%= live_redirect("Update",
+            to:
+              Routes.profile_edit_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.ProfileEditLive,
+                @person
+              ),
+            data_role: "edit-identifying-information-link"
+          ) %>
+        </span>
+      <% end %>
+    </header>
+    <table id="profile-data">
+      <tbody>
+        <tr>
+          <th>Date of birth</th>
+          <th>Preferred language</th>
+          <th>Phone</th>
+          <th>Email</th>
+        </tr>
+        <tr>
+          <td data-role="date-of-birth"><%= string_or_unknown(
+              with(
+                dob when not is_nil(dob) <- demographic_field(@person, :dob),
+                do: Format.date(dob)
+              )
+            ) %></td>
+          <td data-role="preferred-language"><%= string_or_unknown(demographic_field(@person, :preferred_language)) %></td>
+          <td data-role="phone-numbers"><%= list_or_unknown(phone_numbers(@person)) %></td>
+          <td data-role="email-addresses"><%= list_or_unknown(email_addresses(@person)) %></td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <th colspan="4">Address</th>
+        </tr>
+        <tr>
+          <td colspan="4" data-role="addresses">
+            <%= if Euclid.Exists.present?(@person.addresses) do %>
+              <%= for address <- @person.addresses do %>
+                <div class="address-details" data-role="address-details">
+                  <div><%= Format.address(address) %></div>
+                </div>
+              <% end %>
+            <% else %>
+              <%= unknown_value() %>
+            <% end %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  <a id="case-investigations"></a>
+  <%= for case_investigation <- @case_investigations do %>
+    <section
+      class="case-investigation"
+      data-tid={case_investigation.tid}
+      id={"case-investigation-#{case_investigation.name}"}
+    >
+      <div>
+        <header>
+          <h2 data-role="case-investigation-title">
+            Case investigation <%= string_or_unknown(
+              Format.date(case_investigation.initiating_lab_result.reported_on)
+            ) %>
+          </h2>
+          <span class="case-investigation-timestamp" data-role="case-investigation-timestamp">Created on <%= Format.date(case_investigation.inserted_at) %></span>
+        </header>
+        <div class="case-investigation-details" data-role="case-investigation-initiated-by">
+          Initiated by positive lab result collected on <%= Format.date(
+            case_investigation.initiating_lab_result.sampled_on
+          ) %> at <%= case_investigation.initiating_lab_result.request_facility_name %>
+        </div>
+      </div>
+      <div class="case-investigation-sections">
+        <div>
+          <div
+            class="case-investigation-interview-status"
+            data-role="case-investigation-interview-status"
+          >
+            <h3 class="status" data-role="status">
+              <%= displayable_interview_status(case_investigation) %>
+            </h3>
+            <div class="case-investigation-interview-buttons">
+              <%= for link <- interview_buttons(@person, case_investigation) do %>
+                <span><%= link %></span>
+              <% end %>
+            </div>
+          </div>
+          <div class="case-investigation-history">
+            <%= for history_item <- history_items(@person, case_investigation) do %>
+              <div>
+                <span data-role="case-investigation-history-item-text"><%= history_item.text %></span>
+                <span class="history-item-link"><%= history_item.link %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <%= if case_investigation.interview_started_at != nil do %>
+          <div class="clinical-details">
+            <div class="clinical-details-header-row">
+              <h4>
+                <span id={"clinical-details-#{case_investigation.name}"}>Clinical</span>
+              </h4>
+              <div class="links">
+                <%= if is_editable?(@person) do %>
+                  <span>
+                    <%= live_redirect("Edit",
+                      to:
+                        Routes.case_investigation_clinical_details_path(
+                          EpicenterWeb.Endpoint,
+                          EpicenterWeb.CaseInvestigationClinicalDetailsLive,
+                          case_investigation
+                        ),
+                      id: "case-investigation-clinical-details-link-001",
+                      class: "case-investigation-clinical-details-link"
+                    ) %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+            <table class="clinical-data" data-role="clinical-data-table">
+              <thead>
+                <tr data-role="table-column-names">
+                  <th>Clinical status</th>
+                  <th>Onset date</th>
+                  <th>Symptoms</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-tid={case_investigation.tid}>
+                  <td data-role="case-investigation-clinical-status-text"><%= displayable_clinical_status(case_investigation) %></td>
+                  <td data-role="case-investigation-symptom-onset-date-text"><%= Format.date(case_investigation.symptom_onset_on, "None") %></td>
+                  <td data-role="case-investigation-symptoms-text"><%= displayable_symptoms(case_investigation) %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="case-investigation-contacts" id={"contacts-#{case_investigation.name}"}>
+            <div class="contacts-header-row">
+              <h4><span>Contacts</span></h4>
+              <div>
+                <%= if is_editable?(@person) do %>
+                  <%= live_redirect("+ Contact",
+                    to:
+                      Routes.create_case_investigation_contact_path(
+                        EpicenterWeb.Endpoint,
+                        EpicenterWeb.CaseInvestigationContactLive,
+                        case_investigation
+                      ),
+                    id: "add-contact-case-investigation-link-001",
+                    class: "add-contact-case-investigation-link"
+                  ) %>
+                <% end %>
+              </div>
+            </div>
+            <%= for contact_investigation <- case_investigation.contact_investigations do %>
+              <div class="contact">
+                <div class="contact-details">
+                  <div>
+                    <%= live_redirect(Format.person(contact_investigation.exposed_person),
+                      to:
+                        Routes.profile_path(
+                          EpicenterWeb.Endpoint,
+                          EpicenterWeb.ProfileLive,
+                          contact_investigation.exposed_person
+                        ),
+                      data: [role: "visit-contact-link"],
+                      class: "contact-name"
+                    ) %>
+                  </div>
+                  <%= contact_details_as_list(contact_investigation) %>
+                </div>
+                <div class="contact-edit-remove">
+                  <%= live_redirect("Edit",
+                    to:
+                      Routes.edit_case_investigation_contact_path(
+                        EpicenterWeb.Endpoint,
+                        EpicenterWeb.CaseInvestigationContactLive,
+                        case_investigation,
+                        contact_investigation
+                      ),
+                    data: [role: "edit-contact", contact_investigation: contact_investigation.id]
+                  ) %><a
+                    data-confirm={
+                      "#{"Remove #{Format.person(contact_investigation.exposed_person)} as a contact?"}"
+                    }
+                    data-role="remove-contact"
+                    href="#"
+                    phx-click="remove-contact"
+                    phx-value-contact-investigation-id={contact_investigation.id}
+                  >Remove</a>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        <%= if case_investigation.interview_status == "completed" do %>
+          <div class="case-investigation-places">
+            <div class="places-header-row">
+              <h4><span>Places visited</span></h4>
+              <div>
+                <%= if is_editable?(@person) do %>
+                  <%= live_redirect("+ Place",
+                    to:
+                      Routes.place_search_path(
+                        EpicenterWeb.Endpoint,
+                        EpicenterWeb.PlaceSearchLive,
+                        case_investigation
+                      ),
+                    id: "add-place-link-#{case_investigation.tid}",
+                    class: "add-place-link"
+                  ) %>
+                <% end %>
+              </div>
+            </div>
+            <%= for visit <- case_investigation.visits do %>
+              <div class="visit" data-tid={visit.tid}>
+                <div>
+                  <span class="place-name" data-role="place-name"><%= visit.place.name %></span><span
+                    class="visit-address"
+                    data-role="place-address"
+                  ><%= address(visit.place) %></span>
+                </div>
+                <div>
+                  <ul class="dotted-details">
+                    <%= if visit.place.type do %>
+                      <li data-role="place-type"><%= visit.place.type %></li>
+                    <% end %>
+                    <%= if visit.relationship do %>
+                      <li data-role="relationship"><%= visit.relationship %></li>
+                    <% end %>
+                    <%= if visit.place.contact_phone do %>
+                      <li data-role="contact-phone"><%= visit.place.contact_phone %></li>
+                    <% end %>
+                    <li data-role="occurred-on">
+                      <%= "Visited on #{Format.date(visit.occurred_on)}" %>
+                    </li>
+                  </ul>
+                </div>
+                <div class="visit-remove">
+                  <a
+                    data-confirm={"Remove #{address(visit.place)} as a place visited?"}
+                    data-role="remove-visit"
+                    href="#"
+                    phx-click="remove-visit"
+                    phx-value-visit-id={visit.id}
+                  >
+                    Remove
+                  </a>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        <%= if case_investigation.interview_status == "completed" do %>
+          <div>
+            <div
+              class="case-investigation-isolation-monitoring-status"
+              id={"isolation-monitoring-#{case_investigation.name}"}
+            >
+              <h3 class="status" data-role="status">
+                <%= displayable_isolation_monitoring_status(case_investigation, @current_date) %>
+              </h3>
+              <div><%= isolation_monitoring_button(@person, case_investigation) %></div>
+            </div>
+            <div class="case-investigation-history">
+              <%= for item <- isolation_monitoring_history_items(@person, case_investigation) do %>
+                <div>
+                  <span data-role="isolation-monitoring-history-item-text"><%= item.text %></span><span class="history-item-link"><%= item.link %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        <%= if case_investigation.isolation_monitoring_status == "ongoing" do %>
+          <div class="case-investigation-clinical">
+            <div class="clinical-details-header-row" data-tid="isolation-order-details-001">
+              <h4><span>Isolation Order Details</span></h4>
+              <div class="links">
+                <%= if is_editable?(@person) do %>
+                  <span>
+                    <%= live_redirect("Edit",
+                      to:
+                        Routes.case_investigation_isolation_order_path(
+                          EpicenterWeb.Endpoint,
+                          EpicenterWeb.CaseInvestigationIsolationOrderLive,
+                          case_investigation
+                        ),
+                      id: "edit-isolation-order-case-investigation-link-001",
+                      class: "primary"
+                    ) %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+            <table class="clinical-data">
+              <thead>
+                <tr data-role="table-column-names">
+                  <th>Date isolation order sent</th>
+                  <th>Date isolation clearance order sent</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-tid="case-investigation-001-isolation-order-sent-date"><%= Format.date(case_investigation.isolation_order_sent_on, "Not sent") %></td>
+                  <td data-tid="case-investigation-001-isolation-clearance-order-sent-date"><%= Format.date(
+                      case_investigation.isolation_clearance_order_sent_on,
+                      "Not sent"
+                    ) %></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <% end %>
+        <%= component(
+          InvestigationNotesSection,
+          case_investigation.id <> "note section",
+          notes: case_investigation.notes,
+          is_editable: is_editable?(@person),
+          current_user_id: @current_user.id,
+          on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
+          on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
+        ) %>
+      </div>
+    </section>
+  <% end %>
+  <a id="contact-investigations"></a>
+  <%= for contact_investigation <- @contact_investigations do %>
+    <%= component(
+      ContactInvestigation,
+      contact_investigation.id <> "contact investigation",
+      contact_investigation: contact_investigation,
+      current_user_id: @current_user.id,
+      current_date: @current_date,
+      on_add_note: fn note_attrs -> on_note_added(note_attrs, contact_investigation) end,
+      on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end
+    ) %>
+  <% end %>
+  <section data-role="lab-results" id="lab-results">
+    <header>
+      <h2>Lab Results</h2>
+    </header>
+    <%= if Euclid.Exists.blank?(@person.lab_results) do %>
+      <div id="empty-lab-results">No lab results</div>
+    <% else %>
+      <table data-role="lab-result-table" id="lab-results-data">
+        <thead>
+          <tr data-role="table-column-names">
+            <th>Collection</th>
+            <th>Result</th>
+            <th>Ordering Facility</th>
+            <th>Analysis</th>
+            <th>Reported</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= for lab_result <- @person.lab_results do %>
+            <tr data-tid={lab_result.tid}>
+              <td><%= string_or_unknown(Format.date(lab_result.sampled_on)) %></td>
+              <td><%= pretty_result(lab_result.result) %></td>
+              <td><%= string_or_unknown(lab_result.request_facility_name) %></td>
+              <td><%= string_or_unknown(Format.date(lab_result.analyzed_on)) %></td>
+              <td><%= string_or_unknown(Format.date(lab_result.reported_on)) %></td>
+              <td><%= string_or_unknown(lab_result.test_type) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </section>
+  <section id="demographics">
+    <header>
+      <h2>Demographics</h2>
+      <%= if is_editable?(@person) do %>
+        <span>
+          <%= live_redirect("Update",
+            to:
+              Routes.demographics_edit_path(
+                EpicenterWeb.Endpoint,
+                EpicenterWeb.DemographicsEditLive,
+                @person
+              ),
+            data_role: "edit-demographics-link"
+          ) %>
+        </span>
+      <% end %>
+    </header>
+    <table id="demographics-data">
+      <tbody>
+        <tr>
+          <th>Gender identity</th>
+          <th>Sex at birth</th>
+          <th>Ethnicity</th>
+          <th>Race</th>
+        </tr>
+        <tr>
+          <td data-role="gender-identity"><%= @person |> demographic_field(:gender_identity, :format) |> list_or_unknown() %></td>
+          <td data-role="sex-at-birth"><%= @person |> demographic_field(:sex_at_birth, :format) |> string_or_unknown() %></td>
+          <td data-role="ethnicity"><%= @person |> demographic_field(:ethnicity, :format) |> list_or_unknown() %></td>
+          <td data-role="race"><%= @person |> demographic_field(:race, :format) |> list_or_unknown() %></td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <th>Marital status</th>
+          <th>Employment</th>
+          <th>Occupation</th>
+        </tr>
+        <tr>
+          <td data-role="marital-status"><%= @person |> demographic_field(:marital_status, :format) |> string_or_unknown() %></td>
+          <td data-role="employment"><%= @person |> demographic_field(:employment, :format) |> string_or_unknown() %></td>
+          <td data-role="occupation"><%= @person |> demographic_field(:occupation) |> string_or_unknown() %></td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td data-role="notes"><%= @person |> demographic_field(:notes) |> string_or_unknown(unknown_text: "--") %></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

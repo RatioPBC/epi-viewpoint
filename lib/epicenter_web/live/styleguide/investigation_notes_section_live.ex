@@ -1,7 +1,9 @@
 defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, ok: 1, noreply: 1]
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_page_title: 2, ok: 1, noreply: 1]
+
   import EpicenterWeb.LiveComponent.Helpers
 
   alias Epicenter.Accounts.User
@@ -21,15 +23,17 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   def render(assigns) do
     contact_investigation = %ContactInvestigation{id: "styleguide-contact-investigation"}
 
-    ~M"""
-    = component(InvestigationNotesSection,
-          "styleguide-note-section",
-          current_user_id: "author-1",
-          subject: contact_investigation,
-          notes: @notes,
-          is_editable: true,
-          on_add_note: &on_add/1,
-          on_delete_note: &on_delete/1)
+    ~H"""
+    <%= component(
+      InvestigationNotesSection,
+      "styleguide-note-section",
+      current_user_id: "author-1",
+      subject: contact_investigation,
+      notes: @notes,
+      is_editable: true,
+      on_add_note: &on_add/1,
+      on_delete_note: &on_delete/1
+    ) %>
     """
     |> Map.put(:root, true)
   end
@@ -44,7 +48,13 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
 
   def example_notes() do
     [
-      %InvestigationNote{id: "note-1", author: %User{name: "Billy"}, author_id: "author-1", inserted_at: ~U[2020-10-31 10:30:00Z], text: "Good note"},
+      %InvestigationNote{
+        id: "note-1",
+        author: %User{name: "Billy"},
+        author_id: "author-1",
+        inserted_at: ~U[2020-10-31 10:30:00Z],
+        text: "Good note"
+      },
       %InvestigationNote{
         id: "note-2",
         author: %User{name: "Alice"},

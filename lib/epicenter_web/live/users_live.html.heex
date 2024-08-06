@@ -1,0 +1,92 @@
+<section data-page="users" id="users-page">
+  <h2>
+    <div id="title"><span>Users</span></div>
+  </h2>
+  <%= live_redirect("Add user",
+    to: Routes.new_user_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLive),
+    data: [role: :"add-user"],
+    id: "add-user"
+  ) %>
+  <table data-role="users-table">
+    <thead>
+      <tr data-role="table-column-names">
+        <th>Name</th>
+        <th>Email</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Audit trail</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for user <- @users do %>
+        <tr>
+          <td>
+            <%= live_redirect(user.name,
+              to: Routes.user_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLive, user)
+            ) %>
+          </td>
+          <td><%= user.email %></td>
+          <td><%= user.type %></td>
+          <td><%= user.active_status %></td>
+          <td>
+            <%= live_redirect("View",
+              to:
+                Routes.user_logins_path(EpicenterWeb.Endpoint, EpicenterWeb.UserLoginsLive, user),
+              data: [tid: "view-audit-trail-#{user.tid}"]
+            ) %>
+          </td>
+          <td style="text-align: right">
+            <%= if user.password_reset_url do %>
+              <button
+                data-role="close-reset-password"
+                data-tid={user.tid}
+                phx-click="close-reset-password"
+                phx-value-user-id={user.id}
+              >
+                Done
+              </button>
+            <% else %>
+              <button
+                data-role="reset-password"
+                data-tid={user.tid}
+                phx-click="reset-password"
+                phx-value-user-id={user.id}
+              >
+                Set/reset password
+              </button>
+            <% end %>
+          </td>
+        </tr>
+        <%= if user.password_reset_url do %>
+          <tr class="sub-row">
+            <td colspan="6">
+              <form>
+                <fieldset>
+                  <div class="reset-password-message">
+                    Securely send this link to the user to allow them to set or reset their password:
+                    <a
+                      data-clipboard-value={user.password_reset_url}
+                      href="javascript:void(0)"
+                      id={"copy-to-clipboard-#{user.id}"}
+                      phx-hook="CopyToClipboard"
+                    >
+                      Copy to clipboard
+                    </a>
+                  </div>
+                  <input
+                    data-role="reset-password-link"
+                    data-tid={user.tid}
+                    readonly="true"
+                    type="text"
+                    value={user.password_reset_url}
+                  />
+                </fieldset>
+              </form>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</section>

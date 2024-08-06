@@ -1,0 +1,31 @@
+<div data-page="login" id="login-page">
+  <%= form_for @conn, Routes.user_session_path(@conn, :create), [as: :user, data: [role: "login-form"]], fn f -> %>
+    <div id="form-contents">
+      <header><%= login_icon() %></header>
+      <h4 id="title">Log into your account</h4>
+      <%= if get_flash(@conn, :info) do %>
+        <div id="flash"><%= get_flash(@conn, :info) %></div>
+      <% end %>
+      <%= if get_flash(@conn, :extra) do %>
+        <div id="flash-extra"><%= get_flash(@conn, :extra) %></div>
+      <% end %>
+      <%= if get_flash(@conn, :error) do %>
+        <% error = get_flash(@conn, :error) %>
+        <div data-form-error-message={error} id="flash-error"><%= error %></div>
+      <% end %>
+      <%= if @error_message do %>
+        <div id="error-message-wrapper">
+          <div class="form-error-message">
+            <%= error_icon() %>
+            <div data-form-error-message={@error_message}><%= @error_message %></div>
+          </div>
+        </div>
+      <% end %>
+      <fieldset><%= label(f, :email) %><%= email_input(f, :email, required: true) %></fieldset>
+      <fieldset>
+        <%= label(f, :password) %><%= password_input(f, :password, required: true) %>
+      </fieldset>
+      <fieldset><%= submit("Log in", id: "submit") %></fieldset>
+    </div>
+  <% end %>
+</div>

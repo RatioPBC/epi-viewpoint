@@ -52,14 +52,16 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
     end
 
     def render(assigns) do
-      ~M"""
-      = component(InvestigationNotesSection,
-                  "displays-a-notes-section",
-                  notes: @notes,
-                  is_editable: true,
-                  current_user_id: @current_user_id,
-                  on_add_note: @on_add_note,
-                  on_delete_note: @on_delete_note)
+      ~H"""
+      <%= component(
+        InvestigationNotesSection,
+        "displays-a-notes-section",
+        notes: @notes,
+        is_editable: true,
+        current_user_id: @current_user_id,
+        on_add_note: @on_add_note,
+        on_delete_note: @on_delete_note
+      ) %>
       """
     end
 
@@ -84,7 +86,9 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
 
       send(view.pid, {:assigns, on_add_note: on_add_note})
 
-      view |> element("form.investigation-note-form") |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
+      view
+      |> element("form.investigation-note-form")
+      |> render_submit(%{"form_field_data" => %{"text" => "A new note"}})
 
       assert_receive {:received_on_add, %{text: "A new note"}}
     end
@@ -97,7 +101,11 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
       note_to_delete = List.first(@notes)
       pid = self()
       on_delete_note = fn note -> send(pid, {:received_on_delete, note}) end
-      send(view.pid, {:assigns, on_delete_note: on_delete_note, current_user_id: note_to_delete.author_id})
+
+      send(
+        view.pid,
+        {:assigns, on_delete_note: on_delete_note, current_user_id: note_to_delete.author_id}
+      )
 
       assert :ok = Components.InvestigationNote.delete_note(view, note_to_delete.id)
       assert_receive {:received_on_delete, ^note_to_delete}

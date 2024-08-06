@@ -1,9 +1,0 @@
-body class="#{@body_class}"
-  = if @show_nav do
-    header#nav
-      #nav-inner
-        #nav-items
-          #nav-left
-            = link to: "/", id: "logo" do
-              = logo_icon()
-  = @inner_content

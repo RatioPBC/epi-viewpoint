@@ -1,0 +1,16 @@
+<section id="import-page">
+  <h2>Import Labs</h2>
+  <h3>Success</h3>
+  <p>
+    <%= "Successfully imported #{@last_csv_import_info.imported_person_count} people and #{@last_csv_import_info.imported_lab_result_count} lab results." %>
+  </p>
+  <h3><%= "#{@last_csv_import_info.skipped_row_count} row(s) were skipped" %></h3>
+  <div id="failed-rows">
+    <%= for x <- @last_csv_import_info.skipped_row_error_messages do %>
+      <div class="import-error-message">
+        <p><%= x %></p>
+      </div>
+    <% end %>
+  </div>
+  <p><%= link("Continue", to: "/", id: "continue-button") %></p>
+</section>

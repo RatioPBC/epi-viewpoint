@@ -1,0 +1,17 @@
+<section id="import-page">
+  <h2>Import Labs</h2>
+  <%= if Euclid.Exists.present?(@import_error_message) do %>
+    <div class="import-error-message">
+      <p><%= @import_error_message %></p>
+    </div>
+  <% end %>
+  <p>
+    Choose a CSV file from your computer, click “Upload”, and then wait for the file to upload.
+  </p>
+  <%= form_tag("/import/upload", multipart: true, method: :post) %><input name="file" type="file" /><input
+    data-role="upload-labs"
+    id="upload-button"
+    type="submit"
+    value="Upload"
+  />
+</section>

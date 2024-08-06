@@ -1,0 +1,16 @@
+<body class={@body_class}>
+  <%= if @show_nav do %>
+    <header id="nav">
+      <div id="nav-inner">
+        <div id="nav-items">
+          <div id="nav-left">
+            <%= link to: "/", id: "logo" do %>
+              <%= logo_icon() %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </header>
+  <% end %>
+  <%= @inner_content %>
+</body>

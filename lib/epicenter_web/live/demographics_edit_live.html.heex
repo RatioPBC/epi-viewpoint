@@ -1,0 +1,20 @@
+<div
+  data-confirm-navigation={@confirmation_prompt}
+  data-page="demographics-edit"
+  data-role="demographics-edit-page"
+  id="demographics-edit-page"
+>
+  <section>
+    <header id="subnav">
+      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person), data: [role: "back-link"] do %>
+        <%= back_icon() %><span>Back</span>
+      <% end %>
+    </header>
+  </section>
+  <section id="demographics-edit">
+    <header><span>Edit demographics</span></header>
+    <%= form_for @form_changeset, "#", [id: "demographics-form", phx_submit: "save", phx_change: "form-change"], fn f -> %>
+      <%= form_builder(f) %>
+    <% end %>
+  </section>
+</div>

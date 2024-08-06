@@ -6,12 +6,48 @@ defmodule EpicenterWeb.ContactsFilter do
   alias Epicenter.AuditLog
 
   def render(assigns) do
-    ~M"""
-    #status-filter
-      = live_patch "All", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_contact_investigation), class: "button", data: [active: assigns.filter in [:with_contact_investigation, nil], role: "contacts-filter", tid: "all"]
-      = live_patch "Pending interview", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_pending_interview), class: "button", data: [active: assigns.filter == :with_pending_interview, role: "contacts-filter", tid: "with_pending_interview"]
-      = live_patch "Ongoing interview", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_ongoing_interview), class: "button", data: [active: assigns.filter == :with_ongoing_interview, role: "contacts-filter", tid: "with_ongoing_interview"]
-      = live_patch "Quarantine monitoring", to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_quarantine_monitoring), class: "button", data: [active: assigns.filter == :with_quarantine_monitoring, role: "contacts-filter", tid: "with_quarantine_monitoring"]
+    ~H"""
+    <div id="status-filter">
+      <%= live_patch("All",
+        to:
+          Routes.contacts_path(@socket, EpicenterWeb.ContactsLive,
+            filter: :with_contact_investigation
+          ),
+        class: "button",
+        data: [
+          active: assigns.filter in [:with_contact_investigation, nil],
+          role: "contacts-filter",
+          tid: "all"
+        ]
+      ) %><%= live_patch("Pending interview",
+        to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_pending_interview),
+        class: "button",
+        data: [
+          active: assigns.filter == :with_pending_interview,
+          role: "contacts-filter",
+          tid: "with_pending_interview"
+        ]
+      ) %><%= live_patch("Ongoing interview",
+        to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_ongoing_interview),
+        class: "button",
+        data: [
+          active: assigns.filter == :with_ongoing_interview,
+          role: "contacts-filter",
+          tid: "with_ongoing_interview"
+        ]
+      ) %><%= live_patch("Quarantine monitoring",
+        to:
+          Routes.contacts_path(@socket, EpicenterWeb.ContactsLive,
+            filter: :with_quarantine_monitoring
+          ),
+        class: "button",
+        data: [
+          active: assigns.filter == :with_quarantine_monitoring,
+          role: "contacts-filter",
+          tid: "with_quarantine_monitoring"
+        ]
+      ) %>
+    </div>
     """
     |> Map.put(:root, true)
   end
@@ -20,7 +56,8 @@ end
 defmodule EpicenterWeb.ContactsLive do
   use EpicenterWeb, :live_view
 
-  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers,
+    only: [assign_defaults: 1, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   import EpicenterWeb.Presenters.PeoplePresenter,
     only: [
@@ -73,8 +110,12 @@ defmodule EpicenterWeb.ContactsLive do
     socket |> assign_selected_to_empty() |> load_and_assign_exposed_people() |> noreply()
   end
 
-  def handle_event("checkbox-click", %{"value" => "on", "person-id" => person_id} = _value, socket),
-    do: socket |> select_person(person_id) |> noreply()
+  def handle_event(
+        "checkbox-click",
+        %{"value" => "on", "person-id" => person_id} = _value,
+        socket
+      ),
+      do: socket |> select_person(person_id) |> noreply()
 
   def handle_info({:assignee_selected, user_id}, socket) do
     {:ok, _updated_people} =
@@ -136,7 +177,13 @@ defmodule EpicenterWeb.ContactsLive do
   defp load_and_assign_exposed_people(socket),
     do:
       socket
-      |> assign_people(ContactInvestigations.list_exposed_people(socket.assigns.filter, socket.assigns.current_user, reject_archived_people: true))
+      |> assign_people(
+        ContactInvestigations.list_exposed_people(
+          socket.assigns.filter,
+          socket.assigns.current_user,
+          reject_archived_people: true
+        )
+      )
 
   defp load_and_assign_users(socket),
     do: socket |> assign(users: Accounts.list_users())
