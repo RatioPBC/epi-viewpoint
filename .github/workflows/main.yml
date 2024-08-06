@@ -49,6 +49,7 @@ jobs:
           mix deps.unlock --check-unused
           mix deps.audit
           npm audit --audit-level=moderate --prefix assets
+          npm audit fix
           mix sobelow --config
       
       - name: Run tests
