@@ -17,7 +17,6 @@ defmodule EpicenterWeb.Multiselect do
 
   def multiselect_input(f, field, {type, option_label, option_value, children} = _spec, _level) do
     {:safe, parent_input} = multiselect_input(f, field, {type, option_label, option_value}, :parent)
-
     {:safe, child_inputs} = multiselect_inputs(f, [field, option_value], children, :child)
     {:safe, [parent_input] ++ child_inputs}
   end

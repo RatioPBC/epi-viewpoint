@@ -28,10 +28,10 @@ defmodule EpicenterWeb.UserLive do
     @primary_key false
 
     embedded_schema do
-      field(:email, :string)
-      field(:name, :string)
-      field(:status, :string)
-      field(:type, :string)
+      field :email, :string
+      field :name, :string
+      field :status, :string
+      field :type, :string
     end
 
     @required_attrs ~w{email name status type}a
@@ -99,20 +99,13 @@ defmodule EpicenterWeb.UserLive do
     user = socket.assigns.user
 
     with {:form, {:ok, user_attrs}} <- {:form, UserForm.user_attrs(form_changeset)},
-         {:user, {:ok, _user}} <-
-           {:user,
-            if(user,
-              do: update_user(socket, user, user_attrs),
-              else: register_user(socket, user_attrs)
-            )} do
+         {:user, {:ok, _user}} <- {:user, if(user, do: update_user(socket, user, user_attrs), else: register_user(socket, user_attrs))} do
       socket
       |> push_redirect(to: Routes.users_path(socket, EpicenterWeb.UsersLive))
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = invalid_form_changeset}} ->
-        socket
-        |> assign_form_changeset(invalid_form_changeset, "Check the errors above")
-        |> noreply()
+        socket |> assign_form_changeset(invalid_form_changeset, "Check the errors above") |> noreply()
 
       {:user, {:error, %{errors: [email: {email_error_message, _}]}}} ->
         socket
@@ -125,9 +118,7 @@ defmodule EpicenterWeb.UserLive do
         |> noreply()
 
       {:user, {:error, changeset}} ->
-        socket
-        |> assign_form_changeset(form_changeset, changeset_with_errors_to_error_string(changeset))
-        |> noreply()
+        socket |> assign_form_changeset(form_changeset, changeset_with_errors_to_error_string(changeset)) |> noreply()
     end
   end
 

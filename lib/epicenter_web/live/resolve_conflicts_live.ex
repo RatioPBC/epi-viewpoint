@@ -2,9 +2,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
-
-  import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Epicenter.Cases.Merge
   alias Epicenter.DateParser
@@ -12,17 +10,12 @@ defmodule EpicenterWeb.ResolveConflictsLive do
   alias EpicenterWeb.Format
   alias EpicenterWeb.Forms.ResolveConflictsForm
 
-  def mount(
-        %{"id" => person_id, "duplicate_person_ids" => comma_separated_duplicate_person_ids} = _params,
-        session,
-        socket
-      ) do
+  def mount(%{"id" => person_id, "duplicate_person_ids" => comma_separated_duplicate_person_ids} = _params, session, socket) do
     socket = socket |> authenticate_user(session)
 
     duplicate_person_ids = String.split(comma_separated_duplicate_person_ids, ",")
     person_ids = [person_id] ++ duplicate_person_ids
     merge_fields = [{:first_name, :string}, {:dob, :date}, {:preferred_language, :string}]
-
     merge_conflicts = Epicenter.Cases.Merge.merge_conflicts(person_ids, socket.assigns.current_user, merge_fields)
 
     socket
@@ -38,10 +31,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
 
   def handle_event("form-change", %{"resolve_conflicts_form" => form_params}, socket) do
     socket
-    |> assign(
-      :form_changeset,
-      ResolveConflictsForm.changeset(socket.assigns.merge_conflicts, form_params)
-    )
+    |> assign(:form_changeset, ResolveConflictsForm.changeset(socket.assigns.merge_conflicts, form_params))
     |> noreply()
   end
 
@@ -83,11 +73,7 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     Form.new(form)
     |> add_line(:first_name, "Choose the correct first name", merge_conflicts.first_name)
     |> add_line(:dob, "Choose the correct date of birth", formatted_dates)
-    |> add_line(
-      :preferred_language,
-      "Choose the correct preferred language",
-      merge_conflicts.preferred_language
-    )
+    |> add_line(:preferred_language, "Choose the correct preferred language", merge_conflicts.preferred_language)
     |> Form.line(&Form.save_button(&1, title: "Merge", disabled: !valid_changeset?))
     |> Form.safe()
   end

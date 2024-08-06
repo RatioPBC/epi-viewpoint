@@ -20,11 +20,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
     do: selected_people == %{}
 
   def exposure_date(person),
-    do:
-      person.contact_investigations
-      |> hd()
-      |> Map.get(:most_recent_date_together)
-      |> Format.date()
+    do: person.contact_investigations |> hd() |> Map.get(:most_recent_date_together) |> Format.date()
 
   def external_id(person),
     do: Person.coalesce_demographics(person).external_id
@@ -52,29 +48,18 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
   def is_editable?(person), do: !is_archived?(person)
 
   def latest_contact_investigation_status(person, current_date),
-    do:
-      person
-      |> Person.latest_contact_investigation()
-      |> CaseInvestigationPresenter.displayable_status(current_date)
+    do: person |> Person.latest_contact_investigation() |> CaseInvestigationPresenter.displayable_status(current_date)
 
   def latest_lab_result(person) do
     person
     |> Cases.preload_lab_results()
     |> Map.get(:lab_results)
     |> LabResultPresenter.latest_positive()
-    |> Unknown.string_or_unknown(
-      transform: &"Latest lab result on #{&1}",
-      unknown_text: "No lab results"
-    )
+    |> Unknown.string_or_unknown(transform: &"Latest lab result on #{&1}", unknown_text: "No lab results")
   end
 
   def search_result_details(person) do
-    person =
-      person
-      |> Cases.preload_demographics()
-      |> Cases.preload_phones()
-      |> Cases.preload_addresses()
-
+    person = person |> Cases.preload_demographics() |> Cases.preload_phones() |> Cases.preload_addresses()
     demographic = person |> Person.coalesce_demographics()
 
     Phoenix.HTML.Tag.content_tag :ul do

@@ -1,2 +1,0 @@
-- hex
-  - use 2.0.2 version: mix local.hex 2.0.2

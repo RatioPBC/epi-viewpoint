@@ -6,14 +6,7 @@ defmodule EpicenterWeb.AddVisitLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [
-      assign_defaults: 1,
-      assign_form_changeset: 2,
-      assign_page_title: 2,
-      authenticate_user: 2,
-      ok: 1,
-      noreply: 1
-    ]
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, authenticate_user: 2, ok: 1, noreply: 1]
 
   alias Epicenter.AuditLog
   alias Epicenter.Cases
@@ -61,8 +54,7 @@ defmodule EpicenterWeb.AddVisitLive do
            {:data, AddVisitForm.visit_attrs(form_changeset)},
          data = data |> Map.put(:case_investigation_id, socket.assigns.case_investigation.id),
          data = data |> Map.put(:place_id, socket.assigns.place.id),
-         {:save, {:ok, _visit}} <-
-           {:save, Cases.create_visit({data, audit_meta_create_visit(socket)})} do
+         {:save, {:ok, _visit}} <- {:save, Cases.create_visit({data, audit_meta_create_visit(socket)})} do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()

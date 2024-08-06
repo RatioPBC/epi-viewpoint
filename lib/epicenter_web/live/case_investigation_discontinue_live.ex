@@ -5,14 +5,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   import EpicenterWeb.IconView, only: [back_icon: 0]
 
   import EpicenterWeb.LiveHelpers,
-    only: [
-      assign_defaults: 1,
-      assign_form_changeset: 2,
-      assign_page_title: 2,
-      authenticate_user: 2,
-      noreply: 1,
-      ok: 1
-    ]
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
 
   alias Ecto.Changeset
   alias Epicenter.AuditLog
@@ -21,11 +14,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-
-    case_investigation =
-      case_investigation_id
-      |> Cases.get_case_investigation(socket.assigns.current_user)
-      |> Cases.preload_person()
+    case_investigation = case_investigation_id |> Cases.get_case_investigation(socket.assigns.current_user) |> Cases.preload_person()
 
     socket
     |> assign_defaults()
@@ -68,12 +57,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
   end
 
   def reasons("started") do
-    [
-      "Deceased",
-      "Transferred to another jurisdiction",
-      "Lost to follow up",
-      "Refused to cooperate"
-    ]
+    ["Deceased", "Transferred to another jurisdiction", "Lost to follow up", "Refused to cooperate"]
   end
 
   def reasons(_) do
@@ -86,10 +70,7 @@ defmodule EpicenterWeb.CaseInvestigationDiscontinueLive do
     Form.new(changeset)
     |> Form.line(fn line ->
       line
-      |> Form.radio_button_list(
-        :interview_discontinue_reason,
-        "Reason",
-        reasons(changeset.data.interview_status),
+      |> Form.radio_button_list(:interview_discontinue_reason, "Reason", reasons(changeset.data.interview_status),
         other: "Other",
         span: 8
       )

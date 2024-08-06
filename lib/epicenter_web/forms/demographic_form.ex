@@ -12,14 +12,14 @@ defmodule EpicenterWeb.Forms.DemographicForm do
   @primary_key false
 
   embedded_schema do
-    field(:employment, :string)
-    field(:ethnicity, :map)
-    field(:gender_identity, :map)
-    field(:marital_status, :string)
-    field(:notes, :string)
-    field(:occupation, :string)
-    field(:race, :map)
-    field(:sex_at_birth, :string)
+    field :employment, :string
+    field :ethnicity, :map
+    field :gender_identity, :map
+    field :marital_status, :string
+    field :notes, :string
+    field :occupation, :string
+    field :race, :map
+    field :sex_at_birth, :string
   end
 
   @required_attrs ~w{}a
@@ -43,9 +43,7 @@ defmodule EpicenterWeb.Forms.DemographicForm do
       employment: demographic.employment,
       ethnicity: demographic.ethnicity |> MajorDetailed.for_form(Demographic.standard_values(:ethnicity)),
       ethnicity_hispanic_latinx_or_spanish_origin: demographic.ethnicity |> Ethnicity.hispanic_latinx_or_spanish_origin(),
-      gender_identity:
-        demographic.gender_identity
-        |> MajorDetailed.for_form(Demographic.standard_values(:gender_identity)),
+      gender_identity: demographic.gender_identity |> MajorDetailed.for_form(Demographic.standard_values(:gender_identity)),
       marital_status: demographic.marital_status,
       notes: demographic.notes,
       occupation: demographic.occupation,

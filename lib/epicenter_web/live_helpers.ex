@@ -9,10 +9,7 @@ defmodule EpicenterWeb.LiveHelpers do
 
   def assign_defaults(socket, overrides \\ []) do
     new_assigns = Keyword.merge(@default_assigns, overrides)
-
-    Enum.reduce(new_assigns, socket, fn {key, value}, socket_acc ->
-      assign_new(socket_acc, key, fn -> value end)
-    end)
+    Enum.reduce(new_assigns, socket, fn {key, value}, socket_acc -> assign_new(socket_acc, key, fn -> value end) end)
   end
 
   def assign_form_changeset(socket, form_changeset, form_error \\ nil),
@@ -22,19 +19,13 @@ defmodule EpicenterWeb.LiveHelpers do
     do: socket |> assign(page_title: page_title)
 
   def authenticate_user(socket, %{"user_token" => user_token} = _session),
-    do:
-      socket
-      |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end)
-      |> check_user()
+    do: socket |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end) |> check_user()
 
   def authenticate_user(socket, _session),
     do: socket
 
   def authenticate_admin_user!(socket, %{"user_token" => user_token} = _session),
-    do:
-      socket
-      |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end)
-      |> check_admin()
+    do: socket |> assign_new(:current_user, fn -> Accounts.get_user_by_session_token(user_token) end) |> check_admin()
 
   def ok(socket),
     do: {:ok, socket}
@@ -44,16 +35,14 @@ defmodule EpicenterWeb.LiveHelpers do
 
   # # #
 
-  defp check_user(%{assigns: %{current_user: %{confirmed_at: confirmed_at}}} = socket)
-       when not is_nil(confirmed_at),
-       do: socket
+  defp check_user(%{assigns: %{current_user: %{confirmed_at: confirmed_at}}} = socket) when not is_nil(confirmed_at),
+    do: socket
 
   defp check_user(socket),
     do: redirect(socket, to: Routes.user_session_path(Endpoint, :new))
 
-  defp check_admin(%{assigns: %{current_user: %{admin: true, confirmed_at: confirmed_at}}} = socket)
-       when not is_nil(confirmed_at),
-       do: socket
+  defp check_admin(%{assigns: %{current_user: %{admin: true, confirmed_at: confirmed_at}}} = socket) when not is_nil(confirmed_at),
+    do: socket
 
   defp check_admin(socket),
     do: redirect(socket, to: Routes.root_path(EpicenterWeb.Endpoint, :show))

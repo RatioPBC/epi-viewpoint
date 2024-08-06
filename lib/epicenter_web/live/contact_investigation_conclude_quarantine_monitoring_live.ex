@@ -2,10 +2,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.IconView, only: [back_icon: 0]
-
-  import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 1, authenticate_user: 2, noreply: 1, ok: 1]
-
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.ConfirmationModal, only: [confirmation_prompt: 1]
 
   alias Epicenter.AuditLog
@@ -24,32 +21,21 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
     @optional_attrs ~w{}a
     @primary_key false
     embedded_schema do
-      field(:reason, :string)
+      field :reason, :string
     end
 
     def changeset(contact_investigation, attrs) do
-      %ConcludeQuarantineMonitoringForm{
-        reason: contact_investigation.quarantine_conclusion_reason
-      }
+      %ConcludeQuarantineMonitoringForm{reason: contact_investigation.quarantine_conclusion_reason}
       |> cast(attrs, @required_attrs ++ @optional_attrs)
       |> validate_required(@required_attrs)
     end
 
-    def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset, %{
-          quarantine_concluded_at: quarantine_concluded_at
-        }) do
+    def form_changeset_to_model_attrs(%Ecto.Changeset{} = form_changeset, %{quarantine_concluded_at: quarantine_concluded_at}) do
       quarantine_concluded_at = quarantine_concluded_at || @clock.utc_now()
 
       case apply_action(form_changeset, :create) do
-        {:ok, form} ->
-          {:ok,
-           %{
-             quarantine_conclusion_reason: form.reason,
-             quarantine_concluded_at: quarantine_concluded_at
-           }}
-
-        other ->
-          other
+        {:ok, form} -> {:ok, %{quarantine_conclusion_reason: form.reason, quarantine_concluded_at: quarantine_concluded_at}}
+        other -> other
       end
     end
   end
@@ -66,38 +52,21 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
     |> assign_page_heading(contact_investigation)
     |> assign(:confirmation_prompt, nil)
     |> assign(:contact_investigation, contact_investigation)
-    |> assign(
-      :form_changeset,
-      ConcludeQuarantineMonitoringForm.changeset(contact_investigation, %{})
-    )
+    |> assign(:form_changeset, ConcludeQuarantineMonitoringForm.changeset(contact_investigation, %{}))
     |> ok()
   end
 
   def handle_event("change", %{"conclude_quarantine_monitoring_form" => params}, socket) do
     new_changeset = ConcludeQuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params)
-
-    socket
-    |> assign(
-      confirmation_prompt: confirmation_prompt(new_changeset),
-      form_changeset: new_changeset
-    )
-    |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   def handle_event("save", full_params, socket) do
     params = full_params |> Map.get("conclude_quarantine_monitoring_form", %{})
 
-    with %Ecto.Changeset{} = form_changeset <-
-           ConcludeQuarantineMonitoringForm.changeset(
-             socket.assigns.contact_investigation,
-             params
-           ),
+    with %Ecto.Changeset{} = form_changeset <- ConcludeQuarantineMonitoringForm.changeset(socket.assigns.contact_investigation, params),
          {:form, {:ok, model_attrs}} <-
-           {:form,
-            ConcludeQuarantineMonitoringForm.form_changeset_to_model_attrs(
-              form_changeset,
-              socket.assigns.contact_investigation
-            )},
+           {:form, ConcludeQuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset, socket.assigns.contact_investigation)},
          {:contact_investigation, {:ok, _contact_investigation}} <-
            {:contact_investigation,
             ContactInvestigations.update(
@@ -122,15 +91,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
 
   def conclude_quarantine_monitoring_form_builder(form) do
     Form.new(form)
-    |> Form.line(
-      &Form.radio_button_list(
-        &1,
-        :reason,
-        "Reason",
-        ContactInvestigation.text_field_values(:quarantine_conclusion_reason),
-        span: 5
-      )
-    )
+    |> Form.line(&Form.radio_button_list(&1, :reason, "Reason", ContactInvestigation.text_field_values(:quarantine_conclusion_reason), span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
   end
@@ -140,6 +101,5 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
   defp assign_page_heading(socket, %ContactInvestigation{quarantine_concluded_at: nil}),
     do: assign(socket, page_heading: "Conclude quarantine monitoring")
 
-  defp assign_page_heading(socket, %ContactInvestigation{}),
-    do: assign(socket, page_heading: "Edit conclude quarantine monitoring")
+  defp assign_page_heading(socket, %ContactInvestigation{}), do: assign(socket, page_heading: "Edit conclude quarantine monitoring")
 end

@@ -20,9 +20,7 @@ defmodule EpicenterWeb.ImportController do
   end
 
   def create(conn, %{"file" => plug_upload}) do
-    result =
-      UploadedFile.from_plug_upload(plug_upload)
-      |> Cases.import_lab_results(conn.assigns.current_user)
+    result = UploadedFile.from_plug_upload(plug_upload) |> Cases.import_lab_results(conn.assigns.current_user)
 
     case result do
       {:ok, import_info} ->

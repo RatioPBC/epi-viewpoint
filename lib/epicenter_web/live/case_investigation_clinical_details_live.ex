@@ -24,9 +24,9 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
     @primary_key false
     embedded_schema do
-      field(:clinical_status, :string)
-      field(:symptom_onset_on, :string)
-      field(:symptoms, {:array, :string})
+      field :clinical_status, :string
+      field :symptom_onset_on, :string
+      field :symptoms, {:array, :string}
     end
 
     @required_attrs ~w{}a
@@ -69,10 +69,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
     socket = socket |> authenticate_user(session)
 
     case_investigation =
-      id
-      |> Cases.get_case_investigation(socket.assigns.current_user)
-      |> Cases.preload_initiating_lab_result()
-      |> Cases.preload_person()
+      id |> Cases.get_case_investigation(socket.assigns.current_user) |> Cases.preload_initiating_lab_result() |> Cases.preload_person()
 
     socket
     |> assign_defaults()
@@ -88,21 +85,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
       "If asymptomatic, date of first positive test (#{Format.date(case_investigation.initiating_lab_result.sampled_on)})"
 
     Form.new(form)
-    |> Form.line(
-      &Form.radio_button_list(
-        &1,
-        :clinical_status,
-        "Clinical Status",
-        CaseInvestigation.text_field_values(:clinical_status),
-        span: 5
-      )
-    )
-    |> Form.line(
-      &Form.date_field(&1, :symptom_onset_on, "Symptom onset date",
-        explanation_text: symptom_onset_on_explanation_text,
-        span: 5
-      )
-    )
+    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", CaseInvestigation.text_field_values(:clinical_status), span: 5))
+    |> Form.line(&Form.date_field(&1, :symptom_onset_on, "Symptom onset date", explanation_text: symptom_onset_on_explanation_text, span: 5))
     |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
@@ -118,12 +102,7 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
 
     new_changeset = ClinicalDetailsForm.changeset(socket.assigns.case_investigation, params)
 
-    socket
-    |> assign(
-      confirmation_prompt: confirmation_prompt(new_changeset),
-      form_changeset: new_changeset
-    )
-    |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   def handle_event("save", %{"clinical_details_form" => params}, socket) do
@@ -150,10 +129,8 @@ defmodule EpicenterWeb.CaseInvestigationClinicalDetailsLive do
              socket.assigns.case_investigation,
              params
            ),
-         {:form, {:ok, case_investigation_attrs}} <-
-           {:form, ClinicalDetailsForm.case_investigation_attrs(form_changeset)},
-         {:case_investigation, {:ok, _case_investigation}} <-
-           {:case_investigation, update_case_investigation(socket, case_investigation_attrs)} do
+         {:form, {:ok, case_investigation_attrs}} <- {:form, ClinicalDetailsForm.case_investigation_attrs(form_changeset)},
+         {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, case_investigation_attrs)} do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()

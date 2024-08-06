@@ -35,21 +35,21 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
     alias Euclid.Exists
 
     embedded_schema do
-      field(:contact_investigation_id, :string)
-      field(:person_id, :string)
-      field(:phone_id, :string)
-      field(:demographic_id, :string)
-      field(:guardian_name, :string)
-      field(:guardian_phone, :string)
-      field(:first_name, :string)
-      field(:last_name, :string)
-      field(:relationship_to_case, :string)
-      field(:same_household, :boolean)
-      field(:under_18, :boolean)
-      field(:dob, :string)
-      field(:phone, :string)
-      field(:preferred_language, :string)
-      field(:most_recent_date_together, :string)
+      field :contact_investigation_id, :string
+      field :person_id, :string
+      field :phone_id, :string
+      field :demographic_id, :string
+      field :guardian_name, :string
+      field :guardian_phone, :string
+      field :first_name, :string
+      field :last_name, :string
+      field :relationship_to_case, :string
+      field :same_household, :boolean
+      field :under_18, :boolean
+      field :dob, :string
+      field :phone, :string
+      field :preferred_language, :string
+      field :most_recent_date_together, :string
     end
 
     def changeset(%ContactInvestigation{} = contact_investigation, attrs) do
@@ -147,18 +147,10 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
       cond do
         Exists.present?(dob) && under_18? && age(dob) >= 18 ->
-          changeset
-          |> add_error(
-            :dob,
-            "Must be under 18 years if 'This person is under 18 years old' is checked"
-          )
+          changeset |> add_error(:dob, "Must be under 18 years if 'This person is under 18 years old' is checked")
 
         Exists.present?(dob) && !under_18? && age(dob) < 18 ->
-          changeset
-          |> add_error(
-            :dob,
-            "Must be over 18 years if 'This person is under 18 years old' is not checked"
-          )
+          changeset |> add_error(:dob, "Must be over 18 years if 'This person is under 18 years old' is not checked")
 
         true ->
           changeset
@@ -182,8 +174,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
 
     contact_investigation =
       if id = params["id"] do
-        ContactInvestigations.get(id, socket.assigns.current_user)
-        |> ContactInvestigations.preload_exposed_person()
+        ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
       else
         %ContactInvestigation{exposed_person: %Person{demographics: [], phones: []}}
       end
@@ -206,16 +197,9 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
   def handle_event("save", %{"contact_form" => params}, socket) do
     contact_investigation = socket.assigns.contact_investigation
 
-    with {:form, {:ok, data}} <-
-           {:form, ContactForm.changeset(contact_investigation, params) |> ContactForm.contact_params()},
+    with {:form, {:ok, data}} <- {:form, ContactForm.changeset(contact_investigation, params) |> ContactForm.contact_params()},
          data = data |> Map.put(:exposing_case_id, socket.assigns.case_investigation.id),
-         {:created, {:ok, _}} <-
-           {:created,
-            create_or_update_contact_investigation(
-              contact_investigation,
-              data,
-              socket.assigns.current_user
-            )} do
+         {:created, {:ok, _}} <- {:created, create_or_update_contact_investigation(contact_investigation, data, socket.assigns.current_user)} do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
@@ -228,10 +212,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       {:created, {:error, _changeset}} ->
         socket
         # This case should be unreachable as long as UI validation is more strict than db validation
-        |> assign(
-          :form_error,
-          "Validation failed and your contact form changes could not be saved"
-        )
+        |> assign(:form_error, "Validation failed and your contact form changes could not be saved")
         |> noreply()
     end
   end
@@ -325,28 +306,12 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
       |> Form.text_field(:first_name, "First name")
       |> Form.text_field(:last_name, "Last name")
     end)
-    |> Form.line(
-      &Form.radio_button_list(
-        &1,
-        :relationship_to_case,
-        "Relationship to case",
-        @relationship_options,
-        span: 4
-      )
-    )
+    |> Form.line(&Form.radio_button_list(&1, :relationship_to_case, "Relationship to case", @relationship_options, span: 4))
     |> Form.line(&Form.checkbox_field(&1, :same_household, nil, "This person lives in the same household", span: 8))
     |> Form.line(&Form.checkbox_field(&1, :under_18, "Age", "This person is under 18 years old", span: 8))
     |> contact_information.(under_18)
     |> Form.line(&Form.text_field(&1, :dob, "Date of birth", span: 4))
-    |> Form.line(
-      &Form.radio_button_list(
-        &1,
-        :preferred_language,
-        "Preferred Language",
-        @preferred_language_options,
-        span: 4
-      )
-    )
+    |> Form.line(&Form.radio_button_list(&1, :preferred_language, "Preferred Language", @preferred_language_options, span: 4))
     |> Form.line(
       &Form.date_field(
         &1,

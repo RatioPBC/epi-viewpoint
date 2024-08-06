@@ -30,9 +30,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupController do
            }}
         )
 
-        conn
-        |> Session.put_multifactor_auth_success(true)
-        |> redirect(to: Routes.root_path(conn, :show))
+        conn |> Session.put_multifactor_auth_success(true) |> redirect(to: Routes.root_path(conn, :show))
 
       {:error, message} ->
         conn
@@ -54,7 +52,6 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupController do
 
   defp assign_multifactor_auth_key(conn) do
     base_32_encoded_secret = conn |> Session.get_multifactor_auth_secret() |> MultifactorAuth.encode_secret()
-
     conn |> assign(:secret, base_32_encoded_secret)
   end
 

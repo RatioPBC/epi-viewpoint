@@ -12,9 +12,7 @@ defmodule EpicenterWeb.UserSessionController do
   def new(conn, _params) do
     case {Accounts.count_users(), Application.get_env(:epicenter, :initial_user_email)} do
       {0, nil} ->
-        conn
-        |> assign_defaults(@common_assigns)
-        |> render("new.html", error_message: "No users have been set up")
+        conn |> assign_defaults(@common_assigns) |> render("new.html", error_message: "No users have been set up")
 
       {0, initial_user_email} ->
         conn |> register_initial_user(initial_user_email)
@@ -27,10 +25,7 @@ defmodule EpicenterWeb.UserSessionController do
   def create(conn, %{"user" => %{"email" => email, "password" => password} = user_params}) do
     if user = Accounts.get_user(email: email, password: password),
       do: UserAuth.log_in_user(conn, user, user_params),
-      else:
-        conn
-        |> assign_defaults(@common_assigns)
-        |> render("new.html", error_message: "Invalid email or password")
+      else: conn |> assign_defaults(@common_assigns) |> render("new.html", error_message: "Invalid email or password")
   end
 
   def delete(conn, _params),
@@ -39,12 +34,7 @@ defmodule EpicenterWeb.UserSessionController do
   # # #
 
   defp register_initial_user(conn, initial_user_email) do
-    new_user_attrs = %{
-      email: initial_user_email,
-      password: Euclid.Extra.Random.string(),
-      name: "Initial Admin User",
-      admin: true
-    }
+    new_user_attrs = %{email: initial_user_email, password: Euclid.Extra.Random.string(), name: "Initial Admin User", admin: true}
 
     audit_meta = %AuditLog.Meta{
       author_id: Application.get_env(:epicenter, :unpersisted_admin_id),
@@ -64,13 +54,10 @@ defmodule EpicenterWeb.UserSessionController do
 
             errors ->
               validation_errors = Enum.map(errors, fn {message, _} -> message end) |> Enum.join(", ")
-
               "Initial user email address “#{initial_user_email}” is invalid: #{validation_errors}"
           end
 
-        conn
-        |> assign_defaults(@common_assigns)
-        |> render("new.html", error_message: error_message)
+        conn |> assign_defaults(@common_assigns) |> render("new.html", error_message: error_message)
     end
   end
 end

@@ -22,15 +22,8 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
   def mount(%{"id" => case_investigation_id}, session, socket) do
     socket = socket |> authenticate_user(session)
-
-    case_investigation =
-      case_investigation_id
-      |> Cases.get_case_investigation(socket.assigns.current_user)
-      |> Cases.preload_person()
-
-    case_investigation =
-      case_investigation
-      |> Map.replace(:person, case_investigation.person |> Cases.preload_demographics())
+    case_investigation = case_investigation_id |> Cases.get_case_investigation(socket.assigns.current_user) |> Cases.preload_person()
+    case_investigation = case_investigation |> Map.replace(:person, case_investigation.person |> Cases.preload_demographics())
 
     socket
     |> assign_defaults()
@@ -46,12 +39,9 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
   end
 
   def handle_event("save", %{"start_interview_form" => params}, socket) do
-    with %Ecto.Changeset{} = form_changeset <-
-           StartInterviewForm.changeset(socket.assigns.case_investigation, params),
-         {:form, {:ok, cast_investigation_attrs}} <-
-           {:form, StartInterviewForm.investigation_attrs(form_changeset)},
-         {:case_investigation, {:ok, _case_investigation}} <-
-           {:case_investigation, update_case_investigation(socket, cast_investigation_attrs)} do
+    with %Ecto.Changeset{} = form_changeset <- StartInterviewForm.changeset(socket.assigns.case_investigation, params),
+         {:form, {:ok, cast_investigation_attrs}} <- {:form, StartInterviewForm.investigation_attrs(form_changeset)},
+         {:case_investigation, {:ok, _case_investigation}} <- {:case_investigation, update_case_investigation(socket, cast_investigation_attrs)} do
       socket
       |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
@@ -61,10 +51,7 @@ defmodule EpicenterWeb.CaseInvestigationStartInterviewLive do
 
       {:case_investigation, {:error, _}} ->
         socket
-        |> assign_form_changeset(
-          StartInterviewForm.changeset(socket.assigns.case_investigation, params),
-          "An unexpected error occurred"
-        )
+        |> assign_form_changeset(StartInterviewForm.changeset(socket.assigns.case_investigation, params), "An unexpected error occurred")
         |> noreply()
     end
   end

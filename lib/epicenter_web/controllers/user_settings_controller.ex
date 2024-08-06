@@ -7,7 +7,7 @@ defmodule EpicenterWeb.UserSettingsController do
   alias Epicenter.AuditLog
   alias EpicenterWeb.UserAuth
 
-  plug(:assign_password_changeset)
+  plug :assign_password_changeset
 
   @common_assigns [page_title: "Settings"]
 
@@ -34,14 +34,10 @@ defmodule EpicenterWeb.UserSettingsController do
         |> UserAuth.log_in_user(user)
 
       {:error, changeset} ->
-        conn
-        |> assign_defaults(@common_assigns)
-        |> render("edit.html", password_changeset: changeset)
+        conn |> assign_defaults(@common_assigns) |> render("edit.html", password_changeset: changeset)
     end
   end
 
   defp assign_password_changeset(conn, _opts),
-    do:
-      conn
-      |> assign(:password_changeset, Accounts.change_user_password(conn.assigns.current_user))
+    do: conn |> assign(:password_changeset, Accounts.change_user_password(conn.assigns.current_user))
 end

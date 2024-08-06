@@ -4,8 +4,7 @@ defmodule EpicenterWeb.LiveComponent.Helpers do
   defmacro component(module, id, opts \\ [], do_block \\ []) do
     quote do
       is_stateful =
-        Enum.member?(unquote(module).__info__(:functions), {:handle_event, 3}) ||
-          Enum.member?(unquote(module).__info__(:functions), {:preload, 1})
+        Enum.member?(unquote(module).__info__(:functions), {:handle_event, 3}) || Enum.member?(unquote(module).__info__(:functions), {:preload, 1})
 
       opts =
         case is_stateful do

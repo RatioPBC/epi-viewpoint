@@ -143,10 +143,7 @@ defmodule EpicenterWeb.FormHelpers do
   defp predefined_values(values), do: values
 
   defp input_list_label_role(form, field),
-    do:
-      [form.name, Atom.to_string(field)]
-      |> Enum.map(&String.replace(&1, "_", "-"))
-      |> Enum.join("-")
+    do: [form.name, Atom.to_string(field)] |> Enum.map(&String.replace(&1, "_", "-")) |> Enum.join("-")
 
   def select_with_wrapper(form, field, options, html_opts \\ []) do
     data = html_opts |> Keyword.get(:data)

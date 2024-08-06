@@ -15,10 +15,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-
-    contact_investigation =
-      ContactInvestigations.get(id, socket.assigns.current_user)
-      |> ContactInvestigations.preload_exposed_person()
+    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
@@ -68,12 +65,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
   # # #
 
   defp reasons(_) do
-    [
-      "Unable to reach",
-      "Another contact investigation already underway",
-      "Transferred to another jurisdiction",
-      "Deceased"
-    ]
+    ["Unable to reach", "Another contact investigation already underway", "Transferred to another jurisdiction", "Deceased"]
   end
 
   defp discontinue_form_builder(changeset) do

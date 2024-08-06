@@ -10,16 +10,16 @@ defmodule EpicenterWeb.Forms.PlaceForm do
   @required_attrs ~w{}a
   @optional_attrs ~w{name street street_2 city state postal_code type contact_name contact_phone contact_email}a
   embedded_schema do
-    field(:name, :string)
-    field(:street, :string)
-    field(:street_2, :string)
-    field(:city, :string)
-    field(:state, :string)
-    field(:postal_code, :string)
-    field(:type, :string)
-    field(:contact_name, :string)
-    field(:contact_phone, :string)
-    field(:contact_email, :string)
+    field :name, :string
+    field :street, :string
+    field :street_2, :string
+    field :city, :string
+    field :state, :string
+    field :postal_code, :string
+    field :type, :string
+    field :contact_name, :string
+    field :contact_phone, :string
+    field :contact_email, :string
   end
 
   def changeset(_place, attrs) do

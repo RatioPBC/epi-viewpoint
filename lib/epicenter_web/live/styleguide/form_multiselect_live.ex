@@ -2,14 +2,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
   use EpicenterWeb, :live_view
 
   import EpicenterWeb.LiveHelpers,
-    only: [
-      assign_defaults: 1,
-      assign_form_changeset: 2,
-      assign_form_changeset: 3,
-      assign_page_title: 2,
-      noreply: 1,
-      ok: 1
-    ]
+    only: [assign_defaults: 1, assign_form_changeset: 2, assign_form_changeset: 3, assign_page_title: 2, noreply: 1, ok: 1]
 
   alias Epicenter.MajorDetailed
   alias EpicenterWeb.Form
@@ -24,14 +17,14 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     @primary_key false
 
     embedded_schema do
-      field(:radios, :string)
-      field(:radios_with_other, :string)
-      field(:radios_with_other_preselected, :string)
-      field(:checkboxes, {:array, :string})
-      field(:radios_and_checkboxes, {:array, :string})
-      field(:radios_and_checkboxes_with_other, {:array, :string})
-      field(:radios_with_nested_checkboxes, :map)
-      field(:radios_and_checkboxes_with_nested_checkboxes, :map)
+      field :radios, :string
+      field :radios_with_other, :string
+      field :radios_with_other_preselected, :string
+      field :checkboxes, {:array, :string}
+      field :radios_and_checkboxes, {:array, :string}
+      field :radios_and_checkboxes_with_other, {:array, :string}
+      field :radios_with_nested_checkboxes, :map
+      field :radios_and_checkboxes_with_nested_checkboxes, :map
     end
 
     @required_attrs ~w{
@@ -88,14 +81,14 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
     @primary_key false
 
     embedded_schema do
-      field(:radios, :string)
-      field(:radios_with_other, :map)
-      field(:radios_with_other_preselected, :map)
-      field(:checkboxes, {:array, :string})
-      field(:radios_and_checkboxes, {:array, :string})
-      field(:radios_and_checkboxes_with_other, :map)
-      field(:radios_with_nested_checkboxes, :map)
-      field(:radios_and_checkboxes_with_nested_checkboxes, :map)
+      field :radios, :string
+      field :radios_with_other, :map
+      field :radios_with_other_preselected, :map
+      field :checkboxes, {:array, :string}
+      field :radios_and_checkboxes, {:array, :string}
+      field :radios_and_checkboxes_with_other, :map
+      field :radios_with_nested_checkboxes, :map
+      field :radios_and_checkboxes_with_nested_checkboxes, :map
     end
 
     @required_attrs ~w{
@@ -159,50 +152,18 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
         radios_and_checkboxes: example.radios_and_checkboxes,
         radios_and_checkboxes_with_other: example.radios_and_checkboxes_with_other |> MajorDetailed.for_form(standard_values),
         radios_with_nested_checkboxes: example.radios_with_nested_checkboxes |> MajorDetailed.for_form(standard_values),
-        radios_and_checkboxes_with_nested_checkboxes:
-          example.radios_and_checkboxes_with_nested_checkboxes
-          |> MajorDetailed.for_form(standard_values)
+        radios_and_checkboxes_with_nested_checkboxes: example.radios_and_checkboxes_with_nested_checkboxes |> MajorDetailed.for_form(standard_values)
       }
     end
   end
 
   @specs %{
-    radios: [
-      {:radio, "R1", "r1"},
-      {:radio, "R2", "r2"},
-      {:radio, "R3", "r3"},
-      {:radio, "R4", "r4"}
-    ],
-    radios_with_other: [
-      {:radio, "R1", "r1"},
-      {:radio, "R2", "r2"},
-      {:radio, "R3", "r3"},
-      {:other_radio, "Other", "r4"}
-    ],
-    radios_with_other_preselected: [
-      {:radio, "R1", "r1"},
-      {:radio, "R2", "r2"},
-      {:radio, "R3", "r3"},
-      {:other_radio, "Other", "r4"}
-    ],
-    checkboxes: [
-      {:checkbox, "C1", "c1"},
-      {:checkbox, "C2", "c2"},
-      {:checkbox, "C3", "c3"},
-      {:checkbox, "C4", "c4"}
-    ],
-    radios_and_checkboxes: [
-      {:radio, "R1", "r1"},
-      {:radio, "R2", "r2"},
-      {:checkbox, "C1", "c1"},
-      {:checkbox, "C2", "c2"}
-    ],
-    radios_and_checkboxes_with_other: [
-      {:radio, "R1", "r1"},
-      {:radio, "R2", "r2"},
-      {:checkbox, "C1", "c1"},
-      {:other_checkbox, "Other", "c2"}
-    ],
+    radios: [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:radio, "R4", "r4"}],
+    radios_with_other: [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:other_radio, "Other", "r4"}],
+    radios_with_other_preselected: [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:radio, "R3", "r3"}, {:other_radio, "Other", "r4"}],
+    checkboxes: [{:checkbox, "C1", "c1"}, {:checkbox, "C2", "c2"}, {:checkbox, "C3", "c3"}, {:checkbox, "C4", "c4"}],
+    radios_and_checkboxes: [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:checkbox, "C1", "c1"}, {:checkbox, "C2", "c2"}],
+    radios_and_checkboxes_with_other: [{:radio, "R1", "r1"}, {:radio, "R2", "r2"}, {:checkbox, "C1", "c1"}, {:other_checkbox, "Other", "c2"}],
     radios_with_nested_checkboxes: [
       {:radio, "R1", "r1"},
       {:radio, "R2", "r2", [{:checkbox, "C1", "c1"}, {:checkbox, "C2", "c2"}]},
@@ -245,8 +206,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
 
   def handle_event("save", %{"example_form" => params}, socket) do
     with %Ecto.Changeset{} = form_changeset <- ExampleForm.attrs_to_form_changeset(params),
-         {:example_form, {:ok, example_attrs}} <-
-           {:example_form, ExampleForm.example_attrs(form_changeset)},
+         {:example_form, {:ok, example_attrs}} <- {:example_form, ExampleForm.example_attrs(form_changeset)},
          {:example, {:ok, example}} <- {:example, Examples.create_example(example_attrs)} do
       socket |> assign_form_changeset(form_changeset) |> assign_example(example) |> noreply()
     else
@@ -254,9 +214,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
         socket |> assign_form_changeset(form_changeset, "Check the errors above") |> noreply()
 
       {:example, {:error, _}} ->
-        socket
-        |> assign_form_changeset(ExampleForm.changeset(params), "An unexpected error occurred")
-        |> noreply()
+        socket |> assign_form_changeset(ExampleForm.changeset(params), "An unexpected error occurred") |> noreply()
     end
   end
 
@@ -266,32 +224,17 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
       line
       |> Form.multiselect(:radios, "Radios", @specs.radios, span: 2)
       |> Form.multiselect(:radios_with_other, "With other", @specs.radios_with_other, span: 2)
-      |> Form.multiselect(
-        :radios_with_other_preselected,
-        "With other preselected",
-        @specs.radios_with_other_preselected,
-        span: 2
-      )
+      |> Form.multiselect(:radios_with_other_preselected, "With other preselected", @specs.radios_with_other_preselected, span: 2)
     end)
     |> Form.line(fn line ->
       line
       |> Form.multiselect(:checkboxes, "Checkboxes", @specs.checkboxes, span: 2)
       |> Form.multiselect(:radios_and_checkboxes, "Mixed", @specs.radios_and_checkboxes, span: 2)
-      |> Form.multiselect(
-        :radios_and_checkboxes_with_other,
-        "With other",
-        @specs.radios_and_checkboxes_with_other,
-        span: 2
-      )
+      |> Form.multiselect(:radios_and_checkboxes_with_other, "With other", @specs.radios_and_checkboxes_with_other, span: 2)
     end)
     |> Form.line(fn line ->
       line
-      |> Form.multiselect(
-        :radios_with_nested_checkboxes,
-        "Radios + nested checkboxes",
-        @specs.radios_with_nested_checkboxes,
-        span: 3
-      )
+      |> Form.multiselect(:radios_with_nested_checkboxes, "Radios + nested checkboxes", @specs.radios_with_nested_checkboxes, span: 3)
       |> Form.multiselect(
         :radios_and_checkboxes_with_nested_checkboxes,
         "Mixed + nested checkboxes",

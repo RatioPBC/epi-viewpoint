@@ -6,13 +6,9 @@ defmodule EpicenterWeb.UserResetPasswordController do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
 
-  plug(:get_user_by_reset_password_token when action in [:edit, :update])
+  plug :get_user_by_reset_password_token when action in [:edit, :update]
 
-  @common_assigns [
-    show_nav: false,
-    body_class: "body-background-color",
-    page_title: "Reset Password"
-  ]
+  @common_assigns [show_nav: false, body_class: "body-background-color", page_title: "Reset Password"]
 
   def new(conn, _params),
     do: conn |> assign_defaults(@common_assigns) |> render("new.html")
@@ -35,10 +31,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
   end
 
   def edit(conn, _params),
-    do:
-      conn
-      |> assign_defaults(@common_assigns)
-      |> render("edit.html", changeset: Accounts.change_user_password(conn.assigns.user))
+    do: conn |> assign_defaults(@common_assigns) |> render("edit.html", changeset: Accounts.change_user_password(conn.assigns.user))
 
   # Do not log in the user after reset password to avoid a
   # leaked token giving the user access to the account.

@@ -25,9 +25,9 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
 
     @primary_key false
     embedded_schema do
-      field(:clinical_status, :string)
-      field(:exposed_on, :string)
-      field(:symptoms, {:array, :string})
+      field :clinical_status, :string
+      field :exposed_on, :string
+      field :symptoms, {:array, :string}
     end
 
     @required_attrs ~w{}a
@@ -68,10 +68,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
 
   def mount(%{"id" => id}, session, socket) do
     socket = socket |> authenticate_user(session)
-
-    contact_investigation =
-      ContactInvestigations.get(id, socket.assigns.current_user)
-      |> ContactInvestigations.preload_exposed_person()
+    contact_investigation = ContactInvestigations.get(id, socket.assigns.current_user) |> ContactInvestigations.preload_exposed_person()
 
     socket
     |> assign_defaults()
@@ -86,21 +83,8 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
     exposed_on_explanation_text = "Last together with an initiating index case on #{Format.date(contact_investigation.most_recent_date_together)}"
 
     Form.new(form)
-    |> Form.line(
-      &Form.radio_button_list(
-        &1,
-        :clinical_status,
-        "Clinical Status",
-        CaseInvestigation.text_field_values(:clinical_status),
-        span: 5
-      )
-    )
-    |> Form.line(
-      &Form.date_field(&1, :exposed_on, "Exposure date",
-        explanation_text: exposed_on_explanation_text,
-        span: 5
-      )
-    )
+    |> Form.line(&Form.radio_button_list(&1, :clinical_status, "Clinical Status", CaseInvestigation.text_field_values(:clinical_status), span: 5))
+    |> Form.line(&Form.date_field(&1, :exposed_on, "Exposure date", explanation_text: exposed_on_explanation_text, span: 5))
     |> Form.line(&Form.checkbox_list(&1, :symptoms, "Symptoms", symptoms_options(), span: 5))
     |> Form.line(&Form.save_button(&1))
     |> Form.safe()
@@ -130,8 +114,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
              socket.assigns.contact_investigation,
              params
            ),
-         {:form, {:ok, contact_investigation_attrs}} <-
-           {:form, ClinicalDetailsForm.contact_investigation_attrs(form_changeset)},
+         {:form, {:ok, contact_investigation_attrs}} <- {:form, ClinicalDetailsForm.contact_investigation_attrs(form_changeset)},
          {:contact_investigation, {:ok, _contact_investigation}} <-
            {:contact_investigation, update_contact_investigation(socket, contact_investigation_attrs)} do
       person = socket.assigns.contact_investigation.exposed_person
@@ -155,12 +138,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
 
     new_changeset = ClinicalDetailsForm.changeset(socket.assigns.contact_investigation, params)
 
-    socket
-    |> assign(
-      confirmation_prompt: confirmation_prompt(new_changeset),
-      form_changeset: new_changeset
-    )
-    |> noreply()
+    socket |> assign(confirmation_prompt: confirmation_prompt(new_changeset), form_changeset: new_changeset) |> noreply()
   end
 
   defp update_contact_investigation(socket, params) do

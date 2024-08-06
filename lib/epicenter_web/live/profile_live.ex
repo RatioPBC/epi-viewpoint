@@ -3,10 +3,7 @@ defmodule EpicenterWeb.ProfileLive do
 
   import Epicenter.Cases.Person, only: [coalesce_demographics: 1]
   import EpicenterWeb.IconView, only: [arrow_down_icon: 0]
-
-  import EpicenterWeb.LiveHelpers,
-    only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
-
+  import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, assign_page_title: 2, authenticate_user: 2, noreply: 1, ok: 1]
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2, demographic_field: 3]
 
   import EpicenterWeb.Presenters.CaseInvestigationPresenter,
@@ -20,15 +17,11 @@ defmodule EpicenterWeb.ProfileLive do
       isolation_monitoring_history_items: 2
     ]
 
-  import EpicenterWeb.Presenters.InvestigationPresenter,
-    only: [displayable_clinical_status: 1, displayable_symptoms: 1]
-
+  import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
   import EpicenterWeb.Presenters.LabResultPresenter, only: [pretty_result: 1]
   import EpicenterWeb.Presenters.PeoplePresenter, only: [is_archived?: 1, is_editable?: 1]
   import EpicenterWeb.Presenters.PlacePresenter, only: [address: 1]
-
-  import EpicenterWeb.Unknown,
-    only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
+  import EpicenterWeb.Unknown, only: [string_or_unknown: 1, string_or_unknown: 2, list_or_unknown: 1, unknown_value: 0]
 
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
@@ -47,10 +40,7 @@ defmodule EpicenterWeb.ProfileLive do
     socket = socket |> authenticate_user(session)
 
     potential_person = Cases.get_person(person_id, socket.assigns.current_user)
-
-    person =
-      canonical_person(potential_person, socket.assigns.current_user, %{})
-      |> Cases.preload_demographics()
+    person = canonical_person(potential_person, socket.assigns.current_user, %{}) |> Cases.preload_demographics()
 
     socket
     |> assign_defaults(body_class: "body-background-color")
@@ -74,12 +64,7 @@ defmodule EpicenterWeb.ProfileLive do
   end
 
   def handle_info({:add_note, note_attrs, {foreign_key_name, subject}}, socket) do
-    note_attrs =
-      Map.merge(note_attrs, %{
-        foreign_key_name => subject.id,
-        author_id: socket.assigns.current_user.id
-      })
-
+    note_attrs = Map.merge(note_attrs, %{foreign_key_name => subject.id, author_id: socket.assigns.current_user.id})
     {reason_action, reason_event} = audit_log_data_for_adding_note(subject)
 
     Cases.create_investigation_note(
@@ -171,11 +156,7 @@ defmodule EpicenterWeb.ProfileLive do
     {:noreply, assign_updated_person(socket, updated_person)}
   end
 
-  def handle_event(
-        "remove-contact",
-        %{"contact-investigation-id" => contact_investigation_id},
-        socket
-      ) do
+  def handle_event("remove-contact", %{"contact-investigation-id" => contact_investigation_id}, socket) do
     with contact_investigation when not is_nil(contact_investigation) <-
            ContactInvestigations.get(contact_investigation_id, socket.assigns.current_user) do
       ContactInvestigations.update(
@@ -238,15 +219,11 @@ defmodule EpicenterWeb.ProfileLive do
 
   def handle_event("unarchive", _params, socket) do
     {:ok, updated_person} =
-      Cases.unarchive_person(
-        socket.assigns.person.id,
-        socket.assigns.current_user,
-        %AuditLog.Meta{
-          author_id: socket.assigns.current_user.id,
-          reason_action: AuditLog.Revision.unarchive_person_action(),
-          reason_event: AuditLog.Revision.profile_unarchive_person_event()
-        }
-      )
+      Cases.unarchive_person(socket.assigns.person.id, socket.assigns.current_user, %AuditLog.Meta{
+        author_id: socket.assigns.current_user.id,
+        reason_action: AuditLog.Revision.unarchive_person_action(),
+        reason_event: AuditLog.Revision.profile_unarchive_person_event()
+      })
 
     {:noreply, assign_updated_person(socket, updated_person)}
   end
@@ -343,8 +320,7 @@ defmodule EpicenterWeb.ProfileLive do
     "not_hispanic_latinx_or_spanish_origin" => "Not Hispanic, Latino/a, or Spanish origin",
     "hispanic_latinx_or_spanish_origin" => "Hispanic, Latino/a, or Spanish origin"
   }
-  def ethnicity_value(%Epicenter.Cases.Person{} = person),
-    do: person |> coalesce_demographics() |> ethnicity_value()
+  def ethnicity_value(%Epicenter.Cases.Person{} = person), do: person |> coalesce_demographics() |> ethnicity_value()
 
   def ethnicity_value(%{ethnicity: nil}),
     do: @ethnicity_values_map |> Map.get("unknown")
@@ -361,36 +337,24 @@ defmodule EpicenterWeb.ProfileLive do
     "cuban" => "Cuban",
     "another_hispanic_latinx_or_spanish_origin" => "Another Hispanic, Latino/a or Spanish origin"
   }
-  def detailed_ethnicity_value(%Epicenter.Cases.Person{} = person),
-    do: person |> coalesce_demographics() |> detailed_ethnicity_value()
+  def detailed_ethnicity_value(%Epicenter.Cases.Person{} = person), do: person |> coalesce_demographics() |> detailed_ethnicity_value()
 
   def detailed_ethnicity_value(detailed_ethnicity) do
     @detailed_ethnicity_values_map |> Map.get(detailed_ethnicity)
   end
 
-  def detailed_ethnicities(%Epicenter.Cases.Person{} = person),
-    do: person |> coalesce_demographics() |> detailed_ethnicities()
-
+  def detailed_ethnicities(%Epicenter.Cases.Person{} = person), do: person |> coalesce_demographics() |> detailed_ethnicities()
   def detailed_ethnicities(%{ethnicity: nil}), do: []
   def detailed_ethnicities(%{ethnicity: %{detailed: nil}}), do: []
   def detailed_ethnicities(person), do: person.ethnicity.detailed
 
-  defp canonical_person(%Person{merged_into_id: nil} = person, _current_user, _people_seen),
-    do: person
+  defp canonical_person(%Person{merged_into_id: nil} = person, _current_user, _people_seen), do: person
 
-  defp canonical_person(
-         %Person{merged_into_id: merged_into_id} = person,
-         current_user,
-         people_seen
-       ) do
+  defp canonical_person(%Person{merged_into_id: merged_into_id} = person, current_user, people_seen) do
     if people_seen[person.id] do
       person
     else
-      canonical_person(
-        Cases.get_person(merged_into_id, current_user),
-        current_user,
-        Map.put(people_seen, person.id, true)
-      )
+      canonical_person(Cases.get_person(merged_into_id, current_user), current_user, Map.put(people_seen, person.id, true))
     end
   end
 end

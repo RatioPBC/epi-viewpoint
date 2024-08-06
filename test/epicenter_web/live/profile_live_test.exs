@@ -1119,9 +1119,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
           current_user: @admin
         )
 
-      updated_socket =
-        %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user, __changed__: %{}}} |> ProfileLive.assign_updated_person(alice)
-
+      updated_socket = %Phoenix.LiveView.Socket{assigns: %{person: alice, current_user: user, __changed__: %{}}} |> ProfileLive.assign_updated_person(alice)
       assert updated_socket.assigns.person.addresses |> tids() == ["address1"]
       assert updated_socket.assigns.person.assigned_to.tid == "assignee"
       assert updated_socket.assigns.person.lab_results |> tids() == ["lab1"]
