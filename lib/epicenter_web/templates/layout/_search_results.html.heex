@@ -27,7 +27,7 @@
       </div>
     <% else %>
       <%= for person <- @search_results.visible do %>
-        <div class="search-result" data-role="search-result" data-tid={"#{person.tid}"}>
+        <div class="search-result" data-role="search-result" data-tid={person.tid}>
           <%= link(EpicenterWeb.Presenters.PeoplePresenter.full_name_and_external_ids(person),
             to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person),
             data_role: "search-result-name"
@@ -49,10 +49,10 @@
           </button>
           <%= for page <- @search_results.pages do %>
             <button
-              data-page-number={"#{page}"}
+              data-page-number={page}
               disabled={@search_results.current == page}
               phx-click="search-goto"
-              phx-value-page={"#{page}"}
+              phx-value-page={page}
             >
               <%= page %>
             </button>

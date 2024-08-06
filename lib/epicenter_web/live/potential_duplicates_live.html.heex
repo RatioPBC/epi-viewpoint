@@ -1,7 +1,7 @@
 <div
   data-page="potential-duplicates"
   data-role="potential-duplicates-page"
-  data-tid={"#{@person.tid}"}
+  data-tid={@person.tid}
   id="potential-duplicates-page"
 >
   <section>
@@ -32,7 +32,7 @@
         </thead>
         <tbody>
           <%= for person <- @duplicate_people do %>
-            <tr data-role="duplicate-person" data-tid={"#{person.tid}"}>
+            <tr data-role="duplicate-person" data-tid={person.tid}>
               <td>
                 <%= checkbox(f, :people,
                   name: "selected_people[]",

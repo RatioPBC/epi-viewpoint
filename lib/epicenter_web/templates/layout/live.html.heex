@@ -55,7 +55,7 @@
       </div>
     </header>
   <% end %>
-  <main data-body-class={"#{@body_class}"} id="main" phx-hook="MainHook" role="main">
+  <main data-body-class={@body_class} id="main" phx-hook="MainHook" role="main">
     <%= if assigns[:search_results] do %>
       <%= render("_search_results.html",
         search_results: @search_results,

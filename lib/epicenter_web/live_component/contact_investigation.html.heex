@@ -1,8 +1,8 @@
 <section
   class="contact-investigation"
-  data-contact-investigation-id={"#{@contact_investigation.id}"}
+  data-contact-investigation-id={@contact_investigation.id}
   data-role="contact-investigation"
-  data-tid={"#{@contact_investigation.tid}"}
+  data-tid={@contact_investigation.tid}
 >
   <header>
     <h2 data-role="contact-investigation-title">Contact investigation <%= Format.date(@contact_investigation.most_recent_date_together) %></h2>
@@ -32,7 +32,7 @@
       <div class="contact-investigation-status-row">
         <h3>
           <span
-            class={"#{status_class(@contact_investigation.interview_status)}"}
+            class={status_class(@contact_investigation.interview_status)}
             data-role="contact-investigation-interview-status"
           ><%= status_text(@contact_investigation) %></span>
           interview
@@ -82,7 +82,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr data-tid={"#{@contact_investigation.tid}"}>
+            <tr data-tid={@contact_investigation.tid}>
               <td data-role="contact-investigation-clinical-status-text"><%= displayable_clinical_status(@contact_investigation) %></td>
               <td data-role="contact-investigation-exposed-on-date-text"><%= Format.date(@contact_investigation.exposed_on, "None") %></td>
               <td data-role="contact-investigation-symptoms-text"><%= displayable_symptoms(@contact_investigation) %></td>

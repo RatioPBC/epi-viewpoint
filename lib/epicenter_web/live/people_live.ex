@@ -43,7 +43,7 @@ defmodule EpicenterWeb.PeopleFilter do
         checked={@display_people_assigned_to_me}
         data-tid="assigned-to-me-checkbox"
         phx-click="toggle-assigned-to-me"
-        phx-target={"#{@myself}"}
+        phx-target={@myself}
         type="checkbox"
       /><span>My assignments only</span>
     </label>

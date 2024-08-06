@@ -16,7 +16,7 @@
               <option></option>
               <option value="-unassigned-">Unassigned</option>
               <%= for user <- @users do %>
-                <option value={"#{user.id}"}><%= user.name %></option>
+                <option value={user.id}><%= user.name %></option>
               <% end %>
             </select>
           </div>
@@ -26,7 +26,7 @@
         </div>
       </form>
       <button
-        data-confirm={"#{archive_confirmation_message(@selected_people)}"}
+        data-confirm={archive_confirmation_message(@selected_people)}
         data-role="archive-button"
         disabled={disabled?(@selected_people)}
         id="archive-button"
@@ -66,9 +66,9 @@
           <td>
             <input
               checked={selected?(@selected_people, case_investigation.person)}
-              data-tid={"#{case_investigation.person.tid}"}
+              data-tid={case_investigation.person.tid}
               phx-click="checkbox-click"
-              phx-value-person-id={"#{case_investigation.person.id}"}
+              phx-value-person-id={case_investigation.person.id}
               type="checkbox"
             />
           </td>

@@ -1,4 +1,4 @@
-<div data-page="place-search" data-tid={"#{@case_investigation.tid}"} id="place-page">
+<div data-page="place-search" data-tid={@case_investigation.tid} id="place-page">
   <section>
     <header id="subnav">
       <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do %>
@@ -29,7 +29,7 @@
             role="combobox"
             spellcheck="false"
             type="text"
-            value={"#{@query}"}
+            value={@query}
           />
           <ul
             data-role="place-search-results"
@@ -62,9 +62,9 @@
               <li
                 aria-selected="false"
                 data-role="place-search-result"
-                data-tid={"#{place_address.tid}"}
+                data-tid={place_address.tid}
                 phx-click="choose-place-address"
-                phx-value-place-address-id={"#{place_address.id}"}
+                phx-value-place-address-id={place_address.id}
                 role="option"
                 tabindex="-1"
               >

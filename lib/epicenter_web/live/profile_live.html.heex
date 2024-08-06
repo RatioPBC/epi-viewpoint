@@ -1,4 +1,4 @@
-<div data-page="profile" data-role="profile-page" data-tid={"#{@person.tid}"} id="profile-page">
+<div data-page="profile" data-role="profile-page" data-tid={@person.tid} id="profile-page">
   <%= if @person.archived_by != nil do %>
     <div data-role="archived-banner" id="archived-banner">
       <span>This record was archived on <%= Format.date(@person.archived_at) %> by <%= @person.archived_by.name %>.</span>
@@ -39,12 +39,12 @@
     <form id="assignment-form" phx-change="form-change">
       <div id="user-list">
         <div id="assignee-label">Assignee</div>
-        <div data-unset={"#{unassigned?(@person)}"} id="select-wrapper">
+        <div data-unset={unassigned?(@person)} id="select-wrapper">
           <%= arrow_down_icon() %>
           <select data-role="users" name="user">
             <option selected={selected?(nil, @person)} value="-unassigned-">Unassigned</option>
             <%= for user <- @users do %>
-              <option selected={selected?(user, @person)} value={"#{user.id}"}><%= user.name %></option>
+              <option selected={selected?(user, @person)} value={user.id}><%= user.name %></option>
             <% end %>
           </select>
         </div>
@@ -112,8 +112,8 @@
   <%= for case_investigation <- @case_investigations do %>
     <section
       class="case-investigation"
-      data-tid={"#{case_investigation.tid}"}
-      id={"#{"case-investigation-#{case_investigation.name}"}"}
+      data-tid={case_investigation.tid}
+      id={"case-investigation-#{case_investigation.name}"}
     >
       <div>
         <header>
@@ -158,7 +158,7 @@
           <div class="clinical-details">
             <div class="clinical-details-header-row">
               <h4>
-                <span id={"#{"clinical-details-#{case_investigation.name}"}"}>Clinical</span>
+                <span id={"clinical-details-#{case_investigation.name}"}>Clinical</span>
               </h4>
               <div class="links">
                 <%= if is_editable?(@person) do %>
@@ -186,7 +186,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr data-tid={"#{case_investigation.tid}"}>
+                <tr data-tid={case_investigation.tid}>
                   <td data-role="case-investigation-clinical-status-text"><%= displayable_clinical_status(case_investigation) %></td>
                   <td data-role="case-investigation-symptom-onset-date-text"><%= Format.date(case_investigation.symptom_onset_on, "None") %></td>
                   <td data-role="case-investigation-symptoms-text"><%= displayable_symptoms(case_investigation) %></td>
@@ -194,7 +194,7 @@
               </tbody>
             </table>
           </div>
-          <div class="case-investigation-contacts" id={"#{"contacts-#{case_investigation.name}"}"}>
+          <div class="case-investigation-contacts" id={"contacts-#{case_investigation.name}"}>
             <div class="contacts-header-row">
               <h4><span>Contacts</span></h4>
               <div>
@@ -246,7 +246,7 @@
                     data-role="remove-contact"
                     href="#"
                     phx-click="remove-contact"
-                    phx-value-contact-investigation-id={"#{contact_investigation.id}"}
+                    phx-value-contact-investigation-id={contact_investigation.id}
                   >Remove</a>
                 </div>
               </div>
@@ -273,7 +273,7 @@
               </div>
             </div>
             <%= for visit <- case_investigation.visits do %>
-              <div class="visit" data-tid={"#{visit.tid}"}>
+              <div class="visit" data-tid={visit.tid}>
                 <div>
                   <span class="place-name" data-role="place-name"><%= visit.place.name %></span><span
                     class="visit-address"
@@ -298,11 +298,11 @@
                 </div>
                 <div class="visit-remove">
                   <a
-                    data-confirm={"#{"Remove #{address(visit.place)} as a place visited?"}"}
+                    data-confirm={"Remove #{address(visit.place)} as a place visited?"}
                     data-role="remove-visit"
                     href="#"
                     phx-click="remove-visit"
-                    phx-value-visit-id={"#{visit.id}"}
+                    phx-value-visit-id={visit.id}
                   >
                     Remove
                   </a>
@@ -315,7 +315,7 @@
           <div>
             <div
               class="case-investigation-isolation-monitoring-status"
-              id={"#{"isolation-monitoring-#{case_investigation.name}"}"}
+              id={"isolation-monitoring-#{case_investigation.name}"}
             >
               <h3 class="status" data-role="status">
                 <%= displayable_isolation_monitoring_status(case_investigation, @current_date) %>
@@ -415,7 +415,7 @@
         </thead>
         <tbody>
           <%= for lab_result <- @person.lab_results do %>
-            <tr data-tid={"#{lab_result.tid}"}>
+            <tr data-tid={lab_result.tid}>
               <td><%= string_or_unknown(Format.date(lab_result.sampled_on)) %></td>
               <td><%= pretty_result(lab_result.result) %></td>
               <td><%= string_or_unknown(lab_result.request_facility_name) %></td>

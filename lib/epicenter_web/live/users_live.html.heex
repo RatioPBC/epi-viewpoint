@@ -40,18 +40,18 @@
             <%= if user.password_reset_url do %>
               <button
                 data-role="close-reset-password"
-                data-tid={"#{user.tid}"}
+                data-tid={user.tid}
                 phx-click="close-reset-password"
-                phx-value-user-id={"#{user.id}"}
+                phx-value-user-id={user.id}
               >
                 Done
               </button>
             <% else %>
               <button
                 data-role="reset-password"
-                data-tid={"#{user.tid}"}
+                data-tid={user.tid}
                 phx-click="reset-password"
-                phx-value-user-id={"#{user.id}"}
+                phx-value-user-id={user.id}
               >
                 Set/reset password
               </button>
@@ -66,7 +66,7 @@
                   <div class="reset-password-message">
                     Securely send this link to the user to allow them to set or reset their password:
                     <a
-                      data-clipboard-value={"#{user.password_reset_url}"}
+                      data-clipboard-value={user.password_reset_url}
                       href="javascript:void(0)"
                       id={"copy-to-clipboard-#{user.id}"}
                       phx-hook="CopyToClipboard"
@@ -76,10 +76,10 @@
                   </div>
                   <input
                     data-role="reset-password-link"
-                    data-tid={"#{user.tid}"}
+                    data-tid={user.tid}
                     readonly="true"
                     type="text"
-                    value={"#{user.password_reset_url}"}
+                    value={user.password_reset_url}
                   />
                 </fieldset>
               </form>

@@ -19,7 +19,7 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
 
   def render(assigns) do
     ~H"""
-    <div class="investigation-note" data-note-id={"#{@note.id}"} data-role="investigation-note">
+    <div class="investigation-note" data-note-id={@note.id} data-role="investigation-note">
       <div class="investigation-note-header">
         <span class="investigation-note-author" data-role="investigation-note-author"><%= @note.author.name %></span><span data-role="investigation-note-date"><%= Format.date(@note.inserted_at) %></span>
       </div>
@@ -32,7 +32,7 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
             data-role="delete-note"
             href="#"
             phx-click="delete-note"
-            phx-target={"#{@myself}"}
+            phx-target={@myself}
           >
             Delete
           </a>

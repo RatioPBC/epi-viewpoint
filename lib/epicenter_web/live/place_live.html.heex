@@ -1,4 +1,4 @@
-<div data-page="place" data-tid={"#{@case_investigation.tid}"} id="place-page">
+<div data-page="place" data-tid={@case_investigation.tid} id="place-page">
   <section>
     <header id="subnav">
       <%= live_redirect to: Routes.place_search_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceSearchLive, @case_investigation), data: [role: "back-link"] do %>
