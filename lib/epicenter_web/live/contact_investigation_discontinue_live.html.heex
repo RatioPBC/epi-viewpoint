@@ -1,5 +1,5 @@
 <div
-  data-confirm-navigation={"#{confirmation_prompt(@changeset)}"}
+  data-confirm-navigation={confirmation_prompt(@changeset)}
   data-contact-investigation-id={"#{@contact_investigation.id}"}
   data-role="contact-investigation-discontinue-page"
   id="contact-investigation-discontinue-page"
@@ -13,12 +13,10 @@
   </section>
   <div class="InvestigationDiscontinueForm">
     <header>
-      <h2 data-role="form-title">
-        <%= if(@contact_investigation.interview_discontinued_at,
+      <h2 data-role="form-title"><%= if(@contact_investigation.interview_discontinued_at,
           do: "Edit discontinue interview",
           else: "Discontinue interview"
-        ) %>
-      </h2>
+        ) %></h2>
       <h3 class="InvestigationDiscontinueForm__Subtitle">before interview start</h3>
     </header>
     <%= form_for @changeset, "#", [id: "contact-investigation-discontinue-form", class: "InvestigationDiscontinueForm__Form", phx_change: "change", phx_submit: "save"], fn f -> %>

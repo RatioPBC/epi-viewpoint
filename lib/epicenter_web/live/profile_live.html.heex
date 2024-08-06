@@ -1,17 +1,14 @@
 <div data-page="profile" data-role="profile-page" data-tid={"#{@person.tid}"} id="profile-page">
   <%= if @person.archived_by != nil do %>
     <div data-role="archived-banner" id="archived-banner">
-      <span>
-        This record was archived on <%= Format.date(@person.archived_at) %> by <%= @person.archived_by.name %>.
-      </span><button data-role="unarchive" id="unarchive" phx-click="unarchive">Unarchive</button>
+      <span>This record was archived on <%= Format.date(@person.archived_at) %> by <%= @person.archived_by.name %>.</span>
+      <button data-role="unarchive" id="unarchive" phx-click="unarchive">Unarchive</button>
     </div>
   <% end %>
   <section id="heading">
     <div>
       <div id="toolbar">
-        <h1 data-role="full-name" id="toolbar-left">
-          <%= string_or_unknown(Format.person(@person)) %>
-        </h1>
+        <h1 data-role="full-name" id="toolbar-left"><%= string_or_unknown(Format.person(@person)) %></h1>
         <div id="toolbar-right">
           <%= if is_editable?(@person) do %>
             <button
@@ -37,21 +34,19 @@
           <% end %>
         </div>
       </div>
-      <h3 data-role="external-id" id="external-id">
-        <%= demographic_field(@person, :external_id) |> Format.demographic(:external_id) %>
-      </h3>
+      <h3 data-role="external-id" id="external-id"><%= demographic_field(@person, :external_id) |> Format.demographic(:external_id) %></h3>
     </div>
     <form id="assignment-form" phx-change="form-change">
       <div id="user-list">
         <div id="assignee-label">Assignee</div>
         <div data-unset={"#{unassigned?(@person)}"} id="select-wrapper">
-          <%= arrow_down_icon() %><select data-role="users" name="user"><option
-  selected={"#{selected?(nil, @person)}"}
-  value="-unassigned-"
->Unassigned</option><%= for user <- @users do %><option
-  selected={"#{selected?(user, @person)}"}
-  value={"#{user.id}"}
-><%= user.name %></option><% end %></select>
+          <%= arrow_down_icon() %>
+          <select data-role="users" name="user">
+            <option selected={selected?(nil, @person)} value="-unassigned-">Unassigned</option>
+            <%= for user <- @users do %>
+              <option selected={selected?(user, @person)} value={"#{user.id}"}><%= user.name %></option>
+            <% end %>
+          </select>
         </div>
       </div>
     </form>
@@ -82,17 +77,13 @@
           <th>Email</th>
         </tr>
         <tr>
-          <td data-role="date-of-birth">
-            <%= string_or_unknown(
+          <td data-role="date-of-birth"><%= string_or_unknown(
               with(
                 dob when not is_nil(dob) <- demographic_field(@person, :dob),
                 do: Format.date(dob)
               )
-            ) %>
-          </td>
-          <td data-role="preferred-language">
-            <%= string_or_unknown(demographic_field(@person, :preferred_language)) %>
-          </td>
+            ) %></td>
+          <td data-role="preferred-language"><%= string_or_unknown(demographic_field(@person, :preferred_language)) %></td>
           <td data-role="phone-numbers"><%= list_or_unknown(phone_numbers(@person)) %></td>
           <td data-role="email-addresses"><%= list_or_unknown(email_addresses(@person)) %></td>
         </tr>
@@ -131,9 +122,7 @@
               Format.date(case_investigation.initiating_lab_result.reported_on)
             ) %>
           </h2>
-          <span class="case-investigation-timestamp" data-role="case-investigation-timestamp">
-            Created on <%= Format.date(case_investigation.inserted_at) %>
-          </span>
+          <span class="case-investigation-timestamp" data-role="case-investigation-timestamp">Created on <%= Format.date(case_investigation.inserted_at) %></span>
         </header>
         <div class="case-investigation-details" data-role="case-investigation-initiated-by">
           Initiated by positive lab result collected on <%= Format.date(
@@ -159,9 +148,8 @@
           <div class="case-investigation-history">
             <%= for history_item <- history_items(@person, case_investigation) do %>
               <div>
-                <span data-role="case-investigation-history-item-text">
-                  <%= history_item.text %>
-                </span><span class="history-item-link"><%= history_item.link %></span>
+                <span data-role="case-investigation-history-item-text"><%= history_item.text %></span>
+                <span class="history-item-link"><%= history_item.link %></span>
               </div>
             <% end %>
           </div>
@@ -199,15 +187,9 @@
               </thead>
               <tbody>
                 <tr data-tid={"#{case_investigation.tid}"}>
-                  <td data-role="case-investigation-clinical-status-text">
-                    <%= displayable_clinical_status(case_investigation) %>
-                  </td>
-                  <td data-role="case-investigation-symptom-onset-date-text">
-                    <%= Format.date(case_investigation.symptom_onset_on, "None") %>
-                  </td>
-                  <td data-role="case-investigation-symptoms-text">
-                    <%= displayable_symptoms(case_investigation) %>
-                  </td>
+                  <td data-role="case-investigation-clinical-status-text"><%= displayable_clinical_status(case_investigation) %></td>
+                  <td data-role="case-investigation-symptom-onset-date-text"><%= Format.date(case_investigation.symptom_onset_on, "None") %></td>
+                  <td data-role="case-investigation-symptoms-text"><%= displayable_symptoms(case_investigation) %></td>
                 </tr>
               </tbody>
             </table>
@@ -379,15 +361,11 @@
               </thead>
               <tbody>
                 <tr>
-                  <td data-tid="case-investigation-001-isolation-order-sent-date">
-                    <%= Format.date(case_investigation.isolation_order_sent_on, "Not sent") %>
-                  </td>
-                  <td data-tid="case-investigation-001-isolation-clearance-order-sent-date">
-                    <%= Format.date(
+                  <td data-tid="case-investigation-001-isolation-order-sent-date"><%= Format.date(case_investigation.isolation_order_sent_on, "Not sent") %></td>
+                  <td data-tid="case-investigation-001-isolation-clearance-order-sent-date"><%= Format.date(
                       case_investigation.isolation_clearance_order_sent_on,
                       "Not sent"
-                    ) %>
-                  </td>
+                    ) %></td>
                 </tr>
               </tbody>
             </table>
@@ -476,18 +454,10 @@
           <th>Race</th>
         </tr>
         <tr>
-          <td data-role="gender-identity">
-            <%= @person |> demographic_field(:gender_identity, :format) |> list_or_unknown() %>
-          </td>
-          <td data-role="sex-at-birth">
-            <%= @person |> demographic_field(:sex_at_birth, :format) |> string_or_unknown() %>
-          </td>
-          <td data-role="ethnicity">
-            <%= @person |> demographic_field(:ethnicity, :format) |> list_or_unknown() %>
-          </td>
-          <td data-role="race">
-            <%= @person |> demographic_field(:race, :format) |> list_or_unknown() %>
-          </td>
+          <td data-role="gender-identity"><%= @person |> demographic_field(:gender_identity, :format) |> list_or_unknown() %></td>
+          <td data-role="sex-at-birth"><%= @person |> demographic_field(:sex_at_birth, :format) |> string_or_unknown() %></td>
+          <td data-role="ethnicity"><%= @person |> demographic_field(:ethnicity, :format) |> list_or_unknown() %></td>
+          <td data-role="race"><%= @person |> demographic_field(:race, :format) |> list_or_unknown() %></td>
         </tr>
       </tbody>
       <tbody>
@@ -497,15 +467,9 @@
           <th>Occupation</th>
         </tr>
         <tr>
-          <td data-role="marital-status">
-            <%= @person |> demographic_field(:marital_status, :format) |> string_or_unknown() %>
-          </td>
-          <td data-role="employment">
-            <%= @person |> demographic_field(:employment, :format) |> string_or_unknown() %>
-          </td>
-          <td data-role="occupation">
-            <%= @person |> demographic_field(:occupation) |> string_or_unknown() %>
-          </td>
+          <td data-role="marital-status"><%= @person |> demographic_field(:marital_status, :format) |> string_or_unknown() %></td>
+          <td data-role="employment"><%= @person |> demographic_field(:employment, :format) |> string_or_unknown() %></td>
+          <td data-role="occupation"><%= @person |> demographic_field(:occupation) |> string_or_unknown() %></td>
         </tr>
       </tbody>
       <tbody>
@@ -513,9 +477,7 @@
           <th>Notes</th>
         </tr>
         <tr>
-          <td data-role="notes">
-            <%= @person |> demographic_field(:notes) |> string_or_unknown(unknown_text: "--") %>
-          </td>
+          <td data-role="notes"><%= @person |> demographic_field(:notes) |> string_or_unknown(unknown_text: "--") %></td>
         </tr>
       </tbody>
     </table>

@@ -5,14 +5,14 @@
   <div id="toolbar">
     <div id="toolbar-left">
       <form
-        data-disabled={"#{disabled?(@selected_people)}"}
+        data-disabled={disabled?(@selected_people)}
         id="assignment-form"
         phx-change="form-change"
       >
         <div id="user-list">
           <span id="assign-to-label">Assign to</span>
           <div id="select-wrapper">
-            <select data-role="users" disabled={"#{disabled?(@selected_people)}"} name="user">
+            <select data-role="users" disabled={disabled?(@selected_people)} name="user">
               <option></option>
               <option value="-unassigned-">Unassigned</option>
               <%= for user <- @users do %>
@@ -28,7 +28,7 @@
       <button
         data-confirm={"#{archive_confirmation_message(@selected_people)}"}
         data-role="archive-button"
-        disabled={"#{disabled?(@selected_people)}"}
+        disabled={disabled?(@selected_people)}
         id="archive-button"
         phx-click="archive"
       >
@@ -65,7 +65,7 @@
         <tr data-role="person">
           <td>
             <input
-              checked={"#{selected?(@selected_people, case_investigation.person)}"}
+              checked={selected?(@selected_people, case_investigation.person)}
               data-tid={"#{case_investigation.person.tid}"}
               phx-click="checkbox-click"
               phx-value-person-id={"#{case_investigation.person.id}"}

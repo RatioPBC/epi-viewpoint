@@ -11,7 +11,7 @@
       ) %><button
         data-confirm={"#{archive_confirmation_message(@selected_people)}"}
         data-role="archive-button"
-        disabled={"#{disabled?(@selected_people)}"}
+        disabled={disabled?(@selected_people)}
         id="archive-button"
         phx-click="archive"
       >Archive</button>
@@ -36,7 +36,7 @@
         <tr data-role="person">
           <td>
             <input
-              checked={"#{selected?(@selected_people, person)}"}
+              checked={selected?(@selected_people, person)}
               data-tid={"#{person.tid}"}
               phx-click="checkbox-click"
               phx-value-person-id={"#{person.id}"}

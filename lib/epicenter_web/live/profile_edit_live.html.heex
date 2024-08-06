@@ -1,5 +1,5 @@
 <div
-  data-confirm-navigation={"#{confirmation_prompt(@changeset)}"}
+  data-confirm-navigation={confirmation_prompt(@changeset)}
   data-page="profile-edit"
   data-role="profile-edit-page"
   id="profile-edit-page"
@@ -52,7 +52,7 @@
             </div>
           </fieldset>
           <fieldset
-            data-disabled={"#{!@preferred_language_is_other}"}
+            data-disabled={!@preferred_language_is_other}
             data-role="other-preferred-language"
             id="other-preferred-language"
           >

@@ -40,7 +40,7 @@ defmodule EpicenterWeb.PeopleFilter do
     </div>
     <label id="assigned-to-me-button">
       <input
-        checked={"#{@display_people_assigned_to_me}"}
+        checked={@display_people_assigned_to_me}
         data-tid="assigned-to-me-checkbox"
         phx-click="toggle-assigned-to-me"
         phx-target={"#{@myself}"}

@@ -35,16 +35,14 @@
           <div class="search-result-details" data-role="search-result-details">
             <%= EpicenterWeb.Presenters.PeoplePresenter.search_result_details(person) %>
           </div>
-          <div class="search-result-labs" data-role="search-result-labs">
-            <%= EpicenterWeb.Presenters.PeoplePresenter.latest_lab_result(person) %>
-          </div>
+          <div class="search-result-labs" data-role="search-result-labs"><%= EpicenterWeb.Presenters.PeoplePresenter.latest_lab_result(person) %></div>
         </div>
       <% end %>
       <div>
         <div id="search-results-pagination">
           <button
             data-role="search-prev"
-            disabled={"#{!@search_results.prev?}"}
+            disabled={!@search_results.prev?}
             phx-click="search-prev"
           >
             Previous
@@ -52,7 +50,7 @@
           <%= for page <- @search_results.pages do %>
             <button
               data-page-number={"#{page}"}
-              disabled={"#{@search_results.current == page}"}
+              disabled={@search_results.current == page}
               phx-click="search-goto"
               phx-value-page={"#{page}"}
             >
@@ -61,7 +59,7 @@
           <% end %>
           <button
             data-role="search-next"
-            disabled={"#{!@search_results.next?}"}
+            disabled={!@search_results.next?}
             phx-click="search-next"
           >
             Next
