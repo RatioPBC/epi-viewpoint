@@ -134,8 +134,7 @@ defmodule EpicenterWeb.FormTest do
       <fieldset>
         <label data-grid-row="1" data-grid-col="1" data-grid-span="4" for="movie_release_date">Release date</label>
         <div data-grid-row="2" data-grid-col="1" data-grid-span="4"><div>MM/DD/YYYY</div></div>
-        <input
-          data-grid-row="4"
+        <input data-grid-row="4"
           data-grid-col="1"
           data-grid-span="4"
           id="movie_release_date"
@@ -155,8 +154,7 @@ defmodule EpicenterWeb.FormTest do
       <fieldset>
         <label data-grid-row="1" data-grid-col="1" data-grid-span="2" for="movie_release_date">Release date</label>
         <div data-grid-row="2" data-grid-col="1" data-grid-span="2"><div>This is a cool release date!</div></div>
-        <input
-          data-grid-row="4"
+        <input data-grid-row="4"
           data-grid-col="1"
           data-grid-span="2"
           id="movie_release_date"
@@ -282,8 +280,7 @@ defmodule EpicenterWeb.FormTest do
       <label data-grid-row="1" data-grid-col="1" data-grid-span="3" for="movie_title">\v
         Title\v
       </label>
-      <textarea
-        data-grid-row="3" data-grid-col="1" data-grid-span="3"
+      <textarea data-grid-row="3" data-grid-col="1" data-grid-span="3"
         id="movie_title" name="movie[title]" rows="4">
     \v  Strange Brew\v
       </textarea>
@@ -301,8 +298,7 @@ defmodule EpicenterWeb.FormTest do
       <label data-grid-row="1" data-grid-col="1" data-grid-span="3" for="movie_title">\v
         Title\v
       </label>
-      <input
-        data-grid-row="3" data-grid-col="1" data-grid-span="3"
+      <input data-grid-row="3" data-grid-col="1" data-grid-span="3"
         id="movie_title" name="movie[title]" type="text" value="Strange Brew"
       />
     </fieldset>

@@ -51,8 +51,7 @@ defmodule EpicenterWeb.MultiselectTest do
       |> assert_html_eq("""
       <div class="label-wrapper">
         <label data-multiselect="parent" data-role="movie-genres">
-          <input
-            checked="checked"
+          <input checked="checked"
             id="movie_genres_comedy"
             name="movie[genres][major][values][]"
             type="checkbox"
@@ -62,8 +61,7 @@ defmodule EpicenterWeb.MultiselectTest do
       </div>
       <div class="label-wrapper">
         <label data-multiselect="parent" data-role="movie-genres">
-          <input
-            checked="checked"
+          <input checked="checked"
             id="movie_genres_scifi"
             name="movie[genres][major][values][]"
             type="checkbox"
@@ -254,16 +252,14 @@ defmodule EpicenterWeb.MultiselectTest do
       |> assert_html_eq("""
       <div class="label-wrapper">
         <label data-multiselect="parent" data-role="movie-genres">
-          <input
-            checked="checked"
+          <input checked="checked"
             id="movie_genres_other"
             name="movie[genres][_ignore][major][other]"
             type="radio"
             value="true"/>\v
           Other\v
           <div data-multiselect="text-wrapper">
-            <input
-              data-role="other-text"
+            <input data-role="other-text"
               id="movie_genres_other"
               name="movie[genres][major][other]"
               placeholder="Please specify"
@@ -329,16 +325,14 @@ defmodule EpicenterWeb.MultiselectTest do
       generated
       |> render()
       |> assert_html_eq("""
-      <input
-        checked="checked"
+      <input checked="checked"
         id="movie_genres_other"
         name="movie[genres][_ignore][major][other]"
         type="checkbox"
         value="true"/>\v
       Other\v
       <div data-multiselect="text-wrapper">
-        <input
-          data-role="other-text"
+        <input data-role="other-text"
           id="movie_genres_other"
           name="movie[genres][major][other]"
           placeholder="Please specify"

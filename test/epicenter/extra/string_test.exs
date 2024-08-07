@@ -52,7 +52,7 @@ defmodule Epicenter.Extra.StringTest do
         gnu
       """
       |> Extra.String.remove_marked_whitespace()
-      |> assert_eq("ant batcat dogeel foxgnu\n")
+      |> assert_eq("ant batcat dogeel foxgnu")
     end
   end
 
