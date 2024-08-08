@@ -214,7 +214,7 @@ defmodule EpicenterWeb.Styleguide.FormMultiselectLive do
         socket |> assign_form_changeset(form_changeset, "Check the errors above") |> noreply()
 
       {:example, {:error, _}} ->
-        socket |> assign_form_changeset(ExampleForm.changeset(params), "An unexpected error occurred") |> noreply()
+        socket |> assign_form_changeset(nil, "An unexpected error occurred") |> noreply()
     end
   end
 

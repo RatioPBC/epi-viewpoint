@@ -72,7 +72,7 @@ config :epicenter, EpicenterWeb.Endpoint,
 config :epicenter, mfa_issuer: System.fetch_env!("CANONICAL_HOST")
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n", level: :warn
+config :logger, :console, format: "[$level] $message\n", level: :warning
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

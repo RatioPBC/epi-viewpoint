@@ -52,6 +52,6 @@ defmodule Epicenter.Csv do
   rescue
     e ->
       hint = "make sure there are no spaces between the field separators (commas) and the quotes around field contents"
-      {:invalid_csv, "#{e.message} (#{hint})"}
+      {:invalid_csv, "#{Exception.message(e)} (#{hint})"}
   end
 end
