@@ -95,13 +95,13 @@ defmodule EpicenterWeb.FormTest do
       <div class="checkbox-list" data-grid-row="3" data-grid-col="1" data-grid-span="3">
 
         <label data-role="movie-genres">\v
-          <input checked="checked" id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/>Comedy\v
+          <input checked="checked" id="movie_genres_comedy" name="movie[genres][]" type="checkbox" value="comedy"/>Comedy\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>Drama\v
+          <input id="movie_genres_drama" name="movie[genres][]" type="checkbox" value="drama"/>Drama\v
         </label>
         <label data-role="movie-genres">\v
-          <input checked="checked" id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/>Musical\v
+          <input checked="checked" id="movie_genres_musical" name="movie[genres][]" type="checkbox" value="musical"/>Musical\v
         </label>
         <label data-role="movie-genres">\v
           <input checked="checked" id="movie_genres" name="movie[genres_other]" type="checkbox" value="true" />Other\v

@@ -60,7 +60,7 @@ defmodule Epicenter.MixProject do
       {:nimble_csv, "~> 1.0"},
       {:nimble_totp, "~> 0.1"},
       {:number, "~> 1.0"},
-      {:phoenix, "~> 1.6"},
+      {:phoenix, "== 1.6.15"},
       {:phoenix_ecto, "~> 4.1"},
       {:phoenix_html, "~> 3.1"},
       {:phoenix_integration, "~> 0.8", only: :test},

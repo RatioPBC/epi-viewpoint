@@ -15,7 +15,7 @@ defmodule EpicenterWeb.ContactsFilter do
           ),
         class: "button",
         data: [
-          active: assigns.filter in [:with_contact_investigation, nil],
+          active: to_string(assigns.filter in [:with_contact_investigation, nil]),
           role: "contacts-filter",
           tid: "all"
         ]
@@ -23,7 +23,7 @@ defmodule EpicenterWeb.ContactsFilter do
         to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_pending_interview),
         class: "button",
         data: [
-          active: assigns.filter == :with_pending_interview,
+          active: to_string(assigns.filter == :with_pending_interview),
           role: "contacts-filter",
           tid: "with_pending_interview"
         ]
@@ -31,7 +31,7 @@ defmodule EpicenterWeb.ContactsFilter do
         to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_ongoing_interview),
         class: "button",
         data: [
-          active: assigns.filter == :with_ongoing_interview,
+          active: to_string(assigns.filter == :with_ongoing_interview),
           role: "contacts-filter",
           tid: "with_ongoing_interview"
         ]
@@ -42,7 +42,7 @@ defmodule EpicenterWeb.ContactsFilter do
           ),
         class: "button",
         data: [
-          active: assigns.filter == :with_quarantine_monitoring,
+          active: to_string(assigns.filter == :with_quarantine_monitoring),
           role: "contacts-filter",
           tid: "with_quarantine_monitoring"
         ]

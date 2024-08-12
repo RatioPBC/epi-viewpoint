@@ -28,3 +28,4 @@ logfile
 .envrc.private
 /.nix-mix/
 /scripts/
+/.elixir_ls/

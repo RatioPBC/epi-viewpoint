@@ -11,28 +11,31 @@ defmodule EpicenterWeb.PeopleFilter do
       <%= live_patch("All",
         to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :all),
         class: "button",
-        data: [active: assigns.filter in [:all, nil], role: "people-filter", tid: "all"]
-      ) %><%= live_patch("Pending interview",
+        data: [active: to_string(assigns.filter in [:all, nil]), role: "people-filter", tid: "all"]
+      ) %>
+      <%= live_patch("Pending interview",
         to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :pending_interview),
         class: "button",
         data: [
-          active: assigns.filter == :pending_interview,
+          active: to_string(assigns.filter == :pending_interview),
           role: "people-filter",
           tid: "pending_interview"
         ]
-      ) %><%= live_patch("Ongoing interview",
+      ) %>
+      <%= live_patch("Ongoing interview",
         to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :ongoing_interview),
         class: "button",
         data: [
-          active: assigns.filter == :ongoing_interview,
+          active: to_string(assigns.filter == :ongoing_interview),
           role: "people-filter",
           tid: "ongoing_interview"
         ]
-      ) %><%= live_patch("Isolation monitoring",
+      ) %>
+      <%= live_patch("Isolation monitoring",
         to: Routes.people_path(@socket, EpicenterWeb.PeopleLive, filter: :isolation_monitoring),
         class: "button",
         data: [
-          active: assigns.filter == :isolation_monitoring,
+          active: to_string(assigns.filter == :isolation_monitoring),
           role: "people-filter",
           tid: "isolation_monitoring"
         ]

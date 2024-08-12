@@ -55,7 +55,7 @@ defmodule EpicenterWeb.Form do
   def footer(%Form.Line{} = line, error_message, opts \\ []) do
     opts = opts |> Keyword.put_new(:span, 8)
 
-    content_tag :footer, data: grid_data(1, line, opts) ++ [sticky: Keyword.get(opts, :sticky, false)] do
+    content_tag :footer, data: grid_data(1, line, opts) ++ [sticky: to_string(Keyword.get(opts, :sticky, false))] do
       [
         content_tag(:div, id: "form-footer-content") do
           [
