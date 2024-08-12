@@ -86,6 +86,7 @@ defmodule EpicenterWeb do
 
       # Import LiveView helpers (live_render, component, live_patch, etc)
       import Phoenix.LiveView.Helpers
+      import Phoenix.Component
       import EpicenterWeb.LiveComponent.Helpers
 
       # Import basic rendering functionality (render, render_layout, etc)

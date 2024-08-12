@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   import Phoenix.LiveView.Helpers
+  import Phoenix.Component
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
 
   alias Epicenter.Cases

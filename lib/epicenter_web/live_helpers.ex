@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.LiveHelpers do
   import Phoenix.LiveView
+  import Phoenix.Component
 
   alias Epicenter.Accounts
   alias EpicenterWeb.Endpoint
