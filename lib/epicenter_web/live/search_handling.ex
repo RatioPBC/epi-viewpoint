@@ -13,7 +13,7 @@ defmodule EpicenterWeb.SearchHandling do
 
       def handle_event("search-next", _, socket) do
         socket
-        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.next(socket.assigns.search_results))
+        |> Phoenix.Component.assign(:search_results, EpicenterWeb.Pagination.next(socket.assigns.search_results))
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
@@ -21,13 +21,13 @@ defmodule EpicenterWeb.SearchHandling do
         page = page |> Integer.parse() |> elem(0)
 
         socket
-        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.goto(socket.assigns.search_results, page))
+        |> Phoenix.Component.assign(:search_results, EpicenterWeb.Pagination.goto(socket.assigns.search_results, page))
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
       def handle_event("search-prev", _, socket) do
         socket
-        |> Phoenix.LiveView.assign(:search_results, EpicenterWeb.Pagination.previous(socket.assigns.search_results))
+        |> Phoenix.Component.assign(:search_results, EpicenterWeb.Pagination.previous(socket.assigns.search_results))
         |> EpicenterWeb.LiveHelpers.noreply()
       end
 
@@ -35,8 +35,8 @@ defmodule EpicenterWeb.SearchHandling do
         results = if results, do: EpicenterWeb.Pagination.new(results, per_page: 5), else: nil
 
         socket
-        |> Phoenix.LiveView.assign(:search_term, term)
-        |> Phoenix.LiveView.assign(:search_results, results)
+        |> Phoenix.Component.assign(:search_term, term)
+        |> Phoenix.Component.assign(:search_results, results)
       end
     end
   end

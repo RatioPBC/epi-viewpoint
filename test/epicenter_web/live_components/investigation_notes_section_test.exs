@@ -53,7 +53,7 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
 
     def render(assigns) do
       ~H"""
-      <%= component(
+      <%= l_component(
         InvestigationNotesSection,
         "displays-a-notes-section",
         notes: @notes,

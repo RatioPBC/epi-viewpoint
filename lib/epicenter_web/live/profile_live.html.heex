@@ -371,7 +371,7 @@
             </table>
           </div>
         <% end %>
-        <%= component(
+        <%= l_component(
           InvestigationNotesSection,
           case_investigation.id <> "note section",
           notes: case_investigation.notes,
@@ -385,7 +385,7 @@
   <% end %>
   <a id="contact-investigations"></a>
   <%= for contact_investigation <- @contact_investigations do %>
-    <%= component(
+    <%= l_component(
       ContactInvestigation,
       contact_investigation.id <> "contact investigation",
       contact_investigation: contact_investigation,

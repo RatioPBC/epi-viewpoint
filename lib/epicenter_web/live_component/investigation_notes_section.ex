@@ -11,7 +11,7 @@ defmodule EpicenterWeb.InvestigationNotesSection do
     <div class="investigation-notes-section">
       <h3 class="additional_notes">Additional Notes</h3>
       <%= if @is_editable do %>
-        <%= component(
+        <%= l_component(
           InvestigationNoteForm,
           @key <> "note form",
           current_user_id: @current_user_id,
@@ -19,7 +19,7 @@ defmodule EpicenterWeb.InvestigationNotesSection do
         ) %>
       <% end %>
       <%= for note <- @notes |> Enum.reverse() do %>
-        <%= component(InvestigationNoteComponent, note.id <> "note",
+        <%= l_component(InvestigationNoteComponent, note.id <> "note",
           note: note,
           is_editable: @is_editable,
           current_user_id: @current_user_id,

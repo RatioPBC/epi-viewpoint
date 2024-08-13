@@ -24,7 +24,7 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
     contact_investigation = %ContactInvestigation{id: "styleguide-contact-investigation"}
 
     ~H"""
-    <%= component(
+    <%= l_component(
       InvestigationNotesSection,
       "styleguide-note-section",
       current_user_id: "author-1",

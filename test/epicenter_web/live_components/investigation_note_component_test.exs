@@ -32,7 +32,7 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
 
     def render(assigns) do
       ~H"""
-      <%= component(
+      <%= l_component(
         InvestigationNoteComponent,
         "renders-a-note",
         note: @note,

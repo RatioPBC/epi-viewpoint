@@ -17,7 +17,7 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
 
     def render(assigns) do
       ~H"""
-      <%= component(
+      <%= l_component(
         InvestigationNoteForm,
         "renders-a-form",
         on_add: @on_add

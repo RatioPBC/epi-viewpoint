@@ -4,7 +4,7 @@
   </h2>
   <div id="toolbar">
     <div id="toolbar-left">
-      <%= component(EpicenterWeb.AssignmentSelector, "assignment-selection",
+      <%= l_component(EpicenterWeb.AssignmentSelector, "assignment-selection",
         users: @users,
         disabled: disabled?(@selected_people),
         on_assignee_selected: fn user_id -> send(self(), {:assignee_selected, user_id}) end
@@ -17,7 +17,7 @@
       >Archive</button>
     </div>
     <div id="toolbar-right">
-      <%= component(ContactsFilter, "contacts filter", filter: @filter) %>
+      <%= l_component(ContactsFilter, "contacts filter", filter: @filter) %>
     </div>
   </div>
   <table data-role="contacts">

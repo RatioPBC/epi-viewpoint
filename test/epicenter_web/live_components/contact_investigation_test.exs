@@ -61,7 +61,7 @@ defmodule EpicenterWeb.ContactInvestigationTest do
 
     def render(assigns) do
       ~H"""
-      <%= component(
+      <%= l_component(
         ContactInvestigation,
         "renders-a-contact-investigation",
         contact_investigation: @contact_investigation,

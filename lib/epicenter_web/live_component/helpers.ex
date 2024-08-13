@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.LiveComponent.Helpers do
   require Phoenix.LiveView.Helpers
 
-  defmacro component(module, id, opts \\ [], do_block \\ []) do
+  defmacro l_component(module, id, opts \\ [], do_block \\ []) do
     quote do
       is_stateful =
         Enum.member?(unquote(module).__info__(:functions), {:handle_event, 3}) || Enum.member?(unquote(module).__info__(:functions), {:preload, 1})
