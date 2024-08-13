@@ -37,19 +37,12 @@
     </div>
     <div id="toolbar-right">
       <.live_component
-        module={EpicenterWeb.PeopleFilter}
-        id="people-filter"
-        display_people_assigned_to_me={@display_people_assigned_to_me}
-        filter={@filter}
-        on_toggle_assigned_to_me={&on_toggle_assigned_to_me/0} />
-
-      <%= if @display_import_button,
-        do:
-          live_redirect("Import labs",
-            to: "/import/start",
-            id: "import-labs",
-            data_role: "import-labs"
-          ) %>
+      module={EpicenterWeb.PeopleFilter}
+      id="people-filter"
+      display_people_assigned_to_me={@display_people_assigned_to_me}
+      filter={@filter}
+      on_toggle_assigned_to_me={&on_toggle_assigned_to_me/0} />
+      <.link :if={@display_import_button} navigate={"/import/start"} data-role="import-labs" id="import-labs">Import labs</.link>
     </div>
   </div>
   <table data-role="people">
@@ -76,14 +69,7 @@
             />
           </td>
           <td>
-            <%= live_redirect(full_name(case_investigation.person),
-              to:
-                Routes.profile_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.ProfileLive,
-                  case_investigation.person
-                )
-            ) %>
+            <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, case_investigation.person)}><%= full_name(case_investigation.person) %></.link>
           </td>
           <td><%= external_id(case_investigation.person) %></td>
           <td><%= Format.date(case_investigation.initiating_lab_result.sampled_on) %></td>

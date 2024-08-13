@@ -1,9 +1,8 @@
 <div data-page="place-search" data-tid={@case_investigation.tid} id="place-page">
   <section>
     <header id="subnav">
-      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do %>
-        <%= back_icon() %><span>Back</span>
-      <% end %>
+      <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person)}
+             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section>
@@ -46,16 +45,9 @@
                 tabindex="-1"
               >
                 <div><%= @no_results_message %></div>
-                <%= live_redirect("+ Add new place",
-                  to:
-                    Routes.new_place_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.PlaceLive,
-                      @case_investigation
-                    ),
-                  data_role: "no-results-add-new-place",
-                  class: "new-place-link"
-                ) %>
+                <.link navigate={Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, @case_investigation)}
+                       class="new-place-link"
+                       data-role="no-results-add-new-place">+ Add new place</.link>
               </li>
             <% end %>
             <%= for place_address <- @result_place_addresses do %>
@@ -68,30 +60,17 @@
                 role="option"
                 tabindex="-1"
               >
-                <%= live_redirect \
-                    to: Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, @case_investigation, place: place_address.place, place_address: place_address),
-                    data_role: "place_address_link",
-                    data_tid: place_address.tid \
-                do %>
-                  <span class="place-name"><%= place_address.place.name %></span><span><%= address(
-  place_address
-) %></span>
-                <% end %>
+                <.link navigate={Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, @case_investigation, place: place_address.place, place_address: place_address)}
+                       data-role="place_address_link"  data-tid={place_address.tid}>
+                  <span class="place-name"><%= place_address.place.name %></span><span><%= address(place_address) %></span></.link>
               </li>
             <% end %>
           </ul>
         </div>
       </form>
-      <%= live_redirect("+ Add new place",
-        to:
-          Routes.new_place_path(
-            EpicenterWeb.Endpoint,
-            EpicenterWeb.PlaceLive,
-            @case_investigation
-          ),
-        data_role: "add-new-place",
-        class: "new-place-link"
-      ) %>
+      <.link navigate={Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, @case_investigation)}
+             class="new-place-link"
+             data-role="add-new-place">+ Add new place</.link>
     </div>
   </section>
 </div>
