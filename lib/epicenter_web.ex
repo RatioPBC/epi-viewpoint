@@ -45,7 +45,7 @@ defmodule EpicenterWeb do
   def live_view do
     quote do
       use Phoenix.HTML
-      use Phoenix.LiveView, layout: {EpicenterWeb.LayoutView, "live.html"}
+      use Phoenix.LiveView, layout: {EpicenterWeb.LayoutView, :live}
       use EpicenterWeb.SearchHandling
 
       unquote(view_helpers())
