@@ -53,15 +53,16 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
 
     def render(assigns) do
       ~H"""
-      <%= l_component(
-        InvestigationNotesSection,
-        "displays-a-notes-section",
-        notes: @notes,
-        is_editable: true,
-        current_user_id: @current_user_id,
-        on_add_note: @on_add_note,
-        on_delete_note: @on_delete_note
-      ) %>
+      <.live_component
+        module={InvestigationNotesSection}
+        id="displays-a-notes-section"
+        key="displays-a-notes-section"
+        notes={@notes}
+        is_editable={true}
+        current_user_id={@current_user_id}
+        on_add_note={@on_add_note}
+        on_delete_note={@on_delete_note}
+      />
       """
     end
 

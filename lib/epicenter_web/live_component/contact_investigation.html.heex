@@ -113,15 +113,16 @@
       </div>
     <% end %>
     <div class="contact-investigation-notes">
-      <%= l_component(
-        InvestigationNotesSection,
-        @contact_investigation.id <> "note section",
-        notes: @contact_investigation.notes,
-        is_editable: is_editable?(@contact_investigation.exposed_person),
-        current_user_id: @current_user_id,
-        on_add_note: @on_add_note,
-        on_delete_note: @on_delete_note
-      ) %>
+      <.live_component
+        module={InvestigationNotesSection}
+        id={@contact_investigation.id <> "note section"}
+        key={@contact_investigation.id <> "note section"}
+        notes={@contact_investigation.notes}
+        is_editable={is_editable?(@contact_investigation.exposed_person)}
+        current_user_id={@current_user_id}
+        on_add_note={@on_add_note}
+        on_delete_note={@on_delete_note}
+      />
     </div>
   </div>
 </section>

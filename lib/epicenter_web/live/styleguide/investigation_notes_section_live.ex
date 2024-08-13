@@ -17,23 +17,23 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
     |> assign(current_user: %User{})
     |> assign_page_title("Styleguide: note")
     |> assign(notes: example_notes())
+    |> assign(contact_investigation: %ContactInvestigation{id: "styleguide-contact-investigation"})
     |> ok()
   end
 
   def render(assigns) do
-    contact_investigation = %ContactInvestigation{id: "styleguide-contact-investigation"}
-
     ~H"""
-    <%= l_component(
-      InvestigationNotesSection,
-      "styleguide-note-section",
-      current_user_id: "author-1",
-      subject: contact_investigation,
-      notes: @notes,
-      is_editable: true,
-      on_add_note: &on_add/1,
-      on_delete_note: &on_delete/1
-    ) %>
+    <.live_component
+      module = {InvestigationNotesSection}
+      id = "styleguide-note-section"
+      key = "styleguide-note-section"
+      current_user_id = "author-1"
+      subject = {@contact_investigation}
+      notes = {@notes}
+      is_editable = {true}
+      on_add_note = {&on_add/1}
+      on_delete_note = {&on_delete/1}
+    />
     """
     |> Map.put(:root, true)
   end

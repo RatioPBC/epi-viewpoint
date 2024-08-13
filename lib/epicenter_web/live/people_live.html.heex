@@ -36,11 +36,14 @@
       </button>
     </div>
     <div id="toolbar-right">
-      <%= l_component(PeopleFilter, "people filter",
-        display_people_assigned_to_me: @display_people_assigned_to_me,
-        filter: @filter,
-        on_toggle_assigned_to_me: &on_toggle_assigned_to_me/0
-      ) %><%= if @display_import_button,
+      <.live_component
+        module={EpicenterWeb.PeopleFilter}
+        id="people-filter"
+        display_people_assigned_to_me={@display_people_assigned_to_me}
+        filter={@filter}
+        on_toggle_assigned_to_me={&on_toggle_assigned_to_me/0} />
+
+      <%= if @display_import_button,
         do:
           live_redirect("Import labs",
             to: "/import/start",

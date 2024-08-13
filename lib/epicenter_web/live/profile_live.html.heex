@@ -371,29 +371,28 @@
             </table>
           </div>
         <% end %>
-        <%= l_component(
-          InvestigationNotesSection,
-          case_investigation.id <> "note section",
-          notes: case_investigation.notes,
-          is_editable: is_editable?(@person),
-          current_user_id: @current_user.id,
-          on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
-          on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
-        ) %>
+        <.live_component
+          module={InvestigationNotesSection}
+          id={case_investigation.id <> "note section"}
+          key={case_investigation.id <> "note section"}
+          notes={case_investigation.notes}
+          is_editable={is_editable?(@person)}
+          current_user_id={@current_user.id}
+          on_add_note={fn note_attrs -> on_note_added(note_attrs, case_investigation) end}
+          on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end} />
       </div>
     </section>
   <% end %>
   <a id="contact-investigations"></a>
   <%= for contact_investigation <- @contact_investigations do %>
-    <%= l_component(
-      ContactInvestigation,
-      contact_investigation.id <> "contact investigation",
-      contact_investigation: contact_investigation,
-      current_user_id: @current_user.id,
-      current_date: @current_date,
-      on_add_note: fn note_attrs -> on_note_added(note_attrs, contact_investigation) end,
-      on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end
-    ) %>
+    <.live_component
+      module={ContactInvestigation}
+      id={contact_investigation.id <> "contact investigation"}
+      contact_investigation={contact_investigation}
+      current_user_id={@current_user.id}
+      current_date={@current_date}
+      on_add_note={fn note_attrs -> on_note_added(note_attrs, contact_investigation) end}
+      on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end} />
   <% end %>
   <section data-role="lab-results" id="lab-results">
     <header>
