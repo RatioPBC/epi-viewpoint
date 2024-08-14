@@ -2,14 +2,14 @@
   <section>
     <h2>Settings</h2>
   </section>
-  <%= if get_flash(@conn, :info) do %>
-    <section id="flash"><%= get_flash(@conn, :info) %></section>
+  <%= if Phoenix.Flash.get(@flash, :info) do %>
+    <section id="flash"><%= Phoenix.Flash.get(@flash, :info) %></section>
   <% end %>
-  <%= if get_flash(@conn, :error) do %>
-    <section id="flash-error"><%= get_flash(@conn, :error) %></section>
+  <%= if Phoenix.Flash.get(@flash, :error) do %>
+    <section id="flash-error"><%= Phoenix.Flash.get(@flash, :error) %></section>
   <% end %>
-  <%= if get_flash(@conn, :extra) do %>
-    <section id="flash-extra"><%= get_flash(@conn, :extra) %></section>
+  <%= if Phoenix.Flash.get(@flash, :extra) do %>
+    <section id="flash-extra"><%= Phoenix.Flash.get(@flash, :extra) %></section>
   <% end %>
   <div id="change-password">
     <header>Change password</header>

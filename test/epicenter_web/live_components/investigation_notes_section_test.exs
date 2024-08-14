@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.InvestigationNotesSectionTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.InvestigationNote
@@ -31,7 +30,6 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
   defmodule TestLiveView do
     use EpicenterWeb, :live_view
 
-    import EpicenterWeb.LiveComponent.Helpers
     import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, noreply: 1]
 
     alias Epicenter.Accounts

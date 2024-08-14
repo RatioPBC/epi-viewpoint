@@ -59,16 +59,9 @@
           <div class="links">
             <%= if is_editable?(@contact_investigation.exposed_person) do %>
               <span>
-                <%= live_redirect("Edit",
-                  to:
-                    Routes.contact_investigation_clinical_details_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.ContactInvestigationClinicalDetailsLive,
-                      @contact_investigation
-                    ),
-                  class: "contact-investigation-clinical-details-link",
-                  data: [role: "edit-contact-clinical-details-link"]
-                ) %>
+                <.link navigate={Routes.contact_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationClinicalDetailsLive, @contact_investigation)}
+                data-role="edit-contact-clinical-details-link"
+                class="contact-investigation-clinical-details-link">Edit</.link>
               </span>
             <% end %>
           </div>

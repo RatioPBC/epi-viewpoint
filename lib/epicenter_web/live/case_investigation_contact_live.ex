@@ -201,7 +201,7 @@ defmodule EpicenterWeb.CaseInvestigationContactLive do
          data = data |> Map.put(:exposing_case_id, socket.assigns.case_investigation.id),
          {:created, {:ok, _}} <- {:created, create_or_update_contact_investigation(contact_investigation, data, socket.assigns.current_user)} do
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
+      |> push_navigate(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
     else
       {:form, {:error, changeset}} ->

@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.InvestigationNoteComponentTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
   alias Epicenter.Accounts.User

@@ -4,8 +4,6 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   import EpicenterWeb.LiveHelpers,
     only: [assign_defaults: 1, assign_page_title: 2, ok: 1, noreply: 1]
 
-  import EpicenterWeb.LiveComponent.Helpers
-
   alias Epicenter.Accounts.User
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.InvestigationNote

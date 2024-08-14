@@ -8,45 +8,10 @@ defmodule EpicenterWeb.ContactsFilter do
   def render(assigns) do
     ~H"""
     <div id="status-filter">
-      <%= live_patch("All",
-        to:
-          Routes.contacts_path(@socket, EpicenterWeb.ContactsLive,
-            filter: :with_contact_investigation
-          ),
-        class: "button",
-        data: [
-          active: to_string(assigns.filter in [:with_contact_investigation, nil]),
-          role: "contacts-filter",
-          tid: "all"
-        ]
-      ) %><%= live_patch("Pending interview",
-        to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_pending_interview),
-        class: "button",
-        data: [
-          active: to_string(assigns.filter == :with_pending_interview),
-          role: "contacts-filter",
-          tid: "with_pending_interview"
-        ]
-      ) %><%= live_patch("Ongoing interview",
-        to: Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_ongoing_interview),
-        class: "button",
-        data: [
-          active: to_string(assigns.filter == :with_ongoing_interview),
-          role: "contacts-filter",
-          tid: "with_ongoing_interview"
-        ]
-      ) %><%= live_patch("Quarantine monitoring",
-        to:
-          Routes.contacts_path(@socket, EpicenterWeb.ContactsLive,
-            filter: :with_quarantine_monitoring
-          ),
-        class: "button",
-        data: [
-          active: to_string(assigns.filter == :with_quarantine_monitoring),
-          role: "contacts-filter",
-          tid: "with_quarantine_monitoring"
-        ]
-      ) %>
+      <.link patch={Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_contact_investigation)} class="button" data-active={to_string(assigns.filter in [:with_contact_investigation, nil])} data-role="contacts-filter" data-tid="all">All</.link>
+      <.link patch={Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_pending_interview)} class="button" data-active={to_string(assigns.filter == :with_pending_interview)} data-role="contacts-filter" data-tid="with_pending_interview">Pending interview</.link>
+      <.link patch={Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_ongoing_interview)} class="button" data-active={to_string(assigns.filter == :with_ongoing_interview)} data-role="contacts-filter" data-tid="with_ongoing_interview">Ongoing interview</.link>
+      <.link patch={Routes.contacts_path(@socket, EpicenterWeb.ContactsLive, filter: :with_quarantine_monitoring)} class="button" data-active={to_string(assigns.filter == :with_quarantine_monitoring)} data-role="contacts-filter" data-tid="with_quarantine_monitoring">Quarantine monitoring</.link>
     </div>
     """
     |> Map.put(:root, true)

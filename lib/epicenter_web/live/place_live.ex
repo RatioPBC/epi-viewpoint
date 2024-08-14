@@ -40,7 +40,7 @@ defmodule EpicenterWeb.PlaceLive do
       place_address = if Euclid.Exists.present?(place.place_addresses), do: List.first(place.place_addresses), else: nil
 
       socket
-      |> push_redirect(
+      |> push_navigate(
         to:
           Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, socket.assigns.case_investigation,
             place: place,

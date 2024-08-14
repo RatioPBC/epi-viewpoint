@@ -44,7 +44,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
     duplicate_person_ids = socket.assigns[:selected_people] |> Enum.join(",")
 
     socket
-    |> push_redirect(
+    |> push_navigate(
       to:
         "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive, socket.assigns[:person])}?duplicate_person_ids=#{
           duplicate_person_ids

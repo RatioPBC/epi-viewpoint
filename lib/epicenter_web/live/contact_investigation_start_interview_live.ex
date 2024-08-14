@@ -44,7 +44,7 @@ defmodule EpicenterWeb.ContactInvestigationStartInterviewLive do
          {:contact_investigation, {:ok, _contact_investigation}} <-
            {:contact_investigation, update_contact_investigation(socket, cast_investigation_attrs)} do
       socket
-      |> push_redirect(
+      |> push_navigate(
         to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#contact-investigations"
       )
       |> noreply()
