@@ -1,8 +1,8 @@
 <div data-page="mfa-setup" id="mfa-setup-page">
   <section>
     <h2>Set up multi-factor authentication</h2>
-    <%= if get_flash(@conn, :error) do %>
-      <% error = get_flash(@conn, :error) %>
+    <%= if Phoenix.Flash.get(@flash, :error) do %>
+      <% error = Phoenix.Flash.get(@flash, :error) %>
       <div data-form-error-message={error} id="flash-error"><%= error %></div>
     <% end %>
     <p>

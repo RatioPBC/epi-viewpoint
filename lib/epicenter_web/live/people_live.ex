@@ -55,7 +55,6 @@ defmodule EpicenterWeb.PeopleLive do
   alias Epicenter.CaseInvestigationFilterError
   alias Epicenter.Cases
   alias EpicenterWeb.Format
-  alias EpicenterWeb.PeopleFilter
 
   @clock Application.compile_env(:epicenter, :clock)
 

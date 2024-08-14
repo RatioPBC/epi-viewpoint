@@ -41,7 +41,7 @@ defmodule EpicenterWeb.ContactsLive do
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations
   alias Epicenter.ContactsFilterError
-  alias EpicenterWeb.ContactsFilter
+
 
   @clock Application.compile_env(:epicenter, :clock)
 
