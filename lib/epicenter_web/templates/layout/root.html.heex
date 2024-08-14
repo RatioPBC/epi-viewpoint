@@ -4,7 +4,9 @@
     <meta charset="utf-8" /><meta content="IE=edge" http-equiv="X-UA-Compatible" /><meta
       content="width=device-width, initial-scale=1.0"
       name="viewport"
-    /><%= csrf_meta_tag() %><%= live_title_tag(assigns[:page_title] || "", suffix: " · Viewpoint") %><link
+    /><%= csrf_meta_tag() %>
+    <.live_title suffix=" · Viewpoint"><%= assigns[:page_title] || "" %></.live_title>
+    <link
       href="/apple-touch-icon.png"
       rel="apple-touch-icon"
       sizes="180x180"
