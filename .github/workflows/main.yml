@@ -18,13 +18,9 @@ jobs:
     env:
       MIX_ENV: test
 
-    strategy:
-      matrix:
-        postgres-version: [16.4-alpine, 17beta3-alpine⁠]
-
     services:
       postgres:
-        image: postgres:${{ matrix.postgres-version }}
+        image: postgres:16.4-alpine
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
@@ -41,7 +37,7 @@ jobs:
            fetch-depth: 0
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: '27'
+          otp-version: '27.0.1'
           elixir-version: '1.17.2'
 
       - name: Install dependencies
@@ -63,4 +59,3 @@ jobs:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           SECRET_KEY_BASE: iuJS3FLMrRqbKug/CE4zGGd31eY6FMdmpQGjy8RMaQoxk59wAvSxuUKM6c/uaOo4
-        continue-on-error: ${{ matrix.postgres-version == '17beta3-alpine⁠' }}
