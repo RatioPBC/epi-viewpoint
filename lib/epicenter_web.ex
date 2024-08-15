@@ -85,13 +85,12 @@ defmodule EpicenterWeb do
     quote do
       # Use all HTML functionality (forms, tags, etc)
       import Phoenix.HTML
-import Phoenix.HTML.Form
-use PhoenixHTMLHelpers
+      import Phoenix.HTML.Form
+      use PhoenixHTMLHelpers
 
       # Import LiveView helpers (live_render, component, live_patch, etc)
       import Phoenix.LiveView.Helpers
       import Phoenix.Component
-      import EpicenterWeb.LiveComponent.Helpers
 
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View

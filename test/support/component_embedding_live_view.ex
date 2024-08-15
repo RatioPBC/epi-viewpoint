@@ -5,7 +5,6 @@ defmodule EpicenterWeb.Test.ComponentEmbeddingLiveView do
     quote do
       use EpicenterWeb, :live_view
 
-      import EpicenterWeb.LiveComponent.Helpers
       import EpicenterWeb.LiveHelpers, only: [assign_defaults: 2, noreply: 1]
 
       def mount(_params, _session, socket) do
