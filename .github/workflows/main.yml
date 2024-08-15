@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        postgres-version: [16.4-alpine, 17-alpine]  # Add PostgreSQL 17
+        postgres-version: [16.4-alpine, 17beta3-alpine⁠]
 
     services:
       postgres:
@@ -41,7 +41,7 @@ jobs:
            fetch-depth: 0
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: '27.0.1'
+          otp-version: '27'
           elixir-version: '1.17.2'
 
       - name: Install dependencies
@@ -63,4 +63,4 @@ jobs:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           SECRET_KEY_BASE: iuJS3FLMrRqbKug/CE4zGGd31eY6FMdmpQGjy8RMaQoxk59wAvSxuUKM6c/uaOo4
-        continue-on-error: ${{ matrix.postgres-version == '17-alpine' }}
+        continue-on-error: ${{ matrix.postgres-version == '17beta3-alpine⁠' }}
