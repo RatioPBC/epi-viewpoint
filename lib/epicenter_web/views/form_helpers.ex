@@ -1,5 +1,6 @@
 defmodule EpicenterWeb.FormHelpers do
-  use Phoenix.HTML
+  import Phoenix.HTML.Form
+  use PhoenixHTMLHelpers
 
   alias EpicenterWeb.IconView
 

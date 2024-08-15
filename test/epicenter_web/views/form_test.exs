@@ -24,9 +24,10 @@ defmodule EpicenterWeb.FormTest do
   @genres [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}]
 
   defp phx_form(data \\ %{}) do
-    %Movie{}
-    |> Ecto.Changeset.change(Enum.into(data, %{}))
-    |> Phoenix.HTML.Form.form_for("/url")
+    form_data =
+      %Movie{}
+      |> Ecto.Changeset.change(Enum.into(data, %{}))
+    %{Phoenix.HTML.FormData.to_form(form_data, []) | action: "/url"}
   end
 
   # Convert a form into HTML and then parse into a list of 3-tuples, each of which is in the form:

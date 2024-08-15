@@ -17,9 +17,10 @@ defmodule EpicenterWeb.MultiselectTest do
   end
 
   defp phx_form(data) do
-    %Movie{}
-    |> Ecto.Changeset.change(Enum.into(data, %{}))
-    |> Phoenix.HTML.Form.form_for("/url")
+    form_data =
+      %Movie{}
+      |> Ecto.Changeset.change(Enum.into(data, %{}))
+    %{Phoenix.HTML.FormData.to_form(form_data, []) | action: "/url"}
   end
 
   defp parse(safe),

@@ -1,6 +1,6 @@
 defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   import Phoenix.LiveView.Helpers
-  import Phoenix.HTML.Tag
+  import PhoenixHTMLHelpers.Tag
 
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation

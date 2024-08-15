@@ -1,5 +1,5 @@
 defmodule EpicenterWeb.Form do
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   import EpicenterWeb.ErrorHelpers
 
