@@ -17,10 +17,14 @@ jobs:
     
     env:
       MIX_ENV: test
+    
+    strategy:
+      matrix:
+        postgres-version: [16.4-alpine]
 
     services:
       postgres:
-        image: postgres:16.4-alpine
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
