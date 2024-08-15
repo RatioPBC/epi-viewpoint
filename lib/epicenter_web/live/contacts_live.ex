@@ -42,7 +42,6 @@ defmodule EpicenterWeb.ContactsLive do
   alias Epicenter.ContactInvestigations
   alias Epicenter.ContactsFilterError
 
-
   @clock Application.compile_env(:epicenter, :clock)
 
   def mount(_params, session, socket) do

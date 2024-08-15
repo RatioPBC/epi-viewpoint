@@ -90,9 +90,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   defp interview_discontinued_at_history(contact_investigation) do
     %{
       text:
-        "Discontinued interview on #{format_date(contact_investigation.interview_discontinued_at)}: #{
-          contact_investigation.interview_discontinue_reason
-        }",
+        "Discontinued interview on #{format_date(contact_investigation.interview_discontinued_at)}: #{contact_investigation.interview_discontinue_reason}",
       link:
         link_if_editable(
           contact_investigation.exposed_person,
@@ -133,9 +131,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   defp quarantine_dates_history(contact_investigation) do
     %{
       text:
-        "Quarantine dates: #{Format.date(contact_investigation.quarantine_monitoring_starts_on)} - #{
-          Format.date(contact_investigation.quarantine_monitoring_ends_on)
-        }",
+        "Quarantine dates: #{Format.date(contact_investigation.quarantine_monitoring_starts_on)} - #{Format.date(contact_investigation.quarantine_monitoring_ends_on)}",
       link:
         link_if_editable(
           contact_investigation.exposed_person,
@@ -159,9 +155,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   defp quarantine_conclusion(contact_investigation) do
     %{
       text:
-        "Concluded quarantine monitoring on #{Format.date(contact_investigation.quarantine_concluded_at)}: #{
-          Gettext.gettext(Epicenter.Gettext, contact_investigation.quarantine_conclusion_reason)
-        }",
+        "Concluded quarantine monitoring on #{Format.date(contact_investigation.quarantine_concluded_at)}: #{Gettext.gettext(Epicenter.Gettext, contact_investigation.quarantine_conclusion_reason)}",
       link:
         link_if_editable(
           contact_investigation.exposed_person,

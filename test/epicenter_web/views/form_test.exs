@@ -27,6 +27,7 @@ defmodule EpicenterWeb.FormTest do
     form_data =
       %Movie{}
       |> Ecto.Changeset.change(Enum.into(data, %{}))
+
     %{Phoenix.HTML.FormData.to_form(form_data, []) | action: "/url"}
   end
 

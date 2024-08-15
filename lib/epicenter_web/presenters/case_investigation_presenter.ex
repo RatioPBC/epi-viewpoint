@@ -73,9 +73,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Discontinued interview on #{case_investigation.interview_discontinued_at |> Format.date_time_with_presented_time_zone()}: #{
-                case_investigation.interview_discontinue_reason
-              }",
+              "Discontinued interview on #{case_investigation.interview_discontinued_at |> Format.date_time_with_presented_time_zone()}: #{case_investigation.interview_discontinue_reason}",
             link:
               link_if_editable(
                 person,
@@ -197,9 +195,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_starts_on)} - #{
-                Format.date(case_investigation.isolation_monitoring_ends_on)
-              }",
+              "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_starts_on)} - #{Format.date(case_investigation.isolation_monitoring_ends_on)}",
             link:
               link_if_editable(
                 person,
@@ -227,9 +223,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text:
-              "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{
-                Gettext.gettext(Epicenter.Gettext, case_investigation.isolation_conclusion_reason)
-              }",
+              "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{Gettext.gettext(Epicenter.Gettext, case_investigation.isolation_conclusion_reason)}",
             link:
               link_if_editable(
                 person,

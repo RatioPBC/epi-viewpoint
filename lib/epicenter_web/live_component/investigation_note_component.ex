@@ -11,7 +11,8 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
     |> Enum.map(fn {assigns, socket} ->
       socket
       |> assign(assigns)
-      |> assign(:note, Cases.preload_author(assigns.note)) end)
+      |> assign(:note, Cases.preload_author(assigns.note))
+    end)
   end
 
   def render(assigns) do
@@ -44,5 +45,4 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
     socket.assigns.on_delete.(socket.assigns.note)
     socket |> noreply()
   end
-
 end

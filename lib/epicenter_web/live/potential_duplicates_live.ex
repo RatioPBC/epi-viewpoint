@@ -46,9 +46,7 @@ defmodule EpicenterWeb.PotentialDuplicatesLive do
     socket
     |> push_navigate(
       to:
-        "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive, socket.assigns[:person])}?duplicate_person_ids=#{
-          duplicate_person_ids
-        }"
+        "#{Routes.resolve_conflicts_path(socket, EpicenterWeb.ResolveConflictsLive, socket.assigns[:person])}?duplicate_person_ids=#{duplicate_person_ids}"
     )
     |> noreply
   end
