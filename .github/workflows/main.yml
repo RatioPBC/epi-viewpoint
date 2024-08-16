@@ -40,6 +40,8 @@ jobs:
         with:
            fetch-depth: 0
       - uses: erlef/setup-beam@v1
+        with:
+          version-file: .tool-versions
 
       - name: Install dependencies
         run: |
