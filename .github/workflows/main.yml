@@ -40,9 +40,6 @@ jobs:
         with:
            fetch-depth: 0
       - uses: erlef/setup-beam@v1
-        with:
-          otp-version: '27.0.1'
-          elixir-version: '1.17.2'
 
       - name: Install dependencies
         run: |
