@@ -79,7 +79,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
                }}
             )} do
       socket
-      |> push_redirect(
+      |> push_navigate(
         to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#contact-investigations"
       )
       |> noreply()

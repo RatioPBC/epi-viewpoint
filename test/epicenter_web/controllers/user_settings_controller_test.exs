@@ -1,6 +1,6 @@
 defmodule EpicenterWeb.UserSettingsControllerTest do
   use EpicenterWeb.ConnCase, async: true
-
+  alias Phoenix.Flash
   alias Epicenter.Accounts
   import Epicenter.AccountsFixtures
 
@@ -33,7 +33,7 @@ defmodule EpicenterWeb.UserSettingsControllerTest do
 
       assert redirected_to(new_password_conn) == Routes.user_settings_path(conn, :edit)
       assert get_session(new_password_conn, :user_token) != get_session(conn, :user_token)
-      assert get_flash(new_password_conn, :info) =~ "Password updated successfully"
+      assert Flash.get(new_password_conn.assigns.flash, :info) =~ "Password updated successfully"
       assert Accounts.get_user(email: user.email, password: "new valid password")
     end
 

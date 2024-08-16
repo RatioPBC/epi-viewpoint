@@ -1,9 +1,8 @@
 <div data-page="resolve-conflicts" data-role="resolve-conflicts-page" id="resolve-conflicts-page">
   <section>
     <header id="subnav">
-      <%= live_redirect to: Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person_id), data: [role: "back-link"] do %>
-        <%= back_icon() %><span>Back</span>
-      <% end %>
+      <.link navigate={Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person_id)}
+             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section id="potential-duplicates-details">

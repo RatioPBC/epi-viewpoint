@@ -21,7 +21,7 @@
         # erlang = pkgs.beam.interpreters.erlang;
 
         # use latest version of Erlang 27
-        erlang = final.beam.interpreters.erlang_25;
+        erlang = final.beam.interpreters.erlang_27;
 
         # specify exact version of Erlang OTP
         # erlang = pkgs.beam.interpreters.erlang.override {
@@ -40,7 +40,7 @@
         # elixir = pkgs-beam.elixir;
 
         # use latest version of Elixir 1.17
-        elixir = pkgs-beam.elixir_1_14;
+        elixir = pkgs-beam.elixir_1_17;
 
         # specify exact version of Elixir
         # elixir = pkgs-beam.elixir.override {
@@ -55,7 +55,7 @@
             # use the Elixr/OTP versions defined above; will also install OTP, mix, hex, rebar3
             elixir
             
-            postgresql_15
+            postgresql_16
 
             # mix needs it for downloading dependencies
             git

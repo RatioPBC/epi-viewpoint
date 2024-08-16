@@ -21,16 +21,10 @@
             </button>
           <% end %>
           <%= if @potential_duplicate_count > 0 and is_editable?(@person) do %>
-            <%= live_redirect("View potential duplicates (#{@potential_duplicate_count})",
-              id: "view-potential-duplicates",
-              to:
-                Routes.potential_duplicates_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.PotentialDuplicatesLive,
-                  @person
-                ),
-              data_role: "view-potential-duplicates"
-            ) %>
+            <.link navigate={Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person)}
+              id="view-potential-duplicates"
+              data-role="view-potential-duplicates">
+              View potential duplicates (<%= @potential_duplicate_count %>)</.link>
           <% end %>
         </div>
       </div>
@@ -56,15 +50,11 @@
       <h2>Profile</h2>
       <%= if is_editable?(@person) do %>
         <span>
-          <%= live_redirect("Update",
-            to:
-              Routes.profile_edit_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.ProfileEditLive,
-                @person
-              ),
-            data_role: "edit-identifying-information-link"
-          ) %>
+          <.link navigate={Routes.profile_edit_path(
+            EpicenterWeb.Endpoint,
+            EpicenterWeb.ProfileEditLive,
+            @person)}
+            data-role="edit-identifying-information-link">Update</.link>
         </span>
       <% end %>
     </header>
@@ -139,20 +129,12 @@
             <h3 class="status" data-role="status">
               <%= displayable_interview_status(case_investigation) %>
             </h3>
-            <div class="case-investigation-interview-buttons">
-              <%= for link <- interview_buttons(@person, case_investigation) do %>
-                <span><%= link %></span>
-              <% end %>
-            </div>
+            <.interview_buttons
+              :if={is_editable?(@person)}
+              person={@person}
+              case_investigation={case_investigation} />
           </div>
-          <div class="case-investigation-history">
-            <%= for history_item <- history_items(@person, case_investigation) do %>
-              <div>
-                <span data-role="case-investigation-history-item-text"><%= history_item.text %></span>
-                <span class="history-item-link"><%= history_item.link %></span>
-              </div>
-            <% end %>
-          </div>
+          <.history_items person={@person} case_investigation={case_investigation} />
         </div>
         <%= if case_investigation.interview_started_at != nil do %>
           <div class="clinical-details">
@@ -163,16 +145,11 @@
               <div class="links">
                 <%= if is_editable?(@person) do %>
                   <span>
-                    <%= live_redirect("Edit",
-                      to:
-                        Routes.case_investigation_clinical_details_path(
-                          EpicenterWeb.Endpoint,
-                          EpicenterWeb.CaseInvestigationClinicalDetailsLive,
-                          case_investigation
-                        ),
-                      id: "case-investigation-clinical-details-link-001",
-                      class: "case-investigation-clinical-details-link"
-                    ) %>
+                    <.link navigate={Routes.case_investigation_clinical_details_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.CaseInvestigationClinicalDetailsLive,
+                      case_investigation
+                    )} id="case-investigation-clinical-details-link-001" class="case-investigation-clinical-details-link">Edit</.link>
                   </span>
                 <% end %>
               </div>
@@ -199,16 +176,11 @@
               <h4><span>Contacts</span></h4>
               <div>
                 <%= if is_editable?(@person) do %>
-                  <%= live_redirect("+ Contact",
-                    to:
-                      Routes.create_case_investigation_contact_path(
-                        EpicenterWeb.Endpoint,
-                        EpicenterWeb.CaseInvestigationContactLive,
-                        case_investigation
-                      ),
-                    id: "add-contact-case-investigation-link-001",
-                    class: "add-contact-case-investigation-link"
-                  ) %>
+                  <.link
+                    navigate={Routes.create_case_investigation_contact_path(
+                      EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation)}
+                    id="add-contact-case-investigation-link-001"
+                    class="add-contact-case-investigation-link">+ Contact</.link>
                 <% end %>
               </div>
             </div>
@@ -216,30 +188,20 @@
               <div class="contact">
                 <div class="contact-details">
                   <div>
-                    <%= live_redirect(Format.person(contact_investigation.exposed_person),
-                      to:
-                        Routes.profile_path(
-                          EpicenterWeb.Endpoint,
-                          EpicenterWeb.ProfileLive,
-                          contact_investigation.exposed_person
-                        ),
-                      data: [role: "visit-contact-link"],
-                      class: "contact-name"
-                    ) %>
+                    <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, contact_investigation.exposed_person)}
+                           data-role="visit-contact-link"
+                           class="contact-name"><%= Format.person(contact_investigation.exposed_person) %></.link>
                   </div>
                   <%= contact_details_as_list(contact_investigation) %>
                 </div>
                 <div class="contact-edit-remove">
-                  <%= live_redirect("Edit",
-                    to:
-                      Routes.edit_case_investigation_contact_path(
-                        EpicenterWeb.Endpoint,
-                        EpicenterWeb.CaseInvestigationContactLive,
-                        case_investigation,
-                        contact_investigation
-                      ),
-                    data: [role: "edit-contact", contact_investigation: contact_investigation.id]
-                  ) %><a
+                  <.link navigate={Routes.edit_case_investigation_contact_path(
+                    EpicenterWeb.Endpoint,
+                    EpicenterWeb.CaseInvestigationContactLive,
+                    case_investigation,
+                    contact_investigation)}
+                    data-role="edit-contact" data-contact-investigation={contact_investigation.id}>Edit</.link>
+                  <a
                     data-confirm={
                       "#{"Remove #{Format.person(contact_investigation.exposed_person)} as a contact?"}"
                     }
@@ -259,16 +221,15 @@
               <h4><span>Places visited</span></h4>
               <div>
                 <%= if is_editable?(@person) do %>
-                  <%= live_redirect("+ Place",
-                    to:
-                      Routes.place_search_path(
-                        EpicenterWeb.Endpoint,
-                        EpicenterWeb.PlaceSearchLive,
-                        case_investigation
-                      ),
-                    id: "add-place-link-#{case_investigation.tid}",
-                    class: "add-place-link"
-                  ) %>
+                  <.link
+                    navigate={Routes.place_search_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.PlaceSearchLive,
+                      case_investigation
+                    )}
+                    id={"add-place-link-#{case_investigation.tid}"}
+                    class="add-place-link">+ Place</.link>
+
                 <% end %>
               </div>
             </div>
@@ -320,15 +281,14 @@
               <h3 class="status" data-role="status">
                 <%= displayable_isolation_monitoring_status(case_investigation, @current_date) %>
               </h3>
-              <div><%= isolation_monitoring_button(@person, case_investigation) %></div>
+              <div>
+                <.isolation_monitoring_button
+                  :if={is_editable?(@person)}
+                  case_investigation={case_investigation} /></div>
             </div>
-            <div class="case-investigation-history">
-              <%= for item <- isolation_monitoring_history_items(@person, case_investigation) do %>
-                <div>
-                  <span data-role="isolation-monitoring-history-item-text"><%= item.text %></span><span class="history-item-link"><%= item.link %></span>
-                </div>
-              <% end %>
-            </div>
+            <.isolation_monitoring_history_items
+              person={@person}
+              case_investigation={case_investigation} />
           </div>
         <% end %>
         <%= if case_investigation.isolation_monitoring_status == "ongoing" do %>
@@ -338,16 +298,13 @@
               <div class="links">
                 <%= if is_editable?(@person) do %>
                   <span>
-                    <%= live_redirect("Edit",
-                      to:
-                        Routes.case_investigation_isolation_order_path(
-                          EpicenterWeb.Endpoint,
-                          EpicenterWeb.CaseInvestigationIsolationOrderLive,
-                          case_investigation
-                        ),
-                      id: "edit-isolation-order-case-investigation-link-001",
-                      class: "primary"
-                    ) %>
+                    <.link
+                      navigate={Routes.case_investigation_isolation_order_path(
+                        EpicenterWeb.Endpoint,
+                        EpicenterWeb.CaseInvestigationIsolationOrderLive,
+                        case_investigation)}
+                      id="edit-isolation-order-case-investigation-link-001"
+                      class="primary">Edit</.link>
                   </span>
                 <% end %>
               </div>
@@ -371,29 +328,28 @@
             </table>
           </div>
         <% end %>
-        <%= component(
-          InvestigationNotesSection,
-          case_investigation.id <> "note section",
-          notes: case_investigation.notes,
-          is_editable: is_editable?(@person),
-          current_user_id: @current_user.id,
-          on_add_note: fn note_attrs -> on_note_added(note_attrs, case_investigation) end,
-          on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end
-        ) %>
+        <.live_component
+          module={InvestigationNotesSection}
+          id={case_investigation.id <> "note section"}
+          key={case_investigation.id <> "note section"}
+          notes={case_investigation.notes}
+          is_editable={is_editable?(@person)}
+          current_user_id={@current_user.id}
+          on_add_note={fn note_attrs -> on_note_added(note_attrs, case_investigation) end}
+          on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end} />
       </div>
     </section>
   <% end %>
   <a id="contact-investigations"></a>
   <%= for contact_investigation <- @contact_investigations do %>
-    <%= component(
-      ContactInvestigation,
-      contact_investigation.id <> "contact investigation",
-      contact_investigation: contact_investigation,
-      current_user_id: @current_user.id,
-      current_date: @current_date,
-      on_add_note: fn note_attrs -> on_note_added(note_attrs, contact_investigation) end,
-      on_delete_note: fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end
-    ) %>
+    <.live_component
+      module={ContactInvestigation}
+      id={contact_investigation.id <> "contact investigation"}
+      contact_investigation={contact_investigation}
+      current_user_id={@current_user.id}
+      current_date={@current_date}
+      on_add_note={fn note_attrs -> on_note_added(note_attrs, contact_investigation) end}
+      on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end} />
   <% end %>
   <section data-role="lab-results" id="lab-results">
     <header>
@@ -433,15 +389,10 @@
       <h2>Demographics</h2>
       <%= if is_editable?(@person) do %>
         <span>
-          <%= live_redirect("Update",
-            to:
-              Routes.demographics_edit_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.DemographicsEditLive,
-                @person
-              ),
-            data_role: "edit-demographics-link"
-          ) %>
+          <.link navigate={Routes.demographics_edit_path(
+            EpicenterWeb.Endpoint,
+            EpicenterWeb.DemographicsEditLive,
+            @person)} data-role="edit-demographics-link">Update</.link>
         </span>
       <% end %>
     </header>

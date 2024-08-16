@@ -1,7 +1,7 @@
 defmodule EpicenterWeb.ContactInvestigation do
   use EpicenterWeb, :live_component
+  use Phoenix.Component
 
-  import EpicenterWeb.LiveComponent.Helpers
   import EpicenterWeb.Presenters.ContactInvestigationPresenter, only: [exposing_case_link: 1, history_items: 1, quarantine_history_items: 1]
   import EpicenterWeb.Presenters.InvestigationPresenter, only: [displayable_clinical_status: 1, displayable_symptoms: 1]
   import EpicenterWeb.Presenters.PeoplePresenter, only: [is_editable?: 1]
@@ -58,7 +58,69 @@ defmodule EpicenterWeb.ContactInvestigation do
     end
   end
 
-  defp interview_buttons(contact_investigation) do
+  attr :contact_investigation, :any, required: true
+
+  def interview_buttons(assigns) do
+    ~H"""
+      <%= for label <- to_interview_buttons_list(@contact_investigation) do %>
+        <span data-role="contact-investigation-interview-button">
+          <.interview_buttons_router_link
+            label={label}
+            contact_investigation={@contact_investigation} />
+        </span>
+      <% end %>
+    """
+  end
+
+  attr :label, :any, required: true
+  attr :contact_investigation, :any, required: true
+
+  def interview_buttons_router_link(assigns) do
+    ~H"""
+      <.link
+        :if={@label==:start_interview}
+        navigate={Routes.contact_investigation_start_interview_path(EpicenterWeb.Endpoint,EpicenterWeb.ContactInvestigationStartInterviewLive,@contact_investigation)}
+        class="primary"
+        data-role="contact-investigation-start-interview"
+      >Start interview</.link>
+
+      <.link
+        :if={@label==:complete_interview}
+        navigate={Routes.contact_investigation_complete_interview_path(EpicenterWeb.Endpoint,:complete_contact_investigation,@contact_investigation)}
+        class="primary"
+        data-role="contact-investigation-complete-interview-link"
+      >Complete interview</.link>
+
+      <.link
+        :if={@label==:discontinue_interview}
+        navigate={Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, @contact_investigation)}
+        class="discontinue-link"
+        data-role="contact-investigation-discontinue-interview"
+      >Discontinue</.link>
+    """
+  end
+
+  attr :contact_investigation, :any, required: true
+
+  def quarantine_monitoring_button(assigns) do
+    ~H"""
+      <.link
+        :if={@contact_investigation.quarantine_monitoring_status=="pending"}
+        navigate={Routes.contact_investigation_quarantine_monitoring_path(EpicenterWeb.Endpoint,EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,@contact_investigation)}
+        class="primary"
+        data-role="contact-investigation-quarantine-monitoring-start-link"
+      >Add quarantine dates</.link>
+
+      <.link
+        :if={@contact_investigation.quarantine_monitoring_status=="ongoing"}
+        navigate={Routes.contact_investigation_conclude_quarantine_monitoring_path(EpicenterWeb.Endpoint,EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,@contact_investigation)}
+        class="primary"
+        data-role="conclude-contact-investigation-quarantine-monitoring-link"
+      >Conclude monitoring</.link>
+    """
+  end
+
+  defp to_interview_buttons_list(contact_investigation) do
     case is_editable?(contact_investigation.exposed_person) do
       false ->
         []
@@ -66,94 +128,16 @@ defmodule EpicenterWeb.ContactInvestigation do
       true ->
         case contact_investigation.interview_status do
           "pending" ->
-            [
-              redirect_to(contact_investigation, :start_interview),
-              redirect_to(contact_investigation, :discontinue_interview)
-            ]
+            [:start_interview, :discontinue_interview]
 
           "started" ->
-            [
-              redirect_to(contact_investigation, :complete_interview),
-              redirect_to(contact_investigation, :discontinue_interview)
-            ]
+            [:complete_interview, :discontinue_interview]
 
           "completed" ->
             []
 
           "discontinued" ->
             []
-        end
-    end
-  end
-
-  defp redirect_to(contact_investigation, :complete_interview) do
-    live_redirect("Complete interview",
-      to:
-        Routes.contact_investigation_complete_interview_path(
-          EpicenterWeb.Endpoint,
-          :complete_contact_investigation,
-          contact_investigation
-        ),
-      class: "primary",
-      data: [role: "contact-investigation-complete-interview-link"]
-    )
-  end
-
-  defp redirect_to(contact_investigation, :discontinue_interview) do
-    live_redirect("Discontinue",
-      to:
-        Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, contact_investigation),
-      class: "discontinue-link",
-      data: [role: "contact-investigation-discontinue-interview"]
-    )
-  end
-
-  defp redirect_to(contact_investigation, :start_interview) do
-    live_redirect("Start interview",
-      to:
-        Routes.contact_investigation_start_interview_path(
-          EpicenterWeb.Endpoint,
-          EpicenterWeb.ContactInvestigationStartInterviewLive,
-          contact_investigation
-        ),
-      class: "primary",
-      data: [role: "contact-investigation-start-interview"]
-    )
-  end
-
-  def quarantine_monitoring_button(contact_investigation) do
-    case is_editable?(contact_investigation.exposed_person) do
-      false ->
-        nil
-
-      true ->
-        case contact_investigation.quarantine_monitoring_status do
-          "pending" ->
-            live_redirect("Add quarantine dates",
-              to:
-                Routes.contact_investigation_quarantine_monitoring_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
-                  contact_investigation
-                ),
-              class: "primary",
-              data: [role: "contact-investigation-quarantine-monitoring-start-link"]
-            )
-
-          "ongoing" ->
-            live_redirect("Conclude monitoring",
-              to:
-                Routes.contact_investigation_conclude_quarantine_monitoring_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
-                  contact_investigation
-                ),
-              class: "primary",
-              data: [role: "conclude-contact-investigation-quarantine-monitoring-link"]
-            )
-
-          "concluded" ->
-            nil
         end
     end
   end

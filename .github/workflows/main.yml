@@ -17,10 +17,14 @@ jobs:
     
     env:
       MIX_ENV: test
+    
+    strategy:
+      matrix:
+        postgres-version: [16.4-alpine]
 
     services:
       postgres:
-        image: postgres:12.5-alpine
+        image: postgres:${{ matrix.postgres-version }}
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
@@ -37,9 +41,8 @@ jobs:
            fetch-depth: 0
       - uses: erlef/setup-beam@v1
         with:
-          otp-version: '25.3.1'
-          elixir-version: '1.14.5'
-
+          version-file: .tool-versions
+          version-type: strict
       - name: Install dependencies
         run: |
           npm install --prefix assets

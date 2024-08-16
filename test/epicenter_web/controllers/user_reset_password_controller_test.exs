@@ -3,6 +3,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
 
   alias Epicenter.Accounts
   alias Epicenter.Repo
+  alias Phoenix.Flash
   import Epicenter.AccountsFixtures
 
   setup do
@@ -29,7 +30,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
       conn = post(conn, path, %{"user" => %{"email" => user.email}})
 
       assert redirected_to(conn) == "/"
-      assert get_flash(conn, :info) =~ "An email with instructions was sent"
+      assert Flash.get(conn.assigns.flash, :info) =~ "An email with instructions was sent"
       assert Repo.get_by!(Accounts.UserToken, user_id: user.id).context == "reset_password"
     end
 
@@ -40,7 +41,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
       conn = post(conn, path, %{"user" => %{"email" => "unknown@example.com"}})
 
       assert redirected_to(conn) == "/"
-      assert get_flash(conn, :info) =~ "An email with instructions was sent"
+      assert Flash.get(conn.assigns.flash, :info) =~ "An email with instructions was sent"
       assert Repo.all(Accounts.UserToken) == []
     end
   end
@@ -63,7 +64,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
     test "does not render reset password with invalid token", %{conn: conn} do
       conn = get(conn, Routes.user_reset_password_path(conn, :edit, "oops"))
       assert redirected_to(conn) == "/"
-      assert get_flash(conn, :error) =~ "Reset password link is invalid or it has expired"
+      assert Flash.get(conn.assigns.flash, :error) =~ "Reset password link is invalid or it has expired"
     end
   end
 
@@ -88,7 +89,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
 
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
       refute get_session(conn, :user_token)
-      assert get_flash(conn, :info) =~ "Password reset successfully"
+      assert Flash.get(conn.assigns.flash, :info) =~ "Password reset successfully"
       assert Accounts.get_user(email: user.email, password: "new valid password")
     end
 
@@ -110,7 +111,7 @@ defmodule EpicenterWeb.UserResetPasswordControllerTest do
     test "does not reset password with invalid token", %{conn: conn} do
       conn = put(conn, Routes.user_reset_password_path(conn, :update, "oops"))
       assert redirected_to(conn) == "/"
-      assert get_flash(conn, :error) =~ "Reset password link is invalid or it has expired"
+      assert Flash.get(conn.assigns.flash, :error) =~ "Reset password link is invalid or it has expired"
     end
   end
 end

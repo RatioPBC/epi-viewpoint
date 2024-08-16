@@ -4,11 +4,15 @@
   </h2>
   <div id="toolbar">
     <div id="toolbar-left">
-      <%= component(EpicenterWeb.AssignmentSelector, "assignment-selection",
-        users: @users,
-        disabled: disabled?(@selected_people),
-        on_assignee_selected: fn user_id -> send(self(), {:assignee_selected, user_id}) end
-      ) %><button
+
+      <.live_component
+        module={EpicenterWeb.AssignmentSelector}
+        id="assignment-selection"
+        users={@users}
+        disabled={disabled?(@selected_people)}
+        on_assignee_selected={fn user_id -> send(self(), {:assignee_selected, user_id}) end} />
+
+      <button
         data-confirm={archive_confirmation_message(@selected_people)}
         data-role="archive-button"
         disabled={disabled?(@selected_people)}
@@ -17,7 +21,7 @@
       >Archive</button>
     </div>
     <div id="toolbar-right">
-      <%= component(ContactsFilter, "contacts filter", filter: @filter) %>
+      <.live_component module={EpicenterWeb.ContactsFilter} id="contacts-filter" filter={@filter} />
     </div>
   </div>
   <table data-role="contacts">
@@ -44,10 +48,11 @@
             />
           </td>
           <td>
-            <%= live_redirect(full_name(person),
-              to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person),
-              data: [role: "profile-link-#{person.id}"]
-            ) %>
+            <.link
+              navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)}
+              data-role={"profile-link-#{person.id}"}>
+              <%= full_name(person) %>
+            </.link>
           </td>
           <td><%= person.id %></td>
           <td><%= exposure_date(person) %></td>

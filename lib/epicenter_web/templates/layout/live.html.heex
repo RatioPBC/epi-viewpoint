@@ -32,9 +32,7 @@
               <ul>
                 <%= if @current_user.admin do %>
                   <li>
-                    <%= live_redirect("Admin",
-                      to: Routes.users_path(EpicenterWeb.Endpoint, EpicenterWeb.UsersLive)
-                    ) %>
+                    <.link navigate={Routes.users_path(EpicenterWeb.Endpoint, EpicenterWeb.UsersLive)}>Admin</.link>
                   </li>
                 <% end %>
                 <li>

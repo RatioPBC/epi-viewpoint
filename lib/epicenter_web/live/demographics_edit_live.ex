@@ -130,7 +130,7 @@ defmodule EpicenterWeb.DemographicsEditLive do
     with %Ecto.Changeset{} = form_changeset <- DemographicForm.attrs_to_form_changeset(demographic_params),
          {:form, {:ok, model_attrs}} <- {:form, DemographicForm.form_changeset_to_model_attrs(form_changeset)},
          {:model, {:ok, _model}} <- {:model, create_or_update_model(model_attrs, person, current_user)} do
-      socket |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#demographics-data") |> noreply()
+      socket |> push_navigate(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person)}#demographics-data") |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->
         socket |> assign_form_changeset(form_changeset, "Check the errors above") |> noreply()

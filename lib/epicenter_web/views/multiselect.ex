@@ -3,7 +3,7 @@ defmodule EpicenterWeb.Multiselect do
 
   alias Epicenter.Extra
   alias Phoenix.HTML.Form
-  alias Phoenix.HTML.Tag
+  alias PhoenixHTMLHelpers.Tag
 
   def multiselect_inputs(f, field, specs, level \\ :parent) do
     inputs =
@@ -23,7 +23,7 @@ defmodule EpicenterWeb.Multiselect do
 
   def multiselect_input(f, field, {type, option_label, option_value} = _spec, level) do
     Tag.content_tag :div, class: "label-wrapper" do
-      Form.label data: [multiselect: level, role: Extra.String.dasherize([f.name, field])] do
+      PhoenixHTMLHelpers.Form.label data: [multiselect: level, role: Extra.String.dasherize([f.name, field])] do
         case type do
           :checkbox -> [multiselect_chradio(f, field, option_value, :checkbox), option_label]
           :radio -> [multiselect_chradio(f, field, option_value, :radio), option_label]
@@ -58,7 +58,7 @@ defmodule EpicenterWeb.Multiselect do
     {field, _subfield, keypath} = field_info(field)
 
     Tag.content_tag :div, data: [multiselect: "text-wrapper"] do
-      Form.text_input(
+      PhoenixHTMLHelpers.Form.text_input(
         f,
         field,
         data: [role: "other-text"],

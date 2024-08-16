@@ -8,6 +8,7 @@ defmodule EpicenterWeb.UserAuthTest do
   alias EpicenterWeb.UserAuth
   alias EpicenterWeb.Router.Helpers, as: Routes
   alias Plug.Conn
+  alias Phoenix.Flash
 
   setup %{conn: conn} do
     conn =
@@ -165,7 +166,7 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
-      assert get_flash(conn, :error) == "You must log in to access this page"
+      assert Flash.get(conn.assigns.flash, :error) == "You must log in to access this page"
     end
 
     test "redirects if user is authenticated but not confirmed", %{conn: conn} do
@@ -173,7 +174,7 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
-      assert get_flash(conn, :error) == "The account you logged into has not yet been activated"
+      assert Flash.get(conn.assigns.flash, :error) == "The account you logged into has not yet been activated"
     end
 
     test "redirects if the user is authenticated and confirmed but does not have mfa set up", %{conn: conn} do
@@ -188,7 +189,7 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
-      assert get_flash(conn, :error) == "Your account has been disabled by an administrator"
+      assert Flash.get(conn.assigns.flash, :error) == "Your account has been disabled by an administrator"
     end
 
     test "redirects if user is authenticated but the token expired", %{conn: conn, user: user} do
@@ -205,7 +206,7 @@ defmodule EpicenterWeb.UserAuthTest do
 
       assert conn.halted
       assert redirected_to(conn) == Routes.user_session_path(conn, :new)
-      assert get_flash(conn, :error) == "Your session has expired. Please log in again."
+      assert Flash.get(conn.assigns.flash, :error) == "Your session has expired. Please log in again."
     end
 
     test "stores the path to redirect to on GET", %{conn: conn} do

@@ -19,12 +19,12 @@ defmodule EpicenterWeb.Unknown do
     with true <- Euclid.Exists.present?(values),
          values <- Enum.filter(values, &Euclid.Exists.present?/1),
          true <- Euclid.Exists.present?(values) do
-      Phoenix.HTML.Tag.content_tag :ul do
+      PhoenixHTMLHelpers.Tag.content_tag :ul do
         values
         |> pre_fun.()
         |> Enum.map(transform_fun)
         |> post_fun.()
-        |> Enum.map(&Phoenix.HTML.Tag.content_tag(:li, &1))
+        |> Enum.map(&PhoenixHTMLHelpers.Tag.content_tag(:li, &1))
       end
     else
       _ ->
@@ -33,6 +33,6 @@ defmodule EpicenterWeb.Unknown do
   end
 
   def unknown_value(text \\ @unknown_text) do
-    Phoenix.HTML.Tag.content_tag(:span, text, class: "unknown")
+    PhoenixHTMLHelpers.Tag.content_tag(:span, text, class: "unknown")
   end
 end

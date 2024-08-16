@@ -3,14 +3,14 @@
     <div id="form-contents">
       <header><%= login_icon() %></header>
       <h4 id="title">Multi-factor authentication</h4>
-      <%= if get_flash(@conn, :info) do %>
-        <div id="flash"><%= get_flash(@conn, :info) %></div>
+      <%= if Phoenix.Flash.get(@flash, :info) do %>
+        <div id="flash"><%= Phoenix.Flash.get(@flash, :info) %></div>
       <% end %>
-      <%= if get_flash(@conn, :extra) do %>
-        <div id="flash-extra"><%= get_flash(@conn, :extra) %></div>
+      <%= if Phoenix.Flash.get(@flash, :extra) do %>
+        <div id="flash-extra"><%= Phoenix.Flash.get(@flash, :extra) %></div>
       <% end %>
-      <%= if get_flash(@conn, :error) do %>
-        <% error = get_flash(@conn, :error) %>
+      <%= if Phoenix.Flash.get(@flash, :error) do %>
+        <% error = Phoenix.Flash.get(@flash, :error) %>
         <div data-form-error-message={error} id="flash-error"><%= error %></div>
       <% end %>
       <%= if @error_message do %>

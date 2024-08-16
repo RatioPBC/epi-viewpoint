@@ -68,7 +68,7 @@ defmodule EpicenterWeb.Format do
     do: string |> Number.Phone.number_to_phone(area_code: true)
 
   defp reformat_phone(string) when byte_size(string) == 11,
-    do: string |> String.slice(1..-1) |> Number.Phone.number_to_phone(area_code: true, country_code: String.at(string, 0))
+    do: string |> String.slice(1..-1//1) |> Number.Phone.number_to_phone(area_code: true, country_code: String.at(string, 0))
 
   defp reformat_phone(string),
     do: string

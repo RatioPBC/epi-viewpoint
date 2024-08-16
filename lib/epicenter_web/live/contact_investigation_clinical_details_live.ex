@@ -120,7 +120,7 @@ defmodule EpicenterWeb.ContactInvestigationClinicalDetailsLive do
       person = socket.assigns.contact_investigation.exposed_person
 
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, person)}#contact-investigations")
+      |> push_navigate(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, person)}#contact-investigations")
       |> noreply()
     else
       {:form, {:error, form_changeset}} ->

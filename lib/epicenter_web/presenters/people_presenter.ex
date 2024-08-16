@@ -62,7 +62,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
     person = person |> Cases.preload_demographics() |> Cases.preload_phones() |> Cases.preload_addresses()
     demographic = person |> Person.coalesce_demographics()
 
-    Phoenix.HTML.Tag.content_tag :ul do
+    PhoenixHTMLHelpers.Tag.content_tag :ul do
       [
         Format.date(demographic.dob),
         Extra.String.capitalize(demographic.sex_at_birth),
@@ -70,7 +70,7 @@ defmodule EpicenterWeb.Presenters.PeoplePresenter do
         Format.address(person.addresses)
       ]
       |> Enum.filter(&Euclid.Exists.present?/1)
-      |> Enum.map(&Phoenix.HTML.Tag.content_tag(:li, &1))
+      |> Enum.map(&PhoenixHTMLHelpers.Tag.content_tag(:li, &1))
     end
   end
 

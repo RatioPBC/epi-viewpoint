@@ -56,7 +56,7 @@ defmodule EpicenterWeb.AddVisitLive do
          data = data |> Map.put(:place_id, socket.assigns.place.id),
          {:save, {:ok, _visit}} <- {:save, Cases.create_visit({data, audit_meta_create_visit(socket)})} do
       socket
-      |> push_redirect(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
+      |> push_navigate(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.case_investigation.person)}#case-investigations")
       |> noreply()
     else
       {:data, {:error, %Ecto.Changeset{} = form_changeset}} ->

@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.ContactInvestigationTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
   alias Epicenter.Accounts
@@ -61,14 +60,13 @@ defmodule EpicenterWeb.ContactInvestigationTest do
 
     def render(assigns) do
       ~H"""
-      <%= component(
-        ContactInvestigation,
-        "renders-a-contact-investigation",
-        contact_investigation: @contact_investigation,
-        current_user_id: @current_user_id,
-        on_add_note: @on_add_note,
-        on_delete_note: @on_delete_note
-      ) %>
+      <.live_component
+        module={ContactInvestigation}
+        id="renders-a-contact-investigation"
+        contact_investigation={@contact_investigation}
+        current_user_id="test-user-id"
+        on_add_note={@on_add_note}
+        on_delete_note={@on_delete_note} />
       """
     end
   end

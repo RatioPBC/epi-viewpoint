@@ -24,9 +24,11 @@ defmodule EpicenterWeb.FormTest do
   @genres [{"Comedy", "comedy"}, {"Drama", "drama"}, {"Musical", "musical"}]
 
   defp phx_form(data \\ %{}) do
-    %Movie{}
-    |> Ecto.Changeset.change(Enum.into(data, %{}))
-    |> Phoenix.HTML.Form.form_for("/url")
+    form_data =
+      %Movie{}
+      |> Ecto.Changeset.change(Enum.into(data, %{}))
+
+    %{Phoenix.HTML.FormData.to_form(form_data, []) | action: "/url"}
   end
 
   # Convert a form into HTML and then parse into a list of 3-tuples, each of which is in the form:
@@ -95,13 +97,13 @@ defmodule EpicenterWeb.FormTest do
       <div class="checkbox-list" data-grid-row="3" data-grid-col="1" data-grid-span="3">
 
         <label data-role="movie-genres">\v
-          <input checked="checked" id="movie_genres" name="movie[genres][]" type="checkbox" value="comedy"/>Comedy\v
+          <input checked="checked" id="movie_genres_comedy" name="movie[genres][]" type="checkbox" value="comedy"/>Comedy\v
         </label>
         <label data-role="movie-genres">\v
-          <input id="movie_genres" name="movie[genres][]" type="checkbox" value="drama"/>Drama\v
+          <input id="movie_genres_drama" name="movie[genres][]" type="checkbox" value="drama"/>Drama\v
         </label>
         <label data-role="movie-genres">\v
-          <input checked="checked" id="movie_genres" name="movie[genres][]" type="checkbox" value="musical"/>Musical\v
+          <input checked="checked" id="movie_genres_musical" name="movie[genres][]" type="checkbox" value="musical"/>Musical\v
         </label>
         <label data-role="movie-genres">\v
           <input checked="checked" id="movie_genres" name="movie[genres_other]" type="checkbox" value="true" />Other\v
@@ -134,8 +136,7 @@ defmodule EpicenterWeb.FormTest do
       <fieldset>
         <label data-grid-row="1" data-grid-col="1" data-grid-span="4" for="movie_release_date">Release date</label>
         <div data-grid-row="2" data-grid-col="1" data-grid-span="4"><div>MM/DD/YYYY</div></div>
-        <input
-          data-grid-row="4"
+        <input data-grid-row="4"
           data-grid-col="1"
           data-grid-span="4"
           id="movie_release_date"
@@ -155,8 +156,7 @@ defmodule EpicenterWeb.FormTest do
       <fieldset>
         <label data-grid-row="1" data-grid-col="1" data-grid-span="2" for="movie_release_date">Release date</label>
         <div data-grid-row="2" data-grid-col="1" data-grid-span="2"><div>This is a cool release date!</div></div>
-        <input
-          data-grid-row="4"
+        <input data-grid-row="4"
           data-grid-col="1"
           data-grid-span="2"
           id="movie_release_date"
@@ -282,8 +282,7 @@ defmodule EpicenterWeb.FormTest do
       <label data-grid-row="1" data-grid-col="1" data-grid-span="3" for="movie_title">\v
         Title\v
       </label>
-      <textarea
-        data-grid-row="3" data-grid-col="1" data-grid-span="3"
+      <textarea data-grid-row="3" data-grid-col="1" data-grid-span="3"
         id="movie_title" name="movie[title]" rows="4">
     \v  Strange Brew\v
       </textarea>
@@ -301,8 +300,7 @@ defmodule EpicenterWeb.FormTest do
       <label data-grid-row="1" data-grid-col="1" data-grid-span="3" for="movie_title">\v
         Title\v
       </label>
-      <input
-        data-grid-row="3" data-grid-col="1" data-grid-span="3"
+      <input data-grid-row="3" data-grid-col="1" data-grid-span="3"
         id="movie_title" name="movie[title]" type="text" value="Strange Brew"
       />
     </fieldset>

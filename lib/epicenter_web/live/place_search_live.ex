@@ -37,7 +37,7 @@ defmodule EpicenterWeb.PlaceSearchLive do
 
   def handle_event("choose-place-address", %{"value" => 0}, socket) do
     socket
-    |> push_redirect(to: Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, socket.assigns.case_investigation))
+    |> push_navigate(to: Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, socket.assigns.case_investigation))
     |> noreply()
   end
 
@@ -45,7 +45,7 @@ defmodule EpicenterWeb.PlaceSearchLive do
     place_address = Cases.get_place_address(place_address_id) |> Cases.preload_place()
 
     socket
-    |> push_redirect(
+    |> push_navigate(
       to:
         Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, socket.assigns.case_investigation,
           place: place_address.place,

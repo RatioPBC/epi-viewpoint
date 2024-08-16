@@ -6,15 +6,13 @@ defmodule EpicenterWeb.InvestigationNoteComponent do
   alias Epicenter.Cases
   alias EpicenterWeb.Format
 
-  def preload(assigns) do
-    notes =
-      assigns
-      |> Enum.map(fn a -> a.note end)
-      |> Cases.preload_author()
-
-    assigns
-    |> Enum.with_index()
-    |> Enum.map(fn {a, i} -> Map.put(a, :note, Enum.at(notes, i)) end)
+  def update_many(assigns_sockets) do
+    assigns_sockets
+    |> Enum.map(fn {assigns, socket} ->
+      socket
+      |> assign(assigns)
+      |> assign(:note, Cases.preload_author(assigns.note))
+    end)
   end
 
   def render(assigns) do

@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.InvestigationNotesSectionTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
   alias Epicenter.Cases.InvestigationNote
@@ -31,7 +30,6 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
   defmodule TestLiveView do
     use EpicenterWeb, :live_view
 
-    import EpicenterWeb.LiveComponent.Helpers
     import EpicenterWeb.LiveHelpers, only: [assign_defaults: 1, noreply: 1]
 
     alias Epicenter.Accounts
@@ -53,15 +51,16 @@ defmodule EpicenterWeb.InvestigationNotesSectionTest do
 
     def render(assigns) do
       ~H"""
-      <%= component(
-        InvestigationNotesSection,
-        "displays-a-notes-section",
-        notes: @notes,
-        is_editable: true,
-        current_user_id: @current_user_id,
-        on_add_note: @on_add_note,
-        on_delete_note: @on_delete_note
-      ) %>
+      <.live_component
+        module={InvestigationNotesSection}
+        id="displays-a-notes-section"
+        key="displays-a-notes-section"
+        notes={@notes}
+        is_editable={true}
+        current_user_id={@current_user_id}
+        on_add_note={@on_add_note}
+        on_delete_note={@on_delete_note}
+      />
       """
     end
 

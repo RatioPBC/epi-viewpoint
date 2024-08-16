@@ -28,3 +28,5 @@ logfile
 .envrc.private
 /.nix-mix/
 /scripts/
+/.elixir_ls/
+/.erlang-history/

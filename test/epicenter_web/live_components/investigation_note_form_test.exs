@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.InvestigationNoteFormTest do
   use EpicenterWeb.ConnCase, async: true
 
-  import EpicenterWeb.LiveComponent.Helpers
   import Phoenix.LiveViewTest
 
   alias Epicenter.Accounts
@@ -17,11 +16,10 @@ defmodule EpicenterWeb.InvestigationNoteFormTest do
 
     def render(assigns) do
       ~H"""
-      <%= component(
-        InvestigationNoteForm,
-        "renders-a-form",
-        on_add: @on_add
-      ) %>
+      <.live_component
+        module={InvestigationNoteForm}
+        id="renders-a-form"
+        on_add={@on_add} />
       """
     end
   end

@@ -5,9 +5,8 @@
 >
   <section>
     <header id="subnav">
-      <%= live_redirect to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person), data: [role: "back-link"] do %>
-        <%= back_icon() %><span>Back</span>
-      <% end %>
+      <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person)}
+             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section id="case-investigation-isolation-monitoring">
