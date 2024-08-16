@@ -42,7 +42,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           version-file: .tool-versions
-
+          version-type: strict
       - name: Install dependencies
         run: |
           npm install --prefix assets
