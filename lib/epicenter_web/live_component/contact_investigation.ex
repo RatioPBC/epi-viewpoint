@@ -62,9 +62,9 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   def interview_buttons(assigns) do
     ~H"""
-      <%= for label <- to_interview_link_list(@contact_investigation) do %>
+      <%= for label <- to_interview_buttons_list(@contact_investigation) do %>
         <span data-role="contact-investigation-interview-button">
-          <.router_link
+          <.interview_buttons_router_link
             label={label}
             contact_investigation={@contact_investigation} />
         </span>
@@ -75,7 +75,7 @@ defmodule EpicenterWeb.ContactInvestigation do
   attr :label, :any, required: true
   attr :contact_investigation, :any, required: true
 
-  def router_link(assigns) do
+  def interview_buttons_router_link(assigns) do
     ~H"""
       <.link
         :if={@label==:start_interview}
@@ -120,7 +120,7 @@ defmodule EpicenterWeb.ContactInvestigation do
     """
   end
 
-  defp to_interview_link_list(contact_investigation) do
+  defp to_interview_buttons_list(contact_investigation) do
     case is_editable?(contact_investigation.exposed_person) do
       false ->
         []
