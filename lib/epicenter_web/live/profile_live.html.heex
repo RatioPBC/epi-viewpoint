@@ -129,20 +129,12 @@
             <h3 class="status" data-role="status">
               <%= displayable_interview_status(case_investigation) %>
             </h3>
-            <div class="case-investigation-interview-buttons">
-              <%= for link <- interview_buttons(@person, case_investigation) do %>
-                <span><%= link %></span>
-              <% end %>
-            </div>
+            <.interview_buttons
+              :if={is_editable?(@person)}
+              person={@person}
+              case_investigation={case_investigation} />
           </div>
-          <div class="case-investigation-history">
-            <%= for history_item <- history_items(@person, case_investigation) do %>
-              <div>
-                <span data-role="case-investigation-history-item-text"><%= history_item.text %></span>
-                <span class="history-item-link"><%= history_item.link %></span>
-              </div>
-            <% end %>
-          </div>
+          <.history_items person={@person} case_investigation={case_investigation} />
         </div>
         <%= if case_investigation.interview_started_at != nil do %>
           <div class="clinical-details">
@@ -289,15 +281,14 @@
               <h3 class="status" data-role="status">
                 <%= displayable_isolation_monitoring_status(case_investigation, @current_date) %>
               </h3>
-              <div><%= isolation_monitoring_button(@person, case_investigation) %></div>
+              <div>
+                <.isolation_monitoring_button
+                  :if={is_editable?(@person)}
+                  case_investigation={case_investigation} /></div>
             </div>
-            <div class="case-investigation-history">
-              <%= for item <- isolation_monitoring_history_items(@person, case_investigation) do %>
-                <div>
-                  <span data-role="isolation-monitoring-history-item-text"><%= item.text %></span><span class="history-item-link"><%= item.link %></span>
-                </div>
-              <% end %>
-            </div>
+            <.isolation_monitoring_history_items
+              person={@person}
+              case_investigation={case_investigation} />
           </div>
         <% end %>
         <%= if case_investigation.isolation_monitoring_status == "ongoing" do %>

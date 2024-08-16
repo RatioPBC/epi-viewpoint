@@ -1,7 +1,6 @@
 defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
-  import Phoenix.LiveView.Helpers
   import PhoenixHTMLHelpers.Tag
-
+  use Phoenix.Component
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.ContactInvestigations.ContactInvestigation
@@ -39,7 +38,64 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     end
   end
 
-  def history_items(person, case_investigation) do
+  attr :person, :any, required: true
+  attr :case_investigation, :any, required: true
+
+  def history_items(assigns) do
+    ~H"""
+    <div class="case-investigation-history">
+      <%= for item <- to_history_items_list(@person, @case_investigation) do %>
+        <div>
+          <span data-role="case-investigation-history-item-text"><%= item.text %></span>
+          <span class="history-item-link">
+            <.case_investigation_router_link
+              label={item.link}
+              case_investigation={@case_investigation}/>
+          </span>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :label, :any, required: true
+  attr :case_investigation, :any, required: true
+
+  def case_investigation_router_link(assigns) do
+    ~H"""
+    <.link
+      :if={@label == :started_interview}
+      navigate={Routes.case_investigation_start_interview_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.CaseInvestigationStartInterviewLive,
+                      @case_investigation
+                    )}
+      class="case-investigation-link"
+    >Edit</.link>
+    <.link
+      :if={@label == :discontinued_interview}
+      navigate={Routes.case_investigation_discontinue_path(
+                      EpicenterWeb.Endpoint,
+                      EpicenterWeb.CaseInvestigationDiscontinueLive,
+                      @case_investigation
+                    )}
+      id="edit-discontinue-case-investigation-link-001"
+      class="discontinue-case-investigation-link"
+    >Edit</.link>
+    <.link
+      :if={@label == :completed_interview}
+      navigate={Routes.case_investigation_complete_interview_path(
+                      EpicenterWeb.Endpoint,
+                      :complete_case_investigation,
+                      @case_investigation
+                    )}
+      id="edit-complete-interview-link-001"
+      class="edit-complete-interview-link"
+    >Edit</.link>
+    """
+  end
+
+  defp to_history_items_list(person, case_investigation) do
     items = []
 
     items =
@@ -47,20 +103,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text: "Started interview with #{with_interviewee_name(case_investigation)} on #{interview_start_date(case_investigation)}",
-            link:
-              link_if_editable(
-                person,
-                live_redirect(
-                  "Edit",
-                  to:
-                    Routes.case_investigation_start_interview_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.CaseInvestigationStartInterviewLive,
-                      case_investigation
-                    ),
-                  class: "case-investigation-link"
-                )
-              )
+            link: link_if_editable(person, :started_interview)
           }
           | items
         ]
@@ -74,21 +117,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
           %{
             text:
               "Discontinued interview on #{case_investigation.interview_discontinued_at |> Format.date_time_with_presented_time_zone()}: #{case_investigation.interview_discontinue_reason}",
-            link:
-              link_if_editable(
-                person,
-                live_redirect(
-                  "Edit",
-                  to:
-                    Routes.case_investigation_discontinue_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.CaseInvestigationDiscontinueLive,
-                      case_investigation
-                    ),
-                  id: "edit-discontinue-case-investigation-link-001",
-                  class: "discontinue-case-investigation-link"
-                )
-              )
+            link: link_if_editable(person, :discontinued_interview)
           }
           | items
         ]
@@ -101,21 +130,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         [
           %{
             text: "Completed interview on #{completed_interview_date(case_investigation)}",
-            link:
-              link_if_editable(
-                person,
-                live_redirect(
-                  "Edit",
-                  to:
-                    Routes.case_investigation_complete_interview_path(
-                      EpicenterWeb.Endpoint,
-                      :complete_case_investigation,
-                      case_investigation
-                    ),
-                  id: "edit-complete-interview-link-001",
-                  class: "edit-complete-interview-link"
-                )
-              )
+            link: link_if_editable(person, :completed_interview)
           }
           | items
         ]
@@ -126,20 +141,69 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     items |> Enum.reverse()
   end
 
-  def interview_buttons(person, case_investigation) do
+  attr :person, :any, required: true
+  attr :case_investigation, :any, required: true
+
+  def interview_buttons(assigns) do
+    ~H"""
+      <div class="case-investigation-interview-buttons">
+        <%= for link <- to_interview_buttons_list(@person, @case_investigation) do %>
+          <span>
+            <.interview_buttons_router_link
+              label={link}
+              case_investigation={@case_investigation}/>
+          </span>
+        <% end %>
+      </div>
+    """
+  end
+
+  attr :label, :any, required: true
+  attr :case_investigation, :any, required: true
+
+  def interview_buttons_router_link(assigns) do
+    ~H"""
+    <.link
+      :if={@label == :start_interview}
+      navigate={Routes.case_investigation_start_interview_path(
+                  EpicenterWeb.Endpoint,
+                  EpicenterWeb.CaseInvestigationStartInterviewLive,
+                  @case_investigation
+                )}
+      id="start-interview-case-investigation-link-001"
+      class="primary"
+    >Start interview</.link>
+    <.link
+      :if={@label == :complete_interview}
+      navigate={Routes.case_investigation_complete_interview_path(
+                  EpicenterWeb.Endpoint,
+                  :complete_case_investigation,
+                  @case_investigation
+                )}
+      id="complete-interview-case-investigation-link-001"
+      class="primary"
+    >Complete interview</.link>
+    <.link
+      :if={@label == :discontinue_interview}
+      navigate={Routes.case_investigation_discontinue_path(
+                  EpicenterWeb.Endpoint,
+                  EpicenterWeb.CaseInvestigationDiscontinueLive,
+                  @case_investigation
+                )}
+      id="discontinue-case-investigation-link-001"
+      class="discontinue-case-investigation-link"
+    >Discontinue</.link>
+    """
+  end
+
+  defp to_interview_buttons_list(person, case_investigation) do
     if PeoplePresenter.is_editable?(person) do
       case case_investigation.interview_status do
         "pending" ->
-          [
-            redirect_to(case_investigation, :start_interview),
-            redirect_to(case_investigation, :discontinue_interview)
-          ]
+          [:start_interview, :discontinue_interview]
 
         "started" ->
-          [
-            redirect_to(case_investigation, :complete_interview),
-            redirect_to(case_investigation, :discontinue_interview)
-          ]
+          [:complete_interview, :discontinue_interview]
 
         "completed" ->
           []
@@ -152,42 +216,82 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     end
   end
 
-  def isolation_monitoring_button(person, case_investigation) do
-    if PeoplePresenter.is_editable?(person) do
-      case case_investigation.isolation_monitoring_status do
-        "pending" ->
-          live_redirect("Add isolation dates",
-            to:
-              Routes.case_investigation_isolation_monitoring_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
-                case_investigation
-              ),
-            id: "add-isolation-dates-case-investigation-link-001",
-            class: "primary"
-          )
+  attr :case_investigation, :any, required: true
 
-        "ongoing" ->
-          live_redirect("Conclude isolation",
-            to:
-              Routes.case_investigation_conclude_isolation_monitoring_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
-                case_investigation
-              ),
-            id: "conclude-isolation-monitoring-case-investigation-link-001",
-            class: "primary"
-          )
-
-        "concluded" ->
-          nil
-      end
-    else
-      []
-    end
+  def isolation_monitoring_button(assigns) do
+    ~H"""
+      <.link
+        :if={@case_investigation.isolation_monitoring_status == "pending"}
+        navigate={Routes.case_investigation_isolation_monitoring_path(
+                    EpicenterWeb.Endpoint,
+                    EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
+                    @case_investigation
+                  )}
+        id="add-isolation-dates-case-investigation-link-001"
+        class="primary"
+      >Add isolation dates</.link>
+      <.link
+        :if={@case_investigation.isolation_monitoring_status == "ongoing"}
+        navigate={Routes.case_investigation_conclude_isolation_monitoring_path(
+                    EpicenterWeb.Endpoint,
+                    EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
+                    @case_investigation
+                  )}
+        id="conclude-isolation-monitoring-case-investigation-link-001"
+        class="primary"
+      >Conclude isolation</.link>
+    """
   end
 
-  def isolation_monitoring_history_items(person, case_investigation) do
+  attr :person, :any, required: true
+  attr :case_investigation, :any, required: true
+
+  def isolation_monitoring_history_items(assigns) do
+    ~H"""
+    <div class="case-investigation-history">
+      <%= for item <- to_isolation_monitoring_history_items_list(@person, @case_investigation) do %>
+        <div>
+          <span data-role="isolation-monitoring-history-item-text"><%= item.text %></span>
+          <span class="history-item-link">
+            <.isolation_monitoring_history_items_router_link
+              label={item.link}
+              case_investigation={@case_investigation}/>
+          </span>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :label, :any, required: true
+  attr :case_investigation, :any, required: true
+
+  def isolation_monitoring_history_items_router_link(assigns) do
+    ~H"""
+    <.link
+      :if={@label == :edit_isolation_monitoring}
+      navigate={Routes.case_investigation_isolation_monitoring_path(
+                  EpicenterWeb.Endpoint,
+                  EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
+                  @case_investigation
+                )}
+      id="edit-isolation-monitoring-link-001"
+      class="case-investigation-link"
+    >Edit</.link>
+    <.link
+      :if={@label == :edit_isolation_monitoring_conclusion}
+      navigate={Routes.case_investigation_conclude_isolation_monitoring_path(
+                  EpicenterWeb.Endpoint,
+                  EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
+                  @case_investigation
+                )}
+      id="edit-isolation-monitoring-conclusion-link-001"
+      class="case-investigation-link"
+    >Edit</.link>
+    """
+  end
+
+  defp to_isolation_monitoring_history_items_list(person, case_investigation) do
     items = []
 
     items =
@@ -196,21 +300,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
           %{
             text:
               "Isolation dates: #{Format.date(case_investigation.isolation_monitoring_starts_on)} - #{Format.date(case_investigation.isolation_monitoring_ends_on)}",
-            link:
-              link_if_editable(
-                person,
-                live_redirect(
-                  "Edit",
-                  to:
-                    Routes.case_investigation_isolation_monitoring_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
-                      case_investigation
-                    ),
-                  id: "edit-isolation-monitoring-link-001",
-                  class: "case-investigation-link"
-                )
-              )
+            link: link_if_editable(person, :edit_isolation_monitoring)
           }
           | items
         ]
@@ -224,21 +314,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
           %{
             text:
               "Concluded isolation monitoring on #{concluded_isolation_monitoring_date(case_investigation)}. #{Gettext.gettext(Epicenter.Gettext, case_investigation.isolation_conclusion_reason)}",
-            link:
-              link_if_editable(
-                person,
-                live_redirect(
-                  "Edit",
-                  to:
-                    Routes.case_investigation_conclude_isolation_monitoring_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
-                      case_investigation
-                    ),
-                  id: "edit-isolation-monitoring-conclusion-link-001",
-                  class: "case-investigation-link"
-                )
-              )
+            link: link_if_editable(person, :edit_isolation_monitoring_conclusion)
           }
           | items
         ]
@@ -363,35 +439,6 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     else
       []
     end
-  end
-
-  defp redirect_to(case_investigation, :complete_interview) do
-    live_redirect("Complete interview",
-      to:
-        Routes.case_investigation_complete_interview_path(
-          EpicenterWeb.Endpoint,
-          :complete_case_investigation,
-          case_investigation
-        ),
-      id: "complete-interview-case-investigation-link-001",
-      class: "primary"
-    )
-  end
-
-  defp redirect_to(case_investigation, :start_interview) do
-    live_redirect("Start interview",
-      to: Routes.case_investigation_start_interview_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationStartInterviewLive, case_investigation),
-      id: "start-interview-case-investigation-link-001",
-      class: "primary"
-    )
-  end
-
-  defp redirect_to(case_investigation, :discontinue_interview) do
-    live_redirect("Discontinue",
-      to: Routes.case_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationDiscontinueLive, case_investigation),
-      id: "discontinue-case-investigation-link-001",
-      class: "discontinue-case-investigation-link"
-    )
   end
 
   defp styled_status(displayable_status, status, type, postscript \\ "") when type in [:interview, :isolation_monitoring] do

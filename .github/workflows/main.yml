@@ -20,7 +20,7 @@ jobs:
     
     strategy:
       matrix:
-        postgres-version: [16.4-alpine, 17-alpine]
+        postgres-version: [16.4-alpine]
 
     services:
       postgres:
@@ -63,4 +63,3 @@ jobs:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           SECRET_KEY_BASE: iuJS3FLMrRqbKug/CE4zGGd31eY6FMdmpQGjy8RMaQoxk59wAvSxuUKM6c/uaOo4
-    continue-on-error: ${{ matrix.postgres-version == '17-alpine' }}

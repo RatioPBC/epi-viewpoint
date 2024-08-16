@@ -1,6 +1,6 @@
 defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
-  import Phoenix.LiveView.Helpers
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
+  use Phoenix.Component
 
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations.ContactInvestigation
@@ -9,20 +9,20 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   alias EpicenterWeb.Presenters.PeoplePresenter
   alias EpicenterWeb.Router.Helpers, as: Routes
 
-  def exposing_case_link(contact_investigation) do
-    exposing_person = contact_investigation.exposing_case.person
+  attr :contact_investigation, :any, required: true
 
-    live_redirect(
-      "\##{exposing_case_person_id(contact_investigation)}",
-      to:
-        Routes.profile_path(
+  def exposing_case_link(assigns) do
+    ~H"""
+    <.link
+      navigate={Routes.profile_path(
           EpicenterWeb.Endpoint,
           EpicenterWeb.ProfileLive,
-          exposing_person
-        ),
-      data: [role: "visit-exposing-case-link"],
-      class: "visit-exposing-case-link"
-    )
+          @contact_investigation.exposing_case.person
+        )}
+      data-role="visit-exposing-case-link"
+      class="visit-exposing-case-link"
+    ><%= "\##{exposing_case_person_id(@contact_investigation)}" %></.link>
+    """
   end
 
   defp exposing_case_person_id(contact_investigation) do
@@ -30,7 +30,66 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
       contact_investigation.exposing_case.person.id
   end
 
-  def history_items(contact_investigation) do
+  attr :contact_investigation, :any, required: true
+
+  def history_items(assigns) do
+    ~H"""
+    <div class="contact-investigation-history">
+      <%= for item <- to_history_items_list(@contact_investigation) do %>
+        <div>
+          <span data-role="contact-investigation-history-item-text"
+            ><%= item.text %></span>
+          <span class="history-item-link"
+            ><.history_router_link
+              label={item.link}
+              contact_investigation={@contact_investigation} /></span>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :label, :any, required: true
+  attr :contact_investigation, :any, required: true
+
+  def history_router_link(assigns) do
+    ~H"""
+    <.link
+      :if={@label==:start_interview}
+      navigate={Routes.contact_investigation_start_interview_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.ContactInvestigationStartInterviewLive,
+          @contact_investigation
+        )}
+      data-role="contact-investigation-start-interview-edit-link"
+      class="contact-investigation-link"
+    >Edit</.link>
+
+    <.link
+      :if={@label==:complete_interview}
+      navigate={Routes.contact_investigation_complete_interview_path(
+          EpicenterWeb.Endpoint,
+          :complete_contact_investigation,
+          @contact_investigation
+        )}
+      data-role="contact-investigation-complete-interview-edit-link"
+      class="contact-investigation-link"
+    >Edit</.link>
+
+    <.link
+      :if={@label==:discontinue_interview}
+      navigate={Routes.contact_investigation_discontinue_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.ContactInvestigationDiscontinueLive,
+          @contact_investigation
+        )}
+      data-role="contact-investigation-discontinue-interview-edit-link"
+      class="contact-investigation-link"
+    >Edit</.link>
+    """
+  end
+
+  def to_history_items_list(contact_investigation) do
     [
       interview_started_at_history(contact_investigation),
       interview_completed_at_history(contact_investigation),
@@ -47,17 +106,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
       link:
         link_if_editable(
           contact_investigation.exposed_person,
-          live_redirect(
-            "Edit",
-            to:
-              Routes.contact_investigation_start_interview_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.ContactInvestigationStartInterviewLive,
-                contact_investigation
-              ),
-            class: "contact-investigation-link",
-            data: [role: "contact-investigation-start-interview-edit-link"]
-          )
+          :start_interview
         )
     }
   end
@@ -70,17 +119,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
       link:
         link_if_editable(
           contact_investigation.exposed_person,
-          live_redirect(
-            "Edit",
-            to:
-              Routes.contact_investigation_complete_interview_path(
-                EpicenterWeb.Endpoint,
-                :complete_contact_investigation,
-                contact_investigation
-              ),
-            class: "contact-investigation-link",
-            data: [role: "contact-investigation-complete-interview-edit-link"]
-          )
+          :complete_interview
         )
     }
   end
@@ -94,17 +133,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
       link:
         link_if_editable(
           contact_investigation.exposed_person,
-          live_redirect(
-            "Edit",
-            to:
-              Routes.contact_investigation_discontinue_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.ContactInvestigationDiscontinueLive,
-                contact_investigation
-              ),
-            class: "contact-investigation-link",
-            data: [role: "contact-investigation-discontinue-interview-edit-link"]
-          )
+          :discontinue_interview
         )
     }
   end
@@ -117,7 +146,55 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     end
   end
 
-  def quarantine_history_items(contact_investigation) do
+  attr :contact_investigation, :any, required: true
+
+  def quarantine_history_items(assigns) do
+    ~H"""
+    <div class="contact-investigation-history">
+      <%= for item <- to_quarantine_history_items_list(@contact_investigation) do %>
+        <div>
+          <span data-role="contact-investigation-quarantine-history-item-text"
+            ><%= item.text %></span>
+          <span class="history-item-link"
+            ><.quarantine_history_router_link
+              label={item.link}
+              contact_investigation={@contact_investigation} /></span>
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :label, :any, required: true
+  attr :contact_investigation, :any, required: true
+
+  def quarantine_history_router_link(assigns) do
+    ~H"""
+    <.link
+      :if={@label == :quarantine_dates_history}
+      navigate={Routes.contact_investigation_quarantine_monitoring_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
+          @contact_investigation
+        )}
+      data-role="edit-contact-investigation-quarantine-monitoring-link"
+      class="contact-investigation-link"
+    >Edit</.link>
+
+    <.link
+      :if={@label == :quarantine_conclusion}
+      navigate={Routes.contact_investigation_conclude_quarantine_monitoring_path(
+          EpicenterWeb.Endpoint,
+          EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
+          @contact_investigation
+        )}
+      data-role="conclude-contact-investigation-quarantine-monitoring-edit-link"
+      class="contact-investigation-link"
+    >Edit</.link>
+    """
+  end
+
+  def to_quarantine_history_items_list(contact_investigation) do
     [
       quarantine_dates_history(contact_investigation),
       quarantine_conclusion(contact_investigation)
@@ -135,17 +212,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
       link:
         link_if_editable(
           contact_investigation.exposed_person,
-          live_redirect(
-            "Edit",
-            to:
-              Routes.contact_investigation_quarantine_monitoring_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
-                contact_investigation
-              ),
-            class: "contact-investigation-link",
-            data: [role: "edit-contact-investigation-quarantine-monitoring-link"]
-          )
+          :quarantine_dates_history
         )
     }
   end
@@ -159,17 +226,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
       link:
         link_if_editable(
           contact_investigation.exposed_person,
-          live_redirect(
-            "Edit",
-            to:
-              Routes.contact_investigation_conclude_quarantine_monitoring_path(
-                EpicenterWeb.Endpoint,
-                EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
-                contact_investigation
-              ),
-            class: "contact-investigation-link",
-            data: [role: "conclude-contact-investigation-quarantine-monitoring-edit-link"]
-          )
+          :quarantine_conclusion
         )
     }
   end
