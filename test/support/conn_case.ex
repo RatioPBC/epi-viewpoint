@@ -30,7 +30,6 @@ defmodule EpicenterWeb.ConnCase do
       import Plug.Conn
 
       alias Epicenter.Test.AuditLogAssertions
-      alias EpicenterWeb.Router.Helpers, as: Routes
       use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
       # The default endpoint for testing

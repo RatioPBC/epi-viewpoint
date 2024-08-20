@@ -23,7 +23,6 @@ defmodule EpicenterWeb do
 
       import Plug.Conn
       import Epicenter.Gettext
-      alias EpicenterWeb.Router.Helpers, as: Routes
       use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
     end
   end
@@ -86,7 +85,6 @@ defmodule EpicenterWeb do
   def presenter do
     quote do
       use Phoenix.Component
-      alias EpicenterWeb.Router.Helpers, as: Routes
       use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
       alias EpicenterWeb.Format
     end
@@ -108,7 +106,6 @@ defmodule EpicenterWeb do
 
       import Epicenter.Gettext
       import EpicenterWeb.ErrorHelpers
-      alias EpicenterWeb.Router.Helpers, as: Routes
       use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
     end
   end
