@@ -1,6 +1,5 @@
 defmodule EpicenterWeb.UserResetPasswordController do
   use EpicenterWeb, :controller
-  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
   import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
 
   alias Epicenter.Accounts

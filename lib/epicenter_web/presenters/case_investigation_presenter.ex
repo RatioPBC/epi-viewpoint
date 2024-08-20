@@ -1,14 +1,12 @@
 defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   import PhoenixHTMLHelpers.Tag
-  use Phoenix.Component
+  use EpicenterWeb, :presenter
+
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.Person
-  alias EpicenterWeb.Format
   alias EpicenterWeb.Presenters.PeoplePresenter
-  alias EpicenterWeb.Router.Helpers, as: Routes
-  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
   def contact_details_as_list(%ContactInvestigation{} = contact_investigation) do
     content_tag :ul do

@@ -1,10 +1,9 @@
 defmodule EpicenterWeb.UserAuth do
   import Plug.Conn
-  import Phoenix.Controller
+  use EpicenterWeb, :controller
 
   alias Epicenter.Accounts
   alias EpicenterWeb.Session
-  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
   @doc """
   Logs the user in.

@@ -82,6 +82,15 @@ defmodule EpicenterWeb do
     end
   end
 
+  def presenter do
+    quote do
+      use Phoenix.Component
+      alias EpicenterWeb.Router.Helpers, as: Routes
+      use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
+      alias EpicenterWeb.Format
+    end
+  end
+
   defp view_helpers do
     quote do
       # Use all HTML functionality (forms, tags, etc)

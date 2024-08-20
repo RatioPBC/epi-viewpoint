@@ -3,7 +3,6 @@ defmodule EpicenterWeb.ImportController do
   LiveView doesn't currently support file uploads, so this is a regular controller. It could probably be enhanced
   with some ajax or something.
   """
-  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
   use EpicenterWeb, :controller
 
   import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]

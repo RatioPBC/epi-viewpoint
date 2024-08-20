@@ -1,14 +1,12 @@
 defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
-  use Phoenix.Component
+
+  use EpicenterWeb, :presenter
 
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.ContactInvestigations
-  alias EpicenterWeb.Format
   alias EpicenterWeb.Presenters.PeoplePresenter
-  alias EpicenterWeb.Router.Helpers, as: Routes
-  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
   attr :contact_investigation, :any, required: true
 
