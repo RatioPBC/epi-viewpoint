@@ -6,7 +6,6 @@ defmodule EpicenterWeb.UserAuthTest do
   alias Epicenter.AccountsFixtures
   alias Epicenter.Repo
   alias EpicenterWeb.UserAuth
-  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
   alias Plug.Conn
   alias Phoenix.Flash
 
