@@ -32,12 +32,12 @@ defmodule EpicenterWeb.ImportController do
       {:error, [user_readable: user_readable_message]} ->
         conn
         |> Session.set_import_error_message(user_readable_message)
-        |> redirect(to: Routes.import_start_path(conn, EpicenterWeb.ImportLive))
+        |> redirect(to: ~p"/import/start")
 
       {:error, %DateParsingError{user_readable: user_readable_message}} ->
         conn
         |> Session.set_import_error_message(user_readable_message)
-        |> redirect(to: Routes.import_start_path(conn, EpicenterWeb.ImportLive))
+        |> redirect(to: ~p"/import/start")
     end
   end
 

@@ -6,7 +6,7 @@
 >
   <section>
     <header id="subnav">
-      <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @person.id)}
+      <.link navigate={~p"/people/#{@person.id}"}
              data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
@@ -17,7 +17,7 @@
         These records share the same (last name) and (first name, date of birth, phone number, or address).
       </p>
     </div>
-    <%= form_for :records_to_merge, Routes.resolve_conflicts_path(EpicenterWeb.Endpoint, EpicenterWeb.ResolveConflictsLive, @person), [id: "records-to-merge-form", phx_submit: "merge-selected-people", phx_change: "set-selected-people"], fn f -> %>
+    <%= form_for :records_to_merge, ~p"/people/#{@person}/resolve-conflicts", [id: "records-to-merge-form", phx_submit: "merge-selected-people", phx_change: "set-selected-people"], fn f -> %>
       <table data-role="duplicates">
         <thead>
           <tr data-role="table-column-names">
@@ -66,7 +66,7 @@
                 |> list_or_unknown(transform: &Format.address/1, post: &Extra.Enum.sort_uniq/1) %>
               </td>
               <td>
-                <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person.id)}>View</.link>
+                <.link navigate={~p"/people/#{person.id}"}>View</.link>
               </td>
             </tr>
           <% end %>

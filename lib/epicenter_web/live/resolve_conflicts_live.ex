@@ -57,7 +57,8 @@ defmodule EpicenterWeb.ResolveConflictsLive do
     )
 
     socket
-    |> push_navigate(to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.person_id)}")
+    |> push_navigate(to:
+    ~p"/people/#{socket.assigns.person_id}")
     |> noreply()
   end
 

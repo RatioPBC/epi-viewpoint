@@ -79,21 +79,21 @@ defmodule EpicenterWeb.ContactInvestigation do
     ~H"""
       <.link
         :if={@label==:start_interview}
-        navigate={Routes.contact_investigation_start_interview_path(EpicenterWeb.Endpoint,EpicenterWeb.ContactInvestigationStartInterviewLive,@contact_investigation)}
+        navigate={~p"/contact-investigations/#{@contact_investigation}/start-interview"}
         class="primary"
         data-role="contact-investigation-start-interview"
       >Start interview</.link>
 
       <.link
         :if={@label==:complete_interview}
-        navigate={Routes.contact_investigation_complete_interview_path(EpicenterWeb.Endpoint,:complete_contact_investigation,@contact_investigation)}
+        navigate={~p"/contact-investigations/#{@contact_investigation}/complete-interview"}
         class="primary"
         data-role="contact-investigation-complete-interview-link"
       >Complete interview</.link>
 
       <.link
         :if={@label==:discontinue_interview}
-        navigate={Routes.contact_investigation_discontinue_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationDiscontinueLive, @contact_investigation)}
+        navigate={~p"/contact-investigations/#{@contact_investigation}/discontinue"}
         class="discontinue-link"
         data-role="contact-investigation-discontinue-interview"
       >Discontinue</.link>
@@ -106,14 +106,14 @@ defmodule EpicenterWeb.ContactInvestigation do
     ~H"""
       <.link
         :if={@contact_investigation.quarantine_monitoring_status=="pending"}
-        navigate={Routes.contact_investigation_quarantine_monitoring_path(EpicenterWeb.Endpoint,EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,@contact_investigation)}
+        navigate={~p"/contact-investigations/#{@contact_investigation}/quarantine-monitoring"}
         class="primary"
         data-role="contact-investigation-quarantine-monitoring-start-link"
       >Add quarantine dates</.link>
 
       <.link
         :if={@contact_investigation.quarantine_monitoring_status=="ongoing"}
-        navigate={Routes.contact_investigation_conclude_quarantine_monitoring_path(EpicenterWeb.Endpoint,EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,@contact_investigation)}
+        navigate={~p"/contact-investigations/#{@contact_investigation}/conclude-quarantine-monitoring"}
         class="primary"
         data-role="conclude-contact-investigation-quarantine-monitoring-link"
       >Conclude monitoring</.link>

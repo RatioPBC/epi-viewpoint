@@ -97,7 +97,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
          {:contact_investigation, {:ok, _contact_investigation}} <- {:contact_investigation, update_contact_investigation(socket, model_attrs)} do
       socket
       |> push_navigate(
-        to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#case-investigations"
+        to: ~p"/people/#{socket.assigns.contact_investigation.exposed_person}/#case-investigations"
       )
       |> noreply()
     else

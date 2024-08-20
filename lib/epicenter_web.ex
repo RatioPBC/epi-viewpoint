@@ -50,6 +50,7 @@ defmodule EpicenterWeb do
       use PhoenixHTMLHelpers
       use Phoenix.LiveView, layout: {EpicenterWeb.LayoutView, :live}
       use EpicenterWeb.SearchHandling
+      use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
       unquote(view_helpers())
     end
