@@ -37,12 +37,12 @@
                 <% end %>
                 <li>
                   <%= link("Settings",
-                    to: Routes.user_settings_path(EpicenterWeb.Endpoint, :edit)
+                    to: ~p"/users/settings"
                   ) %>
                 </li>
                 <li>
                   <%= link("Log out",
-                    to: Routes.user_session_path(EpicenterWeb.Endpoint, :delete),
+                    to: ~p"/users/log-out",
                     method: :delete
                   ) %>
                 </li>
