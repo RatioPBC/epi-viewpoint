@@ -32,7 +32,7 @@
               <ul>
                 <%= if @current_user.admin do %>
                   <li>
-                    <.link navigate={Routes.users_path(EpicenterWeb.Endpoint, EpicenterWeb.UsersLive)}>Admin</.link>
+                    <.link navigate={~p"/admin/users"}>Admin</.link>
                   </li>
                 <% end %>
                 <li>

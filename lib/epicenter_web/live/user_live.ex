@@ -101,7 +101,7 @@ defmodule EpicenterWeb.UserLive do
     with {:form, {:ok, user_attrs}} <- {:form, UserForm.user_attrs(form_changeset)},
          {:user, {:ok, _user}} <- {:user, if(user, do: update_user(socket, user, user_attrs), else: register_user(socket, user_attrs))} do
       socket
-      |> push_navigate(to: Routes.users_path(socket, EpicenterWeb.UsersLive))
+      |> push_navigate(to: ~p"/admin/users")
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = invalid_form_changeset}} ->
