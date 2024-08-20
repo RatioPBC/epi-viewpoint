@@ -1,6 +1,6 @@
 defmodule EpicenterWeb.UserSessionController do
   use EpicenterWeb, :controller
-
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
   import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
 
   alias Epicenter.Accounts
@@ -44,7 +44,7 @@ defmodule EpicenterWeb.UserSessionController do
 
     with {:user, {:ok, user}} <- {:user, Accounts.register_user({new_user_attrs, audit_meta})},
          {:token, {:ok, token}} <- {:token, Accounts.generate_user_reset_password_token(user)} do
-      conn |> redirect(to: Routes.user_reset_password_path(conn, :edit, token))
+      conn |> redirect(to: ~p"/users/reset-password/#{token}")
     else
       {:user, {:error, %Ecto.Changeset{valid?: false} = changeset}} ->
         error_message =

@@ -1,6 +1,6 @@
 defmodule EpicenterWeb.UserSettingsController do
   use EpicenterWeb, :controller
-
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
   import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
 
   alias Epicenter.Accounts
@@ -30,7 +30,7 @@ defmodule EpicenterWeb.UserSettingsController do
       {:ok, user} ->
         conn
         |> put_flash(:info, "Password updated successfully")
-        |> put_session(:user_return_to, Routes.user_settings_path(conn, :edit))
+        |> put_session(:user_return_to, ~p"/users/settings")
         |> UserAuth.log_in_user(user)
 
       {:error, changeset} ->

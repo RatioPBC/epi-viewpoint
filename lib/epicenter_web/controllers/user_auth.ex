@@ -4,7 +4,7 @@ defmodule EpicenterWeb.UserAuth do
 
   alias Epicenter.Accounts
   alias EpicenterWeb.Session
-  alias EpicenterWeb.Router.Helpers, as: Routes
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
   @doc """
   Logs the user in.
@@ -22,7 +22,7 @@ defmodule EpicenterWeb.UserAuth do
     user_token = Accounts.generate_user_session_token(user)
 
     user_return_to = get_session(conn, :user_return_to)
-    mfa_path = user.mfa_secret == nil && Routes.user_multifactor_auth_setup_path(conn, :new)
+    mfa_path = user.mfa_secret == nil && ~p"/users/mfa-setup"
     user_agent = get_req_header(conn, "user-agent") |> Euclid.Extra.List.first("user_agent_not_found")
 
     {:ok, _} = Accounts.create_login(%{session_id: user_token.id, user_agent: user_agent, user_id: user.id})
@@ -125,9 +125,9 @@ defmodule EpicenterWeb.UserAuth do
   they use the application at all, here would be a good place.
   """
   def require_authenticated_user(conn, opts) do
-    login_path = Routes.user_session_path(conn, :new)
-    mfa_setup_path = Routes.user_multifactor_auth_setup_path(conn, :new)
-    mfa_path = Routes.user_multifactor_auth_path(conn, :new)
+    login_path = ~p"/users/login"
+    mfa_setup_path = ~p"/users/mfa-setup"
+    mfa_path = ~p"/users/mfa"
 
     error =
       case user_authentication_status(conn, opts) do

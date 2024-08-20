@@ -8,6 +8,7 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   alias EpicenterWeb.Format
   alias EpicenterWeb.Presenters.PeoplePresenter
   alias EpicenterWeb.Router.Helpers, as: Routes
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
   attr :contact_investigation, :any, required: true
 

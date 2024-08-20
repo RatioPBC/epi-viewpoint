@@ -10,7 +10,7 @@ defmodule EpicenterWeb.HealthCheckIntegrationTest do
     Test.HealthCheckMock |> expect(:database, fn -> {:ok, :anything} end)
 
     conn
-    |> get(Routes.health_check_path(conn, :show))
+    |> get(~p"/healthcheck")
     |> assert_response(status: 200)
   end
 
@@ -18,7 +18,7 @@ defmodule EpicenterWeb.HealthCheckIntegrationTest do
     Test.HealthCheckMock |> expect(:database, fn -> {:error, :anything} end)
 
     conn
-    |> get(Routes.health_check_path(conn, :show))
+    |> get(~p"/healthcheck")
     |> assert_response(status: 500)
   end
 end

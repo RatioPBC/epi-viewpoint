@@ -13,7 +13,7 @@
   <% end %>
   <div id="change-password">
     <header>Change password</header>
-    <%= form_for @password_changeset, Routes.user_settings_path(@conn, :update_password), fn f -> %>
+    <%= form_for @password_changeset, ~p"/users/settings/update-password", fn f -> %>
       <%= if @password_changeset.action do %>
         <div class="form-error-message">
           <%= error_icon() %>

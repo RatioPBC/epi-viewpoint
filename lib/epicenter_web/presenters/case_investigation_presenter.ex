@@ -8,6 +8,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   alias EpicenterWeb.Format
   alias EpicenterWeb.Presenters.PeoplePresenter
   alias EpicenterWeb.Router.Helpers, as: Routes
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
   def contact_details_as_list(%ContactInvestigation{} = contact_investigation) do
     content_tag :ul do

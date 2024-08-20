@@ -24,7 +24,7 @@ defmodule EpicenterWeb.ImportControllerTest do
 
       on_exit(fn -> File.rm!(temp_file_path) end)
 
-      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
+      conn = post(conn, ~p"/import/upload", %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 
       assert conn |> redirected_to() == "/"
 
@@ -42,7 +42,7 @@ defmodule EpicenterWeb.ImportControllerTest do
 
       on_exit(fn -> File.rm!(temp_file_path) end)
 
-      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
+      conn = post(conn, ~p"/import/upload", %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 
       assert conn |> redirected_to() == "/import/complete"
 
@@ -65,7 +65,7 @@ defmodule EpicenterWeb.ImportControllerTest do
 
       on_exit(fn -> File.rm!(temp_file_path) end)
 
-      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
+      conn = post(conn, ~p"/import/upload", %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 
       assert conn |> redirected_to() == "/import/start"
       assert "Missing required columns: dateofbirth_xx" = Session.get_import_error_message(conn)
@@ -82,7 +82,7 @@ defmodule EpicenterWeb.ImportControllerTest do
 
       on_exit(fn -> File.rm!(temp_file_path) end)
 
-      conn = post(conn, Routes.import_path(conn, :create), %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
+      conn = post(conn, ~p"/import/upload", %{"file" => %Plug.Upload{path: temp_file_path, filename: "test.csv"}})
 
       assert conn |> redirected_to() == "/import/start"
       assert "Invalid mm-dd-yyyy format: 06/02/bb" = Session.get_import_error_message(conn)
@@ -100,7 +100,7 @@ defmodule EpicenterWeb.ImportControllerTest do
           total_person_count: 50,
           total_lab_result_count: 100
         })
-        |> get(Routes.import_path(conn, :show))
+        |> get(~p"/import/complete")
 
       assert conn |> html_response(200) =~ "Successfully imported 2 people and 3 lab results"
     end

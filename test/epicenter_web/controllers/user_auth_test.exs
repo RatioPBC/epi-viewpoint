@@ -6,7 +6,7 @@ defmodule EpicenterWeb.UserAuthTest do
   alias Epicenter.AccountsFixtures
   alias Epicenter.Repo
   alias EpicenterWeb.UserAuth
-  alias EpicenterWeb.Router.Helpers, as: Routes
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
   alias Plug.Conn
   alias Phoenix.Flash
 
@@ -165,7 +165,7 @@ defmodule EpicenterWeb.UserAuthTest do
     test "redirects if user is not authenticated", %{conn: conn} do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])
       assert conn.halted
-      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert redirected_to(conn) == ~p"/users/login"
       assert Flash.get(conn.assigns.flash, :error) == "You must log in to access this page"
     end
 
@@ -173,7 +173,7 @@ defmodule EpicenterWeb.UserAuthTest do
       user = AccountsFixtures.unconfirmed_user_fixture(%{tid: "user2"})
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
-      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert redirected_to(conn) == ~p"/users/login"
       assert Flash.get(conn.assigns.flash, :error) == "The account you logged into has not yet been activated"
     end
 
@@ -181,14 +181,14 @@ defmodule EpicenterWeb.UserAuthTest do
       user = AccountsFixtures.single_factor_user_fixture(%{tid: "user2"})
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
-      assert redirected_to(conn) == Routes.user_multifactor_auth_setup_path(conn, :new)
+      assert redirected_to(conn) == ~p"/users/mfa-setup"
     end
 
     test "redirects if user is authenticated but disabled", %{conn: conn, user: user} do
       {:ok, user} = Accounts.update_user(user, %{disabled: true}, Epicenter.Test.Fixtures.admin_audit_meta())
       conn = conn |> fetch_flash() |> assign(:current_user, user) |> UserAuth.require_authenticated_user([])
       assert conn.halted
-      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert redirected_to(conn) == ~p"/users/login"
       assert Flash.get(conn.assigns.flash, :error) == "Your account has been disabled by an administrator"
     end
 
@@ -205,7 +205,7 @@ defmodule EpicenterWeb.UserAuthTest do
       conn = conn |> UserAuth.require_authenticated_user([])
 
       assert conn.halted
-      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      assert redirected_to(conn) == ~p"/users/login"
       assert Flash.get(conn.assigns.flash, :error) == "Your session has expired. Please log in again."
     end
 
@@ -244,7 +244,7 @@ defmodule EpicenterWeb.UserAuthTest do
         |> UserAuth.require_authenticated_user([])
 
       assert conn.halted
-      assert redirected_to(conn) == Routes.user_multifactor_auth_path(conn, :new)
+      assert redirected_to(conn) == ~p"/users/mfa"
     end
 
     test "does not redirect if user is authenticated", %{conn: conn, user: user} do
