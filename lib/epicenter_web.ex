@@ -23,7 +23,7 @@ defmodule EpicenterWeb do
 
       import Plug.Conn
       import Epicenter.Gettext
-      alias EpicenterWeb.Router.Helpers, as: Routes
+      use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
     end
   end
 
@@ -49,6 +49,7 @@ defmodule EpicenterWeb do
       use PhoenixHTMLHelpers
       use Phoenix.LiveView, layout: {EpicenterWeb.LayoutView, :live}
       use EpicenterWeb.SearchHandling
+      use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
       unquote(view_helpers())
     end
@@ -81,6 +82,14 @@ defmodule EpicenterWeb do
     end
   end
 
+  def presenter do
+    quote do
+      use Phoenix.Component
+      use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
+      alias EpicenterWeb.Format
+    end
+  end
+
   defp view_helpers do
     quote do
       # Use all HTML functionality (forms, tags, etc)
@@ -97,7 +106,7 @@ defmodule EpicenterWeb do
 
       import Epicenter.Gettext
       import EpicenterWeb.ErrorHelpers
-      alias EpicenterWeb.Router.Helpers, as: Routes
+      use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
     end
   end
 

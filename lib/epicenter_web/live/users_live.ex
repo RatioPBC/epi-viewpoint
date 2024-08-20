@@ -5,7 +5,6 @@ defmodule EpicenterWeb.UsersLive do
 
   alias Epicenter.Accounts
   alias Epicenter.Accounts.User
-  alias EpicenterWeb.Endpoint
 
   defmodule UserDetails do
     defstruct ~w{active_status email id name password_reset_url tid type}a
@@ -47,6 +46,6 @@ defmodule EpicenterWeb.UsersLive do
 
   defp password_reset_url(user) do
     {:ok, token} = Accounts.generate_user_reset_password_token(user)
-    Routes.user_reset_password_url(Endpoint, :edit, token)
+    url(~p"/users/reset-password/#{token}")
   end
 end

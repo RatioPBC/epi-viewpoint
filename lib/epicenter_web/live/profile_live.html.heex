@@ -21,7 +21,7 @@
             </button>
           <% end %>
           <%= if @potential_duplicate_count > 0 and is_editable?(@person) do %>
-            <.link navigate={Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person)}
+            <.link navigate={~p"/people/#{@person}/potential-duplicates"}
               id="view-potential-duplicates"
               data-role="view-potential-duplicates">
               View potential duplicates (<%= @potential_duplicate_count %>)</.link>
@@ -50,10 +50,7 @@
       <h2>Profile</h2>
       <%= if is_editable?(@person) do %>
         <span>
-          <.link navigate={Routes.profile_edit_path(
-            EpicenterWeb.Endpoint,
-            EpicenterWeb.ProfileEditLive,
-            @person)}
+          <.link navigate={~p"/people/#{@person}/edit"}
             data-role="edit-identifying-information-link">Update</.link>
         </span>
       <% end %>
@@ -145,11 +142,7 @@
               <div class="links">
                 <%= if is_editable?(@person) do %>
                   <span>
-                    <.link navigate={Routes.case_investigation_clinical_details_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.CaseInvestigationClinicalDetailsLive,
-                      case_investigation
-                    )} id="case-investigation-clinical-details-link-001" class="case-investigation-clinical-details-link">Edit</.link>
+                    <.link navigate={~p"/case-investigations/#{case_investigation}/clinical-details"} id="case-investigation-clinical-details-link-001" class="case-investigation-clinical-details-link">Edit</.link>
                   </span>
                 <% end %>
               </div>
@@ -177,8 +170,7 @@
               <div>
                 <%= if is_editable?(@person) do %>
                   <.link
-                    navigate={Routes.create_case_investigation_contact_path(
-                      EpicenterWeb.Endpoint, EpicenterWeb.CaseInvestigationContactLive, case_investigation)}
+                    navigate={~p"/case-investigations/#{case_investigation}/contact"}
                     id="add-contact-case-investigation-link-001"
                     class="add-contact-case-investigation-link">+ Contact</.link>
                 <% end %>
@@ -188,18 +180,14 @@
               <div class="contact">
                 <div class="contact-details">
                   <div>
-                    <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, contact_investigation.exposed_person)}
+                    <.link navigate={~p"/people/#{contact_investigation.exposed_person}"}
                            data-role="visit-contact-link"
                            class="contact-name"><%= Format.person(contact_investigation.exposed_person) %></.link>
                   </div>
                   <%= contact_details_as_list(contact_investigation) %>
                 </div>
                 <div class="contact-edit-remove">
-                  <.link navigate={Routes.edit_case_investigation_contact_path(
-                    EpicenterWeb.Endpoint,
-                    EpicenterWeb.CaseInvestigationContactLive,
-                    case_investigation,
-                    contact_investigation)}
+                  <.link navigate={~p"/case-investigations/#{case_investigation}/contact/#{contact_investigation}"}
                     data-role="edit-contact" data-contact-investigation={contact_investigation.id}>Edit</.link>
                   <a
                     data-confirm={
@@ -222,11 +210,7 @@
               <div>
                 <%= if is_editable?(@person) do %>
                   <.link
-                    navigate={Routes.place_search_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.PlaceSearchLive,
-                      case_investigation
-                    )}
+                    navigate={~p"/case-investigations/#{case_investigation}/place-search"}
                     id={"add-place-link-#{case_investigation.tid}"}
                     class="add-place-link">+ Place</.link>
 
@@ -299,10 +283,7 @@
                 <%= if is_editable?(@person) do %>
                   <span>
                     <.link
-                      navigate={Routes.case_investigation_isolation_order_path(
-                        EpicenterWeb.Endpoint,
-                        EpicenterWeb.CaseInvestigationIsolationOrderLive,
-                        case_investigation)}
+                      navigate={~p"/case-investigations/#{case_investigation}/isolation-order"}
                       id="edit-isolation-order-case-investigation-link-001"
                       class="primary">Edit</.link>
                   </span>
@@ -389,10 +370,7 @@
       <h2>Demographics</h2>
       <%= if is_editable?(@person) do %>
         <span>
-          <.link navigate={Routes.demographics_edit_path(
-            EpicenterWeb.Endpoint,
-            EpicenterWeb.DemographicsEditLive,
-            @person)} data-role="edit-demographics-link">Update</.link>
+          <.link navigate={~p"/people/#{@person}/edit-demographics"} data-role="edit-demographics-link">Update</.link>
         </span>
       <% end %>
     </header>

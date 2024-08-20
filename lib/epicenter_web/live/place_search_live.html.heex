@@ -1,7 +1,7 @@
 <div data-page="place-search" data-tid={@case_investigation.tid} id="place-page">
   <section>
     <header id="subnav">
-      <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @case_investigation.person)}
+      <.link navigate={~p"/people/#{@case_investigation.person}"}
              data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
@@ -45,7 +45,7 @@
                 tabindex="-1"
               >
                 <div><%= @no_results_message %></div>
-                <.link navigate={Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, @case_investigation)}
+                <.link navigate={~p"/case-investigations/#{@case_investigation}/place"}
                        class="new-place-link"
                        data-role="no-results-add-new-place">+ Add new place</.link>
               </li>
@@ -60,7 +60,8 @@
                 role="option"
                 tabindex="-1"
               >
-                <.link navigate={Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, @case_investigation, place: place_address.place, place_address: place_address)}
+                <.link navigate={
+                  ~p"/case-investigations/#{@case_investigation}/add-visit?#{[place: place_address.place, place_address: place_address]}"}
                        data-role="place_address_link"  data-tid={place_address.tid}>
                   <span class="place-name"><%= place_address.place.name %></span><span><%= address(place_address) %></span></.link>
               </li>
@@ -68,7 +69,7 @@
           </ul>
         </div>
       </form>
-      <.link navigate={Routes.new_place_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceLive, @case_investigation)}
+      <.link navigate={~p"/case-investigations/#{@case_investigation}/place"}
              class="new-place-link"
              data-role="add-new-place">+ Add new place</.link>
     </div>

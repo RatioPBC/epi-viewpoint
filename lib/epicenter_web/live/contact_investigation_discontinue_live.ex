@@ -52,9 +52,7 @@ defmodule EpicenterWeb.ContactInvestigationDiscontinueLive do
       )
 
       socket
-      |> push_navigate(
-        to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#contact-investigations"
-      )
+      |> push_navigate(to: ~p"/people/#{socket.assigns.contact_investigation.exposed_person}/#contact-investigations")
       |> noreply()
     else
       {:error, changeset} ->

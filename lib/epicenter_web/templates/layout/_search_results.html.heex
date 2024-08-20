@@ -29,7 +29,7 @@
       <%= for person <- @search_results.visible do %>
         <div class="search-result" data-role="search-result" data-tid={person.tid}>
           <%= link(EpicenterWeb.Presenters.PeoplePresenter.full_name_and_external_ids(person),
-            to: Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person),
+            to: ~p"/people/#{person}",
             data_role: "search-result-name"
           ) %>
           <div class="search-result-details" data-role="search-result-details">

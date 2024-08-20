@@ -1,6 +1,5 @@
 defmodule EpicenterWeb.UserResetPasswordController do
   use EpicenterWeb, :controller
-
   import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
 
   alias Epicenter.Accounts
@@ -21,7 +20,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
       {:ok, _} =
         Accounts.deliver_user_reset_password_instructions(
           user,
-          &Routes.user_reset_password_url(conn, :edit, &1)
+          &url(~p"/users/reset-password/#{&1}")
         )
     else
       conn
@@ -50,7 +49,7 @@ defmodule EpicenterWeb.UserResetPasswordController do
       {:ok, _} ->
         conn
         |> put_flash(:info, "Password reset successfully — please log in")
-        |> redirect(to: Routes.user_session_path(conn, :new))
+        |> redirect(to: ~p"/users/login")
 
       {:error, changeset} ->
         conn |> assign_defaults(@common_assigns) |> render("edit.html", changeset: changeset)

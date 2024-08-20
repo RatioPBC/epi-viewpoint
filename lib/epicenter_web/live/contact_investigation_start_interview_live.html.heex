@@ -6,7 +6,7 @@
 >
   <section>
     <header id="subnav">
-            <.link navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, @contact_investigation.exposed_person)}
+            <.link navigate={~p"/people/#{@contact_investigation.exposed_person}"}
              data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>

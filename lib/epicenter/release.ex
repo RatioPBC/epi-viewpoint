@@ -1,8 +1,7 @@
 defmodule Epicenter.Release do
   alias Epicenter.Accounts
   alias Epicenter.AuditLog
-  alias EpicenterWeb.Endpoint
-  alias EpicenterWeb.Router.Helpers, as: Routes
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
 
   @app :epicenter
 
@@ -143,7 +142,7 @@ defmodule Epicenter.Release do
   defp generated_password_reset_url(user) do
     {:ok, %{body: body}} =
       Accounts.deliver_user_reset_password_instructions(user, fn encoded_token ->
-        Routes.user_reset_password_url(Endpoint, :edit, encoded_token)
+        url(~p"/users/reset-password/#{encoded_token}")
       end)
 
     [_body, url] = Regex.run(~r|\n(https?://[^\n]+)\n|, body)

@@ -13,13 +13,13 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
   describe "new" do
     test "renders login page", %{conn: conn} do
-      conn = get(conn, Routes.user_session_path(conn, :new))
+      conn = get(conn, ~p"/users/login")
       assert response = html_response(conn, 200)
       Pages.Login.assert_here(response)
     end
 
     test "redirects if already logged in", %{conn: conn, user: user} do
-      conn = conn |> log_in_user(user) |> get(Routes.user_session_path(conn, :new))
+      conn = conn |> log_in_user(user) |> get(~p"/users/login")
       assert redirected_to(conn) == "/"
     end
   end
@@ -35,7 +35,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
     end
 
     test "when initial_user_email is not set, a message is shown", %{conn: conn} do
-      conn = get(conn, Routes.user_session_path(conn, :new))
+      conn = get(conn, ~p"/users/login")
       assert html_response(conn, 200) =~ "No users have been set up"
     end
 
@@ -44,7 +44,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
       assert Accounts.count_users() == 0
 
-      conn = get(conn, Routes.user_session_path(conn, :new))
+      conn = get(conn, ~p"/users/login")
 
       base_64_url_characters = "a-zA-Z0-9-_"
       at_least_ten_base_64_characters = "[#{base_64_url_characters}]{10,}"
@@ -60,7 +60,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
     test "when initial_user_email is set but user could not be created, an error is shown", %{conn: conn} do
       Application.put_env(:epicenter, :initial_user_email, "invalid email address")
 
-      conn = get(conn, Routes.user_session_path(conn, :new))
+      conn = get(conn, ~p"/users/login")
       assert html_response(conn, 200) =~ "Initial user email address “invalid email address” is invalid: must have the @ sign and no spaces"
     end
   end
@@ -68,7 +68,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
   describe "create with email and password" do
     test "logs the user in", %{conn: conn, user: user} do
       conn =
-        post(conn, Routes.user_session_path(conn, :create), %{
+        post(conn, ~p"/users/login", %{
           "user" => %{"email" => user.email, "password" => valid_user_password()}
         })
 
@@ -78,7 +78,7 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
     test "emits error message with invalid credentials", %{conn: conn, user: user} do
       conn =
-        post(conn, Routes.user_session_path(conn, :create), %{
+        post(conn, ~p"/users/login", %{
           "user" => %{"email" => user.email, "password" => "invalid_password"}
         })
 
@@ -90,13 +90,13 @@ defmodule EpicenterWeb.UserSessionControllerTest do
 
   describe "DELETE /users/log_out" do
     test "logs the user out", %{conn: conn, user: user} do
-      conn = conn |> log_in_user(user) |> delete(Routes.user_session_path(conn, :delete))
+      conn = conn |> log_in_user(user) |> delete(~p"/users/log-out")
       assert redirected_to(conn) == "/"
       refute get_session(conn, :user_token)
     end
 
     test "succeeds even if the user is not logged in", %{conn: conn} do
-      conn = delete(conn, Routes.user_session_path(conn, :delete))
+      conn = delete(conn, ~p"/users/log-out")
       assert redirected_to(conn) == "/"
       refute get_session(conn, :user_token)
     end

@@ -1,7 +1,7 @@
 <div data-page="place" data-tid={@case_investigation.tid} id="place-page">
   <section>
     <header id="subnav">
-      <.link navigate={Routes.place_search_path(EpicenterWeb.Endpoint, EpicenterWeb.PlaceSearchLive, @case_investigation)}
+      <.link navigate={~p"/case-investigations/#{@case_investigation}/place-search"}
              data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>

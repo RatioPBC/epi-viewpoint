@@ -1,24 +1,19 @@
 defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   import EpicenterWeb.PersonHelpers, only: [demographic_field: 2]
-  use Phoenix.Component
+
+  use EpicenterWeb, :presenter
 
   alias Epicenter.Cases
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.ContactInvestigations
-  alias EpicenterWeb.Format
   alias EpicenterWeb.Presenters.PeoplePresenter
-  alias EpicenterWeb.Router.Helpers, as: Routes
 
   attr :contact_investigation, :any, required: true
 
   def exposing_case_link(assigns) do
     ~H"""
     <.link
-      navigate={Routes.profile_path(
-          EpicenterWeb.Endpoint,
-          EpicenterWeb.ProfileLive,
-          @contact_investigation.exposing_case.person
-        )}
+      navigate={~p"/people/#{@contact_investigation.exposing_case.person}"}
       data-role="visit-exposing-case-link"
       class="visit-exposing-case-link"
     ><%= "\##{exposing_case_person_id(@contact_investigation)}" %></.link>
@@ -56,33 +51,21 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     ~H"""
     <.link
       :if={@label==:start_interview}
-      navigate={Routes.contact_investigation_start_interview_path(
-          EpicenterWeb.Endpoint,
-          EpicenterWeb.ContactInvestigationStartInterviewLive,
-          @contact_investigation
-        )}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/start-interview"}
       data-role="contact-investigation-start-interview-edit-link"
       class="contact-investigation-link"
     >Edit</.link>
 
     <.link
       :if={@label==:complete_interview}
-      navigate={Routes.contact_investigation_complete_interview_path(
-          EpicenterWeb.Endpoint,
-          :complete_contact_investigation,
-          @contact_investigation
-        )}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/complete-interview"}
       data-role="contact-investigation-complete-interview-edit-link"
       class="contact-investigation-link"
     >Edit</.link>
 
     <.link
       :if={@label==:discontinue_interview}
-      navigate={Routes.contact_investigation_discontinue_path(
-          EpicenterWeb.Endpoint,
-          EpicenterWeb.ContactInvestigationDiscontinueLive,
-          @contact_investigation
-        )}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/discontinue"}
       data-role="contact-investigation-discontinue-interview-edit-link"
       class="contact-investigation-link"
     >Edit</.link>
@@ -172,22 +155,14 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     ~H"""
     <.link
       :if={@label == :quarantine_dates_history}
-      navigate={Routes.contact_investigation_quarantine_monitoring_path(
-          EpicenterWeb.Endpoint,
-          EpicenterWeb.ContactInvestigationQuarantineMonitoringLive,
-          @contact_investigation
-        )}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/quarantine-monitoring"}
       data-role="edit-contact-investigation-quarantine-monitoring-link"
       class="contact-investigation-link"
     >Edit</.link>
 
     <.link
       :if={@label == :quarantine_conclusion}
-      navigate={Routes.contact_investigation_conclude_quarantine_monitoring_path(
-          EpicenterWeb.Endpoint,
-          EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive,
-          @contact_investigation
-        )}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/conclude-quarantine-monitoring"}
       data-role="conclude-contact-investigation-quarantine-monitoring-edit-link"
       class="contact-investigation-link"
     >Edit</.link>

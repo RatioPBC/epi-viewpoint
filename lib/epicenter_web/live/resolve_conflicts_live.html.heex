@@ -1,7 +1,7 @@
 <div data-page="resolve-conflicts" data-role="resolve-conflicts-page" id="resolve-conflicts-page">
   <section>
     <header id="subnav">
-      <.link navigate={Routes.potential_duplicates_path(EpicenterWeb.Endpoint, EpicenterWeb.PotentialDuplicatesLive, @person_id)}
+      <.link navigate={~p"/people/#{@person_id}/potential-duplicates"}
              data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>

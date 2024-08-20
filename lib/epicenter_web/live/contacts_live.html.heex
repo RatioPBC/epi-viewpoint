@@ -49,7 +49,7 @@
           </td>
           <td>
             <.link
-              navigate={Routes.profile_path(EpicenterWeb.Endpoint, EpicenterWeb.ProfileLive, person)}
+              navigate={~p"/people/#{person}"}
               data-role={"profile-link-#{person.id}"}>
               <%= full_name(person) %>
             </.link>

@@ -41,7 +41,7 @@
         After scanning or entering the code, your authenticator app should show a six-digit number
         that changes every 30 seconds. Type that number below to verify that everything is working.
       </p>
-      <%= form_tag Routes.user_multifactor_auth_setup_path(@conn, :create), method: :post, data: [role: "new-mfa-form"] do %>
+      <%= form_tag ~p"/users/mfa-setup", method: :post, data: [role: "new-mfa-form"] do %>
         <%= if @error_message do %>
           <div class="form-error-message">
             <%= error_icon() %>

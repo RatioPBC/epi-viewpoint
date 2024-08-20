@@ -25,7 +25,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupControllerTest do
     test "renders a qr code and secret", %{conn: conn} do
       doc =
         conn
-        |> get(Routes.user_multifactor_auth_setup_path(conn, :new))
+        |> get(~p"/users/mfa-setup")
         |> html_response(200)
         |> Test.Html.parse_doc()
 
@@ -40,7 +40,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupControllerTest do
 
       conn
       |> Session.put_multifactor_auth_secret(Test.TOTPStub.raw_secret())
-      |> post(Routes.user_multifactor_auth_setup_path(conn, :create, params))
+      |> post(~p"/users/mfa-setup?#{params}")
       |> redirected_to()
       |> assert_eq("/")
 
@@ -56,7 +56,7 @@ defmodule EpicenterWeb.UserMultifactorAuthSetupControllerTest do
 
       conn
       |> Session.put_multifactor_auth_secret(Test.TOTPStub.raw_secret())
-      |> post(Routes.user_multifactor_auth_setup_path(conn, :create, params))
+      |> post(~p"/users/mfa-setup?#{params}")
       |> Pages.assert_form_errors(["There was an error—see below", "The six-digit code was incorrect"])
 
       reloaded_user = Accounts.get_user(user.id)

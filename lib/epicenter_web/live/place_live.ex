@@ -42,10 +42,7 @@ defmodule EpicenterWeb.PlaceLive do
       socket
       |> push_navigate(
         to:
-          Routes.add_visit_path(EpicenterWeb.Endpoint, EpicenterWeb.AddVisitLive, socket.assigns.case_investigation,
-            place: place,
-            place_address: place_address
-          )
+          ~p"/case-investigations/#{socket.assigns.case_investigation}/add-visit?#{[place: place, place_address: place_address]}"
       )
       |> noreply()
     else

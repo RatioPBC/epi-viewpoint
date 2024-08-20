@@ -1,10 +1,8 @@
 defmodule EpicenterWeb.LiveHelpers do
   import Phoenix.LiveView
   import Phoenix.Component
-
+  use Phoenix.VerifiedRoutes, endpoint: EpicenterWeb.Endpoint, router: EpicenterWeb.Router
   alias Epicenter.Accounts
-  alias EpicenterWeb.Endpoint
-  alias EpicenterWeb.Router.Helpers, as: Routes
 
   @default_assigns [body_class: "body-background-none", show_nav: true]
 
@@ -40,11 +38,11 @@ defmodule EpicenterWeb.LiveHelpers do
     do: socket
 
   defp check_user(socket),
-    do: redirect(socket, to: Routes.user_session_path(Endpoint, :new))
+    do: redirect(socket, to: ~p"/users/login")
 
   defp check_admin(%{assigns: %{current_user: %{admin: true, confirmed_at: confirmed_at}}} = socket) when not is_nil(confirmed_at),
     do: socket
 
   defp check_admin(socket),
-    do: redirect(socket, to: Routes.root_path(EpicenterWeb.Endpoint, :show))
+    do: redirect(socket, to: ~p"/")
 end

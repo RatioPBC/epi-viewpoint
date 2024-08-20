@@ -51,7 +51,7 @@
           <div class="links">
             <%= if is_editable?(@contact_investigation.exposed_person) do %>
               <span>
-                <.link navigate={Routes.contact_investigation_clinical_details_path(EpicenterWeb.Endpoint, EpicenterWeb.ContactInvestigationClinicalDetailsLive, @contact_investigation)}
+                <.link navigate={~p"/contact-investigations/#{@contact_investigation}/clinical-details"}
                 data-role="edit-contact-clinical-details-link"
                 class="contact-investigation-clinical-details-link">Edit</.link>
               </span>

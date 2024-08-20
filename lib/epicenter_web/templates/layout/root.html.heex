@@ -16,14 +16,14 @@
       sizes="16x16"
       type="image/png"
     /><link href="/site.webmanifest" rel="manifest" /><link
-      href={Routes.static_path(@conn, "/css/app.css")}
+      href={static_path(@conn, "/css/app.css")}
       phx-track-static
       rel="stylesheet"
     />
     <script
       defer
       phx-track-static
-      src={Routes.static_path(@conn, "/js/app.js")}
+      src={static_path(@conn, "/js/app.js")}
       type="text/javascript"
     >
     </script>

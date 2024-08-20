@@ -8,22 +8,22 @@ defmodule EpicenterWeb.UserSettingsControllerTest do
 
   describe "GET /users/settings" do
     test "renders settings page", %{conn: conn} do
-      conn = get(conn, Routes.user_settings_path(conn, :edit))
+      conn = get(conn, ~p"/users/settings")
       response = html_response(conn, 200)
       assert response =~ "<h2>Settings</h2>"
     end
 
     test "redirects if user is not logged in" do
       conn = build_conn()
-      conn = get(conn, Routes.user_settings_path(conn, :edit))
-      assert redirected_to(conn) == Routes.user_session_path(conn, :new)
+      conn = get(conn, ~p"/users/settings")
+      assert redirected_to(conn) == ~p"/users/login"
     end
   end
 
   describe "PUT /users/settings/update_password" do
     test "updates the user password and resets tokens", %{conn: conn, user: user} do
       new_password_conn =
-        put(conn, Routes.user_settings_path(conn, :update_password), %{
+        put(conn, ~p"/users/settings/update-password", %{
           "current_password" => valid_user_password(),
           "user" => %{
             "password" => "new valid password",
@@ -31,7 +31,7 @@ defmodule EpicenterWeb.UserSettingsControllerTest do
           }
         })
 
-      assert redirected_to(new_password_conn) == Routes.user_settings_path(conn, :edit)
+      assert redirected_to(new_password_conn) == ~p"/users/settings"
       assert get_session(new_password_conn, :user_token) != get_session(conn, :user_token)
       assert Flash.get(new_password_conn.assigns.flash, :info) =~ "Password updated successfully"
       assert Accounts.get_user(email: user.email, password: "new valid password")
@@ -39,7 +39,7 @@ defmodule EpicenterWeb.UserSettingsControllerTest do
 
     test "does not update password on invalid data", %{conn: conn} do
       old_password_conn =
-        put(conn, Routes.user_settings_path(conn, :update_password), %{
+        put(conn, ~p"/users/settings/update-password", %{
           "current_password" => "invalid",
           "user" => %{
             "password" => "too short",

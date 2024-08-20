@@ -3,7 +3,6 @@ defmodule EpicenterWeb.ImportController do
   LiveView doesn't currently support file uploads, so this is a regular controller. It could probably be enhanced
   with some ajax or something.
   """
-
   use EpicenterWeb, :controller
 
   import EpicenterWeb.ControllerHelpers, only: [assign_defaults: 2]
@@ -28,17 +27,17 @@ defmodule EpicenterWeb.ImportController do
 
         conn
         |> Session.set_last_csv_import_info(popped_import_info)
-        |> redirect(to: Routes.import_path(conn, :show))
+        |> redirect(to: ~p"/import/complete")
 
       {:error, [user_readable: user_readable_message]} ->
         conn
         |> Session.set_import_error_message(user_readable_message)
-        |> redirect(to: Routes.import_start_path(conn, EpicenterWeb.ImportLive))
+        |> redirect(to: ~p"/import/start")
 
       {:error, %DateParsingError{user_readable: user_readable_message}} ->
         conn
         |> Session.set_import_error_message(user_readable_message)
-        |> redirect(to: Routes.import_start_path(conn, EpicenterWeb.ImportLive))
+        |> redirect(to: ~p"/import/start")
     end
   end
 

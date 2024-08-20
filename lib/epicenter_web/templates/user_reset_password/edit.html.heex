@@ -1,5 +1,5 @@
 <div data-page="reset-password" id="reset-password-page">
-  <%= form_for @changeset, Routes.user_reset_password_path(@conn, :update, @token), [data: [role: "reset-password-form"]], fn f -> %>
+  <%= form_for @changeset, ~p"/users/reset-password/#{@token}", [data: [role: "reset-password-form"]], fn f -> %>
     <div id="form-contents">
       <header><%= login_icon() %></header>
       <h4 id="title">Set your password</h4>
@@ -24,7 +24,7 @@
       </fieldset>
       <fieldset><%= submit("Continue", id: "submit") %></fieldset>
       <fieldset>
-        <%= link("Back to login", to: Routes.user_session_path(@conn, :new), id: "back-to-login") %>
+        <%= link("Back to login", to: ~p"/users/login", id: "back-to-login") %>
       </fieldset>
     </div>
   <% end %>

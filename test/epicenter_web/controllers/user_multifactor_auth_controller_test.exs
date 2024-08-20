@@ -21,7 +21,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
 
   describe "new" do
     test "renders the multifactor auth page", %{conn: conn, user: user} do
-      conn = conn |> log_in_user(user, second_factor_authenticated: false) |> get(Routes.user_multifactor_auth_path(conn, :new))
+      conn = conn |> log_in_user(user, second_factor_authenticated: false) |> get(~p"/users/mfa")
       assert response = html_response(conn, 200)
       Pages.Mfa.assert_here(response)
     end
@@ -32,7 +32,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       conn =
         conn
         |> log_in_user(user, second_factor_authenticated: false)
-        |> post(Routes.user_multifactor_auth_path(conn, :create, %{"user" => %{"passcode" => TOTPStub.valid_passcode()}}))
+        |> post(~p"/users/mfa?#{%{"user" => %{"passcode" => TOTPStub.valid_passcode()}}}")
         |> Pages.follow_conn_redirect()
         |> Pages.assert_form_errors([])
         |> Pages.People.assert_here()
@@ -44,7 +44,7 @@ defmodule EpicenterWeb.UserMultifactorAuthControllerTest do
       conn =
         conn
         |> log_in_user(user, second_factor_authenticated: false)
-        |> post(Routes.user_multifactor_auth_path(conn, :create, %{"user" => %{"passcode" => "000000"}}))
+        |> post(~p"/users/mfa?#{%{"user" => %{"passcode" => "000000"}}}")
         |> Pages.assert_form_errors(["The six-digit code was incorrect"])
 
       refute Session.multifactor_auth_success?(conn)

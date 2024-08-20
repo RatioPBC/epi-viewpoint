@@ -1,13 +1,12 @@
 defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
   import PhoenixHTMLHelpers.Tag
-  use Phoenix.Component
+  use EpicenterWeb, :presenter
+
   alias Epicenter.Cases
   alias Epicenter.Cases.CaseInvestigation
   alias Epicenter.ContactInvestigations.ContactInvestigation
   alias Epicenter.Cases.Person
-  alias EpicenterWeb.Format
   alias EpicenterWeb.Presenters.PeoplePresenter
-  alias EpicenterWeb.Router.Helpers, as: Routes
 
   def contact_details_as_list(%ContactInvestigation{} = contact_investigation) do
     content_tag :ul do
@@ -65,30 +64,18 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     ~H"""
     <.link
       :if={@label == :started_interview}
-      navigate={Routes.case_investigation_start_interview_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.CaseInvestigationStartInterviewLive,
-                      @case_investigation
-                    )}
+      navigate={~p"/case-investigations/#{@case_investigation}/start-interview"}
       class="case-investigation-link"
     >Edit</.link>
     <.link
       :if={@label == :discontinued_interview}
-      navigate={Routes.case_investigation_discontinue_path(
-                      EpicenterWeb.Endpoint,
-                      EpicenterWeb.CaseInvestigationDiscontinueLive,
-                      @case_investigation
-                    )}
+      navigate={~p"/case-investigations/#{@case_investigation}/discontinue"}
       id="edit-discontinue-case-investigation-link-001"
       class="discontinue-case-investigation-link"
     >Edit</.link>
     <.link
       :if={@label == :completed_interview}
-      navigate={Routes.case_investigation_complete_interview_path(
-                      EpicenterWeb.Endpoint,
-                      :complete_case_investigation,
-                      @case_investigation
-                    )}
+      navigate={~p"/case-investigations/#{@case_investigation}/complete-interview"}
       id="edit-complete-interview-link-001"
       class="edit-complete-interview-link"
     >Edit</.link>
@@ -165,31 +152,19 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     ~H"""
     <.link
       :if={@label == :start_interview}
-      navigate={Routes.case_investigation_start_interview_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.CaseInvestigationStartInterviewLive,
-                  @case_investigation
-                )}
+      navigate={~p"/case-investigations/#{@case_investigation}/start-interview"}
       id="start-interview-case-investigation-link-001"
       class="primary"
     >Start interview</.link>
     <.link
       :if={@label == :complete_interview}
-      navigate={Routes.case_investigation_complete_interview_path(
-                  EpicenterWeb.Endpoint,
-                  :complete_case_investigation,
-                  @case_investigation
-                )}
+      navigate={~p"/case-investigations/#{@case_investigation}/complete-interview"}
       id="complete-interview-case-investigation-link-001"
       class="primary"
     >Complete interview</.link>
     <.link
       :if={@label == :discontinue_interview}
-      navigate={Routes.case_investigation_discontinue_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.CaseInvestigationDiscontinueLive,
-                  @case_investigation
-                )}
+      navigate={~p"/case-investigations/#{@case_investigation}/discontinue"}
       id="discontinue-case-investigation-link-001"
       class="discontinue-case-investigation-link"
     >Discontinue</.link>
@@ -222,21 +197,13 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     ~H"""
       <.link
         :if={@case_investigation.isolation_monitoring_status == "pending"}
-        navigate={Routes.case_investigation_isolation_monitoring_path(
-                    EpicenterWeb.Endpoint,
-                    EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
-                    @case_investigation
-                  )}
+        navigate={~p"/case-investigations/#{@case_investigation}/isolation-monitoring"}
         id="add-isolation-dates-case-investigation-link-001"
         class="primary"
       >Add isolation dates</.link>
       <.link
         :if={@case_investigation.isolation_monitoring_status == "ongoing"}
-        navigate={Routes.case_investigation_conclude_isolation_monitoring_path(
-                    EpicenterWeb.Endpoint,
-                    EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
-                    @case_investigation
-                  )}
+        navigate={~p"/case-investigations/#{@case_investigation}/conclude-isolation-monitoring"}
         id="conclude-isolation-monitoring-case-investigation-link-001"
         class="primary"
       >Conclude isolation</.link>
@@ -270,21 +237,13 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
     ~H"""
     <.link
       :if={@label == :edit_isolation_monitoring}
-      navigate={Routes.case_investigation_isolation_monitoring_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.CaseInvestigationIsolationMonitoringLive,
-                  @case_investigation
-                )}
+      navigate={~p"/case-investigations/#{@case_investigation}/isolation-monitoring"}
       id="edit-isolation-monitoring-link-001"
       class="case-investigation-link"
     >Edit</.link>
     <.link
       :if={@label == :edit_isolation_monitoring_conclusion}
-      navigate={Routes.case_investigation_conclude_isolation_monitoring_path(
-                  EpicenterWeb.Endpoint,
-                  EpicenterWeb.CaseInvestigationConcludeIsolationMonitoringLive,
-                  @case_investigation
-                )}
+      navigate={~p"/case-investigations/#{@case_investigation}/conclude-isolation-monitoring"}
       id="edit-isolation-monitoring-conclusion-link-001"
       class="case-investigation-link"
     >Edit</.link>

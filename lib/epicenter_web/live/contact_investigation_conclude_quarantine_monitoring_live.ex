@@ -79,9 +79,7 @@ defmodule EpicenterWeb.ContactInvestigationConcludeQuarantineMonitoringLive do
                }}
             )} do
       socket
-      |> push_navigate(
-        to: "#{Routes.profile_path(socket, EpicenterWeb.ProfileLive, socket.assigns.contact_investigation.exposed_person)}#contact-investigations"
-      )
+      |> push_navigate(to: ~p"/people/#{socket.assigns.contact_investigation.exposed_person}/#contact-investigations")
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->

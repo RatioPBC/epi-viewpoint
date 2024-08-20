@@ -157,7 +157,7 @@ defmodule EpicenterWeb.ProfileEditLive do
                 reason_event: AuditLog.Revision.edit_profile_saved_event()
               }}
            ) do
-      {:noreply, socket |> push_navigate(to: Routes.profile_path(socket, EpicenterWeb.ProfileLive, person))}
+      {:noreply, socket |> push_navigate(to: ~p"/people/#{person}")}
     else
       {:validation_step, _} ->
         {:noreply, assign(socket, :changeset, changeset)}
