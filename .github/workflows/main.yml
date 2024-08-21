@@ -40,6 +40,7 @@ jobs:
         with:
            fetch-depth: 0
       - uses: erlef/setup-beam@v1
+        id: beam
         with:
           version-file: .tool-versions
           version-type: strict
@@ -48,7 +49,26 @@ jobs:
           npm install --prefix assets
           mix local.rebar --force
           mix local.hex --force
-          mix deps.get
+
+      - name: Restore the deps and _build cache
+        uses: actions/cache@v4
+        id: restore-cache
+        env:
+          OTP_VERSION: ${{ steps.beam.outputs.otp-version }}
+          ELIXIR_VERSION: ${{ steps.beam.outputs.elixir-version }}
+          MIX_LOCK_HASH: ${{ hashFiles('**/mix.lock') }}
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-mixlockhash-${{ env.MIX_LOCK_HASH }}
+
+      - name: Install mix dependencies
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: mix deps.get
+
+      - name: audit
+        run: |
           mix deps.unlock --check-unused
           mix deps.audit
           npm audit --audit-level=moderate --prefix assets
