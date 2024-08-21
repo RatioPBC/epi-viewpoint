@@ -47,6 +47,7 @@ defmodule EpiViewpoint.MixProject do
       local_or_remote(:remote, :euclid, version: "~> 0.1", path: System.get_env("EUCLID_PATH", "../euclid")),
       {:bcrypt_elixir, "~> 2.1"},
       {:cowboy_telemetry, "~> 0.4"},
+      {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev},
       {:ecto_sql, "~> 3.11"},
       {:eqrcode, "~> 0.1"},
       {:floki, ">= 0.0.0", only: :test},

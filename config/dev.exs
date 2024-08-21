@@ -31,7 +31,13 @@ config :epiviewpoint, EpiViewpointWeb.Endpoint,
       "--watch",
       "--watch-options-stdin",
       cd: Path.expand("../assets", __DIR__)
-    ]
+    ],
+    sass: {
+      DartSass,
+      :install_and_run,
+      [:default, ~w(--embed-source-map --source-map-urls=absolute --watch)]
+    }
+
   ]
 
 # ## SSL Support

@@ -25,6 +25,7 @@ defmodule EpiViewpointWeb.Endpoint do
     from: :epiviewpoint,
     gzip: false,
     only: ~w[
+      assets
       css
       images
       js
