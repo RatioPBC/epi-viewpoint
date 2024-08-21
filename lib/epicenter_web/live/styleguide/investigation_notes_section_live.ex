@@ -22,15 +22,15 @@ defmodule EpicenterWeb.Styleguide.InvestigationNotesSectionLive do
   def render(assigns) do
     ~H"""
     <.live_component
-      module = {InvestigationNotesSection}
-      id = "styleguide-note-section"
-      key = "styleguide-note-section"
-      current_user_id = "author-1"
-      subject = {@contact_investigation}
-      notes = {@notes}
-      is_editable = {true}
-      on_add_note = {&on_add/1}
-      on_delete_note = {&on_delete/1}
+      module={InvestigationNotesSection}
+      id="styleguide-note-section"
+      key="styleguide-note-section"
+      current_user_id="author-1"
+      subject={@contact_investigation}
+      notes={@notes}
+      is_editable={true}
+      on_add_note={&on_add/1}
+      on_delete_note={&on_delete/1}
     />
     """
     |> Map.put(:root, true)

@@ -66,7 +66,8 @@ defmodule EpicenterWeb.ContactInvestigationTest do
         contact_investigation={@contact_investigation}
         current_user_id="test-user-id"
         on_add_note={@on_add_note}
-        on_delete_note={@on_delete_note} />
+        on_delete_note={@on_delete_note}
+      />
       """
     end
   end

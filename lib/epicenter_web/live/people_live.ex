@@ -8,10 +8,36 @@ defmodule EpicenterWeb.PeopleFilter do
   def render(assigns) do
     ~H"""
     <div id="status-filter">
-      <.link patch={~p"/people?filter=all"} class="button" data-active={to_string(assigns.filter in [:all, nil])} data-role="people-filter" data-tid="all">All</.link>
-      <.link patch={~p"/people?filter=pending_interview"} class="button" data-active={to_string(assigns.filter == :pending_interview)} data-role="people-filter" data-tid="pending_interview">Pending interview</.link>
-      <.link patch={~p"/people?filter=ongoing_interview"} class="button" data-active={to_string(assigns.filter == :ongoing_interview)} data-role="people-filter" data-tid="ongoing_interview">Ongoing interview</.link>
-      <.link patch={~p"/people?filter=isolation_monitoring"} class="button" data-active={to_string(assigns.filter == :isolation_monitoring)} data-role="people-filter" data-tid="isolation_monitoring">Isolation monitoring</.link>
+      <.link patch={~p"/people?filter=all"} class="button" data-active={to_string(assigns.filter in [:all, nil])} data-role="people-filter" data-tid="all">
+        All
+      </.link>
+      <.link
+        patch={~p"/people?filter=pending_interview"}
+        class="button"
+        data-active={to_string(assigns.filter == :pending_interview)}
+        data-role="people-filter"
+        data-tid="pending_interview"
+      >
+        Pending interview
+      </.link>
+      <.link
+        patch={~p"/people?filter=ongoing_interview"}
+        class="button"
+        data-active={to_string(assigns.filter == :ongoing_interview)}
+        data-role="people-filter"
+        data-tid="ongoing_interview"
+      >
+        Ongoing interview
+      </.link>
+      <.link
+        patch={~p"/people?filter=isolation_monitoring"}
+        class="button"
+        data-active={to_string(assigns.filter == :isolation_monitoring)}
+        data-role="people-filter"
+        data-tid="isolation_monitoring"
+      >
+        Isolation monitoring
+      </.link>
     </div>
     <label id="assigned-to-me-button">
       <input

@@ -47,9 +47,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         <div>
           <span data-role="case-investigation-history-item-text"><%= item.text %></span>
           <span class="history-item-link">
-            <.case_investigation_router_link
-              label={item.link}
-              case_investigation={@case_investigation}/>
+            <.case_investigation_router_link label={item.link} case_investigation={@case_investigation} />
           </span>
         </div>
       <% end %>
@@ -62,23 +60,25 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
 
   def case_investigation_router_link(assigns) do
     ~H"""
-    <.link
-      :if={@label == :started_interview}
-      navigate={~p"/case-investigations/#{@case_investigation}/start-interview"}
-      class="case-investigation-link"
-    >Edit</.link>
+    <.link :if={@label == :started_interview} navigate={~p"/case-investigations/#{@case_investigation}/start-interview"} class="case-investigation-link">
+      Edit
+    </.link>
     <.link
       :if={@label == :discontinued_interview}
       navigate={~p"/case-investigations/#{@case_investigation}/discontinue"}
       id="edit-discontinue-case-investigation-link-001"
       class="discontinue-case-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
     <.link
       :if={@label == :completed_interview}
       navigate={~p"/case-investigations/#{@case_investigation}/complete-interview"}
       id="edit-complete-interview-link-001"
       class="edit-complete-interview-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
     """
   end
 
@@ -133,15 +133,13 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
 
   def interview_buttons(assigns) do
     ~H"""
-      <div class="case-investigation-interview-buttons">
-        <%= for link <- to_interview_buttons_list(@person, @case_investigation) do %>
-          <span>
-            <.interview_buttons_router_link
-              label={link}
-              case_investigation={@case_investigation}/>
-          </span>
-        <% end %>
-      </div>
+    <div class="case-investigation-interview-buttons">
+      <%= for link <- to_interview_buttons_list(@person, @case_investigation) do %>
+        <span>
+          <.interview_buttons_router_link label={link} case_investigation={@case_investigation} />
+        </span>
+      <% end %>
+    </div>
     """
   end
 
@@ -155,19 +153,25 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
       navigate={~p"/case-investigations/#{@case_investigation}/start-interview"}
       id="start-interview-case-investigation-link-001"
       class="primary"
-    >Start interview</.link>
+    >
+      Start interview
+    </.link>
     <.link
       :if={@label == :complete_interview}
       navigate={~p"/case-investigations/#{@case_investigation}/complete-interview"}
       id="complete-interview-case-investigation-link-001"
       class="primary"
-    >Complete interview</.link>
+    >
+      Complete interview
+    </.link>
     <.link
       :if={@label == :discontinue_interview}
       navigate={~p"/case-investigations/#{@case_investigation}/discontinue"}
       id="discontinue-case-investigation-link-001"
       class="discontinue-case-investigation-link"
-    >Discontinue</.link>
+    >
+      Discontinue
+    </.link>
     """
   end
 
@@ -195,18 +199,22 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
 
   def isolation_monitoring_button(assigns) do
     ~H"""
-      <.link
-        :if={@case_investigation.isolation_monitoring_status == "pending"}
-        navigate={~p"/case-investigations/#{@case_investigation}/isolation-monitoring"}
-        id="add-isolation-dates-case-investigation-link-001"
-        class="primary"
-      >Add isolation dates</.link>
-      <.link
-        :if={@case_investigation.isolation_monitoring_status == "ongoing"}
-        navigate={~p"/case-investigations/#{@case_investigation}/conclude-isolation-monitoring"}
-        id="conclude-isolation-monitoring-case-investigation-link-001"
-        class="primary"
-      >Conclude isolation</.link>
+    <.link
+      :if={@case_investigation.isolation_monitoring_status == "pending"}
+      navigate={~p"/case-investigations/#{@case_investigation}/isolation-monitoring"}
+      id="add-isolation-dates-case-investigation-link-001"
+      class="primary"
+    >
+      Add isolation dates
+    </.link>
+    <.link
+      :if={@case_investigation.isolation_monitoring_status == "ongoing"}
+      navigate={~p"/case-investigations/#{@case_investigation}/conclude-isolation-monitoring"}
+      id="conclude-isolation-monitoring-case-investigation-link-001"
+      class="primary"
+    >
+      Conclude isolation
+    </.link>
     """
   end
 
@@ -220,9 +228,7 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
         <div>
           <span data-role="isolation-monitoring-history-item-text"><%= item.text %></span>
           <span class="history-item-link">
-            <.isolation_monitoring_history_items_router_link
-              label={item.link}
-              case_investigation={@case_investigation}/>
+            <.isolation_monitoring_history_items_router_link label={item.link} case_investigation={@case_investigation} />
           </span>
         </div>
       <% end %>
@@ -240,13 +246,17 @@ defmodule EpicenterWeb.Presenters.CaseInvestigationPresenter do
       navigate={~p"/case-investigations/#{@case_investigation}/isolation-monitoring"}
       id="edit-isolation-monitoring-link-001"
       class="case-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
     <.link
       :if={@label == :edit_isolation_monitoring_conclusion}
       navigate={~p"/case-investigations/#{@case_investigation}/conclude-isolation-monitoring"}
       id="edit-isolation-monitoring-conclusion-link-001"
       class="case-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
     """
   end
 

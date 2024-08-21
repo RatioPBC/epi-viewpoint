@@ -1,13 +1,7 @@
-<div
-  data-case-investigation-tid={@case_investigation_tid}
-  data-page="add-visit"
-  data-place-address-tid={@place_address_tid}
-  id="add-visit-page"
->
+<div data-case-investigation-tid={@case_investigation_tid} data-page="add-visit" data-place-address-tid={@place_address_tid} id="add-visit-page">
   <section>
     <header id="subnav">
-      <.link navigate={~p"/case-investigations/#{@case_investigation}/place-search"}
-       data-role="back-link"><%= back_icon() %><span>Back</span></.link>
+      <.link navigate={~p"/case-investigations/#{@case_investigation}/place-search"} data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section>

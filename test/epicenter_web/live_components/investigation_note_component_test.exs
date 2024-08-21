@@ -32,7 +32,7 @@ defmodule EpicenterWeb.InvestigationNoteComponentTest do
     def render(assigns) do
       ~H"""
       <.live_component
-        module = {InvestigationNoteComponent}
+        module={InvestigationNoteComponent}
         id="renders-a-note"
         note={@note}
         is_editable={true}

@@ -5,12 +5,7 @@ defmodule EpicenterWeb.AssignmentSelector do
 
   def render(assigns) do
     ~H"""
-    <form
-      data-disabled={@disabled}
-      id="assignment-form"
-      phx-change="form-change"
-      phx-target={@myself}
-    >
+    <form data-disabled={@disabled} id="assignment-form" phx-change="form-change" phx-target={@myself}>
       <div id="user-list">
         <span id="assign-to-label">Assign to</span>
         <div id="select-wrapper">

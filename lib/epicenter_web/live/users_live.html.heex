@@ -24,26 +24,15 @@
           <td><%= user.type %></td>
           <td><%= user.active_status %></td>
           <td>
-            <.link navigate={~p"/admin/user/#{user}/logins"}
-              data-tid={"view-audit-trail-#{user.tid}"}>View</.link>
+            <.link navigate={~p"/admin/user/#{user}/logins"} data-tid={"view-audit-trail-#{user.tid}"}>View</.link>
           </td>
           <td style="text-align: right">
             <%= if user.password_reset_url do %>
-              <button
-                data-role="close-reset-password"
-                data-tid={user.tid}
-                phx-click="close-reset-password"
-                phx-value-user-id={user.id}
-              >
+              <button data-role="close-reset-password" data-tid={user.tid} phx-click="close-reset-password" phx-value-user-id={user.id}>
                 Done
               </button>
             <% else %>
-              <button
-                data-role="reset-password"
-                data-tid={user.tid}
-                phx-click="reset-password"
-                phx-value-user-id={user.id}
-              >
+              <button data-role="reset-password" data-tid={user.tid} phx-click="reset-password" phx-value-user-id={user.id}>
                 Set/reset password
               </button>
             <% end %>
@@ -65,13 +54,7 @@
                       Copy to clipboard
                     </a>
                   </div>
-                  <input
-                    data-role="reset-password-link"
-                    data-tid={user.tid}
-                    readonly="true"
-                    type="text"
-                    value={user.password_reset_url}
-                  />
+                  <input data-role="reset-password-link" data-tid={user.tid} readonly="true" type="text" value={user.password_reset_url} />
                 </fieldset>
               </form>
             </td>

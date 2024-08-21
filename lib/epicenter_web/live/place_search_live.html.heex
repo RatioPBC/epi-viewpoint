@@ -1,8 +1,7 @@
 <div data-page="place-search" data-tid={@case_investigation.tid} id="place-page">
   <section>
     <header id="subnav">
-      <.link navigate={~p"/people/#{@case_investigation.person}"}
-             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
+      <.link navigate={~p"/people/#{@case_investigation.person}"} data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section>
@@ -30,24 +29,13 @@
             type="text"
             value={@query}
           />
-          <ul
-            data-role="place-search-results"
-            id="place-search-results"
-            phx-hook="AutocompleteList"
-            role="listbox"
-          >
+          <ul data-role="place-search-results" id="place-search-results" phx-hook="AutocompleteList" role="listbox">
             <%= if @no_results_message do %>
-              <li
-                aria-selected="false"
-                data-role="place-search-no-results"
-                phx-click="choose-place-address"
-                role="option"
-                tabindex="-1"
-              >
+              <li aria-selected="false" data-role="place-search-no-results" phx-click="choose-place-address" role="option" tabindex="-1">
                 <div><%= @no_results_message %></div>
-                <.link navigate={~p"/case-investigations/#{@case_investigation}/place"}
-                       class="new-place-link"
-                       data-role="no-results-add-new-place">+ Add new place</.link>
+                <.link navigate={~p"/case-investigations/#{@case_investigation}/place"} class="new-place-link" data-role="no-results-add-new-place">
+                  + Add new place
+                </.link>
               </li>
             <% end %>
             <%= for place_address <- @result_place_addresses do %>
@@ -60,18 +48,19 @@
                 role="option"
                 tabindex="-1"
               >
-                <.link navigate={
-                  ~p"/case-investigations/#{@case_investigation}/add-visit?#{[place: place_address.place, place_address: place_address]}"}
-                       data-role="place_address_link"  data-tid={place_address.tid}>
-                  <span class="place-name"><%= place_address.place.name %></span><span><%= address(place_address) %></span></.link>
+                <.link
+                  navigate={~p"/case-investigations/#{@case_investigation}/add-visit?#{[place: place_address.place, place_address: place_address]}"}
+                  data-role="place_address_link"
+                  data-tid={place_address.tid}
+                >
+                  <span class="place-name"><%= place_address.place.name %></span><span><%= address(place_address) %></span>
+                </.link>
               </li>
             <% end %>
           </ul>
         </div>
       </form>
-      <.link navigate={~p"/case-investigations/#{@case_investigation}/place"}
-             class="new-place-link"
-             data-role="add-new-place">+ Add new place</.link>
+      <.link navigate={~p"/case-investigations/#{@case_investigation}/place"} class="new-place-link" data-role="add-new-place">+ Add new place</.link>
     </div>
   </section>
 </div>

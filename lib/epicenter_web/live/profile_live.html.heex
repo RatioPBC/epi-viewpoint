@@ -21,10 +21,9 @@
             </button>
           <% end %>
           <%= if @potential_duplicate_count > 0 and is_editable?(@person) do %>
-            <.link navigate={~p"/people/#{@person}/potential-duplicates"}
-              id="view-potential-duplicates"
-              data-role="view-potential-duplicates">
-              View potential duplicates (<%= @potential_duplicate_count %>)</.link>
+            <.link navigate={~p"/people/#{@person}/potential-duplicates"} id="view-potential-duplicates" data-role="view-potential-duplicates">
+              View potential duplicates (<%= @potential_duplicate_count %>)
+            </.link>
           <% end %>
         </div>
       </div>
@@ -50,8 +49,7 @@
       <h2>Profile</h2>
       <%= if is_editable?(@person) do %>
         <span>
-          <.link navigate={~p"/people/#{@person}/edit"}
-            data-role="edit-identifying-information-link">Update</.link>
+          <.link navigate={~p"/people/#{@person}/edit"} data-role="edit-identifying-information-link">Update</.link>
         </span>
       <% end %>
     </header>
@@ -64,12 +62,14 @@
           <th>Email</th>
         </tr>
         <tr>
-          <td data-role="date-of-birth"><%= string_or_unknown(
+          <td data-role="date-of-birth">
+            <%= string_or_unknown(
               with(
                 dob when not is_nil(dob) <- demographic_field(@person, :dob),
                 do: Format.date(dob)
               )
-            ) %></td>
+            ) %>
+          </td>
           <td data-role="preferred-language"><%= string_or_unknown(demographic_field(@person, :preferred_language)) %></td>
           <td data-role="phone-numbers"><%= list_or_unknown(phone_numbers(@person)) %></td>
           <td data-role="email-addresses"><%= list_or_unknown(email_addresses(@person)) %></td>
@@ -97,39 +97,27 @@
   </section>
   <a id="case-investigations"></a>
   <%= for case_investigation <- @case_investigations do %>
-    <section
-      class="case-investigation"
-      data-tid={case_investigation.tid}
-      id={"case-investigation-#{case_investigation.name}"}
-    >
+    <section class="case-investigation" data-tid={case_investigation.tid} id={"case-investigation-#{case_investigation.name}"}>
       <div>
         <header>
           <h2 data-role="case-investigation-title">
-            Case investigation <%= string_or_unknown(
-              Format.date(case_investigation.initiating_lab_result.reported_on)
-            ) %>
+            Case investigation <%= string_or_unknown(Format.date(case_investigation.initiating_lab_result.reported_on)) %>
           </h2>
-          <span class="case-investigation-timestamp" data-role="case-investigation-timestamp">Created on <%= Format.date(case_investigation.inserted_at) %></span>
+          <span class="case-investigation-timestamp" data-role="case-investigation-timestamp">
+            Created on <%= Format.date(case_investigation.inserted_at) %>
+          </span>
         </header>
         <div class="case-investigation-details" data-role="case-investigation-initiated-by">
-          Initiated by positive lab result collected on <%= Format.date(
-            case_investigation.initiating_lab_result.sampled_on
-          ) %> at <%= case_investigation.initiating_lab_result.request_facility_name %>
+          Initiated by positive lab result collected on <%= Format.date(case_investigation.initiating_lab_result.sampled_on) %> at <%= case_investigation.initiating_lab_result.request_facility_name %>
         </div>
       </div>
       <div class="case-investigation-sections">
         <div>
-          <div
-            class="case-investigation-interview-status"
-            data-role="case-investigation-interview-status"
-          >
+          <div class="case-investigation-interview-status" data-role="case-investigation-interview-status">
             <h3 class="status" data-role="status">
               <%= displayable_interview_status(case_investigation) %>
             </h3>
-            <.interview_buttons
-              :if={is_editable?(@person)}
-              person={@person}
-              case_investigation={case_investigation} />
+            <.interview_buttons :if={is_editable?(@person)} person={@person} case_investigation={case_investigation} />
           </div>
           <.history_items person={@person} case_investigation={case_investigation} />
         </div>
@@ -142,7 +130,13 @@
               <div class="links">
                 <%= if is_editable?(@person) do %>
                   <span>
-                    <.link navigate={~p"/case-investigations/#{case_investigation}/clinical-details"} id="case-investigation-clinical-details-link-001" class="case-investigation-clinical-details-link">Edit</.link>
+                    <.link
+                      navigate={~p"/case-investigations/#{case_investigation}/clinical-details"}
+                      id="case-investigation-clinical-details-link-001"
+                      class="case-investigation-clinical-details-link"
+                    >
+                      Edit
+                    </.link>
                   </span>
                 <% end %>
               </div>
@@ -172,7 +166,10 @@
                   <.link
                     navigate={~p"/case-investigations/#{case_investigation}/contact"}
                     id="add-contact-case-investigation-link-001"
-                    class="add-contact-case-investigation-link">+ Contact</.link>
+                    class="add-contact-case-investigation-link"
+                  >
+                    + Contact
+                  </.link>
                 <% end %>
               </div>
             </div>
@@ -180,15 +177,20 @@
               <div class="contact">
                 <div class="contact-details">
                   <div>
-                    <.link navigate={~p"/people/#{contact_investigation.exposed_person}"}
-                           data-role="visit-contact-link"
-                           class="contact-name"><%= Format.person(contact_investigation.exposed_person) %></.link>
+                    <.link navigate={~p"/people/#{contact_investigation.exposed_person}"} data-role="visit-contact-link" class="contact-name">
+                      <%= Format.person(contact_investigation.exposed_person) %>
+                    </.link>
                   </div>
                   <%= contact_details_as_list(contact_investigation) %>
                 </div>
                 <div class="contact-edit-remove">
-                  <.link navigate={~p"/case-investigations/#{case_investigation}/contact/#{contact_investigation}"}
-                    data-role="edit-contact" data-contact-investigation={contact_investigation.id}>Edit</.link>
+                  <.link
+                    navigate={~p"/case-investigations/#{case_investigation}/contact/#{contact_investigation}"}
+                    data-role="edit-contact"
+                    data-contact-investigation={contact_investigation.id}
+                  >
+                    Edit
+                  </.link>
                   <a
                     data-confirm={
                       "#{"Remove #{Format.person(contact_investigation.exposed_person)} as a contact?"}"
@@ -197,7 +199,9 @@
                     href="#"
                     phx-click="remove-contact"
                     phx-value-contact-investigation-id={contact_investigation.id}
-                  >Remove</a>
+                  >
+                    Remove
+                  </a>
                 </div>
               </div>
             <% end %>
@@ -212,18 +216,17 @@
                   <.link
                     navigate={~p"/case-investigations/#{case_investigation}/place-search"}
                     id={"add-place-link-#{case_investigation.tid}"}
-                    class="add-place-link">+ Place</.link>
-
+                    class="add-place-link"
+                  >
+                    + Place
+                  </.link>
                 <% end %>
               </div>
             </div>
             <%= for visit <- case_investigation.visits do %>
               <div class="visit" data-tid={visit.tid}>
                 <div>
-                  <span class="place-name" data-role="place-name"><%= visit.place.name %></span><span
-                    class="visit-address"
-                    data-role="place-address"
-                  ><%= address(visit.place) %></span>
+                  <span class="place-name" data-role="place-name"><%= visit.place.name %></span><span class="visit-address" data-role="place-address"><%= address(visit.place) %></span>
                 </div>
                 <div>
                   <ul class="dotted-details">
@@ -258,21 +261,15 @@
         <% end %>
         <%= if case_investigation.interview_status == "completed" do %>
           <div>
-            <div
-              class="case-investigation-isolation-monitoring-status"
-              id={"isolation-monitoring-#{case_investigation.name}"}
-            >
+            <div class="case-investigation-isolation-monitoring-status" id={"isolation-monitoring-#{case_investigation.name}"}>
               <h3 class="status" data-role="status">
                 <%= displayable_isolation_monitoring_status(case_investigation, @current_date) %>
               </h3>
               <div>
-                <.isolation_monitoring_button
-                  :if={is_editable?(@person)}
-                  case_investigation={case_investigation} /></div>
+                <.isolation_monitoring_button :if={is_editable?(@person)} case_investigation={case_investigation} />
+              </div>
             </div>
-            <.isolation_monitoring_history_items
-              person={@person}
-              case_investigation={case_investigation} />
+            <.isolation_monitoring_history_items person={@person} case_investigation={case_investigation} />
           </div>
         <% end %>
         <%= if case_investigation.isolation_monitoring_status == "ongoing" do %>
@@ -285,7 +282,10 @@
                     <.link
                       navigate={~p"/case-investigations/#{case_investigation}/isolation-order"}
                       id="edit-isolation-order-case-investigation-link-001"
-                      class="primary">Edit</.link>
+                      class="primary"
+                    >
+                      Edit
+                    </.link>
                   </span>
                 <% end %>
               </div>
@@ -299,11 +299,15 @@
               </thead>
               <tbody>
                 <tr>
-                  <td data-tid="case-investigation-001-isolation-order-sent-date"><%= Format.date(case_investigation.isolation_order_sent_on, "Not sent") %></td>
-                  <td data-tid="case-investigation-001-isolation-clearance-order-sent-date"><%= Format.date(
+                  <td data-tid="case-investigation-001-isolation-order-sent-date">
+                    <%= Format.date(case_investigation.isolation_order_sent_on, "Not sent") %>
+                  </td>
+                  <td data-tid="case-investigation-001-isolation-clearance-order-sent-date">
+                    <%= Format.date(
                       case_investigation.isolation_clearance_order_sent_on,
                       "Not sent"
-                    ) %></td>
+                    ) %>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -317,7 +321,8 @@
           is_editable={is_editable?(@person)}
           current_user_id={@current_user.id}
           on_add_note={fn note_attrs -> on_note_added(note_attrs, case_investigation) end}
-          on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end} />
+          on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, case_investigation) end}
+        />
       </div>
     </section>
   <% end %>
@@ -330,7 +335,8 @@
       current_user_id={@current_user.id}
       current_date={@current_date}
       on_add_note={fn note_attrs -> on_note_added(note_attrs, contact_investigation) end}
-      on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end} />
+      on_delete_note={fn deleted_note -> on_note_deleted(deleted_note, contact_investigation) end}
+    />
   <% end %>
   <section data-role="lab-results" id="lab-results">
     <header>

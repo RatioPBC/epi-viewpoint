@@ -96,9 +96,7 @@ defmodule EpicenterWeb.ContactInvestigationQuarantineMonitoringLive do
          {:form, {:ok, model_attrs}} <- {:form, QuarantineMonitoringForm.form_changeset_to_model_attrs(form_changeset)},
          {:contact_investigation, {:ok, _contact_investigation}} <- {:contact_investigation, update_contact_investigation(socket, model_attrs)} do
       socket
-      |> push_navigate(
-        to: ~p"/people/#{socket.assigns.contact_investigation.exposed_person}/#case-investigations"
-      )
+      |> push_navigate(to: ~p"/people/#{socket.assigns.contact_investigation.exposed_person}/#case-investigations")
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->

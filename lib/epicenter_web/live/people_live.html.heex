@@ -4,11 +4,7 @@
   </h2>
   <div id="toolbar">
     <div id="toolbar-left">
-      <form
-        data-disabled={disabled?(@selected_people)}
-        id="assignment-form"
-        phx-change="form-change"
-      >
+      <form data-disabled={disabled?(@selected_people)} id="assignment-form" phx-change="form-change">
         <div id="user-list">
           <span id="assign-to-label">Assign to</span>
           <div id="select-wrapper">
@@ -37,12 +33,13 @@
     </div>
     <div id="toolbar-right">
       <.live_component
-      module={EpicenterWeb.PeopleFilter}
-      id="people-filter"
-      display_people_assigned_to_me={@display_people_assigned_to_me}
-      filter={@filter}
-      on_toggle_assigned_to_me={&on_toggle_assigned_to_me/0} />
-      <.link :if={@display_import_button} navigate={"/import/start"} data-role="import-labs" id="import-labs">Import labs</.link>
+        module={EpicenterWeb.PeopleFilter}
+        id="people-filter"
+        display_people_assigned_to_me={@display_people_assigned_to_me}
+        filter={@filter}
+        on_toggle_assigned_to_me={&on_toggle_assigned_to_me/0}
+      />
+      <.link :if={@display_import_button} navigate="/import/start" data-role="import-labs" id="import-labs">Import labs</.link>
     </div>
   </div>
   <table data-role="people">

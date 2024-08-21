@@ -1,13 +1,7 @@
-<div
-  data-confirm-navigation={@confirmation_prompt}
-  data-page="demographics-edit"
-  data-role="demographics-edit-page"
-  id="demographics-edit-page"
->
+<div data-confirm-navigation={@confirmation_prompt} data-page="demographics-edit" data-role="demographics-edit-page" id="demographics-edit-page">
   <section>
     <header id="subnav">
-      <.link navigate={~p"/people/#{@person}"}
-             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
+      <.link navigate={~p"/people/#{@person}"} data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section id="demographics-edit">
