@@ -6,7 +6,9 @@
 >
   <header>
     <h2 data-role="contact-investigation-title">Contact investigation <%= Format.date(@contact_investigation.most_recent_date_together) %></h2>
-    <span class="contact-investigation-timestamp" data-role="contact-investigation-timestamp">Created on <%= Format.date(@contact_investigation.inserted_at) %></span>
+    <span class="contact-investigation-timestamp" data-role="contact-investigation-timestamp">
+      Created on <%= Format.date(@contact_investigation.inserted_at) %>
+    </span>
   </header>
   <div>
     <div data-role="initiating-case">
@@ -32,10 +34,9 @@
     <div>
       <div class="contact-investigation-status-row">
         <h3>
-          <span
-            class={status_class(@contact_investigation.interview_status)}
-            data-role="contact-investigation-interview-status"
-          ><%= status_text(@contact_investigation) %></span>
+          <span class={status_class(@contact_investigation.interview_status)} data-role="contact-investigation-interview-status">
+            <%= status_text(@contact_investigation) %>
+          </span>
           interview
         </h3>
         <div class="contact-investigation-interview-buttons">
@@ -51,9 +52,13 @@
           <div class="links">
             <%= if is_editable?(@contact_investigation.exposed_person) do %>
               <span>
-                <.link navigate={~p"/contact-investigations/#{@contact_investigation}/clinical-details"}
-                data-role="edit-contact-clinical-details-link"
-                class="contact-investigation-clinical-details-link">Edit</.link>
+                <.link
+                  navigate={~p"/contact-investigations/#{@contact_investigation}/clinical-details"}
+                  data-role="edit-contact-clinical-details-link"
+                  class="contact-investigation-clinical-details-link"
+                >
+                  Edit
+                </.link>
               </span>
             <% end %>
           </div>
@@ -80,13 +85,8 @@
       <div>
         <div class="contact-investigation-status-row">
           <%= quarantine_monitoring_status_text(@contact_investigation, @current_date) %>
-          <div
-            class="contact-investigation-interview-buttons"
-            data-role="contact-investigation-quarantine-buttons"
-          >
-            <.quarantine_monitoring_button
-              :if={is_editable?(@contact_investigation.exposed_person)}
-              contact_investigation={@contact_investigation} />
+          <div class="contact-investigation-interview-buttons" data-role="contact-investigation-quarantine-buttons">
+            <.quarantine_monitoring_button :if={is_editable?(@contact_investigation.exposed_person)} contact_investigation={@contact_investigation} />
           </div>
         </div>
         <.quarantine_history_items contact_investigation={@contact_investigation} />

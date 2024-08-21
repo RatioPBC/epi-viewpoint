@@ -4,13 +4,13 @@
   </h2>
   <div id="toolbar">
     <div id="toolbar-left">
-
       <.live_component
         module={EpicenterWeb.AssignmentSelector}
         id="assignment-selection"
         users={@users}
         disabled={disabled?(@selected_people)}
-        on_assignee_selected={fn user_id -> send(self(), {:assignee_selected, user_id}) end} />
+        on_assignee_selected={fn user_id -> send(self(), {:assignee_selected, user_id}) end}
+      />
 
       <button
         data-confirm={archive_confirmation_message(@selected_people)}
@@ -18,7 +18,9 @@
         disabled={disabled?(@selected_people)}
         id="archive-button"
         phx-click="archive"
-      >Archive</button>
+      >
+        Archive
+      </button>
     </div>
     <div id="toolbar-right">
       <.live_component module={EpicenterWeb.ContactsFilter} id="contacts-filter" filter={@filter} />
@@ -48,9 +50,7 @@
             />
           </td>
           <td>
-            <.link
-              navigate={~p"/people/#{person}"}
-              data-role={"profile-link-#{person.id}"}>
+            <.link navigate={~p"/people/#{person}"} data-role={"profile-link-#{person.id}"}>
               <%= full_name(person) %>
             </.link>
           </td>

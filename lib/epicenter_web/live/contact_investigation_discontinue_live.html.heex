@@ -6,16 +6,17 @@
 >
   <section>
     <header id="subnav">
-            <.link navigate={~p"/people/#{@contact_investigation.exposed_person}"}
-             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
+      <.link navigate={~p"/people/#{@contact_investigation.exposed_person}"} data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <div class="InvestigationDiscontinueForm">
     <header>
-      <h2 data-role="form-title"><%= if(@contact_investigation.interview_discontinued_at,
+      <h2 data-role="form-title">
+        <%= if(@contact_investigation.interview_discontinued_at,
           do: "Edit discontinue interview",
           else: "Discontinue interview"
-        ) %></h2>
+        ) %>
+      </h2>
       <h3 class="InvestigationDiscontinueForm__Subtitle">before interview start</h3>
     </header>
     <%= form_for @changeset, "#", [id: "contact-investigation-discontinue-form", class: "InvestigationDiscontinueForm__Form", phx_change: "change", phx_submit: "save"], fn f -> %>

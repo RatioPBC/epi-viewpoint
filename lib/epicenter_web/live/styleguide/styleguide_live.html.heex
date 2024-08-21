@@ -2,7 +2,7 @@
   <div id="nav">
     <a href="#text">Text</a><a href="#buttons-and-links">Buttons & links</a><a href="#layout">Layout</a><a href="#containers">Containers</a><a href="#elements">Elements & controls</a><a href="#data">Data</a><a href="#form">Form</a><a href="#effects">Effects</a><a href="#components">Components</a><a href="#icebox">Icebox</a>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="text">Text</div>
     <div class="styleguide-example">
@@ -39,7 +39,7 @@
       <code>font-size: $small-body-text-size</code>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="buttons-and-links">Buttons & links</div>
     <div class="styleguide-example">
@@ -49,11 +49,13 @@
       <div id="primary-button-container">
         <a href="#" id="primary-button-with-icon">
           <%= checkmark_icon() %><span>Primary button with icon</span>
-        </a><a data-disabled="true" href="#" id="primary-button-with-icon-disabled"><%= checkmark_icon() %><span>Primary button with icon disabled</span></a>
+        </a>
+        <a data-disabled="true" href="#" id="primary-button-with-icon-disabled">
+          <%= checkmark_icon() %><span>Primary button with icon disabled</span>
+        </a>
       </div>
       <code>
-        @include button-primary @include has-icon($color: white)
-        <small>Text should be wrapped in a span in order to be spaced properly</small>
+        @include button-primary @include has-icon($color: white) <small>Text should be wrapped in a span in order to be spaced properly</small>
       </code>
     </div>
     <div class="styleguide-example">
@@ -65,7 +67,8 @@
     <div class="styleguide-example">
       <a href="#" id="secondary-button-with-icon">
         <%= plus_icon() %><span>Secondary button with icon</span>
-      </a><code>@include button-secondary @include has-icon <small>Text should be wrapped in a span in order to be spaced properly</small></code>
+      </a>
+      <code>@include button-secondary @include has-icon <small>Text should be wrapped in a span in order to be spaced properly</small></code>
     </div>
     <div class="styleguide-example">
       <a href="#" id="secondary-button-small">Secondary button (small)</a><code>@include button-secondary($size: small)</code>
@@ -81,46 +84,43 @@
         <a href="#" id="link-button">Link button</a><button disabled id="link-button-disabled">Disabled link button</button>
       </div>
       <code>
-        @include button-link
-        <small>Has the same display properties of a button, but without the border</small>
+        @include button-link <small>Has the same display properties of a button, but without the border</small>
       </code>
     </div>
     <div class="styleguide-example">
       <div id="disabled-anchor-buttons">
-        <a data-disabled href="#" id="primary-anchor-button-disabled">Primary</a><a
+        <a data-disabled href="#" id="primary-anchor-button-disabled">Primary</a><a data-disabled href="#" id="secondary-anchor-button-disabled">Secondary</a><a
           data-disabled
           href="#"
-          id="secondary-anchor-button-disabled"
-        >Secondary</a><a data-disabled href="#" id="outline-anchor-button-disabled">Outline</a>
+          id="outline-anchor-button-disabled"
+        >Outline</a>
       </div>
       <code>a data-disabled=true</code>
     </div>
     <div class="styleguide-example">
       <div id="disabled-buttons">
-        <button disabled id="primary-button-disabled">Primary</button><button
+        <button disabled id="primary-button-disabled">Primary</button><button disabled id="secondary-button-disabled">Secondary</button><button
           disabled
-          id="secondary-button-disabled"
-        >Secondary</button><button disabled id="outline-button-disabled">Outline</button>
+          id="outline-button-disabled"
+        >Outline</button>
       </div>
       <code>button disabled=true</code>
     </div>
     <div class="styleguide-example">
       <span id="button-list">
-        <a class="button" href="#">Button</a><a class="button" href="#">List</a><a
+        <a class="button" href="#">Button</a><a class="button" href="#">List</a><a class="button" data-active="true" href="#">Active</a><a
           class="button"
-          data-active="true"
+          data-disabled="true"
           href="#"
-        >Active</a><a class="button" data-disabled="true" href="#">Disabled</a><a
-          class="button"
-          href="#"
-        >Button</a>
-      </span><code>@include button-list</code>
+        >Disabled</a><a class="button" href="#">Button</a>
+      </span>
+      <code>@include button-list</code>
     </div>
     <div class="styleguide-example">
       <a href="#" id="link">Link</a><code>a</code>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="layout">Layout</div>
     <div class="styleguide-example-title">Centered</div>
@@ -142,11 +142,11 @@
         <div style="height: 40px">Tall item</div>
         <span>
           <span>3a</span><span>3b</span><span>3c</span>
-        </span><a>Item 4</a>
+        </span>
+        <a>Item 4</a>
       </div>
       <code>
-        @include level
-        <small>Like horizontal-flow, but the contents are vertically aligned</small>
+        @include level <small>Like horizontal-flow, but the contents are vertically aligned</small>
       </code>
     </div>
     <div class="styleguide-example-title">Horizontal Flow</div>
@@ -156,7 +156,8 @@
         <div style="height: 40px">Tall item</div>
         <span>
           <span>3a</span><span>3b</span><span>3c</span>
-        </span><a>Item 4</a>
+        </span>
+        <a>Item 4</a>
       </div>
       <code>
         @include horizontal-flow <small>The children have a horizontal space between them</small>
@@ -175,8 +176,7 @@
         <span>a</span><span>b</span><span>c</span>
       </div>
       <code>
-        @include horizontal-flow($justify: space-between)
-        <small>The children are spaced apart evenly</small>
+        @include horizontal-flow($justify: space-between) <small>The children are spaced apart evenly</small>
       </code>
     </div>
     <div class="styleguide-example">
@@ -198,7 +198,8 @@
         <div style="height: 40px">Tall item</div>
         <span>
           <span>3a</span><span>3b</span><span>3c</span>
-        </span><a>Item 4</a>
+        </span>
+        <a>Item 4</a>
       </div>
       <code>
         @include vertical-flow <small>The children have a vertical space between them</small>
@@ -220,7 +221,7 @@
       <code>@include vertical-flow, @include horizontal-flow</code>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="containers">Containers</div>
     <div class="styleguide-example-title">Section</div>
@@ -243,8 +244,7 @@
         <div>Here is some text in a div with no border bottom</div>
       </div>
       <code>
-        @include dividers
-        <small>Add border dividers between its children, excluding the first child</small>
+        @include dividers <small>Add border dividers between its children, excluding the first child</small>
       </code>
     </div>
     <div class="styleguide-example-title">Card</div>
@@ -260,8 +260,7 @@
         </div>
       </div>
       <code>
-        @include card
-        <small>use vertical-flow on a container to make vertical space between cards</small>
+        @include card <small>use vertical-flow on a container to make vertical space between cards</small>
       </code>
     </div>
     <div class="styleguide-example-title">Subnav</div>
@@ -274,7 +273,7 @@
       <code>@include subnav</code>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="elements">Elements & controls</div>
     <div class="styleguide-example-title">Tooltip</div>
@@ -333,7 +332,7 @@
       </code>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="data">Data</div>
     <div class="styleguide-example">
@@ -345,7 +344,7 @@
       <code>@include detail-table</code>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="form">Form</div>
     <div class="styleguide-example-title">Full form examples</div>
@@ -356,7 +355,7 @@
       <.link navigate={~p"/styleguide/form-multiselect"}>Form multiselect example</.link>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="effects">Effects</div>
     <div class="styleguide-example-title">Shadow</div>
@@ -369,7 +368,7 @@
       <code>@include shadow($style: dialog)</code>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="components">Components</div>
     <div class="styleguide-example-title">Component examples</div>
@@ -377,7 +376,7 @@
       <.link navigate={~p"/styleguide/investigation-notes-section"}>InvestigationNotesSection example</.link>
     </div>
   </div>
-  
+
   <div class="styleguide-section">
     <div class="styleguide-section-title" id="icebox">Icebox</div>
     <div class="styleguide-example-title">Autocomplete</div>
@@ -387,23 +386,13 @@
           <input />
           <ul id="AutocompleteList" phx-hook="AutocompleteList" role="listbox">
             <%= for address <- @suggested_addresses do %>
-              <li
-                aria-selected="false"
-                phx-click="choose-address"
-                phx-value-address={address}
-                role="option"
-                tabindex="-1"
-              >
+              <li aria-selected="false" phx-click="choose-address" phx-value-address={address} role="option" tabindex="-1">
                 <%= address %>
               </li>
             <% end %>
           </ul>
         </div>
-        <input
-          placeholder="not an autocomplete field"
-          style="width: 400px; margin-top: 2rem"
-          type="text"
-        />
+        <input placeholder="not an autocomplete field" style="width: 400px; margin-top: 2rem" type="text" />
       </form>
       <code>@include autocomplete</code>
     </div>

@@ -40,10 +40,7 @@ defmodule EpicenterWeb.PlaceLive do
       place_address = if Euclid.Exists.present?(place.place_addresses), do: List.first(place.place_addresses), else: nil
 
       socket
-      |> push_navigate(
-        to:
-          ~p"/case-investigations/#{socket.assigns.case_investigation}/add-visit?#{[place: place, place_address: place_address]}"
-      )
+      |> push_navigate(to: ~p"/case-investigations/#{socket.assigns.case_investigation}/add-visit?#{[place: place, place_address: place_address]}")
       |> noreply()
     else
       {:form, {:error, %Ecto.Changeset{valid?: false} = form_changeset}} ->

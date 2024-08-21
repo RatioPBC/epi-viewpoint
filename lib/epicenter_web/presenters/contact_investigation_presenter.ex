@@ -12,11 +12,9 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
 
   def exposing_case_link(assigns) do
     ~H"""
-    <.link
-      navigate={~p"/people/#{@contact_investigation.exposing_case.person}"}
-      data-role="visit-exposing-case-link"
-      class="visit-exposing-case-link"
-    ><%= "\##{exposing_case_person_id(@contact_investigation)}" %></.link>
+    <.link navigate={~p"/people/#{@contact_investigation.exposing_case.person}"} data-role="visit-exposing-case-link" class="visit-exposing-case-link">
+      <%= "\##{exposing_case_person_id(@contact_investigation)}" %>
+    </.link>
     """
   end
 
@@ -32,12 +30,8 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     <div class="contact-investigation-history">
       <%= for item <- to_history_items_list(@contact_investigation) do %>
         <div>
-          <span data-role="contact-investigation-history-item-text"
-            ><%= item.text %></span>
-          <span class="history-item-link"
-            ><.history_router_link
-              label={item.link}
-              contact_investigation={@contact_investigation} /></span>
+          <span data-role="contact-investigation-history-item-text"><%= item.text %></span>
+          <span class="history-item-link"><.history_router_link label={item.link} contact_investigation={@contact_investigation} /></span>
         </div>
       <% end %>
     </div>
@@ -50,25 +44,31 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
   def history_router_link(assigns) do
     ~H"""
     <.link
-      :if={@label==:start_interview}
+      :if={@label == :start_interview}
       navigate={~p"/contact-investigations/#{@contact_investigation}/start-interview"}
       data-role="contact-investigation-start-interview-edit-link"
       class="contact-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
 
     <.link
-      :if={@label==:complete_interview}
+      :if={@label == :complete_interview}
       navigate={~p"/contact-investigations/#{@contact_investigation}/complete-interview"}
       data-role="contact-investigation-complete-interview-edit-link"
       class="contact-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
 
     <.link
-      :if={@label==:discontinue_interview}
+      :if={@label == :discontinue_interview}
       navigate={~p"/contact-investigations/#{@contact_investigation}/discontinue"}
       data-role="contact-investigation-discontinue-interview-edit-link"
       class="contact-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
     """
   end
 
@@ -136,12 +136,8 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
     <div class="contact-investigation-history">
       <%= for item <- to_quarantine_history_items_list(@contact_investigation) do %>
         <div>
-          <span data-role="contact-investigation-quarantine-history-item-text"
-            ><%= item.text %></span>
-          <span class="history-item-link"
-            ><.quarantine_history_router_link
-              label={item.link}
-              contact_investigation={@contact_investigation} /></span>
+          <span data-role="contact-investigation-quarantine-history-item-text"><%= item.text %></span>
+          <span class="history-item-link"><.quarantine_history_router_link label={item.link} contact_investigation={@contact_investigation} /></span>
         </div>
       <% end %>
     </div>
@@ -158,14 +154,18 @@ defmodule EpicenterWeb.Presenters.ContactInvestigationPresenter do
       navigate={~p"/contact-investigations/#{@contact_investigation}/quarantine-monitoring"}
       data-role="edit-contact-investigation-quarantine-monitoring-link"
       class="contact-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
 
     <.link
       :if={@label == :quarantine_conclusion}
       navigate={~p"/contact-investigations/#{@contact_investigation}/conclude-quarantine-monitoring"}
       data-role="conclude-contact-investigation-quarantine-monitoring-edit-link"
       class="contact-investigation-link"
-    >Edit</.link>
+    >
+      Edit
+    </.link>
     """
   end
 

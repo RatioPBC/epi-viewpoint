@@ -57,13 +57,17 @@ defmodule Epicenter.Test.Html do
     do: html |> all("[data-role=#{role}]", as: :text)
 
   def text(html) when not is_binary(html) or is_tuple(html),
-    do: html |> Floki.text(sep: " ")
+    do: html |> Floki.text(sep: " ") |> String.trim() |> remove_extra_white_spaces()
 
-  def text(html, role: role) when not is_binary(html),
-    do: html |> text("[data-role=#{role}]")
+  def text(html, role: role) when not is_binary(html) do
+    html
+    |> text("[data-role=#{role}]")
+    |> String.trim()
+    |> remove_extra_white_spaces()
+  end
 
   def text(html, css_query) when not is_binary(html),
-    do: html |> find(css_query) |> Floki.text()
+    do: html |> find(css_query) |> Floki.text() |> String.trim() |> remove_extra_white_spaces()
 
   def tid(html),
     do: html |> Floki.attribute("data-tid")
@@ -78,4 +82,7 @@ defmodule Epicenter.Test.Html do
 
   defp assert_found(found, _html, _css_query),
     do: found
+
+  defp remove_extra_white_spaces(text),
+    do: text |> String.replace(~r[(\s+)], " ")
 end

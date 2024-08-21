@@ -45,8 +45,8 @@ defmodule EpicenterWeb.PlaceSearchLive do
     place_address = Cases.get_place_address(place_address_id) |> Cases.preload_place()
 
     socket
-    |> push_navigate(to:
-      ~p"/case-investigations/#{socket.assigns.case_investigation}/add-visit?#{[place: place_address.place, place_address: place_address]}"
+    |> push_navigate(
+      to: ~p"/case-investigations/#{socket.assigns.case_investigation}/add-visit?#{[place: place_address.place, place_address: place_address]}"
     )
     |> noreply()
   end

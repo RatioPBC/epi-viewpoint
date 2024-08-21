@@ -1,12 +1,7 @@
-<div
-  data-confirm-navigation={@confirmation_prompt}
-  data-page="investigation-complete-interview"
-  id="investigation-complete-interview-page"
->
+<div data-confirm-navigation={@confirmation_prompt} data-page="investigation-complete-interview" id="investigation-complete-interview-page">
   <section>
     <header id="subnav">
-      <.link navigate={~p"/people/#{get_person(@investigation)}"}
-             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
+      <.link navigate={~p"/people/#{get_person(@investigation)}"} data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section id="investigation-complete-interview">

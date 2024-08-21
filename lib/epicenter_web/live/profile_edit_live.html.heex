@@ -1,13 +1,7 @@
-<div
-  data-confirm-navigation={confirmation_prompt(@changeset)}
-  data-page="profile-edit"
-  data-role="profile-edit-page"
-  id="profile-edit-page"
->
+<div data-confirm-navigation={confirmation_prompt(@changeset)} data-page="profile-edit" data-role="profile-edit-page" id="profile-edit-page">
   <section>
     <header id="subnav">
-      <.link navigate={~p"/people/#{@person}"}
-             data-role="back-link"><%= back_icon() %><span>Back</span></.link>
+      <.link navigate={~p"/people/#{@person}"} data-role="back-link"><%= back_icon() %><span>Back</span></.link>
     </header>
   </section>
   <section id="profile-edit">
@@ -50,11 +44,7 @@
               ) %>
             </div>
           </fieldset>
-          <fieldset
-            data-disabled={!@preferred_language_is_other}
-            data-role="other-preferred-language"
-            id="other-preferred-language"
-          >
+          <fieldset data-disabled={!@preferred_language_is_other} data-role="other-preferred-language" id="other-preferred-language">
             <%= label f, :other_specified_language do %>
               Please specify<%= error_tag(f, :other_specified_language) %>
             <% end %>
@@ -76,13 +66,9 @@
               <div class="phone-wrapper">
                 <%= checkbox(phone_form, :delete) %>
                 <div class="phone-and-trash-can">
-                  <%= telephone_input(phone_form, :number,
-                    data: [role: "phone-input", tid: phone_form.data.tid]
-                  ) %>
+                  <%= telephone_input(phone_form, :number, data: [role: "phone-input", tid: phone_form.data.tid]) %>
                   <div class="select-wrapper">
-                    <%= arrow_down_icon() %><%= select(phone_form, :type, phone_types(),
-                      data: [role: "phone-types"]
-                    ) %>
+                    <%= arrow_down_icon() %><%= select(phone_form, :type, phone_types(), data: [role: "phone-types"]) %>
                   </div>
                   <%= label phone_form, :delete, phx_click: "remove-phone", phx_value_phone_index: phone_form.index do %>
                     <div class="trash-icon"><%= trash_icon() %></div>
@@ -109,9 +95,9 @@
               ) %><%= error_tag(address_form, :postal_code) %>
               <div class="address-wrapper">
                 <div class="address-and-trash-can">
-                  <%= text_input(address_form, :street,
-                    data: [role: "street-input", tid: address_form.data.tid]
-                  ) %><%= text_input(address_form, :city,
+                  <%= text_input(address_form, :street, data: [role: "street-input", tid: address_form.data.tid]) %><%= text_input(
+                    address_form,
+                    :city,
                     data: [role: "city-input", tid: address_form.data.tid]
                   ) %>
                   <div class="select-wrapper">
@@ -122,9 +108,7 @@
                       data_role: "state-input"
                     ) %>
                   </div>
-                  <%= text_input(address_form, :postal_code,
-                    data: [role: "postal-code-input", tid: address_form.data.tid]
-                  ) %>
+                  <%= text_input(address_form, :postal_code, data: [role: "postal-code-input", tid: address_form.data.tid]) %>
                   <%= label address_form, :delete, phx_click: "remove-address", phx_value_address_index: address_form.index do %>
                     <div class="trash-icon"><%= trash_icon() %></div>
                   <% end %>
@@ -146,9 +130,7 @@
               <div class="email-address-wrapper">
                 <%= checkbox(email_form, :delete) %>
                 <div class="email-address-and-trash-can">
-                  <%= email_input(email_form, :address,
-                    data: [role: "email-address-input", tid: email_form.data.tid]
-                  ) %>
+                  <%= email_input(email_form, :address, data: [role: "email-address-input", tid: email_form.data.tid]) %>
                   <%= label email_form, :delete, phx_click: "remove-email", phx_value_email_index: email_form.index do %>
                     <div class="trash-icon"><%= trash_icon() %></div>
                   <% end %>

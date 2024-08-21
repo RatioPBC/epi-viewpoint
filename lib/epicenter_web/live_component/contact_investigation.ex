@@ -62,13 +62,11 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   def interview_buttons(assigns) do
     ~H"""
-      <%= for label <- to_interview_buttons_list(@contact_investigation) do %>
-        <span data-role="contact-investigation-interview-button">
-          <.interview_buttons_router_link
-            label={label}
-            contact_investigation={@contact_investigation} />
-        </span>
-      <% end %>
+    <%= for label <- to_interview_buttons_list(@contact_investigation) do %>
+      <span data-role="contact-investigation-interview-button">
+        <.interview_buttons_router_link label={label} contact_investigation={@contact_investigation} />
+      </span>
+    <% end %>
     """
   end
 
@@ -77,26 +75,32 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   def interview_buttons_router_link(assigns) do
     ~H"""
-      <.link
-        :if={@label==:start_interview}
-        navigate={~p"/contact-investigations/#{@contact_investigation}/start-interview"}
-        class="primary"
-        data-role="contact-investigation-start-interview"
-      >Start interview</.link>
+    <.link
+      :if={@label == :start_interview}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/start-interview"}
+      class="primary"
+      data-role="contact-investigation-start-interview"
+    >
+      Start interview
+    </.link>
 
-      <.link
-        :if={@label==:complete_interview}
-        navigate={~p"/contact-investigations/#{@contact_investigation}/complete-interview"}
-        class="primary"
-        data-role="contact-investigation-complete-interview-link"
-      >Complete interview</.link>
+    <.link
+      :if={@label == :complete_interview}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/complete-interview"}
+      class="primary"
+      data-role="contact-investigation-complete-interview-link"
+    >
+      Complete interview
+    </.link>
 
-      <.link
-        :if={@label==:discontinue_interview}
-        navigate={~p"/contact-investigations/#{@contact_investigation}/discontinue"}
-        class="discontinue-link"
-        data-role="contact-investigation-discontinue-interview"
-      >Discontinue</.link>
+    <.link
+      :if={@label == :discontinue_interview}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/discontinue"}
+      class="discontinue-link"
+      data-role="contact-investigation-discontinue-interview"
+    >
+      Discontinue
+    </.link>
     """
   end
 
@@ -104,19 +108,23 @@ defmodule EpicenterWeb.ContactInvestigation do
 
   def quarantine_monitoring_button(assigns) do
     ~H"""
-      <.link
-        :if={@contact_investigation.quarantine_monitoring_status=="pending"}
-        navigate={~p"/contact-investigations/#{@contact_investigation}/quarantine-monitoring"}
-        class="primary"
-        data-role="contact-investigation-quarantine-monitoring-start-link"
-      >Add quarantine dates</.link>
+    <.link
+      :if={@contact_investigation.quarantine_monitoring_status == "pending"}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/quarantine-monitoring"}
+      class="primary"
+      data-role="contact-investigation-quarantine-monitoring-start-link"
+    >
+      Add quarantine dates
+    </.link>
 
-      <.link
-        :if={@contact_investigation.quarantine_monitoring_status=="ongoing"}
-        navigate={~p"/contact-investigations/#{@contact_investigation}/conclude-quarantine-monitoring"}
-        class="primary"
-        data-role="conclude-contact-investigation-quarantine-monitoring-link"
-      >Conclude monitoring</.link>
+    <.link
+      :if={@contact_investigation.quarantine_monitoring_status == "ongoing"}
+      navigate={~p"/contact-investigations/#{@contact_investigation}/conclude-quarantine-monitoring"}
+      class="primary"
+      data-role="conclude-contact-investigation-quarantine-monitoring-link"
+    >
+      Conclude monitoring
+    </.link>
     """
   end
 

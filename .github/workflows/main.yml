@@ -54,6 +54,9 @@ jobs:
           npm audit --audit-level=moderate --prefix assets
           mix sobelow --config
       
+      - name: Run mix format
+        run: mix format --check-formatted
+
       - name: Run tests
         run: bin/dev/test
         env: 
