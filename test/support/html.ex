@@ -67,7 +67,7 @@ defmodule Epicenter.Test.Html do
   end
 
   def text(html, css_query) when not is_binary(html),
-    do: html |> find(css_query) |> Floki.text() |> String.trim()
+    do: html |> find(css_query) |> Floki.text() |> String.trim() |> String.replace(~r[(\n\s{2,})], " ")
 
   def tid(html),
     do: html |> Floki.attribute("data-tid")

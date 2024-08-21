@@ -28,7 +28,7 @@ defmodule EpicenterWeb.Test.Pages.PlaceSearch do
     view
     |> Pages.parse()
     |> Test.Html.text("[data-role=place-search-results]")
-    |> assert_eq("No results\n                  + Add new place", returning: view)
+    |> assert_eq("No results + Add new place", returning: view)
   end
 
   def assert_selectable_results(view, expected_texts),
