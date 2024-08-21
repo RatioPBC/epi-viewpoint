@@ -829,7 +829,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
                %{
                  id: ^contact_investigation_id,
                  title: "Contact investigation 08/06/2020",
-                 initiating_case_text: "Initiated by index case  #987650",
+                 initiating_case_text: "Initiated by index case #987650",
                  minor_details: [],
                  exposure_details: ["Same household", "Partner or roommate", "Last together on 08/06/2020"],
                  interview_buttons: ["Start interview", "Discontinue"]
@@ -878,7 +878,7 @@ defmodule EpicenterWeb.ProfileLiveTest do
 
       contact_investigation_id = contact_investigation.id
       view = Pages.Profile.visit(conn, contact_investigation.exposed_person)
-      initiating_case_text = "Initiated by index case  \##{sick_person.id}"
+      initiating_case_text = "Initiated by index case \##{sick_person.id}"
 
       assert [%{id: ^contact_investigation_id, initiating_case_text: ^initiating_case_text}] = Pages.Profile.contact_investigations(view)
     end
