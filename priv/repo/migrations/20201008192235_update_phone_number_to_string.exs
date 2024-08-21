@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.UpdatePhoneNumberToString do
+defmodule EpiViewpoint.Repo.Migrations.UpdatePhoneNumberToString do
   use Ecto.Migration
 
   def change do

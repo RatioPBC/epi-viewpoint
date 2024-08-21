@@ -1,7 +1,7 @@
 # ---- Application Base Stage ----
 FROM alpine:latest AS app_runner_base
 
-ENV ELIXIR_PROJECT=epicenter
+ENV ELIXIR_PROJECT=epiviewpoint
 ARG DEFAULT_UID=1111
 ARG DEFAULT_GID=1111
 ENV LANG=C.UTF-8

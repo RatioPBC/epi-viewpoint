@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RenameUsernameToNameAndRemoveUniqueness do
+defmodule EpiViewpoint.Repo.Migrations.RenameUsernameToNameAndRemoveUniqueness do
   use Ecto.Migration
 
   def change do

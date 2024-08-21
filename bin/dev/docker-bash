@@ -4,4 +4,4 @@ source "bin/_support/step.sh"
 
 set -e
 
-step "bashing into container" "docker exec -it epicenter_runner_1 bash"
+step "bashing into container" "docker exec -it epiviewpoint_runner_1 bash"

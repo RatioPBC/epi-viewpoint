@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddDisabledFieldToUsers do
+defmodule EpiViewpoint.Repo.Migrations.AddDisabledFieldToUsers do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddInterviewStartedAtToExposures do
+defmodule EpiViewpoint.Repo.Migrations.AddInterviewStartedAtToExposures do
   use Ecto.Migration
 
   def change() do

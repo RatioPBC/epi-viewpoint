@@ -1,5 +1,5 @@
-defmodule Epicenter.Test.TOTPStub do
-  @behaviour Epicenter.Accounts.TOTP
+defmodule EpiViewpoint.Test.TOTPStub do
+  @behaviour EpiViewpoint.Accounts.TOTP
 
   def raw_secret, do: <<244, 132, 168, 148, 98, 100, 231, 92, 100, 208>>
   def encoded_secret, do: Base.encode32(raw_secret(), padding: false)

@@ -1,12 +1,12 @@
-defmodule Epicenter.Test.Cases do
+defmodule EpiViewpoint.Test.Cases do
   import Euclid.Test.Extra.Assertions
 
-  alias Epicenter.Cases.Person
-  alias Epicenter.Repo
+  alias EpiViewpoint.Cases.Person
+  alias EpiViewpoint.Repo
 
   def assignee_tid(%Person{id: person_id}) do
     Repo.get(Person, person_id)
-    |> Epicenter.Cases.preload_assigned_to()
+    |> EpiViewpoint.Cases.preload_assigned_to()
     |> Map.get(:assigned_to)
     |> case do
       nil -> nil

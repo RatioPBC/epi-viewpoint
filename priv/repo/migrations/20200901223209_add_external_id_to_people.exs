@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddExternalIdToPeople do
+defmodule EpiViewpoint.Repo.Migrations.AddExternalIdToPeople do
   use Ecto.Migration
 
   def change() do

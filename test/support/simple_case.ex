@@ -1,9 +1,9 @@
-defmodule Epicenter.SimpleCase do
+defmodule EpiViewpoint.SimpleCase do
   use ExUnit.CaseTemplate
 
   using do
     quote do
-      import Epicenter.Test.HtmlAssertions
+      import EpiViewpoint.Test.HtmlAssertions
       import Euclid.Test.Extra.Assertions
     end
   end

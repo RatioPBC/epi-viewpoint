@@ -1,9 +1,9 @@
-defmodule EpicenterWeb.Test.LiveViewAssertions do
+defmodule EpiViewpointWeb.Test.LiveViewAssertions do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
+  alias EpiViewpoint.Test
   alias Euclid.Extra
 
   def assert_attribute(view, selector, attribute, expected) do

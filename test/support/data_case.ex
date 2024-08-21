@@ -1,4 +1,4 @@
-defmodule Epicenter.DataCase do
+defmodule EpiViewpoint.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,7 +10,7 @@ defmodule Epicenter.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use Epicenter.DataCase, async: true`, although
+  by setting `use EpiViewpoint.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -21,30 +21,30 @@ defmodule Epicenter.DataCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import Epicenter.DataCase
-      import Epicenter.Test.ChangesetAssertions
-      import Epicenter.Test.SchemaAssertions
-      import Epicenter.Test.RevisionAssertions
+      import EpiViewpoint.DataCase
+      import EpiViewpoint.Test.ChangesetAssertions
+      import EpiViewpoint.Test.SchemaAssertions
+      import EpiViewpoint.Test.RevisionAssertions
       import Euclid.Test.Extra.Assertions
 
-      alias Epicenter.Repo
+      alias EpiViewpoint.Repo
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Epicenter.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(EpiViewpoint.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Epicenter.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(EpiViewpoint.Repo, {:shared, self()})
     end
 
-    Mox.stub_with(Epicenter.Test.PhiLoggerMock, Epicenter.Test.PhiLoggerStub)
+    Mox.stub_with(EpiViewpoint.Test.PhiLoggerMock, EpiViewpoint.Test.PhiLoggerStub)
 
     :ok
   end
 
   def persist_admin(_) do
-    {:ok, _} = Epicenter.Test.Fixtures.admin() |> Epicenter.Accounts.change_user(%{}) |> Epicenter.Repo.insert()
+    {:ok, _} = EpiViewpoint.Test.Fixtures.admin() |> EpiViewpoint.Accounts.change_user(%{}) |> EpiViewpoint.Repo.insert()
     :ok
   end
 

@@ -16,24 +16,24 @@ if [[ -z ${live_directory} || -z ${live_module} || -z ${action} || -z ${capitali
   cecho --white "Example:"
   cecho --bright-bold-yellow "  ${0} people_live PeopleLive show Show"
   cecho --white "generates:"
-  cecho --yellow "  lib/epicenter_web/live/people_live/show.ex" --white "with module" --yellow "EpicenterWeb.PeopleLive.Show"
-  cecho --yellow "  lib/epicenter_web/live/people_live/show.html.slive"
-  cecho --yellow "  test/epicenter_web/live/people_live/show_test.exs" --white "with module" --yellow "EpicenterWeb.PeopleLive.ShowTest"
+  cecho --yellow "  lib/epiviewpoint_web/live/people_live/show.ex" --white "with module" --yellow "EpiViewpointWeb.PeopleLive.Show"
+  cecho --yellow "  lib/epiviewpoint_web/live/people_live/show.html.slive"
+  cecho --yellow "  test/epiviewpoint_web/live/people_live/show_test.exs" --white "with module" --yellow "EpiViewpointWeb.PeopleLive.ShowTest"
   echo ""
 
   exit 1
 fi
 
-new_filename="lib/epicenter_web/live/${live_directory}/${action}.ex"
-new_template_name="lib/epicenter_web/live/${live_directory}/${action}.html.slive"
-new_modulename="EpicenterWeb.${live_module}.${capitalized_action}"
+new_filename="lib/epiviewpoint_web/live/${live_directory}/${action}.ex"
+new_template_name="lib/epiviewpoint_web/live/${live_directory}/${action}.html.slive"
+new_modulename="EpiViewpointWeb.${live_module}.${capitalized_action}"
 
-new_test_filename="test/epicenter_web/live/${live_directory}/${action}_test.exs"
-new_test_modulename="EpicenterWeb.${live_module}.${capitalized_action}Test"
+new_test_filename="test/epiviewpoint_web/live/${live_directory}/${action}_test.exs"
+new_test_modulename="EpiViewpointWeb.${live_module}.${capitalized_action}Test"
 
 cat >$new_filename <<EOF
 defmodule $new_modulename do
-  use EpicenterWeb, :live_view
+  use EpiViewpointWeb, :live_view
 
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -48,7 +48,7 @@ EOF
 
 cat >$new_test_filename <<EOF
 defmodule $new_test_modulename do
-  use use EpicenterWeb.ConnCase, async: true
+  use use EpiViewpointWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
 

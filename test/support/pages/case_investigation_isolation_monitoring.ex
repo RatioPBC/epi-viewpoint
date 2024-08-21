@@ -1,10 +1,10 @@
-defmodule EpicenterWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
+defmodule EpiViewpointWeb.Test.Pages.CaseInvestigationIsolationMonitoring do
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Cases.CaseInvestigation
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn, %CaseInvestigation{id: case_investigation_id}) do

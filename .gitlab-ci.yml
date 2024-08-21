@@ -4,7 +4,7 @@ services:
 variables:
   GIT_DEPTH: 0
   GIT_STRATEGY: clone
-  POSTGRES_DB: epicenter_test
+  POSTGRES_DB: epiviewpoint_test
   POSTGRES_HOST: postgres
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
@@ -57,7 +57,7 @@ deploy_staging:
     - docker:dind
   script:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epiviewpoint:latest
     - bin/remote/deploy staging
   resource_group: staging
   environment:
@@ -72,7 +72,7 @@ deploy_construction:
     - docker:dind
   script:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epiviewpoint:latest
     - bin/remote/deploy construction
   resource_group: construction
   environment:
@@ -88,7 +88,7 @@ deploy_demo:
     - docker:dind
   script:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epicenter:latest
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA epiviewpoint:latest
     - bin/remote/deploy demo
   resource_group: demo
   environment:

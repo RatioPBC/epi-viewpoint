@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RemoveCitextComment do
+defmodule EpiViewpoint.Repo.Migrations.RemoveCitextComment do
   use Ecto.Migration
 
   # The citext comment causes problems with GCP cloud_sql import / export

@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  POSTGRES_DB: epicenter_test
+  POSTGRES_DB: epiviewpoint_test
   POSTGRES_HOST_AUTH_METHOD: trust
   POSTGRES_PASSWORD: postgres
   POSTGRES_USER: postgres

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.DropVersions do
+defmodule EpiViewpoint.Repo.Migrations.DropVersions do
   use Ecto.Migration
 
   def up do

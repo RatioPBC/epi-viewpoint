@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertCaseInvestigationsStringsToText do
+defmodule EpiViewpoint.Repo.Migrations.ConvertCaseInvestigationsStringsToText do
   use Ecto.Migration
 
   def change do

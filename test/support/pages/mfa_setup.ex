@@ -1,6 +1,6 @@
-defmodule EpicenterWeb.Test.Pages.MfaSetup do
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+defmodule EpiViewpointWeb.Test.Pages.MfaSetup do
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
 
   def assert_here(view_or_conn_or_html),
     do: view_or_conn_or_html |> Pages.assert_on_page("mfa-setup")

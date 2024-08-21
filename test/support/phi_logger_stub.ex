@@ -1,5 +1,5 @@
-defmodule Epicenter.Test.PhiLoggerStub do
-  @behaviour Epicenter.AuditLog.PhiLogger
+defmodule EpiViewpoint.Test.PhiLoggerStub do
+  @behaviour EpiViewpoint.AuditLog.PhiLogger
 
   def info(_message, _metadata, _unlogged_metadata),
     do: :ok

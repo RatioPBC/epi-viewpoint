@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddAddressComponentsToAddresses do
+defmodule EpiViewpoint.Repo.Migrations.AddAddressComponentsToAddresses do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.MakeSampledOnNullable do
+defmodule EpiViewpoint.Repo.Migrations.MakeSampledOnNullable do
   use Ecto.Migration
 
   def down do

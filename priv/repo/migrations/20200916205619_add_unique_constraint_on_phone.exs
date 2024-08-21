@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddUniqueConstraintOnPhone do
+defmodule EpiViewpoint.Repo.Migrations.AddUniqueConstraintOnPhone do
   use Ecto.Migration
 
   def change do

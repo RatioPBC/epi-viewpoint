@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddIsolationOrderDateColumns do
+defmodule EpiViewpoint.Repo.Migrations.AddIsolationOrderDateColumns do
   use Ecto.Migration
 
   def change do

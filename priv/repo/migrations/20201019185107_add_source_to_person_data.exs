@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddSourceToPersonData do
+defmodule EpiViewpoint.Repo.Migrations.AddSourceToPersonData do
   use Ecto.Migration
 
   def change do

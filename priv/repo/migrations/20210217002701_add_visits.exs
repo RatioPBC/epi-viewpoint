@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddVisits do
+defmodule EpiViewpoint.Repo.Migrations.AddVisits do
   use Ecto.Migration
 
   def change do

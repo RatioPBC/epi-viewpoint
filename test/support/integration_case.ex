@@ -1,9 +1,9 @@
-defmodule EpicenterWeb.IntegrationCase do
+defmodule EpiViewpointWeb.IntegrationCase do
   use ExUnit.CaseTemplate
 
   using do
     quote do
-      use EpicenterWeb.ConnCase
+      use EpiViewpointWeb.ConnCase
       use PhoenixIntegration
     end
   end

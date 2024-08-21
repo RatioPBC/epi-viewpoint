@@ -1,10 +1,10 @@
-defmodule Epicenter.Test.AuditLogAssertions do
+defmodule EpiViewpoint.Test.AuditLogAssertions do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Mox
 
-  alias Epicenter.Extra
-  alias Epicenter.Test
+  alias EpiViewpoint.Extra
+  alias EpiViewpoint.Test
 
   def expect_phi_view_logs(count) do
     Mox.verify_on_exit!()

@@ -1,5 +1,5 @@
-defmodule EpicenterWeb.Test.Pages.Login do
-  alias EpicenterWeb.Test.Pages
+defmodule EpiViewpointWeb.Test.Pages.Login do
+  alias EpiViewpointWeb.Test.Pages
   alias Plug.Conn
 
   def assert_here(view_or_conn_or_html),

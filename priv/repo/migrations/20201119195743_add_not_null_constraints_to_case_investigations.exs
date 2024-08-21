@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddNotNullConstraintsToCaseInvestigations do
+defmodule EpiViewpoint.Repo.Migrations.AddNotNullConstraintsToCaseInvestigations do
   use Ecto.Migration
 
   def up do

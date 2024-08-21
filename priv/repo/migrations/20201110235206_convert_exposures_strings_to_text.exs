@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertExposuresStringsToText do
+defmodule EpiViewpoint.Repo.Migrations.ConvertExposuresStringsToText do
   use Ecto.Migration
 
   def change do

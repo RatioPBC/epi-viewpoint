@@ -1,14 +1,14 @@
-defmodule EpicenterWeb.Test.Pages.User do
+defmodule EpiViewpointWeb.Test.Pages.User do
   import Phoenix.LiveViewTest
 
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn) do
     conn |> Pages.visit("/admin/user")
   end
 
-  def visit(%Plug.Conn{} = conn, %Epicenter.Accounts.User{} = user) do
+  def visit(%Plug.Conn{} = conn, %EpiViewpoint.Accounts.User{} = user) do
     conn |> Pages.visit("/admin/user/#{user.id}")
   end
 

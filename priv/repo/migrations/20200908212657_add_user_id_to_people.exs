@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddUserIdToPeople do
+defmodule EpiViewpoint.Repo.Migrations.AddUserIdToPeople do
   use Ecto.Migration
 
   def up do
@@ -9,5 +9,5 @@ defmodule Epicenter.Repo.Migrations.AddUserIdToPeople do
     end
   end
 
-  def down, do: Epicenter.Repo.Migrations.CreateAssignments.create_assignments_table()
+  def down, do: EpiViewpoint.Repo.Migrations.CreateAssignments.create_assignments_table()
 end

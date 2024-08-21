@@ -13,10 +13,10 @@ repo_opts =
     do: [socket_dir: socket_dir],
     else: [username: "postgres", password: "postgres", hostname: System.get_env("POSTGRES_HOST", "localhost")]
 
-config :epicenter,
-       Epicenter.Repo,
+config :epiviewpoint,
+       EpiViewpoint.Repo,
        [
-         database: "epicenter_test#{System.get_env("MIX_TEST_PARTITION")}",
+         database: "epiviewpoint_test#{System.get_env("MIX_TEST_PARTITION")}",
          pool: Ecto.Adapters.SQL.Sandbox,
          pool_size: 16,
          queue_target: 300,
@@ -25,19 +25,19 @@ config :epicenter,
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :epicenter, EpicenterWeb.Endpoint,
+config :epiviewpoint, EpiViewpointWeb.Endpoint,
   http: [port: 4002],
   server: false
 
-config :epicenter,
+config :epiviewpoint,
   application_version_sha: "test-version-sha",
   clock: FakeDateTime,
-  health_check: Epicenter.Test.HealthCheckMock,
-  totp: Epicenter.Test.TOTPMock,
-  phi_logger: Epicenter.Test.PhiLoggerMock
+  health_check: EpiViewpoint.Test.HealthCheckMock,
+  totp: EpiViewpoint.Test.TOTPMock,
+  phi_logger: EpiViewpoint.Test.PhiLoggerMock
 
 # Print only warnings and errors during test
 config :logger, level: :warning, metadata: :all
 
 config :phoenix_integration,
-  endpoint: EpicenterWeb.Endpoint
+  endpoint: EpiViewpointWeb.Endpoint

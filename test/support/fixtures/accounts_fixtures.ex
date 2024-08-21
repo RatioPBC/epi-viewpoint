@@ -1,12 +1,12 @@
-defmodule Epicenter.AccountsFixtures do
+defmodule EpiViewpoint.AccountsFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `Epicenter.Accounts` context.
+  entities via the `EpiViewpoint.Accounts` context.
   """
 
-  alias Epicenter.Accounts
-  alias Epicenter.Repo
-  alias Epicenter.Test
+  alias EpiViewpoint.Accounts
+  alias EpiViewpoint.Repo
+  alias EpiViewpoint.Test
 
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "password123"
@@ -34,6 +34,6 @@ defmodule Epicenter.AccountsFixtures do
   end
 
   defp set_mfa(user) do
-    user |> Accounts.update_user_mfa!({Epicenter.Test.TOTPStub.encoded_secret(), Epicenter.Test.Fixtures.audit_meta(user)})
+    user |> Accounts.update_user_mfa!({EpiViewpoint.Test.TOTPStub.encoded_secret(), EpiViewpoint.Test.Fixtures.audit_meta(user)})
   end
 end

@@ -123,7 +123,7 @@ check "postgres: using the right data directory" \
   "bin/dev/postgres-restart"
 
 check "postgres: dev database exists" \
-  "psql -c '\l' epicenter_dev" \
+  "psql -c '\l' epiviewpoint_dev" \
   "mix ecto.setup # or if you have per-project postgres versions, perhaps: bin/dev/postgres-restart"
 
 check "phoenix: digested assets do not exist in dev env" \

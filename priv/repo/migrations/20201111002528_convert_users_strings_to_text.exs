@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertUsersStringsToText do
+defmodule EpiViewpoint.Repo.Migrations.ConvertUsersStringsToText do
   use Ecto.Migration
 
   def change do

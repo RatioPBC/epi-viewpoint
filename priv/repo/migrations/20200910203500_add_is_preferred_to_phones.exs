@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddIsPreferredToPhones do
+defmodule EpiViewpoint.Repo.Migrations.AddIsPreferredToPhones do
   use Ecto.Migration
 
   def change() do

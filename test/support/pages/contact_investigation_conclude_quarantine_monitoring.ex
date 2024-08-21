@@ -1,10 +1,10 @@
-defmodule EpicenterWeb.Test.Pages.ContactInvestigationConcludeQuarantineMonitoring do
+defmodule EpiViewpointWeb.Test.Pages.ContactInvestigationConcludeQuarantineMonitoring do
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.ContactInvestigations.ContactInvestigation
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.ContactInvestigations.ContactInvestigation
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def assert_here(view_or_conn_or_html) do

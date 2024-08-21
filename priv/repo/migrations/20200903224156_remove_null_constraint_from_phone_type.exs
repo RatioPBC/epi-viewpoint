@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RemoveNullConstraintFromPhoneType do
+defmodule EpiViewpoint.Repo.Migrations.RemoveNullConstraintFromPhoneType do
   use Ecto.Migration
 
   def down do

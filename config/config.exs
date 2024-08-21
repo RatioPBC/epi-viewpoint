@@ -10,21 +10,21 @@ import Config
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :tzdata, :autoupdate, :disabled
 
-config :epicenter,
+config :epiviewpoint,
   clock: DateTime,
-  ecto_repos: [Epicenter.Repo],
-  health_check: Epicenter.HealthCheck,
+  ecto_repos: [EpiViewpoint.Repo],
+  health_check: EpiViewpoint.HealthCheck,
   initial_user_email: System.get_env("INITIAL_USER_EMAIL"),
-  phi_logger: Epicenter.AuditLog.PhiLogger,
+  phi_logger: EpiViewpoint.AuditLog.PhiLogger,
   seeds_enabled?: false,
   unpersisted_admin_id: "00000000-0000-0000-0000-000000000000"
 
 # Configures the endpoint
-config :epicenter, EpicenterWeb.Endpoint,
+config :epiviewpoint, EpiViewpointWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
-  render_errors: [view: EpicenterWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: Epicenter.PubSub,
+  render_errors: [view: EpiViewpointWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: EpiViewpoint.PubSub,
   live_view: [signing_salt: System.get_env("LIVE_VIEW_SIGNING_SALT")]
 
 # Configures Elixir's Logger

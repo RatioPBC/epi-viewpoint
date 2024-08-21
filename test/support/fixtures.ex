@@ -1,12 +1,12 @@
-defmodule Epicenter.Test.Fixtures do
-  alias Epicenter.AuditLog
-  alias Epicenter.Accounts.User
-  alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.ContactInvestigations.ContactInvestigation
-  alias Epicenter.Cases.LabResult
-  alias Epicenter.Cases.Person
-  alias Epicenter.Cases.Place
-  alias Epicenter.DateParser
+defmodule EpiViewpoint.Test.Fixtures do
+  alias EpiViewpoint.AuditLog
+  alias EpiViewpoint.Accounts.User
+  alias EpiViewpoint.Cases.CaseInvestigation
+  alias EpiViewpoint.ContactInvestigations.ContactInvestigation
+  alias EpiViewpoint.Cases.LabResult
+  alias EpiViewpoint.Cases.Person
+  alias EpiViewpoint.Cases.Place
+  alias EpiViewpoint.DateParser
 
   def audit_meta(author) do
     %AuditLog.Meta{
@@ -18,7 +18,7 @@ defmodule Epicenter.Test.Fixtures do
 
   @admin_id Ecto.UUID.generate()
   def admin(),
-    do: %Epicenter.Accounts.User{
+    do: %EpiViewpoint.Accounts.User{
       id: @admin_id,
       tid: "admin",
       admin: true,
@@ -288,7 +288,7 @@ defmodule Epicenter.Test.Fixtures do
   def revision_attrs(tid, attrs \\ %{}) do
     %{
       author_id: "author",
-      changed_type: "Epicenter.Cases.Person",
+      changed_type: "EpiViewpoint.Cases.Person",
       reason_action: "reason_action",
       reason_event: "reason_event",
       tid: tid

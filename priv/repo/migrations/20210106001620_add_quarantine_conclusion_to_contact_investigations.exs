@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddQuarantineConclusionToContactInvestigations do
+defmodule EpiViewpoint.Repo.Migrations.AddQuarantineConclusionToContactInvestigations do
   use Ecto.Migration
 
   def change do

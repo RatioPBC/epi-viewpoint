@@ -2,4 +2,4 @@
 
 set -e
 
-psql epicenter_dev
+psql epiviewpoint_dev

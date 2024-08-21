@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddSampleDateToLabResults do
+defmodule EpiViewpoint.Repo.Migrations.AddSampleDateToLabResults do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddClinicalStatusExposedOnSymptomsToContactInvestigation do
+defmodule EpiViewpoint.Repo.Migrations.AddClinicalStatusExposedOnSymptomsToContactInvestigation do
   use Ecto.Migration
 
   def change do

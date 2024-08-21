@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddArchiveFieldsToPeople do
+defmodule EpiViewpoint.Repo.Migrations.AddArchiveFieldsToPeople do
   use Ecto.Migration
 
   def change do

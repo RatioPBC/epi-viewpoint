@@ -1,10 +1,10 @@
-defmodule EpicenterWeb.Test.Pages.People do
+defmodule EpiViewpointWeb.Test.Pages.People do
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.LiveViewAssertions
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.LiveViewAssertions
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn),

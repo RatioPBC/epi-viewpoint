@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RenameCaseInvestigationNotes do
+defmodule EpiViewpoint.Repo.Migrations.RenameCaseInvestigationNotes do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertPhonesStringsToText do
+defmodule EpiViewpoint.Repo.Migrations.ConvertPhonesStringsToText do
   use Ecto.Migration
 
   def change do

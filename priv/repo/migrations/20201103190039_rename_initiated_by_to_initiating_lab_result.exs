@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RenameInitiatedByToInitiatingLabResult do
+defmodule EpiViewpoint.Repo.Migrations.RenameInitiatedByToInitiatingLabResult do
   use Ecto.Migration
 
   def change do

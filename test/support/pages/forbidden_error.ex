@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Test.Pages.ForbiddenError do
+defmodule EpiViewpointWeb.Test.Pages.ForbiddenError do
   import Phoenix.ConnTest
 
   def assert_here(view_or_conn_or_html) do

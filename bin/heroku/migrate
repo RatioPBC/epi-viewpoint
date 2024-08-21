@@ -10,4 +10,4 @@ cecho --yellow "but maybe you need to run them manually sometimes."
 
 confirm "Run migrations manually"
 
-heroku run "POOL_SIZE=2 mix ecto.migrate" -a ratiopbc-epicenter
+heroku run "POOL_SIZE=2 mix ecto.migrate" -a ratiopbc-epiviewpoint

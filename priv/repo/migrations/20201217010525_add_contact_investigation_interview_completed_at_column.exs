@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddContactInvestigationInterviewCompletedAtColumn do
+defmodule EpiViewpoint.Repo.Migrations.AddContactInvestigationInterviewCompletedAtColumn do
   use Ecto.Migration
 
   def up() do

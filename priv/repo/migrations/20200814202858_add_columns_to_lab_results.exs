@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddColumnsToLabResults do
+defmodule EpiViewpoint.Repo.Migrations.AddColumnsToLabResults do
   use Ecto.Migration
 
   def change do

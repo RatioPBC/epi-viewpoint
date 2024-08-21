@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ChangeSeqIntegerColumnsToBigserial do
+defmodule EpiViewpoint.Repo.Migrations.ChangeSeqIntegerColumnsToBigserial do
   use Ecto.Migration
 
   def up do

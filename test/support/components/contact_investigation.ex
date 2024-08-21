@@ -1,8 +1,8 @@
-defmodule EpicenterWeb.Test.Components.ContactInvestigation do
+defmodule EpiViewpointWeb.Test.Components.ContactInvestigation do
   import Euclid.Test.Extra.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
+  alias EpiViewpoint.Test
   alias Phoenix.LiveViewTest.View
 
   def assert_clinical_details(%View{} = view, expected_values) do

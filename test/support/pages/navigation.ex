@@ -1,8 +1,8 @@
-defmodule EpicenterWeb.Test.Pages.Navigation do
+defmodule EpiViewpointWeb.Test.Pages.Navigation do
   import ExUnit.Assertions
 
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
 
   def assert_has_menu_item(view_or_conn_or_html, menu_item) do
     assert menu_item in menu_items(view_or_conn_or_html)

@@ -52,7 +52,7 @@ There are some scripts to make local docker development easier (though they don'
 
 ### Adding translations
 
-When adding strings to be translated in the domain layer (`Epicenter`), you'll want to use `gettext_noop` to provide a 
+When adding strings to be translated in the domain layer (`EpiViewpoint`), you'll want to use `gettext_noop` to provide a 
 hook for `gettext` to be able to extract the keys without translating them in the code at runtime. For example:
 
 ```elixir
@@ -118,7 +118,7 @@ GCP cloud_sql import/export.
 ### Creating users
 
 Unless you used the "Deploy to Heroku" button, you must create the first admin user manually (see the docs 
-for `Epicenter.Release.create_user`). After that, you can log in as that admin user and create other users.
+for `EpiViewpoint.Release.create_user`). After that, you can log in as that admin user and create other users.
 
 ### Exporting Data
 

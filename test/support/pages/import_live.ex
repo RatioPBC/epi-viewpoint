@@ -1,7 +1,7 @@
-defmodule EpicenterWeb.Test.Pages.ImportLive do
+defmodule EpiViewpointWeb.Test.Pages.ImportLive do
   import Phoenix.LiveViewTest
 
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn),

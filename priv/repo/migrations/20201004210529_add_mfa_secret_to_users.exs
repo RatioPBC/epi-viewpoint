@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddMfaSecretToUsers do
+defmodule EpiViewpoint.Repo.Migrations.AddMfaSecretToUsers do
   use Ecto.Migration
 
   def change do

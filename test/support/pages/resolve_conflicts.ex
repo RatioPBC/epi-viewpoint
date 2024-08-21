@@ -1,11 +1,11 @@
-defmodule EpicenterWeb.Test.Pages.ResolveConflicts do
+defmodule EpiViewpointWeb.Test.Pages.ResolveConflicts do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Extra
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Extra
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
 
   def visit(%Plug.Conn{} = conn, person_id, duplicate_person_ids) do
     query_string = Enum.join(duplicate_person_ids, ",")

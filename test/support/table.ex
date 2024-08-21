@@ -1,6 +1,6 @@
-defmodule Epicenter.Test.Table do
-  alias Epicenter.Extra
-  alias Epicenter.Test
+defmodule EpiViewpoint.Test.Table do
+  alias EpiViewpoint.Extra
+  alias EpiViewpoint.Test
 
   def table_contents(parsed_html, opts \\ []) when is_list(parsed_html) do
     desired_columns = opts |> Keyword.get(:columns)

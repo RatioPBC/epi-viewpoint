@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddIsPreferredToAddress do
+defmodule EpiViewpoint.Repo.Migrations.AddIsPreferredToAddress do
   use Ecto.Migration
 
   def change() do

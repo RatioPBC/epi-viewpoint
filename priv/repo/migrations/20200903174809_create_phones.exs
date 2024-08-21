@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.CreatePhones do
+defmodule EpiViewpoint.Repo.Migrations.CreatePhones do
   use Ecto.Migration
 
   def change do

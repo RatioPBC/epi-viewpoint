@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RenameIsolationClearanceOrderColumn do
+defmodule EpiViewpoint.Repo.Migrations.RenameIsolationClearanceOrderColumn do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RenameIsolationDateColumns do
+defmodule EpiViewpoint.Repo.Migrations.RenameIsolationDateColumns do
   use Ecto.Migration
 
   def change do

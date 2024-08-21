@@ -1,11 +1,11 @@
-defmodule EpicenterWeb.Test.Pages.ContactInvestigationClinicalDetails do
+defmodule EpiViewpointWeb.Test.Pages.ContactInvestigationClinicalDetails do
   import ExUnit.Assertions
   import Euclid.Test.Extra.Assertions, only: [assert_eq: 2]
   import Phoenix.LiveViewTest
 
-  alias Epicenter.ContactInvestigations.ContactInvestigation
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.ContactInvestigations.ContactInvestigation
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
 
   alias Phoenix.LiveViewTest.View
 
