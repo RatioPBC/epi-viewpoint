@@ -28,6 +28,11 @@ pull requests or issues at this time.
 2. Run `bin/dev/doctor` and for each problem, either use the suggested remedies or fix it some other way
 3. Run `bin/dev/test` and then `bin/dev/start` to make sure everything is working
 
+### setup esbuild and dart-sass
+after running `mix deps.get`
+- `mix esbuild.install && mix esbuild default`
+- `mix sass.install && mix sass default`
+
 ### Day-to-day
 
 * Get latest code: `bin/dev/update`

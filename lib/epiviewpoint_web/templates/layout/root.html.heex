@@ -12,11 +12,11 @@
       sizes="32x32"
       type="image/png"
     /><link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" /><link href="/site.webmanifest" rel="manifest" /><link
-      href={static_path(@conn, "/css/app.css")}
+      href={static_path(@conn, "/assets/app.css")}
       phx-track-static
       rel="stylesheet"
     />
-    <script defer phx-track-static src={static_path(@conn, "/js/app.js")} type="text/javascript">
+    <script defer phx-track-static src={static_path(@conn, "/assets/app.js")} type="text/javascript">
     </script>
   </head>
   <%= @inner_content %>

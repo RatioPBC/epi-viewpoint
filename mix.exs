@@ -47,8 +47,10 @@ defmodule EpiViewpoint.MixProject do
       local_or_remote(:remote, :euclid, version: "~> 0.1", path: System.get_env("EUCLID_PATH", "../euclid")),
       {:bcrypt_elixir, "~> 2.1"},
       {:cowboy_telemetry, "~> 0.4"},
+      {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev},
       {:ecto_sql, "~> 3.11"},
       {:eqrcode, "~> 0.1"},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.11"},
       {:inflex, "~> 2.1"},
@@ -92,8 +94,9 @@ defmodule EpiViewpoint.MixProject do
       "deps.get": ["deps.get", "deps.audit"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      setup: ["deps.get", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      "assets.deploy": ["esbuild default --minify", "phx.digest"]
     ]
   end
 
