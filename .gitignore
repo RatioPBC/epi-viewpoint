@@ -15,7 +15,7 @@
 /doc/
 /priv/postgres/
 /priv/repo/structure.sql
-/priv/static/
+/priv/static/assets/
 /tmp/
 Brewfile.lock.json
 epiviewpoint-*.tar

@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", TransientControl.setup);
 //
 import "phoenix_html";
 import { Socket } from "phoenix";
-import { LiveSocket, Browser } from "phoenix_live_view";
+import { LiveSocket } from "phoenix_live_view";
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
@@ -60,13 +60,6 @@ let liveSocket = new LiveSocket("/live", Socket, {
     AutocompleteList: AutocompleteList
   },
   params: { _csrf_token: csrfToken }
-});
-
-window.addEventListener("phx:page-loading-stop", (info) => {
-  let hashEl = Browser.getHashTargetEl(window.location.hash);
-  if (hashEl) {
-    hashEl.scrollIntoView();
-  }
 });
 
 // connect if there are any LiveViews on the page

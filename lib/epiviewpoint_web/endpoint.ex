@@ -26,9 +26,7 @@ defmodule EpiViewpointWeb.Endpoint do
     gzip: false,
     only: ~w[
       assets
-      css
       images
-      js
       android-chrome-192x192.png
       android-chrome-512x512.png
       apple-touch-icon.png
