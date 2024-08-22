@@ -18,7 +18,7 @@
     "@babel/core": "^7.x",
     "@babel/preset-env": "^7.x",
     "babel-loader": "^8.x",
-    "copy-webpack-plugin": "^8.x",
+    "copy-webpack-plugin": "^5.1.2",
     "css-loader": "^5.x",
     "css-minimizer-webpack-plugin": "^2.x",
     "mini-css-extract-plugin": "^1.x",
