@@ -50,7 +50,7 @@ defmodule EpiViewpoint.MixProject do
       {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev},
       {:ecto_sql, "~> 3.11"},
       {:eqrcode, "~> 0.1"},
-      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.11"},
       {:inflex, "~> 2.1"},
