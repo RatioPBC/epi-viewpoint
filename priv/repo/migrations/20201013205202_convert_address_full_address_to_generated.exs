@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertAddressFullAddressToGenerated do
+defmodule EpiViewpoint.Repo.Migrations.ConvertAddressFullAddressToGenerated do
   use Ecto.Migration
 
   def up do

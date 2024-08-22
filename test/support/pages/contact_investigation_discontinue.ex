@@ -1,6 +1,6 @@
-defmodule EpicenterWeb.Test.Pages.ContactInvestigationDiscontinue do
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+defmodule EpiViewpointWeb.Test.Pages.ContactInvestigationDiscontinue do
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   import Phoenix.LiveViewTest

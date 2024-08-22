@@ -1,15 +1,15 @@
-defmodule EpicenterWeb.Test.Pages.Profile do
+defmodule EpiViewpointWeb.Test.Pages.Profile do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Accounts.User
-  alias Epicenter.Cases.Person
-  alias Epicenter.Extra
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.LiveViewAssertions
-  alias EpicenterWeb.Test.Components
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Accounts.User
+  alias EpiViewpoint.Cases.Person
+  alias EpiViewpoint.Extra
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.LiveViewAssertions
+  alias EpiViewpointWeb.Test.Components
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn, %Person{id: person_id}, extra_arg \\ nil) do

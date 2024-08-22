@@ -1,10 +1,10 @@
-defmodule EpicenterWeb.Test.Pages.Contacts do
+defmodule EpiViewpointWeb.Test.Pages.Contacts do
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.LiveViewAssertions
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.LiveViewAssertions
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def assert_assign_dropdown_options(%View{} = view, data_role: data_role, expected: expected) do

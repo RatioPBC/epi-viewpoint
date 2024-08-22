@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.CreateAssignments do
+defmodule EpiViewpoint.Repo.Migrations.CreateAssignments do
   use Ecto.Migration
 
   def change, do: create_assignments_table()

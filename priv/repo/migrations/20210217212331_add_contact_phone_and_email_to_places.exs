@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddContactPhoneAndEmailToPlaces do
+defmodule EpiViewpoint.Repo.Migrations.AddContactPhoneAndEmailToPlaces do
   use Ecto.Migration
 
   def change do

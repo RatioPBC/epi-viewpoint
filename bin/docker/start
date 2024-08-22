@@ -13,5 +13,5 @@ until pg_isready $pg_args; do
   fi
 done
 
-/opt/epicenter/bin/epicenter eval "Epicenter.Release.migrate()"
-/opt/epicenter/bin/epicenter start
+/opt/epiviewpoint/bin/epiviewpoint eval "EpiViewpoint.Release.migrate()"
+/opt/epiviewpoint/bin/epiviewpoint start

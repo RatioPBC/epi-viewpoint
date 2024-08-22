@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddInterviewWithProxyAndRenameInterviewedPerson do
+defmodule EpiViewpoint.Repo.Migrations.AddInterviewWithProxyAndRenameInterviewedPerson do
   use Ecto.Migration
 
   def change do

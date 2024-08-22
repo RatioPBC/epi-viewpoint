@@ -1,11 +1,11 @@
-defmodule EpicenterWeb.Test.Pages.UserLogins do
+defmodule EpiViewpointWeb.Test.Pages.UserLogins do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Accounts.User
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Accounts.User
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def assert_here(view_or_conn_or_html) do

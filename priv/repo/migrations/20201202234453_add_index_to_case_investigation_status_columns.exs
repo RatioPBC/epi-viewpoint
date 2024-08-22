@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddIndexToCaseInvestigationStatusColumns do
+defmodule EpiViewpoint.Repo.Migrations.AddIndexToCaseInvestigationStatusColumns do
   use Ecto.Migration
 
   def change do

@@ -1,9 +1,9 @@
-defmodule EpicenterWeb.Test.Pages.PlaceSearch do
+defmodule EpiViewpointWeb.Test.Pages.PlaceSearch do
   import Euclid.Test.Extra.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
 
   def visit(%Plug.Conn{} = conn, case_investigation),
     do: conn |> Pages.visit("/case-investigations/#{case_investigation.id}/place-search")

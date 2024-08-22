@@ -1,6 +1,6 @@
-defmodule EpicenterWeb.Test.Pages.Mfa do
-  alias Epicenter.Test.TOTPStub
-  alias EpicenterWeb.Test.Pages
+defmodule EpiViewpointWeb.Test.Pages.Mfa do
+  alias EpiViewpoint.Test.TOTPStub
+  alias EpiViewpointWeb.Test.Pages
   alias Plug.Conn
 
   def assert_here(view_or_conn_or_html),

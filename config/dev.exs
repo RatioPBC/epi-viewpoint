@@ -1,6 +1,6 @@
 import Config
 
-config :epicenter,
+config :epiviewpoint,
   application_version_sha: System.cmd("git", ["rev-parse", "HEAD"]) |> elem(0) |> String.trim(),
   seeds_enabled?: true
 
@@ -10,7 +10,7 @@ repo_opts =
     do: [socket_dir: socket_dir],
     else: [username: "postgres", password: "postgres"]
 
-config :epicenter, Epicenter.Repo, [database: "epicenter_dev", show_sensitive_data_on_connection_error: true, pool_size: 10] ++ repo_opts
+config :epiviewpoint, EpiViewpoint.Repo, [database: "epiviewpoint_dev", show_sensitive_data_on_connection_error: true, pool_size: 10] ++ repo_opts
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -18,7 +18,7 @@ config :epicenter, Epicenter.Repo, [database: "epicenter_dev", show_sensitive_da
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
-config :epicenter, EpicenterWeb.Endpoint,
+config :epiviewpoint, EpiViewpointWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
@@ -59,17 +59,17 @@ config :epicenter, EpicenterWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :epicenter, EpicenterWeb.Endpoint,
+config :epiviewpoint, EpiViewpointWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/epicenter_web/(live|views)/.*(ex|heex)$",
-      ~r"lib/epicenter_web/templates/.*(eex|heex)$"
+      ~r"lib/epiviewpoint_web/(live|views)/.*(ex|heex)$",
+      ~r"lib/epiviewpoint_web/templates/.*(eex|heex)$"
     ]
   ]
 
-config :epicenter, mfa_issuer: System.fetch_env!("CANONICAL_HOST")
+config :epiviewpoint, mfa_issuer: System.fetch_env!("CANONICAL_HOST")
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n", level: :warning

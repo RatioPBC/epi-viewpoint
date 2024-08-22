@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddMergeFieldsToPerson do
+defmodule EpiViewpoint.Repo.Migrations.AddMergeFieldsToPerson do
   use Ecto.Migration
 
   def change do

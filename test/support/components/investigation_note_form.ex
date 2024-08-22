@@ -1,4 +1,4 @@
-defmodule EpicenterWeb.Test.Components.InvestigationNoteForm do
+defmodule EpiViewpointWeb.Test.Components.InvestigationNoteForm do
   import Phoenix.LiveViewTest
 
   alias Phoenix.LiveViewTest.View

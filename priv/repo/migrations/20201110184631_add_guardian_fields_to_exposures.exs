@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddGuardianFieldsToExposures do
+defmodule EpiViewpoint.Repo.Migrations.AddGuardianFieldsToExposures do
   use Ecto.Migration
 
   def change do

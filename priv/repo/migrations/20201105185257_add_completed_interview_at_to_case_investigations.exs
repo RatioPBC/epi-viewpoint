@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddCompletedInterviewAtToCaseInvestigations do
+defmodule EpiViewpoint.Repo.Migrations.AddCompletedInterviewAtToCaseInvestigations do
   use Ecto.Migration
 
   def change() do

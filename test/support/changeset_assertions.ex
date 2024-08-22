@@ -1,7 +1,7 @@
-defmodule Epicenter.Test.ChangesetAssertions do
+defmodule EpiViewpoint.Test.ChangesetAssertions do
   import ExUnit.Assertions
 
-  alias Epicenter.DataCase
+  alias EpiViewpoint.DataCase
 
   def assert_invalid(tuple_or_changeset, expected_errors \\ nil)
 

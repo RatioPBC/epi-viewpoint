@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddIsolationConclusionReasonToCaseInvestigation do
+defmodule EpiViewpoint.Repo.Migrations.AddIsolationConclusionReasonToCaseInvestigation do
   use Ecto.Migration
 
   def change do

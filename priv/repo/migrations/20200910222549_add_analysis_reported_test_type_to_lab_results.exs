@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddAnalysisReportedTestTypeToLabResults do
+defmodule EpiViewpoint.Repo.Migrations.AddAnalysisReportedTestTypeToLabResults do
   use Ecto.Migration
 
   def change() do

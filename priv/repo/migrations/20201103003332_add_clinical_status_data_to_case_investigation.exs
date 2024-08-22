@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddClinicalStatusDataToCaseInvestigation do
+defmodule EpiViewpoint.Repo.Migrations.AddClinicalStatusDataToCaseInvestigation do
   use Ecto.Migration
 
   def change do

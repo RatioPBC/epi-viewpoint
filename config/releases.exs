@@ -18,16 +18,16 @@ defmodule CFG do
   def to_boolean(_), do: false
 end
 
-config :epicenter,
-  application_version_sha: :code.priv_dir(:epicenter) |> Path.join("static/version.txt") |> File.read!() |> String.trim(),
+config :epiviewpoint,
+  application_version_sha: :code.priv_dir(:epiviewpoint) |> Path.join("static/version.txt") |> File.read!() |> String.trim(),
   mfa_issuer: CFG.canonical_host()
 
-config :epicenter, Epicenter.Repo,
+config :epiviewpoint, EpiViewpoint.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   ssl: CFG.to_boolean(System.get_env("DBSSL", "true")),
   url: CFG.database_url()
 
-config :epicenter, EpicenterWeb.Endpoint,
+config :epiviewpoint, EpiViewpointWeb.Endpoint,
   http: [port: CFG.application_port()],
   live_view: [signing_salt: CFG.live_view_signing_salt()],
   secret_key_base: CFG.secret_key_base(),
@@ -41,5 +41,5 @@ config :epicenter, EpicenterWeb.Endpoint,
 config :logger_json, :google_error_reporter,
   service_context: [
     service: System.fetch_env!("ERROR_REPORTER_SERVICE_NAME"),
-    version: :code.priv_dir(:epicenter) |> Path.join("static/version.txt") |> File.read!() |> String.trim()
+    version: :code.priv_dir(:epiviewpoint) |> Path.join("static/version.txt") |> File.read!() |> String.trim()
   ]

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddDemographicsAssociationToPeople do
+defmodule EpiViewpoint.Repo.Migrations.AddDemographicsAssociationToPeople do
   use Ecto.Migration
 
   def change do

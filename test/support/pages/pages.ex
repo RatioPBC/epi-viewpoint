@@ -1,12 +1,12 @@
-defmodule EpicenterWeb.Test.Pages do
-  @endpoint EpicenterWeb.Endpoint
+defmodule EpiViewpointWeb.Test.Pages do
+  @endpoint EpiViewpointWeb.Endpoint
 
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.ConnTest
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
+  alias EpiViewpoint.Test
   alias Phoenix.LiveViewTest.View
 
   def actual_selections(%View{} = view, data_role, type) do

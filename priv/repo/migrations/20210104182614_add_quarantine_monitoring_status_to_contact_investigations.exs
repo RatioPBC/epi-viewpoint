@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddQuarantineMonitoringStatusToContactInvestigations do
+defmodule EpiViewpoint.Repo.Migrations.AddQuarantineMonitoringStatusToContactInvestigations do
   use Ecto.Migration
 
   def up() do

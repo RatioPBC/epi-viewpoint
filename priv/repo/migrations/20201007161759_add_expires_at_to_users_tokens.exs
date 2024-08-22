@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddExpiresAtToUsersTokens do
+defmodule EpiViewpoint.Repo.Migrations.AddExpiresAtToUsersTokens do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.DropDemographicsRelatedColumnsFromPeople do
+defmodule EpiViewpoint.Repo.Migrations.DropDemographicsRelatedColumnsFromPeople do
   use Ecto.Migration
 
   def change do

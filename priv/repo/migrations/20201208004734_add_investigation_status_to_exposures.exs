@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddInvestigationStatusToExposures do
+defmodule EpiViewpoint.Repo.Migrations.AddInvestigationStatusToExposures do
   use Ecto.Migration
 
   def up do

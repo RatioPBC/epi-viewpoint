@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RenameCaseInvestigationColumnsWithAddedSpecificity do
+defmodule EpiViewpoint.Repo.Migrations.RenameCaseInvestigationColumnsWithAddedSpecificity do
   use Ecto.Migration
 
   def change do

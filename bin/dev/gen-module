@@ -14,18 +14,18 @@ if [[ -z ${filename} || -z ${modulename} ]]; then
   cecho --white "Example:"
   cecho --bright-bold-yellow "  ${0} cases/import Cases.Import"
   cecho --white "generates:"
-  cecho --yellow "  lib/cases/import.ex" --white "with module" --yellow "Epicenter.Cases.Import"
-  cecho --yellow "  test/cases/import_test.exs" --white "with module" --yellow "Epicenter.Cases.ImportTest"
+  cecho --yellow "  lib/cases/import.ex" --white "with module" --yellow "EpiViewpoint.Cases.Import"
+  cecho --yellow "  test/cases/import_test.exs" --white "with module" --yellow "EpiViewpoint.Cases.ImportTest"
   echo ""
 
   exit 1
 fi
 
-new_filename="lib/epicenter/${filename}.ex"
-new_modulename="Epicenter.${modulename}"
+new_filename="lib/epiviewpoint/${filename}.ex"
+new_modulename="EpiViewpoint.${modulename}"
 
-new_test_filename="test/epicenter/${filename}_test.exs"
-new_test_modulename="Epicenter.${modulename}Test"
+new_test_filename="test/epiviewpoint/${filename}_test.exs"
+new_test_modulename="EpiViewpoint.${modulename}Test"
 
 cat >$new_filename <<EOF
 defmodule $new_modulename do
@@ -35,7 +35,7 @@ EOF
 
 cat >$new_test_filename <<EOF
 defmodule $new_test_modulename do
-  use Epicenter.SimpleCase, async: true
+  use EpiViewpoint.SimpleCase, async: true
 
   alias $new_modulename
 

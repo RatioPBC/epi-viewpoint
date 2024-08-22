@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddPersonIdToPhones do
+defmodule EpiViewpoint.Repo.Migrations.AddPersonIdToPhones do
   use Ecto.Migration
 
   def change do

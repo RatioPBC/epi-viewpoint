@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddPersonIdToLabResults do
+defmodule EpiViewpoint.Repo.Migrations.AddPersonIdToLabResults do
   use Ecto.Migration
 
   def change do

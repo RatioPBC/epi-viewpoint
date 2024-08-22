@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertEmailsStringsToText do
+defmodule EpiViewpoint.Repo.Migrations.ConvertEmailsStringsToText do
   use Ecto.Migration
 
   def change do

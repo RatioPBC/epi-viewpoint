@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddUniqueIndexOnPeople do
+defmodule EpiViewpoint.Repo.Migrations.AddUniqueIndexOnPeople do
   use Ecto.Migration
 
   def change do

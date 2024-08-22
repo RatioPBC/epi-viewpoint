@@ -1,8 +1,8 @@
-defmodule EpicenterWeb.Test.Pages.Place do
+defmodule EpiViewpointWeb.Test.Pages.Place do
   import Euclid.Test.Extra.Assertions
 
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   def visit(%Plug.Conn{} = conn, case_investigation),

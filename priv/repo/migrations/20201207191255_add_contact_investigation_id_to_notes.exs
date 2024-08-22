@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddContactInvestigationIdToNotes do
+defmodule EpiViewpoint.Repo.Migrations.AddContactInvestigationIdToNotes do
   use Ecto.Migration
 
   def change do

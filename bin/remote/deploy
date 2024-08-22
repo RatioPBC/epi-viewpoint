@@ -20,7 +20,7 @@ if [[ $env_list =~ (^|[[:space:]])"$env"($|[[:space:]]) ]]; then
   fi
 
   repo="gcr.io/viewpoint-fcoh-$env/viewpoint"
-  docker tag epicenter:latest "$repo:latest"
+  docker tag epiviewpoint:latest "$repo:latest"
   echo "starting push"
   docker push "$repo"
 

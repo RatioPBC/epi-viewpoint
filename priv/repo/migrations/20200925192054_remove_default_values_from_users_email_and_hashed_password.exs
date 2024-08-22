@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RemoveDefaultValuesFromUsersEmailAndHashedPassword do
+defmodule EpiViewpoint.Repo.Migrations.RemoveDefaultValuesFromUsersEmailAndHashedPassword do
   use Ecto.Migration
 
   # the previous migration assigned random values for email and hashed password so existing users had a value,

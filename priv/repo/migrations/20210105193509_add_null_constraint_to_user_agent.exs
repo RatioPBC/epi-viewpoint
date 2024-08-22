@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddNullConstraintToUserAgent do
+defmodule EpiViewpoint.Repo.Migrations.AddNullConstraintToUserAgent do
   use Ecto.Migration
 
   def up do

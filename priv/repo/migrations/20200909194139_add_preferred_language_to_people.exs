@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddPreferredLanguageToPeople do
+defmodule EpiViewpoint.Repo.Migrations.AddPreferredLanguageToPeople do
   use Ecto.Migration
 
   def change do

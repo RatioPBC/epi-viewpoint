@@ -18,7 +18,7 @@
 /priv/static/
 /tmp/
 Brewfile.lock.json
-epicenter-*.tar
+epiviewpoint-*.tar
 erl_crash.dump
 npm-debug.log
 .vscode/

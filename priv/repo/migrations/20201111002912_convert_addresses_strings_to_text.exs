@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertAddressesStringsToText do
+defmodule EpiViewpoint.Repo.Migrations.ConvertAddressesStringsToText do
   use Ecto.Migration
 
   def up do

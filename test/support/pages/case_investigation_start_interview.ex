@@ -1,10 +1,10 @@
-defmodule EpicenterWeb.Test.Pages.CaseInvestigationStartInterview do
+defmodule EpiViewpointWeb.Test.Pages.CaseInvestigationStartInterview do
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Cases.CaseInvestigation
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   @form_id "case-investigation-interview-start-form"

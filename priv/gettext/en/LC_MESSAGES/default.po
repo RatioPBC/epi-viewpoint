@@ -12,60 +12,60 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:89
+#: lib/epiviewpoint/cases/case_investigation.ex:89
 msgid "successfully_completed"
 msgstr "Successfully completed isolation period"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:90
+#: lib/epiviewpoint/cases/case_investigation.ex:90
 msgid "unable_to_isolate"
 msgstr "Person unable to isolate"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:94
-#: lib/epicenter/contact_investigations/contact_investigation.ex:101
+#: lib/epiviewpoint/cases/case_investigation.ex:94
+#: lib/epiviewpoint/contact_investigations/contact_investigation.ex:101
 msgid "deceased"
 msgstr "Deceased"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:92
-#: lib/epicenter/contact_investigations/contact_investigation.ex:99
+#: lib/epiviewpoint/cases/case_investigation.ex:92
+#: lib/epiviewpoint/contact_investigations/contact_investigation.ex:99
 msgid "lost_to_follow_up"
 msgstr "Lost to follow up"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:91
-#: lib/epicenter/contact_investigations/contact_investigation.ex:98
+#: lib/epiviewpoint/cases/case_investigation.ex:91
+#: lib/epiviewpoint/contact_investigations/contact_investigation.ex:98
 msgid "refused_to_cooperate"
 msgstr "Refused to cooperate"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:93
-#: lib/epicenter/contact_investigations/contact_investigation.ex:100
+#: lib/epiviewpoint/cases/case_investigation.ex:93
+#: lib/epiviewpoint/contact_investigations/contact_investigation.ex:100
 msgid "transferred"
 msgstr "Transferred to another jurisdiction"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:86
+#: lib/epiviewpoint/cases/case_investigation.ex:86
 msgid "asymptomatic"
 msgstr "Asymptomatic"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:85
+#: lib/epiviewpoint/cases/case_investigation.ex:85
 msgid "symptomatic"
 msgstr "Symptomatic"
 
 #, elixir-format
-#: lib/epicenter/cases/case_investigation.ex:84
+#: lib/epiviewpoint/cases/case_investigation.ex:84
 msgid "unknown"
 msgstr "Unknown"
 
 #, elixir-format
-#: lib/epicenter/contact_investigations/contact_investigation.ex:96
+#: lib/epiviewpoint/contact_investigations/contact_investigation.ex:96
 msgid "successfully_completed_quarantine"
 msgstr "Successfully completed quarantine period"
 
 #, elixir-format
-#: lib/epicenter/contact_investigations/contact_investigation.ex:97
+#: lib/epiviewpoint/contact_investigations/contact_investigation.ex:97
 msgid "unable_to_quarantine"
 msgstr "Person unable to quarantine"

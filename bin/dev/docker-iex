@@ -4,4 +4,4 @@ source "bin/_support/step.sh"
 
 set -e
 
-step "connecting to iex in container" "docker exec -it epicenter_runner_1 /opt/epicenter/bin/epicenter remote"
+step "connecting to iex in container" "docker exec -it epiviewpoint_runner_1 /opt/epiviewpoint/bin/epiviewpoint remote"

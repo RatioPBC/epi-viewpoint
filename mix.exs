@@ -1,9 +1,9 @@
-defmodule Epicenter.MixProject do
+defmodule EpiViewpoint.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :epicenter,
+      app: :epiviewpoint,
       version: "0.1.0",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -11,7 +11,7 @@ defmodule Epicenter.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      releases: [epicenter: [steps: [:assemble, &update_tzdata/1]]]
+      releases: [epiviewpoint: [steps: [:assemble, &update_tzdata/1]]]
     ]
   end
 
@@ -20,7 +20,7 @@ defmodule Epicenter.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {Epicenter.Application, []},
+      mod: {EpiViewpoint.Application, []},
       extra_applications: [:jason, :logger_json, :runtime_tools]
     ]
   end

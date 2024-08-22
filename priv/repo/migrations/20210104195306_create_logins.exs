@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.CreateLogins do
+defmodule EpiViewpoint.Repo.Migrations.CreateLogins do
   use Ecto.Migration
 
   def change() do

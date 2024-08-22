@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddDeletedAtToExposures do
+defmodule EpiViewpoint.Repo.Migrations.AddDeletedAtToExposures do
   use Ecto.Migration
 
   def change do

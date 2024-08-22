@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.CreateEmails do
+defmodule EpiViewpoint.Repo.Migrations.CreateEmails do
   use Ecto.Migration
 
   def change do

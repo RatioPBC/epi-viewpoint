@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddIsolationMonitoringDatesToCaseInvestigations do
+defmodule EpiViewpoint.Repo.Migrations.AddIsolationMonitoringDatesToCaseInvestigations do
   use Ecto.Migration
 
   def change() do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Test.Html do
+defmodule EpiViewpoint.Test.Html do
   def all(html, css_query, as: :text) when not is_binary(html),
     do: html |> all(css_query, &Floki.text/1)
 

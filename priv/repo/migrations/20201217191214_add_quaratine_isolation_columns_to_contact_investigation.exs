@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddQuaratineIsolationColumnsToContactInvestigation do
+defmodule EpiViewpoint.Repo.Migrations.AddQuaratineIsolationColumnsToContactInvestigation do
   use Ecto.Migration
 
   def change do

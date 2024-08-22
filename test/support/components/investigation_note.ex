@@ -1,8 +1,8 @@
-defmodule EpicenterWeb.Test.Components.InvestigationNote do
+defmodule EpiViewpointWeb.Test.Components.InvestigationNote do
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
+  alias EpiViewpoint.Test
   alias Phoenix.LiveViewTest.View
 
   @spec delete_note(%View{}, String.t()) :: :ok | :note_not_found | :delete_button_not_found

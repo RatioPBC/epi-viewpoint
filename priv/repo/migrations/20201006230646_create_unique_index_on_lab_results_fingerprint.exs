@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.CreateUniqueIndexOnLabResultsFingerprint do
+defmodule EpiViewpoint.Repo.Migrations.CreateUniqueIndexOnLabResultsFingerprint do
   use Ecto.Migration
 
   def change do

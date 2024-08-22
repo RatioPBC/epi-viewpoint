@@ -5,11 +5,11 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: epicenter_dev
+      POSTGRES_DB: epiviewpoint_dev
     ports:
       - 5433:5432
   runner:
-    image: epicenter:latest
+    image: epiviewpoint:latest
     ports:
       - 4001:4000
     volumes:
@@ -17,7 +17,7 @@ services:
     environment:
       ALLOW_PRIVATE_WEB: "true"
       CANONICAL_HOST: viewpoint-dev.network.ratiopbc.dev
-      DATABASE_URL: ecto://postgres:postgres@postgres:5432/epicenter_dev
+      DATABASE_URL: ecto://postgres:postgres@postgres:5432/epiviewpoint_dev
       DBSSL: "false"
       ERROR_REPORTER_SERVICE_NAME: viewpoint-dev
       LIVE_VIEW_SIGNING_SALT: xbK8/I1ibfroHQvkZTMKbO7NOLAHtbdP

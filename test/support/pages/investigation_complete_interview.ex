@@ -1,12 +1,12 @@
-defmodule EpicenterWeb.Test.Pages.InvestigationCompleteInterview do
+defmodule EpiViewpointWeb.Test.Pages.InvestigationCompleteInterview do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Cases.CaseInvestigation
-  alias Epicenter.ContactInvestigations.ContactInvestigation
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Cases.CaseInvestigation
+  alias EpiViewpoint.ContactInvestigations.ContactInvestigation
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
   alias Phoenix.LiveViewTest.View
 
   @form_id "investigation-interview-complete-form"

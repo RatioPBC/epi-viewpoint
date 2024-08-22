@@ -1,5 +1,5 @@
-defmodule EpicenterWeb.Test.Pages.ResetPassword do
-  alias EpicenterWeb.Test.Pages
+defmodule EpiViewpointWeb.Test.Pages.ResetPassword do
+  alias EpiViewpointWeb.Test.Pages
   alias Plug.Conn
 
   def visit(%Conn{} = conn, url),

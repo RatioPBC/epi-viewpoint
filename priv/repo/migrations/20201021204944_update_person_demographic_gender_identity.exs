@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.UpdatePersonDemographicGenderIdentity do
+defmodule EpiViewpoint.Repo.Migrations.UpdatePersonDemographicGenderIdentity do
   use Ecto.Migration
 
   def up do

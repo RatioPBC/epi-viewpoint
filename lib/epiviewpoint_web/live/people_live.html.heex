@@ -1,0 +1,79 @@
+<section data-page="people" id="people-page">
+  <h2>
+    <div id="title"><span>Index case investigations</span></div>
+  </h2>
+  <div id="toolbar">
+    <div id="toolbar-left">
+      <form data-disabled={disabled?(@selected_people)} id="assignment-form" phx-change="form-change">
+        <div id="user-list">
+          <span id="assign-to-label">Assign to</span>
+          <div id="select-wrapper">
+            <select data-role="users" disabled={disabled?(@selected_people)} name="user">
+              <option></option>
+              <option value="-unassigned-">Unassigned</option>
+              <%= for user <- @users do %>
+                <option value={user.id}><%= user.name %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+        <div id="assignment-dropdown-tooltip">
+          Select people below, then assign them to a user
+        </div>
+      </form>
+      <button
+        data-confirm={archive_confirmation_message(@selected_people)}
+        data-role="archive-button"
+        disabled={disabled?(@selected_people)}
+        id="archive-button"
+        phx-click="archive"
+      >
+        Archive
+      </button>
+    </div>
+    <div id="toolbar-right">
+      <.live_component
+        module={EpiViewpointWeb.PeopleFilter}
+        id="people-filter"
+        display_people_assigned_to_me={@display_people_assigned_to_me}
+        filter={@filter}
+        on_toggle_assigned_to_me={&on_toggle_assigned_to_me/0}
+      />
+      <.link :if={@display_import_button} navigate="/import/start" data-role="import-labs" id="import-labs">Import labs</.link>
+    </div>
+  </div>
+  <table data-role="people">
+    <thead>
+      <tr data-role="table-column-names">
+        <th width="1%"></th>
+        <th width="20%">Name</th>
+        <th width="15%">ID</th>
+        <th width="25%">Collection date</th>
+        <th width="20%">Investigation status</th>
+        <th width="25%">Assignee</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for case_investigation <- @case_investigations do %>
+        <tr data-role="person">
+          <td>
+            <input
+              checked={selected?(@selected_people, case_investigation.person)}
+              data-tid={case_investigation.person.tid}
+              phx-click="checkbox-click"
+              phx-value-person-id={case_investigation.person.id}
+              type="checkbox"
+            />
+          </td>
+          <td>
+            <.link navigate={~p"/people/#{case_investigation.person}"}><%= full_name(case_investigation.person) %></.link>
+          </td>
+          <td><%= external_id(case_investigation.person) %></td>
+          <td><%= Format.date(case_investigation.initiating_lab_result.sampled_on) %></td>
+          <td><%= displayable_status(case_investigation, @current_date) %></td>
+          <td><%= assigned_to_name(case_investigation.person) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

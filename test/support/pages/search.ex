@@ -1,10 +1,10 @@
-defmodule EpicenterWeb.Test.Pages.Search do
+defmodule EpiViewpointWeb.Test.Pages.Search do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
   import Phoenix.LiveViewTest
 
-  alias Epicenter.Test
-  alias Epicenter.Test.HtmlAssertions
+  alias EpiViewpoint.Test
+  alias EpiViewpoint.Test.HtmlAssertions
   alias Phoenix.LiveViewTest.View
 
   def assert_disabled(view, link) when link in ~w[prev next]a do

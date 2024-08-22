@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddStreet2ToPlaceAddresses do
+defmodule EpiViewpoint.Repo.Migrations.AddStreet2ToPlaceAddresses do
   use Ecto.Migration
 
   def change do

@@ -1,12 +1,12 @@
-defmodule Epicenter.Test.RevisionAssertions do
+defmodule EpiViewpoint.Test.RevisionAssertions do
   import ExUnit.Assertions
 
   def assert_audit_logged(%{id: model_id}) do
-    if Epicenter.AuditingRepo.entries_for(model_id) == [], do: flunk("Expected schema to have an audit log entry, but found none.")
+    if EpiViewpoint.AuditingRepo.entries_for(model_id) == [], do: flunk("Expected schema to have an audit log entry, but found none.")
   end
 
   def assert_revision_count(%{id: model_id}, count) do
-    entries = Epicenter.AuditingRepo.entries_for(model_id)
+    entries = EpiViewpoint.AuditingRepo.entries_for(model_id)
     if length(entries) != count, do: flunk("Expected #{count} revisions but found #{length(entries)}")
   end
 
@@ -44,11 +44,11 @@ defmodule Epicenter.Test.RevisionAssertions do
   end
 
   def recent_audit_log(%{id: model_id}) do
-    Epicenter.AuditingRepo.entries_for(model_id) |> List.last()
+    EpiViewpoint.AuditingRepo.entries_for(model_id) |> List.last()
   end
 
   def audit_log_that_matches(model, action, event) do
-    Epicenter.AuditingRepo.entries_for(model.id)
+    EpiViewpoint.AuditingRepo.entries_for(model.id)
     |> Enum.find(&(&1.reason_action == action && &1.reason_event == event))
   end
 

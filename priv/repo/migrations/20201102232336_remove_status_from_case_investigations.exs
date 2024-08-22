@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RemoveStatusFromCaseInvestigations do
+defmodule EpiViewpoint.Repo.Migrations.RemoveStatusFromCaseInvestigations do
   use Ecto.Migration
 
   def change do

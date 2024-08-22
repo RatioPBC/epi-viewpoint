@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.RenameExposuresToContactInvestigations do
+defmodule EpiViewpoint.Repo.Migrations.RenameExposuresToContactInvestigations do
   use Ecto.Migration
 
   def change do

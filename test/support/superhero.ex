@@ -4,7 +4,7 @@ defmodule Superhero do
   """
 
   use Ecto.Schema
-  import Epicenter.EctoRedactionJasonEncoder
+  import EpiViewpoint.EctoRedactionJasonEncoder
 
   schema "superhero" do
     field :moniker, :string

@@ -1,9 +1,9 @@
-defmodule EpicenterWeb.Test.Pages.AddVisit do
+defmodule EpiViewpointWeb.Test.Pages.AddVisit do
   import Euclid.Test.Extra.Assertions
   import ExUnit.Assertions
 
-  alias Epicenter.Test
-  alias EpicenterWeb.Test.Pages
+  alias EpiViewpoint.Test
+  alias EpiViewpointWeb.Test.Pages
 
   def visit(%Plug.Conn{} = conn, case_investigation, place, place_address),
     do: conn |> Pages.visit("/case-investigations/#{case_investigation.id}/add-visit?place=#{place.id}&place_address=#{place_address.id}")

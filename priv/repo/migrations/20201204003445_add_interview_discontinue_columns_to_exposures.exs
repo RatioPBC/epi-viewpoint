@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddInterviewDiscontinueColumnsToExposures do
+defmodule EpiViewpoint.Repo.Migrations.AddInterviewDiscontinueColumnsToExposures do
   use Ecto.Migration
 
   def change do

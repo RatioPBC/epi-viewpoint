@@ -1,8 +1,8 @@
-defmodule Epicenter.Test.HtmlAssertions do
+defmodule EpiViewpoint.Test.HtmlAssertions do
   import ExUnit.Assertions
 
-  alias Epicenter.Extra
-  alias Epicenter.Test
+  alias EpiViewpoint.Extra
+  alias EpiViewpoint.Test
 
   def assert_html_eq(left, right) do
     assert to_html_string(left) == to_html_string(right)

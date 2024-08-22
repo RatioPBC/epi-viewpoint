@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddFingerprintColumnToLabResults do
+defmodule EpiViewpoint.Repo.Migrations.AddFingerprintColumnToLabResults do
   use Ecto.Migration
 
   def change do

@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertDemographicRaceToMap do
+defmodule EpiViewpoint.Repo.Migrations.ConvertDemographicRaceToMap do
   use Ecto.Migration
 
   def up do

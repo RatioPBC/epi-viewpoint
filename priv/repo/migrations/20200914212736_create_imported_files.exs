@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.CreateImportedFiles do
+defmodule EpiViewpoint.Repo.Migrations.CreateImportedFiles do
   use Ecto.Migration
 
   def change do

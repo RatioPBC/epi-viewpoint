@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddIsPositiveOrDetectedToLabResults do
+defmodule EpiViewpoint.Repo.Migrations.AddIsPositiveOrDetectedToLabResults do
   use Ecto.Migration
 
   def up do

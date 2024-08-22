@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.ConvertImportedFilesStringsToText do
+defmodule EpiViewpoint.Repo.Migrations.ConvertImportedFilesStringsToText do
   use Ecto.Migration
 
   def change do

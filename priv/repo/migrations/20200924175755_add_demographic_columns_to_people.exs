@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddDemographicColumnsToPeople do
+defmodule EpiViewpoint.Repo.Migrations.AddDemographicColumnsToPeople do
   use Ecto.Migration
 
   def change() do

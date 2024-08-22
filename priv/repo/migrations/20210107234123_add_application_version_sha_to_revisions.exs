@@ -1,4 +1,4 @@
-defmodule Epicenter.Repo.Migrations.AddApplicationVersionShaToRevisions do
+defmodule EpiViewpoint.Repo.Migrations.AddApplicationVersionShaToRevisions do
   use Ecto.Migration
 
   def change do
