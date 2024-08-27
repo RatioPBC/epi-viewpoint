@@ -1,5 +1,4 @@
 defmodule EpiViewpoint.Tempfile do
-  # sobelow_skip ["Traversal.FileModule"]
   def write_csv!(contents) do
     write_file!(contents, "csv")
   end
@@ -8,6 +7,7 @@ defmodule EpiViewpoint.Tempfile do
     write_file!(contents, "ndjson")
   end
 
+  # sobelow_skip ["Traversal.FileModule"]
   defp write_file!(contents, extension) do
     path = System.tmp_dir!() |> Path.join(Ecto.UUID.generate() <> ".#{extension}")
     File.write!(path, contents)
