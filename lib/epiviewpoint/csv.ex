@@ -1,4 +1,5 @@
 defmodule EpiViewpoint.Csv do
+  alias Explorer.DataFrame
   NimbleCSV.define(EpiViewpoint.Csv.Parser,
     separator: ",",
     escape: "\"",
@@ -13,11 +14,12 @@ defmodule EpiViewpoint.Csv do
   alias EpiViewpoint.Extra
 
   def read(string, header_transformer, headers) when is_binary(string),
-    do: read(string, header_transformer, headers, &EpiViewpoint.Csv.Parser.parse_string/2)
+    do: read(string, header_transformer, headers, &parse_with_explorer/1)
 
   def read(input, header_transformer, [required: required_headers, optional: optional_headers], parser) do
-    with {:ok, [provided_headers | rows]} <- parse(input, parser) do
-      provided_headers = provided_headers |> Enum.map(&String.trim/1) |> header_transformer.()
+    with {:ok, df} <- parse(input, parser) do
+      provided_headers = df |> DataFrame.names() |> Enum.map(&String.trim/1) |> header_transformer.()
+      df = DataFrame.rename(df, provided_headers)
 
       case required_headers -- provided_headers do
         [] ->
@@ -26,18 +28,21 @@ defmodule EpiViewpoint.Csv do
               MapSet.new(provided_headers),
               MapSet.union(MapSet.new(required_headers), MapSet.new(optional_headers))
             )
-
-          header_indices =
-            for header_key <- headers, into: %{} do
-              {header_key, Enum.find_index(provided_headers, &(&1 == header_key))}
-            end
+            |> MapSet.to_list()
 
           data =
-            for row <- rows, into: [] do
-              for {header_key, header_index} <- header_indices, into: %{} do
-                {header_key, Enum.at(row, header_index) |> Extra.String.trim()}
+            df
+            |> DataFrame.rename_with(fn col ->
+                 col
+                 |> String.trim()
+               end)
+            |> DataFrame.select(headers)
+            |> DataFrame.to_rows()
+            |> Enum.map(fn row ->
+              for header <- headers, into: %{} do
+                {header, row[header] |> Extra.String.trim()}
               end
-            end
+            end)
 
           {:ok, data}
 
@@ -48,10 +53,18 @@ defmodule EpiViewpoint.Csv do
   end
 
   defp parse(input, parser) do
-    {:ok, parser.(input, skip_headers: false)}
+    EpiViewpoint.Csv.Parser.parse_string(input, headers: true)
+    {:ok, parser.(input)}
   rescue
     e ->
       hint = "make sure there are no spaces between the field separators (commas) and the quotes around field contents"
       {:invalid_csv, "#{Exception.message(e)} (#{hint})"}
+  end
+
+  defp parse_with_explorer(input) do
+    # Remove BOM if present
+    input = String.trim_leading(input, "\uFEFF")
+
+    DataFrame.load_csv!(input, infer_schema_length: 0)
   end
 end
