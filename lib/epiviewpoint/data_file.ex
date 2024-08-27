@@ -61,7 +61,6 @@ defmodule EpiViewpoint.DataFile do
   end
 
   defp parse_csv(input) do
-
     input
     |> validate_csv()
     |> remove_bom()

@@ -119,7 +119,7 @@ defmodule EpiViewpoint.DataFileTest do
       )
     end
 
-    test "reads an ndjson file" do
+    test "reads a ndjson file" do
       """
       {"first_name":"Alice","last_name":"Ant","dob":"01/02/1970","sample_date":"06/01/2020","result_date":"06/03/2020","result":"positive"}
       {"first_name":"Billy","last_name":"Bat","dob":"03/04/1990","sample_date":"06/06/2020","result_date":"06/07/2020","result":"negative"}
