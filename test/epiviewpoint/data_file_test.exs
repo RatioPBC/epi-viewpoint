@@ -118,5 +118,84 @@ defmodule EpiViewpoint.DataFileTest do
          ]}
       )
     end
+
+    test "reads an ndjson file" do
+      """
+      {"first_name":"Alice","last_name":"Ant","dob":"01/02/1970","sample_date":"06/01/2020","result_date":"06/03/2020","result":"positive"}
+      {"first_name":"Billy","last_name":"Bat","dob":"03/04/1990","sample_date":"06/06/2020","result_date":"06/07/2020","result":"negative"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{first_name last_name dob sample_date result_date result}, optional: ~w{})
+      |> assert_eq(
+        {:ok,
+         [
+           %{
+             "first_name" => "Alice",
+             "last_name" => "Ant",
+             "dob" => "01/02/1970",
+             "sample_date" => "06/01/2020",
+             "result_date" => "06/03/2020",
+             "result" => "positive"
+           },
+           %{
+             "first_name" => "Billy",
+             "last_name" => "Bat",
+             "dob" => "03/04/1990",
+             "sample_date" => "06/06/2020",
+             "result_date" => "06/07/2020",
+             "result" => "negative"
+           }
+         ]}
+      )
+    end
+
+    test "ignores unspecified headers in ndjson" do
+      """
+      {"column_a":"value_a","column_b":"value_b","column_c":"value_c"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{column_a}, optional: ~w{column_b})
+      |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b"}]})
+    end
+
+    test "fails if required header is missing in ndjson" do
+      """
+      {"column_a":"value_a","column_b":"value_b"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{column_a column_b column_c column_d}, optional: ~w{})
+      |> assert_eq({:error, :missing_headers, ["column_c", "column_d"]})
+    end
+
+    test "allows optional headers in ndjson" do
+      """
+      {"column_a":"value_a","column_b":"value_b","optional_c":"value_c"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{column_a column_b}, optional: ~w{optional_c optional_d})
+      |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b", "optional_c" => "value_c"}]})
+    end
+
+    test "header transformer transforms headers in ndjson" do
+      """
+      {"first_name":"Alice","last_name":"Ant"}
+      {"first_name":"Billy","last_name":"Bat"}
+      """
+      |> DataFile.read(
+        :ndjson,
+        fn headers -> Enum.map(headers, &String.upcase/1) end,
+        required: ~w{FIRST_NAME LAST_NAME},
+        optional: ~w{}
+      )
+      |> assert_eq(
+        {:ok,
+         [
+           %{
+             "FIRST_NAME" => "Alice",
+             "LAST_NAME" => "Ant"
+           },
+           %{
+             "FIRST_NAME" => "Billy",
+             "LAST_NAME" => "Bat"
+           }
+         ]}
+      )
+    end
   end
 end

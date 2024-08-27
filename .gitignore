@@ -8,15 +8,13 @@
 .iex-history
 /.fetch
 /_build/
-/assets/node_modules/
 /assets/static/version.txt
 /cover/
 /deps/
 /doc/
 /priv/postgres/
 /priv/repo/structure.sql
-/priv/static/js/
-/priv/static/css/
+/priv/static/assets/
 /tmp/
 Brewfile.lock.json
 epiviewpoint-*.tar
