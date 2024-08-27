@@ -13,8 +13,13 @@ defmodule EpiViewpoint.Csv do
 
   alias EpiViewpoint.Extra
 
-  def read(string, header_transformer, headers) when is_binary(string),
-    do: read(string, header_transformer, headers, &parse_with_explorer/1)
+
+
+  def read(string, :csv, header_transformer, headers) when is_binary(string),
+    do: read(string, header_transformer, headers, &parse_csv/1)
+
+  def read(string, :ndjson, header_transformer, headers) when is_binary(string),
+    do: read(string, header_transformer, headers, &parse_ndjson/1)
 
   def read(input, header_transformer, [required: required_headers, optional: optional_headers], parser) do
     with {:ok, df} <- parse(input, parser) do
@@ -53,18 +58,23 @@ defmodule EpiViewpoint.Csv do
   end
 
   defp parse(input, parser) do
+    parser.(input)
+  end
+
+  defp parse_csv(input) do
     EpiViewpoint.Csv.Parser.parse_string(input, headers: true)
-    {:ok, parser.(input)}
+    # Remove BOM if present
+    input = String.trim_leading(input, "\uFEFF")
+
+    DataFrame.load_csv(input, infer_schema_length: 0)
   rescue
     e ->
       hint = "make sure there are no spaces between the field separators (commas) and the quotes around field contents"
       {:invalid_csv, "#{Exception.message(e)} (#{hint})"}
   end
 
-  defp parse_with_explorer(input) do
-    # Remove BOM if present
-    input = String.trim_leading(input, "\uFEFF")
-
-    DataFrame.load_csv!(input, infer_schema_length: 0)
+  defp parse_ndjson(input) do
+    DataFrame.load_ndjson(input)
   end
+
 end

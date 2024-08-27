@@ -66,7 +66,7 @@ defmodule EpiViewpoint.Cases.Import do
       try do
         Cases.create_imported_file(in_audit_tuple(file, originator, AuditLog.Revision.import_csv_action()))
 
-        with {:ok, rows} <- Csv.read(file.contents, &rename_headers/1, @fields),
+        with {:ok, rows} <- file_router(file),
              {:transform_dates, {:ok, rows}} <- {:transform_dates, transform_dates(rows)},
              rows = {rows, []} do
           case import_rows(rows, originator) do
@@ -97,6 +97,14 @@ defmodule EpiViewpoint.Cases.Import do
           Repo.rollback(error)
       end
     end)
+  end
+
+  defp file_router(file) do
+    case Path.extname(file.file_name) do
+      ".csv" -> Csv.read(file.contents, :csv, &rename_headers/1, @fields)
+      ".ndjson" -> Csv.read(file.contents, :ndjson, &rename_headers/1, @fields)
+      _ -> {:error, "Unsupported file type: #{file.extension}"}
+    end
   end
 
   def reject_rows_with_blank_key_values(rows, key) do
