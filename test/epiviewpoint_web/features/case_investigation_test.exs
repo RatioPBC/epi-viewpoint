@@ -20,7 +20,7 @@ defmodule EpiViewpointWeb.Features.CaseInvestigationTest do
                Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
                """
              }
-             |> Cases.Import.import_csv(user)
+             |> Cases.Import.import_data_file(user)
 
     [person] = Cases.list_people(:with_lab_results, user: @admin)
 
@@ -72,7 +72,7 @@ defmodule EpiViewpointWeb.Features.CaseInvestigationTest do
                Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
                """
              }
-             |> Cases.Import.import_csv(@admin)
+             |> Cases.Import.import_data_file(@admin)
 
     [person] = Cases.list_people(:all, user: @admin, reject_archived_people: true)
 

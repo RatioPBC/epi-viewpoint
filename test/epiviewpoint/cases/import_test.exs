@@ -36,7 +36,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                  Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy-result-1 , 1234 Test St          , City               , OH                  , 00000             ,                      ,             , billy      ,       ,             ,                 ,
                  """
                }
-               |> Import.import_csv(originator)
+               |> Import.import_data_file(originator)
 
       assert imported_people |> tids() == ["alice", "billy"]
 
@@ -118,7 +118,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                  Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000             ,                      ,             ,       ,             ,                 ,
                  """
                }
-               |> Import.import_csv(originator)
+               |> Import.import_data_file(originator)
 
       [alice, _billy] =
         Cases.list_people(:all, user: @admin, reject_archived_people: true)
@@ -142,7 +142,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                 total_person_count: 26
               }} =
                %{file_name: file_name, contents: File.read!(file_name)}
-               |> Import.import_csv(originator)
+               |> Import.import_data_file(originator)
     end
 
     test "ignores number suffixes for columns in csv data", %{originator: originator} do
@@ -186,7 +186,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                  Alice              , Testuser          , 01/01/1970, 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice     , female, HispanicOrLatino       , Rocket Scientist, Asian Indian
                  """
                }
-               |> Import.import_csv(originator)
+               |> Import.import_data_file(originator)
 
       assert imported_people |> tids() == ["alice"]
 
@@ -240,7 +240,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                  Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    ,           , Lab Co South            , alice      , alice-result-1 ,                       ,                    ,                     ,                   , 06/05/2020           , TestTest    , alice      , female , HispanicOrLatino , Rocket Scientist , Asian Indian
                  """
                }
-               |> Import.import_csv(originator)
+               |> Import.import_data_file(originator)
 
       assert imported_people |> tids() == ["alice"]
 
@@ -291,7 +291,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                Billy              , Testuser          , 03/01/1990    ,               , 10001    , 06/06/2020       , 06/07/2020    , negative  ,                         , billy      , billy-result-1 , 1234 Test St          , City               , OH                  , 00000             ,                      ,             , bill      ,       ,             ,                 ,
                """
              }
-             |> Import.import_csv(non_admin_user)
+             |> Import.import_data_file(non_admin_user)
   end
 
   describe "de-duplication" do
@@ -315,7 +315,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                  Billy              , Testuser          , 01/01/2000    , 09/01/2020       , 09/02/2020    , positive  , billy-2    , billy-2-result
                  """
                }
-               |> Import.import_csv(originator)
+               |> Import.import_data_file(originator)
 
       assert imported_people |> tids() == ["alice", "billy-1", "billy-2"]
 
@@ -345,7 +345,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                  Person2            , Testuser          , 01/01/1990    , 07/01/2020       , 08/02/2020    , positive  , person-2   , person-2-result-2-dupe
                  """
                }
-               |> Import.import_csv(originator)
+               |> Import.import_data_file(originator)
 
       [person_1, person_2] = Cases.list_people(:all, user: @admin, reject_archived_people: true) |> Enum.map(&Cases.preload_lab_results/1)
 
@@ -375,7 +375,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 ,                       ,                    ,                     ,
         """
       }
-      |> Import.import_csv(originator)
+      |> Import.import_data_file(originator)
 
       alice = Cases.get_person(alice.id, @admin) |> Cases.preload_phones()
       assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000"]
@@ -396,7 +396,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         Alice              , Testuser          , 01/01/1970    , 1111111111    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 ,                       ,                    ,                     ,
         """
       }
-      |> Import.import_csv(originator)
+      |> Import.import_data_file(originator)
 
       alice = Cases.get_person(alice.id, @admin) |> Cases.preload_phones()
       assert alice.phones |> Euclid.Extra.Enum.pluck(:number) == ["1111111000", "1111111111"]
@@ -424,7 +424,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4250 Test St                , City               , OH                   , 00000
         """
       }
-      |> Import.import_csv(originator)
+      |> Import.import_data_file(originator)
 
       alice = Cases.get_person(alice.id, @admin) |> Cases.preload_addresses()
 
@@ -455,7 +455,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , OH                   , 00000
         """
       }
-      |> Import.import_csv(originator)
+      |> Import.import_data_file(originator)
 
       alice = Cases.get_person(alice.id, @admin) |> Cases.preload_addresses()
 
@@ -478,7 +478,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
           Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , OH                   , 00000
           """
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
       # archive the person
 
@@ -493,7 +493,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 07/01/2020       , 07/03/2020    , positive  , Lab Co South           , alice      , alice-result-2 , 4251 Test St                , City               , OH                   , 00000
         """
       }
-      |> Import.import_csv(originator)
+      |> Import.import_data_file(originator)
 
       # check that person is no longer archived
       assert Cases.get_person(imported_person.id, originator).archived_at == nil
@@ -511,7 +511,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
           Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , 4251 Test St                , City               , OH                   , 00000
           """
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
       # archive the person
 
@@ -526,7 +526,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 07/01/2020       , 07/03/2020    , negative  , Lab Co South           , alice      , alice-result-2 , 4251 Test St                , City               , OH                   , 00000
         """
       }
-      |> Import.import_csv(originator)
+      |> Import.import_data_file(originator)
 
       # check that person is no longer archived
       assert Cases.get_person(imported_person.id, originator).archived_at != nil
@@ -559,7 +559,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
           Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , male  , White  , Brain Surgeon, Puerto Rican
           """
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
       assert {:ok, %EpiViewpoint.Cases.Import.ImportInfo{}} = import_output
       updated_alice = Cases.get_person(alice.id, @admin) |> Cases.preload_demographics()
@@ -606,7 +606,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
           Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , male  , White  , Brain Surgeon, Puerto Rican
           """
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
       assert {:ok, %EpiViewpoint.Cases.Import.ImportInfo{}} = import_output
       updated_alice = Cases.get_person(alice.id, @admin) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
@@ -656,7 +656,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
           Alice              , Testuser          , 01/01/1970    , 1111111000    , 10000    , 06/01/2020       , 06/03/2020    , positive  , Lab Co South           , alice      , alice-result-1 , male  , White  , Brain Surgeon, Puerto Rican
           """
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
       assert {:ok, %EpiViewpoint.Cases.Import.ImportInfo{}} = import_output
       updated_alice = Cases.get_person(alice.id, @admin) |> Cases.preload_assigned_to() |> Cases.preload_demographics()
@@ -681,7 +681,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         """
       }
 
-      {:ok, _} = Import.import_csv(in_file_attrs, originator)
+      {:ok, _} = Import.import_data_file(in_file_attrs, originator)
       assert ImportedFile |> Repo.all() |> Enum.count() == 1
       assert in_file_attrs == Repo.one(ImportedFile) |> Map.take([:file_name, :contents])
     end
@@ -700,7 +700,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
         """
       }
 
-      assert {:error, %Ecto.InvalidChangesetError{changeset: %{errors: [file_name: _]}}} = Import.import_csv(in_file_attrs, originator)
+      assert {:error, %Ecto.InvalidChangesetError{changeset: %{errors: [file_name: _]}}} = Import.import_data_file(in_file_attrs, originator)
     end
 
     # TODO: I think this test relied on presence validations for first and last name?
@@ -726,7 +726,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
                              ,                   , 01/02/1980    ,                  ,               , positive  ,            ,
           """
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
       assert {:error, %Ecto.Changeset{}} = result
 
@@ -741,9 +741,9 @@ defmodule EpiViewpoint.Cases.ImportTest do
           file_name: "test.csv",
           contents: "missing columns"
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
-      error_message = "Missing required columns: datecollected_xx, dateofbirth_xx, result_xx, resultdate_xx, search_firstname_xx, search_lastname_xx"
+      error_message = "Missing required fields: datecollected_xx, dateofbirth_xx, result_xx, resultdate_xx, search_firstname_xx, search_lastname_xx"
 
       assert {:error, [user_readable: error_message]} == result
     end
@@ -757,7 +757,7 @@ defmodule EpiViewpoint.Cases.ImportTest do
           \"Alice\"          , Testuser          , 01/01/1970    , 06/01/2020       , 06/02/2020    , positive  , alice      , alice-result
           """
         }
-        |> Import.import_csv(originator)
+        |> Import.import_data_file(originator)
 
       assert message =~ "unexpected escape character"
     end

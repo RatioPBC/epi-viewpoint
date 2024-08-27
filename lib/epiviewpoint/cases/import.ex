@@ -11,10 +11,10 @@ defmodule EpiViewpoint.Cases.Import do
   alias EpiViewpoint.Repo
 
   # Read fields
-  @required_lab_result_csv_fields ~w{sampled_on result analyzed_on}
-  @optional_lab_result_csv_fields ~w{reported_on tid request_facility_name test_type}
-  @required_person_csv_fields ~w{dob first_name last_name}
-  @optional_person_csv_fields ~w{external_id diagaddress_street1 diagaddress_city diagaddress_state diagaddress_zip person_tid phonenumber sex_at_birth ethnicity occupation race}
+  @required_lab_result_data_fields ~w{sampled_on result analyzed_on}
+  @optional_lab_result_data_fields ~w{reported_on tid request_facility_name test_type}
+  @required_person_data_fields ~w{dob first_name last_name}
+  @optional_person_data_fields ~w{external_id diagaddress_street1 diagaddress_city diagaddress_state diagaddress_zip person_tid phonenumber sex_at_birth ethnicity occupation race}
 
   # Insert fields
   @lab_result_db_fields_to_insert ~w{result sampled_on analyzed_on reported_on request_accession_number request_facility_code request_facility_name test_type tid}
@@ -22,11 +22,11 @@ defmodule EpiViewpoint.Cases.Import do
   @address_db_fields_to_insert ~w{diagaddress_street1 diagaddress_city diagaddress_state diagaddress_zip}
 
   @fields [
-    required: @required_lab_result_csv_fields ++ @required_person_csv_fields,
-    optional: @optional_lab_result_csv_fields ++ @optional_person_csv_fields
+    required: @required_lab_result_data_fields ++ @required_person_data_fields,
+    optional: @optional_lab_result_data_fields ++ @optional_person_data_fields
   ]
 
-  # Mapping from csv column name to internal db column names
+  # Mapping from data column name to internal db column names
   @key_map %{
     "caseid" => "external_id",
     "datecollected" => "sampled_on",
@@ -59,12 +59,12 @@ defmodule EpiViewpoint.Cases.Import do
     ]
   end
 
-  def import_csv(_file, %{admin: false}), do: {:error, "Originator must be an admin"}
+  def import_data_file(_file, %{admin: false}), do: {:error, "Originator must be an admin"}
 
-  def import_csv(file, %Accounts.User{} = originator) do
+  def import_data_file(file, %Accounts.User{} = originator) do
     Repo.transaction(fn ->
       try do
-        Cases.create_imported_file(in_audit_tuple(file, originator, AuditLog.Revision.import_csv_action()))
+        Cases.create_imported_file(in_audit_tuple(file, originator, AuditLog.Revision.import_file_action()))
 
         with {:ok, rows} <- file_router(file),
              {:transform_dates, {:ok, rows}} <- {:transform_dates, transform_dates(rows)},
@@ -84,7 +84,7 @@ defmodule EpiViewpoint.Cases.Import do
               |> Enum.map(&Extra.String.add_placeholder_suffix/1)
               |> Enum.join(", ")
 
-            Repo.rollback(user_readable: "Missing required columns: #{headers_string}")
+            Repo.rollback(user_readable: "Missing required fields: #{headers_string}")
 
           {:invalid_csv, message} ->
             Repo.rollback(user_readable: "Invalid CSV: \n #{message}")
@@ -329,7 +329,7 @@ defmodule EpiViewpoint.Cases.Import do
     %AuditLog.Meta{
       author_id: originator.id,
       reason_action: reason_action,
-      reason_event: AuditLog.Revision.import_csv_event()
+      reason_event: AuditLog.Revision.import_file_event()
     }
   end
 
@@ -338,7 +338,7 @@ defmodule EpiViewpoint.Cases.Import do
      %AuditLog.Meta{
        author_id: author.id,
        reason_action: reason_action,
-       reason_event: AuditLog.Revision.import_csv_event()
+       reason_event: AuditLog.Revision.import_file_event()
      }}
   end
 end

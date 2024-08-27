@@ -6,7 +6,7 @@
     </div>
   <% end %>
   <p>
-    Choose a CSV file from your computer, click “Upload”, and then wait for the file to upload.
+    Choose a CSV or NDJSON file from your computer, click “Upload”, and then wait for the file to upload.
   </p>
   <%= form_tag("/import/upload", multipart: true, method: :post) %><input name="file" type="file" /><input
     data-role="upload-labs"
