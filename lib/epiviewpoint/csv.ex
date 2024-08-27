@@ -1,6 +1,6 @@
-defmodule EpiViewpoint.Csv do
+defmodule EpiViewpoint.DataFile do
   alias Explorer.DataFrame
-  NimbleCSV.define(EpiViewpoint.Csv.Parser,
+  NimbleCSV.define(EpiViewpoint.DataFile.Parser,
     separator: ",",
     escape: "\"",
     line_separator: "\r\n",
@@ -62,7 +62,7 @@ defmodule EpiViewpoint.Csv do
   end
 
   defp parse_csv(input) do
-    EpiViewpoint.Csv.Parser.parse_string(input, headers: true)
+    EpiViewpoint.DataFile.Parser.parse_string(input, headers: true)
     # Remove BOM if present
     input = String.trim_leading(input, "\uFEFF")
 

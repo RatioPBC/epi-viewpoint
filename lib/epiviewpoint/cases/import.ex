@@ -5,7 +5,7 @@ defmodule EpiViewpoint.Cases.Import do
   alias EpiViewpoint.Cases.Import
   alias EpiViewpoint.Cases.LabResult
   alias EpiViewpoint.Cases.Person
-  alias EpiViewpoint.Csv
+  alias EpiViewpoint.DataFile
   alias EpiViewpoint.DateParser
   alias EpiViewpoint.Extra
   alias EpiViewpoint.Repo
@@ -101,8 +101,8 @@ defmodule EpiViewpoint.Cases.Import do
 
   defp file_router(file) do
     case Path.extname(file.file_name) do
-      ".csv" -> Csv.read(file.contents, :csv, &rename_headers/1, @fields)
-      ".ndjson" -> Csv.read(file.contents, :ndjson, &rename_headers/1, @fields)
+      ".csv" -> DataFile.read(file.contents, :csv, &rename_headers/1, @fields)
+      ".ndjson" -> DataFile.read(file.contents, :ndjson, &rename_headers/1, @fields)
       _ -> {:error, "Unsupported file type: #{file.extension}"}
     end
   end
