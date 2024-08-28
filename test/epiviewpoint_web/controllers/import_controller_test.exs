@@ -12,7 +12,7 @@ defmodule EpiViewpointWeb.ImportControllerTest do
 
   describe "create" do
     @describetag :tmp_dir
-    
+
     test "prevents non-admins from uploading", %{conn: conn, user: user, tmp_dir: tmp_dir} do
       Accounts.update_user(user, %{admin: false}, Test.Fixtures.audit_meta(@admin))
 
