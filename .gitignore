@@ -8,7 +8,6 @@
 .iex-history
 /.fetch
 /_build/
-/assets/node_modules/
 /assets/static/version.txt
 /cover/
 /deps/
