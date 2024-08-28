@@ -30,7 +30,6 @@ defmodule EpiViewpoint.DataFile do
       data =
         df
         |> DataFrame.rename(provided_headers)
-        |> DataFrame.rename_with(&String.trim/1)
         |> DataFrame.select(headers)
         |> DataFrame.to_rows()
         |> Enum.map(&process_row(&1, headers))
