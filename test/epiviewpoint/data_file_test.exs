@@ -1,7 +1,7 @@
-defmodule EpiViewpoint.CsvTest do
+defmodule EpiViewpoint.DataFileTest do
   use EpiViewpoint.SimpleCase, async: true
 
-  alias EpiViewpoint.Csv
+  alias EpiViewpoint.DataFile
 
   describe "read" do
     test "reads a csv file" do
@@ -10,7 +10,7 @@ defmodule EpiViewpoint.CsvTest do
       Alice      , Ant       , 01/02/1970 , graz , 06/01/2020  , 06/03/2020  , positive , 393
       Billy      , Bat       , 03/04/1990 , fnord, 06/06/2020  , 06/07/2020  , negative , sn3
       """
-      |> Csv.read(&Function.identity/1, required: ~w{first_name last_name dob sample_date result_date result}, optional: ~w{})
+      |> DataFile.read(:csv, &Function.identity/1, required: ~w{first_name last_name dob sample_date result_date result}, optional: ~w{})
       |> assert_eq(
         {:ok,
          [
@@ -39,7 +39,7 @@ defmodule EpiViewpoint.CsvTest do
       column_a , column_b , column_c
       value_a  , value_b  , value_c
       """
-      |> Csv.read(&Function.identity/1, required: ~w{column_a}, optional: ~w{column_b})
+      |> DataFile.read(:csv, &Function.identity/1, required: ~w{column_a}, optional: ~w{column_b})
       |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b"}]})
     end
 
@@ -48,7 +48,7 @@ defmodule EpiViewpoint.CsvTest do
       column_a , column_b
       value_a  , value_b
       """
-      |> Csv.read(&Function.identity/1, required: ~w{column_a column_b column_c column_d}, optional: ~w{})
+      |> DataFile.read(:csv, &Function.identity/1, required: ~w{column_a column_b column_c column_d}, optional: ~w{})
       |> assert_eq({:error, :missing_headers, ["column_c", "column_d"]})
     end
 
@@ -57,7 +57,7 @@ defmodule EpiViewpoint.CsvTest do
       column_a , column_b , optional_c
       value_a  , value_b  , value_c
       """
-      |> Csv.read(&Function.identity/1, required: ~w{column_a column_b}, optional: ~w{optional_c optional_d})
+      |> DataFile.read(:csv, &Function.identity/1, required: ~w{column_a column_b}, optional: ~w{optional_c optional_d})
       |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b", "optional_c" => "value_c"}]})
     end
 
@@ -66,7 +66,7 @@ defmodule EpiViewpoint.CsvTest do
       column_a   ,"column b", column_c
       "value, a","value b", value c
       """
-      |> Csv.read(&Function.identity/1, required: ["column_a", "column b", "column_c"], optional: [])
+      |> DataFile.read(:csv, &Function.identity/1, required: ["column_a", "column b", "column_c"], optional: [])
       |> assert_eq({:ok, [%{"column_a" => "value, a", "column b" => "value b", "column_c" => "value c"}]})
     end
 
@@ -76,7 +76,7 @@ defmodule EpiViewpoint.CsvTest do
 
       assert {:ok, [%{"search_firstname_3" => "AminaT"}]} =
                File.read!("test/support/fixtures/import_dos_file.csv")
-               |> Csv.read(&Function.identity/1, required: ["search_firstname_3"], optional: optional_columns)
+               |> DataFile.read(:csv, &Function.identity/1, required: ["search_firstname_3"], optional: optional_columns)
     end
 
     test "gives a nicer error message when there are spaces between commas and quotes" do
@@ -89,7 +89,7 @@ defmodule EpiViewpoint.CsvTest do
                column_a   , "column b" , column_c
                "value, a" , "value b" , value c
                """
-               |> Csv.read(&Function.identity/1, required: ["column_a", "column b", "column_c"], optional: [])
+               |> DataFile.read(:csv, &Function.identity/1, required: ["column_a", "column b", "column_c"], optional: [])
     end
 
     test "header transformer transforms headers" do
@@ -98,7 +98,87 @@ defmodule EpiViewpoint.CsvTest do
       Alice      , Ant
       Billy      , Bat
       """
-      |> Csv.read(
+      |> DataFile.read(
+        :csv,
+        fn headers -> Enum.map(headers, &String.upcase/1) end,
+        required: ~w{FIRST_NAME LAST_NAME},
+        optional: ~w{}
+      )
+      |> assert_eq(
+        {:ok,
+         [
+           %{
+             "FIRST_NAME" => "Alice",
+             "LAST_NAME" => "Ant"
+           },
+           %{
+             "FIRST_NAME" => "Billy",
+             "LAST_NAME" => "Bat"
+           }
+         ]}
+      )
+    end
+
+    test "reads a ndjson file" do
+      """
+      {"first_name":"Alice","last_name":"Ant","dob":"01/02/1970","sample_date":"06/01/2020","result_date":"06/03/2020","result":"positive"}
+      {"first_name":"Billy","last_name":"Bat","dob":"03/04/1990","sample_date":"06/06/2020","result_date":"06/07/2020","result":"negative"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{first_name last_name dob sample_date result_date result}, optional: ~w{})
+      |> assert_eq(
+        {:ok,
+         [
+           %{
+             "first_name" => "Alice",
+             "last_name" => "Ant",
+             "dob" => "01/02/1970",
+             "sample_date" => "06/01/2020",
+             "result_date" => "06/03/2020",
+             "result" => "positive"
+           },
+           %{
+             "first_name" => "Billy",
+             "last_name" => "Bat",
+             "dob" => "03/04/1990",
+             "sample_date" => "06/06/2020",
+             "result_date" => "06/07/2020",
+             "result" => "negative"
+           }
+         ]}
+      )
+    end
+
+    test "ignores unspecified headers in ndjson" do
+      """
+      {"column_a":"value_a","column_b":"value_b","column_c":"value_c"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{column_a}, optional: ~w{column_b})
+      |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b"}]})
+    end
+
+    test "fails if required header is missing in ndjson" do
+      """
+      {"column_a":"value_a","column_b":"value_b"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{column_a column_b column_c column_d}, optional: ~w{})
+      |> assert_eq({:error, :missing_headers, ["column_c", "column_d"]})
+    end
+
+    test "allows optional headers in ndjson" do
+      """
+      {"column_a":"value_a","column_b":"value_b","optional_c":"value_c"}
+      """
+      |> DataFile.read(:ndjson, &Function.identity/1, required: ~w{column_a column_b}, optional: ~w{optional_c optional_d})
+      |> assert_eq({:ok, [%{"column_a" => "value_a", "column_b" => "value_b", "optional_c" => "value_c"}]})
+    end
+
+    test "header transformer transforms headers in ndjson" do
+      """
+      {"first_name":"Alice","last_name":"Ant"}
+      {"first_name":"Billy","last_name":"Bat"}
+      """
+      |> DataFile.read(
+        :ndjson,
         fn headers -> Enum.map(headers, &String.upcase/1) end,
         required: ~w{FIRST_NAME LAST_NAME},
         optional: ~w{}

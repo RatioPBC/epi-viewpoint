@@ -26,7 +26,7 @@ defmodule EpiViewpointWeb.ImportController do
         {_imported_people, popped_import_info} = import_info |> Map.pop(:imported_people)
 
         conn
-        |> Session.set_last_csv_import_info(popped_import_info)
+        |> Session.set_last_file_import_info(popped_import_info)
         |> redirect(to: ~p"/import/complete")
 
       {:error, [user_readable: user_readable_message]} ->
@@ -44,6 +44,6 @@ defmodule EpiViewpointWeb.ImportController do
   def show(conn, _params) do
     conn
     |> assign_defaults(@common_assigns)
-    |> render("show.html", last_csv_import_info: Session.get_last_csv_import_info(conn))
+    |> render("show.html", last_file_import_info: Session.get_last_file_import_info(conn))
   end
 end

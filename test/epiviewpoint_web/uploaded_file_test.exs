@@ -5,8 +5,9 @@ defmodule EpiViewpointWeb.UploadedFileTest do
   alias EpiViewpointWeb.UploadedFile
 
   describe "from_plug_upload" do
-    test "creates a new ImportedFile with a sanitized filename and the contents of the file" do
-      path = Tempfile.write_csv!("file contents")
+    @tag :tmp_dir
+    test "creates a new ImportedFile with a sanitized filename and the contents of the file", %{tmp_dir: tmp_dir} do
+      path = Tempfile.write_csv!("file contents", tmp_dir)
 
       UploadedFile.from_plug_upload(%{path: path, filename: "   somé//crazy\nfilename"})
       |> assert_eq(%{file_name: "somécrazy filename", contents: "file contents"})

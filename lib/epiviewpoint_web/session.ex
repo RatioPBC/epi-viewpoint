@@ -2,11 +2,11 @@ defmodule EpiViewpointWeb.Session do
   alias EpiViewpoint.Cases.Import.ImportInfo
   alias Plug.Conn
 
-  def get_last_csv_import_info(conn),
-    do: Conn.get_session(conn, :last_csv_import_info)
+  def get_last_file_import_info(conn),
+    do: Conn.get_session(conn, :last_file_import_info)
 
-  def set_last_csv_import_info(conn, %ImportInfo{} = import_info),
-    do: conn |> clear_old_messages |> Conn.put_session(:last_csv_import_info, import_info)
+  def set_last_file_import_info(conn, %ImportInfo{} = import_info),
+    do: conn |> clear_old_messages |> Conn.put_session(:last_file_import_info, import_info)
 
   def get_import_error_message(conn),
     do: Conn.get_session(conn, :import_error_message)
@@ -17,7 +17,7 @@ defmodule EpiViewpointWeb.Session do
   defp clear_old_messages(conn) do
     conn
     |> Conn.delete_session(:import_error_message)
-    |> Conn.delete_session(:last_csv_import_info)
+    |> Conn.delete_session(:last_file_import_info)
   end
 
   def ensure_multifactor_auth_secret(conn, if_nil: if_nil_fn) do
