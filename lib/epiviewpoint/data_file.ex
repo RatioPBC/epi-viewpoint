@@ -23,7 +23,7 @@ defmodule EpiViewpoint.DataFile do
 
   def read(input, header_transformer, [required: required_headers, optional: optional_headers], parser) do
     with {:ok, df} <- parser.(input),
-         provided_headers <- df |> DataFrame.names() |> Enum.map(&String.trim/1) |> header_transformer.(),
+         {:ok, provided_headers} <- extract_provided_headers(df, header_transformer),
          :ok <- validate_headers(provided_headers, required_headers) do
       headers = get_valid_headers(provided_headers, required_headers, optional_headers)
 
@@ -37,6 +37,16 @@ defmodule EpiViewpoint.DataFile do
 
       {:ok, data}
     end
+  end
+
+  defp extract_provided_headers(df, header_transformer) do
+    provided_headers =
+      df
+      |> DataFrame.names()
+      |> Enum.map(&String.trim/1)
+      |> header_transformer.()
+
+    {:ok, provided_headers}
   end
 
   defp validate_headers(provided_headers, required_headers) do
