@@ -1,10 +1,12 @@
 defmodule EpiViewpoint.BulkFhirParser do
   def parse_bulk_fhir(file_list) do
+    contents = file_list |> Enum.map(& &1.contents) |> List.to_string()
+
     file_list
     |> load_resources()
     |> extract_resources()
     |> join_resources()
-    |> to_map()
+    |> to_map(contents)
   end
 
   def load_resources(file_list) do
@@ -23,6 +25,7 @@ defmodule EpiViewpoint.BulkFhirParser do
     file_content
     |> String.split("\n")
     |> Stream.map(&String.trim/1)
+    |> Stream.filter(&(&1 != ""))
     |> Stream.map(&json_to_kindle_schema(&1, "EpiViewpoint.R4"))
     |> Enum.to_list()
   end
@@ -37,21 +40,21 @@ defmodule EpiViewpoint.BulkFhirParser do
   def extract_resource("Patient", resource_list) do
     resource_list
     |> Enum.map(fn
-      %Epiviewpoint.R4.Patient{
+      %EpiViewpoint.R4.Patient{
         id: caseid,
-        identifier: [%Epiviewpoint.R4.Identifier{value: person_tid}],
-        name: [%Epiviewpoint.R4.HumanName{given: [search_firstname], family: search_lastname}],
+        identifier: [%EpiViewpoint.R4.Identifier{value: person_tid}],
+        name: [%EpiViewpoint.R4.HumanName{given: [search_firstname], family: search_lastname}],
         birth_date: dateofbirth,
         gender: sex,
         address: [
-          %Epiviewpoint.R4.Address{
+          %EpiViewpoint.R4.Address{
             line: [diagaddress_street1],
             city: diagaddress_city,
             state: diagaddress_state,
             postal_code: diagaddress_zip
           }
         ],
-        telecom: [%Epiviewpoint.R4.ContactPoint{value: phonenumber}],
+        telecom: [%EpiViewpoint.R4.ContactPoint{value: phonenumber}],
         extension: extensions
       } = _resource ->
         %{
@@ -76,14 +79,14 @@ defmodule EpiViewpoint.BulkFhirParser do
   def extract_resource("Observation", resource_list) do
     resource_list
     |> Enum.map(fn
-      %Epiviewpoint.R4.Observation{
+      %EpiViewpoint.R4.Observation{
         id: lab_result_tid,
-        subject: %Epiviewpoint.R4.Reference{reference: "Patient/" <> pat_id},
+        subject: %EpiViewpoint.R4.Reference{reference: "Patient/" <> pat_id},
         effective_date_time: datecollected,
         issued: resultdate,
-        code: %Epiviewpoint.R4.CodeableConcept{text: testname},
-        interpretation: [%Epiviewpoint.R4.CodeableConcept{coding: [%Epiviewpoint.R4.Coding{display: result}]}],
-        performer: [%Epiviewpoint.R4.Reference{reference: "Organization/" <> org_id}],
+        code: %EpiViewpoint.R4.CodeableConcept{text: testname},
+        interpretation: [%EpiViewpoint.R4.CodeableConcept{coding: [%EpiViewpoint.R4.Coding{display: result}]}],
+        performer: [%EpiViewpoint.R4.Reference{reference: "Organization/" <> org_id}],
         extension: extensions
       } = _resource ->
         %{
@@ -102,7 +105,7 @@ defmodule EpiViewpoint.BulkFhirParser do
   def extract_resource("Organization", resource_list) do
     resource_list
     |> Enum.map(fn
-      %Epiviewpoint.R4.Organization{
+      %EpiViewpoint.R4.Organization{
         id: orgnization_id,
         name: orderingfacilityname
       } = _resource ->
@@ -116,16 +119,16 @@ defmodule EpiViewpoint.BulkFhirParser do
   # Helper function to find extension values
   defp find_extension(extensions, url \\ nil) do
     Enum.find_value(extensions, fn
-      %Epiviewpoint.R4.Extension{
+      %EpiViewpoint.R4.Extension{
         url: ^url,
-        extension: [%Epiviewpoint.R4.Extension{url: "ombCategory", value_coding: %Epiviewpoint.R4.Coding{display: value}}, _]
+        extension: [%EpiViewpoint.R4.Extension{url: "ombCategory", value_coding: %EpiViewpoint.R4.Coding{display: value}}, _]
       } ->
         value
 
-      %Epiviewpoint.R4.Extension{url: "http://hl7.org/fhir/StructureDefinition/patient-occupation", value_string: value} ->
+      %EpiViewpoint.R4.Extension{url: "http://hl7.org/fhir/StructureDefinition/patient-occupation", value_string: value} ->
         value
 
-      %Epiviewpoint.R4.Extension{url: "http://hl7.org/fhir/StructureDefinition/datereportedtolhd", value_date: value} ->
+      %EpiViewpoint.R4.Extension{url: "http://hl7.org/fhir/StructureDefinition/datereportedtolhd", value_date: value} ->
         value
 
       _ ->
@@ -155,7 +158,7 @@ defmodule EpiViewpoint.BulkFhirParser do
     end)
   end
 
-  def to_map(resources) do
-    %{file_name: "load.bulk_fhir", contents: resources}
+  def to_map(resources, contents) do
+    %{file_name: "load.bulk_fhir", contents: contents, list: resources}
   end
 end

@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.Timing do
+defmodule EpiViewpoint.R4.Timing do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -12,17 +12,17 @@ defmodule Epiviewpoint.R4.Timing do
     field(:event, {:array, :utc_datetime_usec})
 
     # Embed One
-    embeds_one(:code, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:repeat, Epiviewpoint.R4.Timing.Repeat)
+    embeds_one(:code, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:repeat, EpiViewpoint.R4.Timing.Repeat)
 
     # Embed Many
-    embeds_many(:extension, Epiviewpoint.R4.Extension)
-    embeds_many(:modifier_extension, Epiviewpoint.R4.Extension)
+    embeds_many(:extension, EpiViewpoint.R4.Extension)
+    embeds_many(:modifier_extension, EpiViewpoint.R4.Extension)
   end
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
 
   def changeset(data \\ %__MODULE__{}, attrs) do

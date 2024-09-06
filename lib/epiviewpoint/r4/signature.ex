@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.Signature do
+defmodule EpiViewpoint.R4.Signature do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -19,17 +19,17 @@ defmodule Epiviewpoint.R4.Signature do
     field(:when, :utc_datetime_usec)
 
     # Embed One
-    embeds_one(:on_behalf_of, Epiviewpoint.R4.Reference)
-    embeds_one(:who, Epiviewpoint.R4.Reference)
+    embeds_one(:on_behalf_of, EpiViewpoint.R4.Reference)
+    embeds_one(:who, EpiViewpoint.R4.Reference)
 
     # Embed Many
-    embeds_many(:extension, Epiviewpoint.R4.Extension)
-    embeds_many(:type, Epiviewpoint.R4.Coding)
+    embeds_many(:extension, EpiViewpoint.R4.Extension)
+    embeds_many(:type, EpiViewpoint.R4.Coding)
   end
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
 
   def changeset(data \\ %__MODULE__{}, attrs) do

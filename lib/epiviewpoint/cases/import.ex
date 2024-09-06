@@ -66,7 +66,6 @@ defmodule EpiViewpoint.Cases.Import do
     |> import_data_file(originator)
   end
 
-
   def import_data_file(_file, %{admin: false}), do: {:error, "Originator must be an admin"}
 
   def import_data_file(file, %Accounts.User{} = originator) do
@@ -111,7 +110,7 @@ defmodule EpiViewpoint.Cases.Import do
     case Path.extname(file.file_name) do
       ".csv" -> DataFile.read(file.contents, :csv, &rename_headers/1, @fields)
       ".ndjson" -> DataFile.read(file.contents, :ndjson, &rename_headers/1, @fields)
-      ".bulk_fhir" -> DataFile.read(file.contents, :bulk_fhir, &rename_headers/1, @fields)
+      ".bulk_fhir" -> DataFile.read(file.list, :bulk_fhir, &rename_headers/1, @fields)
       _ -> {:error, "Unsupported file type: #{file.extension}"}
     end
   end

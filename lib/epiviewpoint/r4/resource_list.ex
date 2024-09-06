@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.ResourceList do
+defmodule EpiViewpoint.R4.ResourceList do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,7 +10,7 @@ defmodule Epiviewpoint.R4.ResourceList do
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
 
   def changeset(data \\ %__MODULE__{}, attrs) do

@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.Extension do
+defmodule EpiViewpoint.R4.Extension do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -51,45 +51,45 @@ defmodule Epiviewpoint.R4.Extension do
     field(:value_id, :string)
 
     # Embed One
-    embeds_one(:value_quantity, Epiviewpoint.R4.Quantity)
-    embeds_one(:value_expression, Epiviewpoint.R4.Expression)
-    embeds_one(:value_attachment, Epiviewpoint.R4.Attachment)
-    embeds_one(:value_identifier, Epiviewpoint.R4.Identifier)
-    embeds_one(:value_sampled_data, Epiviewpoint.R4.SampledData)
-    embeds_one(:value_parameter_definition, Epiviewpoint.R4.ParameterDefinition)
-    embeds_one(:value_timing, Epiviewpoint.R4.Timing)
-    embeds_one(:value_reference, Epiviewpoint.R4.Reference)
-    embeds_one(:value_contact_point, Epiviewpoint.R4.ContactPoint)
-    embeds_one(:value_age, Epiviewpoint.R4.Age)
-    embeds_one(:value_meta, Epiviewpoint.R4.Meta)
-    embeds_one(:value_annotation, Epiviewpoint.R4.Annotation)
-    embeds_one(:value_money, Epiviewpoint.R4.Money)
-    embeds_one(:value_usage_context, Epiviewpoint.R4.UsageContext)
-    embeds_one(:value_related_artifact, Epiviewpoint.R4.RelatedArtifact)
-    embeds_one(:value_contact_detail, Epiviewpoint.R4.ContactDetail)
-    embeds_one(:value_ratio, Epiviewpoint.R4.Ratio)
-    embeds_one(:value_distance, Epiviewpoint.R4.Distance)
-    embeds_one(:value_duration, Epiviewpoint.R4.Duration)
-    embeds_one(:value_human_name, Epiviewpoint.R4.HumanName)
-    embeds_one(:value_period, Epiviewpoint.R4.Period)
-    embeds_one(:value_range, Epiviewpoint.R4.Range)
-    embeds_one(:value_dosage, Epiviewpoint.R4.Dosage)
-    embeds_one(:value_contributor, Epiviewpoint.R4.Contributor)
-    embeds_one(:value_address, Epiviewpoint.R4.Address)
-    embeds_one(:value_signature, Epiviewpoint.R4.Signature)
-    embeds_one(:value_trigger_definition, Epiviewpoint.R4.TriggerDefinition)
-    embeds_one(:value_data_requirement, Epiviewpoint.R4.DataRequirement)
-    embeds_one(:value_count, Epiviewpoint.R4.Count)
-    embeds_one(:value_coding, Epiviewpoint.R4.Coding)
-    embeds_one(:value_codeable_concept, Epiviewpoint.R4.CodeableConcept)
+    embeds_one(:value_quantity, EpiViewpoint.R4.Quantity)
+    embeds_one(:value_expression, EpiViewpoint.R4.Expression)
+    embeds_one(:value_attachment, EpiViewpoint.R4.Attachment)
+    embeds_one(:value_identifier, EpiViewpoint.R4.Identifier)
+    embeds_one(:value_sampled_data, EpiViewpoint.R4.SampledData)
+    embeds_one(:value_parameter_definition, EpiViewpoint.R4.ParameterDefinition)
+    embeds_one(:value_timing, EpiViewpoint.R4.Timing)
+    embeds_one(:value_reference, EpiViewpoint.R4.Reference)
+    embeds_one(:value_contact_point, EpiViewpoint.R4.ContactPoint)
+    embeds_one(:value_age, EpiViewpoint.R4.Age)
+    embeds_one(:value_meta, EpiViewpoint.R4.Meta)
+    embeds_one(:value_annotation, EpiViewpoint.R4.Annotation)
+    embeds_one(:value_money, EpiViewpoint.R4.Money)
+    embeds_one(:value_usage_context, EpiViewpoint.R4.UsageContext)
+    embeds_one(:value_related_artifact, EpiViewpoint.R4.RelatedArtifact)
+    embeds_one(:value_contact_detail, EpiViewpoint.R4.ContactDetail)
+    embeds_one(:value_ratio, EpiViewpoint.R4.Ratio)
+    embeds_one(:value_distance, EpiViewpoint.R4.Distance)
+    embeds_one(:value_duration, EpiViewpoint.R4.Duration)
+    embeds_one(:value_human_name, EpiViewpoint.R4.HumanName)
+    embeds_one(:value_period, EpiViewpoint.R4.Period)
+    embeds_one(:value_range, EpiViewpoint.R4.Range)
+    embeds_one(:value_dosage, EpiViewpoint.R4.Dosage)
+    embeds_one(:value_contributor, EpiViewpoint.R4.Contributor)
+    embeds_one(:value_address, EpiViewpoint.R4.Address)
+    embeds_one(:value_signature, EpiViewpoint.R4.Signature)
+    embeds_one(:value_trigger_definition, EpiViewpoint.R4.TriggerDefinition)
+    embeds_one(:value_data_requirement, EpiViewpoint.R4.DataRequirement)
+    embeds_one(:value_count, EpiViewpoint.R4.Count)
+    embeds_one(:value_coding, EpiViewpoint.R4.Coding)
+    embeds_one(:value_codeable_concept, EpiViewpoint.R4.CodeableConcept)
 
     # Embed Many
-    embeds_many(:extension, Epiviewpoint.R4.Extension)
+    embeds_many(:extension, EpiViewpoint.R4.Extension)
   end
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
 
   def changeset(data \\ %__MODULE__{}, attrs) do

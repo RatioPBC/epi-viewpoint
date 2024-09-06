@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.Observation.Component do
+defmodule EpiViewpoint.R4.Observation.Component do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -21,20 +21,20 @@ defmodule Epiviewpoint.R4.Observation.Component do
     field(:value_time, :string)
 
     # Embed One
-    embeds_one(:code, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:data_absent_reason, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:value_codeable_concept, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:value_period, Epiviewpoint.R4.Period)
-    embeds_one(:value_quantity, Epiviewpoint.R4.Quantity)
-    embeds_one(:value_range, Epiviewpoint.R4.Range)
-    embeds_one(:value_ratio, Epiviewpoint.R4.Ratio)
-    embeds_one(:value_sampled_data, Epiviewpoint.R4.SampledData)
+    embeds_one(:code, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:data_absent_reason, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:value_codeable_concept, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:value_period, EpiViewpoint.R4.Period)
+    embeds_one(:value_quantity, EpiViewpoint.R4.Quantity)
+    embeds_one(:value_range, EpiViewpoint.R4.Range)
+    embeds_one(:value_ratio, EpiViewpoint.R4.Ratio)
+    embeds_one(:value_sampled_data, EpiViewpoint.R4.SampledData)
 
     # Embed Many
-    embeds_many(:extension, Epiviewpoint.R4.Extension)
-    embeds_many(:interpretation, Epiviewpoint.R4.CodeableConcept)
-    embeds_many(:modifier_extension, Epiviewpoint.R4.Extension)
-    embeds_many(:reference_range, Epiviewpoint.R4.Observation.ReferenceRange)
+    embeds_many(:extension, EpiViewpoint.R4.Extension)
+    embeds_many(:interpretation, EpiViewpoint.R4.CodeableConcept)
+    embeds_many(:modifier_extension, EpiViewpoint.R4.Extension)
+    embeds_many(:reference_range, EpiViewpoint.R4.Observation.ReferenceRange)
   end
 
   def choices("value") do
@@ -77,7 +77,7 @@ defmodule Epiviewpoint.R4.Observation.Component do
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
 
   def changeset(data \\ %__MODULE__{}, attrs) do

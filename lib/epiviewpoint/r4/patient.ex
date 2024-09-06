@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.Patient do
+defmodule EpiViewpoint.R4.Patient do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -42,24 +42,24 @@ defmodule Epiviewpoint.R4.Patient do
     )
 
     # Embed One
-    embeds_one(:marital_status, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:managing_organization, Epiviewpoint.R4.Reference)
-    embeds_one(:text, Epiviewpoint.R4.Narrative)
-    embeds_one(:meta, Epiviewpoint.R4.Meta)
+    embeds_one(:marital_status, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:managing_organization, EpiViewpoint.R4.Reference)
+    embeds_one(:text, EpiViewpoint.R4.Narrative)
+    embeds_one(:meta, EpiViewpoint.R4.Meta)
 
     # Embed Many
-    embeds_many(:photo, Epiviewpoint.R4.Attachment)
-    embeds_many(:communication, Epiviewpoint.R4.Patient.Communication)
-    embeds_many(:name, Epiviewpoint.R4.HumanName)
-    embeds_many(:extension, Epiviewpoint.R4.Extension)
-    embeds_many(:telecom, Epiviewpoint.R4.ContactPoint)
-    embeds_many(:contained, Epiviewpoint.R4.ResourceList)
-    embeds_many(:link, Epiviewpoint.R4.Patient.Link)
-    embeds_many(:contact, Epiviewpoint.R4.Patient.Contact)
-    embeds_many(:modifier_extension, Epiviewpoint.R4.Extension)
-    embeds_many(:identifier, Epiviewpoint.R4.Identifier)
-    embeds_many(:general_practitioner, Epiviewpoint.R4.Reference)
-    embeds_many(:address, Epiviewpoint.R4.Address)
+    embeds_many(:photo, EpiViewpoint.R4.Attachment)
+    embeds_many(:communication, EpiViewpoint.R4.Patient.Communication)
+    embeds_many(:name, EpiViewpoint.R4.HumanName)
+    embeds_many(:extension, EpiViewpoint.R4.Extension)
+    embeds_many(:telecom, EpiViewpoint.R4.ContactPoint)
+    embeds_many(:contained, EpiViewpoint.R4.ResourceList)
+    embeds_many(:link, EpiViewpoint.R4.Patient.Link)
+    embeds_many(:contact, EpiViewpoint.R4.Patient.Contact)
+    embeds_many(:modifier_extension, EpiViewpoint.R4.Extension)
+    embeds_many(:identifier, EpiViewpoint.R4.Identifier)
+    embeds_many(:general_practitioner, EpiViewpoint.R4.Reference)
+    embeds_many(:address, EpiViewpoint.R4.Address)
   end
 
   def choices("deceased") do
@@ -80,7 +80,7 @@ defmodule Epiviewpoint.R4.Patient do
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
   def path, do: "/Patient"
 

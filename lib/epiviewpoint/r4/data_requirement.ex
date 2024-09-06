@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.DataRequirement do
+defmodule EpiViewpoint.R4.DataRequirement do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -20,14 +20,14 @@ defmodule Epiviewpoint.R4.DataRequirement do
     field(:profile, {:array, :string})
 
     # Embed One
-    embeds_one(:subject_codeable_concept, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:subject_reference, Epiviewpoint.R4.Reference)
+    embeds_one(:subject_codeable_concept, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:subject_reference, EpiViewpoint.R4.Reference)
 
     # Embed Many
-    embeds_many(:code_filter, Epiviewpoint.R4.DataRequirement.CodeFilter)
-    embeds_many(:date_filter, Epiviewpoint.R4.DataRequirement.DateFilter)
-    embeds_many(:extension, Epiviewpoint.R4.Extension)
-    embeds_many(:sort, Epiviewpoint.R4.DataRequirement.Sort)
+    embeds_many(:code_filter, EpiViewpoint.R4.DataRequirement.CodeFilter)
+    embeds_many(:date_filter, EpiViewpoint.R4.DataRequirement.DateFilter)
+    embeds_many(:extension, EpiViewpoint.R4.Extension)
+    embeds_many(:sort, EpiViewpoint.R4.DataRequirement.Sort)
   end
 
   def choices("subject") do
@@ -40,7 +40,7 @@ defmodule Epiviewpoint.R4.DataRequirement do
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
 
   def changeset(data \\ %__MODULE__{}, attrs) do

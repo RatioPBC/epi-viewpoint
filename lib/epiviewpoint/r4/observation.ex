@@ -1,4 +1,4 @@
-defmodule Epiviewpoint.R4.Observation do
+defmodule EpiViewpoint.R4.Observation do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -50,41 +50,41 @@ defmodule Epiviewpoint.R4.Observation do
     )
 
     # Embed One
-    embeds_one(:value_quantity, Epiviewpoint.R4.Quantity)
-    embeds_one(:effective_timing, Epiviewpoint.R4.Timing)
-    embeds_one(:value_sampled_data, Epiviewpoint.R4.SampledData)
-    embeds_one(:specimen, Epiviewpoint.R4.Reference)
-    embeds_one(:effective_period, Epiviewpoint.R4.Period)
-    embeds_one(:value_ratio, Epiviewpoint.R4.Ratio)
-    embeds_one(:encounter, Epiviewpoint.R4.Reference)
-    embeds_one(:code, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:subject, Epiviewpoint.R4.Reference)
-    embeds_one(:data_absent_reason, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:text, Epiviewpoint.R4.Narrative)
-    embeds_one(:body_site, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:meta, Epiviewpoint.R4.Meta)
-    embeds_one(:value_period, Epiviewpoint.R4.Period)
-    embeds_one(:value_range, Epiviewpoint.R4.Range)
-    embeds_one(:method, Epiviewpoint.R4.CodeableConcept)
-    embeds_one(:device, Epiviewpoint.R4.Reference)
-    embeds_one(:value_codeable_concept, Epiviewpoint.R4.CodeableConcept)
+    embeds_one(:value_quantity, EpiViewpoint.R4.Quantity)
+    embeds_one(:effective_timing, EpiViewpoint.R4.Timing)
+    embeds_one(:value_sampled_data, EpiViewpoint.R4.SampledData)
+    embeds_one(:specimen, EpiViewpoint.R4.Reference)
+    embeds_one(:effective_period, EpiViewpoint.R4.Period)
+    embeds_one(:value_ratio, EpiViewpoint.R4.Ratio)
+    embeds_one(:encounter, EpiViewpoint.R4.Reference)
+    embeds_one(:code, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:subject, EpiViewpoint.R4.Reference)
+    embeds_one(:data_absent_reason, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:text, EpiViewpoint.R4.Narrative)
+    embeds_one(:body_site, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:meta, EpiViewpoint.R4.Meta)
+    embeds_one(:value_period, EpiViewpoint.R4.Period)
+    embeds_one(:value_range, EpiViewpoint.R4.Range)
+    embeds_one(:method, EpiViewpoint.R4.CodeableConcept)
+    embeds_one(:device, EpiViewpoint.R4.Reference)
+    embeds_one(:value_codeable_concept, EpiViewpoint.R4.CodeableConcept)
 
     # Embed Many
-    embeds_many(:extension, Epiviewpoint.R4.Extension)
-    embeds_many(:contained, Epiviewpoint.R4.ResourceList)
-    embeds_many(:reference_range, Epiviewpoint.R4.Observation.ReferenceRange)
-    embeds_many(:derived_from, Epiviewpoint.R4.Reference)
-    embeds_many(:focus, Epiviewpoint.R4.Reference)
-    embeds_many(:based_on, Epiviewpoint.R4.Reference)
-    embeds_many(:component, Epiviewpoint.R4.Observation.Component)
-    embeds_many(:performer, Epiviewpoint.R4.Reference)
-    embeds_many(:modifier_extension, Epiviewpoint.R4.Extension)
-    embeds_many(:identifier, Epiviewpoint.R4.Identifier)
-    embeds_many(:part_of, Epiviewpoint.R4.Reference)
-    embeds_many(:has_member, Epiviewpoint.R4.Reference)
-    embeds_many(:category, Epiviewpoint.R4.CodeableConcept)
-    embeds_many(:note, Epiviewpoint.R4.Annotation)
-    embeds_many(:interpretation, Epiviewpoint.R4.CodeableConcept)
+    embeds_many(:extension, EpiViewpoint.R4.Extension)
+    embeds_many(:contained, EpiViewpoint.R4.ResourceList)
+    embeds_many(:reference_range, EpiViewpoint.R4.Observation.ReferenceRange)
+    embeds_many(:derived_from, EpiViewpoint.R4.Reference)
+    embeds_many(:focus, EpiViewpoint.R4.Reference)
+    embeds_many(:based_on, EpiViewpoint.R4.Reference)
+    embeds_many(:component, EpiViewpoint.R4.Observation.Component)
+    embeds_many(:performer, EpiViewpoint.R4.Reference)
+    embeds_many(:modifier_extension, EpiViewpoint.R4.Extension)
+    embeds_many(:identifier, EpiViewpoint.R4.Identifier)
+    embeds_many(:part_of, EpiViewpoint.R4.Reference)
+    embeds_many(:has_member, EpiViewpoint.R4.Reference)
+    embeds_many(:category, EpiViewpoint.R4.CodeableConcept)
+    embeds_many(:note, EpiViewpoint.R4.Annotation)
+    embeds_many(:interpretation, EpiViewpoint.R4.CodeableConcept)
   end
 
   def choices("effective") do
@@ -139,7 +139,7 @@ defmodule Epiviewpoint.R4.Observation do
 
   def choices(_), do: nil
 
-  def version_namespace, do: Epiviewpoint.R4
+  def version_namespace, do: EpiViewpoint.R4
   def version, do: "R4"
   def path, do: "/Observation"
 

@@ -42,7 +42,6 @@ defmodule EpiViewpointWeb.ImportController do
   end
 
   def create_bulk_fhir(conn, %{"files" => plug_uploads}) do
-
     result = UploadedFile.from_plug_uploads(plug_uploads) |> Cases.import_bulk_fhir_lab_results(conn.assigns.current_user)
 
     case result do
@@ -63,9 +62,7 @@ defmodule EpiViewpointWeb.ImportController do
         |> Session.set_import_error_message(user_readable_message)
         |> redirect(to: ~p"/import/start")
     end
-
   end
-
 
   def show(conn, _params) do
     conn
