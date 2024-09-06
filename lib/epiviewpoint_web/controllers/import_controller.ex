@@ -41,8 +41,12 @@ defmodule EpiViewpointWeb.ImportController do
     end
   end
 
+  def create_bulk_fhir(%{assigns: %{current_user: %{admin: false}}} = conn, _file) do
+    redirect(conn, to: "/")
+  end
+
   def create_bulk_fhir(conn, %{"files" => plug_uploads}) do
-    result = UploadedFile.from_plug_uploads(plug_uploads) |> Cases.import_bulk_fhir_lab_results(conn.assigns.current_user)
+    result = plug_uploads |> UploadedFile.from_plug_uploads() |> Cases.import_bulk_fhir_lab_results(conn.assigns.current_user)
 
     case result do
       {:ok, import_info} ->
