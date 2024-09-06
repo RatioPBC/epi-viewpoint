@@ -18,7 +18,7 @@
     Choose bulk FHIR NDJSON files from your computer, click "Upload", and then wait for the file to upload.
   </p>
   <%= form_tag("/import/upload_bulk_fhir", multipart: true, method: :post) do %>
-    <input name="files[]" type="file" multiple />
+    <input name="files[]" type="file" accept=".ndjson" multiple />
     <input data-role="upload-labs-bulk-fhir" id="upload-button" type="submit" value="Upload" />
   <% end %>
 </section>
