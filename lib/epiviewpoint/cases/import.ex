@@ -61,9 +61,8 @@ defmodule EpiViewpoint.Cases.Import do
   end
 
   def import_bulk_fhir_data_file(lab_result_data_file_list, originator) do
-    lab_result_data_file_list
-    |> BulkFhirParser.parse_bulk_fhir()
-    |> import_data_file(originator)
+    {:ok, bulk_fhir_data} = BulkFhirParser.parse_bulk_fhir(lab_result_data_file_list)
+    import_data_file(bulk_fhir_data, originator)
   end
 
   def import_data_file(_file, %{admin: false}), do: {:error, "Originator must be an admin"}
