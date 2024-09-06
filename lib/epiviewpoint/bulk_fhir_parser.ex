@@ -14,12 +14,13 @@ defmodule EpiViewpoint.BulkFhirParser do
   end
 
   defp load_resources(file_list) do
-    result = Enum.reduce_while(file_list, {:ok, %{}}, fn file, {:ok, acc} ->
-      case load_resource_file(file.contents) do
-        {:ok, resources} -> {:cont, {:ok, group_resources(resources, acc)}}
-        {:error, reason} -> {:halt, {:error, reason}}
-      end
-    end)
+    result =
+      Enum.reduce_while(file_list, {:ok, %{}}, fn file, {:ok, acc} ->
+        case load_resource_file(file.contents) do
+          {:ok, resources} -> {:cont, {:ok, group_resources(resources, acc)}}
+          {:error, reason} -> {:halt, {:error, reason}}
+        end
+      end)
 
     case result do
       {:ok, resources} -> {:ok, resources}
@@ -34,12 +35,13 @@ defmodule EpiViewpoint.BulkFhirParser do
   end
 
   defp load_resource_file(file_content) do
-    result = file_content
-    |> String.split("\n")
-    |> Stream.map(&String.trim/1)
-    |> Stream.filter(&filter_empty_lines/1)
-    |> Stream.map(&json_to_kindle_schema/1)
-    |> Enum.to_list()
+    result =
+      file_content
+      |> String.split("\n")
+      |> Stream.map(&String.trim/1)
+      |> Stream.filter(&filter_empty_lines/1)
+      |> Stream.map(&json_to_kindle_schema/1)
+      |> Enum.to_list()
 
     {:ok, result}
   rescue
@@ -54,12 +56,13 @@ defmodule EpiViewpoint.BulkFhirParser do
   end
 
   defp extract_resources(resources) do
-    result = Enum.reduce_while(resources, {:ok, %{}}, fn {resource_type, resource_list}, {:ok, acc} ->
-      case extract_resource(resource_type, resource_list) do
-        {:ok, extracted} -> {:cont, {:ok, Map.put(acc, resource_type, extracted)}}
-        {:error, reason} -> {:halt, {:error, reason}}
-      end
-    end)
+    result =
+      Enum.reduce_while(resources, {:ok, %{}}, fn {resource_type, resource_list}, {:ok, acc} ->
+        case extract_resource(resource_type, resource_list) do
+          {:ok, extracted} -> {:cont, {:ok, Map.put(acc, resource_type, extracted)}}
+          {:error, reason} -> {:halt, {:error, reason}}
+        end
+      end)
 
     case result do
       {:ok, extracted} -> {:ok, extracted}
@@ -174,18 +177,19 @@ defmodule EpiViewpoint.BulkFhirParser do
     observations = Map.get(resources, "Observation", [])
     organizations = Map.get(resources, "Organization", [])
 
-    joined = observations
-    |> Enum.map(fn observation ->
-      patient = Enum.find(patients, &(&1.caseid == observation.pat_id))
-      organization = Enum.find(organizations, &(&1.organization_id == observation.org_id))
-
-      observation
-      |> Map.merge(patient || %{})
-      |> Map.merge(organization || %{})
-      |> Map.drop([:pat_id, :org_id, :organization_id])
-    end)
+    joined = Enum.map(observations, &merge_resources(&1, patients, organizations))
 
     {:ok, joined}
+  end
+
+  defp merge_resources(observation, patients, organizations) do
+    patient = Enum.find(patients, &(&1.caseid == observation.pat_id))
+    organization = Enum.find(organizations, &(&1.organization_id == observation.org_id))
+
+    observation
+    |> Map.merge(patient || %{})
+    |> Map.merge(organization || %{})
+    |> Map.drop([:pat_id, :org_id, :organization_id])
   end
 
   defp to_map(resources, contents) do
