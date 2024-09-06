@@ -21,6 +21,10 @@ defmodule EpiViewpoint.DataFile do
     read(string, header_transformer, headers, &parse_ndjson/1)
   end
 
+  def read(string, :bulk_fhir, header_transformer, headers) when is_binary(string) do
+    read(string, header_transformer, headers, &parse_bulk_fhir/1)
+  end
+
   def read(input, header_transformer, [required: required_headers, optional: optional_headers], parser) do
     with {:ok, df} <- parser.(input),
          {:ok, provided_headers} <- extract_provided_headers(df, header_transformer),
@@ -82,6 +86,10 @@ defmodule EpiViewpoint.DataFile do
 
   defp parse_ndjson(input) do
     DataFrame.load_ndjson(input)
+  end
+
+  defp parse_bulk_fhir(input) do
+    DataFrame.new(input)
   end
 
   defp validate_csv(input) do

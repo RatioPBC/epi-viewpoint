@@ -34,6 +34,7 @@ defmodule EpiViewpoint.Cases do
   def count_lab_results(), do: LabResult |> Repo.aggregate(:count)
   def create_lab_result!({attrs, audit_meta}), do: %LabResult{} |> change_lab_result(attrs) |> AuditingRepo.insert!(audit_meta)
   def import_lab_results(lab_result_data_file_string, originator), do: Import.import_data_file(lab_result_data_file_string, originator)
+  def import_bulk_fhir_lab_results(lab_result_data_file_list, originator), do: Import.import_bulk_fhir_data_file(lab_result_data_file_list, originator)
   def list_lab_results(), do: LabResult.Query.all() |> Repo.all()
   def preload_initiating_lab_result(case_investigations_or_nil), do: case_investigations_or_nil |> Repo.preload(:initiating_lab_result)
   def preload_lab_results(person_or_people_or_nil), do: person_or_people_or_nil |> Repo.preload(lab_results: LabResult.Query.display_order())

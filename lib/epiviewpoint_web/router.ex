@@ -56,6 +56,7 @@ defmodule EpiViewpointWeb.Router do
     live "/import/start", ImportLive, as: :import_start
     get "/import/complete", ImportController, :show
     post "/import/upload", ImportController, :create
+    post "/import/upload_bulk_fhir", ImportController, :create_bulk_fhir
 
     live "/case-investigations/:case_investigation_id/contact", CaseInvestigationContactLive, as: :create_case_investigation_contact
     live "/case-investigations/:case_investigation_id/contact/:id", CaseInvestigationContactLive, as: :edit_case_investigation_contact
