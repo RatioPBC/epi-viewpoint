@@ -39,7 +39,7 @@ defmodule EpiViewpoint.BulkFhirParser do
       file_content
       |> String.split("\n")
       |> Stream.map(&String.trim/1)
-      |> Stream.filter(&filter_empty_lines/1)
+      |> Stream.filter(&(&1 != ""))
       |> Stream.map(&json_to_kindle_schema/1)
       |> Enum.to_list()
 
@@ -86,23 +86,25 @@ defmodule EpiViewpoint.BulkFhirParser do
     {:error, "Unknown resource type: #{unknown_type}"}
   end
 
-  defp extract_patient(%EpiViewpoint.R4.Patient{
-         id: caseid,
-         identifier: [%EpiViewpoint.R4.Identifier{value: person_tid}],
-         name: [%EpiViewpoint.R4.HumanName{given: [search_firstname], family: search_lastname}],
-         birth_date: dateofbirth,
-         gender: sex,
-         address: [
-           %EpiViewpoint.R4.Address{
-             line: [diagaddress_street1],
-             city: diagaddress_city,
-             state: diagaddress_state,
-             postal_code: diagaddress_zip
-           }
-         ],
-         telecom: [%EpiViewpoint.R4.ContactPoint{value: phonenumber}],
-         extension: extensions
-       }) do
+  defp extract_patient(%EpiViewpoint.R4.Patient{} = patient) do
+    %EpiViewpoint.R4.Patient{
+      id: caseid,
+      identifier: [%EpiViewpoint.R4.Identifier{value: person_tid}],
+      name: [%EpiViewpoint.R4.HumanName{given: [search_firstname], family: search_lastname}],
+      birth_date: dateofbirth,
+      gender: sex,
+      address: [
+        %EpiViewpoint.R4.Address{
+          line: [diagaddress_street1],
+          city: diagaddress_city,
+          state: diagaddress_state,
+          postal_code: diagaddress_zip
+        }
+      ],
+      telecom: [%EpiViewpoint.R4.ContactPoint{value: phonenumber}],
+      extension: extensions
+    } = patient
+
     %{
       caseid: caseid,
       person_tid: person_tid,
@@ -115,22 +117,24 @@ defmodule EpiViewpoint.BulkFhirParser do
       diagaddress_state: diagaddress_state,
       diagaddress_zip: diagaddress_zip,
       phonenumber: phonenumber,
-      ethnicity: find_extension(extensions, "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"),
-      occupation: find_extension(extensions),
-      race: find_extension(extensions, "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race")
+      ethnicity: find_extension(extensions, :ethnicity),
+      occupation: find_extension(extensions, :occupation),
+      race: find_extension(extensions, :race)
     }
   end
 
-  defp extract_observation(%EpiViewpoint.R4.Observation{
-         id: lab_result_tid,
-         subject: %EpiViewpoint.R4.Reference{reference: "Patient/" <> pat_id},
-         effective_date_time: datecollected,
-         issued: resultdate,
-         code: %EpiViewpoint.R4.CodeableConcept{text: testname},
-         interpretation: [%EpiViewpoint.R4.CodeableConcept{coding: [%EpiViewpoint.R4.Coding{display: result}]}],
-         performer: [%EpiViewpoint.R4.Reference{reference: "Organization/" <> org_id}],
-         extension: extensions
-       }) do
+  defp extract_observation(%EpiViewpoint.R4.Observation{} = observation) do
+    %EpiViewpoint.R4.Observation{
+      id: lab_result_tid,
+      subject: %EpiViewpoint.R4.Reference{reference: "Patient/" <> pat_id},
+      effective_date_time: datecollected,
+      issued: resultdate,
+      code: %EpiViewpoint.R4.CodeableConcept{text: testname},
+      interpretation: [%EpiViewpoint.R4.CodeableConcept{coding: [%EpiViewpoint.R4.Coding{display: result}]}],
+      performer: [%EpiViewpoint.R4.Reference{reference: "Organization/" <> org_id}],
+      extension: extensions
+    } = observation
+
     %{
       lab_result_tid: lab_result_tid,
       pat_id: pat_id,
@@ -139,31 +143,60 @@ defmodule EpiViewpoint.BulkFhirParser do
       testname: testname,
       result: result,
       org_id: org_id,
-      datereportedtolhd: find_extension(extensions)
+      datereportedtolhd: find_extension(extensions, :datereportedtolhd)
     }
   end
 
-  defp extract_organization(%EpiViewpoint.R4.Organization{
-         id: organization_id,
-         name: ordering_facility_name
-       }) do
+  defp extract_organization(%EpiViewpoint.R4.Organization{} = organization) do
+    %EpiViewpoint.R4.Organization{
+      id: organization_id,
+      name: ordering_facility_name
+    } = organization
+
     %{
       organization_id: organization_id,
       ordering_facility_name: ordering_facility_name
     }
   end
 
-  defp find_extension(extensions, url \\ nil) do
-    Enum.find_value(extensions, fn
+  defp find_extension(extensions, :race) do
+    Enum.find_value(extensions, nil, fn
       %EpiViewpoint.R4.Extension{
-        url: ^url,
+        url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
         extension: [%EpiViewpoint.R4.Extension{url: "ombCategory", value_coding: %EpiViewpoint.R4.Coding{display: value}}, _]
       } ->
         value
 
+      _ ->
+        nil
+    end)
+  end
+
+  defp find_extension(extensions, :ethnicity) do
+    Enum.find_value(extensions, nil, fn
+      %EpiViewpoint.R4.Extension{
+        url: "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+        extension: [%EpiViewpoint.R4.Extension{url: "ombCategory", value_coding: %EpiViewpoint.R4.Coding{display: value}}, _]
+      } ->
+        value
+
+      _ ->
+        nil
+    end)
+  end
+
+  defp find_extension(extensions, :occupation) do
+    Enum.find_value(extensions, nil, fn
       %EpiViewpoint.R4.Extension{url: "http://hl7.org/fhir/StructureDefinition/patient-occupation", value_string: value} ->
         value
 
+      _ ->
+        nil
+    end)
+  end
+
+  defp find_extension(extensions, :datereportedtolhd) do
+    Enum.find_value(extensions, nil, fn
       %EpiViewpoint.R4.Extension{url: "http://hl7.org/fhir/StructureDefinition/datereportedtolhd", value_date: value} ->
         value
 
@@ -183,12 +216,12 @@ defmodule EpiViewpoint.BulkFhirParser do
   end
 
   defp merge_resources(observation, patients, organizations) do
-    patient = Enum.find(patients, &(&1.caseid == observation.pat_id))
-    organization = Enum.find(organizations, &(&1.organization_id == observation.org_id))
+    patient = Enum.find(patients, %{}, &(&1.caseid == observation.pat_id))
+    organization = Enum.find(organizations, %{}, &(&1.organization_id == observation.org_id))
 
     observation
-    |> Map.merge(patient || %{})
-    |> Map.merge(organization || %{})
+    |> Map.merge(patient)
+    |> Map.merge(organization)
     |> Map.drop([:pat_id, :org_id, :organization_id])
   end
 
@@ -196,10 +229,6 @@ defmodule EpiViewpoint.BulkFhirParser do
     %{file_name: "load.bulk_fhir", contents: contents, list: resources}
   end
 
-  defp filter_empty_lines(line) do
-    line != ""
-  end
-
   defp format_date(date) when is_struct(date, Date), do: Calendar.strftime(date, "%m/%d/%Y")
-  defp format_date(datetime) when is_struct(datetime, DateTime), do: datetime |> DateTime.to_date() |> format_date()
+  defp format_date(datetime) when is_struct(datetime, DateTime), do: DateTime.to_date(datetime) |> format_date()
 end

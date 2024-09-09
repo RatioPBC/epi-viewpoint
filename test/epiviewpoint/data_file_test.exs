@@ -218,11 +218,11 @@ defmodule EpiViewpoint.DataFileTest do
         }
       ]
 
-      assert {:ok, result} =
-               DataFile.read(input, :bulk_fhir, &Function.identity/1,
-                 required: ~w{first_name last_name dob sample_date result_date result},
-                 optional: ~w{}
-               )
+      {:ok, result} =
+        DataFile.read(input, :bulk_fhir, &Function.identity/1,
+          required: ~w{first_name last_name dob sample_date result_date result},
+          optional: ~w{}
+        )
 
       assert result == [
                %{
@@ -253,11 +253,11 @@ defmodule EpiViewpoint.DataFileTest do
         }
       ]
 
-      assert {:ok, result} =
-               DataFile.read(input, :bulk_fhir, &Function.identity/1,
-                 required: ~w{column_a},
-                 optional: ~w{column_b}
-               )
+      {:ok, result} =
+        DataFile.read(input, :bulk_fhir, &Function.identity/1,
+          required: ~w{column_a},
+          optional: ~w{column_b}
+        )
 
       assert result == [%{"column_a" => "value_a", "column_b" => "value_b"}]
     end
@@ -288,11 +288,11 @@ defmodule EpiViewpoint.DataFileTest do
         }
       ]
 
-      assert {:ok, result} =
-               DataFile.read(input, :bulk_fhir, &Function.identity/1,
-                 required: ~w{column_a column_b},
-                 optional: ~w{optional_c optional_d}
-               )
+      {:ok, result} =
+        DataFile.read(input, :bulk_fhir, &Function.identity/1,
+          required: ~w{column_a column_b},
+          optional: ~w{optional_c optional_d}
+        )
 
       assert result == [%{"column_a" => "value_a", "column_b" => "value_b", "optional_c" => "value_c"}]
     end
@@ -309,11 +309,11 @@ defmodule EpiViewpoint.DataFileTest do
         }
       ]
 
-      assert {:ok, result} =
-               DataFile.read(input, :bulk_fhir, fn headers -> Enum.map(headers, &String.upcase/1) end,
-                 required: ~w{FIRST_NAME LAST_NAME},
-                 optional: ~w{}
-               )
+      {:ok, result} =
+        DataFile.read(input, :bulk_fhir, fn headers -> Enum.map(headers, &String.upcase/1) end,
+          required: ~w{FIRST_NAME LAST_NAME},
+          optional: ~w{}
+        )
 
       assert result == [
                %{
