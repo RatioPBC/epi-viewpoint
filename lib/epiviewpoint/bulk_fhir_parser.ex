@@ -148,14 +148,9 @@ defmodule EpiViewpoint.BulkFhirParser do
   end
 
   defp extract_organization(%EpiViewpoint.R4.Organization{} = organization) do
-    %EpiViewpoint.R4.Organization{
-      id: organization_id,
-      name: ordering_facility_name
-    } = organization
-
     %{
-      organization_id: organization_id,
-      ordering_facility_name: ordering_facility_name
+      organization_id: organization.id,
+      ordering_facility_name: organization.name
     }
   end
 
