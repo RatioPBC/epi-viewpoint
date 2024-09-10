@@ -1,6 +1,7 @@
 defmodule EpiViewpoint.Cases.Import do
   alias EpiViewpoint.Accounts
   alias EpiViewpoint.AuditLog
+  alias EpiViewpoint.BulkFhirParser
   alias EpiViewpoint.Cases
   alias EpiViewpoint.Cases.Import
   alias EpiViewpoint.Cases.LabResult
@@ -59,6 +60,11 @@ defmodule EpiViewpoint.Cases.Import do
     ]
   end
 
+  def import_bulk_fhir_data_file(lab_result_data_file_list, originator) do
+    {:ok, bulk_fhir_data} = BulkFhirParser.parse_bulk_fhir(lab_result_data_file_list)
+    import_data_file(bulk_fhir_data, originator)
+  end
+
   def import_data_file(_file, %{admin: false}), do: {:error, "Originator must be an admin"}
 
   def import_data_file(file, %Accounts.User{} = originator) do
@@ -103,6 +109,7 @@ defmodule EpiViewpoint.Cases.Import do
     case Path.extname(file.file_name) do
       ".csv" -> DataFile.read(file.contents, :csv, &rename_headers/1, @fields)
       ".ndjson" -> DataFile.read(file.contents, :ndjson, &rename_headers/1, @fields)
+      ".bulk_fhir" -> DataFile.read(file.list, :bulk_fhir, &rename_headers/1, @fields)
       _ -> {:error, "Unsupported file type: #{file.extension}"}
     end
   end

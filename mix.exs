@@ -56,6 +56,7 @@ defmodule EpiViewpoint.MixProject do
       {:gettext, "~> 0.11"},
       {:inflex, "~> 2.1"},
       {:jason, "~> 1.0"},
+      {:kindling, "~> 1.0.1"},
       {:logger_json, "~> 4.3"},
       {:mix_audit, "~> 1.0", runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},

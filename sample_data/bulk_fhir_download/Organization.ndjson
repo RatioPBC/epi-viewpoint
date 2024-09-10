@@ -1,0 +1,2 @@
+{"resourceType":"Organization","id":"city-hospital-lab","meta":{"profile":["http://hl7.org/fhir/us/core/StructureDefinition/us-core-organization|7.0.0"]},"active":true,"name":"City Hospital Lab"}
+{"resourceType":"Organization","id":"lab-co-south","meta":{"profile":["http://hl7.org/fhir/us/core/StructureDefinition/us-core-organization|7.0.0"]},"active":true,"name":"Lab Co South"}

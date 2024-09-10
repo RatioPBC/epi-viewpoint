@@ -6,12 +6,19 @@
     </div>
   <% end %>
   <p>
-    Choose a CSV or NDJSON file from your computer, click “Upload”, and then wait for the file to upload.
+    Choose a CSV or NDJSON file from your computer, click "Upload", and then wait for the file to upload.
   </p>
-  <%= form_tag("/import/upload", multipart: true, method: :post) %><input name="file" type="file" /><input
-    data-role="upload-labs"
-    id="upload-button"
-    type="submit"
-    value="Upload"
-  />
+  <%= form_tag("/import/upload", multipart: true, method: :post) do %>
+    <input name="file" type="file" />
+    <input data-role="upload-labs" id="upload-button" type="submit" value="Upload" />
+  <% end %>
+
+  <h2>Import Bulk FHIR</h2>
+  <p>
+    Choose bulk FHIR NDJSON files from your computer, click "Upload", and then wait for the file to upload.
+  </p>
+  <%= form_tag("/import/upload_bulk_fhir", multipart: true, method: :post) do %>
+    <input name="files[]" type="file" accept=".ndjson" multiple />
+    <input data-role="upload-labs-bulk-fhir" id="upload-button" type="submit" value="Upload" />
+  <% end %>
 </section>

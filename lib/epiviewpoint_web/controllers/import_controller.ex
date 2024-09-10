@@ -23,7 +23,34 @@ defmodule EpiViewpointWeb.ImportController do
 
     case result do
       {:ok, import_info} ->
-        {_imported_people, popped_import_info} = import_info |> Map.pop(:imported_people)
+        {_imported_people, popped_import_info} = Map.pop(import_info, :imported_people)
+
+        conn
+        |> Session.set_last_file_import_info(popped_import_info)
+        |> redirect(to: ~p"/import/complete")
+
+      {:error, [user_readable: user_readable_message]} ->
+        conn
+        |> Session.set_import_error_message(user_readable_message)
+        |> redirect(to: ~p"/import/start")
+
+      {:error, %DateParsingError{user_readable: user_readable_message}} ->
+        conn
+        |> Session.set_import_error_message(user_readable_message)
+        |> redirect(to: ~p"/import/start")
+    end
+  end
+
+  def create_bulk_fhir(%{assigns: %{current_user: %{admin: false}}} = conn, _file) do
+    redirect(conn, to: "/")
+  end
+
+  def create_bulk_fhir(conn, %{"files" => plug_uploads}) do
+    result = plug_uploads |> UploadedFile.from_plug_uploads() |> Cases.import_bulk_fhir_lab_results(conn.assigns.current_user)
+
+    case result do
+      {:ok, import_info} ->
+        {_imported_people, popped_import_info} = Map.pop(import_info, :imported_people)
 
         conn
         |> Session.set_last_file_import_info(popped_import_info)
