@@ -1,5 +1,7 @@
 # Epi Viewpoint
 
+[![Deploy to Railyard](https://app.railyard.run/deploy/badge)](https://app.railyard.run/deploy?repo=https://github.com/RatioPBC/epi-viewpoint)
+
 _Epi Viewpoint_ is a focused, simple tool that enables case investigation and contact tracing 
 teams to manage cases and contacts and keep track of congregate settings where outbreak clusters 
 have occurred.
